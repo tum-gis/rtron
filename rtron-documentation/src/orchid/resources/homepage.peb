@@ -1,0 +1,63 @@
+---
+title: 'r:trån'
+layout: 'homepage'
+---
+
+<section class="columns is-centered">
+  <div class="column is-half">
+    <figure class="image">
+        <a href="https://github.com/tum-gis/rtron">
+          <img src="{{ 'assets/images/logo.png' | asset }}" alt="r:trån logo">
+        </a>
+    </figure>
+  </div>
+</section>
+
+<section class="columns is-centered">
+  <div class="column is-8">
+    <div class="content is-medium">
+      <p>
+        r:trån transforms road networks described in <a
+        href="https://www.asam.net/standards/detail/opendrive">OpenDRIVE</a> into the virtual 3D city model standard <a
+        href="https://www.opengeospatial.org/standards/citygml">CityGML</a>. This enables you to…
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="columns is-centered">
+  <div class="column is-8">
+      <div class="content is-medium">
+        <p>
+            <em>…inspect your spatio-semantic road space models.</em>
+            <a href="{{ link('Model Inspection') }}">
+            <img class="is-full is-gapless" src="{{ 'assets/media/demos/inspection-opendrive-pointcloud.png' | asset }}"></a>
+        </p>
+        <p>
+            <i>…conduct further model transformations.</i>
+            <a href="{{ link('Model Transformations') }}">
+            <img class="is-full is-gapless" src="{{ 'assets/media/demos/model-transformations-fme-workbench.png' | asset }}"></a>
+        </p>
+        <p>
+            <i>…perform geospatial analyses on the 3D City Database.</i>
+            <a href="{{ link('3D City Database') }}">
+            <img class="is-full is-gapless" src="{{ 'assets/media/demos/3dcitydb-query-answer.png' | asset }}"></a>
+        </p>
+        <p>
+            <i>…deploy virtual globes.</i>
+            <a href="{{ link('Web Map') }}">
+            <img class="is-full is-gapless" src="{{ 'assets/media/demos/3dcitydb-web-map-client-crossing.png' | asset }}"></a>
+        </p>
+        <p>
+            <i>…load your models into a desktop GIS.</i>
+            <a href="{{ link('Desktop GIS') }}">
+            <img class="is-full is-gapless" src="{{ 'assets/media/demos/qgis.png' | asset }}"></a>
+        </p>
+        <p>
+            <i>…compare and validate your models with models other data sources.</i>
+            <a href="{{ link('Model Validation') }}">
+            <img class="is-full is-gapless" src="{{ 'assets/media/demos/model-validation-fme-inspector.png' | asset }}"></a>
+        </p>
+      </div>
+  </div>
+</section>

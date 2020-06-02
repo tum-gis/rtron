@@ -1,0 +1,4 @@
+[build]
+  base    = ""
+  publish = "rtron-documentation/build/docs/orchid"
+  command = "./gradlew orchidBuild -Penv=prod"

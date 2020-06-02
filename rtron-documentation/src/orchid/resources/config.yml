@@ -1,0 +1,85 @@
+site:
+  theme: 'RtronTheme'
+  baseUrl: 'https://rtron.io/'
+  about:
+    siteName: r:trån
+
+theme:
+  social:
+    other:
+      - label: 'GitHub'
+        icon: 'fa-github'
+        link: 'https://github.com/tum-gis/rtron/'
+      - label: 'LinkedIn'
+        icon: 'fa-linkedin'
+        link: 'https://www.linkedin.com/company/save-ingolstadt'
+      - label: 'Instagram'
+        icon: 'fa-instagram'
+        link: 'https://www.instagram.com/save.ingolstadt'
+  menu:
+    - type: 'page'
+      title: 'Home'
+      itemId: 'home'
+      icon: 'home'
+    - type: 'submenu'
+      title: 'User Guide'
+      icon: 'graduation-cap'
+      menu:
+        - type: 'wiki'
+        - type: 'separator'
+        - type: 'page'
+          itemId: 'Model Inspection'
+        - type: 'page'
+          itemId: 'Model Transformations'
+        - type: 'page'
+          itemId: '3D City Database'
+        - type: 'page'
+          itemId: 'Web Map'
+        - type: 'page'
+          itemId: 'Desktop GIS'
+        - type: 'page'
+          itemId: 'Model Validation'
+    - type: 'submenu'
+      title: 'Developer Docs'
+      icon: 'book'
+      menu:
+#        - type: 'page'
+#          title: "Architecture of r:trån"
+#          itemId: 'Architecture of r:trån'
+#        - type: 'separator'
+        - type: 'sourcedocModules'
+          moduleType:  'kotlindoc'
+          moduleGroup: 'ui'
+          node: 'packages'
+        - type: 'sourcedocModules'
+          moduleType:  'kotlindoc'
+          moduleGroup: 'batch-processing'
+          node: 'packages'
+        - type: 'sourcedocModules'
+          moduleType:  'kotlindoc'
+          moduleGroup: 'model-processing'
+          node: 'packages'
+        - type: 'sourcedocModules'
+          moduleType:  'kotlindoc'
+          moduleGroup: 'utility'
+          node: 'packages'
+    - type: 'page'
+      title: 'About'
+      itemId: 'About'
+      icon: 'info-circle'
+  metaComponents:
+    - type: orchidSearch
+
+kotlindoc:
+  homePagePermalink:   'modules/:module'
+  sourcePagePermalink: ':moduleType/:module/:sourceDocPath'
+  modules:
+    - { name: 'Documentation Module', slug: 'documentation', sourceDirs: './../../../../rtron-documentation/src/main/kotlin/', moduleGroup: 'ui' }
+    - { name: 'Command-Line-Interface Module', slug: 'cli', sourceDirs: './../../../../rtron-cli/src/main/kotlin/', moduleGroup: 'ui' }
+    - { name: 'Main Module', slug: 'main', sourceDirs: './../../../../rtron-main/src/main/kotlin/', moduleGroup: 'batch-processing' }
+    - { name: 'Model Module', slug: 'model', sourceDirs: './../../../../rtron-model/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'Reader-Writer Module', slug: 'readerwriter', sourceDirs: './../../../../rtron-readerwriter/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'Transformer Module', slug: 'transformer', sourceDirs: './../../../../rtron-transformer/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'Standard Module', slug: 'std', sourceDirs: './../../../../rtron-std/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'Input-Output Module', slug: 'io', sourceDirs: './../../../../rtron-io/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'Math Module', slug: 'math', sourceDirs: './../../../../rtron-math/src/main/kotlin/', moduleGroup: 'utility' }
