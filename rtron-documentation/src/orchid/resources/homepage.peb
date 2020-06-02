@@ -54,7 +54,7 @@ layout: 'homepage'
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/qgis.png' | asset }}"></a>
         </p>
         <p>
-            <i>…compare and validate your models with models other data sources.</i>
+            <i>…compare and validate your models with models from other data sources.</i>
             <a href="{{ link('Model Validation') }}">
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/model-validation-fme-inspector.png' | asset }}"></a>
         </p>
