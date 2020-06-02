@@ -31,7 +31,7 @@ configure {
 This script is an [internal DSL](https://en.wikipedia.org/wiki/Domain-specific_language) of Kotlin which guarantees type-safety.
 Moreover, a DSL is suitable for describing transformation recipes and complex configurations, such as model mapping rules.
 
-If you want to edit the configuration, [IntellJ](https://www.jetbrains.com/idea/) is recommended as it has the best support for Kotlin.
+If you want to edit the configuration, [IntelliJ](https://www.jetbrains.com/idea/) is recommended as it has the best support for Kotlin.
 An example configuration script can be found at ``rtron-main/src/main/kotlin/io/rtron/main/project/configuration/examples/configuration.kts``.
 
 
