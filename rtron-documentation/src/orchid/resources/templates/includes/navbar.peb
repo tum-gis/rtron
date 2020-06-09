@@ -1,46 +1,32 @@
-<nav class="navbar is-spaced is-fixed-top is-light" role="navigation" aria-label="main navigation">
+{% import 'macros/navbarMenu' %}
+
+<nav
+  class="navbar is-white border-bottom is-fixed-top is-light"
+  role="navigation"
+  aria-label="main navigation"
+>
   <div class="container">
-    <div class="navbar-brand">
-      <a class="navbar-item" href="{{ site.baseUrl }}">
-        <img src="{{ 'assets/images/logo-small.png' | asset }}" alt="r:trån">
-      </a>
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+    <div class="navbar-brand is-marginless">
+
+      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarMain">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
       </a>
     </div>
-    <div class="navbar-menu" id="navMenu">
+
+    <div class="navbar-menu is-marginless" id="navbarMain">
       <div class="navbar-start">
-        {% include 'includes/navbar-search' %}
+      <a class="navbar-item" href="{{ site.baseUrl }}">
+        <img src="{{ 'assets/images/logo-small.png' | asset }}" alt="r:trån">
+      </a>
+
+      {{ _navbarSearch(site) }}
+      {% include 'includes/navbar-menu' %}
       </div>
+
       <div class="navbar-end">
-
-      {% for menuItem in theme.menu.getMenuItems(page) %}
-      {% if menuItem.hasChildren() %}
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">
-            <span class="icon has-text-info"><i class="fas fa-{{ menuItem.icon }}"></i></span>
-            <span>{{ menuItem.title }}</span>
-          </a>
-          <div class="navbar-dropdown is-right">
-          {% for childLink in menuItem.children %}
-            {% if childLink.isSeparator() %}
-              <hr class="navbar-divider">
-            {% else %}
-              <a class="navbar-item" href="{{ childLink.link }}">{{ childLink.title }}</a>
-            {% endif %}
-          {% endfor %}
-          </div>
-        </div>
-      {% else %}
-        <a class="navbar-item" href="{{ menuItem.link }}">
-          <span class="icon has-text-info"><i class="fas fa-{{ menuItem.icon }}"></i></span>
-          <span>{{ menuItem.title }}</span>
-        </a>
-      {% endif %}
-      {% endfor %}
-
+            {{ _navbarSocial(page, site) }}
       </div>
     </div>
   </div>

@@ -6,9 +6,7 @@ layout: 'homepage'
 <section class="columns is-centered">
   <div class="column is-half">
     <figure class="image">
-        <a href="https://github.com/tum-gis/rtron">
-          <img src="{{ 'assets/images/logo.png' | asset }}" alt="r:trån logo">
-        </a>
+      <img src="{{ 'assets/images/logo.png' | asset }}" alt="r:trån logo">
     </figure>
   </div>
 </section>

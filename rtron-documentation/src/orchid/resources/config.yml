@@ -3,30 +3,33 @@ site:
   baseUrl: 'https://rtron.io/'
   about:
     siteName: r:trån
+    siteDescription: a road space model transformer for OpenDRIVE, CityGML and beyond
+    social:
+      other:
+        - link: '/'
+          label: 'Home'
+          icon: 'fas fa-home'
+        - link: 'https://github.com/tum-gis/rtron'
+          label: 'Github'
+          icon: 'fab fa-github'
+        - link: 'https://www.linkedin.com/company/save-ingolstadt'
+          label: 'LinkedIn'
+          icon: 'fab fa-linkedin'
+        - link: 'https://www.instagram.com/save.ingolstadt'
+          label: 'Instagram'
+          icon: 'fab fa-instagram'
+        - link: '/about'
+          label: 'About'
+          icon: 'fas fa-info-circle'
 
 theme:
-  social:
-    other:
-      - label: 'GitHub'
-        icon: 'fa-github'
-        link: 'https://github.com/tum-gis/rtron/'
-      - label: 'LinkedIn'
-        icon: 'fa-linkedin'
-        link: 'https://www.linkedin.com/company/save-ingolstadt'
-      - label: 'Instagram'
-        icon: 'fa-instagram'
-        link: 'https://www.instagram.com/save.ingolstadt'
+  extraCss:
+    - 'assets/css/custom.scss'
   menu:
-    - type: 'page'
-      title: 'Home'
-      itemId: 'home'
-      icon: 'home'
     - type: 'submenu'
-      title: 'User Guide'
-      icon: 'graduation-cap'
+      title: 'Demos'
+      itemId: 'demos'
       menu:
-        - type: 'wiki'
-        - type: 'separator'
         - type: 'page'
           itemId: 'Model Inspection'
         - type: 'page'
@@ -40,8 +43,11 @@ theme:
         - type: 'page'
           itemId: 'Model Validation'
     - type: 'submenu'
+      title: 'User Guide'
+      menu:
+        - type: 'wiki'
+    - type: 'submenu'
       title: 'Developer Docs'
-      icon: 'book'
       menu:
 #        - type: 'page'
 #          title: "Architecture of r:trån"
@@ -63,10 +69,6 @@ theme:
           moduleType:  'kotlindoc'
           moduleGroup: 'utility'
           node: 'packages'
-    - type: 'page'
-      title: 'About'
-      itemId: 'About'
-      icon: 'info-circle'
   metaComponents:
     - type: orchidSearch
 
