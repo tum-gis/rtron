@@ -7,8 +7,8 @@ title: Model Validation
 ## Transformation Logs
 
 OpenDRIVE datasets can reveal different anomalies, which may be divided into two categories.
-1. If the anomaly causes the removal of the object, a warning message is issued.
-2. If actions are possible to handle and overcome the anomaly, an info message is issued.
+1. If the anomaly causes the removal of an object, a warning message is issued.
+2. If the anomaly can be overcome, an information message is issued.
 
 ```text
 2020-06-01T10:41:57,495 INFO  RoadspaceObjectIdentifier(roadspaceObjectId=4017180, roadspaceId=1397000): Removing consecutively following side duplicates of the form (…, A, B, A, …).

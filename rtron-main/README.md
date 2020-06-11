@@ -1,6 +1,6 @@
 ---
 ---
 
-## [Main Module]({{page.link}})
+## [Main Component]({{page.link}})
 
-This module manages the transformation chain of a single model, which is available as source file.
+This component manages the transformation chain of a single model, which is available as source file.

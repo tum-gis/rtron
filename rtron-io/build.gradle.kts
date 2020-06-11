@@ -5,7 +5,7 @@ plugins {
 kotlinProject()
 
 dependencies {
-    implementation(project(ProjectModules.standard))
+    implementation(project(ProjectComponents.standard))
 
     implementation(kotlin("script-runtime"))
     implementation(Dependencies.ktsRunner) {

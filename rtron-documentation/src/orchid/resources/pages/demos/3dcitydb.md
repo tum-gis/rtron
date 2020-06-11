@@ -40,7 +40,7 @@ SELECT
       cog1.intval as opendrive_identifier_roadObjectId,
       cog2.strval as opendrive_identifier_roadObjectName,
       cog3.strval as opendrive_roadSignal_type,
-      ST_Distance(city_furniture.lod1_other_geom, 'SRID=32632;POINT(678195.4482485768 5403954.957612606 414.94568122784835)'::geometry) as distance2d
+      ST_Distance(city_furniture.lod1_other_geom, 'SRID=32632;POINT(678195.4482485768 5403954.957612606 414.94568122784835)'::geometry) as distance
 FROM
      city_furniture
 INNER JOIN cityobject_genericattrib cog0 ON cog0.cityobject_id = city_furniture.id AND cog0.attrname = 'opendrive_identifier_sourceFileName'
@@ -59,6 +59,6 @@ This is the answer of the 3D City Database:
 
 ## References
 
-- [github.com/3dcitydb/3dcitydb](https://github.com/3dcitydb/3dcitydb)
-- [3dcitydb-docs.readthedocs.io](https://3dcitydb-docs.readthedocs.io)
-- Yao, Zhihang; Nagel, Claus; Kunde, Felix; Hudra, György; Willkomm, Philipp; Donaubauer, Andreas; Adolphi, Thomas; Kolbe, Thomas H.: [3DCityDB - a 3D geodatabase solution for the management, analysis, and visualization of semantic 3D city models based on CityGML](https://doi.org/10.1186/s40965-018-0046-7). Open Geospatial Data, Software and Standards 3 (5), 2018, 1-26
+- [GitHub repository](https://github.com/3dcitydb/3dcitydb) of the 3D City Database
+- [Documentation](https://3dcitydb-docs.readthedocs.io) of the 3D City Database
+- Yao, Zhihang; Nagel, Claus; Kunde, Felix; Hudra, György; Willkomm, Philipp; Donaubauer, Andreas; Adolphi, Thomas; Kolbe, Thomas H.: [3DCityDB - a 3D geodatabase solution for the management, analysis, and visualization of semantic 3D city models based on CityGML](https://doi.org/10.1186/s40965-018-0046-7). Open Geospatial Data, Software and Standards 3 (5), 2018, 1-26.

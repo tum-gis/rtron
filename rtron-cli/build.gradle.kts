@@ -13,10 +13,10 @@ application {
 }
 
 dependencies {
-    implementation(project(ProjectModules.standard))
-    implementation(project(ProjectModules.inputOutput))
+    implementation(project(ProjectComponents.standard))
+    implementation(project(ProjectComponents.inputOutput))
 
-    implementation(project(ProjectModules.main))
+    implementation(project(ProjectComponents.main))
 
     implementation(Dependencies.commonsLang)
     implementation(Dependencies.clikt)

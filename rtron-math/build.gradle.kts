@@ -5,8 +5,8 @@ plugins {
 kotlinProject()
 
 dependencies {
-    implementation(project(ProjectModules.standard))
-    testImplementation(project(ProjectModules.inputOutput))
+    implementation(project(ProjectComponents.standard))
+    testImplementation(project(ProjectComponents.inputOutput))
 
     implementation(Dependencies.guava)
     implementation(Dependencies.commonsMath)

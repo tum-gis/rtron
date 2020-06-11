@@ -20,7 +20,7 @@ object Project {
     const val version = "1.1.0"
 }
 
-object ProjectModules {
+object ProjectComponents {
     // user interface layer
     const val commandLineInterface = ":rtron-cli"
     const val documentation = ":rtron-documentation"

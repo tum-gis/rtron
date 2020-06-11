@@ -3,8 +3,6 @@
 
 # Configuring r:trån
 
-
-
 ## Transformation
 
 The transformation of models is usually dependent on a set of parameters.

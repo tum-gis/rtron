@@ -49,10 +49,10 @@ theme:
     - type: 'submenu'
       title: 'Developer Docs'
       menu:
-#        - type: 'page'
-#          title: "Architecture of r:trån"
-#          itemId: 'Architecture of r:trån'
-#        - type: 'separator'
+        - type: 'page'
+          title: "Architecture of r:trån"
+          itemId: 'Architecture of r:trån'
+        - type: 'separator'
         - type: 'sourcedocModules'
           moduleType:  'kotlindoc'
           moduleGroup: 'ui'
@@ -76,12 +76,12 @@ kotlindoc:
   homePagePermalink:   'modules/:module'
   sourcePagePermalink: ':moduleType/:module/:sourceDocPath'
   modules:
-    - { name: 'Documentation Module', slug: 'documentation', sourceDirs: './../../../../rtron-documentation/src/main/kotlin/', moduleGroup: 'ui' }
-    - { name: 'Command-Line-Interface Module', slug: 'cli', sourceDirs: './../../../../rtron-cli/src/main/kotlin/', moduleGroup: 'ui' }
-    - { name: 'Main Module', slug: 'main', sourceDirs: './../../../../rtron-main/src/main/kotlin/', moduleGroup: 'batch-processing' }
-    - { name: 'Model Module', slug: 'model', sourceDirs: './../../../../rtron-model/src/main/kotlin/', moduleGroup: 'model-processing' }
-    - { name: 'Reader-Writer Module', slug: 'readerwriter', sourceDirs: './../../../../rtron-readerwriter/src/main/kotlin/', moduleGroup: 'model-processing' }
-    - { name: 'Transformer Module', slug: 'transformer', sourceDirs: './../../../../rtron-transformer/src/main/kotlin/', moduleGroup: 'model-processing' }
-    - { name: 'Standard Module', slug: 'std', sourceDirs: './../../../../rtron-std/src/main/kotlin/', moduleGroup: 'utility' }
-    - { name: 'Input-Output Module', slug: 'io', sourceDirs: './../../../../rtron-io/src/main/kotlin/', moduleGroup: 'utility' }
-    - { name: 'Math Module', slug: 'math', sourceDirs: './../../../../rtron-math/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'Documentation Component', slug: 'documentation', sourceDirs: './../../../../rtron-documentation/src/main/kotlin/', moduleGroup: 'ui' }
+    - { name: 'CLI Component', slug: 'cli', sourceDirs: './../../../../rtron-cli/src/main/kotlin/', moduleGroup: 'ui' }
+    - { name: 'Main Component', slug: 'main', sourceDirs: './../../../../rtron-main/src/main/kotlin/', moduleGroup: 'batch-processing' }
+    - { name: 'Model Component', slug: 'model', sourceDirs: './../../../../rtron-model/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'ReaderWriter Component', slug: 'readerwriter', sourceDirs: './../../../../rtron-readerwriter/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'Transformer Component', slug: 'transformer', sourceDirs: './../../../../rtron-transformer/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'STD Component', slug: 'std', sourceDirs: './../../../../rtron-std/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'IO Component', slug: 'io', sourceDirs: './../../../../rtron-io/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'Math Component', slug: 'math', sourceDirs: './../../../../rtron-math/src/main/kotlin/', moduleGroup: 'utility' }

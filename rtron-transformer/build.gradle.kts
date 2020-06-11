@@ -5,11 +5,11 @@ plugins {
 kotlinProject()
 
 dependencies {
-    implementation(project(ProjectModules.standard))
-    implementation(project(ProjectModules.inputOutput))
-    implementation(project(ProjectModules.math))
+    implementation(project(ProjectComponents.standard))
+    implementation(project(ProjectComponents.inputOutput))
+    implementation(project(ProjectComponents.math))
 
-    implementation(project(ProjectModules.model))
+    implementation(project(ProjectComponents.model))
 
     implementation(Dependencies.citygml4j)
 }

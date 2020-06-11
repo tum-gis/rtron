@@ -5,12 +5,12 @@ plugins {
 kotlinProject()
 
 dependencies {
-    implementation(project(ProjectModules.standard))
-    implementation(project(ProjectModules.inputOutput))
+    implementation(project(ProjectComponents.standard))
+    implementation(project(ProjectComponents.inputOutput))
 
-    implementation(project(ProjectModules.model))
-    implementation(project(ProjectModules.readerWriter))
-    implementation(project(ProjectModules.transformer))
+    implementation(project(ProjectComponents.model))
+    implementation(project(ProjectComponents.readerWriter))
+    implementation(project(ProjectComponents.transformer))
 
     implementation(kotlin("script-runtime"))
 }

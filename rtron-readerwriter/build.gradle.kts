@@ -9,9 +9,9 @@ plugins {
 kotlinProject()
 
 dependencies {
-    implementation(project(ProjectModules.standard))
-    implementation(project(ProjectModules.inputOutput))
-    implementation(project(ProjectModules.model))
+    implementation(project(ProjectComponents.standard))
+    implementation(project(ProjectComponents.inputOutput))
+    implementation(project(ProjectComponents.model))
 
     xjc(Dependencies.jaxbApi)
     xjc(Dependencies.jaxbImpl)
@@ -27,7 +27,7 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    dependsOn("${ProjectModules.readerWriter}:xjcGeneration")
+    dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
 }
 
 xjcGeneration {
