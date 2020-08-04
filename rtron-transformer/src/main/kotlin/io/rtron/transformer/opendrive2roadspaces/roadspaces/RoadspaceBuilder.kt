@@ -102,7 +102,7 @@ class RoadspaceBuilder(
 
     private fun buildLateralRoadShape(srcLateralProfileShapeList: List<RoadLateralProfileShape>): BivariateFunction {
         if (srcLateralProfileShapeList.isNotEmpty())
-            _reportLogger.infoOnce("Lateral shape profile is not implemented yet.")
+            _reportLogger.warnOnce("Lateral shape profile is not implemented yet.")
         return PlaneFunction.ZERO
     }
 

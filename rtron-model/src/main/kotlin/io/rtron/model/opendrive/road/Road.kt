@@ -54,6 +54,8 @@ data class Road(
 ) {
 
     fun isProcessable(tolerance: Double): Result<ContextMessage<Boolean>, IllegalStateException> {
+        val infos = mutableListOf<String>()
+
         val planViewGeometryLengthsSum = planView.geometry.sumByDouble { it.length }
 
         if (!fuzzyEquals(planViewGeometryLengthsSum, length, tolerance))
@@ -61,10 +63,9 @@ data class Road(
                     "different than the sum of the individual plan view elements ($planViewGeometryLengthsSum)."))
 
         if (lateralProfile.containsShapeProfile() && lanes.containsLaneOffset())
-            return Result.error(IllegalStateException("RoadId: $id: Road contains both a lateral road shape and a " +
-                    "lane offset, which should not be used at the same time."))
+            infos += "Road contains both a lateral road shape and a lane offset, whereby the combination of shapes and" +
+                    " non-linear offsets should be avoided according to the standard."
 
-        val infos = ""
         return Result.success(ContextMessage(true, infos))
     }
 }

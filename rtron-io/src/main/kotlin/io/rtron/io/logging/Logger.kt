@@ -35,6 +35,7 @@ class Logger(
 
     // Properties and Initializers
     private val _infoOnceMessages: MutableSet<String> = mutableSetOf()
+    private val _warnOnceMessages: MutableSet<String> = mutableSetOf()
 
     // Methods
     /**
@@ -68,6 +69,18 @@ class Logger(
      */
     fun infoParagraph() {
         println()
+    }
+
+    /**
+     * Log an warning message only once. Later warn requests are ignored.
+     *
+     * @param message warn message to be logged once
+     */
+    fun warnOnce(message: String) {
+        if (message !in _warnOnceMessages) {
+            _warnOnceMessages.add(message)
+            warn(message)
+        }
     }
 
     /**
