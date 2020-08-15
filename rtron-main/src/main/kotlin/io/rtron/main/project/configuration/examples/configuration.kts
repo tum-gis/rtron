@@ -6,6 +6,10 @@ configure {
         tolerance = 1E-7
         attributesPrefix = "opendrive_"
         crsEpsg = 32632
+
+        offsetX = 0.0
+        offsetY = 0.0
+        offsetZ = 0.0
     }
 
     roadspaces2citygml {

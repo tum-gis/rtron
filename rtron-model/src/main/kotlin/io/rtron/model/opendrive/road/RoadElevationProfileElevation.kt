@@ -27,4 +27,8 @@ class RoadElevationProfileElevation(
 ) {
     // Properties and Initializers
     val coefficients get() = doubleArrayOf(a, b, c, d)
+
+    // Methods
+    fun coefficientsWithOffset(offsetA: Double = 0.0, offsetB: Double = 0.0, offsetC: Double = 0.0,
+                               offsetD: Double = 0.0) = doubleArrayOf(a + offsetA, b + offsetB, c + offsetC, d + offsetD)
 }

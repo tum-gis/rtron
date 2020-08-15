@@ -45,11 +45,13 @@ class Curve2DBuilder(
      * Builds a concatenated curve in 2D for the OpenDRIVE's plan view elements.
      *
      * @param srcPlanViewGeometryList source geometry curve segments of OpenDRIVE
+     * @param offset applied translational offset
      */
-    fun buildCurve2DFromPlanViewGeometries(srcPlanViewGeometryList: List<RoadPlanViewGeometry>): CompositeCurve2D {
+    fun buildCurve2DFromPlanViewGeometries(srcPlanViewGeometryList: List<RoadPlanViewGeometry>,
+                                           offset: Vector2D = Vector2D.ZERO): CompositeCurve2D {
         val curveMembers = srcPlanViewGeometryList.dropLast(1)
-                .map { buildPlanViewGeometry(it, BoundType.OPEN) } +
-                buildPlanViewGeometry(srcPlanViewGeometryList.last(), BoundType.CLOSED)
+                .map { buildPlanViewGeometry(it, BoundType.OPEN, offset) } +
+                buildPlanViewGeometry(srcPlanViewGeometryList.last(), BoundType.CLOSED, offset)
 
         return CompositeCurve2D(curveMembers)
     }
@@ -59,12 +61,13 @@ class Curve2DBuilder(
      *
      * @param srcGeometry source geometry element of OpenDRIVE
      * @param endBoundType applied end bound type for the curve element
+     * @param offset applied translational offset
      */
-    private fun buildPlanViewGeometry(srcGeometry: RoadPlanViewGeometry, endBoundType: BoundType = BoundType.OPEN):
-            AbstractCurve2D {
+    private fun buildPlanViewGeometry(srcGeometry: RoadPlanViewGeometry, endBoundType: BoundType = BoundType.OPEN,
+                                      offset: Vector2D = Vector2D.ZERO): AbstractCurve2D {
 
         val startPose = Pose2D(Vector2D(srcGeometry.x, srcGeometry.y), Rotation2D(srcGeometry.hdg))
-        val affineSequence = AffineSequence2D(Affine2D.of(startPose))
+        val affineSequence = AffineSequence2D.of(Affine2D.of(offset), Affine2D.of(startPose))
 
         return when {
             srcGeometry.isSpiral() -> {

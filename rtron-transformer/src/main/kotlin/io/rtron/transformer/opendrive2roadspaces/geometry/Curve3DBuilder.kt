@@ -50,13 +50,14 @@ class Curve3DBuilder(
     fun buildCurve3D(id: RoadspaceIdentifier, srcPlanViewGeometries: List<RoadPlanViewGeometry>,
                      srcElevationProfiles: List<RoadElevationProfileElevation>): Curve3D {
 
-        val planViewCurve2D = _curve2DBuilder.buildCurve2DFromPlanViewGeometries(srcPlanViewGeometries)
+        val planViewCurve2D =
+                _curve2DBuilder.buildCurve2DFromPlanViewGeometries(srcPlanViewGeometries, parameters.offsetXY)
 
         val heightFunction =
                 if (srcElevationProfiles.isSortedBy { it.s }) {
                     ConcatenatedFunction.ofPolynomialFunctions(
                             srcElevationProfiles.map { it.s },
-                            srcElevationProfiles.map { it.coefficients })
+                            srcElevationProfiles.map { it.coefficientsWithOffset(offsetA = parameters.offsetZ) })
                             .handleMessage { this.reportLogger.info(it, id.toString()) }
                 } else {
                     reportLogger.warn("Elevation profile list is not sorted, therefore the elevation profile" +

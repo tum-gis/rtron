@@ -35,7 +35,17 @@ class Opendrive2RoadspacesParametersBuilder {
     private val crsEpsgProperty = SettableProperty(defaultParameters.crsEpsg)
     var crsEpsg by crsEpsgProperty
 
-    fun build() = Opendrive2RoadspacesParameters(toleranceProperty, attributesPrefixProperty, crsEpsgProperty)
+    private val offsetXProperty = SettableProperty(defaultParameters.offsetX)
+    var offsetX by offsetXProperty
+
+    private val offsetYProperty = SettableProperty(defaultParameters.offsetY)
+    var offsetY by offsetYProperty
+
+    private val offsetZProperty = SettableProperty(defaultParameters.offsetZ)
+    var offsetZ by offsetZProperty
+
+    fun build() = Opendrive2RoadspacesParameters(toleranceProperty, attributesPrefixProperty, crsEpsgProperty,
+            offsetXProperty, offsetYProperty, offsetZProperty)
 }
 
 /**
