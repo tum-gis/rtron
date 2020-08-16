@@ -57,8 +57,8 @@ abstract class Opendrive14Mapper {
     //
     // Plan view mapping
     //
-    fun mapPRange(prange: String): ParamPoly3PRange {
-        return if (prange == "normalized") ParamPoly3PRange.NORMALIZED else ParamPoly3PRange.ARCLENGTH
+    fun mapPRange(prange: PRange): ParamPoly3PRange {
+        return if (prange == PRange.NORMALIZED) ParamPoly3PRange.NORMALIZED else ParamPoly3PRange.ARCLENGTH
     }
 
     @BeforeMapping

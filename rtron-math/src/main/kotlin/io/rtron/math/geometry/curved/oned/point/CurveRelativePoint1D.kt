@@ -38,6 +38,8 @@ data class CurveRelativePoint1D(
     // Operators
     operator fun plus(v: CurveRelativePoint1D) = CurveRelativePoint1D(this.curvePosition + v.curvePosition)
     operator fun minus(v: CurveRelativePoint1D) = CurveRelativePoint1D(this.curvePosition - v.curvePosition)
+    operator fun times(m: Double) = CurveRelativePoint1D(this.curvePosition * m)
+    operator fun div(m: Double) = CurveRelativePoint1D(this.curvePosition / m)
 
     override fun compareTo(other: CurveRelativePoint1D): Int = curvePosition.compareTo(other.curvePosition)
 

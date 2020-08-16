@@ -97,5 +97,6 @@ fun UnitOfMeasure.toGmlString(): String = when (this) {
     UnitOfMeasure.KILOMETER -> "km"
     UnitOfMeasure.METER_PER_SECOND -> "mps"
     UnitOfMeasure.KILOMETER_PER_HOUR -> "kmph"
+    UnitOfMeasure.MILES_PER_HOUR -> "mph"
     else -> TODO("Conversion of $this is not yet implemented.")
 }

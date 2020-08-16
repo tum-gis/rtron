@@ -112,6 +112,8 @@ class RoadObjectAdder(
             return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
         if (srcRoadspaceObject.name == "trafficSign")
             return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
+        if (srcRoadspaceObject.name == "tree")
+            return _vegetationModuleBuilder.createVegetationObject(geometryTransformer)
         if (srcRoadspaceObject.name == "unknown")
             return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
         if (srcRoadspaceObject.name == "wall")

@@ -32,7 +32,7 @@ import io.rtron.std.handleFailure
  */
 abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, Tolerable {
 
-    // properties
+    // Properties
 
     /** length of the curve */
     val length: Double get() = domain.length

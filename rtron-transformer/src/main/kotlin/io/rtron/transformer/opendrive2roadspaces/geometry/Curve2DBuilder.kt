@@ -18,12 +18,14 @@ package io.rtron.transformer.opendrive2roadspaces.geometry
 
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
+import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.curve.*
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.BoundType
+import io.rtron.math.range.Range
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
@@ -75,14 +77,30 @@ class Curve2DBuilder(
                         srcGeometry.spiral.curvStart, srcGeometry.length, srcGeometry.spiral.curvEnd)
                 SpiralSegment2D(curvatureFunction, affineSequence, endBoundType, parameters.tolerance)
             }
-            srcGeometry.isArc() -> Arc2D(srcGeometry.arc.curvature, srcGeometry.length, affineSequence,
-                    endBoundType, parameters.tolerance)
-            srcGeometry.isPoly3() -> CubicCurve2D(srcGeometry.poly3.coefficients, srcGeometry.length, affineSequence,
-                    endBoundType, parameters.tolerance)
-            srcGeometry.isParamPoly3() -> ParametricCubicCurve2D(srcGeometry.paramPoly3.coefficientsU,
-                    srcGeometry.paramPoly3.coefficientsV, srcGeometry.length, affineSequence,
-                    endBoundType, parameters.tolerance)
-            else -> LineSegment2D(srcGeometry.length, affineSequence, endBoundType, parameters.tolerance)
+            srcGeometry.isArc() -> {
+                Arc2D(srcGeometry.arc.curvature, srcGeometry.length, affineSequence,
+                        endBoundType, parameters.tolerance)
+            }
+            srcGeometry.isPoly3() -> {
+                CubicCurve2D(srcGeometry.poly3.coefficients, srcGeometry.length, affineSequence, endBoundType,
+                        parameters.tolerance)
+            }
+            srcGeometry.isParamPoly3() && srcGeometry.paramPoly3.isNormalized() -> {
+                val parameterTransformation : (CurveRelativePoint1D) -> CurveRelativePoint1D = { it / srcGeometry.length }
+                val baseCurve = ParametricCubicCurve2D(srcGeometry.paramPoly3.coefficientsU,
+                        srcGeometry.paramPoly3.coefficientsV, 1.0, affineSequence,
+                        endBoundType, parameters.tolerance)
+                ParameterTransformedCurve2D(baseCurve, parameterTransformation,
+                        Range.closedX(0.0, srcGeometry.length, endBoundType))
+            }
+            srcGeometry.isParamPoly3() && !srcGeometry.paramPoly3.isNormalized() -> {
+                ParametricCubicCurve2D(srcGeometry.paramPoly3.coefficientsU,
+                        srcGeometry.paramPoly3.coefficientsV, srcGeometry.length, affineSequence,
+                        endBoundType, parameters.tolerance)
+            }
+            else -> {
+                LineSegment2D(srcGeometry.length, affineSequence, endBoundType, parameters.tolerance)
+            }
         }
     }
 
