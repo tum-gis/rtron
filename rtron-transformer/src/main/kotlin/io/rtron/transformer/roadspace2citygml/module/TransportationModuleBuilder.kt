@@ -18,10 +18,10 @@ package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
+import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.citygml.transportation.*
-import io.rtron.std.handleFailure
 
 
 /**
@@ -40,7 +40,7 @@ class TransportationModuleBuilder(
 
     // Methods
     fun createLaneSurface(surface: AbstractSurface3D): Result<Road, Exception> {
-        val geometryTransformer = GeometryTransformer(_reportLogger, configuration.parameters)
+        val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
                 .also { surface.accept(it) }
         val roadObject = Road()
 
@@ -49,7 +49,7 @@ class TransportationModuleBuilder(
     }
 
     fun createFillerSurface(surface: AbstractSurface3D): Result<Road, Exception> {
-        val geometryTransformer = GeometryTransformer(_reportLogger, configuration.parameters)
+        val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
                 .also { surface.accept(it) }
 
         val roadObject = Road()
@@ -60,7 +60,7 @@ class TransportationModuleBuilder(
     fun createTransportationComplex(surface: AbstractSurface3D, feature: Feature, type: Type = Type.NONE):
             Result<TransportationComplex, Exception> {
 
-        val geometryTransformer = GeometryTransformer(_reportLogger, configuration.parameters)
+        val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
                 .also { surface.accept(it) }
         return createTransportationComplex(geometryTransformer, feature, type)
     }

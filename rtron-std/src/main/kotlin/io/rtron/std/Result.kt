@@ -26,7 +26,7 @@ import com.github.kittinunf.result.Result
  * @param block the actual handler of the [Result.Success]
  * @return remaining [Result.Failure]
  */
-inline fun <V : Any, E : Exception> Result<V, E>.handleSuccess(block: (Result.Success<V>) -> Nothing): E =
+inline fun <V : Any?, E : Exception> Result<V, E>.handleSuccess(block: (Result.Success<V>) -> Nothing): E =
         when (this) {
             is Result.Success -> block(this)
             is Result.Failure -> error
@@ -39,7 +39,7 @@ inline fun <V : Any, E : Exception> Result<V, E>.handleSuccess(block: (Result.Su
  * @param block the actual handler of the [Result.Failure]
  * @return remaining [Result.Success]
  */
-inline fun <V : Any, E : Exception> Result<V, E>.handleFailure(block: (Result.Failure<E>) -> Nothing): V =
+inline fun <V : Any?, E : Exception> Result<V, E>.handleFailure(block: (Result.Failure<E>) -> Nothing): V =
         when (this) {
             is Result.Success -> value
             is Result.Failure -> block(this)
@@ -53,7 +53,7 @@ inline fun <V : Any, E : Exception> Result<V, E>.handleFailure(block: (Result.Fa
  * @param block the handler in case of an [Result.Failure]
  * @return the list of values of the [Result.Success]
  */
-inline fun <V : Any, E : Exception> List<Result<V, E>>.handleFailure(block: (Result.Failure<E>) -> Nothing): List<V> =
+inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleFailure(block: (Result.Failure<E>) -> Nothing): List<V> =
         map {
             when (it) {
                 is Result.Success -> it.value
@@ -68,7 +68,7 @@ inline fun <V : Any, E : Exception> List<Result<V, E>>.handleFailure(block: (Res
  * @param block the handler in case of an [Result.Failure]
  * @return the list of values of the [Result.Success]
  */
-inline fun <V : Any, E : Exception> List<Result<V, E>>.handleAndRemoveFailure(
+inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleAndRemoveFailure(
         block: (Result.Failure<E>) -> Unit): List<V> =
         fold(emptyList()) { acc, result ->
             when (result) {
@@ -87,7 +87,7 @@ inline fun <V : Any, E : Exception> List<Result<V, E>>.handleAndRemoveFailure(
  * @param block the handler in case of an [Result.Failure] with index information
  * @return the list of values of the [Result.Success]
  */
-inline fun <V : Any, E : Exception> List<Result<V, E>>.handleAndRemoveFailureIndexed(
+inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleAndRemoveFailureIndexed(
         block: (index: Int, Result.Failure<E>) -> Unit): List<V> =
         foldIndexed(emptyList()) { index, acc, result ->
             when (result) {
@@ -104,7 +104,7 @@ inline fun <V : Any, E : Exception> List<Result<V, E>>.handleAndRemoveFailureInd
  * @receiver the list of [Result] to be handled
  * @return the list of values of the [Result.Success]
  */
-fun <V : Any, E : Exception> List<Result<V, E>>.ignoreFailure(): List<V> =
+fun <V : Any?, E : Exception> List<Result<V, E>>.ignoreFailure(): List<V> =
         filterIsInstance<Result.Success<V>>().map { it.value }
 
 /**
@@ -114,7 +114,7 @@ fun <V : Any, E : Exception> List<Result<V, E>>.ignoreFailure(): List<V> =
  * @param key requested key to be accessed
  * @return [Result] of the request
  */
-fun <K, V : Any> Map<K, V>.getValueResult(key: K): Result<V, IllegalArgumentException> {
+fun <K : Any, V : Any?> Map<K, V>.getValueResult(key: K): Result<V, IllegalArgumentException> {
     val value = this[key] ?: return Result.error(IllegalArgumentException("Map does not contain requested key."))
     return Result.success(value)
 }
@@ -126,7 +126,7 @@ fun <K, V : Any> Map<K, V>.getValueResult(key: K): Result<V, IllegalArgumentExce
  * @param index requested key to be accessed
  * @return [Result] of the request
  */
-fun <V : Any> List<V>.getValueResult(index: Int): Result<V, IllegalArgumentException> {
+fun <V : Any?> List<V>.getValueResult(index: Int): Result<V, IllegalArgumentException> {
     val value = this.getOrNull(index) ?: return Result.error(IllegalArgumentException("List does not contain index."))
     return Result.success(value)
 }

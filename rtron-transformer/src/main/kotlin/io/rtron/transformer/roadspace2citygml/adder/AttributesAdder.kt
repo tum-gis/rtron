@@ -16,13 +16,11 @@
 
 package io.rtron.transformer.roadspace2citygml.adder
 
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.model.roadspaces.roadspace.attribute.*
+import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
 import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.generics.AbstractGenericAttribute
-import org.citygml4j.model.gml.basicTypes.Code
 import org.citygml4j.model.gml.basicTypes.Measure
-import org.citygml4j.util.gmlid.DefaultGMLIdManager
-import io.rtron.model.roadspaces.roadspace.attribute.*
 import org.citygml4j.model.citygml.generics.DoubleAttribute as GmlDoubleAttribute
 import org.citygml4j.model.citygml.generics.GenericAttributeSet as GmlGenericAttributeSet
 import org.citygml4j.model.citygml.generics.IntAttribute as GmlIntAttribute
@@ -34,22 +32,10 @@ import org.citygml4j.model.citygml.generics.StringAttribute as GmlStringAttribut
  * Adds [Attribute] and [AttributeList] classes (RoadSpaces model) to an [AbstractCityObject] (CityGML model).
  */
 class AttributesAdder(
-        val configuration: Roadspaces2CitygmlConfiguration
+        private val parameters: Roadspaces2CitygmlParameters
 ) {
 
-    // Properties and Initializers
-    private val gmlIdManager = DefaultGMLIdManager.getInstance()!!
-
     // Methods
-
-    /**
-     * Adds a [name] to the [dstCityObject].
-     */
-    fun addIdName(name: String, dstCityObject: AbstractCityObject): Unit =
-            with(dstCityObject) {
-                id = gmlIdManager.generateUUID()
-                addName(Code(name))
-            }
 
     /**
      * Adds an [attributeList] to the [dstCityObject].
@@ -83,7 +69,7 @@ class AttributesAdder(
                 is AttributeList -> {
                     val attributes = attribute.attributes.flatMap { convertAttribute(it) }
 
-                    if (configuration.parameters.flattenGenericAttributeSets) attributes
+                    if (parameters.flattenGenericAttributeSets) attributes
                     else listOf(GmlGenericAttributeSet(attribute.name, attributes))
                 }
             }

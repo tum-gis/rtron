@@ -169,26 +169,17 @@ class Road(
      *
      * @param step discretization step size
      */
-    fun getAllFillerSurfaces(step: Double): List<AbstractSurface3D> =
-            laneSections
-                    .map { getAllFillerSurfaces(it.id, step) }
-                    .handleFailure { throw it.error }
-                    .flatten()
+    fun getAllLateralFillerSurfaces(step: Double): List<Triple<LaneIdentifier, AbstractSurface3D, AttributeList>> =
+            getAllLaneIdentifiers().fold(emptyList()) { acc, id ->
+                val fillerSurface = getLeftLateralFillerSurfaceOrNull(id, step)
+                        .handleFailure { throw it.error }
 
-    /**
-     * Returns all filler surfaces of a lane section.
-     *
-     * @param id identifier of requested lane section
-     * @param step discretization step size
-     */
-    fun getAllFillerSurfaces(id: LaneSectionIdentifier, step: Double): Result<List<AbstractSurface3D>, Exception> =
-            getLaneSection(id)
-                    .handleFailure { return it }
-                    .laneList
-                    .map { it.id }
-                    .dropLast(1)
-                    .flatMap { curId -> getLeftLateralFillerSurface(curId, step).handleFailure { throw it.error } }
-                    .let { Result.success(it) }
+                if (fillerSurface == null) acc
+                else {
+                    val attributes = getLane(id).handleFailure { throw it.error }.idAttributes
+                    acc + Triple(id, fillerSurface, attributes)
+                }
+            }
 
     /**
      * Returns the left boundary of an individual lane with [laneIdentifier].
@@ -259,14 +250,19 @@ class Road(
     }
 
     /**
-     * Returns the filler surface which closes holes occurring at the lateral transition of two lane elements.
+     * Returns the filler surface which closes the gap occurring at the lateral transition of two lane elements.
      * These lateral transitions might contain vertical holes which are caused by e.g. lane height offsets.
+     * If no lateral surface filler is needed due to adjacent lane surfaces, null is returned.
      *
      * @param laneIdentifier lane identifier for which the lateral filler surfaces to the left shall be created
      * @param step discretization step size
      */
-    private fun getLeftLateralFillerSurface(laneIdentifier: LaneIdentifier, step: Double):
-            Result<List<AbstractSurface3D>, Exception> {
+    private fun getLeftLateralFillerSurfaceOrNull(laneIdentifier: LaneIdentifier, step: Double):
+            Result<AbstractSurface3D?, Exception> {
+
+        // return no lateral filler surface, if there is no lane on the left
+        getLane(laneIdentifier.getAdjacentLeftLaneIdentifier())
+                .handleFailure { return Result.success(null) }
 
         val leftLaneBoundary = getLeftLaneBoundaries(laneIdentifier)
                 .handleFailure { return it }
@@ -277,13 +273,14 @@ class Road(
                 .calculatePointListGlobalCS(step)
                 .handleFailure { return it }
 
+        // return no lateral filler surface, if there is no gap between the lane surfaces
         if (leftLaneBoundary.fuzzyEquals(rightLaneBoundary))
-            return Result.success(emptyList())
+            return Result.success(null)
 
         return LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary)
                 .handleFailure { return it }
                 .let { CompositeSurface3D(it) }
-                .let { Result.success(listOf(it)) }
+                .let { Result.success(it) }
     }
 
     /**

@@ -18,35 +18,34 @@ package io.rtron.transformer.roadspace2citygml.adder
 
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
+import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.module.*
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.core.CityModel
 import org.citygml4j.model.citygml.core.CityObjectMember
-import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
-import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.std.handleFailure
 
 
 /**
  * Adds [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
 class RoadObjectAdder(
-        val configuration: Roadspaces2CitygmlConfiguration
+        private val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Properties and Initializers
     private val _reportLogger: Logger = configuration.getReportLogger()
 
+    private val _identifierAdder = IdentifierAdder(configuration.parameters, _reportLogger)
+    private val _attributesAdder = AttributesAdder(configuration.parameters)
     private val _genericsModuleBuilder = GenericsModuleBuilder(configuration)
     private val _buildingModuleBuilder = BuildingModuleBuilder(configuration)
     private val _cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(configuration)
     private val _transportationModuleBuilder = TransportationModuleBuilder(configuration)
     private val _vegetationModuleBuilder = VegetationModuleBuilder()
-
-    private val _attributesAdder = AttributesAdder(configuration)
-
 
     // Methods
 
@@ -62,7 +61,7 @@ class RoadObjectAdder(
         val abstractCityObject = createAbstractCityObject(srcRoadspaceObject, geometryTransformer)
                 .handleFailure { _reportLogger.log(it); return }
 
-        _attributesAdder.addIdName(srcRoadspaceObject.name, abstractCityObject)
+        _identifierAdder.addIdentifier(srcRoadspaceObject.id, abstractCityObject)
         _attributesAdder.addAttributes(srcRoadspaceObject.attributes, abstractCityObject)
 
         val cityObjectMember = CityObjectMember(abstractCityObject)
@@ -73,7 +72,7 @@ class RoadObjectAdder(
         require(srcRoadspaceObject.geometry.size == 1)
         val currentGeometricPrimitive = srcRoadspaceObject.geometry.first()
 
-        return GeometryTransformer(_reportLogger, configuration.parameters)
+        return GeometryTransformer(configuration.parameters, _reportLogger)
                 .also { currentGeometricPrimitive.accept(it) }
     }
 

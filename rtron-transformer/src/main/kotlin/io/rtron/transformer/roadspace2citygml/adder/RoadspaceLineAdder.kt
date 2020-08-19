@@ -16,14 +16,15 @@
 
 package io.rtron.transformer.roadspace2citygml.adder
 
-import org.citygml4j.model.citygml.core.CityModel
-import org.citygml4j.model.citygml.core.CityObjectMember
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
-import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.model.roadspaces.roadspace.Roadspace
+import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.std.handleFailure
+import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
+import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import org.citygml4j.model.citygml.core.CityModel
+import org.citygml4j.model.citygml.core.CityObjectMember
 
 
 /**
@@ -35,8 +36,9 @@ class RoadspaceLineAdder(
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
 
+    private val _identifierAdder = IdentifierAdder(configuration.parameters, _reportLogger)
+    private val _attributesAdder = AttributesAdder(configuration.parameters)
     private val _genericsModuleBuilder = GenericsModuleBuilder(configuration)
-    private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
 
@@ -44,7 +46,7 @@ class RoadspaceLineAdder(
      * Adds the reference line of the road to the [CityModel].
      */
     fun addRoadReferenceLine(srcRoadspace: Roadspace, dstCityModel: CityModel) {
-        addReferenceLine(srcRoadspace.referenceLine, "roadReferenceLine",
+        addReferenceLine(srcRoadspace.id, "RoadReferenceLine", srcRoadspace.referenceLine,
                 srcRoadspace.attributes, dstCityModel)
     }
 
@@ -53,17 +55,17 @@ class RoadspaceLineAdder(
      * road reference line.
      */
     fun addLaneReferenceLine(srcRoadspace: Roadspace, dstCityModel: CityModel) {
-        addReferenceLine(srcRoadspace.road.getLaneReferenceLine(), "laneReferenceLine",
+        addReferenceLine(srcRoadspace.id, "LaneReferenceLine", srcRoadspace.road.getLaneReferenceLine(),
                 srcRoadspace.attributes, dstCityModel)
     }
 
-    private fun addReferenceLine(line: AbstractCurve3D, name: String, attributes: AttributeList,
-                                 dstCityModel: CityModel) {
+    private fun addReferenceLine(id: RoadspaceIdentifier, name: String, line: AbstractCurve3D,
+                                 attributes: AttributeList, dstCityModel: CityModel) {
 
         val abstractCityObject = _genericsModuleBuilder.createGenericObject(line)
                 .handleFailure { _reportLogger.log(it); return }
 
-        _attributesAdder.addIdName(name, abstractCityObject)
+        _identifierAdder.addIdentifier(id, name, abstractCityObject)
         _attributesAdder.addAttributes(attributes, abstractCityObject)
         dstCityModel.addCityObjectMember(CityObjectMember(abstractCityObject))
     }

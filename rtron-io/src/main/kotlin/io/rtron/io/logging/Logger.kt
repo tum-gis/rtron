@@ -18,9 +18,9 @@ package io.rtron.io.logging
 
 import com.github.kittinunf.result.Result
 import com.vdurmont.emoji.EmojiParser
+import io.rtron.std.ContextMessage
 import org.apache.commons.lang3.SystemUtils
 import org.apache.logging.log4j.LogManager
-import io.rtron.std.ContextMessage
 import org.apache.logging.log4j.Logger as L4JLogger
 
 

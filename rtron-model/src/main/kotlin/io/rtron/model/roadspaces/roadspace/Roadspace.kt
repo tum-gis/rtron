@@ -26,7 +26,7 @@ import io.rtron.model.roadspaces.roadspace.road.Road
  * A [Roadspace] is defined along a [referenceLine] and contains the [roadspaceObjects] belonging to the road space.
  */
 data class Roadspace (
-        val roadspaceIdentifier: RoadspaceIdentifier,
+        val id: RoadspaceIdentifier,
         val length: Double = Double.NaN,
         val junction: String = "",
 

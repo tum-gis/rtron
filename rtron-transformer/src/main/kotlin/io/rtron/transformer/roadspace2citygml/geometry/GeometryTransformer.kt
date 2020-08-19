@@ -17,13 +17,6 @@
 package io.rtron.transformer.roadspace2citygml.geometry
 
 import com.github.kittinunf.result.Result
-import org.citygml4j.factory.GMLGeometryFactory
-import org.citygml4j.model.gml.geometry.GeometryProperty
-import org.citygml4j.model.gml.geometry.aggregates.MultiSurface
-import org.citygml4j.model.gml.geometry.aggregates.MultiSurfaceProperty
-import org.citygml4j.model.gml.geometry.complexes.CompositeSurface
-import org.citygml4j.model.gml.geometry.primitives.*
-import org.citygml4j.util.gmlid.DefaultGMLIdManager
 import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
@@ -35,7 +28,14 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.std.handleFailure
+import io.rtron.transformer.roadspace2citygml.adder.IdentifierAdder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
+import org.citygml4j.factory.GMLGeometryFactory
+import org.citygml4j.model.gml.geometry.GeometryProperty
+import org.citygml4j.model.gml.geometry.aggregates.MultiSurface
+import org.citygml4j.model.gml.geometry.aggregates.MultiSurfaceProperty
+import org.citygml4j.model.gml.geometry.complexes.CompositeSurface
+import org.citygml4j.model.gml.geometry.primitives.*
 import java.util.*
 
 
@@ -45,11 +45,13 @@ import java.util.*
  * @param parameters parameters for the geometry transformation, such as discretization step sizes
  */
 class GeometryTransformer(
-        private val reportLogger: Logger,
-        val parameters: Roadspaces2CitygmlParameters
+        val parameters: Roadspaces2CitygmlParameters,
+        private val reportLogger: Logger
 ) : Geometry3DVisitor {
 
     // Properties and Initializers
+    private val _identifierAdder = IdentifierAdder(parameters, reportLogger)
+
     lateinit var solidProperty: SolidProperty
         private set
     lateinit var multiSurfaceProperty: MultiSurfaceProperty
@@ -109,7 +111,7 @@ class GeometryTransformer(
                 .createDirectPosition(vectorGlobalCS.toDoubleArray(), DIMENSION)!!
         val point = Point().apply {
             pos = directPosition
-            id = gmlIdManager.generateUUID()
+            id = _identifierAdder.generateRandomUUID()
         }
         this.pointProperty = PointProperty(point)
     }
@@ -162,16 +164,16 @@ class GeometryTransformer(
 
         polygons.forEach {
             val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            polygonGml.id = gmlIdManager.generateUUID()
+            polygonGml.id = _identifierAdder.generateRandomUUID()
             surfaceMembers.add(SurfaceProperty(polygonGml))
         }
         val compositeSurface = CompositeSurface().apply {
-            id = gmlIdManager.generateUUID()
+            id = _identifierAdder.generateRandomUUID()
             surfaceMember = surfaceMembers
         }
 
         val solid = Solid().apply {
-            id = gmlIdManager.generateUUID()
+            id = _identifierAdder.generateRandomUUID()
             exterior = SurfaceProperty(compositeSurface)
         }
         this.solidProperty = SolidProperty(solid)
@@ -179,11 +181,11 @@ class GeometryTransformer(
 
     private fun polygonsToMultiSurfaceRepresentation(polygons: List<Polygon3D>) {
         val multiSurface = MultiSurface().apply {
-            id = gmlIdManager.generateUUID()
+            id = _identifierAdder.generateRandomUUID()
         }
         polygons.forEach {
             val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            polygonGml.id = gmlIdManager.generateUUID()
+            polygonGml.id = _identifierAdder.generateRandomUUID()
             multiSurface.addSurfaceMember(SurfaceProperty(polygonGml))
         }
         this.multiSurfaceProperty = MultiSurfaceProperty(multiSurface)
@@ -191,8 +193,6 @@ class GeometryTransformer(
 
     companion object {
         private val geometryFactory = GMLGeometryFactory()
-        private val gmlIdManager = DefaultGMLIdManager.getInstance()!!
-
         private const val DIMENSION = 3
     }
 }

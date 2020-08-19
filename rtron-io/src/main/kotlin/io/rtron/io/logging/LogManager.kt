@@ -16,13 +16,13 @@
 
 package io.rtron.io.logging
 
+import io.rtron.io.files.Path
 import org.apache.logging.log4j.core.Appender
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.appender.RollingFileAppender
 import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy
 import org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy
 import org.apache.logging.log4j.core.layout.PatternLayout
-import io.rtron.io.files.Path
 import org.apache.logging.log4j.LogManager as L4JLogManager
 import org.apache.logging.log4j.core.Logger as L4JCoreLogger
 
@@ -39,6 +39,7 @@ object LogManager {
     }
     private val loggerContext = LoggerContext.getContext(false)!!
     private val loggerConfiguration = loggerContext.configuration!!
+    private val loggers = mutableMapOf<String, Logger>()
 
     // Methods
 
@@ -61,8 +62,7 @@ object LogManager {
      *
      * @param name if a logger with the same name has already be initialized
      */
-    fun getReportLogger(name: String) = Logger(L4JLogManager.getLogger(name))
-
+    fun getReportLogger(name: String) = loggers.getOrPut(name) { Logger(L4JLogManager.getLogger(name)) }
 
     private fun getAppender(name: String, logFilePath: Path): Appender {
         val layout = PatternLayout.newBuilder()
