@@ -24,7 +24,7 @@ import io.rtron.model.roadspaces.ModelIdentifierInterface
  */
 interface RoadspaceIdentifierInterface {
     val roadspaceName: String
-    val roadspaceId: Int
+    val roadspaceId: String
 }
 
 /**
@@ -36,7 +36,7 @@ interface RoadspaceIdentifierInterface {
  */
 data class RoadspaceIdentifier(
         override val roadspaceName: String,
-        override val roadspaceId: Int,
+        override val roadspaceId: String,
         val modelIdentifier: ModelIdentifier
 ) : RoadspaceIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
 

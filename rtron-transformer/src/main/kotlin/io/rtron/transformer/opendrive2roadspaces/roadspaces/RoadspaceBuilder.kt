@@ -21,15 +21,15 @@ import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
-import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.lateralprofile.RoadLateralProfileShape
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.std.handleFailure
+import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
+import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.Road as OpendriveModelRoad
 
 
@@ -60,7 +60,7 @@ class RoadspaceBuilder(
     fun buildRoadspace(modelId: ModelIdentifier, srcRoad: OpendriveModelRoad): Result<Roadspace, Exception> {
 
         // check whether source model is processable
-        val roadspaceId = RoadspaceIdentifier(srcRoad.name, srcRoad.id.toInt(), modelId)
+        val roadspaceId = RoadspaceIdentifier(srcRoad.name, srcRoad.id, modelId)
         srcRoad.isProcessable(configuration.parameters.tolerance)
                 .map { _reportLogger.log(it, roadspaceId.toString()) }
                 .handleFailure { return it }

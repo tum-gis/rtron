@@ -20,11 +20,6 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
-import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
-import io.rtron.transformer.opendrive2roadspaces.geometry.Solid3DBuilder
-import io.rtron.transformer.opendrive2roadspaces.geometry.Surface3DBuilder
-import io.rtron.transformer.opendrive2roadspaces.geometry.Vector3DBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.signals.RoadSignals
 import io.rtron.model.opendrive.road.signals.RoadSignalsSignal
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
@@ -35,6 +30,11 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
 import io.rtron.std.handleAndRemoveFailureIndexed
 import io.rtron.std.handleFailure
+import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
+import io.rtron.transformer.opendrive2roadspaces.geometry.Solid3DBuilder
+import io.rtron.transformer.opendrive2roadspaces.geometry.Surface3DBuilder
+import io.rtron.transformer.opendrive2roadspaces.geometry.Vector3DBuilder
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.objects.RoadObjects as OpendriveRoadObjects
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject as OpendriveRoadObject
 
@@ -75,7 +75,7 @@ class RoadspaceObjectBuilder(
                                 baseAttributes: AttributeList): Result<RoadspaceObject, Exception> {
 
         // check whether source model is processable
-        val roadspaceObjectId = RoadspaceObjectIdentifier(srcRoadObject.id.toInt(), srcRoadObject.name, id)
+        val roadspaceObjectId = RoadspaceObjectIdentifier(srcRoadObject.id, srcRoadObject.name, id)
         srcRoadObject.isProcessable()
                 .map { _reportLogger.log(it, roadspaceObjectId.toString()) }
                 .handleFailure { return it }
@@ -165,7 +165,7 @@ class RoadspaceObjectBuilder(
     private fun buildRoadSignalsSignal(id: RoadspaceIdentifier, srcSignal: RoadSignalsSignal, roadReferenceLine: Curve3D,
                                        baseAttributes: AttributeList): Result<RoadspaceObject, Exception> {
 
-        val objectId = RoadspaceObjectIdentifier(srcSignal.id.toInt(), srcSignal.name, id)
+        val objectId = RoadspaceObjectIdentifier(srcSignal.id, srcSignal.name, id)
 
         val geometry = buildGeometries(srcSignal, roadReferenceLine).handleFailure { return it }
         val idAttributes = _attributesBuilder.toAttributes(objectId)

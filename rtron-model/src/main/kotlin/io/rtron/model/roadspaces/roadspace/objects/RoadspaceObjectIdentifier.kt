@@ -28,7 +28,7 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
  * @param roadspaceIdentifier identifier of the road space
  */
 data class RoadspaceObjectIdentifier(
-        val roadspaceObjectId: Int,
+        val roadspaceObjectId: String,
         val roadspaceObjectName: String,
         val roadspaceIdentifier: RoadspaceIdentifier
 ) : RoadspaceIdentifierInterface by roadspaceIdentifier {
