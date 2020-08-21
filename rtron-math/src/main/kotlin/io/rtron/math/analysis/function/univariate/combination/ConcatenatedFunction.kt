@@ -83,33 +83,31 @@ class ConcatenatedFunction(
     companion object {
 
         /**
-         * Creates a concatenated function with a list of polynomial function.
+         * Creates a concatenated function of a list of linear functions, whereby the slopes are adjusted so that the
+         * concatenated function is continuous.
          * For example:
-         * f(x) = 0 for [0, 5)
-         * f(x) = x - 5 for [5, ∞)
-         * The [starts] would be listOf(0, 5), the [intercepts] would be listOf(0, -5);
-         * the [slopes] would be listOf(0, 1).
+         * f(x) = slope_1 * x + 0 for [0, 5)
+         * f(x) = slope_2 * x - 5 for [5, ∞)
+         * The [starts] would be listOf(0, 5) and the [intercepts] would be listOf(0, -5).
          *
          * @param starts absolute start value of the function member
          * @param intercepts local intercept of the linear function
-         * @param slopes slope of the linear function (if list is empty, a slope of zero is assumed)
          */
-        fun ofLinearFunctions(starts: List<Double>, intercepts: List<Double>, slopes: List<Double> = emptyList()):
+        fun ofLinearFunctions(starts: List<Double>, intercepts: List<Double>):
                 UnivariateFunction {
-
+            require(starts.isNotEmpty()) { "Must contain start values." }
             require(starts.hasSameSizeAs(intercepts)) { "Equally sized starts and intercepts required." }
-            require(starts.size >= slopes.size) { "Too many slope values provided." }
             require(starts.isSorted()) { "Start values must be sorted in ascending order." }
 
-            if (starts.isEmpty()) return LinearFunction.X_AXIS
+            val deltaIntercepts = intercepts.zipWithNext().map { it.second - it.first }
+            val lengths = starts.zipWithNext().map { it.second - it.first }
 
-            val adjustedSlopes = slopes + List(starts.size - slopes.size) { 0.0 }
+            val slopes = deltaIntercepts.zip(lengths).map { it.first / it.second } + 0.0
             check(starts.hasSameSizeAs(intercepts)) { "Equally sized starts and adjustedSlopes required." }
 
-            val lengths = starts.zipWithNext().map { it.second - it.first }
             val domains = lengths.map { Range.closedOpen(0.0, it) } + Range.atLeast(0.0)
             val linearFunctions = starts.mapIndexed { index, _ ->
-                LinearFunction(adjustedSlopes[index], intercepts[index], domains[index])
+                LinearFunction(slopes[index], intercepts[index], domains[index])
             }
 
             return ConcatenatedFunction(linearFunctions)

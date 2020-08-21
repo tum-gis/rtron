@@ -18,8 +18,7 @@ package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
-import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
+import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLRLane
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLRLaneHeight
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -27,6 +26,8 @@ import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.distinctConsecutive
+import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 
 
 /**
@@ -93,10 +94,12 @@ class LaneBuilder(
                     id.toString())
 
         // build the inner and outer height offset functions
-        val inner = ConcatenatedFunction.ofLinearFunctions(
-                heightEntriesAdjusted.map { it.sOffset }, heightEntriesAdjusted.map { it.inner })
-        val outer = ConcatenatedFunction.ofLinearFunctions(
-                heightEntriesAdjusted.map { it.sOffset }, heightEntriesAdjusted.map { it.outer })
+        val inner = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
+        else ConcatenatedFunction.ofLinearFunctions(heightEntriesAdjusted.map { it.sOffset }, heightEntriesAdjusted.map { it.inner })
+
+        val outer = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
+        else ConcatenatedFunction.ofLinearFunctions(heightEntriesAdjusted.map { it.sOffset }, heightEntriesAdjusted.map { it.outer })
+
         return LaneHeightOffset(inner, outer)
     }
 
