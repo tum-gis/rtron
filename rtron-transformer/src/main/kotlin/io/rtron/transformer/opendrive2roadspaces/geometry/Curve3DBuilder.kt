@@ -20,14 +20,14 @@ import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
-import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.model.opendrive.road.RoadElevationProfileElevation
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.std.handleMessage
 import io.rtron.std.isSortedBy
+import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
 
 /**
@@ -53,17 +53,19 @@ class Curve3DBuilder(
         val planViewCurve2D =
                 _curve2DBuilder.buildCurve2DFromPlanViewGeometries(srcPlanViewGeometries, parameters.offsetXY)
 
-        val heightFunction =
-                if (srcElevationProfiles.isSortedBy { it.s }) {
-                    ConcatenatedFunction.ofPolynomialFunctions(
-                            srcElevationProfiles.map { it.s },
-                            srcElevationProfiles.map { it.coefficientsWithOffset(offsetA = parameters.offsetZ) })
-                            .handleMessage { this.reportLogger.info(it, id.toString()) }
-                } else {
-                    reportLogger.warn("Elevation profile list is not sorted, therefore the elevation profile" +
-                            " is set to zero.", id.toString())
-                    LinearFunction.X_AXIS
-                }
+        val heightFunction = when {
+            srcElevationProfiles.isEmpty() -> LinearFunction.X_AXIS
+            srcElevationProfiles.isSortedBy { it.s } -> ConcatenatedFunction.ofPolynomialFunctions(
+                    srcElevationProfiles.map { it.s },
+                    srcElevationProfiles.map { it.coefficientsWithOffset(offsetA = parameters.offsetZ) })
+                    .handleMessage { this.reportLogger.info(it, id.toString()) }
+            else -> {
+                reportLogger.warn("Elevation profile list is not sorted, therefore the elevation profile" +
+                        " is set to zero.", id.toString())
+                LinearFunction.X_AXIS
+            }
+        }
+
         return Curve3D(planViewCurve2D, heightFunction, tolerance = parameters.tolerance)
     }
 

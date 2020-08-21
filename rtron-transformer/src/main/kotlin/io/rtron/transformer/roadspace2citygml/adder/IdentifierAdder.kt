@@ -57,7 +57,7 @@ class IdentifierAdder(
      * Adds a pseudo random hash id (hash based on the [id]) to the [dstCityObject].
      */
     fun addIdentifier(id: RoadspaceObjectIdentifier, dstCityObject: AbstractCityObject) {
-        val hashKey = id.roadspaceObjectId.toString() + '_' +
+        val hashKey = id.roadspaceObjectId + '_' +
                 id.roadspaceIdentifier.roadspaceId + '_' +
                 id.roadspaceIdentifier.modelIdentifier.fileHashSha256
 

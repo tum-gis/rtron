@@ -44,8 +44,11 @@ class Opendrive2RoadspacesParametersBuilder {
     private val offsetZProperty = SettableProperty(defaultParameters.offsetZ)
     var offsetZ by offsetZProperty
 
+    private val extrapolateLateralRoadShapesProperty = SettableProperty(defaultParameters.extrapolateLateralRoadShapes)
+    var extrapolateLateralRoadShapes by extrapolateLateralRoadShapesProperty
+
     fun build() = Opendrive2RoadspacesParameters(toleranceProperty, attributesPrefixProperty, crsEpsgProperty,
-            offsetXProperty, offsetYProperty, offsetZProperty)
+            offsetXProperty, offsetYProperty, offsetZProperty, extrapolateLateralRoadShapesProperty)
 }
 
 /**

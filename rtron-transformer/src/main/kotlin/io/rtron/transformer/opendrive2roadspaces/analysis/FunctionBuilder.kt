@@ -21,16 +21,18 @@ import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.combination.SectionedUnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
+import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.model.opendrive.road.lanes.RoadLanes
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLRLaneWidth
+import io.rtron.model.opendrive.road.lateralprofile.RoadLateralProfileShape
 import io.rtron.model.opendrive.road.lateralprofile.RoadLateralProfileSuperelevation
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.distinctConsecutive
 import io.rtron.std.handleMessage
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
 
 /**
@@ -50,6 +52,7 @@ class FunctionBuilder(
      */
     fun buildCurveTorsion(id: RoadspaceIdentifier, srcSuperelevation: List<RoadLateralProfileSuperelevation>):
             UnivariateFunction {
+        if (srcSuperelevation.isEmpty()) return LinearFunction.X_AXIS
 
         return ConcatenatedFunction.ofPolynomialFunctions(
                 srcSuperelevation.map { it.s },
@@ -58,12 +61,35 @@ class FunctionBuilder(
     }
 
     /**
+     * Builds a function that describes one lateral entry of a road's shape.
+     *
+     * @param srcRoadLateralProfileShape the cross-sectional profile of a road at a certain curve position
+     */
+    fun buildLateralShape(id: RoadspaceIdentifier, srcRoadLateralProfileShape: List<RoadLateralProfileShape>):
+            UnivariateFunction {
+        require(srcRoadLateralProfileShape.isNotEmpty())
+        { "Lateral profile shape must contain elements in order to build a univariate function." }
+        require(srcRoadLateralProfileShape.all { it.s == srcRoadLateralProfileShape.first().s })
+        { "All lateral profile shape elements must have the same curve position." }
+
+        return ConcatenatedFunction.ofPolynomialFunctions(
+                srcRoadLateralProfileShape.map { it.t },
+                srcRoadLateralProfileShape.map { it.coefficients })
+                .handleMessage { this.reportLogger.info(it, id.toString()) }
+    }
+
+    /**
      * Builds a function that described the lateral lane offset to the road reference line.
      */
-    fun buildLaneOffset(id: RoadspaceIdentifier, srcLanes: RoadLanes) =
-            ConcatenatedFunction.ofPolynomialFunctions(
-                    srcLanes.laneOffset.map { it.s }, srcLanes.laneOffset.map { it.coefficients })
-                    .handleMessage { this.reportLogger.info(it, id.toString()) }
+    fun buildLaneOffset(id: RoadspaceIdentifier, srcLanes: RoadLanes): UnivariateFunction {
+        if (srcLanes.laneOffset.isEmpty()) return LinearFunction.X_AXIS
+
+        return ConcatenatedFunction.ofPolynomialFunctions(
+                srcLanes.laneOffsetsWithStartingEntry().map { it.s },
+                srcLanes.laneOffsetsWithStartingEntry().map { it.coefficients })
+                .handleMessage { this.reportLogger.info(it, id.toString()) }
+    }
+
 
     /**
      * Builds a function that describes the lane width.
@@ -80,9 +106,9 @@ class FunctionBuilder(
         if (widthEntriesAdjusted.size < srcLaneWidthEntries.size)
             this.reportLogger.info("Removing redundant width entries.", id.toString())
 
-        return ConcatenatedFunction.ofPolynomialFunctions(
-                widthEntriesAdjusted.map { it.sOffset }, widthEntriesAdjusted.map { it.coefficients }
-        ).handleMessage { this.reportLogger.info(it, id.toString()) }
+        return if (widthEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
+        else ConcatenatedFunction.ofPolynomialFunctions(widthEntriesAdjusted.map { it.sOffset },
+                widthEntriesAdjusted.map { it.coefficients }).handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
     /**

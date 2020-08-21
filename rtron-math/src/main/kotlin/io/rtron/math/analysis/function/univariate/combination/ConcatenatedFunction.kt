@@ -32,18 +32,19 @@ import io.rtron.std.isSorted
  * Represents the sequential concatenation of the provided member functions.
  *
  * @param memberFunctions functions to be concatenated
+ * @param absoluteStart absolute start of the first function
  */
 class ConcatenatedFunction(
-        memberFunctions: List<UnivariateFunction>
+        memberFunctions: List<UnivariateFunction>,
+        val absoluteStart: Double
 ) : UnivariateFunction() {
 
     // Properties and Initializers
-    private val container = ConcatenationContainer(memberFunctions)
+    private val container = ConcatenationContainer(memberFunctions, absoluteStart)
     override val domain: Range<Double> get() = container.domain
 
     // Methods
     override fun valueUnbounded(x: Double): Result<Double, Exception> {
-
         val localMember = container.strictSelectMember(x)
                 .handleFailure { return it }
         return localMember.member.valueUnbounded(localMember.localParameter)
@@ -84,7 +85,7 @@ class ConcatenatedFunction(
 
         /**
          * Creates a concatenated function of a list of linear functions, whereby the slopes are adjusted so that the
-         * concatenated function is continuous.
+         * concatenated function is continuous. The last slope is zero.
          * For example:
          * f(x) = slope_1 * x + 0 for [0, 5)
          * f(x) = slope_2 * x - 5 for [5, ∞)
@@ -95,9 +96,12 @@ class ConcatenatedFunction(
          */
         fun ofLinearFunctions(starts: List<Double>, intercepts: List<Double>):
                 UnivariateFunction {
-            require(starts.isNotEmpty()) { "Must contain start values." }
-            require(starts.hasSameSizeAs(intercepts)) { "Equally sized starts and intercepts required." }
-            require(starts.isSorted()) { "Start values must be sorted in ascending order." }
+            require(starts.isNotEmpty() && intercepts.isNotEmpty())
+            { "List of starts and intercepts must not be empty." }
+            require(starts.hasSameSizeAs(intercepts))
+            { "Equally sized starts and intercepts required." }
+            require(starts.isSorted())
+            { "Start values must be sorted in ascending order." }
 
             val deltaIntercepts = intercepts.zipWithNext().map { it.second - it.first }
             val lengths = starts.zipWithNext().map { it.second - it.first }
@@ -110,16 +114,16 @@ class ConcatenatedFunction(
                 LinearFunction(slopes[index], intercepts[index], domains[index])
             }
 
-            return ConcatenatedFunction(linearFunctions)
+            return ConcatenatedFunction(linearFunctions, starts.first())
         }
 
         /**
          * Creates a concatenated function with a list of polynomial function.
          * For example:
-         * f(x) = 2 + 3*x + 4*x^2 + x^3 for [0, 5)
-         * f(x) = 1 + 2*x + 3*x^2 + 4* x^3  for [5, ∞)
-         * The [starts] would be listOf(0, 5) and the [coefficients] would be
-         * listOf(arrayOf(2, 3, 4, 1), arrayOf(1, 2, 3, 4).
+         * f(x) = 2 + 3*x + 4*x^2 + x^3 for [-2, 3)
+         * f(x) = 1 + 2*x + 3*x^2 + 4* x^3  for [3, ∞)
+         * The [starts] would be listOf(-2, 3) and the [coefficients] would be
+         * listOf(arrayOf(2, 3, 4, 1), arrayOf(1, 2, 3, 4)).
          *
          * @param starts absolute start value of the function member
          * @param coefficients coefficients of the polynomial function members
@@ -127,17 +131,26 @@ class ConcatenatedFunction(
         fun ofPolynomialFunctions(starts: List<Double>, coefficients: List<DoubleArray>):
                 ContextMessage<UnivariateFunction> {
 
-            require(starts.hasSameSizeAs(coefficients)) { "Equally sized starts and coefficients required." }
-            require(starts.isSorted()) { "Polynomials must be sorted in ascending order." }
+            require(starts.isNotEmpty() && coefficients.isNotEmpty())
+            { "List of starts and coefficients must not be empty." }
+            require(starts.hasSameSizeAs(coefficients))
+            { "Equally sized starts and coefficients required." }
+            require(starts.isSorted())
+            { "Polynomials must be sorted in ascending order." }
 
-            if (starts.isEmpty()) return ContextMessage(LinearFunction.X_AXIS)
+            val lengths = starts
+                    .zipWithNext()
+                    .map { it.second - it.first } + Double.POSITIVE_INFINITY
+            val polynomials = coefficients
+                    .zip(lengths)
+                    .filter { it.second != 0.0 }
+                    .map { PolynomialFunction.of(it.first, it.second) }
 
-            val lengths = starts.zipWithNext().map { it.second - it.first } + Double.POSITIVE_INFINITY
-            val polynomials = coefficients.zip(lengths).filter { it.second != 0.0 }.map { PolynomialFunction.of(it.first, it.second) }
+            val message = if (polynomials.hasSameSizeAs(starts)) ""
+            else "Removed element(s) with length zero when building a concatenated polynomial."
 
-            val message = if (polynomials.hasSameSizeAs(starts)) "" else "Removed element(s) with length zero when building a concatenated polynomial."
-
-            return ContextMessage(ConcatenatedFunction(polynomials), message)
+            val concatenatedFunction = ConcatenatedFunction(polynomials, starts.first())
+            return ContextMessage(concatenatedFunction, message)
         }
 
     }

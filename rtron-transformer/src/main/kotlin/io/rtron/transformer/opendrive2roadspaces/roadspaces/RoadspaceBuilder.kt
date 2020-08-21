@@ -20,6 +20,7 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
+import io.rtron.math.analysis.function.bivariate.pure.ShapeFunction
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
 import io.rtron.model.opendrive.road.lateralprofile.RoadLateralProfileShape
 import io.rtron.model.roadspaces.ModelIdentifier
@@ -75,7 +76,7 @@ class RoadspaceBuilder(
         val attributes = buildAttributes(srcRoad)
 
         // build up road's surface geometries
-        val lateralProfileRoadShape = buildLateralRoadShape(srcRoad.lateralProfile.shape)
+        val lateralProfileRoadShape = buildLateralRoadShape(roadspaceId, srcRoad.lateralProfile.shape)
         val roadSurface = CurveRelativeParametricSurface3D(roadReferenceLine.copy(torsionFunction = torsionFunction),
                 lateralProfileRoadShape)
         val roadSurfaceWithoutTorsion = CurveRelativeParametricSurface3D(roadReferenceLine, lateralProfileRoadShape)
@@ -100,10 +101,18 @@ class RoadspaceBuilder(
         return Result.success(roadspace)
     }
 
-    private fun buildLateralRoadShape(srcLateralProfileShapeList: List<RoadLateralProfileShape>): BivariateFunction {
-        if (srcLateralProfileShapeList.isNotEmpty())
-            _reportLogger.warnOnce("Lateral shape profile is not implemented yet.")
-        return PlaneFunction.ZERO
+    private fun buildLateralRoadShape(id: RoadspaceIdentifier, srcLateralProfileShapeList: List<RoadLateralProfileShape>):
+            BivariateFunction {
+
+        if (srcLateralProfileShapeList.isEmpty()) return PlaneFunction.ZERO
+
+        val lateralFunctions = srcLateralProfileShapeList
+                .groupBy { it.s }
+                .mapValues { _functionBuilder.buildLateralShape(id, it.value) }
+                .toSortedMap()
+
+        return ShapeFunction(lateralFunctions, extrapolateX = true,
+                extrapolateY = configuration.parameters.extrapolateLateralRoadShapes)
     }
 
     private fun buildAttributes(srcRoad: OpendriveModelRoad) =

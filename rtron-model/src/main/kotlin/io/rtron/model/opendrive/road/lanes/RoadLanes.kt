@@ -33,4 +33,14 @@ data class RoadLanes(
 
     // Methods
     fun containsLaneOffset() = laneOffset.isNotEmpty()
+
+    /**
+     * Returns the list of lane offsets with the first entry starting at s=0.0.
+     * Sometimes OpenDRIVE datasets contain an entry at s=0.0, sometimes the first entry starts at e.g. 3.0.
+     */
+    fun laneOffsetsWithStartingEntry(): List<RoadLanesLaneOffset> = when {
+        laneOffset.isEmpty() -> laneOffset
+        laneOffset.first().s > 0.0 -> listOf(RoadLanesLaneOffset.ZERO) + laneOffset
+        else -> laneOffset
+    }
 }

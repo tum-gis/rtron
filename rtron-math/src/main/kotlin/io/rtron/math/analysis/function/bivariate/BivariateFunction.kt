@@ -26,7 +26,7 @@ import io.rtron.math.range.fuzzyContains
  */
 abstract class BivariateFunction {
 
-    // initializers and properties
+    // Properties and Initializers
 
     /** function's domain for x */
     abstract val domainX: Range<Double>

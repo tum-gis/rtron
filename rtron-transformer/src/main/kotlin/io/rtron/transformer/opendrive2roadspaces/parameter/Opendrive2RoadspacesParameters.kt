@@ -17,9 +17,9 @@
 package io.rtron.transformer.opendrive2roadspaces.parameter
 
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import io.rtron.std.Property
 import io.rtron.transformer.AbstractTransformerParameters
 import io.rtron.transformer.TransformerConfiguration
-import io.rtron.std.Property
 
 
 typealias Opendrive2RoadspacesConfiguration = TransformerConfiguration<Opendrive2RoadspacesParameters>
@@ -34,8 +34,9 @@ class Opendrive2RoadspacesParameters(
         private val crsEpsgProperty: Property<Int> = Property(0, true),
         private val offsetXProperty: Property<Double> = Property(0.0, true),
         private val offsetYProperty: Property<Double> = Property(0.0, true),
-        private val offsetZProperty: Property<Double> = Property(0.0, true)
-) : AbstractTransformerParameters() {
+        private val offsetZProperty: Property<Double> = Property(0.0, true),
+        private val extrapolateLateralRoadShapesProperty: Property<Boolean> = Property(value = false, isDefault = true)
+        ) : AbstractTransformerParameters() {
 
     // Properties and Initializers
 
@@ -69,12 +70,15 @@ class Opendrive2RoadspacesParameters(
      */
     val offsetZ by offsetZProperty
 
-
     /**
      * offset in the xy plane as vector
      */
     val offsetXY = Vector2D(offsetX, offsetY)
 
+    /**
+     * linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown)
+     */
+    val extrapolateLateralRoadShapes by extrapolateLateralRoadShapesProperty
 
     // Methods
 
@@ -87,9 +91,11 @@ class Opendrive2RoadspacesParameters(
             this.crsEpsgProperty leftMerge other.crsEpsgProperty,
             this.offsetXProperty leftMerge other.offsetXProperty,
             this.offsetYProperty leftMerge other.offsetYProperty,
-            this.offsetZProperty leftMerge other.offsetZProperty)
+            this.offsetZProperty leftMerge other.offsetZProperty,
+            this.extrapolateLateralRoadShapesProperty leftMerge other.extrapolateLateralRoadShapesProperty)
 
     override fun toString() =
             "Opendrive2RoadspacesParameters(tolerance=$tolerance, attributesPrefix=$attributesPrefix," +
-                    " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ)"
+                    " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ, " +
+                    "extrapolateLateralRoadShapes=$extrapolateLateralRoadShapes)"
 }

@@ -24,12 +24,15 @@ import io.rtron.std.handleSuccess
 
 /**
  * Concatenates a list of members according to their domain. The domain of each member must start at zero and
- * be finite, except the last member.
+ * be finite, except the last member. As each members' domain is defined locally, the [absoluteLowerEndpoint]
+ * defines the absolute start of the concatenated container's domain.
  *
  * @param members members to be concatenated
+ * @param absoluteLowerEndpoint absolute start of the concatenated container
  */
 class ConcatenationContainer<T : DefinableDomain<Double>>(
-        members: List<T>
+        members: List<T>,
+        val absoluteLowerEndpoint: Double = 0.0
 ) {
 
     // Properties and Initializers
@@ -42,20 +45,26 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
         { "Domain of all members must greater than zero." }
         require(members.dropLast(1).all { it.domain.hasUpperBound() && it.domain.upperEndpointOrNull()!!.isFinite() })
         { "All members (except the last one) must have a domain with an upper and finite bound." }
+        require(absoluteLowerEndpoint.isFinite())
+        { "Absolute lower endpoint must be finite." }
     }
 
     /** domain lengths of each member */
     private val domainLengths: List<Double> = members.map { it.domain.length }
     /** absolute starts of each member after concatenating them */
-    private val absoluteStarts: List<Double> = domainLengths.dropLast(1).cumulativeSum()
+    private val absoluteStarts: List<Double> = domainLengths
+            .dropLast(1)
+            .cumulativeSum()
+            .map { it + absoluteLowerEndpoint }
     /** domain of each member in absolute values */
     private val absoluteDomains: List<Range<Double>>
     /** domain of this container */
     val domain: Range<Double>
 
     init {
-        absoluteDomains = absoluteStarts.zip(domainLengths)
-                .dropLast(1).map { Range.closedOpen(it.first, it.first + it.second) } +
+        absoluteDomains = absoluteStarts
+                .zipWithNext()
+                .map { Range.closedOpen(it.first, it.second) } +
                 Range.closed(absoluteStarts.last(), absoluteStarts.last() + domainLengths.last())
 
         val absoluteRangeSet = absoluteDomains.toSet().unionRanges()

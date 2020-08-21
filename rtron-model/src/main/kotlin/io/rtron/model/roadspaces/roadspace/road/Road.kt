@@ -29,6 +29,7 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.CompositeSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.range.Range
+import io.rtron.math.range.fuzzyEncloses
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.std.getValueResult
@@ -60,7 +61,10 @@ class Road(
         { "Domains of provided surfaces must have the same domain." }
         require(curvePositionDomain.hasLowerBound() && curvePositionDomain.hasUpperBound())
         { "Domain of curve position must have upper and lower bounds." }
-        require(laneSections.isNotEmpty()) { "Road must contain laneSections." }
+        require(laneOffset.domain.fuzzyEncloses(surface.domain, surface.tolerance))
+        { "The lane offset function must be defined everywhere where the surface is also defined." }
+        require(laneSections.isNotEmpty())
+        { "Road must contain laneSections." }
         require(laneSections.mapIndexed { index, laneSection -> index to laneSection }
                 .all { it.first == it.second.id.laneSectionId })
         { "LaneSection elements must be positioned according to their laneSection id on the list." }
