@@ -26,6 +26,15 @@ class Roadspaces2CitygmlParametersBuilder {
 
     private val defaultParameters = Roadspaces2CitygmlParameters()
 
+    private val gmlIdPrefixProperty = SettableProperty(defaultParameters.gmlIdPrefix)
+    var gmlIdPrefix by gmlIdPrefixProperty
+
+    private val identifierAttributesPrefixProperty = SettableProperty(defaultParameters.identifierAttributesPrefix)
+    var identifierAttributesPrefix by identifierAttributesPrefixProperty
+
+    private val flattenGenericAttributeSetsProperty = SettableProperty(defaultParameters.flattenGenericAttributeSets)
+    var flattenGenericAttributeSets by flattenGenericAttributeSetsProperty
+
     private val discretizationStepSizeProperty = SettableProperty(defaultParameters.discretizationStepSize)
     var discretizationStepSize by discretizationStepSizeProperty
 
@@ -35,18 +44,13 @@ class Roadspaces2CitygmlParametersBuilder {
     private val circleSlicesProperty = SettableProperty(defaultParameters.circleSlices)
     var circleSlices by circleSlicesProperty
 
-    private val flattenGenericAttributeSetsProperty = SettableProperty(defaultParameters.flattenGenericAttributeSets)
-    var flattenGenericAttributeSets by flattenGenericAttributeSetsProperty
-
-    private val idPrefixProperty = SettableProperty(defaultParameters.idPrefix)
-    var idPrefix by idPrefixProperty
-
     fun build() = Roadspaces2CitygmlParameters(
+            gmlIdPrefixProperty,
+            identifierAttributesPrefixProperty,
+            flattenGenericAttributeSetsProperty,
             discretizationStepSizeProperty,
             sweepDiscretizationStepSizeProperty,
-            circleSlicesProperty,
-            flattenGenericAttributeSetsProperty,
-            idPrefixProperty)
+            circleSlicesProperty)
 }
 
 /**

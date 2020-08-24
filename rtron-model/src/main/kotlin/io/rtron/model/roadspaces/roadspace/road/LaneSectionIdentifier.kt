@@ -24,6 +24,7 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
  */
 interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
     val laneSectionId: Int
+    val laneSectionCurveRelativeStart: Double
 }
 
 
@@ -35,11 +36,13 @@ interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
  */
 data class LaneSectionIdentifier(
         override val laneSectionId: Int,
+        override val laneSectionCurveRelativeStart: Double,
         val roadspaceIdentifier: RoadspaceIdentifier
 ) : LaneSectionIdentifierInterface, RoadspaceIdentifierInterface by roadspaceIdentifier {
 
     // Conversions
     override fun toString(): String {
-        return "LaneSectionIdentifier(laneSectionId=$laneSectionId, roadSpaceId=$roadspaceId)"
+        return "LaneSectionIdentifier(laneSectionId=$laneSectionId, " +
+                "laneSectionCurveRelativeStart=$laneSectionCurveRelativeStart, roadSpaceId=$roadspaceId)"
     }
 }

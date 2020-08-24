@@ -79,6 +79,8 @@ class AttributeList(val attributes: List<Attribute> = listOf(), name: String = "
     override fun isEmpty() = attributes.all { it.isEmpty() }
 
     companion object {
+        val EMPTY = AttributeList(emptyList())
+
         fun of(vararg attributes: Attribute) = AttributeList(attributes.toList())
     }
 }

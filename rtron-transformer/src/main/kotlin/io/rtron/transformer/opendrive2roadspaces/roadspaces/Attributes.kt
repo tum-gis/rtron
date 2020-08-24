@@ -16,17 +16,8 @@
 
 package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
-import io.rtron.io.files.FileIdentifier
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.model.opendrive.common.EUnitSpeed
-import io.rtron.model.roadspaces.ModelIdentifier
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
-import io.rtron.model.roadspaces.roadspace.attribute.attributes
-import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 
 
 /**
@@ -37,48 +28,4 @@ fun EUnitSpeed.toUnitOfMeasure(): UnitOfMeasure = when (this) {
     EUnitSpeed.MILES_PER_HOUR -> UnitOfMeasure.MILES_PER_HOUR
     EUnitSpeed.KILOMETER_PER_HOUR -> UnitOfMeasure.KILOMETER_PER_HOUR
     EUnitSpeed.UNKNOWN -> UnitOfMeasure.UNKNOWN
-}
-
-
-/**
- * Builder for [AttributeList] mainly for identifier parameters.
- */
-class AttributesBuilder(
-        private val parameters: Opendrive2RoadspacesParameters
-) {
-    // Methods
-    fun toAttributes(fileIdentifier: FileIdentifier): AttributeList =
-            attributes(parameters.attributesPrefix + "identifier_") {
-                attribute("sourceFileName", fileIdentifier.fileName)
-                attribute("sourceFileHashSha256", fileIdentifier.fileHashSha256)
-            }
-
-    fun toAttributes(modelIdentifier: ModelIdentifier): AttributeList =
-            attributes(parameters.attributesPrefix + "identifier_") {
-                attribute("modelName", modelIdentifier.modelName)
-                attribute("modelDate", modelIdentifier.modelDate)
-                attribute("modelVendor", modelIdentifier.modelVendor)
-            } + toAttributes(modelIdentifier.sourceFileIdentifier)
-
-    fun toAttributes(roadspaceIdentifier: RoadspaceIdentifier): AttributeList =
-            attributes(parameters.attributesPrefix + "identifier_") {
-                attribute("roadName", roadspaceIdentifier.roadspaceName)
-                attribute("roadId", roadspaceIdentifier.roadspaceId)
-            } + toAttributes(roadspaceIdentifier.modelIdentifier)
-
-    fun toAttributes(laneSectionIdentifier: LaneSectionIdentifier): AttributeList =
-            attributes(parameters.attributesPrefix + "identifier_") {
-                attribute("laneSectionId", laneSectionIdentifier.laneSectionId)
-            } + toAttributes(laneSectionIdentifier.roadspaceIdentifier)
-
-    fun toAttributes(laneIdentifier: LaneIdentifier): AttributeList =
-            attributes(parameters.attributesPrefix + "identifier_") {
-                attribute("laneId", laneIdentifier.laneId)
-            } + toAttributes(laneIdentifier.laneSectionIdentifier)
-
-    fun toAttributes(roadspaceObjectIdentifier: RoadspaceObjectIdentifier): AttributeList =
-            attributes(parameters.attributesPrefix + "identifier_") {
-                attribute("roadObjectId", roadspaceObjectIdentifier.roadspaceObjectId)
-                attribute("roadObjectName", roadspaceObjectIdentifier.roadspaceObjectName)
-            } + toAttributes(roadspaceObjectIdentifier.roadspaceIdentifier)
 }

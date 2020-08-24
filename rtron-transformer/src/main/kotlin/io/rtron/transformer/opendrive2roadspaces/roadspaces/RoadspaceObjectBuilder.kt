@@ -48,7 +48,6 @@ class RoadspaceObjectBuilder(
 
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
-    private val _attributesBuilder = AttributesBuilder(configuration.parameters)
 
     private val _solid3DBuilder = Solid3DBuilder(_reportLogger, configuration.parameters)
     private val _surface3DBuilder = Surface3DBuilder(_reportLogger, configuration.parameters)
@@ -87,11 +86,10 @@ class RoadspaceObjectBuilder(
                         .handleFailure { return it }
 
         // build attributes
-        val idAttributes = _attributesBuilder.toAttributes(roadspaceObjectId)
-        val infoAttributes = baseAttributes + buildAttributes(srcRoadObject)
+        val attributes = baseAttributes + buildAttributes(srcRoadObject)
 
         // build roadspace object
-        val roadspaceObject = RoadspaceObject(roadspaceObjectId, type, geometries, idAttributes, infoAttributes)
+        val roadspaceObject = RoadspaceObject(roadspaceObjectId, type, geometries, attributes)
         return Result.success(roadspaceObject)
     }
 
@@ -168,10 +166,9 @@ class RoadspaceObjectBuilder(
         val objectId = RoadspaceObjectIdentifier(srcSignal.id, srcSignal.name, id)
 
         val geometry = buildGeometries(srcSignal, roadReferenceLine).handleFailure { return it }
-        val idAttributes = _attributesBuilder.toAttributes(objectId)
-        val infoAttributes = baseAttributes + buildAttributes(srcSignal)
+        val attributes = baseAttributes + buildAttributes(srcSignal)
 
-        val roadObject = RoadspaceObject(objectId, RoadObjectType.SIGNAL, geometry, idAttributes, infoAttributes)
+        val roadObject = RoadspaceObject(objectId, RoadObjectType.SIGNAL, geometry, attributes)
         return Result.success(roadObject)
     }
 

@@ -135,11 +135,10 @@ class Road(
      *
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
-    fun getAllLeftLaneBoundaries(): List<Triple<LaneIdentifier, AbstractCurve3D, AttributeList>> =
+    fun getAllLeftLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
             getAllLaneIdentifiers().map { id ->
                 val curve = getLeftLaneBoundaries(id).handleFailure { throw it.error }
-                val attributes = getLane(id).handleFailure { throw it.error }.idAttributes
-                Triple(id, curve, attributes)
+                Pair(id, curve)
             }
 
     /**
@@ -147,11 +146,10 @@ class Road(
      *
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
-    fun getAllRightLaneBoundaries(): List<Triple<LaneIdentifier, AbstractCurve3D, AttributeList>> =
+    fun getAllRightLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
             getAllLaneIdentifiers().map { id ->
                 val curve = getRightLaneBoundary(id).handleFailure { throw it.error }
-                val attributes = getLane(id).handleFailure { throw it.error }.idAttributes
-                Triple(id, curve, attributes)
+                Pair(id, curve)
             }
 
     /**
@@ -161,11 +159,10 @@ class Road(
      * lane boundary is returned; if the factor is 0.5, the center line of the lane is returned
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
-    fun getAllCurvesOnLanes(factor: Double): List<Triple<LaneIdentifier, AbstractCurve3D, AttributeList>> =
+    fun getAllCurvesOnLanes(factor: Double): List<Pair<LaneIdentifier, AbstractCurve3D>> =
             getAllLaneIdentifiers().map { id ->
                 val curve = getCurveOnLane(id, factor).handleFailure { throw it.error }
-                val attributes = getLane(id).handleFailure { throw it.error }.idAttributes
-                Triple(id, curve, attributes)
+                Pair(id, curve)
             }
 
     /**
@@ -173,16 +170,11 @@ class Road(
      *
      * @param step discretization step size
      */
-    fun getAllLateralFillerSurfaces(step: Double): List<Triple<LaneIdentifier, AbstractSurface3D, AttributeList>> =
+    fun getAllLateralFillerSurfaces(step: Double): List<Pair<LaneIdentifier, AbstractSurface3D>> =
             getAllLaneIdentifiers().fold(emptyList()) { acc, id ->
                 val fillerSurface = getLeftLateralFillerSurfaceOrNull(id, step)
                         .handleFailure { throw it.error }
-
-                if (fillerSurface == null) acc
-                else {
-                    val attributes = getLane(id).handleFailure { throw it.error }.idAttributes
-                    acc + Triple(id, fillerSurface, attributes)
-                }
+                if (fillerSurface == null) acc else acc + Pair(id, fillerSurface)
             }
 
     /**

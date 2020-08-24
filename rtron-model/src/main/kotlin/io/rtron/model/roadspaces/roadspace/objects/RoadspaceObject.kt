@@ -24,20 +24,17 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * Represents an object within the road space.
  *
  * @param geometry geometry of the road space object
- * @param idAttributes attributes relevant for the identification of the road space object
- * @param infoAttributes attributes containing further information about the road space object
+ * @param attributes attributes containing information about the road space object
  */
 data class RoadspaceObject(
         val id: RoadspaceObjectIdentifier,
         val type: RoadObjectType = RoadObjectType.NONE,
         val geometry: List<AbstractGeometry3D> = listOf(),
-        val idAttributes: AttributeList,
-        val infoAttributes: AttributeList
+        val attributes: AttributeList
 ) {
 
     // Properties and Initializers
     val name get() = id.roadspaceObjectName
-    val attributes get() = idAttributes + infoAttributes
 
     // Conversions
     override fun toString(): String {

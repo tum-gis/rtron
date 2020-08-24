@@ -24,18 +24,10 @@ import io.rtron.math.projection.CoordinateReferenceSystem
  * Header of the [RoadspacesModel] containing the model's meta information.
  */
 data class Header (
-        val modelName: String = "",
         val coordinateReferenceSystem: Result<CoordinateReferenceSystem, Exception>,
-
-        val revMajor: Int = -1,
-        val revMinor: Int = -1,
-        val version: Float = Float.NaN,
-        val date: String = "",
 
         val north: Double = Double.NaN,
         val south: Double = Double.NaN,
         val east: Double = Double.NaN,
-        val west: Double = Double.NaN,
-
-        val vendor: String = ""
+        val west: Double = Double.NaN
 )

@@ -39,8 +39,6 @@ class LaneBuilder(
 
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
-
-    private val _attributesBuilder = AttributesBuilder(configuration.parameters)
     private val _functionBuilder = FunctionBuilder(_reportLogger, configuration.parameters)
 
     // Methods
@@ -59,12 +57,10 @@ class LaneBuilder(
         val laneHeightOffsets = buildLaneHeightOffset(id, srcLane.height)
 
         // build lane attributes
-        val idAttributes = _attributesBuilder.toAttributes(id)
-        val infoAttributes = baseAttributes + buildAttributes(srcLane)
+        val attributes = baseAttributes + buildAttributes(srcLane)
 
         // build up lane object
-        return Lane(id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, srcLane.level,
-                idAttributes, infoAttributes)
+        return Lane(id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, srcLane.level, attributes)
     }
 
     /**

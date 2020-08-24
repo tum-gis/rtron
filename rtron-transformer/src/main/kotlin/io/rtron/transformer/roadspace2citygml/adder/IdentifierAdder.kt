@@ -37,9 +37,9 @@ class IdentifierAdder(
 
     // Properties and Initializers
     private val _checkedIdPrefix by lazy {
-        if (!DefaultGMLIdManager.getInstance()!!.isValidPrefix(parameters.idPrefix))
-            reportLogger.warnOnce("Unvalid ID prefix configured: ${parameters.idPrefix}")
-        parameters.idPrefix
+        if (!DefaultGMLIdManager.getInstance()!!.isValidPrefix(parameters.gmlIdPrefix))
+            reportLogger.warnOnce("Unvalid ID prefix configured: ${parameters.gmlIdPrefix}")
+        parameters.gmlIdPrefix
     }
 
     // Methods

@@ -19,8 +19,6 @@ package io.rtron.transformer.opendrive2roadspaces.roadspaces
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
-import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.lanes.RoadLanes
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSection
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
@@ -32,6 +30,8 @@ import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
+import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 
 
 /**
@@ -64,7 +64,7 @@ class RoadBuilder(
         val laneOffset = _functionBuilder.buildLaneOffset(id, srcLanes)
         val laneSections = srcLanes.laneSection
                 .mapIndexed { currentId, currentLaneSection ->
-                    val laneSectionIdentifier = LaneSectionIdentifier(currentId, id)
+                    val laneSectionIdentifier = LaneSectionIdentifier(currentId, currentLaneSection.s, id)
                     buildLaneSection(laneSectionIdentifier, currentLaneSection, baseAttributes)
                 }
                 .handleAndRemoveFailure { _reportLogger.log(it, id.toString()) }

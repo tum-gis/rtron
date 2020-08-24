@@ -18,9 +18,9 @@ package io.rtron.transformer.opendrive2roadspaces.header
 
 import com.github.kittinunf.result.Result
 import io.rtron.math.projection.CoordinateReferenceSystem
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.roadspaces.Header
 import io.rtron.std.handleSuccess
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.header.Header as OdrHeader
 
 
@@ -32,10 +32,7 @@ class HeaderBuilder(
     fun buildHeader(srcHeader: OdrHeader): Header {
         val crs = buildCoordinateSystem(srcHeader.geoReference)
 
-        return Header(modelName = srcHeader.name,
-                date = srcHeader.date,
-                vendor = srcHeader.vendor,
-                coordinateReferenceSystem = crs)
+        return Header(coordinateReferenceSystem = crs)
     }
 
     /**

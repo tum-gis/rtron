@@ -26,6 +26,7 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
  * approach of OpenDRIVE and generate the surface based modeling approach of CityGML.
  */
 data class RoadspacesModel(
+        val id: ModelIdentifier,
         val header: Header,
         val roadspaces: List<Roadspace> = listOf()
 ) : AbstractModel()

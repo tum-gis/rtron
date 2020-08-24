@@ -20,6 +20,9 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success
 import io.rtron.io.logging.ProgressBar
 import io.rtron.math.projection.CoordinateReferenceSystem
+import io.rtron.model.citygml.CitygmlModel
+import io.rtron.model.roadspaces.RoadspacesModel
+import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.transformer.AbstractTransformer
 import io.rtron.transformer.roadspace2citygml.adder.RoadObjectAdder
 import io.rtron.transformer.roadspace2citygml.adder.RoadsAdder
@@ -28,9 +31,6 @@ import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfig
 import org.citygml4j.model.citygml.core.CityModel
 import org.citygml4j.model.gml.basicTypes.Code
 import org.citygml4j.util.bbox.BoundingBoxOptions
-import io.rtron.model.citygml.CitygmlModel
-import io.rtron.model.roadspaces.RoadspacesModel
-import io.rtron.model.roadspaces.roadspace.Roadspace
 
 
 /**
@@ -61,7 +61,7 @@ class Roadspaces2CitygmlTransformer(
 
         // general model setup
         val cityModel = CityModel()
-        cityModel.name = listOf(Code(roadspacesModel.header.modelName))
+        cityModel.name = listOf(Code(roadspacesModel.id.modelName))
 
         // transformation of each road space
         _reportLogger.info("Transforming roads spaces with ${configuration.parameters}.")

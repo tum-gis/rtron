@@ -26,9 +26,5 @@ data class Lane(
         val innerHeightOffset: UnivariateFunction,
         val outerHeightOffset: UnivariateFunction,
         val level: Boolean,
-        val idAttributes: AttributeList,
-        val infoAttributes: AttributeList
-) {
-    // Properties and Initializers
-    val attributes get() = idAttributes + infoAttributes
-}
+        val attributes: AttributeList
+)

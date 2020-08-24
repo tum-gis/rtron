@@ -18,6 +18,7 @@ package io.rtron.io.files
 
 interface FileIdentifierInterface {
     val fileName: String
+    val fileExtension: String
     val filePath: Path
     val fileHashSha256: String
 }
@@ -26,17 +27,19 @@ interface FileIdentifierInterface {
  * Identifier of a file with hash checksum to verify data integrity.
  *
  * @param fileName actual name of the file
+ * @param fileExtension extension of the file
  * @param filePath path to the file
  * @param fileHashSha256 hash of the file
  */
 data class FileIdentifier(
         override val fileName: String,
+        override val fileExtension: String,
         override val filePath: Path,
         override val fileHashSha256: String
 ) : FileIdentifierInterface {
 
     companion object {
         fun of(path: Path) = of(File(path))
-        fun of(file: File) = FileIdentifier(file.nameWithoutExtension, file.path, file.hashSha256)
+        fun of(file: File) = FileIdentifier(file.nameWithoutExtension, file.extension, file.path, file.hashSha256)
     }
 }

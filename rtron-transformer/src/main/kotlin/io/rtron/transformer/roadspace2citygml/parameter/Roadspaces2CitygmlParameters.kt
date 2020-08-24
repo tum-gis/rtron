@@ -29,14 +29,25 @@ typealias Roadspaces2CitygmlConfiguration = TransformerConfiguration<Roadspaces2
  * Transformation parameters for the RoadSpaces model to the CityGML model transformer.
  */
 class Roadspaces2CitygmlParameters(
+        private val gmlIdPrefixProperty: Property<String> = Property("UUID_", isDefault = true),
+        private val identifierAttributesPrefixProperty: Property<String> = Property("identifier_", isDefault = true),
+        private val flattenGenericAttributeSetsProperty: Property<Boolean> = Property(value = true, isDefault = true),
         private val discretizationStepSizeProperty: Property<Double> = Property(0.7, true),
         private val sweepDiscretizationStepSizeProperty: Property<Double> = Property(ParametricSweep3D.DEFAULT_STEP_SIZE, true),
-        private val circleSlicesProperty: Property<Int> = Property(Cylinder3D.DEFAULT_NUMBER_SLICES, true),
-        private val flattenGenericAttributeSetsProperty: Property<Boolean> = Property(value = true, isDefault = true),
-        private val idPrefixProperty: Property<String> = Property("UUID_", isDefault = true)
+        private val circleSlicesProperty: Property<Int> = Property(Cylinder3D.DEFAULT_NUMBER_SLICES, true)
 ) : AbstractTransformerParameters() {
 
     // Properties and Initializers
+
+    /**
+     * prefix for generated gml ids
+     */
+    val gmlIdPrefix by gmlIdPrefixProperty
+
+    /**
+     * prefix for identifier attribute names
+     */
+    val identifierAttributesPrefix by identifierAttributesPrefixProperty
 
     /**
      * distance between each discretization step for curves and surfaces
@@ -58,27 +69,23 @@ class Roadspaces2CitygmlParameters(
      */
     val flattenGenericAttributeSets by flattenGenericAttributeSetsProperty
 
-    /**
-     * prefix for generated gml ids
-     */
-    val idPrefix by idPrefixProperty
-
     // Methods
 
     /**
      * Merges the [other] parameters into this. See [Property.leftMerge] for the prioritization rules.
      */
     infix fun leftMerge(other: Roadspaces2CitygmlParameters) = Roadspaces2CitygmlParameters(
+            this.gmlIdPrefixProperty leftMerge other.gmlIdPrefixProperty,
+            this.identifierAttributesPrefixProperty leftMerge other.identifierAttributesPrefixProperty,
+            this.flattenGenericAttributeSetsProperty leftMerge other.flattenGenericAttributeSetsProperty,
             this.discretizationStepSizeProperty leftMerge other.discretizationStepSizeProperty,
             this.sweepDiscretizationStepSizeProperty leftMerge other.sweepDiscretizationStepSizeProperty,
-            this.circleSlicesProperty leftMerge other.circleSlicesProperty,
-            this.flattenGenericAttributeSetsProperty leftMerge other.flattenGenericAttributeSetsProperty,
-            this.idPrefixProperty leftMerge other.idPrefixProperty
+            this.circleSlicesProperty leftMerge other.circleSlicesProperty
     )
 
     // Conversions
     override fun toString(): String =
-            "Roadspaces2CitygmlParameters(discretizationStepSize=$discretizationStepSize, " +
-                    "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices, " +
-                    "flattenGenericAttributeSets=$flattenGenericAttributeSets, idPrefix=$idPrefix)"
+            "Roadspaces2CitygmlParameters(gmlIdPrefix=$gmlIdPrefix, identifierAttributesPrefix=$identifierAttributesPrefix, " +
+                    "flattenGenericAttributeSets=$flattenGenericAttributeSets, discretizationStepSize=$discretizationStepSize, " +
+                    "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices)"
 }

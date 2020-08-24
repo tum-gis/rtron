@@ -17,15 +17,15 @@
 package io.rtron.transformer.opendrive2roadspaces
 
 import io.rtron.io.logging.ProgressBar
+import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.model.roadspaces.ModelIdentifier
+import io.rtron.model.roadspaces.RoadspacesModel
+import io.rtron.std.handleAndRemoveFailureIndexed
 import io.rtron.transformer.AbstractTransformer
 import io.rtron.transformer.TransformerConfiguration
 import io.rtron.transformer.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.transformer.opendrive2roadspaces.roadspaces.RoadspaceBuilder
-import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.model.roadspaces.ModelIdentifier
-import io.rtron.model.roadspaces.RoadspacesModel
-import io.rtron.std.handleAndRemoveFailureIndexed
 
 
 /**
@@ -56,8 +56,10 @@ class Opendrive2RoadspacesTransformer(
 
         // general model information
         val header = _headerBuilder.buildHeader(opendriveModel.header)
-        val modelIdentifier = ModelIdentifier(header.modelName,
-                header.date, header.vendor, configuration.sourceFileIdentifier)
+        val modelIdentifier = ModelIdentifier(modelName = opendriveModel.header.name,
+                modelDate = opendriveModel.header.date,
+                modelVendor = opendriveModel.header.vendor,
+                sourceFileIdentifier = configuration.sourceFileIdentifier)
 
         // transformation of each road
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
@@ -68,7 +70,7 @@ class Opendrive2RoadspacesTransformer(
             _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}" ,"Removing road.")
         }
 
-        return RoadspacesModel(header, roadspaces = roadspaces)
+        return RoadspacesModel(modelIdentifier, header, roadspaces = roadspaces)
                 .also { _reportLogger.info("Completed transformation: OpenDRIVE -> RoadspacesModel. ✔") }
     }
 }

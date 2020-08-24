@@ -20,6 +20,7 @@ import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
@@ -66,7 +67,8 @@ class RoadspaceLineAdder(
                 .handleFailure { _reportLogger.log(it); return }
 
         _identifierAdder.addIdentifier(id, name, abstractCityObject)
-        _attributesAdder.addAttributes(attributes, abstractCityObject)
+        _attributesAdder.addAttributes(id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                attributes, abstractCityObject)
         dstCityModel.addCityObjectMember(CityObjectMember(abstractCityObject))
     }
 }

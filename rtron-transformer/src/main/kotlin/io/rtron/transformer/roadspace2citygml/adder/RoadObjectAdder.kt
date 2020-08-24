@@ -18,6 +18,7 @@ package io.rtron.transformer.roadspace2citygml.adder
 
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
+import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
@@ -62,7 +63,9 @@ class RoadObjectAdder(
                 .handleFailure { _reportLogger.log(it); return }
 
         _identifierAdder.addIdentifier(srcRoadspaceObject.id, abstractCityObject)
-        _attributesAdder.addAttributes(srcRoadspaceObject.attributes, abstractCityObject)
+        _attributesAdder.addAttributes(
+                srcRoadspaceObject.id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                        srcRoadspaceObject.attributes, abstractCityObject)
 
         val cityObjectMember = CityObjectMember(abstractCityObject)
         dstCityModel.addCityObjectMember(cityObjectMember)

@@ -13,9 +13,11 @@ configure {
     }
 
     roadspaces2citygml {
+        gmlIdPrefix = "UUID_"
+        identifierAttributesPrefix = "identifier_"
+        flattenGenericAttributeSets = true
         discretizationStepSize = 0.5
         sweepDiscretizationStepSize = 0.3
         circleSlices = 12
-        flattenGenericAttributeSets = true
     }
 }
