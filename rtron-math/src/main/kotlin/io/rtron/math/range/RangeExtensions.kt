@@ -22,3 +22,9 @@ fun <T: Comparable<*>> Set<Range<T>>.containsIntersectingRanges(): Boolean {
     val rangeSetsList = this.map { RangeSet.of(it) }
     return rangeSetsList.toSet().containsIntersectingRangeSets()
 }
+
+/**
+ * Returns true, if the list of ranges contains consecutively following ranges that intersect.
+ */
+fun <T: Comparable<*>> List<Range<T>>.containsConsecutivelyIntersectingRanges(): Boolean =
+        map { it.toRangeSet() }.zipWithNext().any { it.first.intersects(it.second) }

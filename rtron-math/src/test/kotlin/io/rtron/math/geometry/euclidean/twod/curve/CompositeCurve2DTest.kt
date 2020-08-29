@@ -24,8 +24,10 @@ import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import io.rtron.math.range.Range
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
+import io.rtron.std.cumulativeSum
 
 
 internal class CompositeCurve2DTest {
@@ -77,8 +79,10 @@ internal class CompositeCurve2DTest {
             val affineSequence5 = AffineSequence2D.of(affine5)
             val curveMember5 = LineSegment2D(4.8660000002379050e-01, affineSequence5, tolerance = tolerance)
 
-            val compositeCurve = CompositeCurve2D.of(curveMember1, curveMember2, curveMember3,
-                    curveMember4, curveMember5)
+            val curveMembers = listOf(curveMember1, curveMember2, curveMember3, curveMember4, curveMember5)
+            val absoluteStarts = curveMembers.map { it.length }.cumulativeSum()
+            val absoluteDomains = absoluteStarts.zipWithNext().map { Range.closedOpen(it.first, it.second) }
+            val compositeCurve = CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts.dropLast(1))
             val curveRelativePoint = CurveRelativePoint1D(compositeCurve.length)
 
 

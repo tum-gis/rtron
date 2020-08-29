@@ -18,29 +18,28 @@ package io.rtron.math.analysis.function.univariate.combination
 
 import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
+import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.range.Range
-import io.rtron.std.ContextMessage
-import io.rtron.std.handleFailure
-import io.rtron.std.hasSameSizeAs
-import io.rtron.std.isSorted
+import io.rtron.std.*
 
 
 /**
  * Represents the sequential concatenation of the provided member functions.
  *
  * @param memberFunctions functions to be concatenated
- * @param absoluteStart absolute start of the first function
+ * @param absoluteStarts absolute start of the first function
  */
 class ConcatenatedFunction(
         memberFunctions: List<UnivariateFunction>,
-        val absoluteStart: Double
+        absoluteDomains: List<Range<Double>>,
+        absoluteStarts: List<Double>
 ) : UnivariateFunction() {
 
     // Properties and Initializers
-    private val container = ConcatenationContainer(memberFunctions, absoluteStart)
+    private val container = ConcatenationContainer(memberFunctions, absoluteDomains, absoluteStarts)
     override val domain: Range<Double> get() = container.domain
 
     // Methods
@@ -64,10 +63,7 @@ class ConcatenatedFunction(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-        if (!super.equals(other)) return false
-
-        other as ConcatenatedFunction
+        if (other !is ConcatenatedFunction) return false
 
         if (container != other.container) return false
 
@@ -75,9 +71,7 @@ class ConcatenatedFunction(
     }
 
     override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + container.hashCode()
-        return result
+        return container.hashCode()
     }
 
 
@@ -85,7 +79,7 @@ class ConcatenatedFunction(
 
         /**
          * Creates a concatenated function of a list of linear functions, whereby the slopes are adjusted so that the
-         * concatenated function is continuous. The last slope is zero.
+         * concatenated function is continuous.
          * For example:
          * f(x) = slope_1 * x + 0 for [0, 5)
          * f(x) = slope_2 * x - 5 for [5, ∞)
@@ -93,9 +87,11 @@ class ConcatenatedFunction(
          *
          * @param starts absolute start value of the function member
          * @param intercepts local intercept of the linear function
+         * @param prependConstant if true, the first linear function is preceded by a constant function
+         * @param appendConstant if true, the last linear function is appended by a constant function
          */
-        fun ofLinearFunctions(starts: List<Double>, intercepts: List<Double>):
-                UnivariateFunction {
+        fun ofLinearFunctions(starts: List<Double>, intercepts: List<Double>, prependConstant: Boolean = false,
+                              appendConstant: Boolean = true): UnivariateFunction {
             require(starts.isNotEmpty() && intercepts.isNotEmpty())
             { "List of starts and intercepts must not be empty." }
             require(starts.hasSameSizeAs(intercepts))
@@ -103,18 +99,39 @@ class ConcatenatedFunction(
             require(starts.isSorted())
             { "Start values must be sorted in ascending order." }
 
+            // calculate slopes for continuous function
             val deltaIntercepts = intercepts.zipWithNext().map { it.second - it.first }
             val lengths = starts.zipWithNext().map { it.second - it.first }
+            val slopes = deltaIntercepts.zip(lengths).map { it.first / it.second }
 
-            val slopes = deltaIntercepts.zip(lengths).map { it.first / it.second } + 0.0
-            check(starts.hasSameSizeAs(intercepts)) { "Equally sized starts and adjustedSlopes required." }
+            // prepare linear functions
+            val preparedStarts = starts.dropLast(1)
+            val preparedLinearFunctions = slopes.zip(intercepts)
+                    .map { LinearFunction(it.first, it.second) }
+            val preparedAbsoluteDomains = starts
+                    .zipWithNext()
+                    .map { Range.closedOpen(it.first, it.second) }
 
-            val domains = lengths.map { Range.closedOpen(0.0, it) } + Range.atLeast(0.0)
-            val linearFunctions = starts.mapIndexed { index, _ ->
-                LinearFunction(slopes[index], intercepts[index], domains[index])
-            }
+            // prepend function, if necessary
+            val prependedStart = if (prependConstant)
+                listOf(Double.MIN_VALUE) else emptyList()
+            val prependedFunction = if (prependConstant)
+                listOf(ConstantFunction(intercepts.first())) else emptyList()
+            val prependedAbsoluteDomain = if (prependConstant)
+                listOf(Range.lessThan(starts.first())) else emptyList()
+            // append function, if necessary
+            val appendedStart = if (appendConstant)
+                listOf(starts.last()) else emptyList()
+            val appendedFunction = if (appendConstant)
+                listOf(ConstantFunction(intercepts.last())) else emptyList()
+            val appendedAbsoluteDomain = if (appendConstant)
+                listOf(Range.atLeast(starts.last())) else emptyList()
 
-            return ConcatenatedFunction(linearFunctions, starts.first())
+
+            return ConcatenatedFunction(
+                    prependedFunction + preparedLinearFunctions + appendedFunction,
+                    prependedAbsoluteDomain + preparedAbsoluteDomains + appendedAbsoluteDomain,
+                    prependedStart + preparedStarts + appendedStart)
         }
 
         /**
@@ -127,9 +144,10 @@ class ConcatenatedFunction(
          *
          * @param starts absolute start value of the function member
          * @param coefficients coefficients of the polynomial function members
+         * @param prependConstant if true, the first linear function is preceded by a constant function
          */
-        fun ofPolynomialFunctions(starts: List<Double>, coefficients: List<DoubleArray>):
-                ContextMessage<UnivariateFunction> {
+        fun ofPolynomialFunctions(starts: List<Double>, coefficients: List<DoubleArray>, prependConstant: Boolean = false,
+                                  prependConstantValue: Double = Double.NaN): ContextMessage<UnivariateFunction> {
 
             require(starts.isNotEmpty() && coefficients.isNotEmpty())
             { "List of starts and coefficients must not be empty." }
@@ -138,18 +156,44 @@ class ConcatenatedFunction(
             require(starts.isSorted())
             { "Polynomials must be sorted in ascending order." }
 
+            // filter provided starts and coefficients with zero length
             val lengths = starts
                     .zipWithNext()
                     .map { it.second - it.first } + Double.POSITIVE_INFINITY
-            val polynomials = coefficients
-                    .zip(lengths)
-                    .filter { it.second != 0.0 }
-                    .map { PolynomialFunction.of(it.first, it.second) }
-
-            val message = if (polynomials.hasSameSizeAs(starts)) ""
+            val startsCoefficientsFiltered = lengths
+                    .zip(starts.zip(coefficients))
+                    .filter { it.first != 0.0 }
+                    .map { it.second }
+            val message = if (startsCoefficientsFiltered.hasSameSizeAs(starts)) ""
             else "Removed element(s) with length zero when building a concatenated polynomial."
 
-            val concatenatedFunction = ConcatenatedFunction(polynomials, starts.first())
+            // prepare polynomial functions
+            val preparedStarts = startsCoefficientsFiltered
+                    .map { it.first }
+            val preparedPolynomialFunctions = startsCoefficientsFiltered
+                    .map { PolynomialFunction(it.second) }
+            val preparedAbsoluteDomains = startsCoefficientsFiltered
+                    .map { it.first }
+                    .zipWithNext()
+                    .map { Range.closedOpen(it.first, it.second) } + Range.atLeast(starts.last())
+
+            // prepend function, if necessary
+            val prependedStart = if (prependConstant)
+                listOf(Double.MIN_VALUE) else emptyList()
+            val prependedFunction = if (prependConstant) {
+                val prependValue = if (prependConstantValue.isFinite()) prependConstantValue else
+                    preparedPolynomialFunctions.first().value(0.0).handleFailure { throw it.error }
+
+                listOf(ConstantFunction(prependValue))
+            } else emptyList()
+            val prependedAbsoluteDomain = if (prependConstant)
+                listOf(Range.lessThan(starts.first())) else emptyList()
+
+
+            val concatenatedFunction = ConcatenatedFunction(
+                    prependedFunction + preparedPolynomialFunctions,
+                    prependedAbsoluteDomain + preparedAbsoluteDomains,
+                    prependedStart + preparedStarts)
             return ContextMessage(concatenatedFunction, message)
         }
 

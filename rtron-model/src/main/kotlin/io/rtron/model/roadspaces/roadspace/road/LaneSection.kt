@@ -68,10 +68,10 @@ data class LaneSection(
             lanes.getValueResult(laneIdentifier.laneId)
 
     /**
-     * Returns the lateral offset function located on lane with [laneId].
+     * Returns the lateral offset function located on a lane with [laneId].
      *
      * @param laneId id of requested lane
-     * @param factor If the [factor] is 0.0 the inner lane boundary is returned. If the [factor] is 1.0 the outer lane
+     * @param factor if the [factor] is 0.0 the inner lane boundary is returned. If the [factor] is 1.0 the outer lane
      * boundary is returned. An offset function within the middle of the lane is achieved by a [factor] of 0.5.
      */
     fun getLateralLaneOffset(laneId: Int, factor: Double): Result<UnivariateFunction, Exception> {

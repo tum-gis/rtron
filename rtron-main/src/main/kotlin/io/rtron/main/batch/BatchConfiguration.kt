@@ -40,6 +40,7 @@ class BatchConfiguration(
     init {
         require(!outputPath.isRegularFile()) { "Output path must not be an existing file." }
     }
+    val inputDirectoryPath = if (inputPath.isRegularFile()) inputPath.parent else inputPath
     private val reportLoggerName = "general"
     private val reportLoggingPath: Path = outputPath.resolve(Path("$reportLoggerName.log"))
     /** recursive search depth for input models within the input directory */

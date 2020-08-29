@@ -59,8 +59,10 @@ class Road(
     init {
         require(surface.domain == surfaceWithoutTorsion.domain)
         { "Domains of provided surfaces must have the same domain." }
-        require(curvePositionDomain.hasLowerBound() && curvePositionDomain.hasUpperBound())
-        { "Domain of curve position must have upper and lower bounds." }
+        require(curvePositionDomain.hasLowerBound())
+        { "Domain of curve position must have a lower bound." }
+        require(curvePositionDomain.hasUpperBound())
+        { "Domain of curve position must have a upper bound." }
         require(laneOffset.domain.fuzzyEncloses(surface.domain, surface.tolerance))
         { "The lane offset function must be defined everywhere where the surface is also defined." }
         require(laneSections.isNotEmpty())

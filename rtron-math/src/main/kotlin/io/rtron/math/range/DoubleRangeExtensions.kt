@@ -63,7 +63,8 @@ fun Range<Double>.fuzzyContains(value: Double, tolerance: Double): Boolean = whe
     hasLowerBound() && !hasUpperBound() -> fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance)
     !hasLowerBound() && hasUpperBound() -> fuzzyLessThanOrEquals(value, upperEndpointOrNull()!!, tolerance)
     !hasLowerBound() && !hasUpperBound() -> value in this
-    else -> fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance) && fuzzyLessThanOrEquals(value, upperEndpointOrNull()!!, tolerance)
+    else -> fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance) &&
+            fuzzyLessThanOrEquals(value, upperEndpointOrNull()!!, tolerance)
 }
 
 /**

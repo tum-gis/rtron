@@ -37,8 +37,7 @@ data class LaneIdentifier(
     }
 
     // Conversions
-    override fun toString(): String {
-        return "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
-    }
+    override fun toString() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, " +
+            "laneSectionCurveRelativeStart=$laneSectionCurveRelativeStart, roadId=$roadspaceId)"
 
 }

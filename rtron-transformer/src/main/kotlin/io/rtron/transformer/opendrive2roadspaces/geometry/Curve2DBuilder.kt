@@ -55,7 +55,12 @@ class Curve2DBuilder(
                 .map { buildPlanViewGeometry(it, BoundType.OPEN, offset) } +
                 buildPlanViewGeometry(srcPlanViewGeometryList.last(), BoundType.CLOSED, offset)
 
-        return CompositeCurve2D(curveMembers)
+        val absoluteStarts: List<Double> = srcPlanViewGeometryList.map { it.s }
+        val absoluteDomains: List<Range<Double>> = absoluteStarts
+                .zipWithNext().map { Range.closedOpen(it.first, it.second) } +
+                Range.closed(absoluteStarts.last(), absoluteStarts.last() + srcPlanViewGeometryList.last().length)
+
+        return CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts)
     }
 
     /**

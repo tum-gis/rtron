@@ -18,74 +18,62 @@ package io.rtron.math.container
 
 import com.github.kittinunf.result.Result
 import io.rtron.math.range.*
-import io.rtron.std.cumulativeSum
 import io.rtron.std.handleSuccess
+import io.rtron.std.hasSameSizeAs
+import io.rtron.std.isSortedBy
 
 
 /**
- * Concatenates a list of members according to their domain. The domain of each member must start at zero and
- * be finite, except the last member. As each members' domain is defined locally, the [absoluteLowerEndpoint]
- * defines the absolute start of the concatenated container's domain.
+ * Concatenates a list of [members] with a locally defined domain to a container with an absolutely defined domain.
+ * Requests to the container can be performed in the absolute domain, and the container will translate them to the
+ * local domain.
  *
- * @param members members to be concatenated
- * @param absoluteLowerEndpoint absolute start of the concatenated container
+ * @param members members that are locally defined
+ * @param absoluteDomains absolute domains of the respective member that is defined locally
+ * @param absoluteStarts absolute starts of the respective member that is defined locally
  */
 class ConcatenationContainer<T : DefinableDomain<Double>>(
-        members: List<T>,
-        val absoluteLowerEndpoint: Double = 0.0
+        private val members: List<T>,
+        private val absoluteDomains: List<Range<Double>>,
+        private val absoluteStarts: List<Double>,
+        private val tolerance: Double = 0.0
 ) {
 
     // Properties and Initializers
     init {
         require(members.isNotEmpty())
         { "Must contain members for concatenation." }
-        require(members.all { it.domain.hasLowerBound() && it.domain.lowerEndpointOrNull() == 0.0 })
-        { "Domain of all members must start at zero." }
-        require(members.all { it.domain.length > 0.0 })
-        { "Domain of all members must greater than zero." }
-        require(members.dropLast(1).all { it.domain.hasUpperBound() && it.domain.upperEndpointOrNull()!!.isFinite() })
-        { "All members (except the last one) must have a domain with an upper and finite bound." }
-        require(absoluteLowerEndpoint.isFinite())
-        { "Absolute lower endpoint must be finite." }
+        require(absoluteDomains.hasSameSizeAs(members))
+        { "Equally sized absoluteDomains and members required." }
+        require(absoluteStarts.hasSameSizeAs(members))
+        { "Equally sized absoluteStart and members required." }
+
+        // requirement: lower and upper domain boundaries (apart from the first and last entry)
+        val absoluteDomainsWithoutStart =
+                if (absoluteDomains.first().hasLowerBound()) absoluteDomains
+                else absoluteDomains.drop(1)
+        val absoluteDomainsWithoutEndings =
+                if (absoluteDomainsWithoutStart.last().hasUpperBound()) absoluteDomainsWithoutStart
+                else absoluteDomainsWithoutStart.dropLast(1)
+        require(absoluteDomainsWithoutEndings.all { it.hasLowerBound() && it.hasUpperBound() })
+        { "All absolute domains (apart from the first and last one) must have an upper and lower bound." }
+        require(absoluteDomainsWithoutEndings.isSortedBy { it.lowerEndpointOrNull()!! })
+        { "Provided absolute domains must be sorted." }
+
+        // requirement: no intersecting domains
+        require(!absoluteDomains.containsConsecutivelyIntersectingRanges())
+        { "Absolute domains must not contain intersecting ranges." }
+        require(RangeSet(absoluteDomains.toSet()).numberOfDisconnectedRanges() == 1)
+        { "Absolute domains must be connected." }
+
+        require(members.zip(absoluteStarts)
+                .map { it.first.domain.shift(it.second) }
+                .zip(absoluteDomains)
+                .all { it.first.fuzzyEncloses(it.second, tolerance) })
+        { "The local domains must be defined everywhere where the absolute (shifted) domain is also defined." }
     }
 
-    /** domain lengths of each member */
-    private val domainLengths: List<Double> = members.map { it.domain.length }
-    /** absolute starts of each member after concatenating them */
-    private val absoluteStarts: List<Double> = domainLengths
-            .dropLast(1)
-            .cumulativeSum()
-            .map { it + absoluteLowerEndpoint }
-    /** domain of each member in absolute values */
-    private val absoluteDomains: List<Range<Double>>
-    /** domain of this container */
-    val domain: Range<Double>
-
-    init {
-        absoluteDomains = absoluteStarts
-                .zipWithNext()
-                .map { Range.closedOpen(it.first, it.second) } +
-                Range.closed(absoluteStarts.last(), absoluteStarts.last() + domainLengths.last())
-
-        val absoluteRangeSet = absoluteDomains.toSet().unionRanges()
-        domain = absoluteRangeSet.asRanges().first()
-
-        assert(absoluteRangeSet.numberOfDisconnectedRanges() == 1)
-        { "Must have exactly one connected range for the container." }
-    }
-
-    /**
-     * Small helper class storing the absolute domain and the actual member together.
-     *
-     * @param absoluteDomain absolute domain of the [member]
-     * @param member member which has the [absoluteDomains]
-     */
-    private data class AbsoluteDomainMember<T>(val absoluteDomain: Range<Double>, val member: T)
-
-    /** list of absolute domains and their members */
-    private val absoluteDomainMembers: List<AbsoluteDomainMember<T>> =
-            absoluteDomains.zip(members).map { AbsoluteDomainMember(it.first, it.second) }
-
+    val domain = RangeSet(absoluteDomains.toSet()).span()
 
     // Methods
 
@@ -103,8 +91,10 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param parameter absolute parameter
      */
     fun strictSelectMember(parameter: Double): Result<LocalRequest<T>, Exception> {
-        val selection = absoluteDomainMembers
-                .filter { parameter in it.absoluteDomain }
+        val selection = absoluteDomains
+                .withIndex()
+                .filter { parameter in it.value }
+                .map { it.index }
         return handleSelection(parameter, selection)
     }
 
@@ -118,8 +108,10 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
     fun fuzzySelectMember(parameter: Double, tolerance: Double): Result<LocalRequest<T>, Exception> {
         strictSelectMember(parameter).handleSuccess { return it }
 
-        val selection = absoluteDomainMembers
-                .filter { it.absoluteDomain.fuzzyContains(parameter, tolerance) }
+        val selection = absoluteDomains
+                .withIndex()
+                .filter { it.value.fuzzyContains(parameter, tolerance) }
+                .map { it.index }
         return handleSelection(parameter, selection)
     }
 
@@ -130,14 +122,14 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param parameter absolute parameter
      * @param selection list of selected members
      */
-    private fun handleSelection(parameter: Double, selection: List<AbsoluteDomainMember<T>>):
+    private fun handleSelection(parameter: Double, selection: List<Int>):
             Result<LocalRequest<T>, Exception> = when (selection.size) {
 
         0 -> Result.error(
                 IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains."))
         1 -> {
-            val localParameter = parameter - selection.first().absoluteDomain.lowerEndpointOrNull()!!
-            Result.success(LocalRequest(localParameter, selection.first().member))
+            val localParameter = parameter - absoluteStarts[selection.first()]
+            Result.success(LocalRequest(localParameter, members[selection.first()]))
         }
         else -> Result.error(IllegalStateException("Parameter x=$parameter yields multiple members."))
     }

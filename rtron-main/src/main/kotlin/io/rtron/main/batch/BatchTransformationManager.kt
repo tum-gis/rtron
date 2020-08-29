@@ -41,7 +41,7 @@ class BatchTransformationManager(
 
     private val _projectConfigurations = getProcessablePaths().map {
         val outputDirectoryPath = this.configuration.outputPath.resolve(it.withoutExtension())
-        ProjectConfiguration(configuration.inputPath, it, outputDirectoryPath)
+        ProjectConfiguration(configuration.inputDirectoryPath, it, outputDirectoryPath)
     }
 
     // Methods
@@ -50,6 +50,11 @@ class BatchTransformationManager(
      */
     @OptIn(ExperimentalTime::class)
     fun run() {
+        if (configuration.inputPath == configuration.outputPath) {
+            _reportLogger.error("Output path must be different to input path.")
+            return
+        }
+
         if (configuration.clean) configuration.outputPath.deleteDirectoryContents()
         _reportLogger.info("Starting batch transformations.")
 
@@ -87,13 +92,14 @@ class BatchTransformationManager(
      * @return list of paths to supported models within the input path
      */
     private fun getProcessablePaths(): List<Path> =
-        when {
-            this.configuration.inputPath.isRegularFile() ->
-                listOf(this.configuration.inputPath)
-            this.configuration.inputPath.isDirectory() ->
-                this.configuration.inputPath.walk(configuration.recursiveDepth)
-                        .filter { it.extension in ReadWriteManager.supportedFileExtensions }.toList()
-            else -> emptyList()
-        }.map { this.configuration.inputPath.relativize(it) }
-
+            when {
+                this.configuration.inputPath.isRegularFile() -> listOf(this.configuration.inputPath.fileName)
+                this.configuration.inputPath.isDirectory() -> this.configuration.inputPath
+                        .walk(configuration.recursiveDepth)
+                        .filter { it.extension in ReadWriteManager.supportedFileExtensions }
+                        .toList()
+                        .sorted()
+                        .map { this.configuration.inputPath.relativize(it) }
+                else -> emptyList()
+            }
 }

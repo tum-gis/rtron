@@ -54,6 +54,7 @@ fun LaneSectionIdentifier.toAttributes(prefix: String): AttributeList {
     val laneSectionIdentifier = this
     return attributes(prefix) {
         attribute("laneSectionId", laneSectionIdentifier.laneSectionId)
+        attribute("laneSectionCurveRelativeStart", laneSectionIdentifier.laneSectionCurveRelativeStart)
     } + laneSectionIdentifier.roadspaceIdentifier.toAttributes(prefix)
 }
 

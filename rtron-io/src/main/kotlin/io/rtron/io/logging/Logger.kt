@@ -98,6 +98,11 @@ class Logger(
     }
 
     /**
+     * Log an error [message].
+     */
+    fun error(message: String) { this.logger.error(message) }
+
+    /**
      * Log out the exception of a [failure].
      *
      * @param failure failure message to be logged
@@ -144,10 +149,6 @@ class Logger(
         return if (suffix.isEmpty()) prefixedMessage else "$prefixedMessage $suffix"
     }
 
-    private fun warn(message: String, force: Boolean = false) {
-        if (message.isNotEmpty() || force) logger.warn(message)
-    }
-
     private fun info(message: String, force: Boolean = false) {
         if (message.isNotEmpty() || force) logger.info(prepareMessage(message))
     }
@@ -155,6 +156,10 @@ class Logger(
     private fun prepareMessage(message: String): String {
         return if(SystemUtils.IS_OS_WINDOWS) EmojiParser.removeAllEmojis(message).trim()
         else message
+    }
+
+    private fun warn(message: String, force: Boolean = false) {
+        if (message.isNotEmpty() || force) logger.warn(message)
     }
 
     // Conversions

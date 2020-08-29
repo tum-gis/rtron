@@ -31,7 +31,8 @@ interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
 /**
  * Identifier of a lane section containing essential meta information.
  *
- * @param laneSectionId id of the lane section
+ * @param laneSectionId id of the lane section, starting at zero
+ * @param laneSectionCurveRelativeStart start position of the lane section relative to the reference line
  * @param roadspaceIdentifier identifier of the road space
  */
 data class LaneSectionIdentifier(

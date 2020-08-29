@@ -56,7 +56,9 @@ class FunctionBuilder(
 
         return ConcatenatedFunction.ofPolynomialFunctions(
                 srcSuperelevation.map { it.s },
-                srcSuperelevation.map { it.coefficients })
+                srcSuperelevation.map { it.coefficients },
+                prependConstant = true,
+                prependConstantValue = 0.0)
                 .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
@@ -74,7 +76,8 @@ class FunctionBuilder(
 
         return ConcatenatedFunction.ofPolynomialFunctions(
                 srcRoadLateralProfileShape.map { it.t },
-                srcRoadLateralProfileShape.map { it.coefficients })
+                srcRoadLateralProfileShape.map { it.coefficients },
+                prependConstant = true)
                 .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
@@ -86,7 +89,9 @@ class FunctionBuilder(
 
         return ConcatenatedFunction.ofPolynomialFunctions(
                 srcLanes.laneOffsetsWithStartingEntry().map { it.s },
-                srcLanes.laneOffsetsWithStartingEntry().map { it.coefficients })
+                srcLanes.laneOffsetsWithStartingEntry().map { it.coefficients },
+                prependConstant = true,
+                prependConstantValue = 0.0)
                 .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
@@ -100,15 +105,28 @@ class FunctionBuilder(
      */
     fun buildLaneWidth(id: LaneIdentifier, srcLaneWidthEntries: List<RoadLanesLaneSectionLRLaneWidth>):
             UnivariateFunction {
+        if (srcLaneWidthEntries.isEmpty()) {
+            this.reportLogger.info("The lane does not contain any width entries. " +
+                    "Continuing with a zero width.", id.toString())
+            return LinearFunction.X_AXIS
+        }
+
+        if (srcLaneWidthEntries.first().sOffset > 0.0)
+            this.reportLogger.info("The width should be defined for the full length of the lane section and" +
+                    " thus must also be defined for s=0.0. Not defined positions are interpreted with a width of 0.",
+                    id.toString())
 
         val widthEntriesAdjusted = srcLaneWidthEntries
                 .distinctConsecutive { it.sOffset }
         if (widthEntriesAdjusted.size < srcLaneWidthEntries.size)
             this.reportLogger.info("Removing redundant width entries.", id.toString())
 
-        return if (widthEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
-        else ConcatenatedFunction.ofPolynomialFunctions(widthEntriesAdjusted.map { it.sOffset },
-                widthEntriesAdjusted.map { it.coefficients }).handleMessage { this.reportLogger.info(it, id.toString()) }
+        return ConcatenatedFunction.ofPolynomialFunctions(
+                widthEntriesAdjusted.map { it.sOffset },
+                widthEntriesAdjusted.map { it.coefficients },
+                prependConstant = true,
+                prependConstantValue = 0.0)
+                .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
     /**

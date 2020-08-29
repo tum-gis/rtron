@@ -22,6 +22,7 @@ import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import io.rtron.math.range.Range
 import io.rtron.std.handleFailure
 
 
@@ -31,7 +32,9 @@ import io.rtron.std.handleFailure
  * @param curveMembers curves to be concatenated
  */
 data class CompositeCurve2D(
-        val curveMembers: List<AbstractCurve2D>
+        val curveMembers: List<AbstractCurve2D>,
+        private val absoluteDomains: List<Range<Double>>,
+        private val absoluteStarts: List<Double>
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
@@ -42,7 +45,7 @@ data class CompositeCurve2D(
         { "All curveMembers must have the same tolerance." }
     }
 
-    private val container = ConcatenationContainer(curveMembers)
+    private val container = ConcatenationContainer(curveMembers, absoluteDomains, absoluteStarts, tolerance)
     override val domain get() = container.domain
     override val tolerance get() = curveMembers.first().tolerance
 
@@ -74,8 +77,8 @@ data class CompositeCurve2D(
         return "CompositeCurve2D(curveMembers=$curveMembers)"
     }
 
-    companion object {
+    /*companion object {
         fun of(vararg curveMembers: AbstractCurve2D) = CompositeCurve2D(curveMembers.toList())
-    }
+    }*/
 
 }

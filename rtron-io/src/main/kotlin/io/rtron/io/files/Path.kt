@@ -32,7 +32,7 @@ fun NPath.toPath() = Path(this.toString())
  *
  * @param uri [uniform resource identifier](https://en.wikipedia.org/wiki/Uniform_Resource_Identifier) to the file or directory
  */
-class Path(uri: String = "") {
+class Path(uri: String = "") : Comparable<Path> {
 
     // Properties and Initializers
     private val _path: NPath = NPaths.get(uri)
@@ -141,10 +141,26 @@ class Path(uri: String = "") {
      */
     fun getFileSizeToDisplay(): String = FileUtils.byteCountToDisplaySize(getFileSize())
 
+    override fun compareTo(other: Path): Int = this._path.compareTo(other._path)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Path) return false
+
+        if (_path != other._path) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return _path.hashCode()
+    }
+
     // Conversions
     fun toPathN() = _path
     override fun toString() = _path.toString()
 
     fun toFileJ(): JFile = _path.toFile()
     fun toFile() = File(this)
+
 }
