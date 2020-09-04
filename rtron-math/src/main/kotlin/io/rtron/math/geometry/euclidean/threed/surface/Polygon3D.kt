@@ -38,6 +38,7 @@ data class Polygon3D(
 
     // Properties and Initializers
     private val numberOfVertices = vertices.size
+
     /** list of edges between the first vertex and all other vertices */
     private val innerEdges = vertices.filterIndexed { index, _ -> index != 0 }.map { it - vertices.first() }
 
@@ -49,7 +50,7 @@ data class Polygon3D(
         { "Not enough vertices provided for constructing a polygon." }
         require(vertices.distinctConsecutiveEnclosing { it }.size == vertices.size)
         { "Consecutively following point duplicates found." }
-        require( dimensionSpan >= 2)
+        require(dimensionSpan >= 2)
         { "The dimension of the span is too low ($dimensionSpan) which might be caused by colinear vertices." }
         require(vertices.isPlanar())
         { "The vertices of a polygon must be located in a plane." }
@@ -61,6 +62,7 @@ data class Polygon3D(
     /** Returns the normal of the polygon. */
     fun getNormal(): Result<Vector3D, IllegalStateException> =
             this.vertices.calculateNormal().normalized().let { Result.success(it) }
+
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
     fun reversed() = Polygon3D(vertices.reversed(), affineSequence)
 
@@ -81,5 +83,10 @@ data class Polygon3D(
          * Constructs a polygon based on the [vectors].
          */
         fun of(vararg vectors: Vector3D) = Polygon3D(vectors.toList())
+
+        /**
+         * Constructs a polygon based on a [Triple] of [vectors].
+         */
+        fun of(vectors: Triple<Vector3D, Vector3D, Vector3D>) = Polygon3D(vectors.toList())
     }
 }

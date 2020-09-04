@@ -17,7 +17,9 @@
 package io.rtron.model.opendrive
 
 import io.rtron.model.AbstractModel
+import io.rtron.model.opendrive.controller.Controller
 import io.rtron.model.opendrive.header.Header
+import io.rtron.model.opendrive.junction.Junction
 import io.rtron.model.opendrive.road.Road
 
 
@@ -27,5 +29,7 @@ import io.rtron.model.opendrive.road.Road
  */
 data class OpendriveModel(
         var header: Header = Header(),
-        var road: List<Road> = listOf()
+        var road: List<Road> = listOf(),
+        var controller: List<Controller> = listOf(),
+        var junction: List<Junction> = listOf()
 ) : AbstractModel()

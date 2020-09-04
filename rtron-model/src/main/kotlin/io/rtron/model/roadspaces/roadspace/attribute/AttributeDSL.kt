@@ -16,6 +16,8 @@
 
 package io.rtron.model.roadspaces.roadspace.attribute
 
+import io.rtron.std.Optional
+
 
 /**
  * Environment for describing and building attribute lists.
@@ -48,6 +50,11 @@ class AttributeListBuilder(
 
     fun attribute(name: String, value: Double, unitOfMeasure: UnitOfMeasure) {
         attributes += MeasureAttribute(namePrefix + name, value, unitOfMeasure)
+    }
+
+    fun attribute(name: String, optionalValue: Optional<String>) {
+        if (optionalValue.isPresent())
+            attributes += StringAttribute(namePrefix + name, optionalValue.getOrNull()!!)
     }
 
     /**

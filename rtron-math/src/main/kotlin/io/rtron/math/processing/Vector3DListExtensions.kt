@@ -23,6 +23,7 @@ import io.rtron.math.linear.RealMatrix
 import io.rtron.math.linear.SingularValueDecomposition
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.DBL_EPSILON_7
+import io.rtron.std.distinctConsecutiveEnclosing
 import io.rtron.std.filterWindowedEnclosing
 import io.rtron.std.zipWithNextEnclosing
 import io.rtron.std.zipWithNextToTriples
@@ -42,7 +43,8 @@ fun List<Vector3D>.isColinear(tolerance: Double = DBL_EPSILON_7): Boolean =
  * @param tolerance tolerated distance between the line and second [Vector3D]
  */
 fun Triple<Vector3D, Vector3D, Vector3D>.isColinear(tolerance: Double = DBL_EPSILON_7): Boolean =
-        Line3D(first, third).distance(second) <= tolerance
+        if (first.fuzzyEquals(third, tolerance)) true
+        else Line3D(first, third).distance(second) <= tolerance
 
 /**
  * Removes the linearly dependent vertices of a list of vertices that are sequentially interpreted.
@@ -50,8 +52,8 @@ fun Triple<Vector3D, Vector3D, Vector3D>.isColinear(tolerance: Double = DBL_EPSI
  * @receiver list of vertices that are evaluated in an enclosing way
  */
 fun List<Vector3D>.removeLinearlyRedundantVertices(): List<Vector3D> =
-    if (this.size < 3) this
-    else filterWindowedEnclosing(listOf(false, true, false)) { it.isColinear() }
+        if (this.size < 3) this
+        else filterWindowedEnclosing(listOf(false, true, false)) { it.isColinear() }
 
 /**
  * Calculates the best fitting plane that lies in a list of [Vector3D].

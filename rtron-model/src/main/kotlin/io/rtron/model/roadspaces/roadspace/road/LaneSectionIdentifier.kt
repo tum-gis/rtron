@@ -18,32 +18,69 @@ package io.rtron.model.roadspaces.roadspace.road
 
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
+import kotlin.math.abs
+
 
 /**
  * Lane section identifier interface required for class delegation.
  */
 interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
     val laneSectionId: Int
-    val laneSectionCurveRelativeStart: Double
 }
 
 
 /**
  * Identifier of a lane section containing essential meta information.
  *
- * @param laneSectionId id of the lane section, starting at zero
- * @param laneSectionCurveRelativeStart start position of the lane section relative to the reference line
+ * @param laneSectionId identifier of the lane section, whereby the first lane section is referenced with 0
  * @param roadspaceIdentifier identifier of the road space
  */
 data class LaneSectionIdentifier(
         override val laneSectionId: Int,
-        override val laneSectionCurveRelativeStart: Double,
+        val roadspaceIdentifier: RoadspaceIdentifier
+) : LaneSectionIdentifierInterface, RoadspaceIdentifierInterface by roadspaceIdentifier {
+
+    // Properties and Initializers
+    init {
+        require(laneSectionId >= 0) { "Lane section id must be non-negative." }
+    }
+
+    // Methods
+
+    /** Returns the identifier for the next lane section. */
+    fun getNextLaneSectionIdentifier() =
+            LaneSectionIdentifier(this.laneSectionId + 1, this.roadspaceIdentifier)
+
+    // Conversions
+    override fun toString(): String {
+        return "LaneSectionIdentifier(laneSectionId=$laneSectionId, roadSpaceId=$roadspaceId)"
+    }
+}
+
+
+/**
+ * Identifier of a lane section which allows for negative indexing.
+ *
+ * @param laneSectionId identifier of the lane section, whereby the first lane section is referenced with 0 and the
+ * last lane section can be referenced with -1
+ */
+data class RelativeLaneSectionIdentifier(
+        override val laneSectionId: Int,
         val roadspaceIdentifier: RoadspaceIdentifier
 ) : LaneSectionIdentifierInterface, RoadspaceIdentifierInterface by roadspaceIdentifier {
 
     // Conversions
-    override fun toString(): String {
-        return "LaneSectionIdentifier(laneSectionId=$laneSectionId, " +
-                "laneSectionCurveRelativeStart=$laneSectionCurveRelativeStart, roadSpaceId=$roadspaceId)"
+
+    /**
+     * Returns an absolute [LaneSectionIdentifier] and resolves the negative indices.
+     *
+     * @param size number of lane sections in list (last index + 1)
+     */
+    fun toAbsoluteLaneSectionIdentifier(size: Int): LaneSectionIdentifier {
+        require(abs(laneSectionId) <= size)
+        { "Lane section identifier must less or equals the given size ($size)" }
+
+        return if (laneSectionId >= 0) LaneSectionIdentifier(laneSectionId, roadspaceIdentifier)
+        else LaneSectionIdentifier(size - laneSectionId, roadspaceIdentifier)
     }
 }

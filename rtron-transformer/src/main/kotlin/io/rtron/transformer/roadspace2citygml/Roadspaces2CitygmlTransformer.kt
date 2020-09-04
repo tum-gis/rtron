@@ -23,6 +23,7 @@ import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.roadspace.Roadspace
+import io.rtron.model.roadspaces.topology.LaneTopology
 import io.rtron.transformer.AbstractTransformer
 import io.rtron.transformer.roadspace2citygml.adder.RoadObjectAdder
 import io.rtron.transformer.roadspace2citygml.adder.RoadsAdder
@@ -47,7 +48,7 @@ class Roadspaces2CitygmlTransformer(
 
     private val _roadLineAdder = RoadspaceLineAdder(configuration)
     private val _roadObjectAdder = RoadObjectAdder(configuration)
-    private val _lanesAdder = RoadsAdder(configuration)
+    private val _roadLanesAdder = RoadsAdder(configuration)
 
     // Methods
 
@@ -66,9 +67,9 @@ class Roadspaces2CitygmlTransformer(
         // transformation of each road space
         _reportLogger.info("Transforming roads spaces with ${configuration.parameters}.")
         val progressBar = ProgressBar("Transforming road spaces", roadspacesModel.roadspaces.size)
-        roadspacesModel.roadspaces.forEach { currentRoadspace ->
+        roadspacesModel.roadspaces.values.forEach { currentRoadspace ->
             progressBar.step()
-            transform(currentRoadspace, cityModel)
+            transform(currentRoadspace, roadspacesModel.laneTopology, cityModel)
         }
 
         // create CityGML model
@@ -80,12 +81,16 @@ class Roadspaces2CitygmlTransformer(
     /**
      * Transform a single [Roadspace] and add the objects to the [dstCityModel].
      */
-    private fun transform(srcRoadspace: Roadspace, dstCityModel: CityModel) {
+    private fun transform(srcRoadspace: Roadspace, srcLaneTopology: LaneTopology, dstCityModel: CityModel) {
         _roadLineAdder.addRoadReferenceLine(srcRoadspace, dstCityModel)
         _roadLineAdder.addLaneReferenceLine(srcRoadspace, dstCityModel)
 
         _roadObjectAdder.addRoadspaceObjects(srcRoadspace.roadspaceObjects, dstCityModel)
-        _lanesAdder.addLaneSections(srcRoadspace.road, dstCityModel)
+
+        _roadLanesAdder.addLaneSurfaces(srcRoadspace.road, dstCityModel)
+        _roadLanesAdder.addLaneLines(srcRoadspace.road, dstCityModel)
+        _roadLanesAdder.addLateralFillerSurfaces(srcRoadspace.road, dstCityModel)
+        _roadLanesAdder.addLongitudinalFillerSurfaces(srcRoadspace.road, srcLaneTopology, dstCityModel)
     }
 
 

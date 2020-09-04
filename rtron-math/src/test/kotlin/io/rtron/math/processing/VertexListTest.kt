@@ -45,14 +45,30 @@ internal class VertexListTest {
     }
 
     @Nested
-    inner class TestIsColinear {
+    inner class TestListIsColinear {
 
         @Test
-        fun `basic `() {
+        fun `three points located on x axis should be colinear`() {
             val pointA = Vector3D.ZERO
             val pointB = Vector3D.X_AXIS
             val pointC = Vector3D.X_AXIS.scalarMultiply(2.0)
             val vertices = listOf(pointA, pointB, pointC)
+
+            val isColinear = vertices.isColinear()
+
+            assertTrue(isColinear)
+        }
+    }
+
+    @Nested
+    inner class TestTripleIsColinear {
+
+        @Test
+        fun `if first and third vector are equal, vector triple should be colinear `() {
+            val pointA = Vector3D.X_AXIS
+            val pointB = Vector3D(3.0, 4.0, 0.0)
+            val pointC = Vector3D.X_AXIS
+            val vertices = Triple(pointA, pointB, pointC)
 
             val isColinear = vertices.isColinear()
 

@@ -45,7 +45,6 @@ fun ModelIdentifier.toAttributes(prefix: String): AttributeList {
 fun RoadspaceIdentifier.toAttributes(prefix: String): AttributeList {
     val roadspaceIdentifier = this
     return attributes(prefix) {
-        attribute("roadName", roadspaceIdentifier.roadspaceName)
         attribute("roadId", roadspaceIdentifier.roadspaceId)
     } + roadspaceIdentifier.modelIdentifier.toAttributes(prefix)
 }
@@ -54,7 +53,6 @@ fun LaneSectionIdentifier.toAttributes(prefix: String): AttributeList {
     val laneSectionIdentifier = this
     return attributes(prefix) {
         attribute("laneSectionId", laneSectionIdentifier.laneSectionId)
-        attribute("laneSectionCurveRelativeStart", laneSectionIdentifier.laneSectionCurveRelativeStart)
     } + laneSectionIdentifier.roadspaceIdentifier.toAttributes(prefix)
 }
 

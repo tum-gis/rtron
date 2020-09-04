@@ -18,6 +18,8 @@ package io.rtron.model.roadspaces
 
 import io.rtron.model.AbstractModel
 import io.rtron.model.roadspaces.roadspace.Roadspace
+import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
+import io.rtron.model.roadspaces.topology.LaneTopology
 
 
 /**
@@ -28,5 +30,6 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
 data class RoadspacesModel(
         val id: ModelIdentifier,
         val header: Header,
-        val roadspaces: List<Roadspace> = listOf()
+        val roadspaces: Map<RoadspaceIdentifier, Roadspace> = mapOf(),
+        val laneTopology: LaneTopology
 ) : AbstractModel()

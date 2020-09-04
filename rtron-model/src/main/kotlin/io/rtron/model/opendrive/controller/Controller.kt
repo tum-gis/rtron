@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package io.rtron.model.opendrive.road.lanes
-
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+package io.rtron.model.opendrive.controller
 
 
-data class RoadLanes(
-        var laneOffset: List<RoadLanesLaneOffset> = listOf(),
-        var laneSection: List<RoadLanesLaneSection> = listOf(),
+data class Controller(
+        var control: List<ControllerControl> = listOf(),
+        // TODO g_additionalData
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
-) {
-
-    // Methods
-    fun containsLaneOffset() = laneOffset.isNotEmpty()
-
-}
+        var id: String = "",
+        var name: String = ""
+        // TODO var sequence: Int = Int.MIN_VALUE
+)

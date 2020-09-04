@@ -77,6 +77,16 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
             calculatePointLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
 
     /**
+     * Returns the start point in the global cartesian coordinate system that is located on this curve.
+     */
+    fun calculateStartPointGlobalCS() = calculatePointGlobalCS(CurveRelativePoint1D.ZERO)
+
+    /**
+     * Returns the end point in the global cartesian coordinate system that is located on this curve.
+     */
+    fun calculateEndPointGlobalCS() = calculatePointGlobalCS(CurveRelativePoint1D(length))
+
+    /**
      * Returns a list of points on the curve with a step size of [step].
      *
      * @param step step size between the points

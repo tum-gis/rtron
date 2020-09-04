@@ -88,8 +88,8 @@ class FunctionBuilder(
         if (srcLanes.laneOffset.isEmpty()) return LinearFunction.X_AXIS
 
         return ConcatenatedFunction.ofPolynomialFunctions(
-                srcLanes.laneOffsetsWithStartingEntry().map { it.s },
-                srcLanes.laneOffsetsWithStartingEntry().map { it.coefficients },
+                srcLanes.laneOffset.map { it.s },
+                srcLanes.laneOffset.map { it.coefficients },
                 prependConstant = true,
                 prependConstantValue = 0.0)
                 .handleMessage { this.reportLogger.info(it, id.toString()) }

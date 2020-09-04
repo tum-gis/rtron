@@ -16,6 +16,8 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
+
 
 /**
  * Identifier of a lane containing essential meta information.
@@ -36,8 +38,46 @@ data class LaneIdentifier(
         return LaneIdentifier(requestedLaneId, this.laneSectionIdentifier)
     }
 
-    // Conversions
-    override fun toString() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, " +
-            "laneSectionCurveRelativeStart=$laneSectionCurveRelativeStart, roadId=$roadspaceId)"
+    /**
+     * Returns true, if the [other] lane is located within the same roadspace as the lane with this identifier.
+     */
+    fun isWithinSameRoad(other: LaneIdentifier) = toRoadspaceIdentifier() == other.toRoadspaceIdentifier()
 
+    // Conversions
+    override fun toString() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
+    fun toRoadspaceIdentifier() = laneSectionIdentifier.roadspaceIdentifier
+
+    companion object {
+
+        fun of(laneId: Int, laneSectionId: Int, roadspaceIdentifier: RoadspaceIdentifier) =
+                LaneIdentifier(laneId, LaneSectionIdentifier(laneSectionId, roadspaceIdentifier))
+    }
+}
+
+
+/**
+ * Relative identifier of lanes, whereby the [laneSectionIdentifier] is of [RelativeLaneSectionIdentifier].
+ */
+data class RelativeLaneIdentifier(
+        val laneId: Int,
+        val laneSectionIdentifier: RelativeLaneSectionIdentifier
+) : LaneSectionIdentifierInterface by laneSectionIdentifier {
+
+    // Methods
+
+    /**
+     * Returns an absolute [LaneIdentifier]
+     *
+     * @param size number of lane sections in list (last index + 1)
+     */
+    fun toAbsoluteLaneIdentifier(size: Int) =
+            LaneIdentifier(laneId, laneSectionIdentifier.toAbsoluteLaneSectionIdentifier(size))
+
+    // Conversions
+    fun toRoadspaceIdentifier() = laneSectionIdentifier.roadspaceIdentifier
+
+    companion object {
+        fun of(laneId: Int, laneSectionId: Int, roadspaceIdentifier: RoadspaceIdentifier) =
+                RelativeLaneIdentifier(laneId, RelativeLaneSectionIdentifier(laneSectionId, roadspaceIdentifier))
+    }
 }

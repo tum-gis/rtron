@@ -56,11 +56,16 @@ class LaneBuilder(
         val width = _functionBuilder.buildLaneWidth(id, srcLane.width)
         val laneHeightOffsets = buildLaneHeightOffset(id, srcLane.height)
 
+        // lane topology
+        val predecessors = srcLane.link.predecessor.map { it.id }
+        val successors = srcLane.link.successor.map { it.id }
+
         // build lane attributes
         val attributes = baseAttributes + buildAttributes(srcLane)
 
         // build up lane object
-        return Lane(id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, srcLane.level, attributes)
+        return Lane(id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, srcLane.level,
+                predecessors, successors, attributes)
     }
 
     /**
@@ -103,6 +108,17 @@ class LaneBuilder(
             attributes("${configuration.parameters.attributesPrefix}lane_") {
                 attribute("type", srcLeftRightLane.type.toString())
                 attribute("level", srcLeftRightLane.level)
+
+                attributes("predecessor_lane") {
+                    srcLeftRightLane.link.predecessor.forEachIndexed { i, element ->
+                        attribute("_$i", element.id)
+                    }
+                }
+                attributes("successor_lane") {
+                    srcLeftRightLane.link.successor.forEachIndexed { i, element ->
+                        attribute("_$i", element.id)
+                    }
+                }
 
                 attributes("material") {
                     srcLeftRightLane.material.forEachIndexed { i, element ->

@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package io.rtron.model.opendrive.road.lanes
+package io.rtron.model.opendrive.junction
 
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+import io.rtron.model.opendrive.common.EElementDir
 
 
-data class RoadLanes(
-        var laneOffset: List<RoadLanesLaneOffset> = listOf(),
-        var laneSection: List<RoadLanesLaneSection> = listOf(),
-
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
-) {
-
-    // Methods
-    fun containsLaneOffset() = laneOffset.isNotEmpty()
-
-}
+data class JunctionPredecessorSuccessor(
+        // TODO g_additionalData
+        var elementType: String = "",
+        var elementId: String = "",
+        var elementS: Double = Double.NaN,
+        var elementDir: EElementDir = EElementDir.UNKNOWN
+)

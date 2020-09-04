@@ -22,6 +22,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
+import io.rtron.model.roadspaces.topology.LaneTopology
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspace2citygml.module.TransportationModuleBuilder
@@ -48,16 +49,19 @@ class RoadsAdder(
     // Methods
 
     /**
-     * Adds lane surfaces, lane lines, filler surfaces of a [Road] classes (RoadSpaces model) to the [CityModel]
-     * (CityGML model).
+     * Adds lane surfaces of a [Road] class (RoadSpaces model) to the [CityModel] (CityGML model).
      */
-    fun addLaneSections(srcRoad: Road, dstCityModel: CityModel) {
+    fun addLaneSurfaces(srcRoad: Road, dstCityModel: CityModel) {
 
         srcRoad.getAllLanes(configuration.parameters.discretizationStepSize)
                 .forEach { addLaneSurface(it.first, "LaneSurface", it.second, it.third, dstCityModel) }
-        srcRoad.getAllLateralFillerSurfaces(configuration.parameters.discretizationStepSize)
-                .forEach { addLaneSurface(it.first, "LateralLaneFillerSurface", it.second, AttributeList.EMPTY,
-                        dstCityModel) }
+    }
+
+    /**
+     * Adds the relevant lines (center line and lane boundaries) of a [Road] class (RoadSpaces model) to
+     * the [CityModel] (CityGML model).
+     */
+    fun addLaneLines(srcRoad: Road, dstCityModel: CityModel) {
 
         srcRoad.getAllLeftLaneBoundaries()
                 .forEach { addLaneBoundary(it.first, "LeftLaneBoundary", it.second, dstCityModel) }
@@ -65,6 +69,40 @@ class RoadsAdder(
                 .forEach { addLaneBoundary(it.first, "RightLaneBoundary", it.second, dstCityModel) }
         srcRoad.getAllCurvesOnLanes(0.5)
                 .forEach { addLaneBoundary(it.first, "LaneCenterLine", it.second, dstCityModel) }
+    }
+
+    /**
+     * Adds lateral filler surfaces of a [Road] to the [CityModel] (CityGML model).
+     * Lateral filler surfaces are between two adjacent lanes located within the same lane section.
+     * This usually addresses vertical height offsets, which are caused for example by sidewalks.
+     */
+    fun addLateralFillerSurfaces(srcRoad: Road, dstCityModel: CityModel) {
+        srcRoad.getAllLateralFillerSurfaces(configuration.parameters.discretizationStepSize)
+                .forEach {
+                    addLaneSurface(it.first, "LateralLaneFillerSurface", it.second, AttributeList.EMPTY,
+                            dstCityModel)
+                }
+    }
+
+    /**
+     * Adds longitudinal filler surfaces to the [CityModel] (CityGML model).
+     * Longitudinal filler surfaces are between two successive lanes, which can be located in the same street or in
+     * successive streets.
+     */
+    fun addLongitudinalFillerSurfaces(srcRoad: Road, srcLaneTopology: LaneTopology, dstCityModel: CityModel) {
+
+        srcRoad.getAllLaneIdentifiers()
+                .flatMap { srcLaneTopology.getLongitudinalFillerSurfaces(it) }
+                .forEach {
+                    val name = if (it.laneId.isWithinSameRoad(it.successorLaneId))
+                        "LongitudinalLaneFillerSurfaceWithinRoad"
+                    else "LongitudinalLaneFillerSurfaceBetweenRoads"
+
+                    val attributes = it.successorLaneId
+                            .toAttributes(configuration.parameters.identifierAttributesPrefix + "to_")
+
+                    addLaneSurface(it.laneId, name, it.surface, attributes, dstCityModel)
+                }
     }
 
     private fun addLaneSurface(id: LaneIdentifier, name: String, surface: AbstractSurface3D, attributes: AttributeList,

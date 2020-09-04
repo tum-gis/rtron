@@ -17,17 +17,30 @@
 package io.rtron.model.opendrive.road
 
 import io.rtron.model.opendrive.common.AdditionalData
+import io.rtron.model.opendrive.common.EContactPoint
+import io.rtron.std.Optional
 
 
 data class RoadLinkPredecessorSuccessor(
         var additionalData: AdditionalData = AdditionalData(),
-        //var elementType: RoadLinkElementType
+        var elementType: ERoadLinkElementType = ERoadLinkElementType.ROAD,
         var elementId: String = "",
 
         // variant 1
-        //TODO: var contactPoint: ContactPoint
+        var contactPoint: EContactPoint = EContactPoint.UNKNOWN,
 
         // variant 2
         var elementS: Double = Double.NaN
         // TODO: var elementDir:
-)
+) {
+
+    // Methods
+
+    fun getRoadPredecessorSuccessor(): Optional<String> =
+            if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.ROAD) Optional(elementId)
+            else Optional.empty()
+
+    fun getJunctionPredecessorSuccessor(): Optional<String> =
+            if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.JUNCTION) Optional(elementId)
+            else Optional.empty()
+}

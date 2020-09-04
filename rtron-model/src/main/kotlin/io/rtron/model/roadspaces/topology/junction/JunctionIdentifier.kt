@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces.roadspace
+package io.rtron.model.roadspaces.topology.junction
 
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.ModelIdentifierInterface
 
 
 /**
- * Road space identifier interface required for class delegation.
+ * Junction identifier interface required for class delegation.
  */
-interface RoadspaceIdentifierInterface {
-    val roadspaceId: String
+interface JunctionIdentifierInterface {
+    val junctionId: String
 }
 
+
 /**
- * Identifier of a road space containing essential meta information.
+ * Identifier of a [Junction].
  *
- * @param roadspaceName name of the road space
- * @param roadspaceId id of the road space
+ * @param junctionId id of the junction
  * @param modelIdentifier identifier of the model
  */
-data class RoadspaceIdentifier(
-        override val roadspaceId: String,
+data class JunctionIdentifier(
+        override val junctionId: String,
         val modelIdentifier: ModelIdentifier
-) : RoadspaceIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
+): JunctionIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
 
     // Conversions
     override fun toString(): String {
-        return "RoadspaceIdentifier(roadspaceId=$roadspaceId)"
+        return "JunctionIdentifier(junctionId=$junctionId)"
     }
 }

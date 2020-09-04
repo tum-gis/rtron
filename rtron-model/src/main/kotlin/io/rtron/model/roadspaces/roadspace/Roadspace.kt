@@ -20,6 +20,7 @@ import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Road
+import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
 
 
 /**
@@ -27,9 +28,6 @@ import io.rtron.model.roadspaces.roadspace.road.Road
  */
 data class Roadspace (
         val id: RoadspaceIdentifier,
-        val length: Double = Double.NaN,
-        val junction: String = "",
-
         val referenceLine: Curve3D,
         val road: Road,
         val roadspaceObjects: List<RoadspaceObject> = emptyList(),

@@ -28,6 +28,7 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.std.handleFailure
+import io.rtron.std.map
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
@@ -61,7 +62,7 @@ class RoadspaceBuilder(
     fun buildRoadspace(modelId: ModelIdentifier, srcRoad: OpendriveModelRoad): Result<Roadspace, Exception> {
 
         // check whether source model is processable
-        val roadspaceId = RoadspaceIdentifier(srcRoad.name, srcRoad.id, modelId)
+        val roadspaceId = RoadspaceIdentifier(srcRoad.id, modelId)
         srcRoad.isProcessable(configuration.parameters.tolerance)
                 .map { _reportLogger.log(it, roadspaceId.toString()) }
                 .handleFailure { return it }
@@ -83,7 +84,7 @@ class RoadspaceBuilder(
 
         // build up the road containing only lane sections, lanes (no road side objects)
         val road = _roadBuilder
-                .buildRoad(roadspaceId, srcRoad.lanes, roadSurface, roadSurfaceWithoutTorsion, attributes)
+                .buildRoad(roadspaceId, srcRoad, roadSurface, roadSurfaceWithoutTorsion, attributes)
                 .handleFailure { return it }
 
         // build up the road space objects (OpenDRIVE: road objects & signals)
@@ -118,7 +119,17 @@ class RoadspaceBuilder(
     private fun buildAttributes(srcRoad: OpendriveModelRoad) =
             attributes("${configuration.parameters.attributesPrefix}road_") {
                 attribute("length", srcRoad.length)
-                attribute("junction", srcRoad.junction)
+                attribute("junction", srcRoad.getJunction())
                 attribute("rule", srcRoad.rule.toString())
+
+                attribute("predecessor_road", srcRoad.link.predecessor.getRoadPredecessorSuccessor())
+                attribute("predecessor_junction", srcRoad.link.predecessor.getJunctionPredecessorSuccessor())
+                attribute("predecessor_contactPoint",
+                        srcRoad.link.predecessor.contactPoint.toContactPoint().map { it.toString() })
+
+                attribute("successor_road", srcRoad.link.successor.getRoadPredecessorSuccessor())
+                attribute("successor_junction", srcRoad.link.successor.getJunctionPredecessorSuccessor())
+                attribute("successor_contactPoint",
+                        srcRoad.link.successor.contactPoint.toContactPoint().map { it.toString() })
             }
 }

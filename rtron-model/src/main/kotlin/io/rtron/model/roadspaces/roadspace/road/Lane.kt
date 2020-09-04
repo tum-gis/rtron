@@ -20,11 +20,25 @@ import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
 
+/**
+ * Represents a lane within a lane section.
+ *
+ * @param id identifier of the lane
+ * @param width width of the lane as parametric function
+ * @param innerHeightOffset extra vertical offset height on the inner lane boundary
+ * @param outerHeightOffset extra vertical offset height on the outer lane boundary
+ * @param level if true, the lane is kept on level; if false, superelevation is applied to the lane
+ * @param predecessors list of predecessor lane ids
+ * @param successors list of successor lane ids
+ * @param attributes information attributes to the lane
+ */
 data class Lane(
         val id: LaneIdentifier,
         val width: UnivariateFunction,
         val innerHeightOffset: UnivariateFunction,
         val outerHeightOffset: UnivariateFunction,
         val level: Boolean,
+        val predecessors: List<Int>,
+        val successors: List<Int>,
         val attributes: AttributeList
 )

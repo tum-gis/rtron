@@ -28,6 +28,7 @@ import io.rtron.math.geometry.euclidean.threed.point.fuzzyEquals
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.CompositeSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
+import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
@@ -46,13 +47,15 @@ import io.rtron.std.isSortedBy
  * @param surfaceWithoutTorsion surface geometry of the road without torsion applied
  * @param laneOffset lateral lane offset to road reference line
  * @param laneSections lane sections of this road
+ * @param linkage link information to other roads and junctions
  */
 class Road(
         val id: RoadspaceIdentifier,
         val surface: AbstractCurveRelativeSurface3D,
         val surfaceWithoutTorsion: AbstractCurveRelativeSurface3D,
         val laneOffset: UnivariateFunction,
-        private val laneSections: List<LaneSection>
+        val laneSections: List<LaneSection>,
+        val linkage: RoadLinkage
 ) {
 
     // Properties and Initializers
@@ -114,7 +117,10 @@ class Road(
     fun getLaneSection(laneSectionIdentifier: LaneSectionIdentifier) =
             laneSections.getValueResult(laneSectionIdentifier.laneSectionId)
 
-    private fun getLane(laneIdentifier: LaneIdentifier): Result<Lane, IllegalArgumentException> =
+    /**
+     * Returns an individual lane referenced by [laneIdentifier]; if it does not exist, an [Result.Failure] is returned.
+     */
+    fun getLane(laneIdentifier: LaneIdentifier): Result<Lane, IllegalArgumentException> =
             getLaneSection(laneIdentifier.laneSectionIdentifier)
                     .handleFailure { return it }
                     .getLane(laneIdentifier.laneId)
@@ -139,7 +145,7 @@ class Road(
      */
     fun getAllLeftLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
             getAllLaneIdentifiers().map { id ->
-                val curve = getLeftLaneBoundaries(id).handleFailure { throw it.error }
+                val curve = getLeftLaneBoundary(id).handleFailure { throw it.error }
                 Pair(id, curve)
             }
 
@@ -168,9 +174,10 @@ class Road(
             }
 
     /**
-     * Returns all filler surfaces of this road.
+     * Returns all lateral filler surfaces of this road.
      *
      * @param step discretization step size
+     * @return lane identifier and the filler surface to the left of the respective lane
      */
     fun getAllLateralFillerSurfaces(step: Double): List<Pair<LaneIdentifier, AbstractSurface3D>> =
             getAllLaneIdentifiers().fold(emptyList()) { acc, id ->
@@ -182,7 +189,7 @@ class Road(
     /**
      * Returns the left boundary of an individual lane with [laneIdentifier].
      */
-    fun getLeftLaneBoundaries(laneIdentifier: LaneIdentifier): Result<AbstractCurve3D, Exception> =
+    fun getLeftLaneBoundary(laneIdentifier: LaneIdentifier): Result<AbstractCurve3D, Exception> =
             if (laneIdentifier.laneId > 0) getCurveOnLane(laneIdentifier, 1.0)
             else getCurveOnLane(laneIdentifier, 0.0)
 
@@ -233,7 +240,7 @@ class Road(
      * Returns the surface of an individual lane with [laneIdentifier] and a certain discretization [step] size.
      */
     fun getLaneSurface(laneIdentifier: LaneIdentifier, step: Double): Result<AbstractSurface3D, Exception> {
-        val leftBoundary = getLeftLaneBoundaries(laneIdentifier)
+        val leftBoundary = getLeftLaneBoundary(laneIdentifier)
                 .handleFailure { return it }
                 .calculatePointListGlobalCS(step)
                 .handleFailure { throw it.error }
@@ -241,11 +248,28 @@ class Road(
                 .handleFailure { throw it.error }
                 .calculatePointListGlobalCS(step)
                 .handleFailure { throw it.error }
-        val linearRings = LinearRing3D.ofWithDuplicatesRemoval(leftBoundary, rightBoundary)
+        val surface = LinearRing3D.ofWithDuplicatesRemoval(leftBoundary, rightBoundary)
                 .handleFailure { return it }
-        val surface = CompositeSurface3D(linearRings)
+                .let { CompositeSurface3D(it) }
         return Result.success(surface)
     }
+
+    /**
+     * Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road.
+     */
+    fun isInFirstLaneSection(laneIdentifier: LaneIdentifier) =
+            laneSections.first().id == laneIdentifier.laneSectionIdentifier
+
+    /**
+     * Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road.
+     */
+    fun isInLastLaneSection(laneIdentifier: LaneIdentifier) =
+            laneSections.last().id == laneIdentifier.laneSectionIdentifier
+
+    /**
+     * Returns the number of contained lane sections.
+     */
+    fun numberOfLaneSections(): Int = laneSections.size
 
     /**
      * Returns the filler surface which closes the gap occurring at the lateral transition of two lane elements.
@@ -262,7 +286,7 @@ class Road(
         getLane(laneIdentifier.getAdjacentLeftLaneIdentifier())
                 .handleFailure { return Result.success(null) }
 
-        val leftLaneBoundary = getLeftLaneBoundaries(laneIdentifier)
+        val leftLaneBoundary = getLeftLaneBoundary(laneIdentifier)
                 .handleFailure { return it }
                 .calculatePointListGlobalCS(step)
                 .handleFailure { return it }

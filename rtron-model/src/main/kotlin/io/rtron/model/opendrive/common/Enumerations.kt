@@ -127,9 +127,9 @@ enum class EBorderType {
 }
 
 // other enumerations
-enum class EContactPoint { START, END }
-enum class EElementDir { PLUS, MINUS }
-enum class EDirection { SAME, OPPOSITE }
+enum class EContactPoint { START, END, UNKNOWN }
+enum class EElementDir { PLUS, MINUS, UNKNOWN }
+enum class EDirection { SAME, OPPOSITE, UNKNOWN }
 
 /**
  * Rule which is to be observed when passing the line from inside (i.e. from the lane with the lower absolute ID to
