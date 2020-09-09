@@ -19,8 +19,9 @@ package io.rtron.transformer.opendrive2roadspaces.roadspaces
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
+import io.rtron.math.range.Range
+import io.rtron.math.range.shiftLowerEndpointTo
 import io.rtron.model.opendrive.common.EContactPoint
-import io.rtron.model.opendrive.road.Road as OpendriveRoad
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSection
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -33,6 +34,7 @@ import io.rtron.std.handleFailure
 import io.rtron.std.map
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
+import io.rtron.model.opendrive.road.Road as OpendriveRoad
 
 
 /**
@@ -54,18 +56,20 @@ class RoadBuilder(
      * Builds a single road from the OpenDRIVE data model.
      *
      * @param id identifier of the road space
-     * @param srcLanes source lane models of OpenDRIVE
+     * @param srcRoad source road model of OpenDRIVE
      * @param roadSurface road surface with torsion applied
      * @param roadSurfaceWithoutTorsion road surface without torsion applied (needed for lanes with true level entry)
      * @param baseAttributes attributes attached to each element of the road (e.g. lanes)
      */
     fun buildRoad(id: RoadspaceIdentifier, srcRoad: OpendriveRoad, roadSurface: CurveRelativeParametricSurface3D,
-                  roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D, baseAttributes: AttributeList): Result<Road, Exception> {
+                  roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D, baseAttributes: AttributeList):
+            Result<Road, Exception> {
 
         val laneOffset = _functionBuilder.buildLaneOffset(id, srcRoad.lanes)
-        val laneSections = srcRoad.lanes.laneSection
+        val laneSections = srcRoad.lanes.getLaneSectionsWithRanges(srcRoad.length)
                 .mapIndexed { currentId, currentLaneSection ->
-                    buildLaneSection(LaneSectionIdentifier(currentId, id), currentLaneSection, baseAttributes)
+                    buildLaneSection(LaneSectionIdentifier(currentId, id), currentLaneSection.first,
+                            currentLaneSection.second, baseAttributes)
                 }
                 .handleAndRemoveFailure { _reportLogger.log(it, id.toString()) }
 
@@ -81,23 +85,29 @@ class RoadBuilder(
     /**
      * Builds a [LaneSection] which corresponds to OpenDRIVE's concept of lane sections.
      */
-    private fun buildLaneSection(laneSectionIdentifier: LaneSectionIdentifier, srcLaneSection: RoadLanesLaneSection,
-                                 baseAttributes: AttributeList): Result<LaneSection, Exception> {
+    private fun buildLaneSection(laneSectionIdentifier: LaneSectionIdentifier, curvePositionDomain: Range<Double>,
+                                 srcLaneSection: RoadLanesLaneSection, baseAttributes: AttributeList):
+            Result<LaneSection, Exception> {
 
         // check whether source model is processable
         srcLaneSection.isProcessable()
                 .map { _reportLogger.log(it, laneSectionIdentifier.toString()) }
                 .handleFailure { return it }
 
+        val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
+
         val laneSectionAttributes = buildAttributes(srcLaneSection)
         val lanes = srcLaneSection.getLeftRightLanes()
                 .map { (currentLaneId, currentSrcLane) ->
                     val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
                     val attributes = baseAttributes + laneSectionAttributes
-                    _laneBuilder.buildLane(laneIdentifier, currentSrcLane, attributes)
+                    _laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
                 }
 
-        val laneSection = LaneSection(laneSectionIdentifier, srcLaneSection.laneSectionStart, lanes)
+        val centerLane = _laneBuilder.buildCenterLane(laneSectionIdentifier, localCurvePositionDomain,
+                srcLaneSection.center.lane, baseAttributes)
+
+        val laneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
         return Result.success(laneSection)
     }
 

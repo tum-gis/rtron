@@ -33,7 +33,7 @@ data class RoadLanesLaneSectionLCRLaneRoadMark(
         var weight: ERoadMarkWeight = ERoadMarkWeight.STANDARD,
         var color: ERoadMarkColor = ERoadMarkColor.STANDARD,
         var material: String = "",
-        var width: Double = Double.NaN,
+        var width: Double = 0.0,
         var laneChange: ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange = ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE,
         var height: Double = Double.NaN
 )

@@ -27,13 +27,25 @@ import io.rtron.math.range.Range
  * @param value constant's value
  * @param domain domain of the constant function
  */
-class ConstantFunction(
+data class ConstantFunction(
         val value: Double,
         override val domain: Range<Double> = Range.all()
 ) : UnivariateFunction() {
+
+    // Properties and Initializers
+    init {
+        require(value.isFinite()) { "Value must be finite, but was $value." }
+    }
+
+    // Operators
+    infix fun timesValue(other: Double): ConstantFunction = copy(value = this.value * other)
 
     // Methods
     override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> = Result.success(value)
 
     override fun slopeUnbounded(x: Double): Result<Double, IllegalArgumentException> = Result.success(0.0)
+
+    companion object {
+        val ZERO = ConstantFunction(0.0)
+    }
 }

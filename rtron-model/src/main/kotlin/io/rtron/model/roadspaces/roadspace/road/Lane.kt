@@ -28,6 +28,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * @param innerHeightOffset extra vertical offset height on the inner lane boundary
  * @param outerHeightOffset extra vertical offset height on the outer lane boundary
  * @param level if true, the lane is kept on level; if false, superelevation is applied to the lane
+ * @param roadMarkings list of road markings, which are placed on the outer lane boundary
  * @param predecessors list of predecessor lane ids
  * @param successors list of successor lane ids
  * @param attributes information attributes to the lane
@@ -38,7 +39,36 @@ data class Lane(
         val innerHeightOffset: UnivariateFunction,
         val outerHeightOffset: UnivariateFunction,
         val level: Boolean,
+        val roadMarkings: List<RoadMarking>,
         val predecessors: List<Int>,
         val successors: List<Int>,
         val attributes: AttributeList
-)
+) {
+
+    // Properties and Initializers
+    init {
+        require(id.isLeft() || id.isRight()) { "Identifier must be either for a left or right lane." }
+    }
+}
+
+
+/**
+ * Represents the center lane of a lane section. This lane has no width and is therefore geometrically represented as
+ * line.
+ *
+ * @param id identifier of the lane, whereby the lane id is zero
+ * @param level if true, the road markings are kept on level; if false, superelevation is applied to the lane
+ * @param roadMarkings list of road markings, which are placed in the middle of the center lane
+ * @param attributes information attributes to the lane
+ */
+data class CenterLane(
+        val id: LaneIdentifier,
+        val level: Boolean = false,
+        val roadMarkings: List<RoadMarking> = emptyList(),
+        val attributes: AttributeList = AttributeList.EMPTY
+) {
+    // Properties and Initializers
+    init {
+        require(id.isCenter()) { "Identifier must be suited for a center lane." }
+    }
+}

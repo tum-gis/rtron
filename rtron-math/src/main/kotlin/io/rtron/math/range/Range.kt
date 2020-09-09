@@ -85,6 +85,8 @@ class Range<T : Comparable<*>>(
      */
     fun isEmpty() = _range.isEmpty
 
+    fun isNotEmpty() = !isEmpty()
+
     /**
      * Returns true, if there exists a (possibly empty) range which is enclosed by both this range and [other].
      *

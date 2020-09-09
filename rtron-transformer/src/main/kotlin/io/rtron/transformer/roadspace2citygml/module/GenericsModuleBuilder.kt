@@ -18,6 +18,7 @@ package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
+import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
@@ -39,6 +40,12 @@ class GenericsModuleBuilder(
     fun createGenericObject(curve3D: AbstractCurve3D): Result<GenericCityObject, Exception> {
         val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
                 .also { curve3D.accept(it) }
+        return createGenericObject(geometryTransformer)
+    }
+
+    fun createGenericObject(abstractGeometry3D: AbstractGeometry3D): Result<GenericCityObject, Exception> {
+        val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
+                .also { abstractGeometry3D.accept(it) }
         return createGenericObject(geometryTransformer)
     }
 

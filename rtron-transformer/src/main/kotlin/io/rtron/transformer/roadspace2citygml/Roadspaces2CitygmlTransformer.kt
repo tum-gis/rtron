@@ -46,7 +46,7 @@ class Roadspaces2CitygmlTransformer(
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
 
-    private val _roadLineAdder = RoadspaceLineAdder(configuration)
+    private val _roadspaceLineAdder = RoadspaceLineAdder(configuration)
     private val _roadObjectAdder = RoadObjectAdder(configuration)
     private val _roadLanesAdder = RoadsAdder(configuration)
 
@@ -82,15 +82,17 @@ class Roadspaces2CitygmlTransformer(
      * Transform a single [Roadspace] and add the objects to the [dstCityModel].
      */
     private fun transform(srcRoadspace: Roadspace, srcLaneTopology: LaneTopology, dstCityModel: CityModel) {
-        _roadLineAdder.addRoadReferenceLine(srcRoadspace, dstCityModel)
-        _roadLineAdder.addLaneReferenceLine(srcRoadspace, dstCityModel)
+        _roadspaceLineAdder.addRoadReferenceLine(srcRoadspace, dstCityModel)
 
-        _roadObjectAdder.addRoadspaceObjects(srcRoadspace.roadspaceObjects, dstCityModel)
+        _roadLanesAdder.addRoadCenterLaneLines(srcRoadspace.road, dstCityModel)
+        _roadLanesAdder.addLaneLines(srcRoadspace.road, dstCityModel)
 
         _roadLanesAdder.addLaneSurfaces(srcRoadspace.road, dstCityModel)
-        _roadLanesAdder.addLaneLines(srcRoadspace.road, dstCityModel)
         _roadLanesAdder.addLateralFillerSurfaces(srcRoadspace.road, dstCityModel)
         _roadLanesAdder.addLongitudinalFillerSurfaces(srcRoadspace.road, srcLaneTopology, dstCityModel)
+        _roadLanesAdder.addRoadMarkings(srcRoadspace.road, dstCityModel)
+
+        _roadObjectAdder.addRoadspaceObjects(srcRoadspace.roadspaceObjects, dstCityModel)
     }
 
 

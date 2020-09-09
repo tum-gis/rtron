@@ -24,6 +24,7 @@ import io.rtron.math.geometry.curved.threed.surface.AbstractCurveRelativeSurface
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
+import io.rtron.math.range.intersectingRange
 import io.rtron.std.handleFailure
 
 
@@ -31,27 +32,28 @@ import io.rtron.std.handleFailure
  * Curve that lies on a parametric surface. This curve is parallel to the [baseSurface]'s curve but defined by a
  * laterally translated by a [lateralOffsetFunction] and vertically translated by a [heightOffsetFunction].
  *
+ * If the domain of [lateralOffsetFunction] and/or [heightOffsetFunction] is not defined everywhere where the
+ * [baseSurface] is defined, the [CurveOnParametricSurface3D] is only defined, where all domains overlap.
+ *
  * @param baseSurface the base surface on which this curve lies
  * @param lateralOffsetFunction lateral offset to the curve of the [baseSurface]
  * @param heightOffsetFunction height offset to the curve of the [baseSurface]
- *
  */
 class CurveOnParametricSurface3D(
-        val baseSurface: AbstractCurveRelativeSurface3D,
-        val lateralOffsetFunction: UnivariateFunction,
-        val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
+        private val baseSurface: AbstractCurveRelativeSurface3D,
+        private val lateralOffsetFunction: UnivariateFunction,
+        private val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
 ) : AbstractCurve3D() {
 
     // Properties and Initializers
-    init {
-        require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, tolerance))
-        { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
-        require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, tolerance))
-        { "The height offset function must be defined everywhere where the baseSurface is also defined." }
-    }
-
     override val tolerance: Double get() = baseSurface.tolerance
-    override val domain: Range<Double> get() = baseSurface.domain
+
+    override val domain: Range<Double> = setOf(baseSurface.domain,
+            lateralOffsetFunction.domain, heightOffsetFunction.domain).intersectingRange()
+
+    init {
+        require(domain.isNotEmpty()) { "Domain must not be empty." }
+    }
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D): Result<Vector3D, Exception> {
@@ -63,5 +65,24 @@ class CurveOnParametricSurface3D(
 
         val curveRelativePoint2D = curveRelativePoint.toCurveRelative2D(lateralOffset)
         return baseSurface.calculatePointGlobalCS(curveRelativePoint2D, heightOffset)
+    }
+
+    companion object {
+
+        /**
+         * Returns a [CurveOnParametricSurface3D]. Throws an error, if the [lateralOffsetFunction] or the
+         * [heightOffsetFunction] is not defined everywhere, where the [baseSurface] is defined.
+         */
+        fun onCompleteSurface(baseSurface: AbstractCurveRelativeSurface3D, lateralOffsetFunction: UnivariateFunction,
+                              heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS):
+                CurveOnParametricSurface3D {
+
+            require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance))
+            { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
+            require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance))
+            { "The height offset function must be defined everywhere where the baseSurface is also defined." }
+
+            return CurveOnParametricSurface3D(baseSurface, lateralOffsetFunction, heightOffsetFunction)
+        }
     }
 }

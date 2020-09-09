@@ -49,6 +49,14 @@ class RoadsAdder(
     // Methods
 
     /**
+     * Adds the lines of the center lane (id=0) of a [Road] class (RoadSpaces model) to the [CityModel] (CityGML model).
+     */
+    fun addRoadCenterLaneLines(srcRoad: Road, dstCityModel: CityModel) {
+        srcRoad.getAllCenterLanes()
+                .forEach { addLaneLine(it.first, "RoadCenterLaneLine", it.second, it.third, dstCityModel) }
+    }
+
+    /**
      * Adds lane surfaces of a [Road] class (RoadSpaces model) to the [CityModel] (CityGML model).
      */
     fun addLaneSurfaces(srcRoad: Road, dstCityModel: CityModel) {
@@ -64,11 +72,11 @@ class RoadsAdder(
     fun addLaneLines(srcRoad: Road, dstCityModel: CityModel) {
 
         srcRoad.getAllLeftLaneBoundaries()
-                .forEach { addLaneBoundary(it.first, "LeftLaneBoundary", it.second, dstCityModel) }
+                .forEach { addLaneLine(it.first, "LeftLaneBoundary", it.second, AttributeList.EMPTY, dstCityModel) }
         srcRoad.getAllRightLaneBoundaries()
-                .forEach { addLaneBoundary(it.first, "RightLaneBoundary", it.second, dstCityModel) }
+                .forEach { addLaneLine(it.first, "RightLaneBoundary", it.second, AttributeList.EMPTY, dstCityModel) }
         srcRoad.getAllCurvesOnLanes(0.5)
-                .forEach { addLaneBoundary(it.first, "LaneCenterLine", it.second, dstCityModel) }
+                .forEach { addLaneLine(it.first, "LaneCenterLine", it.second, AttributeList.EMPTY, dstCityModel) }
     }
 
     /**
@@ -105,6 +113,22 @@ class RoadsAdder(
                 }
     }
 
+    /**
+     * Adds road markings of a [Road] class (RoadSpaces model) to the [CityModel] (CityGML model).
+     */
+    fun addRoadMarkings(srcRoad: Road, dstCityModel: CityModel) {
+        srcRoad.getAllRoadMarkings(configuration.parameters.discretizationStepSize).forEach {
+            val genericCityObject = _genericsModuleBuilder
+                    .createGenericObject(it.second)
+                    .handleFailure { _reportLogger.log(it); return }
+
+            _identifierAdder.addIdentifier(it.first, "RoadMark", genericCityObject)
+            _attributesAdder.addAttributes(it.first.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                    it.third, genericCityObject)
+            dstCityModel.addCityObjectMember(CityObjectMember(genericCityObject))
+        }
+    }
+
     private fun addLaneSurface(id: LaneIdentifier, name: String, surface: AbstractSurface3D, attributes: AttributeList,
                                dstCityModel: CityModel) {
 
@@ -118,14 +142,17 @@ class RoadsAdder(
         dstCityModel.addCityObjectMember(CityObjectMember(roadObject))
     }
 
-    private fun addLaneBoundary(id: LaneIdentifier, name: String, curve: AbstractCurve3D, dstCityModel: CityModel) {
+    private fun addLaneLine(id: LaneIdentifier, name: String, curve: AbstractCurve3D, attributes: AttributeList,
+                            dstCityModel: CityModel) {
 
         val roadObject = _genericsModuleBuilder
                 .createGenericObject(curve)
                 .handleFailure { _reportLogger.log(it); return }
 
         _identifierAdder.addIdentifier(id, name, roadObject)
-        _attributesAdder.addAttributes(id.toAttributes(configuration.parameters.identifierAttributesPrefix), roadObject)
+        _attributesAdder.addAttributes(id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                attributes, roadObject)
         dstCityModel.addCityObjectMember(CityObjectMember(roadObject))
     }
+
 }

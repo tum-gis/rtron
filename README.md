@@ -56,7 +56,7 @@ configure {
 
 r:trån can [recursively](https://rtron.io/wiki/configuration) iterate over OpenDRIVE datasets contained in the input directory.
 
-## :construction_worker: ‍Building
+## :construction_worker: Building
 
 Clone the repo and let gradle build it:
 

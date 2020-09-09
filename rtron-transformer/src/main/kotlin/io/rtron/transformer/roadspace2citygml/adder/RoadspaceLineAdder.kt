@@ -16,10 +16,7 @@
 
 package io.rtron.transformer.roadspace2citygml.adder
 
-import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.model.roadspaces.roadspace.Roadspace
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
@@ -47,28 +44,13 @@ class RoadspaceLineAdder(
      * Adds the reference line of the road to the [CityModel].
      */
     fun addRoadReferenceLine(srcRoadspace: Roadspace, dstCityModel: CityModel) {
-        addReferenceLine(srcRoadspace.id, "RoadReferenceLine", srcRoadspace.referenceLine,
-                srcRoadspace.attributes, dstCityModel)
-    }
-
-    /**
-     * Adds the lane reference line of the road to the [CityModel]. The lane reference line is a laterally translated
-     * road reference line.
-     */
-    fun addLaneReferenceLine(srcRoadspace: Roadspace, dstCityModel: CityModel) {
-        addReferenceLine(srcRoadspace.id, "LaneReferenceLine", srcRoadspace.road.getLaneReferenceLine(),
-                srcRoadspace.attributes, dstCityModel)
-    }
-
-    private fun addReferenceLine(id: RoadspaceIdentifier, name: String, line: AbstractCurve3D,
-                                 attributes: AttributeList, dstCityModel: CityModel) {
-
-        val abstractCityObject = _genericsModuleBuilder.createGenericObject(line)
+        val abstractCityObject = _genericsModuleBuilder.createGenericObject(srcRoadspace.referenceLine)
                 .handleFailure { _reportLogger.log(it); return }
 
-        _identifierAdder.addIdentifier(id, name, abstractCityObject)
-        _attributesAdder.addAttributes(id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
-                attributes, abstractCityObject)
+        _identifierAdder.addIdentifier(srcRoadspace.id, "RoadReferenceLine", abstractCityObject)
+        _attributesAdder.addAttributes(srcRoadspace.id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                srcRoadspace.attributes, abstractCityObject)
         dstCityModel.addCityObjectMember(CityObjectMember(abstractCityObject))
     }
+
 }

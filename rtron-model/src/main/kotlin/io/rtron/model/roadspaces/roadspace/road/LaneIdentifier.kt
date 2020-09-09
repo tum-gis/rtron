@@ -32,6 +32,10 @@ data class LaneIdentifier(
 
     // Methods
 
+    fun isLeft() = laneId > 0
+    fun isCenter() = laneId == 0
+    fun isRight() = laneId < 0
+
     /** Returns the identifier for the adjacent lane to the left. */
     fun getAdjacentLeftLaneIdentifier(): LaneIdentifier {
         val requestedLaneId = if (laneId == -1) 1 else laneId + 1

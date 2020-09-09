@@ -22,6 +22,7 @@ import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.range.Range
 import io.rtron.math.std.sign
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
@@ -32,35 +33,40 @@ import kotlin.math.abs
  * Represents the section of a road in which the number of lanes and their attributes do not change.
  *
  * @param id identifier of the lane section
- * @param curvePositionStart start point of this lane section in comparison of the road
+ * @param curvePositionDomain domain of the curve position of this lane section in comparison of the road
  * @param lanes lanes collection whereby the lane id is used as the map's key
+ * @param centerLane center lane of the lane section, which has no width
  */
 data class LaneSection(
         val id: LaneSectionIdentifier,
-        val curvePositionStart: CurveRelativePoint1D,
-        val lanes: Map<Int, Lane>
+        val curvePositionDomain: Range<Double>,
+        val lanes: Map<Int, Lane>,
+        val centerLane: CenterLane
 ) {
 
     // Properties and Initializers
-    val laneList get() = lanes.toList().sortedBy { it.first }.map { it.second }
-
     init {
-        require(lanes.isNotEmpty()) { "LaneSection must contain lanes." }
+        require(curvePositionDomain.hasLowerBound())
+        { "Curve position domain must have a lower bound" }
+        require(lanes.isNotEmpty())
+        { "LaneSection must contain lanes." }
         require(lanes.all { it.key == it.value.id.laneId })
         { "Lane elements must be positioned according to their lane id on the map." }
 
-        val expectedLaneIds =
-                (lanes.keys.min()!!..lanes.keys.max()!!)
-                        .toMutableList()
-                        .also { it.remove(0) }
-        if (!lanes.keys.containsAll(expectedLaneIds))
-            print("ok")
-        require(lanes.keys.containsAll(expectedLaneIds)) { "There must be no gaps within the given laneIds." }
+        val expectedLaneIds = (lanes.keys.min()!!..lanes.keys.max()!!)
+                .toMutableList()
+                .also { it.remove(0) }
+        require(lanes.keys.containsAll(expectedLaneIds))
+        { "There must be no gaps within the given laneIds." }
     }
 
+    val curvePositionStart get() = CurveRelativePoint1D(curvePositionDomain.lowerEndpointOrNull()!!)
+    val laneList get() = lanes.toList().sortedBy { it.first }.map { it.second }
+
     // Secondary Constructors
-    constructor(id: LaneSectionIdentifier, curvePositionStart: CurveRelativePoint1D, lanes: List<Lane>) :
-            this(id, curvePositionStart, lanes.map { it.id.laneId to it }.toMap())
+    constructor(id: LaneSectionIdentifier, curvePositionDomain: Range<Double>, lanes: List<Lane>,
+                centerLane: CenterLane) :
+            this(id, curvePositionDomain, lanes.map { it.id.laneId to it }.toMap(), centerLane)
 
     // Methods
     fun getLane(laneId: Int): Result<Lane, IllegalArgumentException> = lanes.getValueResult(laneId)
