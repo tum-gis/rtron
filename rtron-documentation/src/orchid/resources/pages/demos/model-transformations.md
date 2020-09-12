@@ -19,4 +19,4 @@ Moreover, FME provides a [variety of transformers](https://www.safe.com/transfor
 ## References
 
 - [Webinar](https://www.safe.com/webinars/your-data-in-unreal-how-to-bring-your-data-into-real-time-environments/) on how to bring various models into the Unreal Game engine with FME
-- [Article](https://safesoftware.cloud.answerhub.com/articles/54027/creating-and-using-geometry-instances.html) on how to swap primitive geometries with HD model assets
+- [Article](https://community.safe.com/s/article/creating-and-using-geometry-instances) on how to swap primitive geometries with HD model assets
