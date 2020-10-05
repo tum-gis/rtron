@@ -20,14 +20,14 @@ object DependencyVersions {
     // standard libraries
     const val kotlin = "1.3.72"
     const val coroutines = "1.3.8"
-    const val result = "3.0.1"
+    const val result = "3.1.0"
     const val javaaxActivation = "1.1.1"
     const val ktsRunner = "0.0.8"
 
     // testing
-    const val junit = "5.6.2"
-    const val assertj = "3.16.1"
-    const val mockk = "1.10.0"
+    const val junit = "5.7.0"
+    const val assertj = "3.17.2"
+    const val mockk = "1.10.2"
 
     // logging
     const val log4j = "2.13.3"
@@ -42,12 +42,12 @@ object DependencyVersions {
     const val jaxbCore = "2.3.0.1"
 
     // object mapping
-    const val mapstruct = "1.3.1.Final"
+    const val mapstruct = "1.4.0.Final"
 
     // io
     const val clikt = "2.4.0"
     const val mordant = "1.2.1"
-    const val commonsIO = "2.7"
+    const val commonsIO = "2.8.0"
     const val commonsCSV = "1.8"
     const val commonsLang = "3.11"
     const val emojiJava = "5.1.1"
@@ -61,7 +61,7 @@ object DependencyVersions {
 
     // geo
     const val proj4 = "1.1.1"
-    const val citygml4j = "2.11.0"
+    const val citygml4j = "2.11.1"
 }
 
 object Dependencies {
