@@ -50,8 +50,8 @@ class ShapeFunction(
     override val domainX: Range<Double> = Range.all()
     override val domainY: Range<Double> = Range.all()
 
-    private val minimumX: Double = functions.keys.min()!!
-    private val maximumX: Double = functions.keys.max()!!
+    private val minimumX: Double = functions.keys.minOrNull()!!
+    private val maximumX: Double = functions.keys.maxOrNull()!!
 
     // Methods
 

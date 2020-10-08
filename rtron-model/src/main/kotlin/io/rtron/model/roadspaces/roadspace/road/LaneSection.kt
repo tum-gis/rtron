@@ -53,7 +53,7 @@ data class LaneSection(
         require(lanes.all { it.key == it.value.id.laneId })
         { "Lane elements must be positioned according to their lane id on the map." }
 
-        val expectedLaneIds = (lanes.keys.min()!!..lanes.keys.max()!!)
+        val expectedLaneIds = (lanes.keys.minOrNull()!!..lanes.keys.maxOrNull()!!)
                 .toMutableList()
                 .also { it.remove(0) }
         require(lanes.keys.containsAll(expectedLaneIds))

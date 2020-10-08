@@ -23,7 +23,6 @@ import io.rtron.math.linear.RealMatrix
 import io.rtron.math.linear.SingularValueDecomposition
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.DBL_EPSILON_7
-import io.rtron.std.distinctConsecutiveEnclosing
 import io.rtron.std.filterWindowedEnclosing
 import io.rtron.std.zipWithNextEnclosing
 import io.rtron.std.zipWithNextToTriples
@@ -84,7 +83,7 @@ fun List<Vector3D>.isPlanar(tolerance: Double = DBL_EPSILON_7, dynamicToleranceA
     { "Planarity check requires the provision of at least three points." }
 
     val adjustedTolerance = if (dynamicToleranceAdjustment) {
-        val u = Math.ulp(this.flatMap { it.toDoubleList() }.map(::abs).max()!!)
+        val u = Math.ulp(this.flatMap { it.toDoubleList() }.map(::abs).maxOrNull()!!)
         val dynamicFactor = u / DBL_EPSILON
         tolerance * dynamicFactor
     } else tolerance
