@@ -18,8 +18,8 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.3.72"
-    const val coroutines = "1.3.8"
+    const val kotlin = "1.4.10"
+    const val coroutines = "1.3.9"
     const val result = "3.1.0"
     const val javaaxActivation = "1.1.1"
     const val ktsRunner = "0.0.8"
@@ -45,7 +45,7 @@ object DependencyVersions {
     const val mapstruct = "1.4.0.Final"
 
     // io
-    const val clikt = "2.4.0"
+    const val clikt = "3.0.1"
     const val mordant = "1.2.1"
     const val commonsIO = "2.8.0"
     const val commonsCSV = "1.8"
@@ -93,7 +93,7 @@ object Dependencies {
     const val mapstructProcessor = "org.mapstruct:mapstruct-processor:${DependencyVersions.mapstruct}"
 
     // io
-    const val clikt = "com.github.ajalt:clikt:${DependencyVersions.clikt}"
+    const val clikt = "com.github.ajalt.clikt:clikt:${DependencyVersions.clikt}"
     const val mordant = "com.github.ajalt:mordant:${DependencyVersions.mordant}"
     const val commonsIO = "commons-io:commons-io:${DependencyVersions.commonsIO}"
     const val commonsCSV = "org.apache.commons:commons-csv:${DependencyVersions.commonsCSV}"

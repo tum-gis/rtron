@@ -26,9 +26,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.ajalt.mordant.TermColors
-import org.apache.commons.lang3.SystemUtils
 import io.rtron.io.files.toPath
 import io.rtron.main.batch.BatchConfiguration
+import org.apache.commons.lang3.SystemUtils
 
 /**
  * Color formatter for the command line interface.
@@ -63,7 +63,7 @@ class ArgumentParser : CliktCommand(
     }
 
     private val inputPath by argument(
-            help = "Path to the directory containing OpenDRIVE datasets").path(exists = true)
+            help = "Path to the directory containing OpenDRIVE datasets").path(mustExist = true)
     private val outputPath by argument(
             help = "Path to the output directory into which the transformed CityGML models are written").path()
     private val noRecursive by option("--no-recursive",
