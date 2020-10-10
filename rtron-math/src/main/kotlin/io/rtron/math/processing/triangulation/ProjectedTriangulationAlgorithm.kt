@@ -37,13 +37,14 @@ class ProjectedTriangulationAlgorithm(
 ) : TriangulationAlgorithm() {
 
 
-    override fun triangulate(vertices: List<Vector3D>): Result<List<Polygon3D>, Exception> {
-        val projectedVertices = projectVertices(vertices)
-        val projectedPolygonsTriangulated = triangulationAlgorithm.triangulate(projectedVertices)
+    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception> {
+        val projectedVertices = projectVertices(vertices, tolerance)
+        val projectedPolygonsTriangulated = triangulationAlgorithm
+                .triangulate(projectedVertices, tolerance)
                 .handleFailure { return it }
 
         return projectedPolygonsTriangulated
-                .map { constructPolygon(it, projectedVertices, vertices) }
+                .map { constructPolygon(it, projectedVertices, vertices, tolerance) }
                 .handleFailure { return it }
                 .let { Result.success(it) }
     }
@@ -51,10 +52,10 @@ class ProjectedTriangulationAlgorithm(
     /**
      * Projects the [vertices] into a best fitting plane.
      */
-    private fun projectVertices(vertices: List<Vector3D>): List<Vector3D> {
+    private fun projectVertices(vertices: List<Vector3D>, tolerance: Double): List<Vector3D> {
 
         val affine = run {
-            val plane = vertices.calculateBestFittingPlane()
+            val plane = vertices.calculateBestFittingPlane(tolerance)
             val affineTranslation = Affine3D.of(plane.point)
             val affineNewBasis = Affine3D.of(plane.vectorU, plane.vectorV, plane.normal)
             AffineSequence3D.of(affineTranslation, affineNewBasis).solve()
@@ -74,7 +75,7 @@ class ProjectedTriangulationAlgorithm(
      * @return triangulated [Polygon3D] with the original vertices
      */
     private fun constructPolygon(projectedPolygon: Polygon3D, allProjectedVertices: List<Vector3D>,
-                                 allOriginalVertices: List<Vector3D>): Result<Polygon3D, Exception> {
+                                 allOriginalVertices: List<Vector3D>, tolerance: Double): Result<Polygon3D, Exception> {
 
         if (!allProjectedVertices.containsAll(projectedPolygon.vertices))
             return Result.error(RuntimeException("Triangulation algorithm produced deviating points."))
@@ -82,7 +83,7 @@ class ProjectedTriangulationAlgorithm(
         val constructedPolygon = projectedPolygon.vertices
                 .map { allProjectedVertices.indexOf(it) }
                 .map { allOriginalVertices[it] }
-                .let { Polygon3D(it) }
+                .let { Polygon3D(it, tolerance) }
         return Result.success(constructedPolygon)
     }
 }

@@ -16,10 +16,10 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
+import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 
 
 internal class Line3DTest {
@@ -31,7 +31,7 @@ internal class Line3DTest {
         fun `throws error if `() {
             val point = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Line3D(point, point) }
+            assertThatIllegalArgumentException().isThrownBy { Line3D(point, point, 0.0) }
         }
     }
 }

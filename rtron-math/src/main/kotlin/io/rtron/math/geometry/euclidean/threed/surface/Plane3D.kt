@@ -18,7 +18,7 @@ package io.rtron.math.geometry.euclidean.threed.surface
 
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.point.toVector3D
-import io.rtron.math.std.DBL_EPSILON_7
+import io.rtron.math.std.DEFAULT_TOLERANCE
 import org.apache.commons.math3.geometry.euclidean.threed.Plane as CMPlane
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D as CMVector3D
 
@@ -33,7 +33,7 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D as CMVector3D
 data class Plane3D(
         val point: Vector3D = Vector3D.ZERO,
         val normal: Vector3D,
-        val tolerance: Double = DBL_EPSILON_7
+        val tolerance: Double
 ) {
 
     // Properties and Initializers
@@ -61,8 +61,8 @@ data class Plane3D(
     fun toPlane3DCm() = this._plane
 
     companion object {
-        val XY_PLANE = Plane3D(Vector3D.ZERO, Vector3D.Z_AXIS)
-        val XZ_PLANE = Plane3D(Vector3D.ZERO, Vector3D.Y_AXIS)
-        val YZ_PLANE = Plane3D(Vector3D.ZERO, Vector3D.X_AXIS)
+        val XY_PLANE = Plane3D(Vector3D.ZERO, Vector3D.Z_AXIS, DEFAULT_TOLERANCE)
+        val XZ_PLANE = Plane3D(Vector3D.ZERO, Vector3D.Y_AXIS, DEFAULT_TOLERANCE)
+        val YZ_PLANE = Plane3D(Vector3D.ZERO, Vector3D.X_AXIS, DEFAULT_TOLERANCE)
     }
 }

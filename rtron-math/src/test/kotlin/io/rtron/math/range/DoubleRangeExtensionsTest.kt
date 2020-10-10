@@ -26,21 +26,24 @@ internal class DoubleRangeExtensionsTest {
     inner class ArrangeDoubleRange {
         @Test
         fun `correct value spacing`() {
-            val actualValues = Range.closed(0.0, 1.25).arrange(0.25)
+            val actualValues = Range.closed(0.0, 1.25)
+                    .arrange(0.25, false, 0.0)
 
             assertThat(doubleArrayOf(0.0, 0.25, 0.5, 0.75, 1.0, 1.25)).isEqualTo(actualValues)
         }
 
         @Test
         fun `non zero start`() {
-            val actualValues = Range.closed(1.0, 1.25).arrange(0.25)
+            val actualValues = Range.closed(1.0, 1.25)
+                    .arrange(0.25, false, 0.0)
 
             assertThat(doubleArrayOf(1.0, 1.25)).isEqualTo(actualValues)
         }
 
         @Test
         fun `offset start`() {
-            val actualValues = Range.closed(0.51, 1.25).arrange(0.25)
+            val actualValues = Range.closed(0.51, 1.25)
+                    .arrange(0.25, false, 0.0)
 
             assertThat(doubleArrayOf(0.51, 0.76, 1.01)).isEqualTo(actualValues)
         }
@@ -49,7 +52,7 @@ internal class DoubleRangeExtensionsTest {
         @Test
         fun `with epsilon offset and endpoint`() {
             val actualValues = Range.closed(0.51, 1.25)
-                    .arrange(0.25, includeClosedEndPoint = true)
+                    .arrange(0.25, true, 0.0)
 
             assertThat(doubleArrayOf(0.51, 0.76, 1.01, 1.25)).isEqualTo(actualValues)
         }
@@ -57,14 +60,15 @@ internal class DoubleRangeExtensionsTest {
         @Test
         fun `with endpoint`() {
             val actualValues = Range.closed(1.0, 1.25)
-                    .arrange(0.25, includeClosedEndPoint = true)
+                    .arrange(0.25, true, 0.0)
 
             assertThat(doubleArrayOf(1.0, 1.25)).isEqualTo(actualValues)
         }
 
         @Test
         fun `list with length zero`() {
-            val actualValues = Range.closed(1.0, 1.0).arrange(0.25)
+            val actualValues = Range.closed(1.0, 1.0)
+                    .arrange(0.25, false, 0.0)
 
             assertThat(doubleArrayOf(1.0)).isEqualTo(actualValues)
         }
@@ -72,7 +76,7 @@ internal class DoubleRangeExtensionsTest {
         @Test
         fun `list with length zero and endPoint`() {
             val actualValues = Range.closed(1.0, 1.0)
-                    .arrange(0.25, includeClosedEndPoint = true)
+                    .arrange(0.25, true, 0.0)
 
             assertThat(doubleArrayOf(1.0)).isEqualTo(actualValues)
         }
@@ -80,7 +84,7 @@ internal class DoubleRangeExtensionsTest {
         @Test
         fun `smaller range than step size should nevertheless contain the start`() {
             val actualValues = Range.closed(1.0, 2.0)
-                    .arrange(5.0, false)
+                    .arrange(5.0, false, 0.0)
 
             assertThat(doubleArrayOf(1.0)).isEqualTo(actualValues)
         }
@@ -88,7 +92,7 @@ internal class DoubleRangeExtensionsTest {
         @Test
         fun `smaller range than step size should nevertheless contain the start and end`() {
             val actualValues = Range.closed(1.0, 2.0)
-                    .arrange(5.0, true)
+                    .arrange(5.0, true, 0.0)
 
             assertThat(doubleArrayOf(1.0, 2.0)).isEqualTo(actualValues)
         }

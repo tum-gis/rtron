@@ -35,8 +35,8 @@ import io.rtron.std.distinctConsecutiveEnclosing
  */
 data class LinearRing3D(
         val vertices: List<Vector3D>,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
-        override val tolerance: Double = 0.0
+        override val tolerance: Double,
+        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D(), Tolerable {
 
     // Properties and Initializers
@@ -64,17 +64,18 @@ data class LinearRing3D(
 
     @OptIn(ExperimentalTriangulator::class)
     override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> =
-            Triangulator.triangulate(this)
+            Triangulator.triangulate(this, tolerance)
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 
     companion object {
-        val UNIT = LinearRing3D(listOf(-Vector3D.X_AXIS, Vector3D.X_AXIS, Vector3D.Y_AXIS))
+        val UNIT = LinearRing3D(listOf(-Vector3D.X_AXIS, Vector3D.X_AXIS, Vector3D.Y_AXIS), 0.0)
 
         /**
          * Creates a linear ring based on the provided [vertices].
          */
-        fun of(vararg vertices: Vector3D) = LinearRing3D(vertices.toList())
+        fun of(vararg vertices: Vector3D, tolerance: Double = 1E-7) =
+                LinearRing3D(vertices.toList(), tolerance)
 
         /**
          * Creates multiple linear rings from two lists of vertices [leftVertices] and [rightVertices].
@@ -83,7 +84,7 @@ data class LinearRing3D(
          * @param leftVertices left vertices for the linear rings construction
          * @param rightVertices right vertices for the linear rings construction
          */
-        fun of(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>): List<LinearRing3D> {
+        fun of(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double): List<LinearRing3D> {
 
             data class VertexPair(val left: Vector3D, val right: Vector3D)
 
@@ -92,7 +93,7 @@ data class LinearRing3D(
             val linearRingVertices = vertexPairs.zipWithNext()
                     .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
 
-            return linearRingVertices.map { LinearRing3D(it) }
+            return linearRingVertices.map { LinearRing3D(it, tolerance) }
         }
 
         /**
@@ -103,7 +104,7 @@ data class LinearRing3D(
          * @param leftVertices left vertices for the linear rings construction
          * @param rightVertices right vertices for the linear rings construction
          */
-        fun ofWithDuplicatesRemoval(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>):
+        fun ofWithDuplicatesRemoval(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double):
                 Result<List<LinearRing3D>, Exception> {
             data class VertexPair(val left: Vector3D, val right: Vector3D)
 
@@ -115,7 +116,7 @@ data class LinearRing3D(
                     .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
                     .map { currentVertices -> currentVertices.distinctConsecutiveEnclosing { it } }
                     .filter { it.distinct().count() >= 3 }
-                    .map { LinearRing3D(it) }
+                    .map { LinearRing3D(it, tolerance) }
                     .let { Result.success(it.toList()) }
         }
 

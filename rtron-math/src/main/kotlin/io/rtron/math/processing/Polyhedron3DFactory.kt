@@ -41,7 +41,8 @@ object Polyhedron3DFactory {
      * @return resulting [Polyhedron3D] wrapped in a [ContextMessage] in case of processing log messages
      */
     @OptIn(ExperimentalTriangulator::class)
-    fun buildFromVerticalBars(verticalBars: List<LineSegment3D>): Result<ContextMessage<Polyhedron3D>, Exception> {
+    fun buildFromVerticalBars(verticalBars: List<LineSegment3D>, tolerance: Double):
+            Result<ContextMessage<Polyhedron3D>, Exception> {
 
         val preparedBars = prepareBars(verticalBars).handleFailure { return it }
 
@@ -51,19 +52,19 @@ object Polyhedron3DFactory {
         { "Prepared vertical bar zips must have either one or two elements." }
 
         // construct faces
-        val baseFace = LinearRing3D(barZips.reversed().map { it.first().start })
-        val topFace = LinearRing3D(barZips.map { it.first().end })
+        val baseFace = LinearRing3D(barZips.reversed().map { it.first().start }, tolerance)
+        val topFace = LinearRing3D(barZips.map { it.first().end }, tolerance)
         val sideFaces = barZips
                 .zipWithNextEnclosing()
                 .map { SideFaceBoundaries(it.first, it.second) }
-                .map { it.constructSideFace() }
+                .map { it.constructSideFace(tolerance) }
 
         val triangulatedFaces = (sideFaces + baseFace + topFace)
-                .map { Triangulator.triangulate(it) }
+                .map { Triangulator.triangulate(it, tolerance) }
                 .handleFailure { return it }
                 .flatten()
 
-        val polyhedron = Polyhedron3D(triangulatedFaces)
+        val polyhedron = Polyhedron3D(triangulatedFaces, tolerance)
         return Result.success(ContextMessage(polyhedron, preparedBars.messages))
     }
 
@@ -127,9 +128,9 @@ object Polyhedron3DFactory {
         /**
          * Constructs the side face represented as [LinearRing3D].
          */
-        fun constructSideFace(): LinearRing3D {
+        fun constructSideFace(tolerance: Double): LinearRing3D {
             val vertices = getVerticesOfRightLeg() + getVerticesOfLeftLegReversed()
-            return LinearRing3D(vertices)
+            return LinearRing3D(vertices, tolerance)
         }
 
         private fun isCurrentFaceHigherThanPrevious() =

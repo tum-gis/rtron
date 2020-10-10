@@ -65,19 +65,37 @@ inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline selector: (
         this.asSequence().zipWithNext { a, b -> selector(a) <= selector(b) }.all { it }
 
 /**
- * Returns true, if list is sorted in ascending order.
+ * Returns true, if list is sorted in weak ascending order.
  *
  * @receiver list to be evaluated
- * @return true, if the list is sorted in ascending order
+ * @return true, if the list is sorted in weak ascending order
  */
 fun <T : Comparable<T>> Iterable<T>.isSorted(): Boolean =
         this.asSequence().zipWithNext { a, b -> a <= b }.all { it }
 
 /**
- * Returns true, if list is sorted in descending order.
+ * Returns true, if list is sorted in strict ascending order.
  *
  * @receiver list to be evaluated
- * @return true, if the list is sorted in descending order
+ * @return true, if the list is sorted in strict ascending order
+ */
+fun <T : Comparable<T>> Iterable<T>.isStrictlySorted(): Boolean =
+        this.asSequence().zipWithNext { a, b -> a < b }.all { it }
+
+/**
+ * Returns true, if list is sorted in weak descending order.
+ *
+ * @receiver list to be evaluated
+ * @return true, if the list is sorted in weak descending order
  */
 fun <T : Comparable<T>> Iterable<T>.isSortedDescending(): Boolean =
         this.asSequence().zipWithNext { a, b -> a >= b }.all { it }
+
+/**
+ * Returns true, if list is sorted in strict descending order.
+ *
+ * @receiver list to be evaluated
+ * @return true, if the list is sorted in strict descending order
+ */
+fun <T : Comparable<T>> Iterable<T>.isStrictlySortedDescending(): Boolean =
+        this.asSequence().zipWithNext { a, b -> a > b }.all { it }

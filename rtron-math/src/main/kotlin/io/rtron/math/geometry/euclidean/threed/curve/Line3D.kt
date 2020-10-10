@@ -18,14 +18,11 @@ package io.rtron.math.geometry.euclidean.threed.curve
 
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.point.toVector3D
-import io.rtron.math.std.DBL_EPSILON
 import org.apache.commons.math3.geometry.euclidean.threed.Line as CMLine3D
 
 /** Conversion from adapted Line class from Apache Commons Math. */
-fun CMLine3D.toLine3D() = Line3D(
-    this.origin.toVector3D(),
-    this.origin.toVector3D() + this.direction.toVector3D()
-)
+fun CMLine3D.toLine3D(tolerance: Double) =
+        Line3D(this.origin.toVector3D(), this.origin.toVector3D() + this.direction.toVector3D(), tolerance)
 
 
 /**
@@ -37,7 +34,7 @@ fun CMLine3D.toLine3D() = Line3D(
 class Line3D (
         point1: Vector3D,
         point2: Vector3D,
-        private val tolerance: Double = DBL_EPSILON
+        private val tolerance: Double
 ) {
 
     // Properties and Initializers

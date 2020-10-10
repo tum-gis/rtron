@@ -37,6 +37,7 @@ import kotlin.math.sin
 data class Cylinder3D(
         val radius: Double,
         val height: Double,
+        override val tolerance: Double,
         override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
         private val numberSlices: Int = DEFAULT_NUMBER_SLICES
 ) : AbstractSolid3D() {
@@ -58,8 +59,8 @@ data class Cylinder3D(
 
         val circleVertices = circleVertices()
 
-        val basePolygon = Polygon3D(circleVertices.reversed().map { it.toVector3D(z = 0.0) })
-        val topPolygon = Polygon3D(circleVertices.map { it.toVector3D(z = height) })
+        val basePolygon = Polygon3D(circleVertices.reversed().map { it.toVector3D(z = 0.0) }, tolerance)
+        val topPolygon = Polygon3D(circleVertices.map { it.toVector3D(z = height) }, tolerance)
 
         val sidePolygons = circleVertices
                 .zipWithNextEnclosing()
@@ -67,7 +68,8 @@ data class Cylinder3D(
                     Polygon3D.of(it.first.toVector3D(0.0),
                             it.second.toVector3D(0.0),
                             it.second.toVector3D(height),
-                            it.first.toVector3D(height))
+                            it.first.toVector3D(height),
+                            tolerance = tolerance)
                 }
 
         return Result.success(sidePolygons + basePolygon + topPolygon)

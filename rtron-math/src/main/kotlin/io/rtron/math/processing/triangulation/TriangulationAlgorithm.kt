@@ -36,9 +36,9 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    fun triangulateChecked(vertices: List<Vector3D>): Result<List<Polygon3D>, Exception> {
+    fun triangulateChecked(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception> {
 
-        val triangles = triangulate(vertices).handleFailure { return it }
+        val triangles = triangulate(vertices, tolerance).handleFailure { return it }
 
         val newVertices = triangles.flatMap { it.vertices }
         if (newVertices.any { it !in vertices })
@@ -53,5 +53,5 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    internal abstract fun triangulate(vertices: List<Vector3D>): Result<List<Polygon3D>, Exception>
+    internal abstract fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception>
 }

@@ -34,6 +34,7 @@ import kotlin.math.sin
  */
 data class Circle3D(
         val radius: Double,
+        override val tolerance: Double,
         override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
         private val numberSlices: Int = DEFAULT_NUMBER_SLICES
 ) : AbstractSurface3D() {
@@ -49,7 +50,7 @@ data class Circle3D(
         val polygon = (0 until numberSlices)
                 .map { TWO_PI * it / numberSlices }
                 .map { calculatePoint(it) }
-                .let { Polygon3D(it) }
+                .let { Polygon3D(it, tolerance) }
 
         return Result.success(listOf(polygon))
     }

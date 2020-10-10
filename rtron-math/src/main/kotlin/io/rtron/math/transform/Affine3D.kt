@@ -61,8 +61,10 @@ class Affine3D(
     @kotlin.jvm.JvmName("inverseTransformOfListVector3D")
     fun inverseTransform(points: List<Vector3D>) = points.map { inverseTransform(it) }
 
-    fun transform(polygon: Polygon3D) = Polygon3D(polygon.vertices.map { transform(it) })
-    fun inverseTransform(polygon: Polygon3D) = Polygon3D(polygon.vertices.map { inverseTransform(it) })
+    fun transform(polygon: Polygon3D) =
+            Polygon3D(polygon.vertices.map { transform(it) }, polygon.tolerance)
+    fun inverseTransform(polygon: Polygon3D) =
+            Polygon3D(polygon.vertices.map { inverseTransform(it) }, polygon.tolerance)
 
     @kotlin.jvm.JvmName("transformOfListPolygon3D")
     fun transform(polygons: List<Polygon3D>) = polygons.map { transform(it) }

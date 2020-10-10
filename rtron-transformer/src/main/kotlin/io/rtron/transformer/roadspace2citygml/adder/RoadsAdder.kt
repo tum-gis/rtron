@@ -23,6 +23,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.topology.LaneTopology
+import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspace2citygml.module.TransportationModuleBuilder
@@ -62,6 +63,7 @@ class RoadsAdder(
     fun addLaneSurfaces(srcRoad: Road, dstCityModel: CityModel) {
 
         srcRoad.getAllLanes(configuration.parameters.discretizationStepSize)
+                .handleAndRemoveFailure { _reportLogger.log(it) }
                 .forEach { addLaneSurface(it.first, "LaneSurface", it.second, it.third, dstCityModel) }
     }
 
@@ -117,7 +119,9 @@ class RoadsAdder(
      * Adds road markings of a [Road] class (RoadSpaces model) to the [CityModel] (CityGML model).
      */
     fun addRoadMarkings(srcRoad: Road, dstCityModel: CityModel) {
-        srcRoad.getAllRoadMarkings(configuration.parameters.discretizationStepSize).forEach {
+        srcRoad.getAllRoadMarkings(configuration.parameters.discretizationStepSize)
+                .handleAndRemoveFailure { _reportLogger.log(it) }
+                .forEach {
             val genericCityObject = _genericsModuleBuilder
                     .createGenericObject(it.second)
                     .handleFailure { _reportLogger.log(it); return }

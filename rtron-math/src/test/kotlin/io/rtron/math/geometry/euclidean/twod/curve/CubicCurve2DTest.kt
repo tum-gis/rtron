@@ -17,10 +17,6 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -29,6 +25,10 @@ import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Offset
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
 
 internal class CubicCurve2DTest {
@@ -42,7 +42,7 @@ internal class CubicCurve2DTest {
             val pose = Pose2D(Vector2D(0.0, 0.0), Rotation2D(0.0))
             val affine = Affine2D.of(pose)
             val affineSequence = AffineSequence2D.of(affine)
-            val curve = CubicCurve2D(coefficients, 1.0, affineSequence)
+            val curve = CubicCurve2D(coefficients, 1.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativePoint1D(1.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
@@ -60,7 +60,7 @@ internal class CubicCurve2DTest {
             val pose = Pose2D(Vector2D(0.0, 0.0), Rotation2D(HALF_PI))
             val affine = Affine2D.of(pose)
             val affineSequence = AffineSequence2D.of(affine)
-            val curve = CubicCurve2D(coefficients, 1.0, affineSequence)
+            val curve = CubicCurve2D(coefficients, 1.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativePoint1D(1.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)

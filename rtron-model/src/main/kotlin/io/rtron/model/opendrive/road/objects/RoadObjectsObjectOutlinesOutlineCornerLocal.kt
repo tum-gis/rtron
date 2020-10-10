@@ -43,11 +43,11 @@ class RoadObjectsObjectOutlinesOutlineCornerLocal(
     fun getHeadPoint() = Vector3D.of(u, v, z + height)
     fun hasNonZeroHeight() = height.isFinite() && height != 0.0
 
-    fun getVerticalBar(): Result<LineSegment3D, Exception> {
+    fun getVerticalBar(tolerance: Double): Result<LineSegment3D, Exception> {
         val basePoint = getBasePoint().handleFailure { return it }
         val headPoint = getHeadPoint().handleFailure { return it }
 
-        return Result.success(LineSegment3D(basePoint, headPoint))
+        return Result.success(LineSegment3D(basePoint, headPoint, tolerance))
     }
 
 }

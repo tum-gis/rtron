@@ -68,6 +68,7 @@ object Dependencies {
     // standard libraries
     const val kotlinStandardLibrary = "stdlib-jdk8"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${DependencyVersions.coroutines}"
+    const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${DependencyVersions.kotlin}"
     const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
     const val javaaxActivation = "javax.activation:activation:${DependencyVersions.javaaxActivation}"
     const val ktsRunner = "de.swirtz:ktsRunner:${DependencyVersions.ktsRunner}"

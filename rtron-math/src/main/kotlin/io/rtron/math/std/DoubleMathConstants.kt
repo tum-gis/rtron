@@ -33,6 +33,7 @@ val DBL_EPSILON_10 = Math.ulp(1E10)
 
 val FLT_EPSILON = Math.ulp(1.0f)
 
+val DEFAULT_TOLERANCE = DBL_EPSILON_7
 
 /** Value of PI as double. (180 degrees) */
 const val PI = CMFastMath.PI

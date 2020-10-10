@@ -63,7 +63,6 @@ data class Road(
         val infos = mutableListOf<String>()
 
         val planViewGeometryLengthsSum = planView.geometry.sumByDouble { it.length }
-
         if (!fuzzyEquals(planViewGeometryLengthsSum, length, tolerance))
             return Result.error(IllegalStateException("Given length of road (${this.length}) is different than " +
                     "the sum of the individual plan view elements ($planViewGeometryLengthsSum)."))

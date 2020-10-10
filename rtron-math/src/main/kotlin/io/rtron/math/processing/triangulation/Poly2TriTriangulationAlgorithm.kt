@@ -17,7 +17,6 @@
 package io.rtron.math.processing.triangulation
 
 import com.github.kittinunf.result.Result
-import org.poly2tri.Poly2Tri
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.calculateNormal
@@ -25,6 +24,7 @@ import io.rtron.math.processing.isColinear
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.std.handleFailure
+import org.poly2tri.Poly2Tri
 import org.poly2tri.geometry.polygon.Polygon as P2TPolygon
 import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
 
@@ -32,14 +32,14 @@ import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
 /**
  * Adapts the triangulation algorithm of [Poly2Tri](https://github.com/orbisgis/poly2tri.java).
  */
-class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
+class Poly2TriTriangulationAlgorithm() : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: List<Vector3D>): Result<List<Polygon3D>, Exception> {
+    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception> {
 
         val polygon = P2TPolygon(vertices.map { P2TPolygonPoint(it.x, it.y, it.z) })
 
         poly2TriTriangulation(polygon).handleFailure { return it }
-        val triangles = polygonBackConversion(polygon).handleFailure { return it }
+        val triangles = polygonBackConversion(polygon, tolerance).handleFailure { return it }
 
         val adjustedTriangles = adjustOrientation(vertices, triangles)
         return Result.success(adjustedTriangles)
@@ -64,13 +64,14 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
     /**
      * Converts the Poly2Tri triangulation results back to a list of [Polygon3D].
      */
-    private fun polygonBackConversion(polygon: P2TPolygon): Result<List<Polygon3D>, IllegalStateException> {
+    private fun polygonBackConversion(polygon: P2TPolygon, tolerance: Double):
+            Result<List<Polygon3D>, IllegalStateException> {
         val triangles = polygon.triangles.map {
             val triangulatedVertices: List<Vector3D> = it.points.map { point -> Vector3D(point.x, point.y, point.z) }
 
-            if(triangulatedVertices.isColinear())
+            if(triangulatedVertices.isColinear(tolerance))
                 return Result.error(IllegalStateException("Triangulation failure (colinear vertices)."))
-            return@map Polygon3D(triangulatedVertices)
+            return@map Polygon3D(triangulatedVertices, tolerance)
         }
 
         return Result.success(triangles)

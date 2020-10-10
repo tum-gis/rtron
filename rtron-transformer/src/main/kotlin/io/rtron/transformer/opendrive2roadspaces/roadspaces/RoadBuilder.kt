@@ -29,7 +29,6 @@ import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.*
 import io.rtron.model.roadspaces.topology.junction.JunctionIdentifier
 import io.rtron.std.Optional
-import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.map
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
@@ -71,7 +70,7 @@ class RoadBuilder(
                     buildLaneSection(LaneSectionIdentifier(currentId, id), currentLaneSection.first,
                             currentLaneSection.second, baseAttributes)
                 }
-                .handleAndRemoveFailure { _reportLogger.log(it, id.toString()) }
+                .handleFailure { return it }
 
         if (laneSections.isEmpty())
             return Result.error(IllegalArgumentException("Road element contains no valid lane sections."))

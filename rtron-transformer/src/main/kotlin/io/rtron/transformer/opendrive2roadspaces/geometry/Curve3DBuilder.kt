@@ -17,6 +17,7 @@
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
 import io.rtron.io.logging.Logger
+import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
@@ -24,8 +25,7 @@ import io.rtron.model.opendrive.road.RoadElevationProfileElevation
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.std.handleMessage
-import io.rtron.std.isSortedBy
+import io.rtron.std.filterToStrictSortingBy
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
@@ -52,21 +52,30 @@ class Curve3DBuilder(
 
         val planViewCurve2D =
                 _curve2DBuilder.buildCurve2DFromPlanViewGeometries(srcPlanViewGeometries, parameters.offsetXY)
+        val heightFunction = buildHeightFunction(id, srcElevationProfiles)
 
-        val heightFunction = when {
-            srcElevationProfiles.isEmpty() -> LinearFunction.X_AXIS
-            srcElevationProfiles.isSortedBy { it.s } -> ConcatenatedFunction.ofPolynomialFunctions(
-                    srcElevationProfiles.map { it.s },
-                    srcElevationProfiles.map { it.coefficientsWithOffset(offsetA = parameters.offsetZ) })
-                    .handleMessage { this.reportLogger.info(it, id.toString()) }
-            else -> {
-                reportLogger.warn("Elevation profile list is not sorted, therefore the elevation profile" +
-                        " is set to zero.", id.toString())
-                LinearFunction.X_AXIS
-            }
-        }
+        return Curve3D(planViewCurve2D, heightFunction)
+    }
 
-        return Curve3D(planViewCurve2D, heightFunction, tolerance = parameters.tolerance)
+    /**
+     * Builds the height function of the OpenDRIVE's elevation profile.
+     */
+    private fun buildHeightFunction(id: RoadspaceIdentifier, srcElevationProfiles: List<RoadElevationProfileElevation>):
+            UnivariateFunction {
+        if (srcElevationProfiles.isEmpty()) return LinearFunction.X_AXIS
+
+        val elevationEntriesAdjusted = srcElevationProfiles
+                .filterToStrictSortingBy { it.s }
+        if (elevationEntriesAdjusted.size < srcElevationProfiles.size)
+            this.reportLogger.info("Removing elevation entries which are not placed in strict order " +
+                    "according to s.", id.toString())
+
+        return ConcatenatedFunction.ofPolynomialFunctions(
+                elevationEntriesAdjusted.map { it.s },
+                elevationEntriesAdjusted.map { it.coefficientsWithOffset(offsetA = parameters.offsetZ) },
+                prependConstant = true,
+                prependConstantValue = 0.0
+        )
     }
 
     /**
@@ -80,7 +89,7 @@ class Curve3DBuilder(
         val heightFunction = _functionBuilder
                 .buildStackedHeightFunctionFromRepeat(srcRoadObject.repeat, roadReferenceLine)
 
-        val curve3D = Curve3D(curve2D, heightFunction, tolerance = parameters.tolerance)
+        val curve3D = Curve3D(curve2D, heightFunction)
         return listOf(curve3D)
     }
 }

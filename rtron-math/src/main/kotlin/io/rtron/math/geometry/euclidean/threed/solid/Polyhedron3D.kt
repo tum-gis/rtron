@@ -28,6 +28,7 @@ import io.rtron.math.transform.AffineSequence3D
  */
 data class Polyhedron3D(
         val polygons: List<Polygon3D>,
+        override val tolerance: Double,
         override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSolid3D() {
 

@@ -20,12 +20,13 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
+import io.rtron.math.range.Tolerable
 
 
 /**
  * Abstract class for all geometric surface objects in 3D.
  */
-abstract class AbstractSurface3D : AbstractGeometry3D() {
+abstract class AbstractSurface3D : AbstractGeometry3D(), Tolerable {
 
     /**
      * Calculates the polygons for the respective surface geometry within the local coordinate system of the surface.

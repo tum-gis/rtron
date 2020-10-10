@@ -31,7 +31,8 @@ object LinearRing3DFactory {
     /**
      * Builds a [LinearRing3D] from a list of vertices by filtering and preparing the vertices.
      */
-    fun buildFromVertices(vertices: List<Vector3D>): Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
+    fun buildFromVertices(vertices: List<Vector3D>, tolerance: Double):
+            Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
         val infos = mutableListOf<String>()
 
         // remove end element, if start and end element are equal
@@ -49,7 +50,8 @@ object LinearRing3DFactory {
             infos += "Removing at least one consecutively following side duplicate of the form (…, A, B, A,…)."
 
         // remove vertices that are located on a line anyway
-        val preparedVertices = verticesWithoutSideDuplicates.removeLinearlyRedundantVertices()
+        val preparedVertices = verticesWithoutSideDuplicates
+                .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
         if (preparedVertices.size < verticesWithoutSideDuplicates.size)
             infos += "Removing at least one vertex due to linear redundancy."
 
@@ -57,7 +59,7 @@ object LinearRing3DFactory {
         if (preparedVertices.size <= 2)
             return Result.error(IllegalArgumentException("A linear ring requires at least three valid vertices."))
 
-        val linearRing = LinearRing3D(preparedVertices)
+        val linearRing = LinearRing3D(preparedVertices, tolerance)
         return Result.success(ContextMessage(linearRing, infos))
     }
 }

@@ -44,9 +44,9 @@ object SpiralSegment2DWriter {
         val curvatureEnd = 15.0
         val length = (curvatureEnd - curvatureStart) / PI
         val curvatureRange = LinearFunction.ofInclusiveInterceptAndPoint(5.0, 15.0, length)
-        val spiralSegment = SpiralSegment2D(curvatureRange, AffineSequence2D.EMPTY)
+        val spiralSegment = SpiralSegment2D(curvatureRange, 0.0, AffineSequence2D.EMPTY)
 
-        for (currentPosition in curvatureRange.domain.arrange(0.1)) {
+        for (currentPosition in curvatureRange.domain.arrange(0.1, false, 0.0)) {
             val ret = spiralSegment.calculatePoseGlobalCS(CurveRelativePoint1D(currentPosition))
             require(ret is Result.Success)
             csvPrinter.printRecord(currentPosition.toString(), ret.value.point.x.toString(), ret.value.point.y.toString())
@@ -61,8 +61,8 @@ object SpiralSegment2DWriter {
         val header = listOf("type", "curvePosition", "x", "y")
         val csvPrinter = CSVPrinter(path, header)
 
-        for (cDot in Range.closed(-1.0 * kotlin.math.PI, 1.0 * kotlin.math.PI).arrange(0.25 * kotlin.math.PI)) {
-            for (s in Range.closed(-100.0, 100.0).arrange(0.01)) {
+        for (cDot in Range.closed(-1.0 * kotlin.math.PI, 1.0 * kotlin.math.PI).arrange(0.25 * kotlin.math.PI, false, 0.0)) {
+            for (s in Range.closed(-100.0, 100.0).arrange(0.01, false, 0.0)) {
                 val pos = Spiral2D(cDot).calculatePose(s)
                 csvPrinter.printRecord("Spiral2D cDot=$cDot", s, pos.point.x, pos.point.y)
             }
@@ -75,7 +75,7 @@ object SpiralSegment2DWriter {
         val filePath = Path("out/test_files/Fresnel/Fresnel_line.csv")
         val csvPrinter = CSVPrinter(filePath, listOf("curvePosition", "x", "y"))
 
-        val range = Range.closed(-10000.0, 10000.0).arrange(0.01)
+        val range = Range.closed(-10000.0, 10000.0).arrange(0.01, false, 0.0)
         for (curvePosition in range) {
             val pos = Fresnel.calculatePoint(curvePosition)
             csvPrinter.printRecord(curvePosition, pos.first, pos.second)

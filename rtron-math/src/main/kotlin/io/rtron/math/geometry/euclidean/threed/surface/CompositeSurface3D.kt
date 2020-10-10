@@ -29,6 +29,16 @@ class CompositeSurface3D(
         private val surfaceMembers: List<AbstractSurface3D>
 ) : AbstractSurface3D() {
 
+    // Properties and Initializers
+    init {
+        require(surfaceMembers.isNotEmpty())
+        { "Composite surface must contain members." }
+        require(surfaceMembers.all { surfaceMembers.first().tolerance == it.tolerance })
+        { "All surface members must have the same tolerance." }
+    }
+
+    override val tolerance: Double get() = surfaceMembers.first().tolerance
+
     // Secondary Constructors
     constructor(surfaceMember: AbstractSurface3D) : this(listOf(surfaceMember))
 

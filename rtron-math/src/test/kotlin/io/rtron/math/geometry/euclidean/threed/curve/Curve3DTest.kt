@@ -24,11 +24,11 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
+import io.rtron.std.handleFailure
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.std.handleFailure
 import kotlin.math.sqrt
 
 
@@ -39,7 +39,7 @@ internal class Curve3DTest {
 
         @Test
         fun `curve with zero torsion`() {
-            val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS)
+            val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS, 0.0)
             val heightFunction = LinearFunction.X_AXIS
             val curve3D = Curve3D(curveXY, heightFunction)
             val affine = curve3D.calculateAffine(CurveRelativePoint1D(0.5))
@@ -53,7 +53,7 @@ internal class Curve3DTest {
 
         @Test
         fun `curve with constant torsion of quarter pi`() {
-            val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS)
+            val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS, 0.0)
             val heightFunction = LinearFunction.X_AXIS
             val torsionFunction = LinearFunction(0.0, QUARTER_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)
@@ -69,7 +69,7 @@ internal class Curve3DTest {
 
         @Test
         fun `curve with constant torsion of half pi`() {
-            val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS)
+            val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS, 0.0)
             val heightFunction = LinearFunction.X_AXIS
             val torsionFunction = LinearFunction(0.0, HALF_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)

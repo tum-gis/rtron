@@ -35,20 +35,20 @@ import org.apache.commons.math3.geometry.euclidean.threed.Segment as CMLineSegme
 class LineSegment3D(
         val start: Vector3D,
         val end: Vector3D,
-        endBoundType: BoundType = BoundType.CLOSED,
-        override val tolerance: Double = 0.0
+        override val tolerance: Double,
+        endBoundType: BoundType = BoundType.CLOSED
 ) : AbstractCurve3D() {
 
     // Properties and Initializers
     init {
-        require(start != end) { "Start and end vector of a line must be different." }
+        require(start != end) { "Start and end vector of a line segment must be different." }
     }
 
     override val domain = Range.closedX(0.0, start.distance(end), endBoundType)
 
     /** adapted line segment class of Apache Commons Math */
     private val _lineSegment3D by lazy {
-        CMLineSegment3D(start.toVector3DCm(), end.toVector3DCm(), Line3D(start, end).toLine3DCM())
+        CMLineSegment3D(start.toVector3DCm(), end.toVector3DCm(), Line3D(start, end, tolerance).toLine3DCM())
     }
 
     /** direction of the line segment as normalized vector */
@@ -58,6 +58,24 @@ class LineSegment3D(
     val vertices by lazy { listOf(start, end) }
 
     // Methods
+
+    /**
+     * Returns the distance between this line segment and a given [point].
+     * For more, see [StackOverflow](https://stackoverflow.com/a/1501725)
+     *
+     * @param point point for which the distance shall be calculated
+     * @return distance between this and the [point]
+     */
+    fun distance(point: Vector3D): Double {
+        val lengthSquared: Double = (end - start).normSq
+
+        val t = (point - start).dotProduct(end - start) / lengthSquared
+        val tCoerced = t.coerceIn(0.0, 1.0)
+
+        val projectedPoint = start + (end - start).scalarMultiply(tCoerced)
+        return point.distance(projectedPoint)
+    }
+
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
             Result<Vector3D, IllegalArgumentException> {
 
@@ -87,8 +105,4 @@ class LineSegment3D(
         return result
     }
 
-    // Conversions
-
-    /** Conversion to adapted Line Segment class from Apache Commons Math. */
-    fun toLineSegment3DCM() = _lineSegment3D.line.toLine3D()
 }

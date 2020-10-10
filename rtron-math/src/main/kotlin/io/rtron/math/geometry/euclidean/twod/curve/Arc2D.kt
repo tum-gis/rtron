@@ -40,9 +40,9 @@ import kotlin.math.sign
 class Arc2D(
         val curvature: Double,
         length: Double,
+        override val tolerance: Double,
         override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-        endBoundType: BoundType = BoundType.OPEN,
-        override val tolerance: Double = 0.0
+        endBoundType: BoundType = BoundType.OPEN
 ) : AbstractCurve2D() {
 
     // Properties and Initializers

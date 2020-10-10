@@ -17,11 +17,12 @@
 package io.rtron.math.geometry.euclidean.threed.solid
 
 import com.github.kittinunf.result.Result
+import io.rtron.math.std.DBL_EPSILON_1
+import io.rtron.math.transform.AffineSequence3D
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.transform.AffineSequence3D
 
 
 internal class Cylinder3DTest {
@@ -30,7 +31,7 @@ internal class Cylinder3DTest {
     inner class PolygonsGeneration {
         @Test
         fun `polygons start at level zero`() {
-            val cylinder = Cylinder3D(0.5, 1.0, AffineSequence3D.EMPTY)
+            val cylinder = Cylinder3D(0.5, 1.0, DBL_EPSILON_1, AffineSequence3D.EMPTY)
 
             val actualPolygonsResult = cylinder.calculatePolygonsGlobalCS()
 
