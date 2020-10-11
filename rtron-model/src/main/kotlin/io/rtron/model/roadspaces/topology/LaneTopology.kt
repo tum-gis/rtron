@@ -3,7 +3,8 @@ package io.rtron.model.roadspaces.topology
 import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
-import io.rtron.math.processing.removeLinearlyRedundantVertices
+import io.rtron.math.processing.isColinear
+import io.rtron.math.processing.removeRedundantVerticesOnLineSegmentsEnclosing
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.ContactPoint
@@ -12,7 +13,10 @@ import io.rtron.model.roadspaces.roadspace.road.RelativeLaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.topology.junction.Junction
 import io.rtron.model.roadspaces.topology.junction.JunctionIdentifier
-import io.rtron.std.*
+import io.rtron.std.Optional
+import io.rtron.std.getValueResult
+import io.rtron.std.handleAndRemoveFailure
+import io.rtron.std.handleFailure
 
 
 /**
@@ -97,7 +101,8 @@ class LaneTopology(
      * @param successorRoad road to which the successor lane belongs
      */
     private fun buildFillerSurfaceGeometry(laneId: LaneIdentifier, successorLaneId: LaneIdentifier,
-                                           road: Road, successorRoad: Road): Optional<AbstractSurface3D> {
+                                           road: Road, successorRoad: Road):
+            Optional<AbstractSurface3D> {
 
         val currentVertices = listOf(road.getLeftLaneBoundary(laneId), road.getRightLaneBoundary(laneId))
                 .handleFailure { throw it.error }
@@ -118,12 +123,12 @@ class LaneTopology(
             false -> successorLaneBoundaries.map { it.calculateEndPointGlobalCS() }.reversed()
         }.handleAndRemoveFailure { throw it.error }
 
+        val tolerance = minOf(road.surface.tolerance, successorRoad.surface.tolerance)
         val fillerSurfaceVertices = (currentVertices + successorVertices)
-                .distinctConsecutiveEnclosing { it }
-                .removeLinearlyRedundantVertices()
+                .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
 
-        return if (fillerSurfaceVertices.size < 3) Optional.empty()
-        else Optional(LinearRing3D(fillerSurfaceVertices))
+        return if (fillerSurfaceVertices.size < 3 || fillerSurfaceVertices.isColinear(tolerance)) Optional.empty()
+        else Optional(LinearRing3D(fillerSurfaceVertices, tolerance))
     }
 
     /**

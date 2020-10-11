@@ -26,7 +26,6 @@ import io.rtron.math.geometry.euclidean.threed.surface.Rectangle3D
 import io.rtron.math.processing.LinearRing3DFactory
 import io.rtron.math.transform.Affine3D
 import io.rtron.math.transform.AffineSequence3D
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutlineCornerRoad
@@ -36,6 +35,7 @@ import io.rtron.std.ContextMessage
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
 
 /**
@@ -58,7 +58,7 @@ class Surface3DBuilder(
         if (srcRoadObject.isRectangle()) {
             val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            rectangleList += Rectangle3D(srcRoadObject.length, srcRoadObject.width, affineSequence)
+            rectangleList += Rectangle3D(srcRoadObject.length, srcRoadObject.width, parameters.tolerance, affineSequence)
         }
 
         if (srcRoadObject.repeat.isRepeatedCuboid())
@@ -77,7 +77,7 @@ class Surface3DBuilder(
         if (srcRoadObject.isCircle()) {
             val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            circleList += Circle3D(srcRoadObject.radius, affineSequence)
+            circleList += Circle3D(srcRoadObject.radius, parameters.tolerance, affineSequence)
         }
 
         if (srcRoadObject.repeat.isRepeatCylinder())
@@ -108,7 +108,7 @@ class Surface3DBuilder(
                 .map { buildVertices(it, referenceLine) }
                 .handleAndRemoveFailure { reportLogger.log(it) }
 
-        return LinearRing3DFactory.buildFromVertices(vertices)
+        return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
     }
 
     /**
@@ -150,6 +150,6 @@ class Surface3DBuilder(
                 .map { it.getBasePoint() }
                 .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline point.") }
 
-        return LinearRing3DFactory.buildFromVertices(vertices)
+        return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
     }
 }

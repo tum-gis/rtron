@@ -105,6 +105,41 @@ internal class CollectionsKtTest {
     }
 
     @Nested
+    inner class TestFilterToSorting {
+        @Test
+        fun `test basic list with consecutive duplicate at the beginning`() {
+            val expectedValues = listOf(1, 2, 3)
+
+            val actualValues = listOf(1, 1, 2, 3).filterToSorting { first, second -> first < second }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test unsorted list`() {
+            val expectedValues = listOf(3, 4, 12)
+
+            val actualValues = listOf(3, 1, 2, 4, 12, 5, 3).filterToSorting { first, second -> first < second }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test empty list`() {
+            val actualValues = emptyList<String>().filterToSorting { first, second -> first < second }
+
+            assertThat(actualValues).isEqualTo(emptyList<String>())
+        }
+
+        @Test
+        fun `test list with a single element`() {
+            val actualValues = listOf("a").filterToSorting { first, second -> first < second }
+
+            assertThat(actualValues).isEqualTo(listOf("a"))
+        }
+    }
+
+    @Nested
     inner class TestWindowedEnclosing {
 
         @Test

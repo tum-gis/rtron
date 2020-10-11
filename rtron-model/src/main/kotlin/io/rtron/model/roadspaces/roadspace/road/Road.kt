@@ -32,6 +32,7 @@ import io.rtron.math.geometry.euclidean.threed.surface.CompositeSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
+import io.rtron.math.range.length
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.std.getValueResult
@@ -67,6 +68,8 @@ class Road(
         { "Domain of curve position must have a lower bound." }
         require(curvePositionDomain.hasUpperBound())
         { "Domain of curve position must have a upper bound." }
+        require(surface.tolerance == surfaceWithoutTorsion.tolerance)
+        { "Surface and SurfaceWithoutTorsion must have the same tolerance." }
         require(laneOffset.domain.fuzzyEncloses(surface.domain, surface.tolerance))
         { "The lane offset function must be defined everywhere where the surface is also defined." }
         require(laneSections.isNotEmpty())
@@ -99,6 +102,8 @@ class Road(
     private val sectionedLaneOffset: List<UnivariateFunction> =
             getLaneSectionCurvePositionDomains().map { SectionedUnivariateFunction(laneOffset, it) }
 
+    /** tolerance of the used geometries */
+    private val geometricalTolerance get() = surface.tolerance
 
     // Methods
 
@@ -137,11 +142,11 @@ class Road(
      * @param step discretization step size
      * @return a triple of the lane identifier, the lane surface geometry and the lane's attribute list
      */
-    fun getAllLanes(step: Double): List<Triple<LaneIdentifier, AbstractSurface3D, AttributeList>> =
+    fun getAllLanes(step: Double): List<Result<Triple<LaneIdentifier, AbstractSurface3D, AttributeList>, Exception>> =
             getAllLaneIdentifiers().map { id ->
-                val laneSurface = getLaneSurface(id, step).handleFailure { throw it.error }
-                val attributes = getAttributeList(id).handleFailure { throw it.error }
-                Triple(id, laneSurface, attributes)
+                val laneSurface = getLaneSurface(id, step).handleFailure { return@map it }
+                val attributes = getAttributeList(id).handleFailure { return@map it }
+                Result.success(Triple(id, laneSurface, attributes))
             }
 
     /**
@@ -208,9 +213,10 @@ class Road(
      * @param step discretization step size
      * @return list of the road markings containing it's identifier, geometry and attribute list
      */
-    fun getAllRoadMarkings(step: Double): List<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>> =
-        getAllLaneIdentifiers().flatMap { getRoadMarkings(it, step) } +
-                getAllLaneSectionIdentifiers().flatMap { getCenterRoadMarkings(it, step) }
+    fun getAllRoadMarkings(step: Double):
+            List<Result<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>, Exception>> =
+            getAllLaneIdentifiers().flatMap { getRoadMarkings(it, step) } +
+                    getAllLaneSectionIdentifiers().flatMap { getCenterRoadMarkings(it, step) }
 
 
     /**
@@ -288,6 +294,13 @@ class Road(
      * Returns the surface of an individual lane with [laneIdentifier] and a certain discretization [step] size.
      */
     fun getLaneSurface(laneIdentifier: LaneIdentifier, step: Double): Result<AbstractSurface3D, Exception> {
+
+        val laneSection = getLaneSection(laneIdentifier.laneSectionIdentifier)
+                .handleFailure { throw it.error }
+        if (laneSection.curvePositionDomain.length < geometricalTolerance)
+            return Result.error(IllegalStateException("$laneIdentifier: The length of the lane is almost zero " +
+                    "(below tolerance) and thus no surface can be constructed."))
+
         val leftBoundary = getLeftLaneBoundary(laneIdentifier)
                 .handleFailure { return it }
                 .calculatePointListGlobalCS(step)
@@ -296,9 +309,15 @@ class Road(
                 .handleFailure { throw it.error }
                 .calculatePointListGlobalCS(step)
                 .handleFailure { throw it.error }
-        val surface = LinearRing3D.ofWithDuplicatesRemoval(leftBoundary, rightBoundary)
-                .handleFailure { return it }
-                .let { CompositeSurface3D(it) }
+
+        if (leftBoundary.zip(rightBoundary).all { it.first.fuzzyEquals(it.second, geometricalTolerance) })
+            return Result.error(IllegalStateException("$laneIdentifier: Lane has zero width (when discretized) and " +
+                    "thus no surface can be constructed."))
+
+        val surface =
+                LinearRing3D.ofWithDuplicatesRemoval(leftBoundary, rightBoundary, geometricalTolerance)
+                        .handleFailure { return it }
+                        .let { CompositeSurface3D(it) }
         return Result.success(surface)
     }
 
@@ -347,7 +366,7 @@ class Road(
         if (leftLaneBoundary.fuzzyEquals(rightLaneBoundary))
             return Result.success(null)
 
-        return LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary)
+        return LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary, geometricalTolerance)
                 .handleFailure { return it }
                 .let { CompositeSurface3D(it) }
                 .let { Result.success(it) }
@@ -360,12 +379,12 @@ class Road(
      * @param step discretization step size
      */
     private fun getCenterRoadMarkings(laneSectionIdentifier: LaneSectionIdentifier, step: Double):
-            List<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>> {
+            List<Result<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>, Exception>> {
 
         val centerLane = getLaneSection(laneSectionIdentifier).handleFailure { throw it.error }.centerLane
 
         return centerLane.roadMarkings.map {
-            Triple(centerLane.id, getCenterRoadMarkingGeometry(centerLane, it, step), it.attributes)
+            Result.success(Triple(centerLane.id, getCenterRoadMarkingGeometry(centerLane, it, step), it.attributes))
         }
     }
 
@@ -380,20 +399,20 @@ class Road(
     private fun getCenterRoadMarkingGeometry(centerLane: CenterLane, roadMarking: RoadMarking, step: Double):
             AbstractGeometry3D {
 
-        if (roadMarking.width.value == 0.0)
+        if (roadMarking.width.value < geometricalTolerance)
             return getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level)
                     .handleFailure { throw it.error }
 
         val leftOffsetFunction = roadMarking.width timesValue 0.5
         val leftRoadMarkingBoundary =
                 getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, leftOffsetFunction)
-                .handleFailure { throw it.error }.calculatePointListGlobalCS(step).handleFailure { throw it.error }
+                        .handleFailure { throw it.error }.calculatePointListGlobalCS(step).handleFailure { throw it.error }
         val rightOffsetFunction = roadMarking.width timesValue -0.5
         val rightRoadMarkingBoundary =
                 getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, rightOffsetFunction)
-                .handleFailure { throw it.error }.calculatePointListGlobalCS(step).handleFailure { throw it.error }
+                        .handleFailure { throw it.error }.calculatePointListGlobalCS(step).handleFailure { throw it.error }
 
-        return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkingBoundary, rightRoadMarkingBoundary)
+        return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkingBoundary, rightRoadMarkingBoundary, geometricalTolerance)
                 .handleFailure { throw it.error }
                 .let { CompositeSurface3D(it) }
     }
@@ -405,12 +424,15 @@ class Road(
      * @param step discretization step size
      */
     private fun getRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
-            List<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>> {
-
-        val lane = getLane(laneIdentifier).handleFailure { throw it.error }
-        return lane.roadMarkings
-                .map { Triple(laneIdentifier, getRoadMarkingGeometry(laneIdentifier, it, step), it.attributes) }
-    }
+            List<Result<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>, Exception>> =
+            getLane(laneIdentifier)
+                    .handleFailure { throw it.error }
+                    .roadMarkings
+                    .map { currentRoadMarking ->
+                        val geometry = getRoadMarkingGeometry(laneIdentifier, currentRoadMarking, step)
+                                .handleFailure { return@map it }
+                        Result.success(Triple(laneIdentifier, geometry, currentRoadMarking.attributes))
+                    }
 
     /**
      * Returns the geometry of a [roadMarking] which is attached to a lane with [laneIdentifier].
@@ -421,10 +443,14 @@ class Road(
      * is not zero
      */
     private fun getRoadMarkingGeometry(laneIdentifier: LaneIdentifier, roadMarking: RoadMarking, step: Double):
-            AbstractGeometry3D {
+            Result<AbstractGeometry3D, Exception> {
 
-        if (roadMarking.width.value == 0.0)
-            return getCurveOnLane(laneIdentifier, 1.0, roadMarking.width).handleFailure { throw it.error }
+        if (roadMarking.width.domain.length < geometricalTolerance)
+            return Result.error(IllegalStateException("$laneIdentifier: Road marking's length is almost zero " +
+                    "(below tolerance) and thus no surface can be constructed."))
+
+        if (roadMarking.width.value < geometricalTolerance)
+            return getCurveOnLane(laneIdentifier, 1.0, roadMarking.width)
 
         val leftOffsetFunction = roadMarking.width timesValue 0.5
         val leftRoadMarkBoundary = getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
@@ -433,9 +459,10 @@ class Road(
         val rightRoadMarkBoundary = getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
                 .handleFailure { throw it.error }.calculatePointListGlobalCS(step).handleFailure { throw it.error }
 
-        return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary)
+        return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
                 .handleFailure { throw it.error }
                 .let { CompositeSurface3D(it) }
+                .let { Result.success(it) }
     }
 
     /**

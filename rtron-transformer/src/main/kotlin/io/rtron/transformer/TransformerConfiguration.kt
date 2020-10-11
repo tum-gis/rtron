@@ -26,11 +26,13 @@ import io.rtron.io.logging.LogManager
  *
  * @param projectId identifier of the current transformation project
  * @param sourceFileIdentifier identifier of model's source file
+ * @param concurrentProcessing if true, apply concurrent processing
  * @param parameters transformer specific parameters
  */
 class TransformerConfiguration<T : AbstractTransformerParameters>(
         val projectId: String,
         val sourceFileIdentifier: FileIdentifier,
+        val concurrentProcessing: Boolean,
         val parameters: T
 ) {
     // Methods

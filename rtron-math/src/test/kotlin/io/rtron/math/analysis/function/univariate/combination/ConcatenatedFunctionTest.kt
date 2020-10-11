@@ -94,7 +94,7 @@ internal class ConcatenatedFunctionTest {
                     doubleArrayOf(2.0, 3.0, 4.0, 1.0),
                     doubleArrayOf(1.0, 2.0, 3.0, 4.0))
             val concatenatedFunction =
-                    ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients).value
+                    ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients)
 
             val actualResult1 = concatenatedFunction.valueInFuzzy(0.0, 1E-7)
             val actualResult2 = concatenatedFunction.valueInFuzzy(2.0, 1E-7)
@@ -118,7 +118,7 @@ internal class ConcatenatedFunctionTest {
                     doubleArrayOf(2.0, 3.0, 4.0, 1.0),
                     doubleArrayOf(1.0, 2.0, 3.0, 4.0))
             val concatenatedFunction =
-                    ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients).value
+                    ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients)
 
             val actualResult1 = concatenatedFunction.valueInFuzzy(-2.0, 1E-7)
             val actualResult2 = concatenatedFunction.valueInFuzzy(0.0, 1E-7)
@@ -142,7 +142,7 @@ internal class ConcatenatedFunctionTest {
                     doubleArrayOf(2.0, 3.0, 4.0, 1.0),
                     doubleArrayOf(1.0, 2.0, 3.0, 4.0))
             val concatenatedFunction =
-                    ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients).value
+                    ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients)
 
             val actualResult1 = concatenatedFunction.valueInFuzzy(2.0, 1E-7)
             val actualResult2 = concatenatedFunction.valueInFuzzy(4.0, 1E-7)

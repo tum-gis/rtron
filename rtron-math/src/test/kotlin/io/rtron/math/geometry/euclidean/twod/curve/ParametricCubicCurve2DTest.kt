@@ -17,10 +17,6 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -30,6 +26,10 @@ import io.rtron.math.std.PI
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Offset
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
 
@@ -41,7 +41,7 @@ internal class ParametricCubicCurve2DTest {
         fun `simple quadratic curve`() {
             val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0)
+            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0)
             val curveRelativePoint = CurveRelativePoint1D(2.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
@@ -57,7 +57,7 @@ internal class ParametricCubicCurve2DTest {
             val coefficientY = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
             val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(QUARTER_PI))
             val affineSequence = AffineSequence2D.of(affine)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, affineSequence)
+            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativePoint1D(sqrt(2.0))
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
@@ -74,7 +74,7 @@ internal class ParametricCubicCurve2DTest {
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
             val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(PI))
             val affineSequence = AffineSequence2D.of(affine)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, affineSequence)
+            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativePoint1D(2.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
@@ -91,7 +91,7 @@ internal class ParametricCubicCurve2DTest {
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
             val length = 1.479
             val curveRelativePoint = CurveRelativePoint1D(length)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, length)
+            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, length, 0.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 

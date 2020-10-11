@@ -73,7 +73,7 @@ internal class SingularValueDecompositionTest {
 
             val actualMatrixU = singularValueDecomposition.matrixU
 
-            assertThat(actualMatrixU.entries).hasSameSizeAs(expectedMatrixU.entries)
+            assertThat(actualMatrixU.dimension).isEqualTo(expectedMatrixU.dimension)
             assertThat(actualMatrixU.entriesFlattened)
                     .containsExactly(expectedMatrixU.entriesFlattened, Offset.offset(0.01))
         }
@@ -92,7 +92,7 @@ internal class SingularValueDecompositionTest {
 
             val actualMatrixS = singularValueDecomposition.matrixS
 
-            assertThat(actualMatrixS.entries).hasSameSizeAs(expectedMatrixS.entries)
+            assertThat(actualMatrixS.dimension).isEqualTo(expectedMatrixS.dimension)
             assertThat(actualMatrixS.entriesFlattened)
                     .containsExactly(expectedMatrixS.entriesFlattened, Offset.offset(0.01))
         }
@@ -110,7 +110,7 @@ internal class SingularValueDecompositionTest {
 
             val actualMatrixVT = singularValueDecomposition.matrixVT
 
-            assertThat(actualMatrixVT.entries).hasSameSizeAs(expectedMatrixV.entries)
+            assertThat(actualMatrixVT.dimension).isEqualTo(expectedMatrixV.dimension)
             assertThat(actualMatrixVT.entriesFlattened)
                     .containsExactly(expectedMatrixV.entriesFlattened, Offset.offset(0.01))
         }

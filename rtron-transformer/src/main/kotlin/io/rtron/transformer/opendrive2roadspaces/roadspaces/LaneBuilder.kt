@@ -30,7 +30,7 @@ import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLRLaneHeight
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.*
-import io.rtron.std.distinctConsecutive
+import io.rtron.std.filterToStrictSortingBy
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 
@@ -121,16 +121,16 @@ class LaneBuilder(
             LaneHeightOffset {
 
         // remove consecutively duplicated height entries
-        val heightEntriesDistinct = srcLaneHeights.distinctConsecutive { it.sOffset }
+        val heightEntriesDistinct = srcLaneHeights.filterToStrictSortingBy { it.sOffset }
         if (heightEntriesDistinct.size < srcLaneHeights.size)
-            _reportLogger.info("Removing redundant lane height entries (equal sOffset values).", id.toString())
+            _reportLogger.info("Removing lane height entries which are placed not in strict order according " +
+                    "to sOffset.", id.toString())
 
         // filter non-finite entries
         val heightEntriesAdjusted = heightEntriesDistinct
                 .filter { it.inner.isFinite() && it.outer.isFinite() }
         if (heightEntriesAdjusted.size < heightEntriesDistinct.size)
-            _reportLogger.warn("Removing at least one lane height entry as the values are not finite. This " +
-                    "can also be caused by an OpenDRIVE version for which no dedicated reader is available.",
+            _reportLogger.warn("Removing at least one lane height entry, since no valid values are provided.",
                     id.toString())
 
         // build the inner and outer height offset functions

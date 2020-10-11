@@ -32,7 +32,7 @@ import kotlin.math.sign
  * @param tolerance tolerance for checking whether endpoint is already included
  * @return [DoubleArray] of arranged values from lowerEndPoint to upperEndPoint of [Range]
  */
-fun Range<Double>.arrange(step: Double, includeClosedEndPoint: Boolean = false, tolerance: Double = 0.0): DoubleArray {
+fun Range<Double>.arrange(step: Double, includeClosedEndPoint: Boolean = false, tolerance: Double): DoubleArray {
     val lowerEndpoint = lowerEndpointOrNull()
     requireNotNull(lowerEndpoint) { "Closed lower bound type required." }
     val upperEndpoint = upperEndpointOrNull()

@@ -17,10 +17,11 @@
 package io.rtron.math.geometry.euclidean.threed.surface
 
 import com.github.kittinunf.result.Result
-import org.assertj.core.api.Assertions.*
+import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 
 
 internal class Polygon3DTest {
@@ -33,21 +34,21 @@ internal class Polygon3DTest {
             val pointA = Vector3D(0.0, 0.0, 0.0)
             val pointB = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA, pointB)) }
+            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA, pointB), 0.0) }
         }
 
         @Test
         fun `creation of polygon with only one point should fail`() {
             val pointA = Vector3D(0.0, 0.0, 0.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA)) }
+            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA), 0.0) }
         }
 
         @Test
         fun `creation of polygon with no point should fail`() {
             val pointA = Vector3D(0.0, 0.0, 0.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA)) }
+            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA), 0.0) }
         }
 
         @Test
@@ -55,7 +56,8 @@ internal class Polygon3DTest {
             val pointA = Vector3D(0.0, 0.0, 0.0)
             val pointB = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA, pointB, pointA)) }
+            assertThatIllegalArgumentException()
+                    .isThrownBy { Polygon3D(listOf(pointA, pointB, pointA), 0.0) }
         }
 
         @Test
@@ -64,7 +66,8 @@ internal class Polygon3DTest {
             val pointB = Vector3D(2.0, 3.0, 0.0)
             val pointC = Vector3D(3.0, 4.0, 0.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA, pointB, pointC)) }
+            assertThatIllegalArgumentException()
+                    .isThrownBy { Polygon3D(listOf(pointA, pointB, pointC), 0.0) }
         }
 
         @Test
@@ -74,7 +77,8 @@ internal class Polygon3DTest {
             val pointC = Vector3D.Y_AXIS
             val pointD = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(listOf(pointA, pointB, pointC, pointD)) }
+            assertThatIllegalArgumentException()
+                    .isThrownBy { Polygon3D(listOf(pointA, pointB, pointC, pointD), 0.0) }
         }
 
     }
@@ -87,7 +91,7 @@ internal class Polygon3DTest {
             val pointA = Vector3D(1.0, 1.0, 1.0)
             val pointB = Vector3D(2.0, 1.0, 1.0)
             val pointC = Vector3D(2.0, 2.0, 1.0)
-            val triangle = Polygon3D(listOf(pointA, pointB, pointC))
+            val triangle = Polygon3D(listOf(pointA, pointB, pointC), 0.0)
 
             val actualReturn = triangle.getNormal()
 
@@ -99,7 +103,7 @@ internal class Polygon3DTest {
         @Test
         fun `test planar quadrilateral polygon`() {
             val planarQuadrilateral = Polygon3D(listOf( Vector3D.ZERO, Vector3D.X_AXIS,
-                Vector3D(1.0, 0.0, 1.0), Vector3D.Z_AXIS))
+                Vector3D(1.0, 0.0, 1.0), Vector3D.Z_AXIS), 0.0)
             val expectedResult = Vector3D(0.0, -1.0, 0.0)
 
             val actualReturn = planarQuadrilateral.getNormal()

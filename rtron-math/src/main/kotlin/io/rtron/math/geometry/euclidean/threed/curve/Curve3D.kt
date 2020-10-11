@@ -43,8 +43,7 @@ import io.rtron.std.handleFailure
 data class Curve3D(
         val curveXY: AbstractCurve2D,
         val heightFunction: UnivariateFunction,
-        val torsionFunction: UnivariateFunction = LinearFunction.X_AXIS,
-        override val tolerance: Double = 0.0
+        val torsionFunction: UnivariateFunction = LinearFunction.X_AXIS
 ) : AbstractCurve3D() {
 
     // Properties and Initializers
@@ -56,6 +55,7 @@ data class Curve3D(
     }
 
     override val domain get() = curveXY.domain
+    override val tolerance get() = curveXY.tolerance
 
     // Methods
 

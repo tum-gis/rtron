@@ -22,6 +22,7 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
 import io.rtron.math.processing.calculateNormal
 import io.rtron.math.processing.isPlanar
+import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.std.distinctConsecutiveEnclosing
 
@@ -33,6 +34,7 @@ import io.rtron.std.distinctConsecutiveEnclosing
  */
 data class Polygon3D(
         val vertices: List<Vector3D> = listOf(),
+        override val tolerance: Double,
         override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D() {
 
@@ -52,7 +54,7 @@ data class Polygon3D(
         { "Consecutively following point duplicates found." }
         require(dimensionSpan >= 2)
         { "The dimension of the span is too low ($dimensionSpan) which might be caused by colinear vertices." }
-        require(vertices.isPlanar())
+        require(vertices.isPlanar(tolerance))
         { "The vertices of a polygon must be located in a plane." }
     }
 
@@ -64,7 +66,7 @@ data class Polygon3D(
             this.vertices.calculateNormal().normalized().let { Result.success(it) }
 
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
-    fun reversed() = Polygon3D(vertices.reversed(), affineSequence)
+    fun reversed() = Polygon3D(vertices.reversed(), tolerance, affineSequence)
 
     override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, NoException> = Result.success(listOf(this))
 
@@ -77,16 +79,17 @@ data class Polygon3D(
                 Vector3D(-1.0, -1.0, 0.0),
                 Vector3D(-1.0, 1.0, 0.0),
                 Vector3D(1.0, 1.0, 0.0),
-                Vector3D(1.0, -1.0, 0.0))
+                Vector3D(1.0, -1.0, 0.0), tolerance = DEFAULT_TOLERANCE)
 
         /**
          * Constructs a polygon based on the [vectors].
          */
-        fun of(vararg vectors: Vector3D) = Polygon3D(vectors.toList())
+        fun of(vararg vectors: Vector3D, tolerance: Double) = Polygon3D(vectors.toList(), tolerance)
 
         /**
          * Constructs a polygon based on a [Triple] of [vectors].
          */
-        fun of(vectors: Triple<Vector3D, Vector3D, Vector3D>) = Polygon3D(vectors.toList())
+        fun of(vectors: Triple<Vector3D, Vector3D, Vector3D>, tolerance: Double) =
+                Polygon3D(vectors.toList(), tolerance)
     }
 }

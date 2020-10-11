@@ -25,14 +25,14 @@ import io.rtron.io.logging.LogManager
  * @param inputPath path to the directory comprising input models
  * @param outputPath path to the directory where new models and files are written to
  * @param recursive true, if the input models shall be searched recursively in the input directory
- * @param parallelProcessing allow for parallel processing of the models
+ * @param concurrentProcessing enable concurrent processing during the transformation of a model
  * @param clean delete output directory content before transformation starts
  */
 class BatchConfiguration(
         val inputPath: Path,
         val outputPath: Path,
         private val recursive: Boolean = true,
-        val parallelProcessing: Boolean = false,
+        val concurrentProcessing: Boolean = false,
         val clean: Boolean = false
 ) {
 

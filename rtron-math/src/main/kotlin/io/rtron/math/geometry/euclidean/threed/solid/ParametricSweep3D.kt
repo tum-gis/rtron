@@ -48,8 +48,8 @@ data class ParametricSweep3D(
         val absoluteHeight: UnivariateFunction,
         val objectHeightFunction: LinearFunction,
         val objectWidthFunction: LinearFunction,
-        private val discretizationStepSize: Double = DEFAULT_STEP_SIZE,
-        override val tolerance: Double
+        override val tolerance: Double,
+        private val discretizationStepSize: Double = DEFAULT_STEP_SIZE
 ) : AbstractSolid3D(), DefinableDomain<Double>, Tolerable {
 
     // Properties and Initializers
@@ -70,7 +70,7 @@ data class ParametricSweep3D(
         get() {
             val curveXY = referenceCurveXY.addLateralTranslation(objectWidthFunction, -0.5)
             val height = StackedFunction.ofSum(absoluteHeight, objectHeightFunction, defaultValue = 0.0)
-            return Curve3D(curveXY, height, tolerance = tolerance)
+            return Curve3D(curveXY, height)
         }
 
     /** upper right curve of the sweep (perspective in the direction of the reference curve) */
@@ -78,21 +78,21 @@ data class ParametricSweep3D(
         get() {
             val curveXY = referenceCurveXY.addLateralTranslation(objectWidthFunction, +0.5)
             val height = StackedFunction.ofSum(absoluteHeight, objectHeightFunction, defaultValue = 0.0)
-            return Curve3D(curveXY, height, tolerance = tolerance)
+            return Curve3D(curveXY, height)
         }
 
     /** lower left curve of the sweep (perspective in the direction of the reference curve) */
     private val lowerLeftCurve: Curve3D
         get() {
             val curveXY = referenceCurveXY.addLateralTranslation(objectWidthFunction, -0.5)
-            return Curve3D(curveXY, absoluteHeight, tolerance = tolerance)
+            return Curve3D(curveXY, absoluteHeight)
         }
 
     /** lower right curve of the sweep (perspective in the direction of the reference curve) */
     private val lowerRightCurve: Curve3D
         get() {
             val curveXY = referenceCurveXY.addLateralTranslation(objectWidthFunction, +0.5)
-            return Curve3D(curveXY, absoluteHeight, tolerance = tolerance)
+            return Curve3D(curveXY, absoluteHeight)
         }
 
     /** lower left curve of the sweep as a list of points */
@@ -155,7 +155,7 @@ data class ParametricSweep3D(
 
     private fun createPolygons(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>):
             Result<List<Polygon3D>, Exception> =
-            LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices)
+            LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
                     .handleFailure { return it }
                     .map { it.calculatePolygonsGlobalCS() }
                     .handleFailure { return it }

@@ -27,8 +27,6 @@ import io.rtron.math.geometry.euclidean.threed.solid.Polyhedron3D
 import io.rtron.math.processing.Polyhedron3DFactory
 import io.rtron.math.transform.Affine3D
 import io.rtron.math.transform.AffineSequence3D
-import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutlineCornerRoad
@@ -38,6 +36,8 @@ import io.rtron.std.ContextMessage
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
+import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
 
 /**
@@ -64,7 +64,7 @@ class Solid3DBuilder(
         if (srcRoadObject.isCuboid()) {
             val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cuboidList += Cuboid3D(srcRoadObject.length, srcRoadObject.width, srcRoadObject.height, affineSequence)
+            cuboidList += Cuboid3D(srcRoadObject.length, srcRoadObject.width, srcRoadObject.height, parameters.tolerance, affineSequence)
         }
 
         if (srcRoadObject.repeat.isRepeatedCuboid())
@@ -83,7 +83,7 @@ class Solid3DBuilder(
         if (srcRoadObject.isCylinder()) {
             val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cylinderList += Cylinder3D(srcRoadObject.radius, srcRoadObject.height, affineSequence)
+            cylinderList += Cylinder3D(srcRoadObject.radius, srcRoadObject.height, parameters.tolerance, affineSequence)
         }
 
         if (srcRoadObject.repeat.isRepeatCylinder())
@@ -120,7 +120,7 @@ class Solid3DBuilder(
         val verticalBars = srcOutline.cornerRoad
                 .map { buildVerticalBar(it, referenceLine) }
                 .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
-        return Polyhedron3DFactory.buildFromVerticalBars(verticalBars)
+        return Polyhedron3DFactory.buildFromVerticalBars(verticalBars, parameters.tolerance)
     }
 
     /**
@@ -141,7 +141,7 @@ class Solid3DBuilder(
                 .handleFailure { return it }
                 .let { affine.transform(it.getCartesianCurveOffset()) }
 
-        val lineSegment3D = LineSegment3D(basePoint, headPoint)
+        val lineSegment3D = LineSegment3D(basePoint, headPoint, parameters.tolerance)
         return Result.success(lineSegment3D)
     }
 
@@ -174,10 +174,10 @@ class Solid3DBuilder(
         { "Outline does not contain a polyhedron represented by local corners." }
 
         val verticalBars = srcOutline.cornerLocal
-                .map { it.getVerticalBar() }
+                .map { it.getVerticalBar(parameters.tolerance) }
                 .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing vertical bar.") }
 
-        return Polyhedron3DFactory.buildFromVerticalBars(verticalBars)
+        return Polyhedron3DFactory.buildFromVerticalBars(verticalBars, parameters.tolerance)
     }
 
     /**
@@ -200,7 +200,7 @@ class Solid3DBuilder(
         val widthFunction = srcRoadObject.repeat.getObjectWidthFunction()
 
         val parametricSweep3D = ParametricSweep3D(sweepReferenceCurve2D,
-                sweepReferenceHeight, heightFunction, widthFunction, tolerance = parameters.tolerance)
+                sweepReferenceHeight, heightFunction, widthFunction, parameters.tolerance)
         return listOf(parametricSweep3D)
     }
 }

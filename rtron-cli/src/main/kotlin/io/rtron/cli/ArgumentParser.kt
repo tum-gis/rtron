@@ -26,9 +26,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.github.ajalt.clikt.parameters.types.path
 import com.github.ajalt.mordant.TermColors
-import org.apache.commons.lang3.SystemUtils
 import io.rtron.io.files.toPath
 import io.rtron.main.batch.BatchConfiguration
+import org.apache.commons.lang3.SystemUtils
 
 /**
  * Color formatter for the command line interface.
@@ -56,20 +56,20 @@ class ArgumentParser : CliktCommand(
 
     // Properties and Initializers
     init {
-        if(!SystemUtils.IS_OS_WINDOWS)
+        if (!SystemUtils.IS_OS_WINDOWS)
             context { helpFormatter = ColorHelpFormatter() }
 
         versionOption("1.1.0")
     }
 
     private val inputPath by argument(
-            help = "Path to the directory containing OpenDRIVE datasets").path(exists = true)
+            help = "Path to the directory containing OpenDRIVE datasets").path(mustExist = true)
     private val outputPath by argument(
             help = "Path to the output directory into which the transformed CityGML models are written").path()
     private val noRecursive by option("--no-recursive",
             help = "Do not search recursively for input files in given input directory").flag(default = false)
-    private val parallel by option(help = "Run processing in parallel")
-            .flag(default = false)
+    private val concurrentProcessing by option("--concurrent", help = "Enable concurrent processing " +
+            "during the transformation of a model (experimental)").flag(default = false)
     private val clean by option("--clean", "-c",
             help = "Clean output directory by deleting its current content before starting").flag(default = false)
 
@@ -81,5 +81,5 @@ class ArgumentParser : CliktCommand(
      * Parses arguments to the [BatchConfiguration].
      */
     fun parseConfiguration() = BatchConfiguration(inputPath.toPath(), outputPath.toPath(),
-            !noRecursive, parallelProcessing = parallel, clean = clean)
+            !noRecursive, concurrentProcessing = concurrentProcessing, clean = clean)
 }

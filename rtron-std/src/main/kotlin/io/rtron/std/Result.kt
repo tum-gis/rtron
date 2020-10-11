@@ -53,7 +53,7 @@ inline fun <V : Any?, E : Exception> Result<V, E>.handleFailure(block: (Result.F
  * @param block the handler in case of an [Result.Failure]
  * @return the list of values of the [Result.Success]
  */
-inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleFailure(block: (Result.Failure<E>) -> Nothing): List<V> =
+inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleFailure(block: (Result.Failure<E>) -> Nothing): List<V> =
         map {
             when (it) {
                 is Result.Success -> it.value
@@ -68,7 +68,7 @@ inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleFailure(block: (Re
  * @param block the handler in case of an [Result.Failure]
  * @return the list of values of the [Result.Success]
  */
-inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleAndRemoveFailure(
+inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleAndRemoveFailure(
         block: (Result.Failure<E>) -> Unit): List<V> =
         fold(emptyList()) { acc, result ->
             when (result) {
@@ -87,7 +87,7 @@ inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleAndRemoveFailure(
  * @param block the handler in case of an [Result.Failure] with index information
  * @return the list of values of the [Result.Success]
  */
-inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleAndRemoveFailureIndexed(
+inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleAndRemoveFailureIndexed(
         block: (index: Int, Result.Failure<E>) -> Unit): List<V> =
         foldIndexed(emptyList()) { index, acc, result ->
             when (result) {
@@ -104,7 +104,7 @@ inline fun <V : Any?, E : Exception> List<Result<V, E>>.handleAndRemoveFailureIn
  * @receiver the list of [Result] to be handled
  * @return the list of values of the [Result.Success]
  */
-fun <V : Any?, E : Exception> List<Result<V, E>>.ignoreFailure(): List<V> =
+fun <V : Any?, E : Exception> Iterable<Result<V, E>>.ignoreFailure(): List<V> =
         filterIsInstance<Result.Success<V>>().map { it.value }
 
 /**

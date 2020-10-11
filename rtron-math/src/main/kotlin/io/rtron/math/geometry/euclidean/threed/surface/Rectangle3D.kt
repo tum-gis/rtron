@@ -30,6 +30,7 @@ import io.rtron.math.transform.AffineSequence3D
 data class Rectangle3D (
         val length: Double,
         val width: Double,
+        override val tolerance: Double,
         override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D() {
 
@@ -45,7 +46,7 @@ data class Rectangle3D (
     // Methods
     override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
         val vertices = listOf(upperRightPoint, upperLeftPoint, lowerLeftPoint, lowerRightPoint)
-        return Result.success(listOf(Polygon3D(vertices)))
+        return Result.success(listOf(Polygon3D(vertices, tolerance)))
     }
 
 }

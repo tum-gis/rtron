@@ -16,21 +16,106 @@
 
 package io.rtron.math.processing
 
+import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.std.DBL_EPSILON_1
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 
 
 internal class VertexListTest {
 
     @Nested
+    inner class TestTripleIsColinear {
+
+        @Test
+        fun `if first and third vector are equal, vector triple should be colinear`() {
+            val pointA = Vector3D.X_AXIS
+            val pointB = Vector3D(3.0, 4.0, 0.0)
+            val pointC = Vector3D.X_AXIS
+            val vertices = Triple(pointA, pointB, pointC)
+
+            val isColinear = vertices.isColinear(DBL_EPSILON_1)
+
+            assertTrue(isColinear)
+        }
+
+        @Test
+        fun `three linearly independent vectors should be not colinear`() {
+            val vertices = Triple(Vector3D.X_AXIS, Vector3D.Y_AXIS, Vector3D.Z_AXIS)
+
+            val isColinear = vertices.isColinear(DBL_EPSILON_1)
+
+            assertFalse(isColinear)
+        }
+
+        @Test
+        fun `three colinear vectors with a mixed ordering should still result true`() {
+            val pointA = Vector3D.ZERO
+            val pointB = Vector3D.X_AXIS.scalarMultiply(5.0)
+            val pointC = Vector3D.X_AXIS
+            val vertices = Triple(pointA, pointB, pointC)
+
+            val isColinear = vertices.isColinear(DBL_EPSILON_1)
+
+            assertTrue(isColinear)
+        }
+    }
+
+    @Nested
     inner class TestRemoveLinearlyRedundantVertices {
 
         @Test
-        fun `basic `() {
+        fun `empty list should yield an empty list`() {
+            val vertices = listOf<Vector3D>()
+            val expectedVertices = listOf<Vector3D>()
+
+            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+        }
+
+        @Test
+        fun `two different point should yield the exact points`() {
+            val pointA = Vector3D.ZERO
+            val pointB = Vector3D.X_AXIS
+            val vertices = listOf(pointA, pointB)
+            val expectedVertices = listOf(pointA, pointB)
+
+            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+        }
+
+        @Test
+        fun `two equal points should yield only one point`() {
+            val pointA = Vector3D.X_AXIS
+            val pointB = Vector3D.X_AXIS
+            val vertices = listOf(pointA, pointB)
+            val expectedVertices = listOf(pointA)
+
+            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+        }
+
+        @Test
+        fun `three points of pattern ABB`() {
+            val pointA = Vector3D.ZERO
+            val pointB = Vector3D.X_AXIS
+            val pointC = Vector3D.X_AXIS
+            val vertices = listOf(pointA, pointB, pointC)
+            val expectedVertices = listOf(pointA, pointB)
+
+            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+        }
+
+        @Test
+        fun `basic four points`() {
             val pointA = Vector3D.ZERO
             val pointB = Vector3D.X_AXIS
             val pointC = Vector3D.X_AXIS.scalarMultiply(2.0)
@@ -38,10 +123,40 @@ internal class VertexListTest {
             val vertices = listOf(pointA, pointB, pointC, pointD)
             val expectedVertices = listOf(pointA, pointC, pointD)
 
-            val actualResultingVertices = vertices.removeLinearlyRedundantVertices()
+            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
             assertThat(actualResultingVertices).isEqualTo(expectedVertices)
         }
+
+        @Test
+        fun `four points of pattern ABBA`() {
+            val pointA = Vector3D.ZERO
+            val pointB = Vector3D.X_AXIS
+            val pointC = Vector3D.X_AXIS
+            val pointD = Vector3D.ZERO
+            val vertices = listOf(pointA, pointB, pointC, pointD)
+            val expectedVertices = listOf(pointA, pointB)
+
+            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+        }
+
+        @Test
+        fun `five points of pattern ABBBA`() {
+            val pointA = Vector3D.ZERO
+            val pointB = Vector3D.X_AXIS
+            val pointC = Vector3D.X_AXIS
+            val pointD = Vector3D.X_AXIS
+            val pointE = Vector3D.ZERO
+            val vertices = listOf(pointA, pointB, pointC, pointD, pointE)
+            val expectedVertices = listOf(pointA, pointB)
+
+            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+        }
+
     }
 
     @Nested
@@ -54,23 +169,7 @@ internal class VertexListTest {
             val pointC = Vector3D.X_AXIS.scalarMultiply(2.0)
             val vertices = listOf(pointA, pointB, pointC)
 
-            val isColinear = vertices.isColinear()
-
-            assertTrue(isColinear)
-        }
-    }
-
-    @Nested
-    inner class TestTripleIsColinear {
-
-        @Test
-        fun `if first and third vector are equal, vector triple should be colinear `() {
-            val pointA = Vector3D.X_AXIS
-            val pointB = Vector3D(3.0, 4.0, 0.0)
-            val pointC = Vector3D.X_AXIS
-            val vertices = Triple(pointA, pointB, pointC)
-
-            val isColinear = vertices.isColinear()
+            val isColinear = vertices.isColinear(DBL_EPSILON_1)
 
             assertTrue(isColinear)
         }
@@ -83,7 +182,7 @@ internal class VertexListTest {
         fun `test triangle polygon`() {
             val points = listOf( Vector3D.ZERO, Vector3D.X_AXIS, Vector3D.Y_AXIS)
 
-            val actual = points.isPlanar()
+            val actual = points.isPlanar(DBL_EPSILON_1)
 
             assertTrue(actual)
         }
@@ -96,7 +195,7 @@ internal class VertexListTest {
             val pointD = Vector3D.Z_AXIS
             val points = listOf(pointA, pointB, pointC, pointD)
 
-            val actual = points.isPlanar()
+            val actual = points.isPlanar(DBL_EPSILON_1)
 
             assertTrue(actual)
         }
@@ -109,7 +208,7 @@ internal class VertexListTest {
             val pointD = Vector3D(1.0, 1.0, 1.0)
             val points = listOf(pointA, pointB, pointC, pointD)
 
-            val actual = points.isPlanar()
+            val actual = points.isPlanar(DBL_EPSILON_1)
 
             assertFalse(actual)
         }

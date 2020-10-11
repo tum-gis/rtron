@@ -23,15 +23,16 @@ import io.rtron.io.files.Path
 /**
  * Configuration for a single transformation project of one source model.
  *
- * @param baseSourceFilePath the absolute base path of the directory
+ * @param baseSourceFilePath the absolute base path of the source directory
  * @param relativeSourceFilePath the relative path to the actual file of the source model
- * @param outputDirectoryPath
- *
+ * @param outputDirectoryPath the absolute base path of the output directory
+ * @param concurrentProcessing enable concurrent processing during the transformation of a model
  */
 class ProjectConfiguration(
         val baseSourceFilePath: Path,
         val relativeSourceFilePath: Path,
-        val outputDirectoryPath: Path
+        val outputDirectoryPath: Path,
+        val concurrentProcessing: Boolean
 ) {
     // Properties and Initializers
 

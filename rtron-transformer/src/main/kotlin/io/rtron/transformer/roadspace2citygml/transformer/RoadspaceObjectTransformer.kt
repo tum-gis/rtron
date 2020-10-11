@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.adder
+package io.rtron.transformer.roadspace2citygml.transformer
 
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
+import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.module.*
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.core.CityModel
-import org.citygml4j.model.citygml.core.CityObjectMember
 
 
 /**
- * Adds [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
+ * Transforms [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
-class RoadObjectAdder(
+class RoadspaceObjectTransformer(
         private val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
@@ -51,24 +51,24 @@ class RoadObjectAdder(
     // Methods
 
     /**
-     * Adds a list of [srcRoadspaceObjects] (RoadSpaces model) to the [dstCityModel] (CityGML model).
+     * Transforms a list of [srcRoadspaceObjects] (RoadSpaces model) to the [AbstractCityObject] (CityGML model).
      */
-    fun addRoadspaceObjects(srcRoadspaceObjects: List<RoadspaceObject>, dstCityModel: CityModel) {
-        srcRoadspaceObjects.forEach { addSingleRoadspaceObject(it, dstCityModel) }
-    }
+    fun transformRoadspaceObjects(srcRoadspaceObjects: List<RoadspaceObject>): List<AbstractCityObject> =
+        srcRoadspaceObjects
+                .map { transformSingleRoadspaceObject(it) }
+                .handleAndRemoveFailure { _reportLogger.log(it) }
 
-    private fun addSingleRoadspaceObject(srcRoadspaceObject: RoadspaceObject, dstCityModel: CityModel) {
+    private fun transformSingleRoadspaceObject(srcRoadspaceObject: RoadspaceObject): Result<AbstractCityObject, Exception> {
         val geometryTransformer = createGeometryTransformer(srcRoadspaceObject)
         val abstractCityObject = createAbstractCityObject(srcRoadspaceObject, geometryTransformer)
-                .handleFailure { _reportLogger.log(it); return }
+                .handleFailure { return it }
 
         _identifierAdder.addIdentifier(srcRoadspaceObject.id, abstractCityObject)
         _attributesAdder.addAttributes(
                 srcRoadspaceObject.id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
                         srcRoadspaceObject.attributes, abstractCityObject)
 
-        val cityObjectMember = CityObjectMember(abstractCityObject)
-        dstCityModel.addCityObjectMember(cityObjectMember)
+        return Result.success(abstractCityObject)
     }
 
     private fun createGeometryTransformer(srcRoadspaceObject: RoadspaceObject): GeometryTransformer {

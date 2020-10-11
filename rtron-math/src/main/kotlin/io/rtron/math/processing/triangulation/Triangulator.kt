@@ -44,16 +44,17 @@ object Triangulator {
      *
      * @param linearRing linear ring to be triangulated
      */
-    fun triangulate(linearRing: LinearRing3D): Result<List<Polygon3D>, Exception> {
+    fun triangulate(linearRing: LinearRing3D, tolerance: Double): Result<List<Polygon3D>, Exception> {
 
-        if (linearRing.vertices.isPlanar()) return Result.success(listOf(Polygon3D(linearRing.vertices)))
+        if (linearRing.vertices.isPlanar(tolerance))
+            return Result.success(listOf(Polygon3D(linearRing.vertices, tolerance)))
 
         // run triangulation algorithms until one succeeds
-        val errorStandard = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices)
+        val errorStandard = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
                 .handleSuccess { return it }
-        fallbackTriangulationAlgorithm.triangulateChecked(linearRing.vertices)
+        fallbackTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
                 .handleSuccess { return it }
-        fanTriangulationAlgorithm.triangulateChecked(linearRing.vertices)
+        fanTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
                 .handleSuccess { return it }
 
         return Result.error(errorStandard)

@@ -30,8 +30,7 @@ import io.rtron.model.opendrive.road.lateralprofile.RoadLateralProfileSupereleva
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.std.distinctConsecutive
-import io.rtron.std.handleMessage
+import io.rtron.std.filterToStrictSortingBy
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
 
@@ -54,12 +53,17 @@ class FunctionBuilder(
             UnivariateFunction {
         if (srcSuperelevation.isEmpty()) return LinearFunction.X_AXIS
 
+        val superelevationEntriesAdjusted = srcSuperelevation
+                .filterToStrictSortingBy { it.s }
+        if (superelevationEntriesAdjusted.size < srcSuperelevation.size)
+            this.reportLogger.info("Removing superelevation entries which are not placed in strict order" +
+                    " according to s.", id.toString())
+
         return ConcatenatedFunction.ofPolynomialFunctions(
-                srcSuperelevation.map { it.s },
-                srcSuperelevation.map { it.coefficients },
+                superelevationEntriesAdjusted.map { it.s },
+                superelevationEntriesAdjusted.map { it.coefficients },
                 prependConstant = true,
                 prependConstantValue = 0.0)
-                .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
     /**
@@ -74,11 +78,16 @@ class FunctionBuilder(
         require(srcRoadLateralProfileShape.all { it.s == srcRoadLateralProfileShape.first().s })
         { "All lateral profile shape elements must have the same curve position." }
 
+        val lateralProfileEntriesAdjusted = srcRoadLateralProfileShape
+                .filterToStrictSortingBy { it.t }
+        if (lateralProfileEntriesAdjusted.size < srcRoadLateralProfileShape.size)
+            this.reportLogger.info("Removing lateral profile entries which are not placed in strict order " +
+                    "according to t.", id.toString())
+
         return ConcatenatedFunction.ofPolynomialFunctions(
-                srcRoadLateralProfileShape.map { it.t },
-                srcRoadLateralProfileShape.map { it.coefficients },
+                lateralProfileEntriesAdjusted.map { it.t },
+                lateralProfileEntriesAdjusted.map { it.coefficients },
                 prependConstant = true)
-                .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
     /**
@@ -87,12 +96,16 @@ class FunctionBuilder(
     fun buildLaneOffset(id: RoadspaceIdentifier, srcLanes: RoadLanes): UnivariateFunction {
         if (srcLanes.laneOffset.isEmpty()) return LinearFunction.X_AXIS
 
+        val laneOffsetEntriesAdjusted = srcLanes.laneOffset.filterToStrictSortingBy { it.s }
+        if (laneOffsetEntriesAdjusted.size < srcLanes.laneOffset.size)
+            this.reportLogger.info("Removing lane offset entries which are not placed in strict order " +
+                    "according to s.", id.toString())
+
         return ConcatenatedFunction.ofPolynomialFunctions(
-                srcLanes.laneOffset.map { it.s },
-                srcLanes.laneOffset.map { it.coefficients },
+                laneOffsetEntriesAdjusted.map { it.s },
+                laneOffsetEntriesAdjusted.map { it.coefficients },
                 prependConstant = true,
                 prependConstantValue = 0.0)
-                .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
 
@@ -117,16 +130,16 @@ class FunctionBuilder(
                     id.toString())
 
         val widthEntriesAdjusted = srcLaneWidthEntries
-                .distinctConsecutive { it.sOffset }
+                .filterToStrictSortingBy { it.sOffset }
         if (widthEntriesAdjusted.size < srcLaneWidthEntries.size)
-            this.reportLogger.info("Removing redundant width entries.", id.toString())
+            this.reportLogger.info("Removing width entries which are not in strict order according to sOffset.",
+                    id.toString())
 
         return ConcatenatedFunction.ofPolynomialFunctions(
                 widthEntriesAdjusted.map { it.sOffset },
                 widthEntriesAdjusted.map { it.coefficients },
                 prependConstant = true,
                 prependConstantValue = 0.0)
-                .handleMessage { this.reportLogger.info(it, id.toString()) }
     }
 
     /**

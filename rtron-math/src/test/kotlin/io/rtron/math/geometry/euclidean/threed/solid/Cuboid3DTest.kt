@@ -17,11 +17,11 @@
 package io.rtron.math.geometry.euclidean.threed.solid
 
 import com.github.kittinunf.result.Result
+import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 
 
 internal class Cuboid3DTest {
@@ -44,12 +44,12 @@ internal class Cuboid3DTest {
         fun `generated polygons list contain base polygon`() {
             val length = 6.0
             val width = 4.0
-            val cuboid = Cuboid3D(length = length, width = width, height = 1.0)
+            val cuboid = Cuboid3D(length = length, width = width, height = 1.0, tolerance = 0.0)
             val vertexA = Vector3D(length / 2.0, width / 2.0, 0.0)
             val vertexB = Vector3D(length / 2.0, -width / 2.0, 0.0)
             val vertexC = Vector3D(-length / 2.0, -width / 2.0, 0.0)
             val vertexD = Vector3D(-length / 2.0, width / 2.0, 0.0)
-            val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD)
+            val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD, tolerance = 0.0)
 
             val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
 
@@ -63,12 +63,12 @@ internal class Cuboid3DTest {
             val length = 5.0
             val width = 3.0
             val height = 1.0
-            val cuboid = Cuboid3D(length = length, width = width, height = height)
+            val cuboid = Cuboid3D(length = length, width = width, height = height, tolerance = 0.0)
             val vertexA = Vector3D(length / 2.0, width / 2.0, height)
             val vertexB = Vector3D(-length / 2.0, width / 2.0, height)
             val vertexC = Vector3D(-length / 2.0, -width / 2.0, height)
             val vertexD = Vector3D(length / 2.0, -width / 2.0, height)
-            val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD)
+            val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD, tolerance = 0.0)
 
             val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
 
@@ -82,12 +82,12 @@ internal class Cuboid3DTest {
             val length = 5.0
             val width = 3.0
             val height = 1.0
-            val cuboid = Cuboid3D(length = length, width = width, height = height)
+            val cuboid = Cuboid3D(length = length, width = width, height = height, tolerance = 0.0)
             val vertexA = Vector3D(length / 2.0, width / 2.0, 0.0)
             val vertexB = Vector3D(length / 2.0, width / 2.0, height)
             val vertexC = Vector3D(length / 2.0, -width / 2.0, height)
             val vertexD = Vector3D(length / 2.0, -width / 2.0, 0.0)
-            val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD)
+            val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD, tolerance = 0.0)
 
             val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
 

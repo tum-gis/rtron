@@ -17,15 +17,15 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Offset
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
 
@@ -37,7 +37,7 @@ internal class LineSegment2DTest {
         fun `length of line segment on axis`() {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(7.0, 0.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB)
+            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
             assertThat(lineSegment.length).isCloseTo(7.0, Offset.offset(DBL_EPSILON))
         }
@@ -46,7 +46,7 @@ internal class LineSegment2DTest {
         fun `length of diagonal line segment`() {
             val pointA = Vector2D(3.0, 0.0)
             val pointB = Vector2D(0.0, 4.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB)
+            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
             assertThat(lineSegment.length).isCloseTo(5.0, Offset.offset(DBL_EPSILON))
         }
@@ -58,7 +58,7 @@ internal class LineSegment2DTest {
         fun `angle of line segment on axis`() {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(0.0, 1.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB)
+            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
 
@@ -71,7 +71,7 @@ internal class LineSegment2DTest {
         fun `angle of diagonal line segment`() {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(1.0, 1.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB)
+            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
 
@@ -87,7 +87,7 @@ internal class LineSegment2DTest {
         fun `point on line segment on axis`() {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(10.0, 0.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB)
+            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
             val curveRelativePoint = CurveRelativePoint1D(5.0)
 
 
@@ -102,7 +102,7 @@ internal class LineSegment2DTest {
         fun `point on diagonal line segment on axis`() {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(1.0, 1.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB)
+            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
             val curveRelativePoint = CurveRelativePoint1D(sqrt(2.0))
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
@@ -117,7 +117,7 @@ internal class LineSegment2DTest {
         fun `point on diagonal line segment on axis 2`() {
             val pointA = Vector2D(-1.0, 0.0)
             val pointB = Vector2D(0.0, 0.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB)
+            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
             val curveRelativePoint = CurveRelativePoint1D(1.0)
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
