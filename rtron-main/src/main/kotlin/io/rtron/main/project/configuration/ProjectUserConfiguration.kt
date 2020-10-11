@@ -21,14 +21,14 @@ import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParame
 
 
 data class ProjectUserConfiguration(
-        val opendrive2Roadspaces: Opendrive2RoadspacesParameters = Opendrive2RoadspacesParameters(),
+        val opendrive2RoadspacesParameters: Opendrive2RoadspacesParameters = Opendrive2RoadspacesParameters(),
         val roadspaces2CitygmlParameters: Roadspaces2CitygmlParameters = Roadspaces2CitygmlParameters()
 ) {
 
     // Methods
     infix fun leftMerge(other: ProjectUserConfiguration) =
             ProjectUserConfiguration(
-                    opendrive2Roadspaces = this.opendrive2Roadspaces leftMerge other.opendrive2Roadspaces,
+                    opendrive2RoadspacesParameters = this.opendrive2RoadspacesParameters leftMerge other.opendrive2RoadspacesParameters,
                     roadspaces2CitygmlParameters = this.roadspaces2CitygmlParameters leftMerge other.roadspaces2CitygmlParameters
             )
 }

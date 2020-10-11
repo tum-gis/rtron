@@ -16,10 +16,12 @@
 
 package io.rtron.transformer.opendrive2roadspaces
 
+import com.github.kittinunf.result.Result
 import io.rtron.io.logging.ProgressBar
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.RoadspacesModel
+import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.topology.LaneTopology
 import io.rtron.std.handleAndRemoveFailureIndexed
 import io.rtron.transformer.AbstractTransformer
@@ -28,6 +30,9 @@ import io.rtron.transformer.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.transformer.opendrive2roadspaces.roadspaces.RoadspaceBuilder
 import io.rtron.transformer.opendrive2roadspaces.topology.TopologyBuilder
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 
 /**
@@ -66,12 +71,14 @@ class Opendrive2RoadspacesTransformer(
 
         // transformation of each road
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
-        val roadspaces = opendriveModel.road.map {
-            progressBar.step()
-            _roadspaceBuilder.buildRoadspace(modelIdentifier, it)
-        }.handleAndRemoveFailureIndexed { index, failure ->
-            _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}" ,"Removing road.")
+        val roadspacesResults =
+                if (configuration.concurrentProcessing) transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar)
+                else transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar)
+
+        val roadspaces = roadspacesResults.handleAndRemoveFailureIndexed { index, failure ->
+            _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}", "Removing road.")
         }.map { it.id to it }.toMap()
+
 
         val junctions = opendriveModel.junction
                 .map { _topologyBuilder.buildJunction(modelIdentifier, it) }
@@ -81,4 +88,21 @@ class Opendrive2RoadspacesTransformer(
         return RoadspacesModel(modelIdentifier, header, roadspaces, laneTopology)
                 .also { _reportLogger.info("Completed transformation: OpenDRIVE -> RoadspacesModel. ✔") }
     }
+
+    private fun transformRoadspacesSequentially(modelIdentifier: ModelIdentifier, opendriveModel: OpendriveModel,
+                                                progressBar: ProgressBar): List<Result<Roadspace, Exception>> =
+        opendriveModel.road.map {
+            _roadspaceBuilder.buildRoadspace(modelIdentifier, it). also { progressBar.step() }
+        }
+
+    private fun transformRoadspacesConcurrently(modelIdentifier: ModelIdentifier, opendriveModel: OpendriveModel,
+                                                progressBar: ProgressBar): List<Result<Roadspace, Exception>> {
+        val roadspacesDeferred = opendriveModel.road.map {
+            GlobalScope.async {
+                _roadspaceBuilder.buildRoadspace(modelIdentifier, it). also { progressBar.step() }
+            }
+        }
+        return runBlocking { roadspacesDeferred.map { it.await() } }
+    }
+
 }

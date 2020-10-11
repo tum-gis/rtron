@@ -62,6 +62,8 @@ data class Optional<T>(
     // Conversions
     override fun toString() = if (value != null) "Optional[$value]" else "Optional.empty"
 
+    fun toList(): List<T> = if (value != null) listOf(value) else emptyList()
+
     companion object {
         fun <T> empty() = Optional<T>(null)
     }

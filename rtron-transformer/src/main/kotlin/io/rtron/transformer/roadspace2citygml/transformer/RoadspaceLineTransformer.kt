@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.adder
+package io.rtron.transformer.roadspace2citygml.transformer
 
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
+import io.rtron.std.Optional
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.core.CityModel
-import org.citygml4j.model.citygml.core.CityObjectMember
 
 
 /**
- * Adds lines, such as lane boundaries and center lines (RoadSpaces model), to the [CityModel] (CityGML model).
+ * Transforms lines, such as lane boundaries and center lines (RoadSpaces model), to the [CityModel] (CityGML model).
  */
-class RoadspaceLineAdder(
+class RoadspaceLineTransformer(
         private val configuration: Roadspaces2CitygmlConfiguration
 ) {
     // Properties and Initializers
@@ -43,14 +44,14 @@ class RoadspaceLineAdder(
     /**
      * Adds the reference line of the road to the [CityModel].
      */
-    fun addRoadReferenceLine(srcRoadspace: Roadspace, dstCityModel: CityModel) {
+    fun transformRoadReferenceLine(srcRoadspace: Roadspace): Optional<AbstractCityObject> {
         val abstractCityObject = _genericsModuleBuilder.createGenericObject(srcRoadspace.referenceLine)
-                .handleFailure { _reportLogger.log(it); return }
+                .handleFailure { _reportLogger.log(it); return Optional.empty() }
 
         _identifierAdder.addIdentifier(srcRoadspace.id, "RoadReferenceLine", abstractCityObject)
         _attributesAdder.addAttributes(srcRoadspace.id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
                 srcRoadspace.attributes, abstractCityObject)
-        dstCityModel.addCityObjectMember(CityObjectMember(abstractCityObject))
+        return Optional(abstractCityObject)
     }
 
 }

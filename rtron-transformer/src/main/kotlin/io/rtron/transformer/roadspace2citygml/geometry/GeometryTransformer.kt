@@ -28,7 +28,7 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.std.handleFailure
-import io.rtron.transformer.roadspace2citygml.adder.IdentifierAdder
+import io.rtron.transformer.roadspace2citygml.transformer.IdentifierAdder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
 import org.citygml4j.factory.GMLGeometryFactory
 import org.citygml4j.model.gml.geometry.GeometryProperty

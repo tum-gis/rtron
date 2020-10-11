@@ -16,10 +16,6 @@
 
 package io.rtron.main.batch
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import io.rtron.io.files.Path
 import io.rtron.main.project.ProjectConfiguration
 import io.rtron.main.project.ProjectTransformationManager
@@ -41,7 +37,7 @@ class BatchTransformationManager(
 
     private val _projectConfigurations = getProcessablePaths().map {
         val outputDirectoryPath = this.configuration.outputPath.resolve(it.withoutExtension())
-        ProjectConfiguration(configuration.inputDirectoryPath, it, outputDirectoryPath)
+        ProjectConfiguration(configuration.inputDirectoryPath, it, outputDirectoryPath, configuration.concurrentProcessing)
     }
 
     // Methods
@@ -58,21 +54,8 @@ class BatchTransformationManager(
         if (configuration.clean) configuration.outputPath.deleteDirectoryContents()
         _reportLogger.info("Starting batch transformations.")
 
-        val timeElapsed = measureTime {
-            if (this.configuration.parallelProcessing)
-                runBlocking { transformAllFilesParallel() }
-            else
-                transformAllFilesSequential()
-        }
+        val timeElapsed = measureTime { _projectConfigurations.forEach { transformFile(it) } }
         _reportLogger.info("Transformation completed in $timeElapsed.")
-    }
-
-    private fun transformAllFilesSequential() {
-        _projectConfigurations.forEach { transformFile(it) }
-    }
-
-    private suspend fun transformAllFilesParallel() = withContext(Dispatchers.Default) {
-        _projectConfigurations.forEach { launch { transformFile(it) } }
     }
 
     /**

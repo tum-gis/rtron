@@ -21,7 +21,7 @@ import org.citygml4j.model.citygml.vegetation.SolitaryVegetationObject
 import org.citygml4j.model.gml.measures.Length
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.std.handleFailure
-import io.rtron.transformer.roadspace2citygml.adder.toGmlString
+import io.rtron.transformer.roadspace2citygml.transformer.toGmlString
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 
 

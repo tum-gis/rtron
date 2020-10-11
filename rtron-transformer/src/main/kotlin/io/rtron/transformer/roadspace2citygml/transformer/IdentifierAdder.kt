@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.adder
+package io.rtron.transformer.roadspace2citygml.transformer
 
 import io.rtron.io.logging.Logger
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier

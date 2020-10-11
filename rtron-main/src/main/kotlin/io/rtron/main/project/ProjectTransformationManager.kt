@@ -20,14 +20,14 @@ import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.io.scripting.ScriptLoader
 import io.rtron.main.project.configuration.ProjectUserConfiguration
-import io.rtron.transformer.opendrive2roadspaces.Opendrive2RoadspacesTransformer
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
-import io.rtron.transformer.roadspace2citygml.Roadspaces2CitygmlTransformer
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.ReadWriteManager
 import io.rtron.readerwriter.citygml.CitygmlReaderWriterConfiguration
 import io.rtron.readerwriter.opendrive.OpendriveReaderWriterConfiguration
+import io.rtron.transformer.opendrive2roadspaces.Opendrive2RoadspacesTransformer
+import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.roadspace2citygml.Roadspaces2CitygmlTransformer
+import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -50,9 +50,9 @@ class ProjectTransformationManager(
 
     private val userConfiguration = loadConfig()
 
-    private val _opendrive2RoadspacesConfiguration = Opendrive2RoadspacesConfiguration(configuration.projectId, configuration.sourceFileIdentifier, userConfiguration.opendrive2Roadspaces )
+    private val _opendrive2RoadspacesConfiguration = Opendrive2RoadspacesConfiguration(configuration.projectId, configuration.sourceFileIdentifier, configuration.concurrentProcessing, userConfiguration.opendrive2RoadspacesParameters )
     private val _opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(_opendrive2RoadspacesConfiguration)
-    private val _roadspaces2CitygmlConfiguration = Roadspaces2CitygmlConfiguration(configuration.projectId, configuration.sourceFileIdentifier, userConfiguration.roadspaces2CitygmlParameters )
+    private val _roadspaces2CitygmlConfiguration = Roadspaces2CitygmlConfiguration(configuration.projectId, configuration.sourceFileIdentifier, configuration.concurrentProcessing, userConfiguration.roadspaces2CitygmlParameters )
     private val _roadspaces2CitygmlTransformer = Roadspaces2CitygmlTransformer(_roadspaces2CitygmlConfiguration)
 
     // Methods

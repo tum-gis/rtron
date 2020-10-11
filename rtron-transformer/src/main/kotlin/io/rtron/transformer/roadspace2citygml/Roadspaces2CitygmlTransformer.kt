@@ -25,11 +25,16 @@ import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.topology.LaneTopology
 import io.rtron.transformer.AbstractTransformer
-import io.rtron.transformer.roadspace2citygml.adder.RoadObjectAdder
-import io.rtron.transformer.roadspace2citygml.adder.RoadsAdder
-import io.rtron.transformer.roadspace2citygml.adder.RoadspaceLineAdder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspace2citygml.transformer.RoadsTransformer
+import io.rtron.transformer.roadspace2citygml.transformer.RoadspaceLineTransformer
+import io.rtron.transformer.roadspace2citygml.transformer.RoadspaceObjectTransformer
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
+import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.core.CityModel
+import org.citygml4j.model.citygml.core.CityObjectMember
 import org.citygml4j.model.gml.basicTypes.Code
 import org.citygml4j.util.bbox.BoundingBoxOptions
 
@@ -46,9 +51,9 @@ class Roadspaces2CitygmlTransformer(
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
 
-    private val _roadspaceLineAdder = RoadspaceLineAdder(configuration)
-    private val _roadObjectAdder = RoadObjectAdder(configuration)
-    private val _roadLanesAdder = RoadsAdder(configuration)
+    private val _roadspaceLineTransformer = RoadspaceLineTransformer(configuration)
+    private val _roadObjectTransformer = RoadspaceObjectTransformer(configuration)
+    private val _roadLanesTransformer = RoadsTransformer(configuration)
 
     // Methods
 
@@ -67,10 +72,13 @@ class Roadspaces2CitygmlTransformer(
         // transformation of each road space
         _reportLogger.info("Transforming roads spaces with ${configuration.parameters}.")
         val progressBar = ProgressBar("Transforming road spaces", roadspacesModel.roadspaces.size)
-        roadspacesModel.roadspaces.values.forEach { currentRoadspace ->
-            progressBar.step()
-            transform(currentRoadspace, roadspacesModel.laneTopology, cityModel)
-        }
+        val abstractCityObjects = if (configuration.concurrentProcessing)
+            transformRoadspacesConcurrently(roadspacesModel.roadspaces.values.toList(), roadspacesModel.laneTopology, progressBar)
+        else transformRoadspacesSequentially(roadspacesModel.roadspaces.values.toList(), roadspacesModel.laneTopology, progressBar)
+
+        abstractCityObjects
+                .map { CityObjectMember(it) }
+                .forEach { cityModel.addCityObjectMember(it) }
 
         // create CityGML model
         this.calculateBoundedBy(roadspacesModel.header.coordinateReferenceSystem, cityModel)
@@ -78,23 +86,35 @@ class Roadspaces2CitygmlTransformer(
         return CitygmlModel(cityModel)
     }
 
-    /**
-     * Transform a single [Roadspace] and add the objects to the [dstCityModel].
-     */
-    private fun transform(srcRoadspace: Roadspace, srcLaneTopology: LaneTopology, dstCityModel: CityModel) {
-        _roadspaceLineAdder.addRoadReferenceLine(srcRoadspace, dstCityModel)
+    private fun transformRoadspacesSequentially(srcRoadspaces: List<Roadspace>, srcLaneTopology: LaneTopology,
+                                                progressBar: ProgressBar): List<AbstractCityObject> =
+            srcRoadspaces.flatMap {
+                transform(it, srcLaneTopology).also { progressBar.step() }
+            }
 
-        _roadLanesAdder.addRoadCenterLaneLines(srcRoadspace.road, dstCityModel)
-        _roadLanesAdder.addLaneLines(srcRoadspace.road, dstCityModel)
+    private fun transformRoadspacesConcurrently(srcRoadspaces: List<Roadspace>, srcLaneTopology: LaneTopology,
+                                                progressBar: ProgressBar): List<AbstractCityObject> {
 
-        _roadLanesAdder.addLaneSurfaces(srcRoadspace.road, dstCityModel)
-        _roadLanesAdder.addLateralFillerSurfaces(srcRoadspace.road, dstCityModel)
-        _roadLanesAdder.addLongitudinalFillerSurfaces(srcRoadspace.road, srcLaneTopology, dstCityModel)
-        _roadLanesAdder.addRoadMarkings(srcRoadspace.road, dstCityModel)
-
-        _roadObjectAdder.addRoadspaceObjects(srcRoadspace.roadspaceObjects, dstCityModel)
+        val resultsDeferred = srcRoadspaces.map {
+            GlobalScope.async {
+                transform(it, srcLaneTopology).also { progressBar.step() }
+            }
+        }
+        return runBlocking { resultsDeferred.flatMap { it.await() } }
     }
 
+    /**
+     * Transform a single [Roadspace] and add the objects to the [AbstractCityObject].
+     */
+    private fun transform(srcRoadspace: Roadspace, srcLaneTopology: LaneTopology): List<AbstractCityObject> =
+            _roadspaceLineTransformer.transformRoadReferenceLine(srcRoadspace).toList() +
+                    _roadLanesTransformer.transformRoadCenterLaneLines(srcRoadspace.road) +
+                    _roadLanesTransformer.transformLaneLines(srcRoadspace.road) +
+                    _roadLanesTransformer.transformLaneSurfaces(srcRoadspace.road) +
+                    _roadLanesTransformer.transformLateralFillerSurfaces(srcRoadspace.road) +
+                    _roadLanesTransformer.transformLongitudinalFillerSurfaces(srcRoadspace.road, srcLaneTopology) +
+                    _roadLanesTransformer.transformRoadMarkings(srcRoadspace.road) +
+                    _roadObjectTransformer.transformRoadspaceObjects(srcRoadspace.roadspaceObjects)
 
     private fun calculateBoundedBy(srcCrs: Result<CoordinateReferenceSystem, Exception>, dstCityModel: CityModel) {
         if (dstCityModel.cityObjectMember.isEmpty()) return
