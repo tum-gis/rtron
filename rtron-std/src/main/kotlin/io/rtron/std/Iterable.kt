@@ -16,6 +16,11 @@
 
 package io.rtron.std
 
+/**
+ * Returns either the size of [T] or the [default] value.
+ */
+internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
+        if (this is Collection<*>) this.size else default
 
 /**
  * Returns the cumulative sum.
@@ -46,6 +51,37 @@ fun Iterable<Float>.cumulativeSum(): List<Float> = scan(0.0f) { acc, element -> 
 @OptIn(ExperimentalStdlibApi::class)
 @kotlin.jvm.JvmName("cumulativeSumOfInt")
 fun Iterable<Int>.cumulativeSum(): List<Int> = scan(0) { acc, element -> acc + element }
+
+/**
+ * Returns a list of triples built from the elements of [this] collection and the [otherA] as well as [otherB] array
+ * with the same index. The returned list has length of the shortest collection.
+ *
+ * @param otherA array to be combined
+ * @param otherB array to be combined
+ * @return list of [Triple] having the length of the shortest collection
+ */
+fun <T, R, S> Iterable<T>.zip(otherA: Iterable<R>, otherB: Iterable<S>): List<Triple<T, R, S>> =
+        zip(otherA, otherB) { t1, t2, t3 -> Triple(t1, t2, t3) }
+
+/**
+ * Returns a list of values built from [this] collection and the [otherA] as well as [otherB] array with the same index.
+ * For combining the arrays the [transform] function is applied.
+ *
+ * @param otherA array to be combined
+ * @param otherB array to be combined
+ * @return list having the length of the shortest collection
+ */
+fun <T, R, S, V> Iterable<T>.zip(otherA: Iterable<R>, otherB: Iterable<S>, transform: (a: T, b: R, c: S) -> V): List<V> {
+    val first = iterator()
+    val second = otherA.iterator()
+    val third = otherB.iterator()
+    val list = ArrayList<V>(minOf(collectionSizeOrDefault(10), otherA.collectionSizeOrDefault(10),
+            otherB.collectionSizeOrDefault(10)))
+    while (first.hasNext() && second.hasNext() && third.hasNext()) {
+        list.add(transform(first.next(), second.next(), third.next()))
+    }
+    return list
+}
 
 /**
  * Zip each element in this list with the next two elements and zip them to a [Triple].

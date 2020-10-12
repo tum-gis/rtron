@@ -30,6 +30,7 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
+import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
 
@@ -49,16 +50,25 @@ class Curve2DBuilder(
      * @param srcPlanViewGeometryList source geometry curve segments of OpenDRIVE
      * @param offset applied translational offset
      */
-    fun buildCurve2DFromPlanViewGeometries(srcPlanViewGeometryList: List<RoadPlanViewGeometry>,
+    fun buildCurve2DFromPlanViewGeometries(id: RoadspaceIdentifier, srcPlanViewGeometryList: List<RoadPlanViewGeometry>,
                                            offset: Vector2D = Vector2D.ZERO): CompositeCurve2D {
-        val curveMembers = srcPlanViewGeometryList.dropLast(1)
-                .map { buildPlanViewGeometry(it, BoundType.OPEN, offset) } +
-                buildPlanViewGeometry(srcPlanViewGeometryList.last(), BoundType.CLOSED, offset)
 
-        val absoluteStarts: List<Double> = srcPlanViewGeometryList.map { it.s }
+        // prepare
+        val srcPlanViewGeometryListAdjusted =
+                srcPlanViewGeometryList.filter { it.length > parameters.tolerance }
+        if (srcPlanViewGeometryListAdjusted.size < srcPlanViewGeometryList.size)
+            reportLogger.warn("Plan view geometry has a length of zero (below tolerance) and therefore the " +
+                    "curve element can not be constructed.", id.toString())
+
+        // construct composite curve
+        val curveMembers = srcPlanViewGeometryListAdjusted.dropLast(1)
+                .map { buildPlanViewGeometry(it, BoundType.OPEN, offset) } +
+                buildPlanViewGeometry(srcPlanViewGeometryListAdjusted.last(), BoundType.CLOSED, offset)
+
+        val absoluteStarts: List<Double> = srcPlanViewGeometryListAdjusted.map { it.s }
         val absoluteDomains: List<Range<Double>> = absoluteStarts
                 .zipWithNext().map { Range.closedOpen(it.first, it.second) } +
-                Range.closed(absoluteStarts.last(), absoluteStarts.last() + srcPlanViewGeometryList.last().length)
+                Range.closed(absoluteStarts.last(), absoluteStarts.last() + srcPlanViewGeometryListAdjusted.last().length)
 
         return CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts)
     }
@@ -91,7 +101,7 @@ class Curve2DBuilder(
                         endBoundType)
             }
             srcGeometry.isParamPoly3() && srcGeometry.paramPoly3.isNormalized() -> {
-                val parameterTransformation : (CurveRelativePoint1D) -> CurveRelativePoint1D = { it / srcGeometry.length }
+                val parameterTransformation: (CurveRelativePoint1D) -> CurveRelativePoint1D = { it / srcGeometry.length }
                 val baseCurve = ParametricCubicCurve2D(srcGeometry.paramPoly3.coefficientsU,
                         srcGeometry.paramPoly3.coefficientsV, 1.0, parameters.tolerance, affineSequence,
                         endBoundType)

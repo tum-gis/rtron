@@ -51,7 +51,7 @@ class Curve3DBuilder(
                      srcElevationProfiles: List<RoadElevationProfileElevation>): Curve3D {
 
         val planViewCurve2D =
-                _curve2DBuilder.buildCurve2DFromPlanViewGeometries(srcPlanViewGeometries, parameters.offsetXY)
+                _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, srcPlanViewGeometries, parameters.offsetXY)
         val heightFunction = buildHeightFunction(id, srcElevationProfiles)
 
         return Curve3D(planViewCurve2D, heightFunction)
