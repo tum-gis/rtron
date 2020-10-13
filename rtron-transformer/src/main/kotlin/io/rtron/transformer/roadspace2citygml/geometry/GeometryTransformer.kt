@@ -28,8 +28,8 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.std.handleFailure
-import io.rtron.transformer.roadspace2citygml.transformer.IdentifierAdder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspace2citygml.transformer.IdentifierAdder
 import org.citygml4j.factory.GMLGeometryFactory
 import org.citygml4j.model.gml.geometry.GeometryProperty
 import org.citygml4j.model.gml.geometry.aggregates.MultiSurface
@@ -111,7 +111,7 @@ class GeometryTransformer(
                 .createDirectPosition(vectorGlobalCS.toDoubleArray(), DIMENSION)!!
         val point = Point().apply {
             pos = directPosition
-            id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
         this.pointProperty = PointProperty(point)
     }
@@ -164,16 +164,16 @@ class GeometryTransformer(
 
         polygons.forEach {
             val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            polygonGml.id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
             surfaceMembers.add(SurfaceProperty(polygonGml))
         }
         val compositeSurface = CompositeSurface().apply {
-            id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
             surfaceMember = surfaceMembers
         }
 
         val solid = Solid().apply {
-            id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
             exterior = SurfaceProperty(compositeSurface)
         }
         this.solidProperty = SolidProperty(solid)
@@ -181,11 +181,11 @@ class GeometryTransformer(
 
     private fun polygonsToMultiSurfaceRepresentation(polygons: List<Polygon3D>) {
         val multiSurface = MultiSurface().apply {
-            id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
         polygons.forEach {
             val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            polygonGml.id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
             multiSurface.addSurfaceMember(SurfaceProperty(polygonGml))
         }
         this.multiSurfaceProperty = MultiSurfaceProperty(multiSurface)

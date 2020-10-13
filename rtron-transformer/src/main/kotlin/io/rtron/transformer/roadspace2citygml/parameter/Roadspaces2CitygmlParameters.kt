@@ -34,7 +34,8 @@ class Roadspaces2CitygmlParameters(
         private val flattenGenericAttributeSetsProperty: Property<Boolean> = Property(value = true, isDefault = true),
         private val discretizationStepSizeProperty: Property<Double> = Property(0.7, true),
         private val sweepDiscretizationStepSizeProperty: Property<Double> = Property(ParametricSweep3D.DEFAULT_STEP_SIZE, true),
-        private val circleSlicesProperty: Property<Int> = Property(Cylinder3D.DEFAULT_NUMBER_SLICES, true)
+        private val circleSlicesProperty: Property<Int> = Property(Cylinder3D.DEFAULT_NUMBER_SLICES, true),
+        private val generateRandomGeometryIdsProperty: Property<Boolean> = Property(value = true, isDefault = true)
 ) : AbstractTransformerParameters() {
 
     // Properties and Initializers
@@ -48,6 +49,11 @@ class Roadspaces2CitygmlParameters(
      * prefix for identifier attribute names
      */
     val identifierAttributesPrefix by identifierAttributesPrefixProperty
+
+    /**
+     * true, if nested attribute lists shall be flattened out
+     */
+    val flattenGenericAttributeSets by flattenGenericAttributeSetsProperty
 
     /**
      * distance between each discretization step for curves and surfaces
@@ -65,9 +71,10 @@ class Roadspaces2CitygmlParameters(
     val circleSlices by circleSlicesProperty
 
     /**
-     * true, if nested attribute lists shall be flattened out
+     * true, if random ids shall be generated for the gml geometries
      */
-    val flattenGenericAttributeSets by flattenGenericAttributeSetsProperty
+    val generateRandomGeometryIds by generateRandomGeometryIdsProperty
+
 
     // Methods
 
@@ -80,12 +87,14 @@ class Roadspaces2CitygmlParameters(
             this.flattenGenericAttributeSetsProperty leftMerge other.flattenGenericAttributeSetsProperty,
             this.discretizationStepSizeProperty leftMerge other.discretizationStepSizeProperty,
             this.sweepDiscretizationStepSizeProperty leftMerge other.sweepDiscretizationStepSizeProperty,
-            this.circleSlicesProperty leftMerge other.circleSlicesProperty
+            this.circleSlicesProperty leftMerge other.circleSlicesProperty,
+            this.generateRandomGeometryIdsProperty leftMerge other.generateRandomGeometryIdsProperty
     )
 
     // Conversions
     override fun toString(): String =
             "Roadspaces2CitygmlParameters(gmlIdPrefix=$gmlIdPrefix, identifierAttributesPrefix=$identifierAttributesPrefix, " +
                     "flattenGenericAttributeSets=$flattenGenericAttributeSets, discretizationStepSize=$discretizationStepSize, " +
-                    "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices)"
+                    "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices, " +
+                    "generateRandomGeometryIds=$generateRandomGeometryIds)"
 }

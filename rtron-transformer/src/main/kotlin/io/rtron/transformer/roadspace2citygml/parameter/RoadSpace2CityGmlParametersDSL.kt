@@ -44,13 +44,17 @@ class Roadspaces2CitygmlParametersBuilder {
     private val circleSlicesProperty = SettableProperty(defaultParameters.circleSlices)
     var circleSlices by circleSlicesProperty
 
+    private val generateRandomGeometryIdsProperty = SettableProperty(defaultParameters.generateRandomGeometryIds)
+    var generateRandomGeometryIds by generateRandomGeometryIdsProperty
+
     fun build() = Roadspaces2CitygmlParameters(
             gmlIdPrefixProperty,
             identifierAttributesPrefixProperty,
             flattenGenericAttributeSetsProperty,
             discretizationStepSizeProperty,
             sweepDiscretizationStepSizeProperty,
-            circleSlicesProperty)
+            circleSlicesProperty,
+            generateRandomGeometryIdsProperty)
 }
 
 /**

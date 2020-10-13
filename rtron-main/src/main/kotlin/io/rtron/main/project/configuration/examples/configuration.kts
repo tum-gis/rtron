@@ -19,5 +19,6 @@ configure {
         discretizationStepSize = 0.5
         sweepDiscretizationStepSize = 0.3
         circleSlices = 12
+        generateRandomGeometryIds = true
     }
 }
