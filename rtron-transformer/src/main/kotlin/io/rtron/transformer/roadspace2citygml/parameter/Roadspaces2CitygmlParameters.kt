@@ -31,6 +31,7 @@ typealias Roadspaces2CitygmlConfiguration = TransformerConfiguration<Roadspaces2
 class Roadspaces2CitygmlParameters(
         private val gmlIdPrefixProperty: Property<String> = Property("UUID_", isDefault = true),
         private val identifierAttributesPrefixProperty: Property<String> = Property("identifier_", isDefault = true),
+        private val geometryAttributesPrefixProperty: Property<String> = Property("geometry_", isDefault = true),
         private val flattenGenericAttributeSetsProperty: Property<Boolean> = Property(value = true, isDefault = true),
         private val discretizationStepSizeProperty: Property<Double> = Property(0.7, true),
         private val sweepDiscretizationStepSizeProperty: Property<Double> = Property(ParametricSweep3D.DEFAULT_STEP_SIZE, true),
@@ -49,6 +50,11 @@ class Roadspaces2CitygmlParameters(
      * prefix for identifier attribute names
      */
     val identifierAttributesPrefix by identifierAttributesPrefixProperty
+
+    /**
+     * prefix for geometry attribute names
+     */
+    val geometryAttributesPrefix by geometryAttributesPrefixProperty
 
     /**
      * true, if nested attribute lists shall be flattened out
@@ -84,6 +90,7 @@ class Roadspaces2CitygmlParameters(
     infix fun leftMerge(other: Roadspaces2CitygmlParameters) = Roadspaces2CitygmlParameters(
             this.gmlIdPrefixProperty leftMerge other.gmlIdPrefixProperty,
             this.identifierAttributesPrefixProperty leftMerge other.identifierAttributesPrefixProperty,
+            this.geometryAttributesPrefixProperty leftMerge other.geometryAttributesPrefixProperty,
             this.flattenGenericAttributeSetsProperty leftMerge other.flattenGenericAttributeSetsProperty,
             this.discretizationStepSizeProperty leftMerge other.discretizationStepSizeProperty,
             this.sweepDiscretizationStepSizeProperty leftMerge other.sweepDiscretizationStepSizeProperty,

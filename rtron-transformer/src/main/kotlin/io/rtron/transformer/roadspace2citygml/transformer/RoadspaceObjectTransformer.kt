@@ -46,7 +46,7 @@ class RoadspaceObjectTransformer(
     private val _buildingModuleBuilder = BuildingModuleBuilder(configuration)
     private val _cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(configuration)
     private val _transportationModuleBuilder = TransportationModuleBuilder(configuration)
-    private val _vegetationModuleBuilder = VegetationModuleBuilder()
+    private val _vegetationModuleBuilder = VegetationModuleBuilder(configuration)
 
     // Methods
 

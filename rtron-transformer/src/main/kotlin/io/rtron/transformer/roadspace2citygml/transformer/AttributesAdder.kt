@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.roadspace2citygml.transformer
 
+import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.model.roadspaces.roadspace.attribute.*
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
 import org.citygml4j.model.citygml.core.AbstractCityObject
@@ -36,6 +37,18 @@ class AttributesAdder(
 ) {
 
     // Methods
+
+    /**
+     * Adds the angle values of a [Rotation3D] in radians to the [dstCityObject].
+     */
+    fun addRotationAttributes(rotation: Rotation3D, dstCityObject: AbstractCityObject) {
+        val attributeList = attributes("${parameters.geometryAttributesPrefix}rotation_") {
+            attribute("z", rotation.heading)
+            attribute("y", rotation.pitch)
+            attribute("x", rotation.roll)
+        }
+        addAttributes(attributeList, dstCityObject)
+    }
 
     /**
      * Adds an [attributeList] to the [dstCityObject].

@@ -41,4 +41,7 @@ interface Geometry3DVisitor {
     fun visit(abstractSolid3D: AbstractSolid3D)
     fun visit(cylinder3D: Cylinder3D)
     fun visit(parametricSweep3D: ParametricSweep3D)
+
+    // abstract geometry
+    fun visit(abstractGeometry3D: AbstractGeometry3D)
 }

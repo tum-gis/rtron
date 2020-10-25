@@ -17,24 +17,37 @@
 package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
-import org.citygml4j.model.citygml.vegetation.SolitaryVegetationObject
-import org.citygml4j.model.gml.measures.Length
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.std.handleFailure
-import io.rtron.transformer.roadspace2citygml.transformer.toGmlString
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
+import io.rtron.transformer.roadspace2citygml.transformer.toGmlString
+import org.citygml4j.model.citygml.vegetation.SolitaryVegetationObject
+import org.citygml4j.model.gml.measures.Length
 
 
 /**
  * Builder for city objects of the CityGML Vegetation module.
  */
-class VegetationModuleBuilder {
+class VegetationModuleBuilder(
+        val configuration: Roadspaces2CitygmlConfiguration
+) {
+
+    // Properties and Initializers
+    private val _attributesAdder = AttributesAdder(configuration.parameters)
+
+    // Methods
 
     fun createVegetationObject(geometryTransformer: GeometryTransformer): Result<SolitaryVegetationObject, Exception> {
         val solitaryVegetationObject = SolitaryVegetationObject()
+
         solitaryVegetationObject.lod1Geometry = geometryTransformer
                 .getGeometryProperty()
                 .handleFailure { return it }
+        if (geometryTransformer.isSetRotation())
+            _attributesAdder.addRotationAttributes(geometryTransformer.rotation, solitaryVegetationObject)
+
         addAttributes(solitaryVegetationObject, geometryTransformer)
         return Result.success(solitaryVegetationObject)
     }

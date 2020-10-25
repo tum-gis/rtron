@@ -32,6 +32,9 @@ class Roadspaces2CitygmlParametersBuilder {
     private val identifierAttributesPrefixProperty = SettableProperty(defaultParameters.identifierAttributesPrefix)
     var identifierAttributesPrefix by identifierAttributesPrefixProperty
 
+    private val geometryAttributesPrefixProperty = SettableProperty(defaultParameters.geometryAttributesPrefix)
+    var geometryAttributesPrefix by geometryAttributesPrefixProperty
+
     private val flattenGenericAttributeSetsProperty = SettableProperty(defaultParameters.flattenGenericAttributeSets)
     var flattenGenericAttributeSets by flattenGenericAttributeSetsProperty
 
@@ -50,6 +53,7 @@ class Roadspaces2CitygmlParametersBuilder {
     fun build() = Roadspaces2CitygmlParameters(
             gmlIdPrefixProperty,
             identifierAttributesPrefixProperty,
+            geometryAttributesPrefixProperty,
             flattenGenericAttributeSetsProperty,
             discretizationStepSizeProperty,
             sweepDiscretizationStepSizeProperty,

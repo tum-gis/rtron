@@ -17,10 +17,11 @@
 package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
+import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import org.citygml4j.model.citygml.cityfurniture.CityFurniture
-import io.rtron.std.handleFailure
 
 
 /**
@@ -30,10 +31,17 @@ class CityFurnitureModuleBuilder(
         val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
+    // Properties and Initializers
+    private val _attributesAdder = AttributesAdder(configuration.parameters)
+
     // Methods
     fun createCityFurnitureObject(geometryTransformer: GeometryTransformer): Result<CityFurniture, Exception> {
         val cityFurnitureObject = CityFurniture()
+
         cityFurnitureObject.lod1Geometry = geometryTransformer.getGeometryProperty().handleFailure { return it }
+        if (geometryTransformer.isSetRotation())
+            _attributesAdder.addRotationAttributes(geometryTransformer.rotation, cityFurnitureObject)
+
         return Result.success(cityFurnitureObject)
     }
 }

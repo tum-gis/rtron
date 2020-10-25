@@ -95,8 +95,19 @@ class Affine3D(
      * @return rotation
      */
     fun extractRotationAffine(): Affine3D {
-        val rotation = _matrix.getUnnormalizedRotation(JOMLQuaterniond())
+        val rotation = _matrix.getUnnormalizedRotation(JOMLQuaterniond())!!
         return Affine3D(JOMLMatrix4d().rotate(rotation))
+    }
+
+    /**
+     * Extracts the rotation of the [Affine3D] transformation matrix to a [Rotation3D].
+     *
+     * @return rotation angles
+     */
+    fun extractRotation(): Rotation3D {
+        val rotationQuaternion = _matrix.getUnnormalizedRotation(JOMLQuaterniond())!!
+        val rotationEuler = rotationQuaternion.getEulerAnglesXYZ(JOMLVector3d())!!
+        return Rotation3D(rotationEuler.z, rotationEuler.y, rotationEuler.x)
     }
 
     /**

@@ -18,7 +18,9 @@ package io.rtron.transformer.roadspace2citygml.geometry
 
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
+import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
+import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
@@ -61,6 +63,9 @@ class GeometryTransformer(
     lateinit var pointProperty: PointProperty
         private set
 
+    lateinit var rotation: Rotation3D
+        private set
+
     var height: Double = Double.NaN
         private set
     var diameter: Double = Double.NaN
@@ -69,7 +74,7 @@ class GeometryTransformer(
     // Methods
     fun getSolidProperty(): Result<SolidProperty, IllegalStateException> =
             if (isSetSolid()) Result.success(solidProperty)
-            else Result.error(IllegalStateException("No MultiSurfaceProperty available for geometry."))
+            else Result.error(IllegalStateException("No SolidProperty available for geometry."))
 
     fun getMultiSurfaceProperty(): Result<MultiSurfaceProperty, IllegalStateException> =
             if (isSetMultiSurface()) Result.success(multiSurfaceProperty)
@@ -96,10 +101,16 @@ class GeometryTransformer(
                 else -> Result.error(IllegalStateException("No adequate geometry found."))
             }
 
+    fun getRotation(): Result<Rotation3D, IllegalStateException> =
+            if (isSetRotation()) Result.success(rotation)
+            else Result.error(IllegalStateException("No rotation available."))
+
     private fun isSetSolid() = this::solidProperty.isInitialized && solidProperty.isSetGeometry
     private fun isSetMultiSurface() = this::multiSurfaceProperty.isInitialized && multiSurfaceProperty.isSetGeometry
     private fun isSetLineString() = this::lineStringProperty.isInitialized && lineStringProperty.isSetGeometry
     private fun isSetPoint() = this::pointProperty.isInitialized && pointProperty.isSetGeometry
+
+    fun isSetRotation() = this::rotation.isInitialized
 
     fun isSetHeight() = !height.isNaN()
     fun isSetDiameter() = !diameter.isNaN()
@@ -114,6 +125,7 @@ class GeometryTransformer(
             if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
         this.pointProperty = PointProperty(point)
+        visit(vector3D as AbstractGeometry3D)
     }
 
     override fun visit(abstractCurve3D: AbstractCurve3D) {
@@ -123,7 +135,7 @@ class GeometryTransformer(
                 .ifEmpty { return }
 
         val coordinatesList = points.flatMap { it.toDoubleList() }
-        val lineString = geometryFactory.createLineString(coordinatesList, DIMENSION)
+        val lineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
         this.lineStringProperty = LineStringProperty(lineString)
     }
 
@@ -132,11 +144,13 @@ class GeometryTransformer(
                 { polygonsToMultiSurfaceRepresentation(it) },
                 { reportLogger.log(it) }
         )
+        visit(abstractSurface3D as AbstractGeometry3D)
     }
 
     override fun visit(circle3D: Circle3D) {
         val adjustedCircle = circle3D.copy(numberSlices = parameters.circleSlices)
         visit(adjustedCircle as AbstractSurface3D)
+        visit(circle3D as AbstractGeometry3D)
     }
 
     override fun visit(abstractSolid3D: AbstractSolid3D) {
@@ -144,6 +158,7 @@ class GeometryTransformer(
                 { polygonsToSolidRepresentation(it) },
                 { reportLogger.log(it) }
         )
+        visit(abstractSolid3D as AbstractGeometry3D)
     }
 
     override fun visit(cylinder3D: Cylinder3D) {
@@ -157,6 +172,10 @@ class GeometryTransformer(
         val adjustedParametricSweep3D = parametricSweep3D
                 .copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
         visit(adjustedParametricSweep3D as AbstractSolid3D)
+    }
+
+    override fun visit(abstractGeometry3D: AbstractGeometry3D) {
+        this.rotation = abstractGeometry3D.affineSequence.solve().extractRotation()
     }
 
     private fun polygonsToSolidRepresentation(polygons: List<Polygon3D>) {

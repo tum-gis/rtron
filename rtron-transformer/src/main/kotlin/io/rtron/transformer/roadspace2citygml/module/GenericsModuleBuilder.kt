@@ -23,6 +23,7 @@ import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import org.citygml4j.model.citygml.generics.GenericCityObject
 
 
@@ -35,6 +36,7 @@ class GenericsModuleBuilder(
 
     // Properties and Initializers
     private val _reportLogger: Logger = configuration.getReportLogger()
+    private val _attributesAdder = AttributesAdder(configuration.parameters)
 
     // Methods
     fun createGenericObject(curve3D: AbstractCurve3D): Result<GenericCityObject, Exception> {
@@ -53,6 +55,8 @@ class GenericsModuleBuilder(
         val genericCityObject = GenericCityObject()
         genericCityObject.lod2Geometry = geometryTransformer.getGeometryProperty()
                 .handleFailure { return it }
+        if (geometryTransformer.isSetRotation())
+            _attributesAdder.addRotationAttributes(geometryTransformer.rotation, genericCityObject)
         return Result.success(genericCityObject)
     }
 }
