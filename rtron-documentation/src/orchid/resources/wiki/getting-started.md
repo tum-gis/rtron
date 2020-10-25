@@ -38,24 +38,25 @@ cd rtron-cli/build/libs
 Let it run:
 ```bash
 java -jar rtron-*.jar
-  Usage: rtron [OPTIONS] INPUTPATH OUTPUTPATH
-  
-    r:trån transforms road networks described in OpenDRIVE into the virtual 3D
-    city model standard CityGML.
-  
-  Options:
-    --version       Show the version and exit
-    --no-recursive  Do not search recursively for input files in given
-                    input directory
-    --parallel      Run processing in parallel
-    -c, --clean     Clean output directory by deleting its
-                    current content before starting
-    -h, --help      Show this message and exit
-  
-  Arguments:
-    INPUTPATH   Path to the directory containing OpenDRIVE datasets
-    OUTPUTPATH  Path to the output directory into which the
-                transformed CityGML models are written
+    Usage: rtron [OPTIONS] INPUTPATH OUTPUTPATH
+    
+      r:trån transforms road networks described in OpenDRIVE into the virtual 3D
+      city model standard CityGML.
+    
+    Options:
+      --version       Show the version and exit
+      --no-recursive  Do not search recursively for input files in given
+                      input directory
+      --concurrent    Enable concurrent processing during the
+                      transformation of a model (experimental)
+      -c, --clean     Clean output directory by deleting its
+                      current content before starting
+      -h, --help      Show this message and exit
+    
+    Arguments:
+      INPUTPATH   Path to the directory containing OpenDRIVE datasets
+      OUTPUTPATH  Path to the output directory into which the
+                  transformed CityGML models are written
 ```
 
 ## Batch Processing
