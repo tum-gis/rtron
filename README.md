@@ -1,9 +1,9 @@
 <p align="center"><a href="https://rtron.io" target="_blank" rel="noopener noreferrer"><img width="500" src="rtron-documentation/src/orchid/resources/assets/images/logo.png" alt="rtron logo"></a></p>
 
 <p align="center">
-    <a href="https://github.com/tum-gis/rtron/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/tum-gis/rtron"></a>
-    <a href="https://travis-ci.org/github/tum-gis/rtron" title="Build Status"><img src="https://travis-ci.org/tum-gis/rtron.svg?branch=master"></a>
-    <a href="./LICENSE" title="License"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg"></a>
+    <a href="https://github.com/tum-gis/rtron/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/tum-gis/rtron?style=for-the-badge"></a>
+    <a href="https://travis-ci.org/github/tum-gis/rtron" title="Build Status"><img src="https://img.shields.io/travis/tum-gis/rtron?style=for-the-badge"></a>
+    <a href="./LICENSE" title="License"><img src="https://img.shields.io/github/license/tum-gis/rtron.svg?style=for-the-badge"></a>
 </p>
 
 <p align="center">
