@@ -27,32 +27,32 @@ layout: 'homepage'
   <div class="column is-8">
       <div class="content is-medium">
         <p>
-            <em>…inspect your spatio-semantic road space models.</em>
+            <em>…<a href="{{ link('Model Inspection') }}">inspect</a> your spatio-semantic road space models:</em>
             <a href="{{ link('Model Inspection') }}">
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/inspection-opendrive-pointcloud.png' | asset }}"></a>
         </p>
         <p>
-            <i>…conduct further model transformations.</i>
+            <i>…conduct further <a href="{{ link('Model Transformations') }}">model transformations</a>:</i>
             <a href="{{ link('Model Transformations') }}">
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/model-transformations-fme-workbench.png' | asset }}"></a>
         </p>
         <p>
-            <i>…perform geospatial analyses on the 3D City Database.</i>
+            <i>…perform geospatial analyses on the <a href="{{ link('3D City Database') }}">3D City Database</a>:</i>
             <a href="{{ link('3D City Database') }}">
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/3dcitydb-query-answer.png' | asset }}"></a>
         </p>
         <p>
-            <i>…deploy virtual globes.</i>
+            <i>…deploy <a href="{{ link('Web Map') }}">virtual globes</a>:</i>
             <a href="{{ link('Web Map') }}">
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/3dcitydb-web-map-client-crossing.png' | asset }}"></a>
         </p>
         <p>
-            <i>…load your models into a desktop GIS.</i>
+            <i>…load your models into a <a href="{{ link('Desktop GIS') }}">desktop GIS</a>:</i>
             <a href="{{ link('Desktop GIS') }}">
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/qgis.png' | asset }}"></a>
         </p>
         <p>
-            <i>…compare and validate your models with models from other data sources.</i>
+            <i>…<a href="{{ link('Model Validation') }}">compare and validate</a> your models with models from other data sources:</i>
             <a href="{{ link('Model Validation') }}">
             <img class="is-full is-gapless" src="{{ 'assets/media/demos/model-validation-fme-inspector.png' | asset }}"></a>
         </p>
