@@ -1,12 +1,6 @@
 <p align="center"><a href="https://rtron.io" target="_blank" rel="noopener noreferrer"><img width="500" src="rtron-documentation/src/orchid/resources/assets/images/logo.png" alt="rtron logo"></a></p>
 
 <p align="center">
-    <a href="https://github.com/tum-gis/rtron/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/tum-gis/rtron?style=for-the-badge"></a>
-    <a href="https://travis-ci.org/github/tum-gis/rtron" title="Build Status"><img src="https://img.shields.io/travis/tum-gis/rtron?style=for-the-badge"></a>
-    <a href="./LICENSE" title="License"><img src="https://img.shields.io/github/license/tum-gis/rtron.svg?style=for-the-badge"></a>
-</p>
-
-<p align="center">
     <em>a road space model transformer for OpenDRIVE, CityGML and beyond</em>
     <br />
     <a href="https://rtron.io">View Demos</a>
@@ -14,6 +8,12 @@
     <a href="https://github.com/tum-gis/rtron/issues">Report Bug</a>
     ·
     <a href="https://github.com/tum-gis/rtron/issues">Request Feature</a>
+</p>
+
+<p align="center">
+    <a href="https://github.com/tum-gis/rtron/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/tum-gis/rtron?style=for-the-badge"></a>
+    <a href="https://travis-ci.org/github/tum-gis/rtron" title="Build Status"><img src="https://img.shields.io/travis/tum-gis/rtron?style=for-the-badge"></a>
+    <a href="./LICENSE" title="License"><img src="https://img.shields.io/github/license/tum-gis/rtron.svg?style=for-the-badge"></a>
 </p>
 
 ![rtron preview](rtron-documentation/src/orchid/resources/assets/images/rtron-preview.png)
@@ -27,7 +27,7 @@ This enables you to
 * perform geospatial analyses on the [3D City Database](https://rtron.io/demos/3dcitydb)
 * deploy [virtual globes](https://rtron.io/demos/web-map)
 * load your models into a [desktop GIS](https://rtron.io/demos/desktop-gis)
-* [compare and validate](https://rtron.io/demos/model-validation) your models with models other data sources
+* [compare and validate](https://rtron.io/demos/model-validation) your models with models from other data sources
 
 ## :rocket: Usage
 
