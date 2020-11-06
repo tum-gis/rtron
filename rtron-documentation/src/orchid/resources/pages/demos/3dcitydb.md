@@ -27,7 +27,7 @@ For a manual database setup checkout the [documentation](https://3dcitydb-docs.r
 
 ## Loading Datasets
 
-Load and extract CityGML datasets into the database with the [Importer/Exporter tool](https://github.com/3dcitydb/importer-exporter).
+Import CityGML datasets into the database with the [Importer/Exporter tool](https://github.com/3dcitydb/importer-exporter).
 Therefore, setup the connection in the database tab and load the generated CityGML datasets into the database using the import tab:
 ![3DCityDB Query Answer](/assets/media/demos/3dcitydb-importerexporter-connect.png)
 
@@ -58,6 +58,7 @@ This is the answer of the 3D City Database:
 ![3DCityDB Query Answer](/assets/media/demos/3dcitydb-query-answer.png)
 
 ## Extracting Datasets
+
 Using the [Importer/Exporter tool](https://github.com/3dcitydb/importer-exporter), the 3D city model can be exported as CityGML and KML/COLLADA/glTF datasets:
 ![3DCityDB Query Answer](/assets/media/demos/3dcitydb-importerexporter-export.png)
 
