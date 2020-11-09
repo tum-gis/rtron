@@ -57,20 +57,26 @@ class ProgressBar(
     private fun printUpdate() {
         val elapsedTime = getElapsedTime()
         if (elapsedTime > PRINT_AFTER && getElapsedTimeSinceLastUpdate() > PRINT_AT_LEAST) {
-            print("$PREFIX $taskName $currentStatus/$completion ${getProgressPercent()}% [ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]\r")
+            print("$PREFIX $taskName $currentStatus/$completion ${getProgressPercent()}% " +
+                    "[ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]\r")
             lastPrintUpdateTime = System.currentTimeMillis()
         }
     }
 
-    private fun getElapsedTimeSinceLastUpdate() =
+    private fun getElapsedTimeSinceLastUpdate(): Duration =
             (System.currentTimeMillis() - lastPrintUpdateTime).toDuration(DurationUnit.MILLISECONDS)
 
-    private fun getProgressPercent(): Int = (100.0 * (currentStatus.toFloat() / completion.toFloat())).roundToInt()
+    private fun getProgressPercent(): Int =
+            (100.0 * (currentStatus.toFloat() / completion.toFloat())).roundToInt()
 
-    private fun getElapsedTime() =
+    private fun getElapsedTime(): Duration =
             (System.currentTimeMillis() - startTime).toDuration(DurationUnit.MILLISECONDS)
 
-    private fun getEstimatedTimeOfArrival(): Duration = getElapsedTime() * completion / currentStatus
+    private fun getTotalEstimatedElapsedTime(): Duration =
+            getElapsedTime() * completion / currentStatus
+
+    private fun getEstimatedTimeOfArrival(): Duration =
+            getElapsedTime() * ((completion / currentStatus) - 1)
 
     companion object {
 
@@ -82,11 +88,11 @@ class ProgressBar(
         /**
          * Starts printing the progress bar after the duration of [PRINT_AFTER].
          */
-        val PRINT_AFTER = 3.toDuration(DurationUnit.SECONDS)
+        val PRINT_AFTER = 0.toDuration(DurationUnit.SECONDS)
 
         /**
          * Print updates only after the duration of [PRINT_AT_LEAST] has elapsed.
          */
-        val PRINT_AT_LEAST = 1.toDuration(DurationUnit.SECONDS)
+        val PRINT_AT_LEAST = 0.toDuration(DurationUnit.SECONDS)
     }
 }
