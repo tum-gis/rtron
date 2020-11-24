@@ -18,7 +18,7 @@
 object PluginVersions {
     const val shadowjar = "6.1.0"
     const val xjc = "1.5"
-    const val versionChecker = "0.34.0"
+    const val versionChecker = "0.36.0"
     const val orchid = "0.21.1"
 }
 

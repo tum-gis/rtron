@@ -92,14 +92,14 @@ class Opendrive2RoadspacesTransformer(
     private fun transformRoadspacesSequentially(modelIdentifier: ModelIdentifier, opendriveModel: OpendriveModel,
                                                 progressBar: ProgressBar): List<Result<Roadspace, Exception>> =
         opendriveModel.road.map {
-            _roadspaceBuilder.buildRoadspace(modelIdentifier, it). also { progressBar.step() }
+            _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
         }
 
     private fun transformRoadspacesConcurrently(modelIdentifier: ModelIdentifier, opendriveModel: OpendriveModel,
                                                 progressBar: ProgressBar): List<Result<Roadspace, Exception>> {
         val roadspacesDeferred = opendriveModel.road.map {
             GlobalScope.async {
-                _roadspaceBuilder.buildRoadspace(modelIdentifier, it). also { progressBar.step() }
+                _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
             }
         }
         return runBlocking { roadspacesDeferred.map { it.await() } }

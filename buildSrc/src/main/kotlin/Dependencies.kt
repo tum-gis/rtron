@@ -18,7 +18,7 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.4.10"
+    const val kotlin = "1.4.20"
     const val coroutines = "1.4.1"
     const val result = "3.1.0"
     const val javaaxActivation = "1.1.1"
@@ -26,11 +26,11 @@ object DependencyVersions {
 
     // testing
     const val junit = "5.7.0"
-    const val assertj = "3.18.0"
+    const val assertj = "3.18.1"
     const val mockk = "1.10.2"
 
     // logging
-    const val log4j = "2.13.3"
+    const val log4j = "2.14.0"
     const val slf4jSimple = "1.7.30"
 
     // documentation
@@ -53,7 +53,7 @@ object DependencyVersions {
     const val emojiJava = "5.1.1"
 
     // math
-    const val guava = "29.0-jre"
+    const val guava = "30.0-jre"
     const val commonsMath = "3.6.1"
     const val joml = "1.9.25"
     const val poly2tri = "0.1.2"
