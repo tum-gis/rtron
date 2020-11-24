@@ -57,7 +57,7 @@ class ProgressBar(
     private fun printUpdate() {
         val elapsedTime = getElapsedTime()
         if (elapsedTime > PRINT_AFTER && getElapsedTimeSinceLastUpdate() > PRINT_AT_LEAST) {
-            print("$PREFIX $taskName $currentStatus/$completion ${getProgressPercent()}% " +
+            print("$PREFIX $taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% " +
                     "[ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]\r")
             lastPrintUpdateTime = System.currentTimeMillis()
         }
@@ -66,17 +66,16 @@ class ProgressBar(
     private fun getElapsedTimeSinceLastUpdate(): Duration =
             (System.currentTimeMillis() - lastPrintUpdateTime).toDuration(DurationUnit.MILLISECONDS)
 
-    private fun getProgressPercent(): Int =
-            (100.0 * (currentStatus.toFloat() / completion.toFloat())).roundToInt()
+    private fun getProgressPercent(): Double = 100.0 * (currentStatus.toDouble() / completion.toDouble())
 
     private fun getElapsedTime(): Duration =
             (System.currentTimeMillis() - startTime).toDuration(DurationUnit.MILLISECONDS)
 
     private fun getTotalEstimatedElapsedTime(): Duration =
-            getElapsedTime() * completion / currentStatus
+            getElapsedTime() * completion.toDouble() / currentStatus.toDouble()
 
     private fun getEstimatedTimeOfArrival(): Duration =
-            getElapsedTime() * ((completion / currentStatus) - 1)
+            getElapsedTime() * ((completion.toDouble() / currentStatus.toDouble()) - 1.0)
 
     companion object {
 
