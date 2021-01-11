@@ -12,7 +12,7 @@
 
 <p align="center">
     <a href="https://github.com/tum-gis/rtron/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/tum-gis/rtron?style=for-the-badge"></a>
-    <a href="https://travis-ci.org/github/tum-gis/rtron" title="Build Status"><img src="https://img.shields.io/travis/tum-gis/rtron?style=for-the-badge"></a>
+    <a href="https://github.com/tum-gis/rtron/actions" title="Build Status"><img src="https://img.shields.io/github/workflow/status/tum-gis/rtron/CI?style=for-the-badge"></a>
     <a href="./LICENSE" title="License"><img src="https://img.shields.io/github/license/tum-gis/rtron.svg?style=for-the-badge"></a>
 </p>
 
