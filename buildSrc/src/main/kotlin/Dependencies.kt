@@ -20,7 +20,7 @@ object DependencyVersions {
     // standard libraries
     const val kotlin = "1.4.21"
     const val coroutines = "1.4.2"
-    const val result = "3.1.0"
+    const val result = "4.0.0"
     const val javaaxActivation = "1.1.1"
     const val ktsRunner = "0.0.8"
 
@@ -38,7 +38,7 @@ object DependencyVersions {
 
     // object creation
     const val jaxb = "2.3.3"
-    const val jaxbApi = "2.3.1"
+    const val jaxbApi = "2.3.3"
     const val jaxbCore = "2.3.0.1"
 
     // object mapping
@@ -53,7 +53,7 @@ object DependencyVersions {
     const val emojiJava = "5.1.1"
 
     // math
-    const val guava = "30.0-jre"
+    const val guava = "30.1-jre"
     const val commonsMath = "3.6.1"
     const val joml = "1.10.0"
     const val poly2tri = "0.1.2"
@@ -84,7 +84,7 @@ object Dependencies {
     const val slf4jSimple = "org.slf4j:slf4j-simple:${DependencyVersions.slf4jSimple}"
 
     // object creation
-    const val jaxbApi = "javax.xml.bind:jaxb-api:${DependencyVersions.jaxbApi}"
+    const val jaxbApi = "jakarta.xml.bind:jakarta.xml.bind-api:${DependencyVersions.jaxbApi}"
     const val jaxbImpl = "com.sun.xml.bind:jaxb-impl:${DependencyVersions.jaxb}"
     const val jaxbXjc = "com.sun.xml.bind:jaxb-xjc:${DependencyVersions.jaxb}"
     const val jaxbCore = "com.sun.xml.bind:jaxb-core:${DependencyVersions.jaxbCore}"
