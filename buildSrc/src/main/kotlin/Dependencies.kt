@@ -21,7 +21,6 @@ object DependencyVersions {
     const val kotlin = "1.4.21"
     const val coroutines = "1.4.2"
     const val result = "4.0.0"
-    const val javaaxActivation = "1.1.1"
     const val ktsRunner = "0.0.8"
 
     // testing
@@ -37,8 +36,9 @@ object DependencyVersions {
     const val orchid = "0.21.1"
 
     // object creation
+    const val jakartaActivationApi = "2.0.0"
+    const val jakartaXmlBindApi = "2.3.3"
     const val jaxb = "2.3.3"
-    const val jaxbApi = "2.3.3"
     const val jaxbCore = "2.3.0.1"
 
     // object mapping
@@ -70,7 +70,6 @@ object Dependencies {
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${DependencyVersions.coroutines}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${DependencyVersions.kotlin}"
     const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
-    const val javaaxActivation = "javax.activation:activation:${DependencyVersions.javaaxActivation}"
     const val ktsRunner = "de.swirtz:ktsRunner:${DependencyVersions.ktsRunner}"
 
     // testing
@@ -84,7 +83,8 @@ object Dependencies {
     const val slf4jSimple = "org.slf4j:slf4j-simple:${DependencyVersions.slf4jSimple}"
 
     // object creation
-    const val jaxbApi = "jakarta.xml.bind:jakarta.xml.bind-api:${DependencyVersions.jaxbApi}"
+    const val jakartaActivationApi = "jakarta.activation:jakarta.activation-api:${DependencyVersions.jakartaActivationApi}"
+    const val jakartaXmlBindApi = "jakarta.xml.bind:jakarta.xml.bind-api:${DependencyVersions.jakartaXmlBindApi}"
     const val jaxbImpl = "com.sun.xml.bind:jaxb-impl:${DependencyVersions.jaxb}"
     const val jaxbXjc = "com.sun.xml.bind:jaxb-xjc:${DependencyVersions.jaxb}"
     const val jaxbCore = "com.sun.xml.bind:jaxb-core:${DependencyVersions.jaxbCore}"
