@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.curved.threed.surface
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.twod.point.CurveRelativePoint2D
+import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
@@ -49,10 +49,10 @@ class SectionedCurveRelativeParametricSurface3D(
     private val sectionStart = section.lowerEndpointResult().handleFailure { throw it.error }
 
     // Methods
-    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativePoint2D, addHeightOffset: Double):
+    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
             Result<Vector3D, Exception> {
 
-        val pointOnCompleteSurface = CurveRelativePoint2D(sectionStart + curveRelativePoint.curvePosition,
+        val pointOnCompleteSurface = CurveRelativeVector2D(sectionStart + curveRelativePoint.curvePosition,
                 curveRelativePoint.lateralOffset)
         return completeCurveRelativeSurface.calculatePointGlobalCS(pointOnCompleteSurface, addHeightOffset)
     }

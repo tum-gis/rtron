@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
@@ -46,17 +46,17 @@ class SectionedCurve2D(
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
     override val tolerance: Double get() = completeCurve.tolerance
-    private val sectionStart = CurveRelativePoint1D(section.lowerEndpointResult().handleFailure { throw it.error })
+    private val sectionStart = CurveRelativeVector1D(section.lowerEndpointResult().handleFailure { throw it.error })
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Vector2D, Exception> {
 
         val pointOnCompleteCurve = sectionStart + curveRelativePoint
         return completeCurve.calculatePointGlobalCS(pointOnCompleteCurve)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Rotation2D, Exception> {
 
         val pointOnCompleteCurve = sectionStart + curveRelativePoint

@@ -66,6 +66,8 @@ data class Optional<T>(
 
     companion object {
         fun <T> empty() = Optional<T>(null)
+
+        fun <T> of(result: Result<T, Exception>): Optional<T> = result.fold( { Optional(it) }, { empty() } )
     }
 }
 
@@ -73,7 +75,7 @@ inline fun <T, R> Optional<T>.map(transform: (T) -> R): Optional<R> =
     if (isEmpty()) Optional.empty()
     else Optional(transform(this.getOrNull()!!))
 
-fun <T> Optional<T>.getOrElse(defaultValue: T): T = getOrNull() ?: defaultValue
+infix fun <T> Optional<T>.getOrElse(defaultValue: T): T = getOrNull() ?: defaultValue
 
 
 /**

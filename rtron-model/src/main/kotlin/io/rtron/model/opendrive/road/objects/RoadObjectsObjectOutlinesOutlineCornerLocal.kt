@@ -17,12 +17,12 @@
 package io.rtron.model.opendrive.road.objects
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.euclidean.threed.curve.LineSegment3D
+import com.github.kittinunf.result.map
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
-import io.rtron.std.handleFailure
+import io.rtron.std.Optional
 
 
 class RoadObjectsObjectOutlinesOutlineCornerLocal(
@@ -38,16 +38,16 @@ class RoadObjectsObjectOutlinesOutlineCornerLocal(
 ) {
 
     // Methods
+    fun hasZeroHeight(): Boolean = !height.isFinite() || height == 0.0
+    fun hasPositiveHeight(): Boolean = !hasZeroHeight() && height > 0.0
+
     fun getBasePoint() = Vector3D.of(u, v, z)
     fun isSetBasePoint() = getBasePoint() is Result.Success
-    fun getHeadPoint() = Vector3D.of(u, v, z + height)
-    fun hasNonZeroHeight() = height.isFinite() && height != 0.0
+    fun getHeadPoint(): Optional<Vector3D> =
+        if (hasZeroHeight()) Optional.empty()
+        else Optional.of(Vector3D.of(u, v, z + height))
 
-    fun getVerticalBar(tolerance: Double): Result<LineSegment3D, Exception> {
-        val basePoint = getBasePoint().handleFailure { return it }
-        val headPoint = getHeadPoint().handleFailure { return it }
-
-        return Result.success(LineSegment3D(basePoint, headPoint, tolerance))
-    }
+    fun getPoints(): Result<Pair<Vector3D, Optional<Vector3D>>, Exception> =
+        getBasePoint().map { Pair(it, getHeadPoint()) }
 
 }

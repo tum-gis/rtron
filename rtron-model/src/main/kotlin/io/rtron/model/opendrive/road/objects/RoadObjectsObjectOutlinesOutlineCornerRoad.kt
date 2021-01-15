@@ -17,11 +17,13 @@
 package io.rtron.model.opendrive.road.objects
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
-import io.rtron.math.geometry.curved.threed.point.CurveRelativePoint3D
+import com.github.kittinunf.result.map
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
+import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
+import io.rtron.std.Optional
 
 
 class RoadObjectsObjectOutlinesOutlineCornerRoad(
@@ -36,18 +38,19 @@ class RoadObjectsObjectOutlinesOutlineCornerRoad(
         var id: Int = Int.MIN_VALUE
 ) {
     // Properties and Initializers
-    val curveRelativePosition get() = CurveRelativePoint1D(s)
+    val curveRelativePosition get() = CurveRelativeVector1D(s)
 
     // Methods
-    fun getBasePoint(): Result<CurveRelativePoint3D, IllegalArgumentException> =
-            CurveRelativePoint3D.of(s, t, dz)
+    fun hasZeroHeight(): Boolean = !height.isFinite() || height == 0.0
+    fun hasPositiveHeight(): Boolean = !hasZeroHeight() && height > 0.0
 
-    fun isSetBasePoint(): Boolean =
-            getBasePoint() is Result.Success
+    fun getBasePoint() = CurveRelativeVector3D.of(s, t, dz)
+    fun isSetBasePoint(): Boolean = getBasePoint() is Result.Success
+    fun getHeadPoint(): Optional<CurveRelativeVector3D> =
+        if (hasZeroHeight()) Optional.empty()
+        else Optional.of(CurveRelativeVector3D.of(s, t, dz + height))
 
-    fun getHeadPoint(): Result<CurveRelativePoint3D, IllegalArgumentException> =
-            CurveRelativePoint3D.of(s, t, dz + height)
-
-    fun hasNonZeroHeight(): Boolean = height.isFinite() && height != 0.0
+    fun getPoints(): Result<Pair<CurveRelativeVector3D, Optional<CurveRelativeVector3D>>, Exception> =
+        getBasePoint().map { Pair(it, getHeadPoint()) }
 
 }

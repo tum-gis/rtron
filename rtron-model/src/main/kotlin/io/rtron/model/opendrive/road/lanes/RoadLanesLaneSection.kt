@@ -17,7 +17,7 @@
 package io.rtron.model.opendrive.road.lanes
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
@@ -38,7 +38,7 @@ data class RoadLanesLaneSection(
         var singleSide: Boolean = false
 ) {
     // Properties and Initializers
-    val laneSectionStart get() = CurveRelativePoint1D(s)
+    val laneSectionStart get() = CurveRelativeVector1D(s)
 
     // Methods
     fun getNumberOfLanes() = left.getNumberOfLanes() + center.getNumberOfLanes() + right.getNumberOfLanes()

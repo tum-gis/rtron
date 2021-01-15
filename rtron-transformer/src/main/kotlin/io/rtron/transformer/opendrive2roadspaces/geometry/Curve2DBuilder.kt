@@ -18,7 +18,7 @@ package io.rtron.transformer.opendrive2roadspaces.geometry
 
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -110,7 +110,7 @@ class Curve2DBuilder(
                         endBoundType)
             }
             srcGeometry.isParamPoly3() && srcGeometry.paramPoly3.isNormalized() -> {
-                val parameterTransformation: (CurveRelativePoint1D) -> CurveRelativePoint1D = { it / length }
+                val parameterTransformation: (CurveRelativeVector1D) -> CurveRelativeVector1D = { it / length }
                 val baseCurve = ParametricCubicCurve2D(srcGeometry.paramPoly3.coefficientsU,
                         srcGeometry.paramPoly3.coefficientsV, 1.0, parameters.tolerance, affineSequence,
                         endBoundType)

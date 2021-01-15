@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -43,7 +43,7 @@ internal class CubicCurve2DTest {
             val affine = Affine2D.of(pose)
             val affineSequence = AffineSequence2D.of(affine)
             val curve = CubicCurve2D(coefficients, 1.0, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativePoint1D(1.0)
+            val curveRelativePoint = CurveRelativeVector1D(1.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -61,7 +61,7 @@ internal class CubicCurve2DTest {
             val affine = Affine2D.of(pose)
             val affineSequence = AffineSequence2D.of(affine)
             val curve = CubicCurve2D(coefficients, 1.0, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativePoint1D(1.0)
+            val curveRelativePoint = CurveRelativeVector1D(1.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 

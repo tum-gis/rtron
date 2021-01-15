@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
@@ -37,9 +37,9 @@ import io.rtron.math.range.fuzzyEncloses
  *
  */
 data class ParameterTransformedCurve2D(
-        private val baseCurve: AbstractCurve2D,
-        private val transformationFunction: (CurveRelativePoint1D) -> CurveRelativePoint1D,
-        override val domain: Range<Double>
+    private val baseCurve: AbstractCurve2D,
+    private val transformationFunction: (CurveRelativeVector1D) -> CurveRelativeVector1D,
+    override val domain: Range<Double>
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
@@ -50,8 +50,8 @@ data class ParameterTransformedCurve2D(
         require(domain.hasLowerBound() && domain.hasUpperBound())
         { "Domain must have lower and upper bound." }
 
-        val lowerEndpoint = transformationFunction(CurveRelativePoint1D(domain.lowerEndpointOrNull()!!))
-        val upperEndpoint = transformationFunction(CurveRelativePoint1D(domain.upperEndpointOrNull()!!))
+        val lowerEndpoint = transformationFunction(CurveRelativeVector1D(domain.lowerEndpointOrNull()!!))
+        val upperEndpoint = transformationFunction(CurveRelativeVector1D(domain.upperEndpointOrNull()!!))
         val transformedDomain = Range.range(domain.lowerBoundType(), lowerEndpoint.curvePosition,
                 domain.upperBoundType(), upperEndpoint.curvePosition)
         require(baseCurve.domain.fuzzyEncloses(transformedDomain, tolerance))
@@ -62,13 +62,13 @@ data class ParameterTransformedCurve2D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Vector2D, Exception> {
         val transformedPoint = transformationFunction(curveRelativePoint)
         return baseCurve.calculatePointGlobalCS(transformedPoint)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Rotation2D, Exception> {
         val transformedPoint = transformationFunction(curveRelativePoint)
         return baseCurve.calculateRotationGlobalCS(transformedPoint)

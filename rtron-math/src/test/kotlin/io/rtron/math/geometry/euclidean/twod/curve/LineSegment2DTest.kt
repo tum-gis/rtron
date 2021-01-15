@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
@@ -60,7 +60,7 @@ internal class LineSegment2DTest {
             val pointB = Vector2D(0.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
+            val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
             require(actualReturn is Result.Success)
@@ -73,7 +73,7 @@ internal class LineSegment2DTest {
             val pointB = Vector2D(1.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
+            val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
             require(actualReturn is Result.Success)
@@ -88,7 +88,7 @@ internal class LineSegment2DTest {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(10.0, 0.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
-            val curveRelativePoint = CurveRelativePoint1D(5.0)
+            val curveRelativePoint = CurveRelativeVector1D(5.0)
 
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
@@ -103,7 +103,7 @@ internal class LineSegment2DTest {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(1.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
-            val curveRelativePoint = CurveRelativePoint1D(sqrt(2.0))
+            val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -118,7 +118,7 @@ internal class LineSegment2DTest {
             val pointA = Vector2D(-1.0, 0.0)
             val pointB = Vector2D(0.0, 0.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
-            val curveRelativePoint = CurveRelativePoint1D(1.0)
+            val curveRelativePoint = CurveRelativeVector1D(1.0)
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
 

@@ -33,6 +33,8 @@ object LinearRing3DFactory {
      */
     fun buildFromVertices(vertices: List<Vector3D>, tolerance: Double):
             Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
+        require(vertices.isNotEmpty()) { "List of vertices must not be empty." }
+
         val infos = mutableListOf<String>()
 
         // remove end element, if start and end element are equal

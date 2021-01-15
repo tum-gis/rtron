@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.curved.threed.surface
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.twod.point.CurveRelativePoint2D
+import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Tolerable
@@ -41,7 +41,7 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @param addHeightOffset adds an additional height offset to the surface
      * @return point in cartesian coordinates
      */
-    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativePoint2D, addHeightOffset: Double = 0.0):
+    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double = 0.0):
             Result<Vector3D, Exception> {
 
         this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
@@ -56,6 +56,6 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @param addHeightOffset adds an additional height offset to the surface
      * @return point in cartesian coordinates
      */
-    abstract fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativePoint2D, addHeightOffset: Double):
+    abstract fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
             Result<Vector3D, Exception>
 }

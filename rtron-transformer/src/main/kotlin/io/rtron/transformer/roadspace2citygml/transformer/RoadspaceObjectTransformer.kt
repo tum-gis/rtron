@@ -21,8 +21,8 @@ import io.rtron.io.logging.Logger
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
+import io.rtron.std.mapAndHandleFailureOnOriginal
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.module.*
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
@@ -54,9 +54,9 @@ class RoadspaceObjectTransformer(
      * Transforms a list of [srcRoadspaceObjects] (RoadSpaces model) to the [AbstractCityObject] (CityGML model).
      */
     fun transformRoadspaceObjects(srcRoadspaceObjects: List<RoadspaceObject>): List<AbstractCityObject> =
-        srcRoadspaceObjects
-                .map { transformSingleRoadspaceObject(it) }
-                .handleAndRemoveFailure { _reportLogger.log(it) }
+        srcRoadspaceObjects.mapAndHandleFailureOnOriginal(
+            { transformSingleRoadspaceObject(it) },
+            { result, original -> _reportLogger.log(result, original.id.toString()) } )
 
     private fun transformSingleRoadspaceObject(srcRoadspaceObject: RoadspaceObject): Result<AbstractCityObject, Exception> {
         val geometryTransformer = createGeometryTransformer(srcRoadspaceObject)
@@ -73,6 +73,7 @@ class RoadspaceObjectTransformer(
 
     private fun createGeometryTransformer(srcRoadspaceObject: RoadspaceObject): GeometryTransformer {
         require(srcRoadspaceObject.geometry.size == 1)
+        { "Roadspace object must contain exactly one geometrical representation." }
         val currentGeometricPrimitive = srcRoadspaceObject.geometry.first()
 
         return GeometryTransformer(configuration.parameters, _reportLogger)

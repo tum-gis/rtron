@@ -19,7 +19,7 @@ package io.rtron.math.geometry.euclidean.twod.curve
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -71,13 +71,13 @@ class SpiralSegment2D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Vector2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.point }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Rotation2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.rotation }
 
-    private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativePoint1D):
+    private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D):
             Result<Pose2D, IllegalArgumentException> {
 
         val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)

@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON_4
@@ -98,7 +98,7 @@ internal class Arc2DTest {
         fun `calculate pose point on the start`() {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
+            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
             require(actualReturn is Result.Success)
@@ -108,7 +108,7 @@ internal class Arc2DTest {
         @Test
         fun `calculate pose point on the curve`() {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
-            val curveRelativePoint = CurveRelativePoint1D(HALF_PI)
+            val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -121,7 +121,7 @@ internal class Arc2DTest {
         fun `calculate pose angle on the start`() {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
+            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
             require(actualReturn is Result.Success)
@@ -131,7 +131,7 @@ internal class Arc2DTest {
         @Test
         fun `calculate pose angle on the curve`() {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
-            val curveRelativePoint = CurveRelativePoint1D(HALF_PI)
+            val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -154,7 +154,7 @@ internal class Arc2DTest {
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
+            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
             require(actualReturn is Result.Success)
@@ -168,7 +168,7 @@ internal class Arc2DTest {
             val affine = Affine2D.of(point, rotation)
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativePoint1D(HALF_PI)
+            val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -185,7 +185,7 @@ internal class Arc2DTest {
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(0.0125, 170.0, 0.0, affineSequence)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
+            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
             require(actualReturn is Result.Success)
@@ -201,7 +201,7 @@ internal class Arc2DTest {
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativePoint1D.ZERO)
+            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
             require(actualReturn is Result.Success)
@@ -215,7 +215,7 @@ internal class Arc2DTest {
             val affine = Affine2D.of(point, rotation)
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativePoint1D(HALF_PI)
+            val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -231,7 +231,7 @@ internal class Arc2DTest {
             val affine = Affine2D.of(point, rotation)
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativePoint1D(PI)
+            val curveRelativePoint = CurveRelativeVector1D(PI)
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 

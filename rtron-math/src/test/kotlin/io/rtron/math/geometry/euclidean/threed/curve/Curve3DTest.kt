@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.curve.LineSegment2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -42,7 +42,7 @@ internal class Curve3DTest {
             val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS, 0.0)
             val heightFunction = LinearFunction.X_AXIS
             val curve3D = Curve3D(curveXY, heightFunction)
-            val affine = curve3D.calculateAffine(CurveRelativePoint1D(0.5))
+            val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
                     .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, 1.0, 0.0)
 
@@ -57,7 +57,7 @@ internal class Curve3DTest {
             val heightFunction = LinearFunction.X_AXIS
             val torsionFunction = LinearFunction(0.0, QUARTER_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)
-            val affine = curve3D.calculateAffine(CurveRelativePoint1D(0.5))
+            val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
                     .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, sqrt(2.0), 0.0)
 
@@ -73,7 +73,7 @@ internal class Curve3DTest {
             val heightFunction = LinearFunction.X_AXIS
             val torsionFunction = LinearFunction(0.0, HALF_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)
-            val affine = curve3D.calculateAffine(CurveRelativePoint1D(0.5))
+            val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
                     .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, 1.0, 0.0)
 

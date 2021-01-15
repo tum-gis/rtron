@@ -47,10 +47,14 @@ class RoadObjectsObjectOutlinesOutline(
     /** Returns true, if the provided geometry information correspond to a linear ring. */
     fun isLinearRing() = isLinearRingDefinedByRoadCorners() || isLinearRingDefinedByLocalCorners()
 
-    fun isPolyhedronDefinedByRoadCorners() = cornerRoad.any { it.isSetBasePoint() && it.hasNonZeroHeight() }
-    fun isPolyhedronDefinedByLocalCorners() = cornerLocal.any { it.isSetBasePoint() && it.hasNonZeroHeight() }
+    fun isPolyhedronDefinedByRoadCorners() =
+        cornerRoad.isNotEmpty() && cornerRoad.any { it.isSetBasePoint() && it.hasPositiveHeight() }
+    fun isPolyhedronDefinedByLocalCorners() =
+        cornerLocal.isNotEmpty() && cornerLocal.any { it.isSetBasePoint() && it.hasPositiveHeight() }
 
-    fun isLinearRingDefinedByRoadCorners() = cornerRoad.any { it.isSetBasePoint() && !it.hasNonZeroHeight() }
-    fun isLinearRingDefinedByLocalCorners() = cornerLocal.any { it.isSetBasePoint() && !it.hasNonZeroHeight() }
+    fun isLinearRingDefinedByRoadCorners() =
+        cornerRoad.isNotEmpty() && cornerRoad.all { it.isSetBasePoint() && it.hasZeroHeight() }
+    fun isLinearRingDefinedByLocalCorners() =
+        cornerLocal.isNotEmpty() && cornerLocal.all { it.isSetBasePoint() && it.hasZeroHeight() }
 
 }

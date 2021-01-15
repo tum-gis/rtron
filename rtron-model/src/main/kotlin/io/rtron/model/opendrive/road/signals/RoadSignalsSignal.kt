@@ -16,7 +16,7 @@
 
 package io.rtron.model.opendrive.road.signals
 
-import io.rtron.math.geometry.curved.threed.point.CurveRelativePoint3D
+import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.common.*
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectLaneValidity
@@ -55,7 +55,7 @@ data class RoadSignalsSignal(
         var roll: Double = Double.NaN
 ) {
     // Properties and Initializers
-    val curveRelativePosition get() = CurveRelativePoint3D(s, t, zOffset)
+    val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
 
     /** Position of the object relative to the point on the road reference line */
     val referenceLinePointRelativePosition get() = Vector3D(0.0, t, zOffset)

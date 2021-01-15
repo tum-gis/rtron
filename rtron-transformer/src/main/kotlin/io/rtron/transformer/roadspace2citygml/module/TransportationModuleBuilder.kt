@@ -78,18 +78,19 @@ class TransportationModuleBuilder(
 
         when (type) {
             Type.TRAFFICAREA -> {
-                val trafficArea = TrafficArea()
-                        .apply { lod2MultiSurface = geometryTransformer.multiSurfaceProperty }
+                val trafficArea = TrafficArea().apply {
+                    lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it } }
                 val trafficAreaProperty = TrafficAreaProperty(trafficArea)
                 transportationComplex.trafficArea = listOf(trafficAreaProperty)
             }
             Type.AUXILARYTRAFFICAREA -> {
-                val auxiliaryTrafficArea = AuxiliaryTrafficArea()
-                        .apply { lod2MultiSurface = geometryTransformer.multiSurfaceProperty }
+                val auxiliaryTrafficArea = AuxiliaryTrafficArea().apply {
+                    lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it } }
                 val auxiliaryTrafficAreaProperty = AuxiliaryTrafficAreaProperty(auxiliaryTrafficArea)
                 transportationComplex.auxiliaryTrafficArea = listOf(auxiliaryTrafficAreaProperty)
             }
-            else -> transportationComplex.lod2MultiSurface = geometryTransformer.multiSurfaceProperty
+            else -> transportationComplex.lod2MultiSurface =
+                geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
         }
 
         return Result.success(transportationComplex)

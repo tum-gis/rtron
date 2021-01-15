@@ -81,9 +81,8 @@ class RoadspaceObjectBuilder(
 
         // get general object type and geometry representation
         val type = getObjectType(srcRoadObject)
-        val geometries =
-                buildGeometries(roadspaceObjectId, srcRoadObject, roadReferenceLine)
-                        .handleFailure { return it }
+        val geometries = buildGeometries(roadspaceObjectId, srcRoadObject, roadReferenceLine)
+            .handleFailure { return it }
 
         // build attributes
         val attributes = baseAttributes + buildAttributes(srcRoadObject)

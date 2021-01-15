@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
@@ -76,7 +76,7 @@ class LineSegment3D(
         return point.distance(projectedPoint)
     }
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Vector3D, IllegalArgumentException> {
 
         val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
@@ -103,6 +103,20 @@ class LineSegment3D(
         result = 31 * result + length.hashCode()
         result = 31 * result + domain.hashCode()
         return result
+    }
+
+    companion object {
+
+        /**
+         * Creates a [LineSegment3D], if [start] and [end] [Vector3D] are not fuzzily equal according to the [tolerance].
+         *
+         */
+        fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED):
+                Result<LineSegment3D, IllegalArgumentException> =
+            if (start.fuzzyEquals(end, tolerance))
+                Result.error(IllegalArgumentException("Start and end vector of a line segment must be different " +
+                        "according to the given tolerance."))
+            else Result.success(LineSegment3D(start, end, tolerance, endBoundType))
     }
 
 }

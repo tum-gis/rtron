@@ -23,10 +23,13 @@ package io.rtron.std
  * @param value actual object to be enriched by [messages]
  * @param messages the actual list of messages to be added to the object
  */
-data class ContextMessage<out V>(
+class ContextMessage<out V>(
         val value: V,
-        val messages: List<String> = emptyList()
+        messages: List<String> = emptyList()
 ) {
+
+    // Properties and Initializers
+    val messages = messages.filter { it.isNotBlank() }
 
     // Secondary Constructors
     constructor(value: V, message: String) : this(value, listOf(message))
@@ -34,6 +37,25 @@ data class ContextMessage<out V>(
     // Methods
     fun isEmpty() = messages.isEmpty()
     fun isNotEmpty() = messages.isNotEmpty()
+
+    fun appendMessages(messages: List<String>) = ContextMessage(this.value, this.messages + messages)
+    fun appendMessages(message: String) = ContextMessage(this.value, this.messages + message)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ContextMessage<*>) return false
+
+        if (value != other.value) return false
+        if (messages != other.messages) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = value?.hashCode() ?: 0
+        result = 31 * result + messages.hashCode()
+        return result
+    }
 }
 
 /**
@@ -60,3 +82,11 @@ inline fun <V : Any> List<ContextMessage<V>>.handleMessage(block: (ContextMessag
             block(it)
             it.value
         }
+
+/**
+ * Unwraps a list of [ContextMessage] to a single [ContextMessage] containing the list of values and messages.
+ *
+ * @receiver list of [ContextMessage] to be handled
+ * @return a [ContextMessage] containing all values and messages of the original list
+ */
+fun <V : Any> List<ContextMessage<V>>.unwrapMessages() = ContextMessage(map { it.value } , flatMap { it.messages } )

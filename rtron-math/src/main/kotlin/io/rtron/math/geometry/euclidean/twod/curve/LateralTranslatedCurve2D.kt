@@ -19,8 +19,8 @@ package io.rtron.math.geometry.euclidean.twod.curve
 import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
-import io.rtron.math.geometry.curved.twod.point.CurveRelativePoint2D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
+import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
@@ -52,7 +52,7 @@ data class LateralTranslatedCurve2D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Vector2D, Exception> {
 
         val curveAffine = baseCurve.calculatePoseGlobalCS(curveRelativePoint)
@@ -66,7 +66,7 @@ data class LateralTranslatedCurve2D(
         return Result.success(point)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Rotation2D, Exception> {
 
         val curveRotation = baseCurve.calculateRotationGlobalCS(curveRelativePoint)
@@ -97,13 +97,13 @@ data class LateralTranslatedCurve2D(
     /**
      * Returns the lateral translation at the [curveRelativePoint].
      */
-    private fun calculateTranslation(curveRelativePoint: CurveRelativePoint1D):
-            Result<CurveRelativePoint2D, Exception> {
+    private fun calculateTranslation(curveRelativePoint: CurveRelativeVector1D):
+            Result<CurveRelativeVector2D, Exception> {
 
         val translation = lateralTranslationFunction
                 .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
                 .handleFailure { return it }
-                .let { CurveRelativePoint2D(curveRelativePoint.curvePosition, it) }
+                .let { CurveRelativeVector2D(curveRelativePoint.curvePosition, it) }
 
         return Result.success(translation)
     }

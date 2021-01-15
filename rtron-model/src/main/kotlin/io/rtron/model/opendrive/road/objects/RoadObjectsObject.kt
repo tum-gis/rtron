@@ -17,7 +17,7 @@
 package io.rtron.model.opendrive.road.objects
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.threed.point.CurveRelativePoint3D
+import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -67,7 +67,7 @@ data class RoadObjectsObject(
         var radius: Double = Double.NaN
 ) {
     // Properties and Initializers
-    val curveRelativePosition get() = CurveRelativePoint3D(s, t, zOffset)
+    val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
 
     /** position of the object relative to the point on the road reference line */
     val referenceLinePointRelativePosition get() = Vector3D(0.0, t, zOffset)
@@ -81,17 +81,17 @@ data class RoadObjectsObject(
             Pose3D(referenceLinePointRelativePosition, referenceLinePointRelativeRotation)
 
     // Methods
-    fun getPolyhedronsDefinedByRoadCorners() =
-            if (height.isNaN() || height != 0.0) outlines.getPolyhedronsDefinedByRoadCorners() else emptyList()
+    fun getPolyhedronsDefinedByRoadCorners(): List<RoadObjectsObjectOutlinesOutline> =
+        outlines.getPolyhedronsDefinedByRoadCorners()
 
-    fun getPolyhedronsDefinedByLocalCorners() =
-            if (height.isNaN() || height != 0.0) outlines.getPolyhedronsDefinedByLocalCorners() else emptyList()
+    fun getPolyhedronsDefinedByLocalCorners(): List<RoadObjectsObjectOutlinesOutline> =
+        outlines.getPolyhedronsDefinedByLocalCorners()
 
-    fun getLinearRingsDefinedByRoadCorners() =
-            if (height.isNaN() || height == 0.0) outlines.getLinearRingsDefinedByRoadCorners() else emptyList()
+    fun getLinearRingsDefinedByRoadCorners(): List<RoadObjectsObjectOutlinesOutline> =
+        outlines.getLinearRingsDefinedByRoadCorners()
 
-    fun getLinearRingsDefinedByLocalCorners() =
-            if (height.isNaN() || height == 0.0) outlines.getLinearRingsDefinedByLocalCorners() else emptyList()
+    fun getLinearRingsDefinedByLocalCorners(): List<RoadObjectsObjectOutlinesOutline> =
+        outlines.getLinearRingsDefinedByLocalCorners()
 
 
     /** Returns true, if the provided geometry information correspond to a cuboid. */

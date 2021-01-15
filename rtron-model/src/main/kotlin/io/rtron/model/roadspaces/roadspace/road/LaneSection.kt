@@ -21,7 +21,7 @@ import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.range.Range
 import io.rtron.math.std.sign
 import io.rtron.std.getValueResult
@@ -60,7 +60,7 @@ data class LaneSection(
         { "There must be no gaps within the given laneIds." }
     }
 
-    val curvePositionStart get() = CurveRelativePoint1D(curvePositionDomain.lowerEndpointOrNull()!!)
+    val curvePositionStart get() = CurveRelativeVector1D(curvePositionDomain.lowerEndpointOrNull()!!)
     val laneList get() = lanes.toList().sortedBy { it.first }.map { it.second }
 
     // Secondary Constructors

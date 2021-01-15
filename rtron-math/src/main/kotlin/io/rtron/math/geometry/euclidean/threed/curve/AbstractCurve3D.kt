@@ -18,7 +18,7 @@ package io.rtron.math.geometry.euclidean.threed.curve
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -50,7 +50,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointLocalCS(curveRelativePoint: CurveRelativePoint1D): Result<Vector3D, Exception> {
+    fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Result<Vector3D, Exception> {
         this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
         return calculatePointLocalCSUnbounded(curveRelativePoint)
     }
@@ -62,7 +62,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    protected abstract fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    protected abstract fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Vector3D, Exception>
 
     /**
@@ -73,18 +73,18 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativePoint1D): Result<Vector3D, Exception> =
+    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Result<Vector3D, Exception> =
             calculatePointLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
 
     /**
      * Returns the start point in the global cartesian coordinate system that is located on this curve.
      */
-    fun calculateStartPointGlobalCS() = calculatePointGlobalCS(CurveRelativePoint1D.ZERO)
+    fun calculateStartPointGlobalCS() = calculatePointGlobalCS(CurveRelativeVector1D.ZERO)
 
     /**
      * Returns the end point in the global cartesian coordinate system that is located on this curve.
      */
-    fun calculateEndPointGlobalCS() = calculatePointGlobalCS(CurveRelativePoint1D(length))
+    fun calculateEndPointGlobalCS() = calculatePointGlobalCS(CurveRelativeVector1D(length))
 
     /**
      * Returns a list of points on the curve with a step size of [step].
@@ -95,7 +95,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      */
     fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true): Result<List<Vector3D>, Exception>
             = domain.arrange(step, includeEndPoint, tolerance)
-            .map(::CurveRelativePoint1D)
+            .map(::CurveRelativeVector1D)
             .map { calculatePointGlobalCS(it) }
             .handleFailure { return it }
             .let { Result.success(it) }

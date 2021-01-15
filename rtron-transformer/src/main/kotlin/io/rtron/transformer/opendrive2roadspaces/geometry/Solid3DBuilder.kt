@@ -19,7 +19,6 @@ package io.rtron.transformer.opendrive2roadspaces.geometry
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
-import io.rtron.math.geometry.euclidean.threed.curve.LineSegment3D
 import io.rtron.math.geometry.euclidean.threed.solid.Cuboid3D
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
@@ -32,10 +31,7 @@ import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutlineCornerRoad
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
-import io.rtron.std.ContextMessage
-import io.rtron.std.handleAndRemoveFailure
-import io.rtron.std.handleFailure
-import io.rtron.std.handleMessage
+import io.rtron.std.*
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
@@ -117,32 +113,38 @@ class Solid3DBuilder(
         require(srcOutline.isPolyhedronDefinedByRoadCorners())
         { "Outline does not contain a polyhedron represented by road corners." }
 
-        val verticalBars = srcOutline.cornerRoad
-                .map { buildVerticalBar(it, referenceLine) }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
-        return Polyhedron3DFactory.buildFromVerticalBars(verticalBars, parameters.tolerance)
+        val validCornerRoadElements = srcOutline.cornerRoad.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
+        if (validCornerRoadElements.size < srcOutline.cornerRoad.size)
+            reportLogger.info("Removing at least one outline element due to a negative height value.",
+                id.toString())
+
+        val verticalOutlineElements = validCornerRoadElements
+            .map { buildVerticalOutlineElement(it, referenceLine) }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
+
+        return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, parameters.tolerance)
     }
 
     /**
-     * Builds a vertical bar from OpenDRIVE's road corner element and it's height.
+     * Builds a vertical outline element from OpenDRIVE's road corner element and it's height.
      *
      * @param srcCornerRoad road corner element of OpenDRIVE which defines one corner of a road object
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      */
-    private fun buildVerticalBar(srcCornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad, roadReferenceLine: Curve3D):
-            Result<LineSegment3D, Exception> {
+    private fun buildVerticalOutlineElement(srcCornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad,
+                                            roadReferenceLine: Curve3D):
+            Result<Polyhedron3DFactory.VerticalOutlineElement, Exception> {
 
-        val affine = roadReferenceLine.calculateAffine(srcCornerRoad.curveRelativePosition)
-                .handleFailure { return it }
-        val basePoint = srcCornerRoad.getBasePoint()
-                .handleFailure { return it }
-                .let { affine.transform(it.getCartesianCurveOffset()) }
-        val headPoint = srcCornerRoad.getHeadPoint()
-                .handleFailure { return it }
-                .let { affine.transform(it.getCartesianCurveOffset()) }
+        val curveRelativeOutlineElementGeometry = srcCornerRoad.getPoints()
+            .handleFailure { return it }
 
-        val lineSegment3D = LineSegment3D(basePoint, headPoint, parameters.tolerance)
-        return Result.success(lineSegment3D)
+        val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
+            .handleFailure { return it }
+        val headPoint = curveRelativeOutlineElementGeometry.second
+            .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
+
+        val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint)
+        return Result.success(verticalOutlineElement)
     }
 
     /**
@@ -173,11 +175,18 @@ class Solid3DBuilder(
         require(srcOutline.isPolyhedronDefinedByLocalCorners())
         { "Outline does not contain a polyhedron represented by local corners." }
 
-        val verticalBars = srcOutline.cornerLocal
-                .map { it.getVerticalBar(parameters.tolerance) }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing vertical bar.") }
+        val validCornerLocalElements = srcOutline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
+        if (validCornerLocalElements.size < srcOutline.cornerLocal.size)
+            reportLogger.info("Removing at least one outline element due to a negative height value.",
+                id.toString())
 
-        return Polyhedron3DFactory.buildFromVerticalBars(verticalBars, parameters.tolerance)
+        val verticalOutlineElements = validCornerLocalElements
+            .map { it.getPoints() }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
+            .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, Optional.empty(), parameters.tolerance) }
+            .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
+
+        return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, parameters.tolerance)
     }
 
     /**

@@ -17,7 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
@@ -42,7 +42,7 @@ internal class ParametricCubicCurve2DTest {
             val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0)
-            val curveRelativePoint = CurveRelativePoint1D(2.0)
+            val curveRelativePoint = CurveRelativeVector1D(2.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -58,7 +58,7 @@ internal class ParametricCubicCurve2DTest {
             val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(QUARTER_PI))
             val affineSequence = AffineSequence2D.of(affine)
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativePoint1D(sqrt(2.0))
+            val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -75,7 +75,7 @@ internal class ParametricCubicCurve2DTest {
             val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(PI))
             val affineSequence = AffineSequence2D.of(affine)
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativePoint1D(2.0)
+            val curveRelativePoint = CurveRelativeVector1D(2.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 
@@ -90,7 +90,7 @@ internal class ParametricCubicCurve2DTest {
             val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
             val length = 1.479
-            val curveRelativePoint = CurveRelativePoint1D(length)
+            val curveRelativePoint = CurveRelativeVector1D(length)
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, length, 0.0)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)

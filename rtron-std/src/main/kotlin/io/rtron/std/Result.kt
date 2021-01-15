@@ -130,3 +130,22 @@ fun <V : Any?> List<V>.getValueResult(index: Int): Result<V, IllegalArgumentExce
     val value = this.getOrNull(index) ?: return Result.error(IllegalArgumentException("List does not contain index."))
     return Result.success(value)
 }
+
+/**
+ * Map a list of [T] with [transform] and handle the [Result.Failure] with [failureHandler].
+ * The [failureHandler] has access to the [Result.Failure] as well as to the original [T].
+ *
+ * @receiver the list to be mapped
+ * @param transform mapping function from [T] to [Result]
+ * @param failureHandler the handler of a [Result.Failure] with access to the original [T]
+ * @return the list of values which have been successfully [Result.Success] transformed by [transform]
+ */
+inline fun <T, V : Any?, E : Exception> Iterable<T>.mapAndHandleFailureOnOriginal(transform: (T) -> Result<V, E>,
+    failureHandler: (result: (Result.Failure<E>), original: T) -> Unit): List<V> = fold(emptyList()) { acc, element ->
+            when (val result = transform(element)) {
+                is Result.Success -> acc + result.value
+                is Result.Failure -> {
+                    failureHandler(result, element); acc
+                }
+            }
+        }

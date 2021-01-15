@@ -18,7 +18,7 @@ package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.BoundType
@@ -64,7 +64,7 @@ class ParametricCubicCurve2D(
     override val domain: Range<Double> = Range.closedX(0.0, length, endBoundType)
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Vector2D, Exception> {
 
         val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition)
@@ -74,7 +74,7 @@ class ParametricCubicCurve2D(
         return Result.success(Vector2D(x, y))
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D):
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
             Result<Rotation2D, Exception> {
 
         val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition)

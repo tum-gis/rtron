@@ -17,12 +17,13 @@
 package io.rtron.math.processing
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.geometry.euclidean.threed.curve.LineSegment3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.Polyhedron3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.processing.triangulation.ExperimentalTriangulator
 import io.rtron.math.processing.triangulation.Triangulator
+import io.rtron.math.range.Tolerable
+import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.std.*
 
 
@@ -33,129 +34,212 @@ import io.rtron.std.*
 object Polyhedron3DFactory {
 
     /**
-     * Builds a [Polyhedron3D] based on a list of vertical bars. Each vertical bar is represented as [LineSegment3D]
-     * and various preparation steps are conducted to return a valid polyhedron.
+     * Builds a [Polyhedron3D] from a list of [VerticalOutlineElement], which define the boundary of the [Polyhedron3D].
      *
-     * @param verticalBars list of vertical bars whereby the start points define the polyhedron's base polygon and the
-     * end points define the polyhedron's top polygon
-     * @return resulting [Polyhedron3D] wrapped in a [ContextMessage] in case of processing log messages
+     * @param outlineElements vertical line segments or points bounding the polyhedron
      */
     @OptIn(ExperimentalTriangulator::class)
-    fun buildFromVerticalBars(verticalBars: List<LineSegment3D>, tolerance: Double):
+    fun buildFromVerticalOutlineElements(outlineElements: List<VerticalOutlineElement>, tolerance: Double):
             Result<ContextMessage<Polyhedron3D>, Exception> {
 
-        val preparedBars = prepareBars(verticalBars).handleFailure { return it }
-
-        // zip with consecutively following elements
-        val barZips = preparedBars.value.zipWithConsecutivesEnclosing { it.start }
-        require(barZips.all { it.size == 1 || it.size == 2 })
-        { "Prepared vertical bar zips must have either one or two elements." }
+        // prepare vertical outline elements
+        val preparedOutlineElementsWithContext = prepareOutlineElements(outlineElements, tolerance)
+            .handleFailure { return it }
+        val messages = preparedOutlineElementsWithContext.messages
+        val preparedOutlineElements = preparedOutlineElementsWithContext.value
 
         // construct faces
-        val baseFace = LinearRing3D(barZips.reversed().map { it.first().start }, tolerance)
-        val topFace = LinearRing3D(barZips.map { it.first().end }, tolerance)
-        val sideFaces = barZips
-                .zipWithNextEnclosing()
-                .map { SideFaceBoundaries(it.first, it.second) }
-                .map { it.constructSideFace(tolerance) }
+        val baseFace = LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }, tolerance)
+        val topFace = LinearRing3D(preparedOutlineElements.flatMap { it.getHighestPointAdjacentToTheTop() }, tolerance)
+        val sideFaces: List<LinearRing3D> = preparedOutlineElements
+            .zipWithNextEnclosing()
+            .flatMap { buildSideFace(it.first, it.second, tolerance).toList() }
 
+        // triangulate faces
         val triangulatedFaces = (sideFaces + baseFace + topFace)
-                .map { Triangulator.triangulate(it, tolerance) }
-                .handleFailure { return it }
-                .flatten()
+            .map { Triangulator.triangulate(it, tolerance) }
+            .handleFailure { return it }
+            .flatten()
 
-        val polyhedron = Polyhedron3D(triangulatedFaces, tolerance)
-        return Result.success(ContextMessage(polyhedron, preparedBars.messages))
+        val polyhedron = ContextMessage(Polyhedron3D(triangulatedFaces, tolerance), messages)
+        return Result.success(polyhedron)
     }
 
     /**
-     * Preparation and cleanup of [verticalBars] including the removal of duplicates and error messaging.
+     * A vertical outline element is represented by a [basePoint] and an optional [leftHeadPoint] and [rightHeadPoint].
+     * The [basePoint] defines the bound of the base surface
+     *
+     * @param basePoint base point of the outline element
+     * @param leftHeadPoint left head point representing the bound point of the side surface to the left
+     * @param rightHeadPoint right head point representing the bound point of the side surface to the right
      */
-    private fun prepareBars(verticalBars: List<LineSegment3D>): Result<ContextMessage<List<LineSegment3D>>, Exception> {
+    data class VerticalOutlineElement(
+        val basePoint: Vector3D,
+        val leftHeadPoint: Optional<Vector3D>,
+        val rightHeadPoint: Optional<Vector3D> = Optional.empty(),
+        override val tolerance: Double = DEFAULT_TOLERANCE
+    ): Tolerable {
+
+        // Properties and Initializers
+        init {
+            if (rightHeadPoint.isPresent())
+                require(leftHeadPoint.isPresent())
+                { "Left head point must be present, if right head point is present." }
+
+            if (leftHeadPoint.isPresent()) {
+                val leftHeadPointValue = leftHeadPoint.getResult().handleFailure { throw it.error }
+                require(!basePoint.fuzzyEquals(leftHeadPointValue, tolerance))
+                { "Left head point must not be fuzzily equal to base point." }
+
+                if (rightHeadPoint.isPresent()) {
+                    val rightHeadPointValue = rightHeadPoint.getResult().handleFailure { throw it.error }
+                    require(!basePoint.fuzzyEquals(rightHeadPointValue, tolerance))
+                    { "Right head point must not be fuzzily equal to base point." }
+
+                    require(!leftHeadPointValue.fuzzyEquals(rightHeadPointValue))
+                    { "Left head point must not be fuzzily equal to the right point." }
+                }
+            }
+        }
+
+        private val leftLength: Double get() = leftHeadPoint.map { basePoint.distance(it) } getOrElse 0.0
+        private val rightLength: Double get() = rightHeadPoint.map { basePoint.distance(it) } getOrElse 0.0
+
+        // Methods
+        fun containsHeadPoint() = leftHeadPoint.isPresent() || rightHeadPoint.isPresent()
+        fun containsOneHeadPoint() = leftHeadPoint.isPresent() && rightHeadPoint.isEmpty()
+
+        fun getVerticesAsLeftBoundary(): List<Vector3D> {
+            val midPoint = if (containsOneHeadPoint() || leftLength < rightLength) leftHeadPoint.toList()
+            else emptyList()
+            return listOf(basePoint) + midPoint + rightHeadPoint.toList()
+        }
+
+        fun getVerticesAsRightBoundary(): List<Vector3D> {
+            val midPoint = if (leftLength > rightLength) rightHeadPoint.toList() else emptyList()
+            return listOf(basePoint) + midPoint + leftHeadPoint.toList()
+        }
+
+        fun getHeadPointAdjacentToTheRight() = if (rightHeadPoint.isPresent()) rightHeadPoint else leftHeadPoint
+
+        fun getHighestPointAdjacentToTheTop(): List<Vector3D> =
+            if (containsHeadPoint()) leftHeadPoint.toList() + rightHeadPoint.toList()
+            else listOf(basePoint)
+
+        companion object {
+
+            fun of(basePoint: Vector3D, leftHeadPoint: Optional<Vector3D>, rightHeadPoint: Optional<Vector3D>,
+                   tolerance: Double): ContextMessage<VerticalOutlineElement> {
+
+                val infos = mutableListOf<String>()
+                val headPoints = leftHeadPoint.toList() + rightHeadPoint.toList()
+
+                // remove head points that are fuzzily equal to base point
+                val prepHeadPoints = headPoints.filter { !it.fuzzyEquals(basePoint, tolerance) }
+                if (prepHeadPoints.size < headPoints.size)
+                    infos += "Height of outline element must be above tolerance."
+
+                if (prepHeadPoints.size <= 1)
+                    return ContextMessage(of(basePoint, prepHeadPoints, tolerance), infos)
+
+                // if head points are fuzzily equal, take only one
+                return if (prepHeadPoints.first().fuzzyEquals(prepHeadPoints.last(), tolerance))
+                    ContextMessage(of(basePoint, prepHeadPoints.take(1), tolerance), infos)
+                else ContextMessage(of(basePoint, prepHeadPoints, tolerance), infos)
+            }
+
+            /**
+             * Returns a [VerticalOutlineElement] based on a provided list of [headPoints].
+             *
+             * @param basePoint base point of the outline element
+             * @param headPoints a maximum number of two head points must be provided
+             * @param tolerance allowed tolerance
+             */
+            fun of(basePoint: Vector3D, headPoints: List<Vector3D>, tolerance: Double): VerticalOutlineElement {
+                require(headPoints.size <= 2) { "Must contain not more than two head points." }
+
+                val leftHeadPoint = if (headPoints.isNotEmpty()) Optional(headPoints.first()) else Optional.empty()
+                val rightHeadPont = if (headPoints.size == 2) Optional(headPoints.last()) else Optional.empty()
+
+                return VerticalOutlineElement(basePoint, leftHeadPoint, rightHeadPont, tolerance)
+            }
+
+            /**
+             * Returns a [VerticalOutlineElement] by merging a list of [elements].
+             *
+             * @param elements list of [VerticalOutlineElement] which must all contain the same base point
+             * @param tolerance allowed tolerance
+             */
+            fun of(elements: List<VerticalOutlineElement>, tolerance: Double): ContextMessage<VerticalOutlineElement> {
+                require(elements.isNotEmpty())
+                { "List of elements must not be empty." }
+                require(elements.drop(1).all { it.basePoint == elements.first().basePoint })
+                { "All elements must have the same base point." }
+
+                if (elements.size == 1)
+                    return ContextMessage(elements.first())
+
+                val message = if (elements.size > 2) "Contains more than two consecutively following outline " +
+                        "element duplicates." else ""
+
+                val basePoint = elements.first().basePoint
+                val leftHeadPoint = elements.first().leftHeadPoint
+                val rightHeadPoint = elements.last().getHeadPointAdjacentToTheRight()
+
+                return of(basePoint, leftHeadPoint, rightHeadPoint, tolerance).appendMessages(message)
+            }
+        }
+    }
+
+    /**
+     * Builds a side face, whereas the [leftElement] and [rightElement] represent the boundaries.
+     * Furthermore, the height of the previous or succeeding side face is taken into account, since it has an effect
+     * on the vertices of the side face in focus.
+     *
+     * @param leftElement left boundary of side surface to be constructed
+     * @param rightElement right boundary of side surface to be constructed
+     * @param tolerance allowed tolerance
+     */
+    private fun buildSideFace(leftElement: VerticalOutlineElement, rightElement: VerticalOutlineElement,
+                              tolerance: Double): Optional<LinearRing3D> {
+
+        if (!leftElement.containsHeadPoint() && !rightElement.containsHeadPoint())
+            return Optional.empty()
+
+        val vertices = rightElement.getVerticesAsRightBoundary() + leftElement.getVerticesAsLeftBoundary().reversed()
+        val linearRing = LinearRing3D(vertices, tolerance)
+        return Optional(linearRing)
+    }
+
+    /**
+     * Preparation and cleanup of [verticalOutlineElements] including the removal of duplicates and error messaging.
+     */
+    private fun prepareOutlineElements(verticalOutlineElements: List<VerticalOutlineElement>, tolerance: Double):
+            Result<ContextMessage<List<VerticalOutlineElement>>, Exception> {
+
         val infos = mutableListOf<String>()
 
-        // remove end element, if start and end element are equal
-        val barsWithoutClosing = if (verticalBars.first() == verticalBars.last())
-            verticalBars.dropLast(1) else verticalBars
-
         // remove consecutively following line segment duplicates
-        val barsWithoutDuplicates = barsWithoutClosing.distinctConsecutiveEnclosing { it }
-        if (barsWithoutDuplicates.size < barsWithoutClosing.size)
+        val elementsWithoutDuplicates = verticalOutlineElements.distinctConsecutiveEnclosing { it }
+        if (elementsWithoutDuplicates.size < verticalOutlineElements.size)
             infos += "Removing at least one consecutively following line segment duplicate."
 
         // if there are not enough points to construct a polyhedron
-        if (barsWithoutDuplicates.size < 3)
+        if (elementsWithoutDuplicates.size < 3)
             return Result.error(IllegalStateException("A polyhedron requires at least three valid outline elements."))
 
         // remove consecutively following side duplicates of the form (…, A, B, A, …)
-        val cleanedBars =
-                barsWithoutDuplicates.filterWindowedEnclosing(listOf(false, true, true)) { it[0] == it[2] }
-        if (cleanedBars.size < barsWithoutDuplicates.size)
+        val cleanedElements = elementsWithoutDuplicates
+            .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
+        if (cleanedElements.size < elementsWithoutDuplicates.size)
             infos += "Removing consecutively following side duplicates of the form (…, A, B, A, …)."
 
-        // remove all elements that are surrounded by two outline elements (all having the same starting point)
-        val preparedBars = cleanedBars.filterWindowedEnclosing(listOf(false, true, false))
-            { it[0].start == it[1].start && it[1].start == it[2].start }
-        if (preparedBars.size < cleanedBars.size)
-            infos += "Removing elements that are surrounded by outline elements having the same starting point."
+        val elements: ContextMessage<List<VerticalOutlineElement>> = cleanedElements
+            .zipWithConsecutivesEnclosing { it.basePoint }
+            .map { VerticalOutlineElement.of(it, tolerance) }
+            .unwrapMessages()
 
-        return Result.success(ContextMessage(preparedBars, infos))
-    }
-
-    /**
-     * Helper class for constructing the linear rings based on a list vertical bars.
-     * The left and right boundary of the face to be constructed might be represented by multiple vertical bars.
-     *
-     * @param leftVerticalBars list of vertical bars defining the left side of the linear ring
-     * @param rightVerticalBars list of vertical bars defining the right side of the linear ring
-     */
-    private data class SideFaceBoundaries(
-            private val leftVerticalBars: List<LineSegment3D>,
-            private val rightVerticalBars: List<LineSegment3D>
-    ) {
-
-        init {
-            require(leftVerticalBars.size == 1 || leftVerticalBars.size == 2)
-            { "Requiring one or two left vertical bars to construct a side face." }
-            require(rightVerticalBars.size == 1 || rightVerticalBars.size == 2)
-            { "Requiring one or two right vertical bars to construct a side face." }
-            require(leftVerticalBars.all { leftVerticalBars.first().start == it.start })
-            { "All left vertical bars must have the same starting point." }
-            require(rightVerticalBars.all { rightVerticalBars.first().start == it.start })
-            { "All right vertical bars must have the same starting point." }
-        }
-
-        /**
-         * Constructs the side face represented as [LinearRing3D].
-         */
-        fun constructSideFace(tolerance: Double): LinearRing3D {
-            val vertices = getVerticesOfRightLeg() + getVerticesOfLeftLegReversed()
-            return LinearRing3D(vertices, tolerance)
-        }
-
-        private fun isCurrentFaceHigherThanPrevious() =
-                leftVerticalBars.first().length < leftVerticalBars.last().length
-
-        private fun isCurrentFaceHigherThanNext() =
-                rightVerticalBars.first().length > rightVerticalBars.last().length
-
-        /**
-         * Returns the list of vertices of the left leg in a reversed order for easier side face construction.
-         * The inclusion of vertices depends on whether the current face is higher than the previous.
-         */
-        private fun getVerticesOfLeftLegReversed(): List<Vector3D> =
-                if (isCurrentFaceHigherThanPrevious())
-                    listOf(leftVerticalBars.last().end, leftVerticalBars.first().end, leftVerticalBars.last().start)
-                else listOf(leftVerticalBars.last().end, leftVerticalBars.last().start)
-
-        /**
-         * Returns the list of vertices of the right leg.
-         * The inclusion of vertices depends on whether the current face is higher than the next.
-         */
-        private fun getVerticesOfRightLeg(): List<Vector3D> =
-                if (isCurrentFaceHigherThanNext())
-                    listOf(rightVerticalBars.first().start, rightVerticalBars.last().end, rightVerticalBars.first().end)
-                else listOf(rightVerticalBars.first().start, rightVerticalBars.first().end)
+        return Result.success(elements)
     }
 
 }

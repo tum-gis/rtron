@@ -18,7 +18,7 @@ package io.rtron.math.geometry.euclidean.twod.curve
 
 import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
@@ -84,7 +84,7 @@ internal class CompositeCurve2DTest {
             val absoluteStarts = curveMembers.map { it.length }.cumulativeSum()
             val absoluteDomains = absoluteStarts.zipWithNext().map { Range.closedOpen(it.first, it.second) }
             val compositeCurve = CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts.dropLast(1))
-            val curveRelativePoint = CurveRelativePoint1D(compositeCurve.length)
+            val curveRelativePoint = CurveRelativeVector1D(compositeCurve.length)
 
 
             val actualPoint = compositeCurve.calculatePoseGlobalCS(curveRelativePoint)

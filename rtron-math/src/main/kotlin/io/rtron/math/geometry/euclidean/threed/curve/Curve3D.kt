@@ -20,7 +20,9 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
+import io.rtron.math.geometry.curved.threed.curve.CurveRelativeLineSegment3D
+import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -59,7 +61,7 @@ data class Curve3D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativePoint1D): Result<Vector3D, Exception> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Result<Vector3D, Exception> {
 
         val pointXY = curveXY.calculatePointGlobalCS(curveRelativePoint)
                 .handleFailure { throw it.error }
@@ -75,7 +77,7 @@ data class Curve3D(
      * @param curveRelativePoint pose is calculated on the [curveRelativePoint]
      * @return pose whereby the orientation is tangential to this curve and its torsion
      */
-    fun calculatePose(curveRelativePoint: CurveRelativePoint1D): Result<Pose3D, Exception> {
+    fun calculatePose(curveRelativePoint: CurveRelativeVector1D): Result<Pose3D, Exception> {
         this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
 
         val poseXY = curveXY.calculatePoseGlobalCS(curveRelativePoint)
@@ -97,8 +99,32 @@ data class Curve3D(
      * @param curveRelativePoint affine transformation matrix is calculated on the [curveRelativePoint]
      * @return affine transformation matrix whereby the orientation is tangential to this curve and its torsion
      */
-    fun calculateAffine(curveRelativePoint: CurveRelativePoint1D): Result<Affine3D, Exception> =
+    fun calculateAffine(curveRelativePoint: CurveRelativeVector1D): Result<Affine3D, Exception> =
             calculatePose(curveRelativePoint).map { Affine3D.of(it) }
+
+    /**
+     * Transforms the [curveRelativePoint] (relative to this curve) to a [Vector3D] in cartesian coordinates.
+     *
+     * @param curveRelativePoint point in curve relative coordinates
+     * @return point in cartesian coordinates
+     */
+    fun transform(curveRelativePoint: CurveRelativeVector3D): Result<Vector3D, Exception> {
+        val affine = calculateAffine(curveRelativePoint.toCurveRelative1D()).handleFailure { return it }
+        val vector = affine.transform(curveRelativePoint.getCartesianCurveOffset())
+        return Result.success(vector)
+    }
+
+    /**
+     * Transforms the [curveRelativeLineSegment] (relative to this curve) to a [LineSegment3D] in cartesian coordinates.
+     *
+     * @param curveRelativeLineSegment line segment in curve relative coordinates
+     * @return line segment in cartesian coordinates
+     */
+    fun transform(curveRelativeLineSegment: CurveRelativeLineSegment3D): Result<LineSegment3D, Exception> {
+        val start = transform(curveRelativeLineSegment.start).handleFailure { return it }
+        val end = transform(curveRelativeLineSegment.end).handleFailure { return it }
+        return LineSegment3D.of(start, end, curveRelativeLineSegment.tolerance, endBoundType)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

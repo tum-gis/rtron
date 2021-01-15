@@ -21,7 +21,7 @@ import io.rtron.io.csv.CSVPrinter
 import io.rtron.io.files.Path
 import io.rtron.math.analysis.Fresnel
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.curved.oned.point.CurveRelativePoint1D
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.curve.Spiral2D
 import io.rtron.math.geometry.euclidean.twod.curve.SpiralSegment2D
 import io.rtron.math.range.Range
@@ -47,7 +47,7 @@ object SpiralSegment2DWriter {
         val spiralSegment = SpiralSegment2D(curvatureRange, 0.0, AffineSequence2D.EMPTY)
 
         for (currentPosition in curvatureRange.domain.arrange(0.1, false, 0.0)) {
-            val ret = spiralSegment.calculatePoseGlobalCS(CurveRelativePoint1D(currentPosition))
+            val ret = spiralSegment.calculatePoseGlobalCS(CurveRelativeVector1D(currentPosition))
             require(ret is Result.Success)
             csvPrinter.printRecord(currentPosition.toString(), ret.value.point.x.toString(), ret.value.point.y.toString())
         }

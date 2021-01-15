@@ -16,8 +16,8 @@
 
 package io.rtron.math.geometry.curved.oned.point
 
-import io.rtron.math.geometry.curved.threed.point.CurveRelativePoint3D
-import io.rtron.math.geometry.curved.twod.point.CurveRelativePoint2D
+import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
+import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 
 
 /**
@@ -26,9 +26,9 @@ import io.rtron.math.geometry.curved.twod.point.CurveRelativePoint2D
  *
  * @param curvePosition distance between the start of the curve and the point to be referenced
  */
-data class CurveRelativePoint1D(
+data class CurveRelativeVector1D(
         val curvePosition: Double
-) : Comparable<CurveRelativePoint1D> {
+) : Comparable<CurveRelativeVector1D> {
 
     // Properties and Initializers
     init {
@@ -36,22 +36,22 @@ data class CurveRelativePoint1D(
     }
 
     // Operators
-    operator fun plus(v: CurveRelativePoint1D) = CurveRelativePoint1D(this.curvePosition + v.curvePosition)
-    operator fun minus(v: CurveRelativePoint1D) = CurveRelativePoint1D(this.curvePosition - v.curvePosition)
-    operator fun times(m: Double) = CurveRelativePoint1D(this.curvePosition * m)
-    operator fun div(m: Double) = CurveRelativePoint1D(this.curvePosition / m)
+    operator fun plus(v: CurveRelativeVector1D) = CurveRelativeVector1D(this.curvePosition + v.curvePosition)
+    operator fun minus(v: CurveRelativeVector1D) = CurveRelativeVector1D(this.curvePosition - v.curvePosition)
+    operator fun times(m: Double) = CurveRelativeVector1D(this.curvePosition * m)
+    operator fun div(m: Double) = CurveRelativeVector1D(this.curvePosition / m)
 
-    override fun compareTo(other: CurveRelativePoint1D): Int = curvePosition.compareTo(other.curvePosition)
+    override fun compareTo(other: CurveRelativeVector1D): Int = curvePosition.compareTo(other.curvePosition)
 
     // Conversions
     fun toCurveRelative2D(lateralOffset: Double = 0.0) =
-            CurveRelativePoint2D(curvePosition, lateralOffset)
+            CurveRelativeVector2D(curvePosition, lateralOffset)
 
     fun toCurveRelative3D(lateralOffset: Double = 0.0, heightOffset: Double = 0.0) =
-            CurveRelativePoint3D(curvePosition, lateralOffset, heightOffset)
+            CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset)
 
     companion object {
-        val ZERO = CurveRelativePoint1D(0.0)
+        val ZERO = CurveRelativeVector1D(0.0)
     }
 
 }
