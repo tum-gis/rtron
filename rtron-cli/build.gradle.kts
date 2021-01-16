@@ -9,7 +9,8 @@ plugins {
 kotlinProject()
 
 application {
-    mainClassName = "io.rtron.cli.Main"
+    mainClass.set("io.rtron.cli.Main")
+    mainClassName = mainClass.toString() // backwards compatibility for shadowJar
 }
 
 dependencies {
@@ -25,11 +26,11 @@ dependencies {
 
 tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = application.mainClassName
+        attributes["Main-Class"] = application.mainClass
         attributes["Multi-Release"] = true
     }
 
-    from(configurations.runtime.get().map { if (it.isDirectory) it else zipTree(it) })
+    from(configurations.getByName("runtimeClasspath").map { if (it.isDirectory) it else zipTree(it) })
 }
 
 tasks {
