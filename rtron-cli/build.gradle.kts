@@ -10,7 +10,7 @@ kotlinProject()
 
 application {
     mainClass.set("io.rtron.cli.Main")
-    mainClassName = mainClass.toString() // backwards compatibility for shadowJar
+    mainClassName = "io.rtron.cli.Main" // compatibility for shadowJar
 }
 
 dependencies {
