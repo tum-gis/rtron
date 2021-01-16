@@ -20,18 +20,17 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.transform.AffineSequence3D
 
-
 /**
  * Rectangle with a certain [length] and [width] whereby the origin is located at the rectangle's center at z=0.
  *
  * @param length length of rectangle in the direction of the x axis
  * @param width width of rectangle in the direction of the y axis
  */
-data class Rectangle3D (
-        val length: Double,
-        val width: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+data class Rectangle3D(
+    val length: Double,
+    val width: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D() {
 
     // Properties and Initializers
@@ -48,5 +47,4 @@ data class Rectangle3D (
         val vertices = listOf(upperRightPoint, upperLeftPoint, lowerLeftPoint, lowerRightPoint)
         return Result.success(listOf(Polygon3D(vertices, tolerance)))
     }
-
 }

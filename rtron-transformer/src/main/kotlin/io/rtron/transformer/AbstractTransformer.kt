@@ -16,7 +16,6 @@
 
 package io.rtron.transformer
 
-
 /**
  * Abstract class for all implemented transformers.
  */

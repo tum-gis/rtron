@@ -16,7 +16,6 @@
 
 package io.rtron.model.opendrive.road.lanes
 
-
 class RoadLanesLaneSectionRightLane(
-        var id: Int = Int.MIN_VALUE
+    var id: Int = Int.MIN_VALUE
 ) : RoadLanesLaneSectionLRLane()

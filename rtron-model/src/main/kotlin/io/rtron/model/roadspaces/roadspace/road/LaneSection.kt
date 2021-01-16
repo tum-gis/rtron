@@ -28,7 +28,6 @@ import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
 import kotlin.math.abs
 
-
 /**
  * Represents the section of a road in which the number of lanes and their attributes do not change.
  *
@@ -38,40 +37,40 @@ import kotlin.math.abs
  * @param centerLane center lane of the lane section, which has no width
  */
 data class LaneSection(
-        val id: LaneSectionIdentifier,
-        val curvePositionDomain: Range<Double>,
-        val lanes: Map<Int, Lane>,
-        val centerLane: CenterLane
+    val id: LaneSectionIdentifier,
+    val curvePositionDomain: Range<Double>,
+    val lanes: Map<Int, Lane>,
+    val centerLane: CenterLane
 ) {
 
     // Properties and Initializers
     init {
-        require(curvePositionDomain.hasLowerBound())
-        { "Curve position domain must have a lower bound" }
-        require(lanes.isNotEmpty())
-        { "LaneSection must contain lanes." }
-        require(lanes.all { it.key == it.value.id.laneId })
-        { "Lane elements must be positioned according to their lane id on the map." }
+        require(curvePositionDomain.hasLowerBound()) { "Curve position domain must have a lower bound" }
+        require(lanes.isNotEmpty()) { "LaneSection must contain lanes." }
+        require(lanes.all { it.key == it.value.id.laneId }) { "Lane elements must be positioned according to their lane id on the map." }
 
         val expectedLaneIds = (lanes.keys.minOrNull()!!..lanes.keys.maxOrNull()!!)
-                .toMutableList()
-                .also { it.remove(0) }
-        require(lanes.keys.containsAll(expectedLaneIds))
-        { "There must be no gaps within the given laneIds." }
+            .toMutableList()
+            .also { it.remove(0) }
+        require(lanes.keys.containsAll(expectedLaneIds)) { "There must be no gaps within the given laneIds." }
     }
 
     val curvePositionStart get() = CurveRelativeVector1D(curvePositionDomain.lowerEndpointOrNull()!!)
     val laneList get() = lanes.toList().sortedBy { it.first }.map { it.second }
 
     // Secondary Constructors
-    constructor(id: LaneSectionIdentifier, curvePositionDomain: Range<Double>, lanes: List<Lane>,
-                centerLane: CenterLane) :
-            this(id, curvePositionDomain, lanes.map { it.id.laneId to it }.toMap(), centerLane)
+    constructor(
+        id: LaneSectionIdentifier,
+        curvePositionDomain: Range<Double>,
+        lanes: List<Lane>,
+        centerLane: CenterLane
+    ) :
+        this(id, curvePositionDomain, lanes.map { it.id.laneId to it }.toMap(), centerLane)
 
     // Methods
     fun getLane(laneId: Int): Result<Lane, IllegalArgumentException> = lanes.getValueResult(laneId)
     fun getLane(laneIdentifier: LaneIdentifier): Result<Lane, IllegalArgumentException> =
-            lanes.getValueResult(laneIdentifier.laneId)
+        lanes.getValueResult(laneIdentifier.laneId)
 
     /**
      * Returns the lateral offset function located on a lane with [laneId].
@@ -82,18 +81,20 @@ data class LaneSection(
      */
     fun getLateralLaneOffset(laneId: Int, factor: Double): Result<UnivariateFunction, Exception> {
         val selectedLanes = (1..abs(laneId)).toList()
-                .map { sign(laneId) * it }
-                .map { getLane(it) }
-                .handleFailure { return it }
+            .map { sign(laneId) * it }
+            .map { getLane(it) }
+            .handleFailure { return it }
 
         val currentLane = selectedLanes.last()
         val innerLaneBoundaryOffset = selectedLanes.dropLast(1)
-                .map { it.width }
-                .let { if (it.isEmpty()) LinearFunction.X_AXIS else StackedFunction.ofSum(it) }
+            .map { it.width }
+            .let { if (it.isEmpty()) LinearFunction.X_AXIS else StackedFunction.ofSum(it) }
 
         return StackedFunction(
-                listOf(innerLaneBoundaryOffset, currentLane.width), { sign(laneId) * (it[0] + factor * it[1]) })
-                .let { Result.success(it) }
+            listOf(innerLaneBoundaryOffset, currentLane.width),
+            { sign(laneId) * (it[0] + factor * it[1]) }
+        )
+            .let { Result.success(it) }
     }
 
     /**
@@ -105,19 +106,19 @@ data class LaneSection(
      * of the lane is achieved by a [factor] of 0.5.
      */
     fun getLaneHeightOffset(laneIdentifier: LaneIdentifier, factor: Double):
-            Result<UnivariateFunction, IllegalArgumentException> {
+        Result<UnivariateFunction, IllegalArgumentException> {
 
-        val inner = getInnerLaneHeightOffset(laneIdentifier).handleFailure { return it }
-        val outer = getOuterLaneHeightOffset(laneIdentifier).handleFailure { return it }
-        val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
-        return Result.success(laneHeightOffset)
-    }
+            val inner = getInnerLaneHeightOffset(laneIdentifier).handleFailure { return it }
+            val outer = getOuterLaneHeightOffset(laneIdentifier).handleFailure { return it }
+            val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
+            return Result.success(laneHeightOffset)
+        }
 
     private fun getOuterLaneHeightOffset(laneIdentifier: LaneIdentifier):
-            Result<UnivariateFunction, IllegalArgumentException> =
+        Result<UnivariateFunction, IllegalArgumentException> =
             getLane(laneIdentifier).map { it.outerHeightOffset }
 
     private fun getInnerLaneHeightOffset(laneIdentifier: LaneIdentifier):
-            Result<UnivariateFunction, IllegalArgumentException> =
+        Result<UnivariateFunction, IllegalArgumentException> =
             getLane(laneIdentifier).map { it.innerHeightOffset }
 }

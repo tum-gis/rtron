@@ -18,7 +18,6 @@ package io.rtron.math.geometry.euclidean.threed.point
 
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 
-
 /**
  * Abstract class for all geometric point objects in 3D.
  */

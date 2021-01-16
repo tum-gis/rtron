@@ -18,10 +18,9 @@ package io.rtron.model.opendrive.road
 
 import io.rtron.model.opendrive.common.AdditionalData
 
-
 data class RoadSurfaceCrg(
-        var additionalData: AdditionalData = AdditionalData(),
-        var file: String = "",
-        var sStart: Double = Double.NaN
-        // TODO
+    var additionalData: AdditionalData = AdditionalData(),
+    var file: String = "",
+    var sStart: Double = Double.NaN
+    // TODO
 )

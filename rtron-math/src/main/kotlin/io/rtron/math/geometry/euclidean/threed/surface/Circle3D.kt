@@ -25,7 +25,6 @@ import io.rtron.math.transform.AffineSequence3D
 import kotlin.math.cos
 import kotlin.math.sin
 
-
 /**
  * Represents a circle with a certain [radius] in 3D.
  *
@@ -33,10 +32,10 @@ import kotlin.math.sin
  * @param numberSlices number of discretization steps for polygon construction
  */
 data class Circle3D(
-        val radius: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
-        private val numberSlices: Int = DEFAULT_NUMBER_SLICES
+    val radius: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
+    private val numberSlices: Int = DEFAULT_NUMBER_SLICES
 ) : AbstractSurface3D() {
 
     // Properties and Initializers
@@ -48,16 +47,16 @@ data class Circle3D(
     // Methods
     override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, NoException> {
         val polygon = (0 until numberSlices)
-                .map { TWO_PI * it / numberSlices }
-                .map { calculatePoint(it) }
-                .let { Polygon3D(it, tolerance) }
+            .map { TWO_PI * it / numberSlices }
+            .map { calculatePoint(it) }
+            .let { Polygon3D(it, tolerance) }
 
         return Result.success(listOf(polygon))
     }
 
     /** Calculates a point the circle based on the [angle] around the origin. */
     private fun calculatePoint(angle: Double = 0.0) =
-            Vector3D(radius * cos(angle), radius * sin(angle), 0.0)
+        Vector3D(radius * cos(angle), radius * sin(angle), 0.0)
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 

@@ -29,7 +29,7 @@ fun <T : Comparable<*>> GRange<T>.toRange() = Range(this)
  * @param _range adapted guava range class
  */
 class Range<T : Comparable<*>>(
-        private val _range: GRange<T>
+    private val _range: GRange<T>
 ) {
     // Operators
 
@@ -47,10 +47,10 @@ class Range<T : Comparable<*>>(
      * @return [Result.Success], if [value] is fuzzily contained; [Result.Failure], otherwise
      */
     fun containsResult(value: T): Result<Boolean, IllegalArgumentException> =
-            when (value in this) {
-                true -> Result.success(true)
-                false -> Result.error(IllegalArgumentException("Value ($value) is not contained in range $this."))
-            }
+        when (value in this) {
+            true -> Result.success(true)
+            false -> Result.error(IllegalArgumentException("Value ($value) is not contained in range $this."))
+        }
 
     /** Returns true, if this range has a lower endpoint. */
     fun hasLowerBound() = _range.hasLowerBound()
@@ -66,13 +66,13 @@ class Range<T : Comparable<*>>(
 
     /** Returns the lower endpoint as result. */
     fun lowerEndpointResult(): Result<T, IllegalStateException> =
-            if (hasLowerBound()) Result.success(_range.lowerEndpoint())
-            else Result.error(IllegalStateException("No lower endpoint available."))
+        if (hasLowerBound()) Result.success(_range.lowerEndpoint())
+        else Result.error(IllegalStateException("No lower endpoint available."))
 
     /** Returns the upper endpoint as result. */
     fun upperEndpointResult(): Result<T, IllegalStateException> =
-            if (hasUpperBound()) Result.success(_range.upperEndpoint())
-            else Result.error(IllegalStateException("No upper endpoint available."))
+        if (hasUpperBound()) Result.success(_range.upperEndpoint())
+        else Result.error(IllegalStateException("No upper endpoint available."))
 
     /** Returns the lower [BoundType] of this range. */
     fun lowerBoundType(): BoundType = if (hasLowerBound()) _range.lowerBoundType().toBoundType() else BoundType.NONE
@@ -172,8 +172,12 @@ class Range<T : Comparable<*>>(
          * @param upperEndpoint value for upper endpoint
          * @return created [Range]
          */
-        fun <T : Comparable<*>> rangeOfNullable(lowerBoundType: BoundType, lowerEndpoint: T?,
-                                                upperBoundType: BoundType, upperEndpoint: T?): Range<T> {
+        fun <T : Comparable<*>> rangeOfNullable(
+            lowerBoundType: BoundType,
+            lowerEndpoint: T?,
+            upperBoundType: BoundType,
+            upperEndpoint: T?
+        ): Range<T> {
             // consistency checks
             if (lowerBoundType == BoundType.NONE)
                 require(lowerEndpoint == null) { "Inconsistent lower bound parameters." }
@@ -193,8 +197,12 @@ class Range<T : Comparable<*>>(
             if (lowerBoundType == BoundType.NONE && upperBoundType != BoundType.NONE)
                 return GRange.upTo(upperEndpoint!!, upperBoundType.toBoundTypeG()!!).toRange()
 
-            return GRange.range(lowerEndpoint!!, lowerBoundType.toBoundTypeG()!!,
-                    upperEndpoint!!, upperBoundType.toBoundTypeG()!!).toRange()
+            return GRange.range(
+                lowerEndpoint!!,
+                lowerBoundType.toBoundTypeG()!!,
+                upperEndpoint!!,
+                upperBoundType.toBoundTypeG()!!
+            ).toRange()
         }
 
         /**
@@ -206,8 +214,12 @@ class Range<T : Comparable<*>>(
          * @param upperEndpoint value for upper endpoint
          * @return created [Range]
          */
-        fun <T : Comparable<*>> range(lowerBoundType: BoundType, lowerEndpoint: T,
-                                      upperBoundType: BoundType, upperEndpoint: T): Range<T> {
+        fun <T : Comparable<*>> range(
+            lowerBoundType: BoundType,
+            lowerEndpoint: T,
+            upperBoundType: BoundType,
+            upperEndpoint: T
+        ): Range<T> {
             val lowerEndpointNullable: T? = if (lowerBoundType == BoundType.NONE) null else lowerEndpoint
             val upperEndpointNullable: T? = if (upperBoundType == BoundType.NONE) null else upperEndpoint
 
@@ -240,7 +252,6 @@ class Range<T : Comparable<*>>(
 
         /** Creates a [Range] that contains every value in [T]. */
         fun <T : Comparable<*>> all(): Range<T> = GRange.all<T>().toRange()
-
 
         /**
          * Creates a [Range] of the form [[endpoint], ∞) or ([endpoint], ∞) depending on the [boundType].
@@ -275,11 +286,10 @@ class Range<T : Comparable<*>>(
          * @return created [Range]
          */
         fun <T : Comparable<*>> closedX(lower: T, upper: T, upperBoundType: BoundType): Range<T> =
-                when (upperBoundType) {
-                    BoundType.CLOSED -> closed(lower, upper)
-                    BoundType.OPEN -> closedOpen(lower, upper)
-                    BoundType.NONE -> throw IllegalArgumentException("Upper bound must exist")
-                }
-
+            when (upperBoundType) {
+                BoundType.CLOSED -> closed(lower, upper)
+                BoundType.OPEN -> closedOpen(lower, upper)
+                BoundType.NONE -> throw IllegalArgumentException("Upper bound must exist")
+            }
     }
 }

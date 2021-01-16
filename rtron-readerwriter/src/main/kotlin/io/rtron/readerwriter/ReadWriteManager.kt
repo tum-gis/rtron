@@ -40,9 +40,8 @@ class ReadWriteManager(projectId: String = "", readerWriterConfigurations: List<
         require(readers.isNotEmpty()) { "No adequate reader found." }
         require(readers.size <= 1) { "Multiple adequate readers found." }
 
-
         return readers.first().read(filePath)
-                .also { _reportLogger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔") }
+            .also { _reportLogger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔") }
     }
 
     fun write(model: AbstractModel, directoryPath: Path) {
@@ -51,34 +50,31 @@ class ReadWriteManager(projectId: String = "", readerWriterConfigurations: List<
         require(writers.size <= 1) { "Multiple adequate writers found." }
 
         writers.first().write(model, directoryPath)
-                .handleFailure { throw it.error }
-                .forEach { _reportLogger.info("Completed writing of file ${it.fileName} (around ${it.getFileSizeToDisplay()}). ✔") }
+            .handleFailure { throw it.error }
+            .forEach { _reportLogger.info("Completed writing of file ${it.fileName} (around ${it.getFileSizeToDisplay()}). ✔") }
     }
 
     private fun getConcreteReaderWriter(configuration: AbstractReaderWriterConfiguration): AbstractReaderWriter =
-            when (configuration) {
-                is CitygmlReaderWriterConfiguration -> CitygmlReaderWriter(configuration)
-                is OpendriveReaderWriterConfiguration -> OpendriveReaderWriter(configuration)
-                // register new ReaderWriter classes here
-                else -> throw IllegalArgumentException("Unknown ReaderWriterConfiguration. Registration is required if it is a new one.")
-            }
+        when (configuration) {
+            is CitygmlReaderWriterConfiguration -> CitygmlReaderWriter(configuration)
+            is OpendriveReaderWriterConfiguration -> OpendriveReaderWriter(configuration)
+            // register new ReaderWriter classes here
+            else -> throw IllegalArgumentException("Unknown ReaderWriterConfiguration. Registration is required if it is a new one.")
+        }
 
     companion object {
 
         val supportedFileExtensions: List<String> =
-                CitygmlReaderWriter.supportedFileExtensions +
-                        OpendriveReaderWriter.supportedFileExtensions
+            CitygmlReaderWriter.supportedFileExtensions +
+                OpendriveReaderWriter.supportedFileExtensions
         // register new ReaderWriter classes here
 
         init {
             val multiplyHandledExtensions = supportedFileExtensions.groupingBy { it }.eachCount().filter { it.value > 1 }
-            require(multiplyHandledExtensions.isEmpty())
-            { "A file extensions ${multiplyHandledExtensions.keys} must have a unique ReaderWriter it is handled by." }
+            require(multiplyHandledExtensions.isEmpty()) { "A file extensions ${multiplyHandledExtensions.keys} must have a unique ReaderWriter it is handled by." }
         }
 
         fun of(projectId: String, vararg configuration: AbstractReaderWriterConfiguration) =
-                ReadWriteManager(projectId, configuration.toList())
-
+            ReadWriteManager(projectId, configuration.toList())
     }
-
 }

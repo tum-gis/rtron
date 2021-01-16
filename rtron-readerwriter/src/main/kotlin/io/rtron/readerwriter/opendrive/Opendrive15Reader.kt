@@ -20,11 +20,10 @@ import io.rtron.io.files.Path
 import io.rtron.model.opendrive.OpendriveModel
 
 class Opendrive15Reader(
-        val configuration: OpendriveReaderWriterConfiguration
+    val configuration: OpendriveReaderWriterConfiguration
 ) {
 
     fun createOpendriveModel(file: Path): OpendriveModel {
         TODO("not implemented yet for $file")
     }
-
 }

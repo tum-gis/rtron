@@ -24,7 +24,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class SectionedBivariateFunctionTest {
 
     @Nested
@@ -40,6 +39,5 @@ internal class SectionedBivariateFunctionTest {
             require(actualResult is Result.Success)
             assertThat(actualResult.value).isEqualTo(1.0)
         }
-
     }
 }

@@ -40,15 +40,14 @@ import org.citygml4j.model.gml.geometry.complexes.CompositeSurface
 import org.citygml4j.model.gml.geometry.primitives.*
 import java.util.*
 
-
 /**
  * Generates a surface based geometry representation for CityGML by visiting the geometry class.
  *
  * @param parameters parameters for the geometry transformation, such as discretization step sizes
  */
 class GeometryTransformer(
-        val parameters: Roadspaces2CitygmlParameters,
-        private val reportLogger: Logger
+    val parameters: Roadspaces2CitygmlParameters,
+    private val reportLogger: Logger
 ) : Geometry3DVisitor {
 
     // Properties and Initializers
@@ -73,37 +72,37 @@ class GeometryTransformer(
 
     // Methods
     fun getSolidProperty(): Result<SolidProperty, IllegalStateException> =
-            if (isSetSolid()) Result.success(solidProperty)
-            else Result.error(IllegalStateException("No SolidProperty available for geometry."))
+        if (isSetSolid()) Result.success(solidProperty)
+        else Result.error(IllegalStateException("No SolidProperty available for geometry."))
 
     fun getMultiSurfaceProperty(): Result<MultiSurfaceProperty, IllegalStateException> =
-            if (isSetMultiSurface()) Result.success(multiSurfaceProperty)
-            else Result.error(IllegalStateException("No MultiSurfaceProperty available for geometry."))
+        if (isSetMultiSurface()) Result.success(multiSurfaceProperty)
+        else Result.error(IllegalStateException("No MultiSurfaceProperty available for geometry."))
 
     fun getLineStringProperty(): Result<LineStringProperty, IllegalStateException> =
-            if (isSetLineString()) Result.success(lineStringProperty)
-            else Result.error(IllegalStateException("No LineStringProperty available for geometry."))
+        if (isSetLineString()) Result.success(lineStringProperty)
+        else Result.error(IllegalStateException("No LineStringProperty available for geometry."))
 
     fun getPointProperty(): Result<PointProperty, IllegalStateException> =
-            if (isSetPoint()) Result.success(pointProperty)
-            else Result.error(IllegalStateException("No PointProperty available for geometry."))
+        if (isSetPoint()) Result.success(pointProperty)
+        else Result.error(IllegalStateException("No PointProperty available for geometry."))
 
     /**
      * Returns the available corresponding CityGML [GeometryProperty] in the prioritization order: solid,
      * multi surface, line string and point
      */
     fun getGeometryProperty(): Result<GeometryProperty<*>, IllegalStateException> =
-            when {
-                isSetSolid() -> getSolidProperty()
-                isSetMultiSurface() -> getMultiSurfaceProperty()
-                isSetLineString() -> getLineStringProperty()
-                isSetPoint() -> getPointProperty()
-                else -> Result.error(IllegalStateException("No adequate geometry found."))
-            }
+        when {
+            isSetSolid() -> getSolidProperty()
+            isSetMultiSurface() -> getMultiSurfaceProperty()
+            isSetLineString() -> getLineStringProperty()
+            isSetPoint() -> getPointProperty()
+            else -> Result.error(IllegalStateException("No adequate geometry found."))
+        }
 
     fun getRotation(): Result<Rotation3D, IllegalStateException> =
-            if (isSetRotation()) Result.success(rotation)
-            else Result.error(IllegalStateException("No rotation available."))
+        if (isSetRotation()) Result.success(rotation)
+        else Result.error(IllegalStateException("No rotation available."))
 
     private fun isSetSolid() = this::solidProperty.isInitialized && solidProperty.isSetGeometry
     private fun isSetMultiSurface() = this::multiSurfaceProperty.isInitialized && multiSurfaceProperty.isSetGeometry
@@ -115,11 +114,10 @@ class GeometryTransformer(
     fun isSetHeight() = !height.isNaN()
     fun isSetDiameter() = !diameter.isNaN()
 
-
     override fun visit(vector3D: Vector3D) {
         val vectorGlobalCS = vector3D.calculatePointGlobalCS()
         val directPosition = geometryFactory
-                .createDirectPosition(vectorGlobalCS.toDoubleArray(), DIMENSION)!!
+            .createDirectPosition(vectorGlobalCS.toDoubleArray(), DIMENSION)!!
         val point = Point().apply {
             pos = directPosition
             if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
@@ -131,8 +129,8 @@ class GeometryTransformer(
     override fun visit(abstractCurve3D: AbstractCurve3D) {
 
         val points = abstractCurve3D.calculatePointListGlobalCS(parameters.discretizationStepSize)
-                .handleFailure { throw it.error }
-                .ifEmpty { return }
+            .handleFailure { throw it.error }
+            .ifEmpty { return }
 
         val coordinatesList = points.flatMap { it.toDoubleList() }
         val lineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
@@ -141,8 +139,8 @@ class GeometryTransformer(
 
     override fun visit(abstractSurface3D: AbstractSurface3D) {
         abstractSurface3D.calculatePolygonsGlobalCS().fold(
-                { polygonsToMultiSurfaceRepresentation(it) },
-                { reportLogger.log(it) }
+            { polygonsToMultiSurfaceRepresentation(it) },
+            { reportLogger.log(it) }
         )
         visit(abstractSurface3D as AbstractGeometry3D)
     }
@@ -155,8 +153,8 @@ class GeometryTransformer(
 
     override fun visit(abstractSolid3D: AbstractSolid3D) {
         abstractSolid3D.calculatePolygonsGlobalCS().fold(
-                { polygonsToSolidRepresentation(it) },
-                { reportLogger.log(it) }
+            { polygonsToSolidRepresentation(it) },
+            { reportLogger.log(it) }
         )
         visit(abstractSolid3D as AbstractGeometry3D)
     }
@@ -170,7 +168,7 @@ class GeometryTransformer(
 
     override fun visit(parametricSweep3D: ParametricSweep3D) {
         val adjustedParametricSweep3D = parametricSweep3D
-                .copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
+            .copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
         visit(adjustedParametricSweep3D as AbstractSolid3D)
     }
 

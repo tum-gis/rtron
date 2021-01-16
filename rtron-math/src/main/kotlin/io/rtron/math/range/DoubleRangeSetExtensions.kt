@@ -16,12 +16,11 @@
 
 package io.rtron.math.range
 
-
 fun RangeSet.Companion.ofNonIntersectingRanges(ranges: Set<Range<Double>>): RangeSet<Double> {
     val rangeSets = ranges.map { of(it) }.toSet()
     require(!rangeSets.containsIntersectingRangeSets()) { "Creation of RangeSet must not contain connected ranges." }
     return rangeSets.unionRangeSets()
 }
 
-fun RangeSet.Companion.ofNonIntersectingRanges(vararg ranges: Range<Double>): RangeSet<Double>
-        = ofNonIntersectingRanges(ranges.toSet())
+fun RangeSet.Companion.ofNonIntersectingRanges(vararg ranges: Range<Double>): RangeSet<Double> =
+    ofNonIntersectingRanges(ranges.toSet())

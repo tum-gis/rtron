@@ -16,12 +16,11 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
+import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.processing.removeConsecutiveSideDuplicates
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import io.rtron.math.processing.removeConsecutiveSideDuplicates
-
 
 internal class LinearRing3DUtilTest {
 
@@ -41,6 +40,5 @@ internal class LinearRing3DUtilTest {
 
             assertThat(actualRemovedVerticesList).isEqualTo(expected)
         }
-
     }
 }

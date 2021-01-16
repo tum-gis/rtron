@@ -16,24 +16,28 @@
 
 package io.rtron.model.opendrive.road.lanes
 
-import io.rtron.model.opendrive.common.*
-
+import io.rtron.model.opendrive.common.DataQuality
+import io.rtron.model.opendrive.common.ERoadMarkColor
+import io.rtron.model.opendrive.common.ERoadMarkType
+import io.rtron.model.opendrive.common.ERoadMarkWeight
+import io.rtron.model.opendrive.common.Include
+import io.rtron.model.opendrive.common.UserData
 
 data class RoadLanesLaneSectionLCRLaneRoadMark(
-        var sway: List<RoadLanesLaneSectionLCRLaneRoadMarkSway> = listOf(),
-        var type: RoadLanesLaneSectionLCRLaneRoadMarkType = RoadLanesLaneSectionLCRLaneRoadMarkType(),
-        var explicit: RoadLanesLaneSectionLCRLaneRoadMarkExplicit = RoadLanesLaneSectionLCRLaneRoadMarkExplicit(),
+    var sway: List<RoadLanesLaneSectionLCRLaneRoadMarkSway> = listOf(),
+    var type: RoadLanesLaneSectionLCRLaneRoadMarkType = RoadLanesLaneSectionLCRLaneRoadMarkType(),
+    var explicit: RoadLanesLaneSectionLCRLaneRoadMarkExplicit = RoadLanesLaneSectionLCRLaneRoadMarkExplicit(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var sOffset: Double = Double.NaN,
-        var typeAttribute: ERoadMarkType = ERoadMarkType.NONE,
-        var weight: ERoadMarkWeight = ERoadMarkWeight.STANDARD,
-        var color: ERoadMarkColor = ERoadMarkColor.STANDARD,
-        var material: String = "",
-        var width: Double = 0.0,
-        var laneChange: ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange = ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE,
-        var height: Double = Double.NaN
+    var sOffset: Double = Double.NaN,
+    var typeAttribute: ERoadMarkType = ERoadMarkType.NONE,
+    var weight: ERoadMarkWeight = ERoadMarkWeight.STANDARD,
+    var color: ERoadMarkColor = ERoadMarkColor.STANDARD,
+    var material: String = "",
+    var width: Double = 0.0,
+    var laneChange: ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange = ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE,
+    var height: Double = Double.NaN
 )

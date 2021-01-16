@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
-
 internal class Curve3DTest {
 
     @Nested
@@ -43,7 +42,7 @@ internal class Curve3DTest {
             val heightFunction = LinearFunction.X_AXIS
             val curve3D = Curve3D(curveXY, heightFunction)
             val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
-                    .handleFailure { throw it.error }
+                .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, 1.0, 0.0)
 
             val actualPointGlobal = affine.transform(pointLocal)
@@ -58,7 +57,7 @@ internal class Curve3DTest {
             val torsionFunction = LinearFunction(0.0, QUARTER_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)
             val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
-                    .handleFailure { throw it.error }
+                .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, sqrt(2.0), 0.0)
 
             val actualPointGlobal = affine.transform(pointLocal)
@@ -74,7 +73,7 @@ internal class Curve3DTest {
             val torsionFunction = LinearFunction(0.0, HALF_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)
             val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
-                    .handleFailure { throw it.error }
+                .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, 1.0, 0.0)
 
             val actualPointGlobal = affine.transform(pointLocal)
@@ -82,5 +81,4 @@ internal class Curve3DTest {
             assertThat(actualPointGlobal).isEqualTo(Vector3D(0.5, 0.0, 1.0))
         }
     }
-
 }

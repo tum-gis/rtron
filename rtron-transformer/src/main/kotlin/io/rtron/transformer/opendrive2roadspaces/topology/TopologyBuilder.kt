@@ -29,9 +29,8 @@ import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesC
 import io.rtron.transformer.opendrive2roadspaces.roadspaces.toContactPoint
 import io.rtron.model.opendrive.junction.Junction as OpendriveJunction
 
-
 class TopologyBuilder(
-        private val configuration: Opendrive2RoadspacesConfiguration
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Methods

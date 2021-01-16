@@ -37,13 +37,12 @@ import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
-
 /**
  * Builder for surface geometries in 3D from the OpenDRIVE data model.
  */
 class Surface3DBuilder(
-        private val reportLogger: Logger,
-        private val parameters: Opendrive2RoadspacesParameters
+    private val reportLogger: Logger,
+    private val parameters: Opendrive2RoadspacesParameters
 ) {
 
     // Methods
@@ -89,67 +88,72 @@ class Surface3DBuilder(
     /**
      * Builds a list of linear rings from an OpenDRIVE road object defined by road corner outlines.
      */
-    fun buildLinearRingsByRoadCorners(id: RoadspaceObjectIdentifier, srcRoadObject: RoadObjectsObject,
-                                      referenceLine: Curve3D): List<LinearRing3D> {
+    fun buildLinearRingsByRoadCorners(
+        id: RoadspaceObjectIdentifier,
+        srcRoadObject: RoadObjectsObject,
+        referenceLine: Curve3D
+    ): List<LinearRing3D> {
 
         return srcRoadObject.getLinearRingsDefinedByRoadCorners()
-                .map { buildLinearRingByRoadCorners(it, referenceLine) }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
-                .handleMessage { reportLogger.log(it, id.toString()) }
+            .map { buildLinearRingByRoadCorners(it, referenceLine) }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .handleMessage { reportLogger.log(it, id.toString()) }
     }
 
     /**
      * Builds a single linear ring from an OpenDRIVE road object defined by road corner outlines.
      */
     private fun buildLinearRingByRoadCorners(srcOutline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D):
-            Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
+        Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
 
-        val vertices = srcOutline.cornerRoad
+            val vertices = srcOutline.cornerRoad
                 .map { buildVertices(it, referenceLine) }
                 .handleAndRemoveFailure { reportLogger.log(it) }
 
-        return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
-    }
+            return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
+        }
 
     /**
      * Builds a vertex from the OpenDRIVE road corner element.
      */
     private fun buildVertices(srcCornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad, referenceLine: Curve3D):
-            Result<Vector3D, Exception> {
-        val affine = referenceLine.calculateAffine(srcCornerRoad.curveRelativePosition)
+        Result<Vector3D, Exception> {
+            val affine = referenceLine.calculateAffine(srcCornerRoad.curveRelativePosition)
                 .handleFailure { return it }
-        val basePoint = srcCornerRoad.getBasePoint()
+            val basePoint = srcCornerRoad.getBasePoint()
                 .handleFailure { return it }
                 .let { affine.transform(it.getCartesianCurveOffset()) }
-        return Result.success(basePoint)
-    }
+            return Result.success(basePoint)
+        }
 
     /**
      * Builds a list of linear rings from an OpenDRIVE road object defined by local corner outlines.
      */
-    fun buildLinearRingsByLocalCorners(id: RoadspaceObjectIdentifier, srcRoadObject: RoadObjectsObject,
-                                       curveAffine: Affine3D): List<LinearRing3D> {
+    fun buildLinearRingsByLocalCorners(
+        id: RoadspaceObjectIdentifier,
+        srcRoadObject: RoadObjectsObject,
+        curveAffine: Affine3D
+    ): List<LinearRing3D> {
         val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
-
         return srcRoadObject.getLinearRingsDefinedByLocalCorners()
-                .map { buildLinearRingByLocalCorners(id, it) }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
-                .handleMessage { reportLogger.log(it, id.toString()) }
-                .map { it.copy(affineSequence = affineSequence) }
+            .map { buildLinearRingByLocalCorners(id, it) }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .handleMessage { reportLogger.log(it, id.toString()) }
+            .map { it.copy(affineSequence = affineSequence) }
     }
 
     /**
      * Builds a single linear ring from an OpenDRIVE road object defined by local corner outlines.
      */
     private fun buildLinearRingByLocalCorners(id: RoadspaceObjectIdentifier, srcOutline: RoadObjectsObjectOutlinesOutline):
-            Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
+        Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
 
-        val vertices = srcOutline.cornerLocal
+            val vertices = srcOutline.cornerLocal
                 .map { it.getBasePoint() }
                 .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline point.") }
 
-        return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
-    }
+            return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
+        }
 }

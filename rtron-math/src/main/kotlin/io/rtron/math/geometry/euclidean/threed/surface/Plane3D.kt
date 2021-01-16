@@ -22,7 +22,6 @@ import io.rtron.math.std.DEFAULT_TOLERANCE
 import org.apache.commons.math3.geometry.euclidean.threed.Plane as CMPlane
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D as CMVector3D
 
-
 /**
  * Representation of a plane in 3D.
  * See the wikipedia article on a [plane](https://en.wikipedia.org/wiki/Plane_(geometry)).
@@ -31,9 +30,9 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D as CMVector3D
  * @param normal normal direction to the plane
  */
 data class Plane3D(
-        val point: Vector3D = Vector3D.ZERO,
-        val normal: Vector3D,
-        val tolerance: Double
+    val point: Vector3D = Vector3D.ZERO,
+    val normal: Vector3D,
+    val tolerance: Double
 ) {
 
     // Properties and Initializers

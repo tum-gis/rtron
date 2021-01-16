@@ -16,12 +16,15 @@
 
 package io.rtron.math.geometry.euclidean.threed
 
+import io.rtron.math.std.DBL_EPSILON
+import io.rtron.math.std.DBL_EPSILON_3
+import io.rtron.math.std.HALF_PI
+import io.rtron.math.std.QUARTER_PI
+import io.rtron.math.std.TWO_PI
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.std.*
-
 
 internal class Rotation3DTest {
 
@@ -91,5 +94,4 @@ internal class Rotation3DTest {
             assertThat(actualRoll).isCloseTo(HALF_PI, Offset.offset(DBL_EPSILON_3))
         }
     }
-
 }

@@ -26,7 +26,6 @@ import io.rtron.math.range.Range
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.std.handleFailure
 
-
 /**
  * Represents a parametric cubic curve of the following form:
  * x = fx(t) = x0 + x1*t + x2*t^2 + x3*t^3
@@ -37,26 +36,21 @@ import io.rtron.std.handleFailure
  * @param length length of parametric curve which is used for constructing the domain
  */
 class ParametricCubicCurve2D(
-        private val coefficientsX: DoubleArray,
-        private val coefficientsY: DoubleArray,
-        length: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-        endBoundType: BoundType = BoundType.OPEN
+    private val coefficientsX: DoubleArray,
+    private val coefficientsY: DoubleArray,
+    length: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
+    endBoundType: BoundType = BoundType.OPEN
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
     init {
-        require(coefficientsX.size == 4)
-        { "Requiring exactly four x coefficients for building a cubic curve." }
-        require(coefficientsY.size == 4)
-        { "Requiring exactly four y coefficients for building a cubic curve." }
-        require(coefficientsX.all { it.isFinite() })
-        { "All x coefficients must be finite." }
-        require(coefficientsY.all { it.isFinite() })
-        { "All y coefficients must be finite." }
-        require(length.isFinite() && length > 0.0)
-        { "Length must be finite and greater than zero." }
+        require(coefficientsX.size == 4) { "Requiring exactly four x coefficients for building a cubic curve." }
+        require(coefficientsY.size == 4) { "Requiring exactly four y coefficients for building a cubic curve." }
+        require(coefficientsX.all { it.isFinite() }) { "All x coefficients must be finite." }
+        require(coefficientsY.all { it.isFinite() }) { "All y coefficients must be finite." }
+        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
     }
 
     private val _polynomialFunctionX by lazy { PolynomialFunction(coefficientsX) }
@@ -65,25 +59,25 @@ class ParametricCubicCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, Exception> {
+        Result<Vector2D, Exception> {
 
-        val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition)
+            val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition)
                 .handleFailure { throw it.error }
-        val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition)
+            val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition)
                 .handleFailure { throw it.error }
-        return Result.success(Vector2D(x, y))
-    }
+            return Result.success(Vector2D(x, y))
+        }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, Exception> {
+        Result<Rotation2D, Exception> {
 
-        val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition)
+            val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition)
                 .handleFailure { throw it.error }
-        val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition)
+            val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition)
                 .handleFailure { throw it.error }
-        val rotation = Rotation2D.of(Vector2D(x, y))
-        return Result.success(rotation)
-    }
+            val rotation = Rotation2D.of(Vector2D(x, y))
+            return Result.success(rotation)
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -108,5 +102,4 @@ class ParametricCubicCurve2D(
         result = 31 * result + domain.hashCode()
         return result
     }
-
 }

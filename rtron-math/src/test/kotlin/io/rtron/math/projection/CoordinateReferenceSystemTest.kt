@@ -46,7 +46,6 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.name).isEqualTo(crsName)
         }
 
-
         @Test
         fun `extract epsg code 4326`() {
             val crsName = "EPSG:4326"
@@ -87,5 +86,4 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(4326)
         }
     }
-
 }

@@ -37,8 +37,8 @@ interface ModelIdentifierInterface {
  * @param sourceFileIdentifier identifier of the model's source file
  */
 data class ModelIdentifier(
-        override val modelName: String,
-        override val modelDate: String,
-        override val modelVendor: String,
-        val sourceFileIdentifier: FileIdentifier
+    override val modelName: String,
+    override val modelDate: String,
+    override val modelVendor: String,
+    val sourceFileIdentifier: FileIdentifier
 ) : ModelIdentifierInterface, FileIdentifierInterface by sourceFileIdentifier

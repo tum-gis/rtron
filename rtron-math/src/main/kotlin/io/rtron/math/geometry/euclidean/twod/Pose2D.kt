@@ -18,7 +18,6 @@ package io.rtron.math.geometry.euclidean.twod
 
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 
-
 /**
  * A pose in 2D consists of a position and an orientation.
  * See the wikipedia article on [pose](https://en.wikipedia.org/wiki/Pose_(computer_vision)).
@@ -26,9 +25,9 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
  * @param point position in 2D
  * @param rotation orientation
  */
-data class Pose2D (
-        val point: Vector2D,
-        val rotation: Rotation2D
+data class Pose2D(
+    val point: Vector2D,
+    val rotation: Rotation2D
 ) {
 
     companion object {

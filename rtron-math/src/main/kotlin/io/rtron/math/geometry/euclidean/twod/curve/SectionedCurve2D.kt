@@ -25,7 +25,6 @@ import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.shiftLowerEndpointTo
 import io.rtron.std.handleFailure
 
-
 /**
  * Cuts out a section from the [completeCurve].
  * The resulting domain of the [SectionedCurve2D] starts at 0.0 and ends at the length of the section.
@@ -34,14 +33,13 @@ import io.rtron.std.handleFailure
  * @param section the range that is cut out from the [completeCurve]'s domain
  */
 class SectionedCurve2D(
-        private val completeCurve: AbstractCurve2D,
-        section: Range<Double>
+    private val completeCurve: AbstractCurve2D,
+    section: Range<Double>
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
     init {
-        require(completeCurve.domain.fuzzyEncloses(section, tolerance))
-        { "The complete function must be defined everywhere where the section is also defined." }
+        require(completeCurve.domain.fuzzyEncloses(section, tolerance)) { "The complete function must be defined everywhere where the section is also defined." }
     }
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
@@ -50,16 +48,16 @@ class SectionedCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, Exception> {
+        Result<Vector2D, Exception> {
 
-        val pointOnCompleteCurve = sectionStart + curveRelativePoint
-        return completeCurve.calculatePointGlobalCS(pointOnCompleteCurve)
-    }
+            val pointOnCompleteCurve = sectionStart + curveRelativePoint
+            return completeCurve.calculatePointGlobalCS(pointOnCompleteCurve)
+        }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, Exception> {
+        Result<Rotation2D, Exception> {
 
-        val pointOnCompleteCurve = sectionStart + curveRelativePoint
-        return completeCurve.calculateRotationGlobalCS(pointOnCompleteCurve)
-    }
+            val pointOnCompleteCurve = sectionStart + curveRelativePoint
+            return completeCurve.calculateRotationGlobalCS(pointOnCompleteCurve)
+        }
 }

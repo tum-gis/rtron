@@ -16,7 +16,6 @@
 
 package io.rtron.std
 
-
 /**
  * A class for adding context [messages] to an object of type [V].
  *
@@ -24,8 +23,8 @@ package io.rtron.std
  * @param messages the actual list of messages to be added to the object
  */
 class ContextMessage<out V>(
-        val value: V,
-        messages: List<String> = emptyList()
+    val value: V,
+    messages: List<String> = emptyList()
 ) {
 
     // Properties and Initializers
@@ -78,10 +77,10 @@ inline fun <V : Any> ContextMessage<V>.handleMessage(block: (List<String>) -> Un
  * @return remaining list of [ContextMessage.value]
  */
 inline fun <V : Any> List<ContextMessage<V>>.handleMessage(block: (ContextMessage<V>) -> Unit): List<V> =
-        map {
-            block(it)
-            it.value
-        }
+    map {
+        block(it)
+        it.value
+    }
 
 /**
  * Unwraps a list of [ContextMessage] to a single [ContextMessage] containing the list of values and messages.
@@ -89,4 +88,4 @@ inline fun <V : Any> List<ContextMessage<V>>.handleMessage(block: (ContextMessag
  * @receiver list of [ContextMessage] to be handled
  * @return a [ContextMessage] containing all values and messages of the original list
  */
-fun <V : Any> List<ContextMessage<V>>.unwrapMessages() = ContextMessage(map { it.value } , flatMap { it.messages } )
+fun <V : Any> List<ContextMessage<V>>.unwrapMessages() = ContextMessage(map { it.value }, flatMap { it.messages })

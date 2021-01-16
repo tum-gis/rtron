@@ -46,20 +46,19 @@ inline fun <T, K> Iterable<T>.distinctConsecutiveEnclosing(crossinline selector:
     return this.toList().filterWindowedEnclosing(listOf(true, false)) { selector(it[0]) == selector(it[1]) }
 }
 
-
 /**
  * Returns a list sorted according to natural sort order of the value returned by specified [selector] function by
  * filtering all unsorted elements.
  */
-inline fun <T, K: Comparable<K>> Iterable<T>.filterToStrictSortingBy(crossinline selector: (T) -> K): List<T> =
-        this.filterToSorting { first, second -> selector(first) < selector(second) }
+inline fun <T, K : Comparable<K>> Iterable<T>.filterToStrictSortingBy(crossinline selector: (T) -> K): List<T> =
+    this.filterToSorting { first, second -> selector(first) < selector(second) }
 
 /**
  * Returns a list sorted descending according to natural sort order of the value returned by specified [selector]
  * function by filtering all unsorted elements.
  */
-inline fun <T, K: Comparable<K>> Iterable<T>.filterToStrictSortingByDescending(crossinline selector: (T) -> K): List<T> =
-        this.filterToSorting { first, second -> selector(first) > selector(second) }
+inline fun <T, K : Comparable<K>> Iterable<T>.filterToStrictSortingByDescending(crossinline selector: (T) -> K): List<T> =
+    this.filterToSorting { first, second -> selector(first) > selector(second) }
 
 /**
  * Returns a sorted list according to the [predicate] by filtering all unsorted elements.
@@ -97,7 +96,7 @@ inline fun <T> Iterable<T>.filterToSorting(predicate: (first: T, second: T) -> B
  * @return the sequence of sublists
  */
 fun <T> Sequence<T>.windowedEnclosing(size: Int, step: Int = 1): Sequence<List<T>> =
-        (this + this.take(size - 1)).windowed(size, step)
+    (this + this.take(size - 1)).windowed(size, step)
 
 /**
  * Returns true, if all lists have the same number of elements.

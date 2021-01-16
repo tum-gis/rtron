@@ -32,7 +32,6 @@ import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.transform.Affine3D
 import io.rtron.std.handleFailure
 
-
 /**
  * A curve in 3D defined by a curve in 2D and a height function. Furthermore, the curve can have a torsion, which is
  * relevant for pose and transformation matrix calculations along the curve.
@@ -43,17 +42,15 @@ import io.rtron.std.handleFailure
  * @param torsionFunction the torsion of the curve, which must be defined where the [curveXY] is defined
  */
 data class Curve3D(
-        val curveXY: AbstractCurve2D,
-        val heightFunction: UnivariateFunction,
-        val torsionFunction: UnivariateFunction = LinearFunction.X_AXIS
+    val curveXY: AbstractCurve2D,
+    val heightFunction: UnivariateFunction,
+    val torsionFunction: UnivariateFunction = LinearFunction.X_AXIS
 ) : AbstractCurve3D() {
 
     // Properties and Initializers
     init {
-        require(heightFunction.domain.fuzzyEncloses(curveXY.domain, tolerance))
-        { "The height function must be defined everywhere where the curveXY is also defined." }
-        require(torsionFunction.domain.fuzzyEncloses(curveXY.domain, tolerance))
-        { "The torsion function must be defined everywhere where the curveXY is also defined." }
+        require(heightFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The height function must be defined everywhere where the curveXY is also defined." }
+        require(torsionFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The torsion function must be defined everywhere where the curveXY is also defined." }
     }
 
     override val domain get() = curveXY.domain
@@ -64,9 +61,9 @@ data class Curve3D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Result<Vector3D, Exception> {
 
         val pointXY = curveXY.calculatePointGlobalCS(curveRelativePoint)
-                .handleFailure { throw it.error }
+            .handleFailure { throw it.error }
         val height = heightFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-                .handleFailure { throw it.error }
+            .handleFailure { throw it.error }
         val vector = Vector3D(pointXY.x, pointXY.y, height)
         return Result.success(vector)
     }
@@ -81,11 +78,11 @@ data class Curve3D(
         this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
 
         val poseXY = curveXY.calculatePoseGlobalCS(curveRelativePoint)
-                .handleFailure { throw it.error }
+            .handleFailure { throw it.error }
         val height = heightFunction.value(curveRelativePoint.curvePosition)
-                .handleFailure { throw it.error }
+            .handleFailure { throw it.error }
         val torsion = torsionFunction.value(curveRelativePoint.curvePosition)
-                .handleFailure { throw it.error }
+            .handleFailure { throw it.error }
 
         val point = Vector3D(poseXY.point.x, poseXY.point.y, height)
         val rotation = Rotation3D(poseXY.rotation.angle, 0.0, torsion)
@@ -100,7 +97,7 @@ data class Curve3D(
      * @return affine transformation matrix whereby the orientation is tangential to this curve and its torsion
      */
     fun calculateAffine(curveRelativePoint: CurveRelativeVector1D): Result<Affine3D, Exception> =
-            calculatePose(curveRelativePoint).map { Affine3D.of(it) }
+        calculatePose(curveRelativePoint).map { Affine3D.of(it) }
 
     /**
      * Transforms the [curveRelativePoint] (relative to this curve) to a [Vector3D] in cartesian coordinates.

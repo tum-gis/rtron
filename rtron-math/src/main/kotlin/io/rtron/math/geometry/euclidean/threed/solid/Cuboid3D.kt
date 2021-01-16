@@ -22,7 +22,6 @@ import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.math.transform.AffineSequence3D
 
-
 /**
  * Represents a cuboid in 3D with the dimension ([length], [width], [height]). The origin of the local coordinate system
  * is located at the center of the ground face.
@@ -32,21 +31,18 @@ import io.rtron.math.transform.AffineSequence3D
  * @param height height of the cuboid in the direction of the z axis
  */
 data class Cuboid3D(
-        val length: Double,
-        val width: Double,
-        val height: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    val length: Double,
+    val width: Double,
+    val height: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSolid3D() {
 
     // Properties and Initializers
     init {
-        require(length.isFinite() && length > 0.0)
-        { "Length must be finite and greater than zero." }
-        require(width.isFinite() && width > 0.0)
-        { "Width must be finite and greater than zero." }
-        require(height.isFinite() && height > 0.0)
-        { "Height must be finite and greater than zero." }
+        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
+        require(width.isFinite() && width > 0.0) { "Width must be finite and greater than zero." }
+        require(height.isFinite() && height > 0.0) { "Height must be finite and greater than zero." }
     }
 
     private val halfLength = length / 2.0
@@ -63,23 +59,53 @@ data class Cuboid3D(
     private val vertexElevatedQuadrantIII = Vector3D(-halfLength, -halfWidth, height)
     private val vertexElevatedQuadrantIV = Vector3D(halfLength, -halfWidth, height)
 
-    private val basePolygon = Polygon3D.of(vertexBaseQuadrantI, vertexBaseQuadrantIV, vertexBaseQuadrantIII,
-            vertexBaseQuadrantII, tolerance = tolerance)
+    private val basePolygon = Polygon3D.of(
+        vertexBaseQuadrantI,
+        vertexBaseQuadrantIV,
+        vertexBaseQuadrantIII,
+        vertexBaseQuadrantII,
+        tolerance = tolerance
+    )
 
-    private val elevatedPolygon = Polygon3D.of(vertexElevatedQuadrantI, vertexElevatedQuadrantII,
-            vertexElevatedQuadrantIII, vertexElevatedQuadrantIV, tolerance = tolerance)
+    private val elevatedPolygon = Polygon3D.of(
+        vertexElevatedQuadrantI,
+        vertexElevatedQuadrantII,
+        vertexElevatedQuadrantIII,
+        vertexElevatedQuadrantIV,
+        tolerance = tolerance
+    )
 
-    private val frontPolygon = Polygon3D.of(vertexBaseQuadrantI, vertexElevatedQuadrantI, vertexElevatedQuadrantIV,
-            vertexBaseQuadrantIV, tolerance = tolerance)
+    private val frontPolygon = Polygon3D.of(
+        vertexBaseQuadrantI,
+        vertexElevatedQuadrantI,
+        vertexElevatedQuadrantIV,
+        vertexBaseQuadrantIV,
+        tolerance = tolerance
+    )
 
-    private val leftPolygon = Polygon3D.of(vertexBaseQuadrantI, vertexBaseQuadrantII, vertexElevatedQuadrantII,
-            vertexElevatedQuadrantI, tolerance = tolerance)
+    private val leftPolygon = Polygon3D.of(
+        vertexBaseQuadrantI,
+        vertexBaseQuadrantII,
+        vertexElevatedQuadrantII,
+        vertexElevatedQuadrantI,
+        tolerance = tolerance
+    )
 
-    private val backPolygon = Polygon3D.of(vertexBaseQuadrantII, vertexBaseQuadrantIII, vertexElevatedQuadrantIII,
-            vertexElevatedQuadrantII, tolerance = tolerance)
+    private val backPolygon = Polygon3D.of(
+        vertexBaseQuadrantII,
+        vertexBaseQuadrantIII,
+        vertexElevatedQuadrantIII,
+        vertexElevatedQuadrantII,
+        tolerance = tolerance
+    )
 
-    private val rightPolygon = Polygon3D.of(vertexElevatedQuadrantIV, vertexElevatedQuadrantIII,
-            vertexBaseQuadrantIII, vertexBaseQuadrantIV, tolerance = tolerance)
+    private val rightPolygon = Polygon3D.of(
+        vertexElevatedQuadrantIV,
+        vertexElevatedQuadrantIII,
+        vertexBaseQuadrantIII,
+        vertexBaseQuadrantIV,
+        tolerance = tolerance
+    )
 
     // Methods
     override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {

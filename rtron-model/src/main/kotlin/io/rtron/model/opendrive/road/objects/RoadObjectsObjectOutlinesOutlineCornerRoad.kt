@@ -25,17 +25,16 @@ import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 import io.rtron.std.Optional
 
-
 class RoadObjectsObjectOutlinesOutlineCornerRoad(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var s: Double = Double.NaN,
-        var t: Double = Double.NaN,
-        var dz: Double = Double.NaN,
-        var height: Double = Double.NaN,
-        var id: Int = Int.MIN_VALUE
+    var s: Double = Double.NaN,
+    var t: Double = Double.NaN,
+    var dz: Double = Double.NaN,
+    var height: Double = Double.NaN,
+    var id: Int = Int.MIN_VALUE
 ) {
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector1D(s)
@@ -52,5 +51,4 @@ class RoadObjectsObjectOutlinesOutlineCornerRoad(
 
     fun getPoints(): Result<Pair<CurveRelativeVector3D, Optional<CurveRelativeVector3D>>, Exception> =
         getBasePoint().map { Pair(it, getHeadPoint()) }
-
 }

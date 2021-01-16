@@ -38,12 +38,11 @@ import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesC
 import io.rtron.model.opendrive.road.objects.RoadObjects as OpendriveRoadObjects
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject as OpendriveRoadObject
 
-
 /**
  * Builder for [RoadspaceObject] which correspond to the OpenDRIVE road object class.
  */
 class RoadspaceObjectBuilder(
-        private val configuration: Opendrive2RoadspacesConfiguration
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Properties and Initializers
@@ -61,23 +60,30 @@ class RoadspaceObjectBuilder(
      * @param roadReferenceLine road reference line required to build the geometries of the road object
      * @param baseAttributes attributes attached to each road space object
      */
-    fun buildRoadspaceObjects(roadspaceId: RoadspaceIdentifier, srcRoadObjects: OpendriveRoadObjects,
-                              roadReferenceLine: Curve3D, baseAttributes: AttributeList): List<RoadspaceObject> =
-            srcRoadObjects.roadObject
-                    .map { buildRoadObject(roadspaceId, it, roadReferenceLine, baseAttributes) }
-                    .handleAndRemoveFailureIndexed { index, failure ->
-                        _reportLogger.log(failure, "ObjectId=${srcRoadObjects.roadObject[index].id}")
-                    }
+    fun buildRoadspaceObjects(
+        roadspaceId: RoadspaceIdentifier,
+        srcRoadObjects: OpendriveRoadObjects,
+        roadReferenceLine: Curve3D,
+        baseAttributes: AttributeList
+    ): List<RoadspaceObject> =
+        srcRoadObjects.roadObject
+            .map { buildRoadObject(roadspaceId, it, roadReferenceLine, baseAttributes) }
+            .handleAndRemoveFailureIndexed { index, failure ->
+                _reportLogger.log(failure, "ObjectId=${srcRoadObjects.roadObject[index].id}")
+            }
 
-
-    private fun buildRoadObject(id: RoadspaceIdentifier, srcRoadObject: OpendriveRoadObject, roadReferenceLine: Curve3D,
-                                baseAttributes: AttributeList): Result<RoadspaceObject, Exception> {
+    private fun buildRoadObject(
+        id: RoadspaceIdentifier,
+        srcRoadObject: OpendriveRoadObject,
+        roadReferenceLine: Curve3D,
+        baseAttributes: AttributeList
+    ): Result<RoadspaceObject, Exception> {
 
         // check whether source model is processable
         val roadspaceObjectId = RoadspaceObjectIdentifier(srcRoadObject.id, srcRoadObject.name, id)
         srcRoadObject.isProcessable()
-                .map { _reportLogger.log(it, roadspaceObjectId.toString()) }
-                .handleFailure { return it }
+            .map { _reportLogger.log(it, roadspaceObjectId.toString()) }
+            .handleFailure { return it }
 
         // get general object type and geometry representation
         val type = getObjectType(srcRoadObject)
@@ -103,13 +109,16 @@ class RoadspaceObjectBuilder(
      * @param srcRoadObject road object source model
      * @return list of transformed geometries
      */
-    private fun buildGeometries(id: RoadspaceObjectIdentifier, srcRoadObject: OpendriveRoadObject,
-                                roadReferenceLine: Curve3D): Result<List<AbstractGeometry3D>, Exception> {
+    private fun buildGeometries(
+        id: RoadspaceObjectIdentifier,
+        srcRoadObject: OpendriveRoadObject,
+        roadReferenceLine: Curve3D
+    ): Result<List<AbstractGeometry3D>, Exception> {
 
         // affine transformation matrix at the curve point of the object
         val curveAffine = roadReferenceLine
-                .calculateAffine(srcRoadObject.curveRelativePosition.toCurveRelative1D())
-                .handleFailure { return it }
+            .calculateAffine(srcRoadObject.curveRelativePosition.toCurveRelative1D())
+            .handleFailure { return it }
 
         // build up solid geometrical representations
         val geometry = mutableListOf<AbstractGeometry3D>()
@@ -135,32 +144,39 @@ class RoadspaceObjectBuilder(
         // if no other geometrical representation has been found, use a point instead
         if (geometry.isEmpty())
             geometry += _vector3DBuilder
-                    .buildVector3Ds(srcRoadObject, curveAffine, force = true)
-                    .handleFailure { throw it.error }
+                .buildVector3Ds(srcRoadObject, curveAffine, force = true)
+                .handleFailure { throw it.error }
 
         return Result.success(geometry)
     }
 
     private fun buildAttributes(srcRoadObject: OpendriveRoadObject) =
-            attributes("${configuration.parameters.attributesPrefix}roadObject_") {
-                attribute("type", srcRoadObject.type.toString())
-                attribute("subtype", srcRoadObject.subtype)
-                attribute("dynamic", srcRoadObject.dynamic)
-                attribute("validLength", srcRoadObject.validLength)
-                attribute("orientation", srcRoadObject.orientation)
+        attributes("${configuration.parameters.attributesPrefix}roadObject_") {
+            attribute("type", srcRoadObject.type.toString())
+            attribute("subtype", srcRoadObject.subtype)
+            attribute("dynamic", srcRoadObject.dynamic)
+            attribute("validLength", srcRoadObject.validLength)
+            attribute("orientation", srcRoadObject.orientation)
+        }
+
+    fun buildRoadspaceObjects(
+        id: RoadspaceIdentifier,
+        srcRoadSignals: RoadSignals,
+        roadReferenceLine: Curve3D,
+        baseAttributes: AttributeList
+    ): List<RoadspaceObject> =
+        srcRoadSignals.signal
+            .map { buildRoadSignalsSignal(id, it, roadReferenceLine, baseAttributes) }
+            .handleAndRemoveFailureIndexed { index, failure ->
+                _reportLogger.log(failure, "ObjectId=${srcRoadSignals.signal[index].id}")
             }
 
-
-    fun buildRoadspaceObjects(id: RoadspaceIdentifier, srcRoadSignals: RoadSignals, roadReferenceLine: Curve3D,
-                              baseAttributes: AttributeList): List<RoadspaceObject> =
-            srcRoadSignals.signal
-                    .map { buildRoadSignalsSignal(id, it, roadReferenceLine, baseAttributes) }
-                    .handleAndRemoveFailureIndexed { index, failure ->
-                        _reportLogger.log(failure, "ObjectId=${srcRoadSignals.signal[index].id}")
-                    }
-
-    private fun buildRoadSignalsSignal(id: RoadspaceIdentifier, srcSignal: RoadSignalsSignal, roadReferenceLine: Curve3D,
-                                       baseAttributes: AttributeList): Result<RoadspaceObject, Exception> {
+    private fun buildRoadSignalsSignal(
+        id: RoadspaceIdentifier,
+        srcSignal: RoadSignalsSignal,
+        roadReferenceLine: Curve3D,
+        baseAttributes: AttributeList
+    ): Result<RoadspaceObject, Exception> {
 
         val objectId = RoadspaceObjectIdentifier(srcSignal.id, srcSignal.name, id)
 
@@ -172,28 +188,28 @@ class RoadspaceObjectBuilder(
     }
 
     private fun buildAttributes(srcSignal: RoadSignalsSignal): AttributeList =
-            attributes("${configuration.parameters.attributesPrefix}roadSignal_") {
-                attribute("dynamic", srcSignal.dynamic)
-                attribute("orientation", srcSignal.orientation.toString())
-                attribute("countryCode", srcSignal.countryCode.code)
-                attribute("type", srcSignal.type)
-                attribute("subtype", srcSignal.subtype)
-                attribute("value", srcSignal.value)
-            }
+        attributes("${configuration.parameters.attributesPrefix}roadSignal_") {
+            attribute("dynamic", srcSignal.dynamic)
+            attribute("orientation", srcSignal.orientation.toString())
+            attribute("countryCode", srcSignal.countryCode.code)
+            attribute("type", srcSignal.type)
+            attribute("subtype", srcSignal.subtype)
+            attribute("value", srcSignal.value)
+        }
 
     private fun buildGeometries(srcRoadObject: RoadSignalsSignal, roadReferenceLine: Curve3D):
-            Result<List<AbstractGeometry3D>, Exception> {
+        Result<List<AbstractGeometry3D>, Exception> {
 
-        val curveAffine = roadReferenceLine
+            val curveAffine = roadReferenceLine
                 .calculateAffine(srcRoadObject.curveRelativePosition.toCurveRelative1D())
                 .handleFailure { return it }
 
-        val geometry = mutableListOf<AbstractGeometry3D>()
-        if (geometry.isEmpty())
-            geometry += _vector3DBuilder
+            val geometry = mutableListOf<AbstractGeometry3D>()
+            if (geometry.isEmpty())
+                geometry += _vector3DBuilder
                     .buildVector3Ds(srcRoadObject, curveAffine, force = true)
                     .handleFailure { throw it.error }
 
-        return Result.success(geometry)
-    }
+            return Result.success(geometry)
+        }
 }

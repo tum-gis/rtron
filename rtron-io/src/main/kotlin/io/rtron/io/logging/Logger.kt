@@ -23,14 +23,13 @@ import org.apache.commons.lang3.SystemUtils
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger as L4JLogger
 
-
 /**
  * Logger for operation messages. Building of [Logger]s is provided by [LogManager].
  *
  * @param logger adapted [org.apache.logging.log4j.Logger] logger.
  */
 class Logger(
-        private val logger: L4JLogger = LogManager.getLogger()
+    private val logger: L4JLogger = LogManager.getLogger()
 ) {
 
     // Properties and Initializers
@@ -140,7 +139,7 @@ class Logger(
     }
 
     private fun combineMessage(messages: List<String>, prefix: String, suffix: String) =
-            combineMessage(messages.joinToString(), prefix, suffix)
+        combineMessage(messages.joinToString(), prefix, suffix)
 
     private fun combineMessage(message: String, prefix: String, suffix: String): String {
         if (message.isEmpty()) return ""
@@ -154,7 +153,7 @@ class Logger(
     }
 
     private fun prepareMessage(message: String): String {
-        return if(SystemUtils.IS_OS_WINDOWS) EmojiParser.removeAllEmojis(message).trim()
+        return if (SystemUtils.IS_OS_WINDOWS) EmojiParser.removeAllEmojis(message).trim()
         else message
     }
 

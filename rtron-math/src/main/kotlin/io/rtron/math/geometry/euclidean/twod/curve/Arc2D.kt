@@ -29,7 +29,6 @@ import io.rtron.math.transform.AffineSequence2D
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-
 /**
  * Represents an arc of a circle with a certain [curvature] which starts at the coordinates origin and continues in
  * the direction of the x axis.
@@ -38,21 +37,18 @@ import kotlin.math.sign
  * @param curvature positive curvature: counter clockwise; negative curvature: clockwise
  */
 class Arc2D(
-        val curvature: Double,
-        length: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-        endBoundType: BoundType = BoundType.OPEN
+    val curvature: Double,
+    length: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
+    endBoundType: BoundType = BoundType.OPEN
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
     init {
-        require(curvature.isFinite())
-        { "Curvature must be finite." }
-        require(curvature != 0.0)
-        { "Curvature must not be zero (use a line segment instead)." }
-        require(length.isFinite() && length > 0.0)
-        { "Length must be finite and greater than zero." }
+        require(curvature.isFinite()) { "Curvature must be finite." }
+        require(curvature != 0.0) { "Curvature must not be zero (use a line segment instead)." }
+        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
     }
 
     override val domain: Range<Double> = Range.closedX(0.0, length, endBoundType)
@@ -81,32 +77,30 @@ class Arc2D(
     /** end angle of the arc relative to the [center] */
     val endAngle = startAngle + aperture * Rotation2D(curvatureSign)
 
-
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, IllegalArgumentException> {
+        Result<Vector2D, IllegalArgumentException> {
 
-        // angle in radians between start point of the arc and given curve position
-        val curvePositionAngle =
+            // angle in radians between start point of the arc and given curve position
+            val curvePositionAngle =
                 Rotation2D(TWO_PI * (curveRelativePoint.curvePosition / circumference) * curvatureSign)
 
-        // calculate offset to center of the arc
-        val offsetToCenterVector =
+            // calculate offset to center of the arc
+            val offsetToCenterVector =
                 Affine2D.of(startAngle + curvePositionAngle).transform(Vector2D.X_AXIS).scalarMultiply(radius)
 
-        val point = center + offsetToCenterVector
-        return Result.success(point)
-    }
+            val point = center + offsetToCenterVector
+            return Result.success(point)
+        }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, IllegalArgumentException> {
-        val rotation = Rotation2D(curveRelativePoint.curvePosition * curvature)
-        return Result.success(rotation)
-    }
+        Result<Rotation2D, IllegalArgumentException> {
+            val rotation = Rotation2D(curveRelativePoint.curvePosition * curvature)
+            return Result.success(rotation)
+        }
 
     // Conversions
     override fun toString(): String {
         return "Arc2D(curvature=$curvature, domain=$domain, length=$length)"
     }
-
 }

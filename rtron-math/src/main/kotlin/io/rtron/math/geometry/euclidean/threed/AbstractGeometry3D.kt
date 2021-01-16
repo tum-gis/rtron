@@ -19,7 +19,6 @@ package io.rtron.math.geometry.euclidean.threed
 import io.rtron.math.geometry.euclidean.AbstractGeometry
 import io.rtron.math.transform.AffineSequence3D
 
-
 /**
  * Abstract class for all geometric objects in 3D.
  */

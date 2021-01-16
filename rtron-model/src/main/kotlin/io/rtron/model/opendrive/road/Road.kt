@@ -30,46 +30,49 @@ import io.rtron.model.opendrive.road.signals.RoadSignals
 import io.rtron.std.ContextMessage
 import io.rtron.std.Optional
 
-
 data class Road(
-        var link: RoadLink = RoadLink(),
-        var type: List<RoadType> = listOf(),
-        var planView: RoadPlanView = RoadPlanView(),
-        var elevationProfile: RoadElevationProfile = RoadElevationProfile(),
-        var lateralProfile: RoadLateralProfile = RoadLateralProfile(),
-        var lanes: RoadLanes = RoadLanes(),
-        var objects: RoadObjects = RoadObjects(),
-        var signals: RoadSignals = RoadSignals(),
-        var surface: RoadSurface = RoadSurface(),
-        var railroad: RoadRailroad = RoadRailroad(),
+    var link: RoadLink = RoadLink(),
+    var type: List<RoadType> = listOf(),
+    var planView: RoadPlanView = RoadPlanView(),
+    var elevationProfile: RoadElevationProfile = RoadElevationProfile(),
+    var lateralProfile: RoadLateralProfile = RoadLateralProfile(),
+    var lanes: RoadLanes = RoadLanes(),
+    var objects: RoadObjects = RoadObjects(),
+    var signals: RoadSignals = RoadSignals(),
+    var surface: RoadSurface = RoadSurface(),
+    var railroad: RoadRailroad = RoadRailroad(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var name: String = "",
-        var length: Double = Double.NaN,
-        var id: String = "",
-        var junction: String = "",
-        var rule: ETrafficRule = ETrafficRule.RIGHTHANDTRAFFIC
+    var name: String = "",
+    var length: Double = Double.NaN,
+    var id: String = "",
+    var junction: String = "",
+    var rule: ETrafficRule = ETrafficRule.RIGHTHANDTRAFFIC
 ) {
 
     // Methods
 
     fun getJunction(): Optional<String> =
-            if (junction.isNotEmpty() && junction != "-1") Optional(junction) else Optional.empty()
+        if (junction.isNotEmpty() && junction != "-1") Optional(junction) else Optional.empty()
 
     fun isProcessable(tolerance: Double): Result<ContextMessage<Boolean>, IllegalStateException> {
         val infos = mutableListOf<String>()
 
         val planViewGeometryLengthsSum = planView.geometry.sumByDouble { it.length }
         if (!fuzzyEquals(planViewGeometryLengthsSum, length, tolerance))
-            return Result.error(IllegalStateException("Given length of road (${this.length}) is different than " +
-                    "the sum of the individual plan view elements ($planViewGeometryLengthsSum)."))
+            return Result.error(
+                IllegalStateException(
+                    "Given length of road (${this.length}) is different than " +
+                        "the sum of the individual plan view elements ($planViewGeometryLengthsSum)."
+                )
+            )
 
         if (lateralProfile.containsShapeProfile() && lanes.containsLaneOffset())
             infos += "Road contains both a lateral road shape and a lane offset, whereby the combination of shapes " +
-                    "and non-linear offsets should be avoided according to the standard."
+                "and non-linear offsets should be avoided according to the standard."
 
         return Result.success(ContextMessage(true, infos))
     }

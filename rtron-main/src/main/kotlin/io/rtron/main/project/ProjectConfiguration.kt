@@ -19,7 +19,6 @@ package io.rtron.main.project
 import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
 
-
 /**
  * Configuration for a single transformation project of one source model.
  *
@@ -29,10 +28,10 @@ import io.rtron.io.files.Path
  * @param concurrentProcessing enable concurrent processing during the transformation of a model
  */
 class ProjectConfiguration(
-        val baseSourceFilePath: Path,
-        val relativeSourceFilePath: Path,
-        val outputDirectoryPath: Path,
-        val concurrentProcessing: Boolean
+    val baseSourceFilePath: Path,
+    val relativeSourceFilePath: Path,
+    val outputDirectoryPath: Path,
+    val concurrentProcessing: Boolean
 ) {
     // Properties and Initializers
 

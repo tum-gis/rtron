@@ -20,11 +20,10 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadObjectsObjectBorders(
-        var marking: List<RoadObjectsObjectBordersBorder> = listOf(),
+    var marking: List<RoadObjectsObjectBordersBorder> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality()
 )

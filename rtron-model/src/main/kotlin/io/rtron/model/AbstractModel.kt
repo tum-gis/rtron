@@ -16,7 +16,6 @@
 
 package io.rtron.model
 
-
 /**
  * Represents all models
  */

@@ -24,7 +24,6 @@ import io.rtron.std.Optional
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
 
-
 /**
  * Represents the connection of two roads, the incoming road and the connecting road.
  *
@@ -35,11 +34,11 @@ import io.rtron.std.handleFailure
  * @param laneLinks links between the individual lanes
  */
 data class Connection(
-        val id: ConnectionIdentifier,
-        val incomingRoadspaceId: RoadspaceIdentifier,
-        val connectingRoadspaceId: RoadspaceIdentifier,
-        val contactPoint: ContactPoint,
-        val laneLinks: Map<Int, Int>
+    val id: ConnectionIdentifier,
+    val incomingRoadspaceId: RoadspaceIdentifier,
+    val connectingRoadspaceId: RoadspaceIdentifier,
+    val contactPoint: ContactPoint,
+    val laneLinks: Map<Int, Int>
 ) {
 
     // Methods
@@ -53,9 +52,8 @@ data class Connection(
         if (incomingRoadspaceId != laneIdentifier.toRoadspaceIdentifier()) return Optional.empty()
 
         return laneLinks.getValueResult(laneIdentifier.laneId)
-                .handleFailure { return Optional.empty() }
-                .let { RelativeLaneIdentifier.of(it, ContactPoint.START.relativeIndex, connectingRoadspaceId) }
-                .let { Optional(it) }
+            .handleFailure { return Optional.empty() }
+            .let { RelativeLaneIdentifier.of(it, ContactPoint.START.relativeIndex, connectingRoadspaceId) }
+            .let { Optional(it) }
     }
-
 }

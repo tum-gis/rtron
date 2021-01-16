@@ -28,7 +28,6 @@ import io.rtron.math.transform.AffineSequence2D
 import org.apache.commons.math3.geometry.euclidean.twod.Line as CMLine2D
 import org.apache.commons.math3.geometry.euclidean.twod.Segment as CMSegment2D
 
-
 /**
  * Line segment starting in the origin in the direction of the x axis. It has a given [length] and is moved by
  * means of the [affineSequence].
@@ -36,10 +35,10 @@ import org.apache.commons.math3.geometry.euclidean.twod.Segment as CMSegment2D
  * @param length length of line segment
  */
 class LineSegment2D(
-        length: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-        endBoundType: BoundType = BoundType.OPEN
+    length: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
+    endBoundType: BoundType = BoundType.OPEN
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
@@ -58,24 +57,21 @@ class LineSegment2D(
     /** adapted line segment class of Apache Commons Math */
     private val _segment2D = CMSegment2D(Vector2D.ZERO.toVector2DCm(), _endPoint.toVector2DCm(), _line)
 
-
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, Exception> {
+        Result<Vector2D, Exception> {
 
-        val point = Vector2D(curveRelativePoint.curvePosition, 0.0)
-        return Result.success(point)
-    }
+            val point = Vector2D(curveRelativePoint.curvePosition, 0.0)
+            return Result.success(point)
+        }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, Exception> = Result.success(Rotation2D.ZERO)
-
+        Result<Rotation2D, Exception> = Result.success(Rotation2D.ZERO)
 
     // Conversions
 
     /** Returns adapted line segment class of Commons Math. */
     fun toLineSegment2DCM() = _segment2D
-
 
     companion object {
 

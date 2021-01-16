@@ -34,14 +34,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
-
 /**
  * Transformer from OpenDRIVE data model to the RoadSpaces data model.
  *
  * @param configuration configuration for the transformation
  */
 class Opendrive2RoadspacesTransformer(
-        val configuration: TransformerConfiguration<Opendrive2RoadspacesParameters>
+    val configuration: TransformerConfiguration<Opendrive2RoadspacesParameters>
 ) : AbstractTransformer() {
 
     // Properties and Initializers
@@ -64,39 +63,46 @@ class Opendrive2RoadspacesTransformer(
 
         // general model information
         val header = _headerBuilder.buildHeader(opendriveModel.header)
-        val modelIdentifier = ModelIdentifier(modelName = opendriveModel.header.name,
-                modelDate = opendriveModel.header.date,
-                modelVendor = opendriveModel.header.vendor,
-                sourceFileIdentifier = configuration.sourceFileIdentifier)
+        val modelIdentifier = ModelIdentifier(
+            modelName = opendriveModel.header.name,
+            modelDate = opendriveModel.header.date,
+            modelVendor = opendriveModel.header.vendor,
+            sourceFileIdentifier = configuration.sourceFileIdentifier
+        )
 
         // transformation of each road
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
         val roadspacesResults =
-                if (configuration.concurrentProcessing) transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar)
-                else transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar)
+            if (configuration.concurrentProcessing) transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar)
+            else transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar)
 
         val roadspaces = roadspacesResults.handleAndRemoveFailureIndexed { index, failure ->
             _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}", "Removing road.")
         }.map { it.id to it }.toMap()
 
-
         val junctions = opendriveModel.junction
-                .map { _topologyBuilder.buildJunction(modelIdentifier, it) }
-                .map { it.id to it }.toMap()
+            .map { _topologyBuilder.buildJunction(modelIdentifier, it) }
+            .map { it.id to it }.toMap()
         val laneTopology = LaneTopology(roadspaces, junctions)
 
         return RoadspacesModel(modelIdentifier, header, roadspaces, laneTopology)
-                .also { _reportLogger.info("Completed transformation: OpenDRIVE -> RoadspacesModel. ✔") }
+            .also { _reportLogger.info("Completed transformation: OpenDRIVE -> RoadspacesModel. ✔") }
     }
 
-    private fun transformRoadspacesSequentially(modelIdentifier: ModelIdentifier, opendriveModel: OpendriveModel,
-                                                progressBar: ProgressBar): List<Result<Roadspace, Exception>> =
+    private fun transformRoadspacesSequentially(
+        modelIdentifier: ModelIdentifier,
+        opendriveModel: OpendriveModel,
+        progressBar: ProgressBar
+    ): List<Result<Roadspace, Exception>> =
         opendriveModel.road.map {
             _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
         }
 
-    private fun transformRoadspacesConcurrently(modelIdentifier: ModelIdentifier, opendriveModel: OpendriveModel,
-                                                progressBar: ProgressBar): List<Result<Roadspace, Exception>> {
+    private fun transformRoadspacesConcurrently(
+        modelIdentifier: ModelIdentifier,
+        opendriveModel: OpendriveModel,
+        progressBar: ProgressBar
+    ): List<Result<Roadspace, Exception>> {
         val roadspacesDeferred = opendriveModel.road.map {
             GlobalScope.async {
                 _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
@@ -104,5 +110,4 @@ class Opendrive2RoadspacesTransformer(
         }
         return runBlocking { roadspacesDeferred.map { it.await() } }
     }
-
 }

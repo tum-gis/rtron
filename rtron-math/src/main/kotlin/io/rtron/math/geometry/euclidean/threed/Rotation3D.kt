@@ -16,15 +16,14 @@
 
 package io.rtron.math.geometry.euclidean.threed
 
-import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention
-import org.apache.commons.math3.geometry.euclidean.threed.RotationOrder
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.linear.RealMatrix
 import io.rtron.math.std.RAD_TO_DEG
 import io.rtron.math.std.normalizeAngle
+import org.apache.commons.math3.geometry.euclidean.threed.RotationConvention
+import org.apache.commons.math3.geometry.euclidean.threed.RotationOrder
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation as CMRotation
-
 
 /**
  * Rotation in the three dimensional space given as Tait-Bryan angles.
@@ -36,9 +35,9 @@ import org.apache.commons.math3.geometry.euclidean.threed.Rotation as CMRotation
  * @param roll around x’’-axis, 0.0 = level (parallel to x’’/y’’ plane)
  */
 class Rotation3D(
-        heading: Double,
-        pitch: Double = 0.0,
-        roll: Double = 0.0
+    heading: Double,
+    pitch: Double = 0.0,
+    roll: Double = 0.0
 ) {
 
     // Properties and Initializers
@@ -71,12 +70,12 @@ class Rotation3D(
      * @param selectAxis axis to be selected for 2D; selecting the z axis will take the heading angle for 2D
      */
     fun toRotation2D(selectAxis: Vector3D = Vector3D.Z_AXIS): Rotation2D =
-            when (selectAxis.normalized()) {
-                Vector3D.Z_AXIS -> Rotation2D(heading)
-                Vector3D.Y_AXIS -> Rotation2D(pitch)
-                Vector3D.X_AXIS -> Rotation2D(roll)
-                else -> throw IllegalArgumentException("Unknown axis.")
-            }
+        when (selectAxis.normalized()) {
+            Vector3D.Z_AXIS -> Rotation2D(heading)
+            Vector3D.Y_AXIS -> Rotation2D(pitch)
+            Vector3D.X_AXIS -> Rotation2D(roll)
+            else -> throw IllegalArgumentException("Unknown axis.")
+        }
 
     override fun toString(): String {
         return "Rotation3D(heading='$heading' pitch='$pitch' roll='$roll')"
@@ -88,5 +87,4 @@ class Rotation3D(
 
         val ZERO = Rotation3D(0.0, 0.0, 0.0)
     }
-
 }

@@ -21,16 +21,15 @@ import io.rtron.model.opendrive.common.EBorderType
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadObjectsObjectBordersBorder(
-        var cornerReference: List<RoadObjectsObjectMarkingsMarkingCornerReference> = listOf(),
+    var cornerReference: List<RoadObjectsObjectMarkingsMarkingCornerReference> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var width: Double = Double.NaN,
-        var type: EBorderType = EBorderType.UNKNOWN,
-        var outlineId: Int = Int.MIN_VALUE,
-        var useCompleteOutline: Boolean = true
+    var width: Double = Double.NaN,
+    var type: EBorderType = EBorderType.UNKNOWN,
+    var outlineId: Int = Int.MIN_VALUE,
+    var useCompleteOutline: Boolean = true
 )

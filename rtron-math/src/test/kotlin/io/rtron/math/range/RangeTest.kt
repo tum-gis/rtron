@@ -16,13 +16,14 @@
 
 package io.rtron.math.range
 
+import io.rtron.math.std.DBL_EPSILON
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.std.DBL_EPSILON
-
 
 internal class RangeTest {
 
@@ -145,7 +146,6 @@ internal class RangeTest {
         fun `negative orientation of the range throws an illegal argument exception`() {
             assertThatIllegalArgumentException().isThrownBy { Range.closed(-1.0, -1.25) }
         }
-
     }
 
     @Nested
@@ -208,7 +208,5 @@ internal class RangeTest {
 
             assertThatIllegalArgumentException().isThrownBy { rangeA.join(rangeB) }
         }
-
     }
-
 }

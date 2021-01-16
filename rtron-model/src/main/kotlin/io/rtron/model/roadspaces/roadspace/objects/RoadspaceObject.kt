@@ -19,7 +19,6 @@ package io.rtron.model.roadspaces.roadspace.objects
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
-
 /**
  * Represents an object within the road space.
  *
@@ -27,10 +26,10 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * @param attributes attributes containing information about the road space object
  */
 data class RoadspaceObject(
-        val id: RoadspaceObjectIdentifier,
-        val type: RoadObjectType = RoadObjectType.NONE,
-        val geometry: List<AbstractGeometry3D> = listOf(),
-        val attributes: AttributeList
+    val id: RoadspaceObjectIdentifier,
+    val type: RoadObjectType = RoadObjectType.NONE,
+    val geometry: List<AbstractGeometry3D> = listOf(),
+    val attributes: AttributeList
 ) {
 
     // Properties and Initializers

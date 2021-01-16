@@ -20,11 +20,10 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadPlanViewGeometryLine(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality()
 ) : RoadPlanViewGeometryInterface {
 
     // not known, due to no variables in this class

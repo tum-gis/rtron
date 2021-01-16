@@ -21,38 +21,37 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.common.*
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectLaneValidity
 
-
 data class RoadSignalsSignal(
-        var validity: List<RoadObjectsObjectLaneValidity> = listOf(),
-        var dependency: List<RoadSignalsSignalDependency> = listOf(),
-        var reference: List<RoadSignalsSignalReference> = listOf(),
+    var validity: List<RoadObjectsObjectLaneValidity> = listOf(),
+    var dependency: List<RoadSignalsSignalDependency> = listOf(),
+    var reference: List<RoadSignalsSignalReference> = listOf(),
 
-        var positionRoad: RoadSignalsSignalPositionRoad = RoadSignalsSignalPositionRoad(),
-        var positionInertial: RoadSignalsSignalPositionInertial = RoadSignalsSignalPositionInertial(),
+    var positionRoad: RoadSignalsSignalPositionRoad = RoadSignalsSignalPositionRoad(),
+    var positionInertial: RoadSignalsSignalPositionInertial = RoadSignalsSignalPositionInertial(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var s: Double = Double.NaN,
-        var t: Double = Double.NaN,
-        var id: String = "",
-        var name: String = "",
-        var dynamic: Boolean = false,
-        var orientation: EOrientation = EOrientation.NONE,
-        var zOffset: Double = Double.NaN,
-        var countryCode: CountryCode = CountryCode(),
-        var countryRevision: String = "",
-        var type: String = "",
-        var subtype: String = "",
-        var value: Double = Double.NaN,
-        var unit: EUnit = EUnit.UNKNOWN,
-        var height: Double = Double.NaN,
-        var width: Double = Double.NaN,
-        var text: String = "",
-        var hOffset: Double = Double.NaN,
-        var pitch: Double = Double.NaN,
-        var roll: Double = Double.NaN
+    var s: Double = Double.NaN,
+    var t: Double = Double.NaN,
+    var id: String = "",
+    var name: String = "",
+    var dynamic: Boolean = false,
+    var orientation: EOrientation = EOrientation.NONE,
+    var zOffset: Double = Double.NaN,
+    var countryCode: CountryCode = CountryCode(),
+    var countryRevision: String = "",
+    var type: String = "",
+    var subtype: String = "",
+    var value: Double = Double.NaN,
+    var unit: EUnit = EUnit.UNKNOWN,
+    var height: Double = Double.NaN,
+    var width: Double = Double.NaN,
+    var text: String = "",
+    var hOffset: Double = Double.NaN,
+    var pitch: Double = Double.NaN,
+    var roll: Double = Double.NaN
 ) {
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)

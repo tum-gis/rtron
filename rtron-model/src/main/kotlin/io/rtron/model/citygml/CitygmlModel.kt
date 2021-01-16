@@ -16,9 +16,8 @@
 
 package io.rtron.model.citygml
 
-import org.citygml4j.model.citygml.core.CityModel
 import io.rtron.model.AbstractModel
-
+import org.citygml4j.model.citygml.core.CityModel
 
 /**
  * Implementation of the CityGML data model according to version 2.0.
@@ -26,6 +25,6 @@ import io.rtron.model.AbstractModel
  *
  * @param cityModel implementation of the data model by citygml4j
  */
-class CitygmlModel (
-        val cityModel: CityModel
+class CitygmlModel(
+    val cityModel: CityModel
 ) : AbstractModel()

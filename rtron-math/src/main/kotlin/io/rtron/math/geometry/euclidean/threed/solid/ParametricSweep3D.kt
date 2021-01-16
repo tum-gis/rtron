@@ -33,7 +33,6 @@ import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.std.handleFailure
 
-
 /**
  * Represents a parametric sweep in 3D. This refers to a geometry solid, which is defined by a [referenceCurveXY].
  * The width and height of the solid is defined as functions along the reference curve.
@@ -44,22 +43,19 @@ import io.rtron.std.handleFailure
  * @param objectWidthFunction width of the object as function of the curve relative position
  */
 data class ParametricSweep3D(
-        val referenceCurveXY: LateralTranslatedCurve2D,
-        val absoluteHeight: UnivariateFunction,
-        val objectHeightFunction: LinearFunction,
-        val objectWidthFunction: LinearFunction,
-        override val tolerance: Double,
-        private val discretizationStepSize: Double = DEFAULT_STEP_SIZE
+    val referenceCurveXY: LateralTranslatedCurve2D,
+    val absoluteHeight: UnivariateFunction,
+    val objectHeightFunction: LinearFunction,
+    val objectWidthFunction: LinearFunction,
+    override val tolerance: Double,
+    private val discretizationStepSize: Double = DEFAULT_STEP_SIZE
 ) : AbstractSolid3D(), DefinableDomain<Double>, Tolerable {
 
     // Properties and Initializers
     init {
-        require(absoluteHeight.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance))
-        { "The absolute height function must be defined everywhere where the referenceCurveXY is also defined." }
-        require(objectHeightFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance))
-        { "The object height function must be defined everywhere where the referenceCurveXY is also defined." }
-        require(objectWidthFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance))
-        { "The object width function must be defined everywhere where the referenceCurveXY is also defined." }
+        require(absoluteHeight.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The absolute height function must be defined everywhere where the referenceCurveXY is also defined." }
+        require(objectHeightFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The object height function must be defined everywhere where the referenceCurveXY is also defined." }
+        require(objectWidthFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The object width function must be defined everywhere where the referenceCurveXY is also defined." }
     }
 
     override val domain: Range<Double>
@@ -116,14 +112,10 @@ data class ParametricSweep3D(
     }
 
     init {
-        require(lowerLeftVertices.zipWithNext().all { it.first != it.second })
-        { "Must not contain consecutively points." }
-        require(lowerRightVertices.zipWithNext().all { it.first != it.second })
-        { "Must not contain consecutively points." }
-        require(upperLeftVertices.zipWithNext().all { it.first != it.second })
-        { "Must not contain consecutively points." }
-        require(upperRightVertices.zipWithNext().all { it.first != it.second })
-        { "Must not contain consecutively points." }
+        require(lowerLeftVertices.zipWithNext().all { it.first != it.second }) { "Must not contain consecutively points." }
+        require(lowerRightVertices.zipWithNext().all { it.first != it.second }) { "Must not contain consecutively points." }
+        require(upperLeftVertices.zipWithNext().all { it.first != it.second }) { "Must not contain consecutively points." }
+        require(upperRightVertices.zipWithNext().all { it.first != it.second }) { "Must not contain consecutively points." }
     }
 
     // Methods
@@ -137,35 +129,42 @@ data class ParametricSweep3D(
 
         // calculate the start and end faces
         val startPolygons = run {
-            val linearRing = LinearRing3D.of(upperLeftVertices.first(), upperRightVertices.first(),
-                    lowerRightVertices.first(), lowerLeftVertices.first())
+            val linearRing = LinearRing3D.of(
+                upperLeftVertices.first(),
+                upperRightVertices.first(),
+                lowerRightVertices.first(),
+                lowerLeftVertices.first()
+            )
             linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
         }
         val endPolygons = run {
-            val linearRing = LinearRing3D.of(upperLeftVertices.last(), lowerLeftVertices.last(),
-                    lowerRightVertices.last(), upperRightVertices.last())
+            val linearRing = LinearRing3D.of(
+                upperLeftVertices.last(),
+                lowerLeftVertices.last(),
+                lowerRightVertices.last(),
+                upperRightVertices.last()
+            )
             linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
         }
 
         // combine all polygons
         val allPolygons = basePolygons + topPolygons + leftPolygons + rightPolygons +
-                startPolygons + endPolygons
+            startPolygons + endPolygons
         return Result.success(allPolygons)
     }
 
     private fun createPolygons(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>):
-            Result<List<Polygon3D>, Exception> =
+        Result<List<Polygon3D>, Exception> =
             LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
-                    .handleFailure { return it }
-                    .map { it.calculatePolygonsGlobalCS() }
-                    .handleFailure { return it }
-                    .flatten()
-                    .let { Result.success(it) }
+                .handleFailure { return it }
+                .map { it.calculatePolygonsGlobalCS() }
+                .handleFailure { return it }
+                .flatten()
+                .let { Result.success(it) }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 
     companion object {
         const val DEFAULT_STEP_SIZE: Double = 0.3 // used for tesselation
     }
-
 }

@@ -16,7 +16,6 @@
 
 package io.rtron.model.roadspaces.roadspace.objects
 
-
 enum class RoadObjectType {
     NONE,
     OBSTACLE,

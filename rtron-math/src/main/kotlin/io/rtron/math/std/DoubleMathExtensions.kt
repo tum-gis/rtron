@@ -29,8 +29,8 @@ import com.google.common.math.DoubleMath as GDoubleMath
  * @return true, if abs(a - b) <= tolerance
  */
 fun fuzzyEquals(a: Double, b: Double, tolerance: Double): Boolean =
-        if (tolerance == 0.0) a == b
-        else GDoubleMath.fuzzyEquals(a, b, tolerance)
+    if (tolerance == 0.0) a == b
+    else GDoubleMath.fuzzyEquals(a, b, tolerance)
 
 /**
  * Returns the comparison of [a] and [b] with a defined [tolerance].
@@ -41,7 +41,7 @@ fun fuzzyEquals(a: Double, b: Double, tolerance: Double): Boolean =
  * @return 0 for a fuzzyEquals b; -1 for a < b; 1 for a > b
  */
 fun fuzzyCompare(a: Double, b: Double, tolerance: Double) =
-        GDoubleMath.fuzzyCompare(a, b, tolerance)
+    GDoubleMath.fuzzyCompare(a, b, tolerance)
 
 /**
  * Returns true, if [a] <= [b] with a [tolerance].
@@ -52,7 +52,7 @@ fun fuzzyCompare(a: Double, b: Double, tolerance: Double) =
  * @return true, if [a] <= [b] with a [tolerance]; false otherwise
  */
 fun fuzzyLessThanOrEquals(a: Double, b: Double, tolerance: Double) =
-        a <= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
+    a <= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
 
 /**
  * Returns true, if [a] >= [b] with a [tolerance].
@@ -63,7 +63,7 @@ fun fuzzyLessThanOrEquals(a: Double, b: Double, tolerance: Double) =
  * @return true, if [a] >= [b] with a [tolerance]; false otherwise
  */
 fun fuzzyMoreThanOrEquals(a: Double, b: Double, tolerance: Double) =
-        a >= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
+    a >= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
 
 /**
  * Normalizes an [angle] around the [center].

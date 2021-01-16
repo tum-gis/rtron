@@ -23,12 +23,11 @@ import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfig
 import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import org.citygml4j.model.citygml.cityfurniture.CityFurniture
 
-
 /**
  * Builder for city objects of the CityGML CityFurniture module.
  */
 class CityFurnitureModuleBuilder(
-        val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Properties and Initializers

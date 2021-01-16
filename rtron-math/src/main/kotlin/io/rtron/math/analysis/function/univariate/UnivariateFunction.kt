@@ -22,7 +22,6 @@ import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.fuzzyContains
 import io.rtron.std.handleFailure
 
-
 /**
  * Function with exactly one parameter of the form z = f(x).
  */
@@ -94,10 +93,10 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * successful
      */
     fun slope(x: Double) =
-            when (x) {
-                in domain -> slopeUnbounded(x)
-                else -> Result.error(IllegalArgumentException("Value x=$x must be within in the defined $domain."))
-            }
+        when (x) {
+            in domain -> slopeUnbounded(x)
+            else -> Result.error(IllegalArgumentException("Value x=$x must be within in the defined $domain."))
+        }
 
     /**
      * Evaluation of the slope = f(x) with fuzzy checking whether x is within the function's [domain].
@@ -112,5 +111,4 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
             Result.error(IllegalArgumentException("Value x=$x must be within in the defined $domain."))
         else slopeUnbounded(x)
     }
-
 }

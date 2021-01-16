@@ -21,7 +21,7 @@ import io.rtron.io.files.Path
 import io.rtron.model.AbstractModel
 
 abstract class AbstractReaderWriter(
-        open val configuration: AbstractReaderWriterConfiguration
+    open val configuration: AbstractReaderWriterConfiguration
 ) {
 
     // Properties and Initializers
@@ -33,5 +33,4 @@ abstract class AbstractReaderWriter(
     abstract fun read(filePath: Path): AbstractModel
 
     abstract fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception>
-
 }

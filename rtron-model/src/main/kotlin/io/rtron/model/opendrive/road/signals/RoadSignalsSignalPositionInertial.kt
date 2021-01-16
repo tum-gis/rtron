@@ -20,16 +20,15 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadSignalsSignalPositionInertial(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var x: Double = Double.NaN,
-        var y: Double = Double.NaN,
-        var z: Double = Double.NaN,
-        var hdg: Double = Double.NaN,
-        var pitch: Double = Double.NaN,
-        var roll: Double = Double.NaN
+    var x: Double = Double.NaN,
+    var y: Double = Double.NaN,
+    var z: Double = Double.NaN,
+    var hdg: Double = Double.NaN,
+    var pitch: Double = Double.NaN,
+    var roll: Double = Double.NaN
 )

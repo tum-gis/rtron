@@ -16,14 +16,13 @@
 
 package io.rtron.math.transform
 
-
 /**
  * Represents a sequence of affine transformation matrices in 3D.
  *
  * @param affineList list of consecutively applied [AffineSequence3D] transformation matrices
  */
 data class AffineSequence3D(
-        val affineList: List<Affine3D>
+    val affineList: List<Affine3D>
 ) {
     // Properties and Initializers
 

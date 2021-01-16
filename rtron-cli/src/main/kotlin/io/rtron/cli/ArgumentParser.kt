@@ -44,14 +44,14 @@ class ColorHelpFormatter : CliktHelpFormatter() {
     override fun optionMetavar(option: HelpFormatter.ParameterHelp.Option) = tc.green(super.optionMetavar(option))
 }
 
-
 /**
  * Parser of the command line interface arguments.
  */
 class ArgumentParser : CliktCommand(
-        name = "rtron".toLowerCase(),
-        help = """r:trån transforms road networks described in OpenDRIVE into the virtual 3D city model standard CityGML.""".trimMargin(),
-        printHelpOnEmptyArgs = true
+    name = "rtron".toLowerCase(),
+    help =
+        """r:trån transforms road networks described in OpenDRIVE into the virtual 3D city model standard CityGML.""".trimMargin(),
+    printHelpOnEmptyArgs = true
 ) {
 
     // Properties and Initializers
@@ -63,16 +63,25 @@ class ArgumentParser : CliktCommand(
     }
 
     private val inputPath by argument(
-            help = "Path to the directory containing OpenDRIVE datasets").path(mustExist = true)
+        help = "Path to the directory containing OpenDRIVE datasets"
+    ).path(mustExist = true)
     private val outputPath by argument(
-            help = "Path to the output directory into which the transformed CityGML models are written").path()
-    private val noRecursive by option("--no-recursive",
-            help = "Do not search recursively for input files in given input directory").flag(default = false)
-    private val concurrentProcessing by option("--concurrent", help = "Enable concurrent processing " +
-            "during the transformation of a model (experimental)").flag(default = false)
-    private val clean by option("--clean", "-c",
-            help = "Clean output directory by deleting its current content before starting").flag(default = false)
-
+        help = "Path to the output directory into which the transformed CityGML models are written"
+    ).path()
+    private val noRecursive by option(
+        "--no-recursive",
+        help = "Do not search recursively for input files in given input directory"
+    ).flag(default = false)
+    private val concurrentProcessing by option(
+        "--concurrent",
+        help = "Enable concurrent processing " +
+            "during the transformation of a model (experimental)"
+    ).flag(default = false)
+    private val clean by option(
+        "--clean",
+        "-c",
+        help = "Clean output directory by deleting its current content before starting"
+    ).flag(default = false)
 
     // Methods
     override fun run() {}
@@ -80,6 +89,11 @@ class ArgumentParser : CliktCommand(
     /**
      * Parses arguments to the [BatchConfiguration].
      */
-    fun parseConfiguration() = BatchConfiguration(inputPath.toPath(), outputPath.toPath(),
-            !noRecursive, concurrentProcessing = concurrentProcessing, clean = clean)
+    fun parseConfiguration() = BatchConfiguration(
+        inputPath.toPath(),
+        outputPath.toPath(),
+        !noRecursive,
+        concurrentProcessing = concurrentProcessing,
+        clean = clean
+    )
 }

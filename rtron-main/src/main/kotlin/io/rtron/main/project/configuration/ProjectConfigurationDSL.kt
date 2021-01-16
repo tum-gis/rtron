@@ -40,7 +40,6 @@ class ConfigurationBuilder {
     fun build() = ProjectUserConfiguration(opendrive2RoadspacesParameters, roadspace2CitygmlParameters)
 }
 
-
 fun configure(setup: ConfigurationBuilder.() -> Unit): ProjectUserConfiguration {
     val builder = ConfigurationBuilder()
     builder.setup()

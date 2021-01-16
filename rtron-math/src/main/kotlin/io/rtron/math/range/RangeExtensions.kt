@@ -6,19 +6,19 @@ package io.rtron.math.range
  * @receiver provided set of ranges for which the intersecting range shall be found
  * @return maximum range that intersects all ranges within the set
  */
-fun <T: Comparable<*>> Set<Range<T>>.intersectingRange(): Range<T> =
-        reduce { acc, element -> acc.intersection(element) }
+fun <T : Comparable<*>> Set<Range<T>>.intersectingRange(): Range<T> =
+    reduce { acc, element -> acc.intersection(element) }
 
 /**
  * Union operation of a set of [Range] to a [RangeSet].
  */
-fun <T: Comparable<*>> Set<Range<T>>.unionRanges(): RangeSet<T> =
-        map { RangeSet.of(it) }.toSet().unionRangeSets()
+fun <T : Comparable<*>> Set<Range<T>>.unionRanges(): RangeSet<T> =
+    map { RangeSet.of(it) }.toSet().unionRangeSets()
 
 /**
  * Returns true, if the set of ranges contains intersecting [Range].
  */
-fun <T: Comparable<*>> Set<Range<T>>.containsIntersectingRanges(): Boolean {
+fun <T : Comparable<*>> Set<Range<T>>.containsIntersectingRanges(): Boolean {
     val rangeSetsList = this.map { RangeSet.of(it) }
     return rangeSetsList.toSet().containsIntersectingRangeSets()
 }
@@ -26,5 +26,5 @@ fun <T: Comparable<*>> Set<Range<T>>.containsIntersectingRanges(): Boolean {
 /**
  * Returns true, if the list of ranges contains consecutively following ranges that intersect.
  */
-fun <T: Comparable<*>> List<Range<T>>.containsConsecutivelyIntersectingRanges(): Boolean =
-        map { it.toRangeSet() }.zipWithNext().any { it.first.intersects(it.second) }
+fun <T : Comparable<*>> List<Range<T>>.containsConsecutivelyIntersectingRanges(): Boolean =
+    map { it.toRangeSet() }.zipWithNext().any { it.first.intersects(it.second) }

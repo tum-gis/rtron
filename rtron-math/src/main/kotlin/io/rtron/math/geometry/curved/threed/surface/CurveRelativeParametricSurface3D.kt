@@ -25,7 +25,6 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.std.handleFailure
 
-
 /**
  * Surface which is defined along the [baseCurve]. The height of the surface id defined by means of a
  * [BivariateFunction].
@@ -35,8 +34,8 @@ import io.rtron.std.handleFailure
  * is interpreted as lateral offset
  */
 class CurveRelativeParametricSurface3D(
-        private val baseCurve: Curve3D,
-        private val heightFunction: BivariateFunction = PlaneFunction.ZERO
+    private val baseCurve: Curve3D,
+    private val heightFunction: BivariateFunction = PlaneFunction.ZERO
 ) : AbstractCurveRelativeSurface3D() {
 
     // Properties and Initializers
@@ -44,21 +43,20 @@ class CurveRelativeParametricSurface3D(
     override val domain get() = baseCurve.domain
 
     init {
-        require(heightFunction.domainX.fuzzyEncloses(baseCurve.domain, tolerance))
-        { "The height function must be defined everywhere where the referenceLine is also defined." }
+        require(heightFunction.domainX.fuzzyEncloses(baseCurve.domain, tolerance)) { "The height function must be defined everywhere where the referenceLine is also defined." }
     }
 
     // Methods
     override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-            Result<Vector3D, Exception> {
+        Result<Vector3D, Exception> {
 
-        val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
+            val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
                 .handleFailure { throw it.error }
-        val surfaceHeight = heightFunction
+            val surfaceHeight = heightFunction
                 .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)
                 .handleFailure { throw it.error }
-        val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
+            val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
 
-        return Result.success(affine.transform(offset))
-    }
+            return Result.success(affine.transform(offset))
+        }
 }

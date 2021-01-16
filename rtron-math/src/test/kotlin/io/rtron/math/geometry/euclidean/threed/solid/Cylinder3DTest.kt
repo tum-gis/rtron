@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class Cylinder3DTest {
 
     @Nested

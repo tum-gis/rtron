@@ -23,9 +23,8 @@ import io.rtron.std.handleSuccess
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.header.Header as OdrHeader
 
-
 class HeaderBuilder(
-        private val configuration: Opendrive2RoadspacesConfiguration
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Methods

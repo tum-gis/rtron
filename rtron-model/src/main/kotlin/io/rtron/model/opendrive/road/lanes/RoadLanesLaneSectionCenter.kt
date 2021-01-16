@@ -20,16 +20,14 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadLanesLaneSectionCenter(
-        var lane: List<RoadLanesLaneSectionCenterLane> = listOf(),
+    var lane: List<RoadLanesLaneSectionCenterLane> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality()
 ) {
 
     // Methods
     fun getNumberOfLanes() = lane.size
-
 }

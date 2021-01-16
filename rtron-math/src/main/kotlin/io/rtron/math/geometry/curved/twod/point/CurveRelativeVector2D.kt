@@ -19,7 +19,6 @@ package io.rtron.math.geometry.curved.twod.point
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 
-
 /**
  * Point in a curve relative coordinate system in 2D. This means that only points can be referenced which are on the
  * curve or laterally translated to the curve.
@@ -28,8 +27,8 @@ import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
  * @param lateralOffset lateral offset that is perpendicular to the curve at the [curvePosition]
  */
 data class CurveRelativeVector2D(
-        val curvePosition: Double,
-        val lateralOffset: Double = 0.0
+    val curvePosition: Double,
+    val lateralOffset: Double = 0.0
 ) {
 
     // Properties and Initializers
@@ -41,7 +40,7 @@ data class CurveRelativeVector2D(
     // Conversions
     fun toCurveRelative1D() = CurveRelativeVector1D(this.curvePosition)
     fun toCurveRelative3D(heightOffset: Double = 0.0) =
-            CurveRelativeVector3D(this.curvePosition, this.lateralOffset, heightOffset)
+        CurveRelativeVector3D(this.curvePosition, this.lateralOffset, heightOffset)
 
     companion object {
         val ZERO = CurveRelativeVector2D(0.0, 0.0)

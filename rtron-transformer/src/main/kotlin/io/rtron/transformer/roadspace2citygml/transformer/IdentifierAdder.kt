@@ -27,13 +27,12 @@ import org.citygml4j.util.gmlid.DefaultGMLIdManager
 import java.util.*
 import kotlin.collections.HashMap
 
-
 /**
  * Adds object identifiers from the RoadSpaces model to an [AbstractCityObject] (CityGML model).
  */
 class IdentifierAdder(
-        private val parameters: Roadspaces2CitygmlParameters,
-        private val reportLogger: Logger
+    private val parameters: Roadspaces2CitygmlParameters,
+    private val reportLogger: Logger
 ) {
 
     // Properties and Initializers
@@ -62,8 +61,8 @@ class IdentifierAdder(
      */
     fun addIdentifier(id: RoadspaceObjectIdentifier, dstCityObject: AbstractCityObject) {
         val hashKey = id.roadspaceObjectId + '_' +
-                id.roadspaceIdentifier.roadspaceId + '_' +
-                id.roadspaceIdentifier.modelIdentifier.fileHashSha256
+            id.roadspaceIdentifier.roadspaceId + '_' +
+            id.roadspaceIdentifier.modelIdentifier.fileHashSha256
 
         dstCityObject.id = generateHashUUID(hashKey)
         dstCityObject.addName(Code(id.roadspaceObjectName))
@@ -74,10 +73,10 @@ class IdentifierAdder(
      */
     fun addIdentifier(id: LaneIdentifier, name: String, dstCityObject: AbstractCityObject) {
         val hashKey = name + '_' +
-                id.laneId + '_' +
-                id.laneSectionIdentifier.laneSectionId + '_' +
-                id.laneSectionIdentifier.roadspaceIdentifier.roadspaceId + '_' +
-                id.laneSectionIdentifier.roadspaceIdentifier.modelIdentifier.fileHashSha256
+            id.laneId + '_' +
+            id.laneSectionIdentifier.laneSectionId + '_' +
+            id.laneSectionIdentifier.roadspaceIdentifier.roadspaceId + '_' +
+            id.laneSectionIdentifier.roadspaceIdentifier.modelIdentifier.fileHashSha256
 
         dstCityObject.id = generateHashUUID(hashKey)
         dstCityObject.addName(Code(name))

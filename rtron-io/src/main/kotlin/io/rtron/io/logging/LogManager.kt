@@ -26,7 +26,6 @@ import org.apache.logging.log4j.core.layout.PatternLayout
 import org.apache.logging.log4j.LogManager as L4JLogManager
 import org.apache.logging.log4j.core.Logger as L4JCoreLogger
 
-
 /**
  * LogManager creates and parametrizes the [Logger] instances.
  */
@@ -66,12 +65,14 @@ object LogManager {
 
     private fun getAppender(name: String, logFilePath: Path): Appender {
         val layout = PatternLayout.newBuilder()
-                .withConfiguration(loggerConfiguration)
-                .withPattern("%d{ISO8601} %-5level %msg%n")
-                .build()
+            .withConfiguration(loggerConfiguration)
+            .withPattern("%d{ISO8601} %-5level %msg%n")
+            .build()
 
-        val appender = (RollingFileAppender.newBuilder<RollingFileAppenderBuilder>()
-                as RollingFileAppender.Builder<RollingFileAppenderBuilder>).apply {
+        val appender = (
+            RollingFileAppender.newBuilder<RollingFileAppenderBuilder>()
+                as RollingFileAppender.Builder<RollingFileAppenderBuilder>
+            ).apply {
             setConfiguration(loggerConfiguration)
             setName(name)
             withFileName(logFilePath.toString())
@@ -83,7 +84,6 @@ object LogManager {
 
         return appender.apply { start() }
     }
-
 }
 
 /**

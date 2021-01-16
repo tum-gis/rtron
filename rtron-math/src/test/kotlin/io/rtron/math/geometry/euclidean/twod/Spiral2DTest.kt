@@ -16,16 +16,14 @@
 
 package io.rtron.math.geometry.euclidean.twod
 
+import io.rtron.math.geometry.euclidean.twod.curve.Spiral2D
+import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import io.rtron.math.std.DBL_EPSILON_1
+import io.rtron.math.std.PI
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.twod.curve.Spiral2D
-import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-import io.rtron.math.std.DBL_EPSILON_1
-
-import io.rtron.math.std.PI
-
 
 internal class Spiral2DTest {
 
@@ -76,5 +74,4 @@ internal class Spiral2DTest {
             assertThat(actualRotation.toAngleRadians()).isEqualTo(0.0)
         }
     }
-
 }

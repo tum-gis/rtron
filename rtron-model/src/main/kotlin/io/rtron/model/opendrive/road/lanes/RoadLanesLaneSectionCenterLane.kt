@@ -21,16 +21,15 @@ import io.rtron.model.opendrive.common.ELaneType
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadLanesLaneSectionCenterLane(
-        var link: RoadLanesLaneSectionLCRLaneLink = RoadLanesLaneSectionLCRLaneLink(),
-        var roadMark: List<RoadLanesLaneSectionLCRLaneRoadMark> = listOf(),
+    var link: RoadLanesLaneSectionLCRLaneLink = RoadLanesLaneSectionLCRLaneLink(),
+    var roadMark: List<RoadLanesLaneSectionLCRLaneRoadMark> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var id: Int = 0,
-        var type: ELaneType = ELaneType.NONE,
-        var level: Boolean = false
+    var id: Int = 0,
+    var type: ELaneType = ELaneType.NONE,
+    var level: Boolean = false
 )

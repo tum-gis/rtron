@@ -24,19 +24,18 @@ import io.rtron.transformer.TransformerConfiguration
 
 typealias Roadspaces2CitygmlConfiguration = TransformerConfiguration<Roadspaces2CitygmlParameters>
 
-
 /**
  * Transformation parameters for the RoadSpaces model to the CityGML model transformer.
  */
 class Roadspaces2CitygmlParameters(
-        private val gmlIdPrefixProperty: Property<String> = Property("UUID_", isDefault = true),
-        private val identifierAttributesPrefixProperty: Property<String> = Property("identifier_", isDefault = true),
-        private val geometryAttributesPrefixProperty: Property<String> = Property("geometry_", isDefault = true),
-        private val flattenGenericAttributeSetsProperty: Property<Boolean> = Property(value = true, isDefault = true),
-        private val discretizationStepSizeProperty: Property<Double> = Property(0.7, true),
-        private val sweepDiscretizationStepSizeProperty: Property<Double> = Property(ParametricSweep3D.DEFAULT_STEP_SIZE, true),
-        private val circleSlicesProperty: Property<Int> = Property(Cylinder3D.DEFAULT_NUMBER_SLICES, true),
-        private val generateRandomGeometryIdsProperty: Property<Boolean> = Property(value = true, isDefault = true)
+    private val gmlIdPrefixProperty: Property<String> = Property("UUID_", isDefault = true),
+    private val identifierAttributesPrefixProperty: Property<String> = Property("identifier_", isDefault = true),
+    private val geometryAttributesPrefixProperty: Property<String> = Property("geometry_", isDefault = true),
+    private val flattenGenericAttributeSetsProperty: Property<Boolean> = Property(value = true, isDefault = true),
+    private val discretizationStepSizeProperty: Property<Double> = Property(0.7, true),
+    private val sweepDiscretizationStepSizeProperty: Property<Double> = Property(ParametricSweep3D.DEFAULT_STEP_SIZE, true),
+    private val circleSlicesProperty: Property<Int> = Property(Cylinder3D.DEFAULT_NUMBER_SLICES, true),
+    private val generateRandomGeometryIdsProperty: Property<Boolean> = Property(value = true, isDefault = true)
 ) : AbstractTransformerParameters() {
 
     // Properties and Initializers
@@ -81,27 +80,26 @@ class Roadspaces2CitygmlParameters(
      */
     val generateRandomGeometryIds by generateRandomGeometryIdsProperty
 
-
     // Methods
 
     /**
      * Merges the [other] parameters into this. See [Property.leftMerge] for the prioritization rules.
      */
     infix fun leftMerge(other: Roadspaces2CitygmlParameters) = Roadspaces2CitygmlParameters(
-            this.gmlIdPrefixProperty leftMerge other.gmlIdPrefixProperty,
-            this.identifierAttributesPrefixProperty leftMerge other.identifierAttributesPrefixProperty,
-            this.geometryAttributesPrefixProperty leftMerge other.geometryAttributesPrefixProperty,
-            this.flattenGenericAttributeSetsProperty leftMerge other.flattenGenericAttributeSetsProperty,
-            this.discretizationStepSizeProperty leftMerge other.discretizationStepSizeProperty,
-            this.sweepDiscretizationStepSizeProperty leftMerge other.sweepDiscretizationStepSizeProperty,
-            this.circleSlicesProperty leftMerge other.circleSlicesProperty,
-            this.generateRandomGeometryIdsProperty leftMerge other.generateRandomGeometryIdsProperty
+        this.gmlIdPrefixProperty leftMerge other.gmlIdPrefixProperty,
+        this.identifierAttributesPrefixProperty leftMerge other.identifierAttributesPrefixProperty,
+        this.geometryAttributesPrefixProperty leftMerge other.geometryAttributesPrefixProperty,
+        this.flattenGenericAttributeSetsProperty leftMerge other.flattenGenericAttributeSetsProperty,
+        this.discretizationStepSizeProperty leftMerge other.discretizationStepSizeProperty,
+        this.sweepDiscretizationStepSizeProperty leftMerge other.sweepDiscretizationStepSizeProperty,
+        this.circleSlicesProperty leftMerge other.circleSlicesProperty,
+        this.generateRandomGeometryIdsProperty leftMerge other.generateRandomGeometryIdsProperty
     )
 
     // Conversions
     override fun toString(): String =
-            "Roadspaces2CitygmlParameters(gmlIdPrefix=$gmlIdPrefix, identifierAttributesPrefix=$identifierAttributesPrefix, " +
-                    "flattenGenericAttributeSets=$flattenGenericAttributeSets, discretizationStepSize=$discretizationStepSize, " +
-                    "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices, " +
-                    "generateRandomGeometryIds=$generateRandomGeometryIds)"
+        "Roadspaces2CitygmlParameters(gmlIdPrefix=$gmlIdPrefix, identifierAttributesPrefix=$identifierAttributesPrefix, " +
+            "flattenGenericAttributeSets=$flattenGenericAttributeSets, discretizationStepSize=$discretizationStepSize, " +
+            "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices, " +
+            "generateRandomGeometryIds=$generateRandomGeometryIds)"
 }

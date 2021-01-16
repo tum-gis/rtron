@@ -33,13 +33,12 @@ import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
-
 /**
  * Builder for functions of the OpenDRIVE data model.
  */
 class FunctionBuilder(
-        private val reportLogger: Logger,
-        private val parameters: Opendrive2RoadspacesParameters
+    private val reportLogger: Logger,
+    private val parameters: Opendrive2RoadspacesParameters
 ) {
 
     // Methods
@@ -50,21 +49,25 @@ class FunctionBuilder(
      * @param srcSuperelevation entries containing coefficients for polynomial functions
      */
     fun buildCurveTorsion(id: RoadspaceIdentifier, srcSuperelevation: List<RoadLateralProfileSuperelevation>):
-            UnivariateFunction {
-        if (srcSuperelevation.isEmpty()) return LinearFunction.X_AXIS
+        UnivariateFunction {
+            if (srcSuperelevation.isEmpty()) return LinearFunction.X_AXIS
 
-        val superelevationEntriesAdjusted = srcSuperelevation
+            val superelevationEntriesAdjusted = srcSuperelevation
                 .filterToStrictSortingBy { it.s }
-        if (superelevationEntriesAdjusted.size < srcSuperelevation.size)
-            this.reportLogger.info("Removing superelevation entries which are not placed in strict order" +
-                    " according to s.", id.toString())
+            if (superelevationEntriesAdjusted.size < srcSuperelevation.size)
+                this.reportLogger.info(
+                    "Removing superelevation entries which are not placed in strict order" +
+                        " according to s.",
+                    id.toString()
+                )
 
-        return ConcatenatedFunction.ofPolynomialFunctions(
+            return ConcatenatedFunction.ofPolynomialFunctions(
                 superelevationEntriesAdjusted.map { it.s },
                 superelevationEntriesAdjusted.map { it.coefficients },
                 prependConstant = true,
-                prependConstantValue = 0.0)
-    }
+                prependConstantValue = 0.0
+            )
+        }
 
     /**
      * Builds a function that describes one lateral entry of a road's shape.
@@ -72,23 +75,25 @@ class FunctionBuilder(
      * @param srcRoadLateralProfileShape the cross-sectional profile of a road at a certain curve position
      */
     fun buildLateralShape(id: RoadspaceIdentifier, srcRoadLateralProfileShape: List<RoadLateralProfileShape>):
-            UnivariateFunction {
-        require(srcRoadLateralProfileShape.isNotEmpty())
-        { "Lateral profile shape must contain elements in order to build a univariate function." }
-        require(srcRoadLateralProfileShape.all { it.s == srcRoadLateralProfileShape.first().s })
-        { "All lateral profile shape elements must have the same curve position." }
+        UnivariateFunction {
+            require(srcRoadLateralProfileShape.isNotEmpty()) { "Lateral profile shape must contain elements in order to build a univariate function." }
+            require(srcRoadLateralProfileShape.all { it.s == srcRoadLateralProfileShape.first().s }) { "All lateral profile shape elements must have the same curve position." }
 
-        val lateralProfileEntriesAdjusted = srcRoadLateralProfileShape
+            val lateralProfileEntriesAdjusted = srcRoadLateralProfileShape
                 .filterToStrictSortingBy { it.t }
-        if (lateralProfileEntriesAdjusted.size < srcRoadLateralProfileShape.size)
-            this.reportLogger.info("Removing lateral profile entries which are not placed in strict order " +
-                    "according to t.", id.toString())
+            if (lateralProfileEntriesAdjusted.size < srcRoadLateralProfileShape.size)
+                this.reportLogger.info(
+                    "Removing lateral profile entries which are not placed in strict order " +
+                        "according to t.",
+                    id.toString()
+                )
 
-        return ConcatenatedFunction.ofPolynomialFunctions(
+            return ConcatenatedFunction.ofPolynomialFunctions(
                 lateralProfileEntriesAdjusted.map { it.t },
                 lateralProfileEntriesAdjusted.map { it.coefficients },
-                prependConstant = true)
-    }
+                prependConstant = true
+            )
+        }
 
     /**
      * Builds a function that described the lateral lane offset to the road reference line.
@@ -98,16 +103,19 @@ class FunctionBuilder(
 
         val laneOffsetEntriesAdjusted = srcLanes.laneOffset.filterToStrictSortingBy { it.s }
         if (laneOffsetEntriesAdjusted.size < srcLanes.laneOffset.size)
-            this.reportLogger.info("Removing lane offset entries which are not placed in strict order " +
-                    "according to s.", id.toString())
+            this.reportLogger.info(
+                "Removing lane offset entries which are not placed in strict order " +
+                    "according to s.",
+                id.toString()
+            )
 
         return ConcatenatedFunction.ofPolynomialFunctions(
-                laneOffsetEntriesAdjusted.map { it.s },
-                laneOffsetEntriesAdjusted.map { it.coefficients },
-                prependConstant = true,
-                prependConstantValue = 0.0)
+            laneOffsetEntriesAdjusted.map { it.s },
+            laneOffsetEntriesAdjusted.map { it.coefficients },
+            prependConstant = true,
+            prependConstantValue = 0.0
+        )
     }
-
 
     /**
      * Builds a function that describes the lane width.
@@ -117,30 +125,38 @@ class FunctionBuilder(
      * @return function describing the width of a lane
      */
     fun buildLaneWidth(id: LaneIdentifier, srcLaneWidthEntries: List<RoadLanesLaneSectionLRLaneWidth>):
-            UnivariateFunction {
-        if (srcLaneWidthEntries.isEmpty()) {
-            this.reportLogger.info("The lane does not contain any width entries. " +
-                    "Continuing with a zero width.", id.toString())
-            return LinearFunction.X_AXIS
-        }
+        UnivariateFunction {
+            if (srcLaneWidthEntries.isEmpty()) {
+                this.reportLogger.info(
+                    "The lane does not contain any width entries. " +
+                        "Continuing with a zero width.",
+                    id.toString()
+                )
+                return LinearFunction.X_AXIS
+            }
 
-        if (srcLaneWidthEntries.first().sOffset > 0.0)
-            this.reportLogger.info("The width should be defined for the full length of the lane section and" +
-                    " thus must also be defined for s=0.0. Not defined positions are interpreted with a width of 0.",
-                    id.toString())
+            if (srcLaneWidthEntries.first().sOffset > 0.0)
+                this.reportLogger.info(
+                    "The width should be defined for the full length of the lane section and" +
+                        " thus must also be defined for s=0.0. Not defined positions are interpreted with a width of 0.",
+                    id.toString()
+                )
 
-        val widthEntriesAdjusted = srcLaneWidthEntries
+            val widthEntriesAdjusted = srcLaneWidthEntries
                 .filterToStrictSortingBy { it.sOffset }
-        if (widthEntriesAdjusted.size < srcLaneWidthEntries.size)
-            this.reportLogger.info("Removing width entries which are not in strict order according to sOffset.",
-                    id.toString())
+            if (widthEntriesAdjusted.size < srcLaneWidthEntries.size)
+                this.reportLogger.info(
+                    "Removing width entries which are not in strict order according to sOffset.",
+                    id.toString()
+                )
 
-        return ConcatenatedFunction.ofPolynomialFunctions(
+            return ConcatenatedFunction.ofPolynomialFunctions(
                 widthEntriesAdjusted.map { it.sOffset },
                 widthEntriesAdjusted.map { it.coefficients },
                 prependConstant = true,
-                prependConstantValue = 0.0)
-    }
+                prependConstantValue = 0.0
+            )
+        }
 
     /**
      * Returns the absolute height function of a [RoadObjectsObjectRepeat] object. Therefore a linear function is build
@@ -151,11 +167,12 @@ class FunctionBuilder(
      * @return function of the object's absolute height
      */
     fun buildStackedHeightFunctionFromRepeat(srcRepeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
-            StackedFunction {
+        StackedFunction {
 
-        val heightFunctionSection = SectionedUnivariateFunction(
-                roadReferenceLine.heightFunction, srcRepeat.getRoadReferenceLineParameterSection())
-        return StackedFunction.ofSum(heightFunctionSection, srcRepeat.getHeightOffsetFunction())
-    }
-
+            val heightFunctionSection = SectionedUnivariateFunction(
+                roadReferenceLine.heightFunction,
+                srcRepeat.getRoadReferenceLineParameterSection()
+            )
+            return StackedFunction.ofSum(heightFunctionSection, srcRepeat.getHeightOffsetFunction())
+        }
 }

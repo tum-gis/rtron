@@ -20,7 +20,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class RealVectorUtilsTest {
 
     @Nested
@@ -58,7 +57,5 @@ internal class RealVectorUtilsTest {
 
             assertThat(actualSpan).isEqualTo(0)
         }
-
     }
-
 }

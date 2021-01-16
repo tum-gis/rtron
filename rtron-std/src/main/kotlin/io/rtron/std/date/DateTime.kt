@@ -32,11 +32,10 @@ annotation class ExperimentalDateTime
  */
 @ExperimentalDateTime
 class DateTime(
-        private val _localDateTime: LocalDateTime
+    private val _localDateTime: LocalDateTime
 ) {
 
     // Properties and Initializers
-
 
     companion object {
         fun of(text: String) = DateTime(LocalDateTime.parse(text))

@@ -19,7 +19,6 @@ package io.rtron.model.roadspaces.roadspace.road
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
-
 /**
  * Represents a single road marking.
  *
@@ -27,6 +26,6 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * @param attributes further information attributes
  */
 data class RoadMarking(
-        val width: ConstantFunction,
-        val attributes: AttributeList
+    val width: ConstantFunction,
+    val attributes: AttributeList
 )

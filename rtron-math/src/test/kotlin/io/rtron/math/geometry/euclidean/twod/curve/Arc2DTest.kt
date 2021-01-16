@@ -75,7 +75,6 @@ internal class Arc2DTest {
 
             assertThat(actualStartAngle).isEqualTo(HALF_PI)
         }
-
     }
 
     @Nested
@@ -139,9 +138,7 @@ internal class Arc2DTest {
             require(actualReturn is Result.Success)
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(HALF_PI)
         }
-
     }
-
 
     @Nested
     inner class TestGlobalPoseCalculation {
@@ -240,5 +237,4 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(PI + HALF_PI)
         }
     }
-
 }

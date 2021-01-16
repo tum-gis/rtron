@@ -16,9 +16,8 @@
 
 package io.rtron.model.opendrive.junction
 
-
 data class JunctionPriority(
-        // TODO g_additionalData
-        var high: String = "",
-        var low: String = ""
+    // TODO g_additionalData
+    var high: String = "",
+    var low: String = ""
 )

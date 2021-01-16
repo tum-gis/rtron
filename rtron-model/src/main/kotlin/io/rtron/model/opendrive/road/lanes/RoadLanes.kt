@@ -21,30 +21,29 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadLanes(
-        var laneOffset: List<RoadLanesLaneOffset> = listOf(),
-        var laneSection: List<RoadLanesLaneSection> = listOf(),
+    var laneOffset: List<RoadLanesLaneOffset> = listOf(),
+    var laneSection: List<RoadLanesLaneSection> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality()
 ) {
 
     // Methods
     fun containsLaneOffset() = laneOffset.isNotEmpty()
 
     fun getLaneSectionsWithRanges(lastLaneSectionEnd: Double): List<Pair<Range<Double>, RoadLanesLaneSection>> {
-        require(laneSection.all { it.s < lastLaneSectionEnd })
-        { "The curve relative starts of all lane section must be below the " +
-                "provided lastLaneSectionEnd ($lastLaneSectionEnd)." }
+        require(laneSection.all { it.s < lastLaneSectionEnd }) {
+            "The curve relative starts of all lane section must be below the " +
+                "provided lastLaneSectionEnd ($lastLaneSectionEnd)."
+        }
 
         if (laneSection.isEmpty()) return emptyList()
 
         return laneSection
-                .zipWithNext()
-                .map { Range.closed(it.first.s, it.second.s) to it.first } +
-                (Range.closed(laneSection.last().s, lastLaneSectionEnd) to laneSection.last())
+            .zipWithNext()
+            .map { Range.closed(it.first.s, it.second.s) to it.first } +
+            (Range.closed(laneSection.last().s, lastLaneSectionEnd) to laneSection.last())
     }
-
 }

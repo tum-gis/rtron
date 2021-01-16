@@ -18,7 +18,6 @@ package io.rtron.math.linear
 
 import org.apache.commons.math3.linear.SingularValueDecomposition as CMSingularValueDecomposition
 
-
 /**
  * Performs a singular value decomposition (SVD) on a [RealMatrix].
  * See the wikipedia article on [singular value decomposition](https://en.wikipedia.org/wiki/Singular_value_decomposition).
@@ -26,7 +25,7 @@ import org.apache.commons.math3.linear.SingularValueDecomposition as CMSingularV
  * @param matrix matrix to be decomposed
  */
 class SingularValueDecomposition(
-        matrix: RealMatrix
+    matrix: RealMatrix
 ) {
 
     // Properties and Initializers

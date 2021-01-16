@@ -19,7 +19,6 @@ package io.rtron.math.geometry.euclidean.twod
 import io.rtron.math.geometry.euclidean.AbstractGeometry
 import io.rtron.math.transform.AffineSequence2D
 
-
 /**
  * Abstract class for all geometric objects in 2D.
  */

@@ -20,7 +20,6 @@ import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.range.Range
 import io.rtron.math.range.shiftLowerEndpointTo
 
-
 /**
  * Cuts out a section of a [BivariateFunction]. If no cut out shall be applied for either x or y, provide either of them
  * with [Range.all].
@@ -30,23 +29,22 @@ import io.rtron.math.range.shiftLowerEndpointTo
  * @param sectionY section to be cut out of y
  */
 class SectionedBivariateFunction(
-        private val completeFunction: BivariateFunction,
-        sectionX: Range<Double>,
-        sectionY: Range<Double>
+    private val completeFunction: BivariateFunction,
+    sectionX: Range<Double>,
+    sectionY: Range<Double>
 ) : BivariateFunction() {
 
     // Properties and Initializers
     override val domainX =
-            if (sectionX.hasLowerBound()) sectionX.shiftLowerEndpointTo(0.0) else completeFunction.domainX
+        if (sectionX.hasLowerBound()) sectionX.shiftLowerEndpointTo(0.0) else completeFunction.domainX
 
     override val domainY =
-            if (sectionY.hasLowerBound()) sectionY.shiftLowerEndpointTo(0.0) else completeFunction.domainY
+        if (sectionY.hasLowerBound()) sectionY.shiftLowerEndpointTo(0.0) else completeFunction.domainY
 
     private val sectionXStart = sectionX.lowerEndpointOrNull() ?: 0.0
     private val sectionYStart = sectionY.lowerEndpointOrNull() ?: 0.0
 
     // Methods
     override fun valueUnbounded(x: Double, y: Double) =
-            completeFunction.valueUnbounded(sectionXStart + x, sectionYStart + y)
-
+        completeFunction.valueUnbounded(sectionXStart + x, sectionYStart + y)
 }

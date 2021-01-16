@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
-
 internal class ParametricCubicCurve2DTest {
 
     @Nested
@@ -101,5 +100,4 @@ internal class ParametricCubicCurve2DTest {
             assertThat(actualReturn.value.point.y).isCloseTo(length * length, Offset.offset(DBL_EPSILON))
         }
     }
-
 }

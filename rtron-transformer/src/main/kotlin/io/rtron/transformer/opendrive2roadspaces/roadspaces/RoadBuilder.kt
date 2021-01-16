@@ -26,7 +26,12 @@ import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSection
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
-import io.rtron.model.roadspaces.roadspace.road.*
+import io.rtron.model.roadspaces.roadspace.road.ContactPoint
+import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
+import io.rtron.model.roadspaces.roadspace.road.LaneSection
+import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
+import io.rtron.model.roadspaces.roadspace.road.Road
+import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
 import io.rtron.model.roadspaces.topology.junction.JunctionIdentifier
 import io.rtron.std.Optional
 import io.rtron.std.handleFailure
@@ -35,12 +40,11 @@ import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
 
-
 /**
  * Builder for [Road] objects of the RoadSpaces data model.
  */
 class RoadBuilder(
-        private val configuration: Opendrive2RoadspacesConfiguration
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Properties and Initializers
@@ -60,88 +64,112 @@ class RoadBuilder(
      * @param roadSurfaceWithoutTorsion road surface without torsion applied (needed for lanes with true level entry)
      * @param baseAttributes attributes attached to each element of the road (e.g. lanes)
      */
-    fun buildRoad(id: RoadspaceIdentifier, srcRoad: OpendriveRoad, roadSurface: CurveRelativeParametricSurface3D,
-                  roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D, baseAttributes: AttributeList):
-            Result<Road, Exception> {
+    fun buildRoad(
+        id: RoadspaceIdentifier,
+        srcRoad: OpendriveRoad,
+        roadSurface: CurveRelativeParametricSurface3D,
+        roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D,
+        baseAttributes: AttributeList
+    ):
+        Result<Road, Exception> {
 
-        val laneOffset = _functionBuilder.buildLaneOffset(id, srcRoad.lanes)
-        val laneSections = srcRoad.lanes.getLaneSectionsWithRanges(srcRoad.length)
+            val laneOffset = _functionBuilder.buildLaneOffset(id, srcRoad.lanes)
+            val laneSections = srcRoad.lanes.getLaneSectionsWithRanges(srcRoad.length)
                 .mapIndexed { currentId, currentLaneSection ->
-                    buildLaneSection(LaneSectionIdentifier(currentId, id), currentLaneSection.first,
-                            currentLaneSection.second, baseAttributes)
+                    buildLaneSection(
+                        LaneSectionIdentifier(currentId, id),
+                        currentLaneSection.first,
+                        currentLaneSection.second,
+                        baseAttributes
+                    )
                 }
                 .handleFailure { return it }
 
-        if (laneSections.isEmpty())
-            return Result.error(IllegalArgumentException("Road element contains no valid lane sections."))
+            if (laneSections.isEmpty())
+                return Result.error(IllegalArgumentException("Road element contains no valid lane sections."))
 
-        val roadLinkage = buildRoadLinkage(id, srcRoad)
+            val roadLinkage = buildRoadLinkage(id, srcRoad)
 
-        val road = Road(id, roadSurface, roadSurfaceWithoutTorsion, laneOffset, laneSections, roadLinkage)
-        return Result.success(road)
-    }
+            val road = Road(id, roadSurface, roadSurfaceWithoutTorsion, laneOffset, laneSections, roadLinkage)
+            return Result.success(road)
+        }
 
     /**
      * Builds a [LaneSection] which corresponds to OpenDRIVE's concept of lane sections.
      */
-    private fun buildLaneSection(laneSectionIdentifier: LaneSectionIdentifier, curvePositionDomain: Range<Double>,
-                                 srcLaneSection: RoadLanesLaneSection, baseAttributes: AttributeList):
-            Result<LaneSection, Exception> {
+    private fun buildLaneSection(
+        laneSectionIdentifier: LaneSectionIdentifier,
+        curvePositionDomain: Range<Double>,
+        srcLaneSection: RoadLanesLaneSection,
+        baseAttributes: AttributeList
+    ):
+        Result<LaneSection, Exception> {
 
-        // check whether source model is processable
-        srcLaneSection.isProcessable()
+            // check whether source model is processable
+            srcLaneSection.isProcessable()
                 .map { _reportLogger.log(it, laneSectionIdentifier.toString()) }
                 .handleFailure { return it }
 
-        val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
+            val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
 
-        val laneSectionAttributes = buildAttributes(srcLaneSection)
-        val lanes = srcLaneSection.getLeftRightLanes()
+            val laneSectionAttributes = buildAttributes(srcLaneSection)
+            val lanes = srcLaneSection.getLeftRightLanes()
                 .map { (currentLaneId, currentSrcLane) ->
                     val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
                     val attributes = baseAttributes + laneSectionAttributes
                     _laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
                 }
 
-        val centerLane = _laneBuilder.buildCenterLane(laneSectionIdentifier, localCurvePositionDomain,
-                srcLaneSection.center.lane, baseAttributes)
+            val centerLane = _laneBuilder.buildCenterLane(
+                laneSectionIdentifier,
+                localCurvePositionDomain,
+                srcLaneSection.center.lane,
+                baseAttributes
+            )
 
-        val laneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
-        return Result.success(laneSection)
-    }
+            val laneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
+            return Result.success(laneSection)
+        }
 
     private fun buildRoadLinkage(id: RoadspaceIdentifier, srcRoad: OpendriveRoad): RoadLinkage {
 
         val belongsToJunctionId = srcRoad.getJunction()
-                .map { JunctionIdentifier(it, id.modelIdentifier) }
+            .map { JunctionIdentifier(it, id.modelIdentifier) }
 
         val predecessorRoadspaceId = srcRoad.link.predecessor.getRoadPredecessorSuccessor()
-                .map { RoadspaceIdentifier(it, id.modelIdentifier) }
+            .map { RoadspaceIdentifier(it, id.modelIdentifier) }
         val predecessorJunctionId = srcRoad.link.predecessor.getJunctionPredecessorSuccessor()
-                .map { JunctionIdentifier(it, id.modelIdentifier) }
+            .map { JunctionIdentifier(it, id.modelIdentifier) }
         val predecessorContactPoint = srcRoad.link.predecessor
-                .contactPoint.toContactPoint(default = Optional(ContactPoint.START))
+            .contactPoint.toContactPoint(default = Optional(ContactPoint.START))
 
         val successorRoadspaceId = srcRoad.link.successor.getRoadPredecessorSuccessor()
-                .map { RoadspaceIdentifier(it, id.modelIdentifier) }
+            .map { RoadspaceIdentifier(it, id.modelIdentifier) }
         val successorJunctionId = srcRoad.link.successor.getJunctionPredecessorSuccessor()
-                .map { JunctionIdentifier(it, id.modelIdentifier) }
+            .map { JunctionIdentifier(it, id.modelIdentifier) }
         val successorContactPoint = srcRoad.link.successor.contactPoint
-                .toContactPoint(default = Optional(ContactPoint.START))
+            .toContactPoint(default = Optional(ContactPoint.START))
 
-        return RoadLinkage(belongsToJunctionId, predecessorRoadspaceId, predecessorJunctionId, predecessorContactPoint,
-                successorRoadspaceId, successorJunctionId, successorContactPoint)
+        return RoadLinkage(
+            belongsToJunctionId,
+            predecessorRoadspaceId,
+            predecessorJunctionId,
+            predecessorContactPoint,
+            successorRoadspaceId,
+            successorJunctionId,
+            successorContactPoint
+        )
     }
 
     private fun buildAttributes(srcLaneSection: RoadLanesLaneSection) =
-            attributes("${configuration.parameters.attributesPrefix}laneSection_") {
-                attribute("curvePositionStart", srcLaneSection.laneSectionStart.curvePosition)
-            }
+        attributes("${configuration.parameters.attributesPrefix}laneSection_") {
+            attribute("curvePositionStart", srcLaneSection.laneSectionStart.curvePosition)
+        }
 }
 
 fun EContactPoint.toContactPoint(default: Optional<ContactPoint> = Optional.empty()) =
-        when (this) {
-            EContactPoint.START -> Optional(ContactPoint.START)
-            EContactPoint.END -> Optional(ContactPoint.END)
-            else -> default
-        }
+    when (this) {
+        EContactPoint.START -> Optional(ContactPoint.START)
+        EContactPoint.END -> Optional(ContactPoint.END)
+        else -> default
+    }

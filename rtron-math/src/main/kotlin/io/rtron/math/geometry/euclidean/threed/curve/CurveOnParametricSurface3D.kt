@@ -27,7 +27,6 @@ import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.intersectingRange
 import io.rtron.std.handleFailure
 
-
 /**
  * Curve that lies on a parametric surface. This curve is parallel to the [baseSurface]'s curve but defined by a
  * laterally translated by a [lateralOffsetFunction] and vertically translated by a [heightOffsetFunction].
@@ -40,16 +39,19 @@ import io.rtron.std.handleFailure
  * @param heightOffsetFunction height offset to the curve of the [baseSurface]
  */
 class CurveOnParametricSurface3D(
-        private val baseSurface: AbstractCurveRelativeSurface3D,
-        private val lateralOffsetFunction: UnivariateFunction,
-        private val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
+    private val baseSurface: AbstractCurveRelativeSurface3D,
+    private val lateralOffsetFunction: UnivariateFunction,
+    private val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
 ) : AbstractCurve3D() {
 
     // Properties and Initializers
     override val tolerance: Double get() = baseSurface.tolerance
 
-    override val domain: Range<Double> = setOf(baseSurface.domain,
-            lateralOffsetFunction.domain, heightOffsetFunction.domain).intersectingRange()
+    override val domain: Range<Double> = setOf(
+        baseSurface.domain,
+        lateralOffsetFunction.domain,
+        heightOffsetFunction.domain
+    ).intersectingRange()
 
     init {
         require(domain.isNotEmpty()) { "Domain must not be empty." }
@@ -59,9 +61,9 @@ class CurveOnParametricSurface3D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Result<Vector3D, Exception> {
 
         val lateralOffset = lateralOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-                .handleFailure { return it }
+            .handleFailure { return it }
         val heightOffset = heightOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-                .handleFailure { return it }
+            .handleFailure { return it }
 
         val curveRelativePoint2D = curveRelativePoint.toCurveRelative2D(lateralOffset)
         return baseSurface.calculatePointGlobalCS(curveRelativePoint2D, heightOffset)
@@ -73,16 +75,17 @@ class CurveOnParametricSurface3D(
          * Returns a [CurveOnParametricSurface3D]. Throws an error, if the [lateralOffsetFunction] or the
          * [heightOffsetFunction] is not defined everywhere, where the [baseSurface] is defined.
          */
-        fun onCompleteSurface(baseSurface: AbstractCurveRelativeSurface3D, lateralOffsetFunction: UnivariateFunction,
-                              heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS):
-                CurveOnParametricSurface3D {
+        fun onCompleteSurface(
+            baseSurface: AbstractCurveRelativeSurface3D,
+            lateralOffsetFunction: UnivariateFunction,
+            heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
+        ):
+            CurveOnParametricSurface3D {
 
-            require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance))
-            { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
-            require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance))
-            { "The height offset function must be defined everywhere where the baseSurface is also defined." }
+                require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
+                require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The height offset function must be defined everywhere where the baseSurface is also defined." }
 
-            return CurveOnParametricSurface3D(baseSurface, lateralOffsetFunction, heightOffsetFunction)
-        }
+                return CurveOnParametricSurface3D(baseSurface, lateralOffsetFunction, heightOffsetFunction)
+            }
     }
 }

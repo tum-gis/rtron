@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class Plane3DUtilTest {
 
     @Nested
@@ -81,10 +80,10 @@ internal class Plane3DUtilTest {
             val expectedPlane = Plane3D(expectedCentroid, expectedNormal, 0.0)
 
             val actualBestFittingPlane = listOf(pointA, pointB, pointC, pointD)
-                    .calculateBestFittingPlane(DBL_EPSILON_2)
+                .calculateBestFittingPlane(DBL_EPSILON_2)
 
             assertThat(actualBestFittingPlane.normal.toDoubleArray())
-                    .containsExactly(expectedPlane.normal.toDoubleArray(), Offset.offset(DBL_EPSILON_2))
+                .containsExactly(expectedPlane.normal.toDoubleArray(), Offset.offset(DBL_EPSILON_2))
             assertTrue(actualBestFittingPlane.isSimilarTo(expectedPlane))
         }
 
@@ -99,11 +98,9 @@ internal class Plane3DUtilTest {
             val expectedNormal = -Vector3D.X_AXIS
             val expectedPlane = Plane3D(expectedCentroid, expectedNormal, DBL_EPSILON_1)
             val actualBestFittingPlane = listOf(pointA, pointB, pointC, pointD, pointE)
-                    .calculateBestFittingPlane(DBL_EPSILON_1)
+                .calculateBestFittingPlane(DBL_EPSILON_1)
 
             assertThat(actualBestFittingPlane).isEqualTo(expectedPlane)
         }
-
     }
-
 }

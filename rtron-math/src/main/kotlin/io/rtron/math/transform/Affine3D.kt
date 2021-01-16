@@ -39,7 +39,7 @@ fun JOMLMatrix4dc.toRealMatrix(): RealMatrix {
  * @param _matrix internal matrix of adapting library
  */
 class Affine3D(
-        private val _matrix: JOMLMatrix4dc
+    private val _matrix: JOMLMatrix4dc
 ) : AbstractAffine() {
 
     // Properties and Initializers
@@ -62,9 +62,9 @@ class Affine3D(
     fun inverseTransform(points: List<Vector3D>) = points.map { inverseTransform(it) }
 
     fun transform(polygon: Polygon3D) =
-            Polygon3D(polygon.vertices.map { transform(it) }, polygon.tolerance)
+        Polygon3D(polygon.vertices.map { transform(it) }, polygon.tolerance)
     fun inverseTransform(polygon: Polygon3D) =
-            Polygon3D(polygon.vertices.map { inverseTransform(it) }, polygon.tolerance)
+        Polygon3D(polygon.vertices.map { inverseTransform(it) }, polygon.tolerance)
 
     @kotlin.jvm.JvmName("transformOfListPolygon3D")
     fun transform(polygons: List<Polygon3D>) = polygons.map { transform(it) }
@@ -181,9 +181,9 @@ class Affine3D(
          */
         fun of(rotation: Rotation3D): Affine3D {
             val matrix = JOMLMatrix4d()
-                    .rotateZ(rotation.heading)
-                    .rotateY(rotation.pitch)
-                    .rotateX(rotation.roll)
+                .rotateZ(rotation.heading)
+                .rotateY(rotation.pitch)
+                .rotateX(rotation.roll)
 
             return Affine3D(matrix)
         }
@@ -219,12 +219,13 @@ class Affine3D(
          * @param basisZ z axis of new basis
          */
         fun of(basisX: Vector3D, basisY: Vector3D, basisZ: Vector3D): Affine3D {
-            val matrix = JOMLMatrix4d().set(basisX.toVector4DJOML(),
-                    basisY.toVector4DJOML(),
-                    basisZ.toVector4DJOML(),
-                    Vector3D.ZERO.toVector4DJOML())!!
+            val matrix = JOMLMatrix4d().set(
+                basisX.toVector4DJOML(),
+                basisY.toVector4DJOML(),
+                basisZ.toVector4DJOML(),
+                Vector3D.ZERO.toVector4DJOML()
+            )!!
             return Affine3D(matrix.invertAffine())
         }
     }
-
 }

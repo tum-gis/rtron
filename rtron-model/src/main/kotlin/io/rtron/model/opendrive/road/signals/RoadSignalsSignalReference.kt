@@ -20,17 +20,16 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 /**
  * Reference Record.
  */
 data class RoadSignalsSignalReference(
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var elementType: ERoadSignalsSignalReferenceElementType = ERoadSignalsSignalReferenceElementType.UNKNOWN,
-        var elementId: String = "",
-        var type: String = ""
+    var elementType: ERoadSignalsSignalReferenceElementType = ERoadSignalsSignalReferenceElementType.UNKNOWN,
+    var elementId: String = "",
+    var type: String = ""
 )

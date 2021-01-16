@@ -21,7 +21,6 @@ import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class DoubleArrayExtensionTest {
 
     @Nested
@@ -30,15 +29,17 @@ internal class DoubleArrayExtensionTest {
         @Test
         fun `test reshape of square matrix`() {
             val expectedMatrix = arrayOf(
-                    doubleArrayOf(1.0, 0.0, 0.0, 1.0),
-                    doubleArrayOf(0.0, 1.0, 0.0, 2.0),
-                    doubleArrayOf(0.0, 0.0, 1.0, 3.0),
-                    doubleArrayOf(0.0, 0.0, 0.0, 1.0))
+                doubleArrayOf(1.0, 0.0, 0.0, 1.0),
+                doubleArrayOf(0.0, 1.0, 0.0, 2.0),
+                doubleArrayOf(0.0, 0.0, 1.0, 3.0),
+                doubleArrayOf(0.0, 0.0, 0.0, 1.0)
+            )
             val matrix = doubleArrayOf(
-                    1.0, 0.0, 0.0, 1.0,
-                    0.0, 1.0, 0.0, 2.0,
-                    0.0, 0.0, 1.0, 3.0,
-                    0.0, 0.0, 0.0, 1.0)
+                1.0, 0.0, 0.0, 1.0,
+                0.0, 1.0, 0.0, 2.0,
+                0.0, 0.0, 1.0, 3.0,
+                0.0, 0.0, 0.0, 1.0
+            )
 
             val actualReshapedMatrix = matrix.reshapeByColumnDimension(4)
 
@@ -59,20 +60,21 @@ internal class DoubleArrayExtensionTest {
         @Test
         fun `test reshape of square matrix`() {
             val expectedMatrix = arrayOf(
-                    doubleArrayOf(0.0, 0.0, 1.0),
-                    doubleArrayOf(1.0, 0.0, 2.0),
-                    doubleArrayOf(0.0, 1.0, 3.0),
-                    doubleArrayOf(0.0, 0.0, 1.0))
+                doubleArrayOf(0.0, 0.0, 1.0),
+                doubleArrayOf(1.0, 0.0, 2.0),
+                doubleArrayOf(0.0, 1.0, 3.0),
+                doubleArrayOf(0.0, 0.0, 1.0)
+            )
             val matrix = doubleArrayOf(
-                    0.0, 0.0, 1.0,
-                    1.0, 0.0, 2.0,
-                    0.0, 1.0, 3.0,
-                    0.0, 0.0, 1.0)
+                0.0, 0.0, 1.0,
+                1.0, 0.0, 2.0,
+                0.0, 1.0, 3.0,
+                0.0, 0.0, 1.0
+            )
 
             val actualReshapedMatrix = matrix.reshapeByRowDimension(4)
 
             assertThat(actualReshapedMatrix).isEqualTo(expectedMatrix)
         }
     }
-
 }

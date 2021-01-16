@@ -23,7 +23,6 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 
-
 fun FileIdentifier.toAttributes(prefix: String): AttributeList {
     val fileIdentifier = this
     return attributes(prefix) {

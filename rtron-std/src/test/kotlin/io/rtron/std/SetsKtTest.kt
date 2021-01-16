@@ -20,7 +20,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class SetsKtTest {
 
     @Nested
@@ -30,12 +29,14 @@ internal class SetsKtTest {
         fun `test basic combination generation`() {
             val startSet = setOf("a", "b", "c")
             val expectedCombinations = setOf(
-                    setOf("a", "b"), setOf("a", "c"), setOf("b", "c"))
+                setOf("a", "b"),
+                setOf("a", "c"),
+                setOf("b", "c")
+            )
 
             val actualCombinations = startSet.combinations(2)
 
             assertThat(actualCombinations).isEqualTo(expectedCombinations)
         }
     }
-
 }

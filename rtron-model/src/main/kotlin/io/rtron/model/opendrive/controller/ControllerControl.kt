@@ -17,7 +17,7 @@
 package io.rtron.model.opendrive.controller
 
 data class ControllerControl(
-        // TODO g_additionalData
-        var signalId: String = "",
-        var type: String = ""
+    // TODO g_additionalData
+    var signalId: String = "",
+    var type: String = ""
 )

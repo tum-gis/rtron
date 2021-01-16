@@ -26,12 +26,11 @@ import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfig
 import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import org.citygml4j.model.citygml.generics.GenericCityObject
 
-
 /**
  * Builder for city objects of the CityGML Generics module.
  */
 class GenericsModuleBuilder(
-        val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Properties and Initializers
@@ -41,20 +40,20 @@ class GenericsModuleBuilder(
     // Methods
     fun createGenericObject(curve3D: AbstractCurve3D): Result<GenericCityObject, Exception> {
         val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
-                .also { curve3D.accept(it) }
+            .also { curve3D.accept(it) }
         return createGenericObject(geometryTransformer)
     }
 
     fun createGenericObject(abstractGeometry3D: AbstractGeometry3D): Result<GenericCityObject, Exception> {
         val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
-                .also { abstractGeometry3D.accept(it) }
+            .also { abstractGeometry3D.accept(it) }
         return createGenericObject(geometryTransformer)
     }
 
     fun createGenericObject(geometryTransformer: GeometryTransformer): Result<GenericCityObject, Exception> {
         val genericCityObject = GenericCityObject()
         genericCityObject.lod2Geometry = geometryTransformer.getGeometryProperty()
-                .handleFailure { return it }
+            .handleFailure { return it }
         if (geometryTransformer.isSetRotation())
             _attributesAdder.addRotationAttributes(geometryTransformer.rotation, genericCityObject)
         return Result.success(genericCityObject)

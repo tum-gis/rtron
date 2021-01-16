@@ -18,7 +18,6 @@ package io.rtron.math.geometry.euclidean.twod.point
 
 import io.rtron.math.geometry.euclidean.twod.AbstractGeometry2D
 
-
 /**
  * Abstract class for all geometric point objects in 2D.
  */

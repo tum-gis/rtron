@@ -20,14 +20,13 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadPlanViewGeometrySpiral(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var curvStart: Double = Double.NaN,
-        var curvEnd: Double = Double.NaN
+    var curvStart: Double = Double.NaN,
+    var curvEnd: Double = Double.NaN
 ) : RoadPlanViewGeometryInterface {
 
     // both values are required to construct the spiral

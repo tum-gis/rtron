@@ -20,7 +20,6 @@ import de.swirtz.ktsrunner.objectloader.KtsObjectLoader
 import io.rtron.io.files.BufferedReader
 import io.rtron.io.files.Path
 
-
 /**
  * Loads Kotlin scripts and executes them.
  */

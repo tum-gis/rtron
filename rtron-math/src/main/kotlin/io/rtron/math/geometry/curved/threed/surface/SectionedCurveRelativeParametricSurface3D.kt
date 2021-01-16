@@ -24,7 +24,6 @@ import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.shiftLowerEndpointTo
 import io.rtron.std.handleFailure
 
-
 /**
  * Cuts out a section from the [completeCurveRelativeSurface].
  * The resulting domain of the [SectionedCurveRelativeParametricSurface3D] starts at 0.0 and ends at the length of
@@ -34,14 +33,13 @@ import io.rtron.std.handleFailure
  * @param section the range that is cut out from the [completeCurveRelativeSurface]'s domain
  */
 class SectionedCurveRelativeParametricSurface3D(
-        private val completeCurveRelativeSurface: AbstractCurveRelativeSurface3D,
-        section: Range<Double>
+    private val completeCurveRelativeSurface: AbstractCurveRelativeSurface3D,
+    section: Range<Double>
 ) : AbstractCurveRelativeSurface3D() {
 
     // Properties and Initializers
     init {
-        require(completeCurveRelativeSurface.domain.fuzzyEncloses(section, tolerance))
-        { "The complete surface must be defined everywhere where the section is also defined." }
+        require(completeCurveRelativeSurface.domain.fuzzyEncloses(section, tolerance)) { "The complete surface must be defined everywhere where the section is also defined." }
     }
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
@@ -50,10 +48,12 @@ class SectionedCurveRelativeParametricSurface3D(
 
     // Methods
     override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-            Result<Vector3D, Exception> {
+        Result<Vector3D, Exception> {
 
-        val pointOnCompleteSurface = CurveRelativeVector2D(sectionStart + curveRelativePoint.curvePosition,
-                curveRelativePoint.lateralOffset)
-        return completeCurveRelativeSurface.calculatePointGlobalCS(pointOnCompleteSurface, addHeightOffset)
-    }
+            val pointOnCompleteSurface = CurveRelativeVector2D(
+                sectionStart + curveRelativePoint.curvePosition,
+                curveRelativePoint.lateralOffset
+            )
+            return completeCurveRelativeSurface.calculatePointGlobalCS(pointOnCompleteSurface, addHeightOffset)
+        }
 }

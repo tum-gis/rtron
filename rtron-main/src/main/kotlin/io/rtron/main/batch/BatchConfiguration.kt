@@ -29,11 +29,11 @@ import io.rtron.io.logging.LogManager
  * @param clean delete output directory content before transformation starts
  */
 class BatchConfiguration(
-        val inputPath: Path,
-        val outputPath: Path,
-        private val recursive: Boolean = true,
-        val concurrentProcessing: Boolean = false,
-        val clean: Boolean = false
+    val inputPath: Path,
+    val outputPath: Path,
+    private val recursive: Boolean = true,
+    val concurrentProcessing: Boolean = false,
+    val clean: Boolean = false
 ) {
 
     // Properties and Initializers

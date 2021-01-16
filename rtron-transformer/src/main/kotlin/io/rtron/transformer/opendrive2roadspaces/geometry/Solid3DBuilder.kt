@@ -35,13 +35,12 @@ import io.rtron.std.*
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
-
 /**
  * Builder for solid geometries in 3D from the OpenDRIVE data model.
  */
 class Solid3DBuilder(
-        private val reportLogger: Logger,
-        private val parameters: Opendrive2RoadspacesParameters
+    private val reportLogger: Logger,
+    private val parameters: Opendrive2RoadspacesParameters
 ) {
 
     // Properties and Initializers
@@ -96,27 +95,34 @@ class Solid3DBuilder(
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      * @return list of polyhedrons
      */
-    fun buildPolyhedronsByRoadCorners(id: RoadspaceObjectIdentifier, srcRoadObject: RoadObjectsObject,
-                                      roadReferenceLine: Curve3D): List<Polyhedron3D> {
+    fun buildPolyhedronsByRoadCorners(
+        id: RoadspaceObjectIdentifier,
+        srcRoadObject: RoadObjectsObject,
+        roadReferenceLine: Curve3D
+    ): List<Polyhedron3D> {
 
         return srcRoadObject.getPolyhedronsDefinedByRoadCorners()
-                .map { buildPolyhedronByRoadCorners(id, it, roadReferenceLine) }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
-                .handleMessage { reportLogger.log(it, id.toString()) }
+            .map { buildPolyhedronByRoadCorners(id, it, roadReferenceLine) }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .handleMessage { reportLogger.log(it, id.toString()) }
     }
 
     /**
      * Builds a single polyhedron from an OpenDRIVE road object defined by road corner outlines.
      */
-    private fun buildPolyhedronByRoadCorners(id: RoadspaceObjectIdentifier, srcOutline: RoadObjectsObjectOutlinesOutline,
-                                             referenceLine: Curve3D): Result<ContextMessage<Polyhedron3D>, Exception> {
-        require(srcOutline.isPolyhedronDefinedByRoadCorners())
-        { "Outline does not contain a polyhedron represented by road corners." }
+    private fun buildPolyhedronByRoadCorners(
+        id: RoadspaceObjectIdentifier,
+        srcOutline: RoadObjectsObjectOutlinesOutline,
+        referenceLine: Curve3D
+    ): Result<ContextMessage<Polyhedron3D>, Exception> {
+        require(srcOutline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
 
         val validCornerRoadElements = srcOutline.cornerRoad.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
         if (validCornerRoadElements.size < srcOutline.cornerRoad.size)
-            reportLogger.info("Removing at least one outline element due to a negative height value.",
-                id.toString())
+            reportLogger.info(
+                "Removing at least one outline element due to a negative height value.",
+                id.toString()
+            )
 
         val verticalOutlineElements = validCornerRoadElements
             .map { buildVerticalOutlineElement(it, referenceLine) }
@@ -131,21 +137,23 @@ class Solid3DBuilder(
      * @param srcCornerRoad road corner element of OpenDRIVE which defines one corner of a road object
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      */
-    private fun buildVerticalOutlineElement(srcCornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad,
-                                            roadReferenceLine: Curve3D):
-            Result<Polyhedron3DFactory.VerticalOutlineElement, Exception> {
+    private fun buildVerticalOutlineElement(
+        srcCornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad,
+        roadReferenceLine: Curve3D
+    ):
+        Result<Polyhedron3DFactory.VerticalOutlineElement, Exception> {
 
-        val curveRelativeOutlineElementGeometry = srcCornerRoad.getPoints()
-            .handleFailure { return it }
+            val curveRelativeOutlineElementGeometry = srcCornerRoad.getPoints()
+                .handleFailure { return it }
 
-        val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
-            .handleFailure { return it }
-        val headPoint = curveRelativeOutlineElementGeometry.second
-            .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
+            val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
+                .handleFailure { return it }
+            val headPoint = curveRelativeOutlineElementGeometry.second
+                .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
 
-        val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint)
-        return Result.success(verticalOutlineElement)
-    }
+            val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint)
+            return Result.success(verticalOutlineElement)
+        }
 
     /**
      * Builds a list of polyhedrons from OpenDRIVE road objects defined by local corner outlines.
@@ -155,39 +163,43 @@ class Solid3DBuilder(
      * @param curveAffine affine transformation matrix from the curve
      * @return list of polyhedrons
      */
-    fun buildPolyhedronsByLocalCorners(id: RoadspaceObjectIdentifier, srcRoadObject: RoadObjectsObject,
-                                       curveAffine: Affine3D): List<Polyhedron3D> {
+    fun buildPolyhedronsByLocalCorners(
+        id: RoadspaceObjectIdentifier,
+        srcRoadObject: RoadObjectsObject,
+        curveAffine: Affine3D
+    ): List<Polyhedron3D> {
         val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
         return srcRoadObject.getPolyhedronsDefinedByLocalCorners()
-                .map { buildPolyhedronByLocalCorners(id, it) }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
-                .handleMessage { reportLogger.log(it, id.toString()) }
-                .map { it.copy(affineSequence = affineSequence) }
+            .map { buildPolyhedronByLocalCorners(id, it) }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .handleMessage { reportLogger.log(it, id.toString()) }
+            .map { it.copy(affineSequence = affineSequence) }
     }
 
     /**
      * Builds a single polyhedron from an OpenDRIVE road object defined by local corner outlines.
      */
     private fun buildPolyhedronByLocalCorners(id: RoadspaceObjectIdentifier, srcOutline: RoadObjectsObjectOutlinesOutline):
-            Result<ContextMessage<Polyhedron3D>, Exception> {
-        require(srcOutline.isPolyhedronDefinedByLocalCorners())
-        { "Outline does not contain a polyhedron represented by local corners." }
+        Result<ContextMessage<Polyhedron3D>, Exception> {
+            require(srcOutline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
 
-        val validCornerLocalElements = srcOutline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
-        if (validCornerLocalElements.size < srcOutline.cornerLocal.size)
-            reportLogger.info("Removing at least one outline element due to a negative height value.",
-                id.toString())
+            val validCornerLocalElements = srcOutline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
+            if (validCornerLocalElements.size < srcOutline.cornerLocal.size)
+                reportLogger.info(
+                    "Removing at least one outline element due to a negative height value.",
+                    id.toString()
+                )
 
-        val verticalOutlineElements = validCornerLocalElements
-            .map { it.getPoints() }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
-            .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, Optional.empty(), parameters.tolerance) }
-            .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
+            val verticalOutlineElements = validCornerLocalElements
+                .map { it.getPoints() }
+                .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
+                .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, Optional.empty(), parameters.tolerance) }
+                .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
 
-        return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, parameters.tolerance)
-    }
+            return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, parameters.tolerance)
+        }
 
     /**
      * Builds a parametric sweep from OpenDRIVE road objects defined by the repeat entries.
@@ -200,16 +212,21 @@ class Solid3DBuilder(
 
         // curve over which the object is moved
         val sweepReferenceCurve2D =
-                _curve2DBuilder.buildLateralTranslatedCurve(srcRoadObject.repeat, roadReferenceLine)
+            _curve2DBuilder.buildLateralTranslatedCurve(srcRoadObject.repeat, roadReferenceLine)
         val sweepReferenceHeight =
-                _functionBuilder.buildStackedHeightFunctionFromRepeat(srcRoadObject.repeat, roadReferenceLine)
+            _functionBuilder.buildStackedHeightFunctionFromRepeat(srcRoadObject.repeat, roadReferenceLine)
 
         // dimensions of the sweep
         val heightFunction = srcRoadObject.repeat.getObjectHeightFunction()
         val widthFunction = srcRoadObject.repeat.getObjectWidthFunction()
 
-        val parametricSweep3D = ParametricSweep3D(sweepReferenceCurve2D,
-                sweepReferenceHeight, heightFunction, widthFunction, parameters.tolerance)
+        val parametricSweep3D = ParametricSweep3D(
+            sweepReferenceCurve2D,
+            sweepReferenceHeight,
+            heightFunction,
+            widthFunction,
+            parameters.tolerance
+        )
         return listOf(parametricSweep3D)
     }
 }

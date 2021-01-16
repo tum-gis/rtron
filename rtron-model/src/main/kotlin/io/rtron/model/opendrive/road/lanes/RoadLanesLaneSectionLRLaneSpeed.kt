@@ -21,13 +21,12 @@ import io.rtron.model.opendrive.common.EUnitSpeed
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadLanesLaneSectionLRLaneSpeed(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var sOffset: Double = Double.NaN,
-        var max: Double = Double.NaN,
-        var unit: EUnitSpeed = EUnitSpeed.KILOMETER_PER_HOUR
+    var sOffset: Double = Double.NaN,
+    var max: Double = Double.NaN,
+    var unit: EUnitSpeed = EUnitSpeed.KILOMETER_PER_HOUR
 )

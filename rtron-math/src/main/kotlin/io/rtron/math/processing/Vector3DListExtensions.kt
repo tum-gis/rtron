@@ -41,7 +41,6 @@ fun List<Vector3D>.isColinear(tolerance: Double): Boolean {
     return this.zipWithNextToTriples().all { it.isColinear(tolerance) }
 }
 
-
 /**
  * Returns true, if all three [Vector3D] are located on a line with a given [tolerance].
  *
@@ -68,7 +67,7 @@ fun List<Vector3D>.removeRedundantVerticesOnLineSegmentsEnclosing(tolerance: Dou
     if (this.size <= 1) return this
 
     val vertices = filterWindowedEnclosing(listOf(false, true)) { it[0].fuzzyEquals(it[1], tolerance) }
-    if(vertices.size <= 2) return vertices
+    if (vertices.size <= 2) return vertices
 
     return vertices.filterWindowedEnclosing(listOf(false, true, false)) {
         if (it[0].fuzzyEquals(it[2])) return@filterWindowedEnclosing false // it[0].distance(it[1]) < tolerance
@@ -102,8 +101,7 @@ fun List<Vector3D>.calculateBestFittingPlane(tolerance: Double): Plane3D {
  * @param dynamicToleranceAdjustment increases the tolerance when numbers are greater
  */
 fun List<Vector3D>.isPlanar(tolerance: Double, dynamicToleranceAdjustment: Boolean = true): Boolean {
-    require(size >= 3)
-    { "Planarity check requires the provision of at least three points." }
+    require(size >= 3) { "Planarity check requires the provision of at least three points." }
 
     val adjustedTolerance = if (dynamicToleranceAdjustment) {
         val u = Math.ulp(this.flatMap { it.toDoubleList() }.map(::abs).maxOrNull()!!)
@@ -120,16 +118,16 @@ fun List<Vector3D>.isPlanar(tolerance: Double, dynamicToleranceAdjustment: Boole
  * (Newell’s method)[https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method].
  */
 fun List<Vector3D>.calculateNormal(): Vector3D =
-        this.zipWithNextEnclosing().fold(Vector3D.ZERO) { normalVector, vertexPair ->
-            normalVector + (vertexPair.first - vertexPair.second).crossProduct(vertexPair.first + vertexPair.second)
-        }
+    this.zipWithNextEnclosing().fold(Vector3D.ZERO) { normalVector, vertexPair ->
+        normalVector + (vertexPair.first - vertexPair.second).crossProduct(vertexPair.first + vertexPair.second)
+    }
 
 /**
  * Calculates the centroid of a list of [Vector3D].
  * See the wikipedia article of [Centroid](https://en.wikipedia.org/wiki/Centroid).
  */
 fun List<Vector3D>.calculateCentroid(): Vector3D =
-        this.reduce { sum, point -> sum + point }.div(this.size.toDouble())
+    this.reduce { sum, point -> sum + point }.div(this.size.toDouble())
 
 /**
  * Conversion to a string of coordinates.
@@ -149,5 +147,5 @@ fun List<Vector3D>.toCoordinatesString(): String {
  * @return list of vectors without consecutively following side duplicates
  */
 fun List<Vector3D>.removeConsecutiveSideDuplicates(): List<Vector3D> =
-        if (this.size < 3) this
-        else filterWindowedEnclosing(listOf(false, true, true)) { it[0] == it[2] }
+    if (this.size < 3) this
+    else filterWindowedEnclosing(listOf(false, true, true)) { it[0] == it[2] }

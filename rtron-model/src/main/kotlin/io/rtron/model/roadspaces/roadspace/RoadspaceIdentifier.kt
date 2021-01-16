@@ -19,7 +19,6 @@ package io.rtron.model.roadspaces.roadspace
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.ModelIdentifierInterface
 
-
 /**
  * Road space identifier interface required for class delegation.
  */
@@ -35,8 +34,8 @@ interface RoadspaceIdentifierInterface {
  * @param modelIdentifier identifier of the model
  */
 data class RoadspaceIdentifier(
-        override val roadspaceId: String,
-        val modelIdentifier: ModelIdentifier
+    override val roadspaceId: String,
+    val modelIdentifier: ModelIdentifier
 ) : RoadspaceIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
 
     // Conversions

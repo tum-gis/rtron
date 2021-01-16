@@ -27,44 +27,43 @@ import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 import io.rtron.std.ContextMessage
 
-
 data class RoadObjectsObject(
-        var repeat: RoadObjectsObjectRepeat = RoadObjectsObjectRepeat(),
-        // outline is deprecated
-        var outlines: RoadObjectsObjectOutlines = RoadObjectsObjectOutlines(),
-        var material: List<RoadObjectsObjectMaterial> = listOf(),
-        var validity: List<RoadObjectsObjectLaneValidity> = listOf(),
-        var parkingSpace: RoadObjectsObjectParkingSpace = RoadObjectsObjectParkingSpace(),
-        var markings: RoadObjectsObjectMarkings = RoadObjectsObjectMarkings(),
-        var borders: RoadObjectsObjectBorders = RoadObjectsObjectBorders(),
+    var repeat: RoadObjectsObjectRepeat = RoadObjectsObjectRepeat(),
+    // outline is deprecated
+    var outlines: RoadObjectsObjectOutlines = RoadObjectsObjectOutlines(),
+    var material: List<RoadObjectsObjectMaterial> = listOf(),
+    var validity: List<RoadObjectsObjectLaneValidity> = listOf(),
+    var parkingSpace: RoadObjectsObjectParkingSpace = RoadObjectsObjectParkingSpace(),
+    var markings: RoadObjectsObjectMarkings = RoadObjectsObjectMarkings(),
+    var borders: RoadObjectsObjectBorders = RoadObjectsObjectBorders(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var type: EObjectType = EObjectType.NONE,
-        var subtype: String = "",
-        var dynamic: Boolean = false,
-        var name: String = "",
-        var id: String = "",
+    var type: EObjectType = EObjectType.NONE,
+    var subtype: String = "",
+    var dynamic: Boolean = false,
+    var name: String = "",
+    var id: String = "",
 
-        var s: Double = Double.NaN,
-        var t: Double = Double.NaN,
-        var zOffset: Double = 0.0,
+    var s: Double = Double.NaN,
+    var t: Double = Double.NaN,
+    var zOffset: Double = 0.0,
 
-        var validLength: Double = Double.NaN,
-        var orientation: String = "",
-        var hdg: Double = 0.0,
-        var pitch: Double = 0.0,
-        var roll: Double = 0.0,
+    var validLength: Double = Double.NaN,
+    var orientation: String = "",
+    var hdg: Double = 0.0,
+    var pitch: Double = 0.0,
+    var roll: Double = 0.0,
 
-        var height: Double = Double.NaN,
+    var height: Double = Double.NaN,
 
-        // cuboid
-        var length: Double = Double.NaN,
-        var width: Double = Double.NaN,
-        // cylinder
-        var radius: Double = Double.NaN
+    // cuboid
+    var length: Double = Double.NaN,
+    var width: Double = Double.NaN,
+    // cylinder
+    var radius: Double = Double.NaN
 ) {
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
@@ -93,14 +92,13 @@ data class RoadObjectsObject(
     fun getLinearRingsDefinedByLocalCorners(): List<RoadObjectsObjectOutlinesOutline> =
         outlines.getLinearRingsDefinedByLocalCorners()
 
-
     /** Returns true, if the provided geometry information correspond to a cuboid. */
     fun isCuboid() = !length.isNaN() && length > 0.0 && !width.isNaN() && width > 0.0 &&
-            !height.isNaN() && height > 0.0 && !outlines.containsGeometries()
+        !height.isNaN() && height > 0.0 && !outlines.containsGeometries()
 
     /** Returns true, if the provided geometry information correspond to a rectangle. */
     fun isRectangle() = !length.isNaN() && length > 0.0 && !width.isNaN() && width > 0.0 &&
-            (height.isNaN() || height == 0.0) && !outlines.containsGeometries()
+        (height.isNaN() || height == 0.0) && !outlines.containsGeometries()
 
     /** Returns true, if the provided geometry information correspond to a cylinder. */
     fun isCylinder() = !radius.isNaN() && !height.isNaN() && radius > 0.0 && height > 0.0
@@ -114,8 +112,12 @@ data class RoadObjectsObject(
     fun isProcessable(): Result<ContextMessage<Boolean>, IllegalStateException> {
 
         if (outlines.outline.any { it.isPolyhedron() && !it.isPolyhedronUniquelyDefined() })
-            return Result.error(IllegalStateException("Road object has mixed outline definitions. This is " +
-                    "not allowed according to the standard."))
+            return Result.error(
+                IllegalStateException(
+                    "Road object has mixed outline definitions. This is " +
+                        "not allowed according to the standard."
+                )
+            )
 
         val infos = mutableListOf<String>()
 
@@ -125,7 +127,7 @@ data class RoadObjectsObject(
 
         if (!height.isNaN() && height == 0.0 && outlines.containsPolyhedrons())
             infos += "Road object contains a polyhedron with non-zero height, but the height of the road " +
-                    "object element is $height."
+                "object element is $height."
 
         return Result.success(ContextMessage(true, infos))
     }

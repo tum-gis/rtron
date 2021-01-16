@@ -22,14 +22,13 @@ import org.apache.commons.math3.linear.RealVector as CMRealVector
 /** Conversion from adapted Real Vector class from Apache Commons Math. */
 fun CMRealVector.toRealVector() = RealVector(this.toArray()!!)
 
-
 /**
  * Real vector of double values, whereby the number of provided values defines the [dimension] of the vector.
  *
  * @param entries entry values of the real vector
  */
 class RealVector(
-        private val entries: DoubleArray
+    private val entries: DoubleArray
 ) {
 
     // Properties and Initializers
@@ -43,17 +42,14 @@ class RealVector(
     /** L_2 norm of the vector */
     val norm by lazy { _vector.norm }
 
-
     // Secondary Constructors
     constructor(entries: List<Double>) : this(entries.toDoubleArray())
-
 
     // Operators
 
     operator fun get(index: Int): Double = _vector.getEntry(index)
     operator fun plus(v: RealVector) = _vector.add(v._vector).toRealVector()
     operator fun minus(v: RealVector) = _vector.subtract(v._vector).toRealVector()
-
 
     // Methods
 
@@ -93,7 +89,6 @@ class RealVector(
         return entries.contentHashCode()
     }
 
-
     // Conversions
 
     fun toDoubleArray(): DoubleArray = _vector.toArray()!!
@@ -102,9 +97,7 @@ class RealVector(
     /** Conversion to adapted Real Vector class from Apache Commons Math. */
     fun toVectorCM(): CMArrayRealVector = _vector
 
-
     companion object {
         fun of(vararg entries: Double) = RealVector(entries)
     }
-
 }

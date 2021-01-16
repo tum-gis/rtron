@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class VertexListTest {
 
     @Nested
@@ -156,7 +155,6 @@ internal class VertexListTest {
 
             assertThat(actualResultingVertices).isEqualTo(expectedVertices)
         }
-
     }
 
     @Nested
@@ -180,7 +178,7 @@ internal class VertexListTest {
 
         @Test
         fun `test triangle polygon`() {
-            val points = listOf( Vector3D.ZERO, Vector3D.X_AXIS, Vector3D.Y_AXIS)
+            val points = listOf(Vector3D.ZERO, Vector3D.X_AXIS, Vector3D.Y_AXIS)
 
             val actual = points.isPlanar(DBL_EPSILON_1)
 
@@ -212,7 +210,6 @@ internal class VertexListTest {
 
             assertFalse(actual)
         }
-
     }
 
     @Nested
@@ -244,5 +241,4 @@ internal class VertexListTest {
             assertThat(actualCentroid).isEqualTo(expectedCentroid)
         }
     }
-
 }

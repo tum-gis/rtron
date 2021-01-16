@@ -20,7 +20,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class MatrixUtilsTest {
 
     @Nested
@@ -38,5 +37,4 @@ internal class MatrixUtilsTest {
             assertThat(actualAppendedMatrix.getRow(1)).isEqualTo(doubleArrayOf(0.0, 4.0, 1.0))
         }
     }
-
 }

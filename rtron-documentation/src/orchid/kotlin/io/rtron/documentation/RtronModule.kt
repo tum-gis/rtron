@@ -16,40 +16,40 @@ import javax.inject.Inject
 
 class RtronModule : OrchidModule() {
 
-  override fun configure() {
-    addToSet<Theme, RtronTheme>()
-  }
+    override fun configure() {
+        addToSet<Theme, RtronTheme>()
+    }
 }
 
 class RtronTheme
 @Inject
 constructor(context: OrchidContext) : Theme(context, "RtronTheme", DEFAULT_PRIORITY + 1) {
 
-  private val delegateTheme = CopperTheme(context)
+    private val delegateTheme = CopperTheme(context)
 
-  @Option
-  lateinit var social: Social
+    @Option
+    lateinit var social: Social
 
-  override fun loadAssets(delegate: AssetManagerDelegate): Unit = with(delegate) {
-    addCss("assets/css/bulma.min.css")
-    addCss("assets/css/bulma-tooltip.css")
-    addCss("assets/css/bulma-accordion.min.css")
+    override fun loadAssets(delegate: AssetManagerDelegate): Unit = with(delegate) {
+        addCss("assets/css/bulma.min.css")
+        addCss("assets/css/bulma-tooltip.css")
+        addCss("assets/css/bulma-accordion.min.css")
 
-    addJs("https://use.fontawesome.com/releases/v5.4.0/js/all.js") {
-      defer = true
-      attrs["data-search-pseudo-elements"] = "true"
+        addJs("https://use.fontawesome.com/releases/v5.4.0/js/all.js") {
+            defer = true
+            attrs["data-search-pseudo-elements"] = "true"
+        }
+        addJs("assets/js/bulma.js")
+        addJs("assets/js/bulma-accordion.min.js")
+        addJs("assets/js/bulma-tabs.js")
     }
-    addJs("assets/js/bulma.js")
-    addJs("assets/js/bulma-accordion.min.js")
-    addJs("assets/js/bulma-tabs.js")
-  }
 
-  override fun getResourceSource(): OrchidResourceSource {
-    return DelegatingResourceSource(
-      listOfNotNull(super.getResourceSource(), delegateTheme.resourceSource),
-      emptyList(),
-      priority,
-      ThemeResourceSource
-    )
-  }
+    override fun getResourceSource(): OrchidResourceSource {
+        return DelegatingResourceSource(
+            listOfNotNull(super.getResourceSource(), delegateTheme.resourceSource),
+            emptyList(),
+            priority,
+            ThemeResourceSource
+        )
+    }
 }

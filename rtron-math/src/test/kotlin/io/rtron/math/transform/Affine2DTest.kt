@@ -16,10 +16,6 @@
 
 package io.rtron.math.transform
 
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -27,7 +23,10 @@ import io.rtron.math.linear.RealMatrix
 import io.rtron.math.linear.RealVector
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
-
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
 internal class Affine2DTest {
 
@@ -70,10 +69,11 @@ internal class Affine2DTest {
             val scaling = RealVector.of(2.0, 3.0)
             val affineB = Affine2D.of(scaling)
             val expectedValues = doubleArrayOf(
-                    2.0, 0.0, 0.0, 1.0,
-                    0.0, 3.0, 0.0, 2.0,
-                    0.0, 0.0, 1.0, 0.0,
-                    0.0, 0.0, 0.0, 1.0)
+                2.0, 0.0, 0.0, 1.0,
+                0.0, 3.0, 0.0, 2.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0
+            )
             val expectedMatrix = RealMatrix(expectedValues, 4)
 
             val actualAppended = affineA.append(affineB)
@@ -132,7 +132,6 @@ internal class Affine2DTest {
         }
     }
 
-
     @Nested
     inner class TestDecomposition {
 
@@ -178,5 +177,4 @@ internal class Affine2DTest {
             assertThat(actual.toAngleRadians()).isEqualTo(rotation.toAngleRadians())
         }
     }
-
 }

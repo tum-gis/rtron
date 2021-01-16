@@ -20,14 +20,12 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
 import kotlin.math.abs
 
-
 /**
  * Lane section identifier interface required for class delegation.
  */
 interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
     val laneSectionId: Int
 }
-
 
 /**
  * Identifier of a lane section containing essential meta information.
@@ -36,8 +34,8 @@ interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
  * @param roadspaceIdentifier identifier of the road space
  */
 data class LaneSectionIdentifier(
-        override val laneSectionId: Int,
-        val roadspaceIdentifier: RoadspaceIdentifier
+    override val laneSectionId: Int,
+    val roadspaceIdentifier: RoadspaceIdentifier
 ) : LaneSectionIdentifierInterface, RoadspaceIdentifierInterface by roadspaceIdentifier {
 
     // Properties and Initializers
@@ -49,14 +47,13 @@ data class LaneSectionIdentifier(
 
     /** Returns the identifier for the next lane section. */
     fun getNextLaneSectionIdentifier() =
-            LaneSectionIdentifier(this.laneSectionId + 1, this.roadspaceIdentifier)
+        LaneSectionIdentifier(this.laneSectionId + 1, this.roadspaceIdentifier)
 
     // Conversions
     override fun toString(): String {
         return "LaneSectionIdentifier(laneSectionId=$laneSectionId, roadSpaceId=$roadspaceId)"
     }
 }
-
 
 /**
  * Identifier of a lane section which allows for negative indexing.
@@ -65,8 +62,8 @@ data class LaneSectionIdentifier(
  * last lane section can be referenced with -1
  */
 data class RelativeLaneSectionIdentifier(
-        override val laneSectionId: Int,
-        val roadspaceIdentifier: RoadspaceIdentifier
+    override val laneSectionId: Int,
+    val roadspaceIdentifier: RoadspaceIdentifier
 ) : LaneSectionIdentifierInterface, RoadspaceIdentifierInterface by roadspaceIdentifier {
 
     // Conversions
@@ -77,8 +74,7 @@ data class RelativeLaneSectionIdentifier(
      * @param size number of lane sections in list (last index + 1)
      */
     fun toAbsoluteLaneSectionIdentifier(size: Int): LaneSectionIdentifier {
-        require(abs(laneSectionId) <= size)
-        { "Lane section identifier must less or equals the given size ($size)" }
+        require(abs(laneSectionId) <= size) { "Lane section identifier must less or equals the given size ($size)" }
 
         return if (laneSectionId >= 0) LaneSectionIdentifier(laneSectionId, roadspaceIdentifier)
         else LaneSectionIdentifier(size - laneSectionId, roadspaceIdentifier)

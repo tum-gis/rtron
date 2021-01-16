@@ -16,22 +16,20 @@
 
 package io.rtron.math.transform
 
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.RealMatrix
 import io.rtron.math.linear.RealVector
 import io.rtron.math.std.DBL_EPSILON
-
 import io.rtron.math.std.HALF_PI
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Offset
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import kotlin.math.cos
 import kotlin.math.sin
 import org.joml.Matrix4d as JOMLMatrix4d
-
 
 internal class Affine3DTest {
 
@@ -47,7 +45,6 @@ internal class Affine3DTest {
 
             assertThat(actual).isEqualTo(1.0)
         }
-
     }
 
     @Nested
@@ -65,10 +62,11 @@ internal class Affine3DTest {
         @Test
         fun `test translation from 3x4 matrix`() {
             val values = doubleArrayOf(
-                    1.0, 0.0, 0.0, 0.0,
-                    0.0, 1.0, 0.0, 3.0,
-                    0.0, 0.0, 1.0, 2.0,
-                    0.0, 0.0, 0.0, 1.0)
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 3.0,
+                0.0, 0.0, 1.0, 2.0,
+                0.0, 0.0, 0.0, 1.0
+            )
             val matrix = RealMatrix(values, 4)
             val affine = Affine3D.of(matrix)
 
@@ -105,11 +103,14 @@ internal class Affine3DTest {
             val rotation = Rotation3D(heading)
             val affine = Affine3D.of(Affine3D.of(scaling), Affine3D.of(translation), Affine3D.of(rotation))
 
-            val expectedRotationMatrix = RealMatrix(arrayOf(
+            val expectedRotationMatrix = RealMatrix(
+                arrayOf(
                     doubleArrayOf(cos(heading), -sin(heading), 0.0, 0.0),
                     doubleArrayOf(sin(heading), cos(heading), 0.0, 0.0),
                     doubleArrayOf(0.0, 0.0, 1.0, 0.0),
-                    doubleArrayOf(0.0, 0.0, 0.0, 1.0)))
+                    doubleArrayOf(0.0, 0.0, 0.0, 1.0)
+                )
+            )
 
             val actual = affine.extractRotationAffine().toRealMatrix()
 
@@ -128,10 +129,11 @@ internal class Affine3DTest {
             val scaling = RealVector.of(2.0, 3.0, 4.0)
             val affineB = Affine3D.of(scaling)
             val expectedValues = doubleArrayOf(
-                    2.0, 0.0, 0.0, 1.0,
-                    0.0, 3.0, 0.0, 2.0,
-                    0.0, 0.0, 4.0, 3.0,
-                    0.0, 0.0, 0.0, 1.0)
+                2.0, 0.0, 0.0, 1.0,
+                0.0, 3.0, 0.0, 2.0,
+                0.0, 0.0, 4.0, 3.0,
+                0.0, 0.0, 0.0, 1.0
+            )
             val expectedMatrix = RealMatrix(expectedValues, 4)
 
             val actualAppended = affineA.append(affineB)
@@ -164,7 +166,6 @@ internal class Affine3DTest {
 
             assertThat(actualTranslated).isEqualTo(-translation)
         }
-
     }
 
     @Nested
@@ -217,10 +218,12 @@ internal class Affine3DTest {
         fun `test to double array`() {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affine = Affine3D.of(translation)
-            val expectedDoubleArray = doubleArrayOf(1.0, 0.0, 0.0, 1.0,
-                    0.0, 1.0, 0.0, 2.0,
-                    0.0, 0.0, 1.0, 3.0,
-                    0.0, 0.0, 0.0, 1.0)
+            val expectedDoubleArray = doubleArrayOf(
+                1.0, 0.0, 0.0, 1.0,
+                0.0, 1.0, 0.0, 2.0,
+                0.0, 0.0, 1.0, 3.0,
+                0.0, 0.0, 0.0, 1.0
+            )
 
             val actualDoubleArray = affine.toDoubleArray()
 

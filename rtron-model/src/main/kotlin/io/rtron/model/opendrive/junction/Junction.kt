@@ -16,15 +16,14 @@
 
 package io.rtron.model.opendrive.junction
 
-
 data class Junction(
-        var connection: List<JunctionConnection> = listOf(),
-        var priority: List<JunctionPriority> = listOf(),
-        // TODO var controller: List<JunctionController> = listOf(),
-        // TODO surface
-        // TODO g_additionalData
+    var connection: List<JunctionConnection> = listOf(),
+    var priority: List<JunctionPriority> = listOf(),
+    // TODO var controller: List<JunctionController> = listOf(),
+    // TODO surface
+    // TODO g_additionalData
 
-        var name: String = "",
-        var id: String = "",
-        var type: EJunctionType = EJunctionType.DEFAULT
+    var name: String = "",
+    var id: String = "",
+    var type: EJunctionType = EJunctionType.DEFAULT
 )

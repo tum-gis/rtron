@@ -24,14 +24,13 @@ import com.google.common.hash.Hashing as GHashing
 import com.google.common.io.Files as GFiles
 import java.io.File as JFile
 
-
 /**
  * Representation of a file or directory.
  *
  * @param path path to the file or directory
  */
 class File(
-        val path: Path
+    val path: Path
 ) {
 
     // Properties and Initializers
@@ -62,7 +61,6 @@ class File(
             ""
         }
     }
-
 
     private val attributes by lazy { Files.readAttributes(path.toPathN(), BasicFileAttributes::class.java) }
 

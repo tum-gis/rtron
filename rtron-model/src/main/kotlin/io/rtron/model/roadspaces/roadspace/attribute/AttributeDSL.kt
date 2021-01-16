@@ -18,12 +18,11 @@ package io.rtron.model.roadspaces.roadspace.attribute
 
 import io.rtron.std.Optional
 
-
 /**
  * Environment for describing and building attribute lists.
  */
 class AttributeListBuilder(
-        private var namePrefix: String = ""
+    private var namePrefix: String = ""
 ) {
 
     private val attributes = mutableListOf<Attribute>()
@@ -69,7 +68,6 @@ class AttributeListBuilder(
     fun build() = AttributeList(attributes)
     private fun toAttributeList(name: String) = AttributeList(attributes, name)
 }
-
 
 /**
  * Environment for building up an [AttributeList] with an attribute's [namePrefix].

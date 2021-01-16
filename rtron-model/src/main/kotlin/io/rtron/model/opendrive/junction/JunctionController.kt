@@ -16,10 +16,9 @@
 
 package io.rtron.model.opendrive.junction
 
-
 class JunctionController(
-        // TODO g_additionalData
-        var id: String = "",
-        var type: String = "",
-        var sequence: Int = Int.MIN_VALUE
+    // TODO g_additionalData
+    var id: String = "",
+    var type: String = "",
+    var sequence: Int = Int.MIN_VALUE
 )

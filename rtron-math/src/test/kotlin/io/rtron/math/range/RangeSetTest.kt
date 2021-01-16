@@ -36,7 +36,6 @@ internal class RangeSetTest {
 
             assertTrue(rangeSet.contains(1.3))
         }
-
     }
 
     @Nested
@@ -52,7 +51,7 @@ internal class RangeSetTest {
             val actualUnion = rangeSetA.union(rangeSetB)
 
             assertThat(actualUnion.asRanges())
-                    .containsExactlyInAnyOrder(rangeA, rangeB)
+                .containsExactlyInAnyOrder(rangeA, rangeB)
         }
 
         @Test
@@ -67,7 +66,6 @@ internal class RangeSetTest {
 
             assertThat(actualUnion.asRanges()).containsOnly(expectedRange)
         }
-
     }
 
     @Nested
@@ -102,6 +100,5 @@ internal class RangeSetTest {
 
             assertTrue(rangeSetA.intersects(rangeSetB))
         }
-
     }
 }

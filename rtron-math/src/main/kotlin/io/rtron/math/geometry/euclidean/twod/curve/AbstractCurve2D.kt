@@ -26,7 +26,6 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.*
 import io.rtron.std.handleFailure
 
-
 /**
  * Abstract class for all geometric curve objects in 2D.
  */
@@ -64,7 +63,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return point in cartesian coordinates
      */
     protected abstract fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, Exception>
+        Result<Vector2D, Exception>
 
     /**
      * Returns the orientation in the local cartesian coordinate system that is tangential to this curve at a given
@@ -88,7 +87,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return orientation tangential to this curve
      */
     protected abstract fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, Exception>
+        Result<Rotation2D, Exception>
 
     /**
      * Returns the global point in the global cartesian coordinate system that is located on this curve and given by a
@@ -99,7 +98,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return point in cartesian coordinates
      */
     fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Result<Vector2D, Exception> =
-            calculatePointLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
+        calculatePointLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
 
     /**
      * Returns the orientation in the global cartesian coordinate system that is tangential to this curve at a given
@@ -109,7 +108,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return orientation tangential to this curve
      */
     fun calculateRotationGlobalCS(curveRelativePoint: CurveRelativeVector1D): Result<Rotation2D, Exception> =
-            calculateRotationLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
+        calculateRotationLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
 
     /**
      * Returns a pose at the position along the curve [curveRelativePoint].

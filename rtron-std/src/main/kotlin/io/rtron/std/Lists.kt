@@ -43,10 +43,11 @@ enum class MovingWindowShape {
  * @return the size of the resulting list depends on the [shape]
  */
 fun <S, T, K> List<S>.moveWindow(
-        window: List<T>,
-        multiplication: (baseElement: S, otherElement: T) -> K,
-        addition: (K, K) -> K,
-        shape: MovingWindowShape = MovingWindowShape.FULL): List<K> {
+    window: List<T>,
+    multiplication: (baseElement: S, otherElement: T) -> K,
+    addition: (K, K) -> K,
+    shape: MovingWindowShape = MovingWindowShape.FULL
+): List<K> {
     require(this.isNotEmpty()) { "Base list requires elements and thus must not be empty." }
     require(window.isNotEmpty()) { "Other list requires elements and thus must not be empty." }
 
@@ -72,7 +73,6 @@ fun <S, T, K> List<S>.moveWindow(
     }
 }
 
-
 /**
  * Moving a [window] over a [Boolean] list with boolean [window].
  *
@@ -84,10 +84,12 @@ fun <S, T, K> List<S>.moveWindow(
  * and [window] list is true
  */
 fun List<Boolean>.moveWindow(window: List<Boolean>, shape: MovingWindowShape = MovingWindowShape.FULL) =
-        this.moveWindow(window,
-                { baseElement, otherElement -> baseElement && otherElement },
-                { a, b -> a || b },
-                shape)
+    this.moveWindow(
+        window,
+        { baseElement, otherElement -> baseElement && otherElement },
+        { a, b -> a || b },
+        shape
+    )
 
 /**
  * Returns a list containing all elements not matching the given [predicate]. The predicate is operated on a sublist

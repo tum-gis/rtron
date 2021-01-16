@@ -23,7 +23,6 @@ import io.rtron.math.transform.AffineSequence3D
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.signals.RoadSignalsSignal
 
-
 /**
  * Builder for vectors in 3D from the OpenDRIVE data model.
  */
@@ -40,11 +39,11 @@ class Vector3DBuilder {
      * @param force true, if the point generation shall be forced
      */
     fun buildVector3Ds(srcRoadObject: RoadObjectsObject, curveAffine: Affine3D, force: Boolean = false):
-            Result<Vector3D, IllegalArgumentException> =
+        Result<Vector3D, IllegalArgumentException> =
             if (srcRoadObject.isPoint() || force) {
                 val affineSequence = AffineSequence3D.of(curveAffine)
                 val vector = srcRoadObject.referenceLinePointRelativePosition
-                        .copy(affineSequence = affineSequence)
+                    .copy(affineSequence = affineSequence)
                 Result.success(vector)
             } else Result.error(java.lang.IllegalArgumentException("Not a point geometry."))
 
@@ -57,11 +56,11 @@ class Vector3DBuilder {
      * @param force true, if the point generation shall be forced
      */
     fun buildVector3Ds(srcRoadSignal: RoadSignalsSignal, curveAffine: Affine3D, force: Boolean = false):
-            Result<Vector3D, IllegalArgumentException> =
+        Result<Vector3D, IllegalArgumentException> =
             if (srcRoadSignal.isPoint() || force) {
                 val affineSequence = AffineSequence3D.of(curveAffine)
                 val vector = srcRoadSignal.referenceLinePointRelativePosition
-                        .copy(affineSequence = affineSequence)
+                    .copy(affineSequence = affineSequence)
                 Result.success(vector)
             } else Result.error(java.lang.IllegalArgumentException("Not a point geometry."))
 }

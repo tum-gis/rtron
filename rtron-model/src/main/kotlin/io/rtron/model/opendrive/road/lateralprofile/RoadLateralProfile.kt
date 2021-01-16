@@ -20,14 +20,13 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadLateralProfile(
-        var superelevation: List<RoadLateralProfileSuperelevation> = listOf(),
-        var shape: List<RoadLateralProfileShape> = listOf(),
+    var superelevation: List<RoadLateralProfileSuperelevation> = listOf(),
+    var shape: List<RoadLateralProfileShape> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality()
 ) {
 
     // Methods

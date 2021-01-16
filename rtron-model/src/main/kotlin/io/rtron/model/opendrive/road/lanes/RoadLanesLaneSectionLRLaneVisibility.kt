@@ -20,15 +20,14 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadLanesLaneSectionLRLaneVisibility(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var sOffset: Double = Double.NaN,
-        var forward: Double = Double.NaN,
-        var back: Double = Double.NaN,
-        var left: Double = Double.NaN,
-        var right: Double = Double.NaN
+    var sOffset: Double = Double.NaN,
+    var forward: Double = Double.NaN,
+    var back: Double = Double.NaN,
+    var left: Double = Double.NaN,
+    var right: Double = Double.NaN
 )

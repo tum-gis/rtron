@@ -20,22 +20,21 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableRangeSet as GImmutableRangeSet
 
 /** Conversion from Guava range set class. */
-fun <T: Comparable<*>> GImmutableRangeSet<T>.toRangeSet() = RangeSet(this)
-
+fun <T : Comparable<*>> GImmutableRangeSet<T>.toRangeSet() = RangeSet(this)
 
 /**
  * An immutable set of ranges.
  *
  * @param rangeSet adapted Guava class
  */
-class RangeSet<T: Comparable<*>>(
-        private val rangeSet: GImmutableRangeSet<T>
+class RangeSet<T : Comparable<*>>(
+    private val rangeSet: GImmutableRangeSet<T>
 ) {
 
     // Secondary Constructors
 
     constructor(ranges: Set<Range<T>>) :
-            this (GImmutableRangeSet.copyOf(ImmutableList.copyOf(ranges.map { it.toRangeG() })))
+        this (GImmutableRangeSet.copyOf(ImmutableList.copyOf(ranges.map { it.toRangeG() })))
 
     // Operators
 
@@ -96,7 +95,6 @@ class RangeSet<T: Comparable<*>>(
      */
     fun asRanges(): Set<Range<T>> = this.rangeSet.asRanges().map { it.toRange() }.toSet()
 
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -117,18 +115,18 @@ class RangeSet<T: Comparable<*>>(
         /**
          * Creates an empty [RangeSet].
          */
-        fun <T: Comparable<*>> empty() = RangeSet(emptySet<Range<T>>())
+        fun <T : Comparable<*>> empty() = RangeSet(emptySet<Range<T>>())
 
         /**
          * Creates a [RangeSet] that contains all values.
          */
-        fun <T: Comparable<*>> all() = RangeSet(setOf<Range<T>>(Range.all()))
+        fun <T : Comparable<*>> all() = RangeSet(setOf<Range<T>>(Range.all()))
 
         /**
          * Creates a [RangeSet] containing the provided [ranges].
          *
          * @param ranges ranges which are included in the [RangeSet]
          */
-        fun <T: Comparable<*>> of(vararg ranges: Range<T>): RangeSet<T> = RangeSet(ranges.toSet())
+        fun <T : Comparable<*>> of(vararg ranges: Range<T>): RangeSet<T> = RangeSet(ranges.toSet())
     }
 }

@@ -18,7 +18,6 @@ package io.rtron.std
 
 import com.github.kittinunf.result.Result
 
-
 /**
  * Handle the [Result.Success] with [block] and return the [Result.Failure].
  *
@@ -27,10 +26,10 @@ import com.github.kittinunf.result.Result
  * @return remaining [Result.Failure]
  */
 inline fun <V : Any?, E : Exception> Result<V, E>.handleSuccess(block: (Result.Success<V>) -> Nothing): E =
-        when (this) {
-            is Result.Success -> block(this)
-            is Result.Failure -> error
-        }
+    when (this) {
+        is Result.Success -> block(this)
+        is Result.Failure -> error
+    }
 
 /**
  * Handle the [Result.Failure] with [block] and return the [Result.Success].
@@ -40,10 +39,10 @@ inline fun <V : Any?, E : Exception> Result<V, E>.handleSuccess(block: (Result.S
  * @return remaining [Result.Success]
  */
 inline fun <V : Any?, E : Exception> Result<V, E>.handleFailure(block: (Result.Failure<E>) -> Nothing): V =
-        when (this) {
-            is Result.Success -> value
-            is Result.Failure -> block(this)
-        }
+    when (this) {
+        is Result.Success -> value
+        is Result.Failure -> block(this)
+    }
 
 /**
  * A failure within the list is handled with the [block] operation, otherwise the value list of [Result.Success]
@@ -54,12 +53,12 @@ inline fun <V : Any?, E : Exception> Result<V, E>.handleFailure(block: (Result.F
  * @return the list of values of the [Result.Success]
  */
 inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleFailure(block: (Result.Failure<E>) -> Nothing): List<V> =
-        map {
-            when (it) {
-                is Result.Success -> it.value
-                is Result.Failure -> block(it)
-            }
+    map {
+        when (it) {
+            is Result.Success -> it.value
+            is Result.Failure -> block(it)
         }
+    }
 
 /**
  * Handle all [Result.Failure] with [block] and return only the values of [Result.Success].
@@ -69,15 +68,16 @@ inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleFailure(block:
  * @return the list of values of the [Result.Success]
  */
 inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleAndRemoveFailure(
-        block: (Result.Failure<E>) -> Unit): List<V> =
-        fold(emptyList()) { acc, result ->
-            when (result) {
-                is Result.Success -> acc + result.value
-                is Result.Failure -> {
-                    block(result); acc
-                }
+    block: (Result.Failure<E>) -> Unit
+): List<V> =
+    fold(emptyList()) { acc, result ->
+        when (result) {
+            is Result.Success -> acc + result.value
+            is Result.Failure -> {
+                block(result); acc
             }
         }
+    }
 
 /**
  * Handle all [Result.Failure] with [block] containing the index and exception and return
@@ -88,15 +88,16 @@ inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleAndRemoveFailu
  * @return the list of values of the [Result.Success]
  */
 inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleAndRemoveFailureIndexed(
-        block: (index: Int, Result.Failure<E>) -> Unit): List<V> =
-        foldIndexed(emptyList()) { index, acc, result ->
-            when (result) {
-                is Result.Success -> acc + result.value
-                is Result.Failure -> {
-                    block(index, result); acc
-                }
+    block: (index: Int, Result.Failure<E>) -> Unit
+): List<V> =
+    foldIndexed(emptyList()) { index, acc, result ->
+        when (result) {
+            is Result.Success -> acc + result.value
+            is Result.Failure -> {
+                block(index, result); acc
             }
         }
+    }
 
 /**
  * Ignore and filter out all [Result.Failure].
@@ -105,7 +106,7 @@ inline fun <V : Any?, E : Exception> Iterable<Result<V, E>>.handleAndRemoveFailu
  * @return the list of values of the [Result.Success]
  */
 fun <V : Any?, E : Exception> Iterable<Result<V, E>>.ignoreFailure(): List<V> =
-        filterIsInstance<Result.Success<V>>().map { it.value }
+    filterIsInstance<Result.Success<V>>().map { it.value }
 
 /**
  * Returns the value of map[key] as [Result.Success], if it exists, or as [Result.Failure] otherwise.
@@ -140,12 +141,14 @@ fun <V : Any?> List<V>.getValueResult(index: Int): Result<V, IllegalArgumentExce
  * @param failureHandler the handler of a [Result.Failure] with access to the original [T]
  * @return the list of values which have been successfully [Result.Success] transformed by [transform]
  */
-inline fun <T, V : Any?, E : Exception> Iterable<T>.mapAndHandleFailureOnOriginal(transform: (T) -> Result<V, E>,
-    failureHandler: (result: (Result.Failure<E>), original: T) -> Unit): List<V> = fold(emptyList()) { acc, element ->
-            when (val result = transform(element)) {
-                is Result.Success -> acc + result.value
-                is Result.Failure -> {
-                    failureHandler(result, element); acc
-                }
-            }
+inline fun <T, V : Any?, E : Exception> Iterable<T>.mapAndHandleFailureOnOriginal(
+    transform: (T) -> Result<V, E>,
+    failureHandler: (result: (Result.Failure<E>), original: T) -> Unit
+): List<V> = fold(emptyList()) { acc, element ->
+    when (val result = transform(element)) {
+        is Result.Success -> acc + result.value
+        is Result.Failure -> {
+            failureHandler(result, element); acc
         }
+    }
+}

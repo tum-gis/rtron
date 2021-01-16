@@ -16,23 +16,22 @@
 
 package io.rtron.model.opendrive.header
 
-
 class Header(
-        // Properties and Initializers
-        var geoReference: String = "",
-        //var userData: List<UserData> = listOf(),
-        //var include: List<Include> = listOf(),
+    // Properties and Initializers
+    var geoReference: String = "",
+    // var userData: List<UserData> = listOf(),
+    // var include: List<Include> = listOf(),
 
-        var revMajor: Int = -1,
-        var revMinor: Int = -1,
-        var name: String = "",
-        var version: Float = Float.NaN,
-        var date: String = "",
+    var revMajor: Int = -1,
+    var revMinor: Int = -1,
+    var name: String = "",
+    var version: Float = Float.NaN,
+    var date: String = "",
 
-        var north: Double = Double.NaN,
-        var south: Double = Double.NaN,
-        var east: Double = Double.NaN,
-        var west: Double = Double.NaN,
+    var north: Double = Double.NaN,
+    var south: Double = Double.NaN,
+    var east: Double = Double.NaN,
+    var west: Double = Double.NaN,
 
-        var vendor: String = ""
+    var vendor: String = ""
 )

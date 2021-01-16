@@ -16,14 +16,12 @@
 
 package io.rtron.math.geometry.euclidean.twod
 
+import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import io.rtron.math.std.PI
+import io.rtron.math.std.TWO_PI
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-
-import io.rtron.math.std.PI
-import io.rtron.math.std.TWO_PI
-
 
 internal class Pose2DTest {
 
@@ -61,5 +59,4 @@ internal class Pose2DTest {
             assertThat(pose.rotation.toAngleRadians()).isEqualTo(PI)
         }
     }
-
 }

@@ -24,7 +24,6 @@ import io.rtron.math.std.PI
 import kotlin.math.abs
 import kotlin.math.sqrt
 
-
 /**
  * Represents a spiral of the form:
  * x(l) = A * sqrt(pi) * int_0^l cos( (pi*t^2) / 2 ) dt
@@ -34,7 +33,7 @@ import kotlin.math.sqrt
  * @param cDot first derivative of curvature
  */
 data class Spiral2D(
-        val cDot: Double
+    val cDot: Double
 ) {
 
     // Properties and Initializers

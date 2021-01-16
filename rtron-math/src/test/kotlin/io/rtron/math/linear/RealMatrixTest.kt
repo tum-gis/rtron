@@ -16,11 +16,10 @@
 
 package io.rtron.math.linear
 
+import io.rtron.math.std.DBL_EPSILON
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Test
-import io.rtron.math.std.DBL_EPSILON
-
 
 internal class RealMatrixTest {
 
@@ -31,7 +30,7 @@ internal class RealMatrixTest {
         val toleratedOffset = Offset.offset(DBL_EPSILON)
 
         val actualMatrix = matrix
-                .normalize(matrix.rowDimension - 1, matrix.columnDimension - 1)
+            .normalize(matrix.rowDimension - 1, matrix.columnDimension - 1)
 
         assertThat(actualMatrix[0][0]).isCloseTo(0.25, toleratedOffset)
         assertThat(actualMatrix[0][1]).isCloseTo(0.0, toleratedOffset)

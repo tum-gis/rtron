@@ -23,12 +23,11 @@ import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.citygml.transportation.*
 
-
 /**
  * Builder for city objects of the CityGML Transportation module.
  */
 class TransportationModuleBuilder(
-        val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     enum class Feature { TRACK, ROAD, RAILWAY, SQUARE, NONE }
@@ -37,11 +36,10 @@ class TransportationModuleBuilder(
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
 
-
     // Methods
     fun createLaneSurface(surface: AbstractSurface3D): Result<Road, Exception> {
         val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
-                .also { surface.accept(it) }
+            .also { surface.accept(it) }
         val roadObject = Road()
 
         roadObject.lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
@@ -50,7 +48,7 @@ class TransportationModuleBuilder(
 
     fun createFillerSurface(surface: AbstractSurface3D): Result<Road, Exception> {
         val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
-                .also { surface.accept(it) }
+            .also { surface.accept(it) }
 
         val roadObject = Road()
         roadObject.lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
@@ -58,42 +56,44 @@ class TransportationModuleBuilder(
     }
 
     fun createTransportationComplex(surface: AbstractSurface3D, feature: Feature, type: Type = Type.NONE):
-            Result<TransportationComplex, Exception> {
+        Result<TransportationComplex, Exception> {
 
-        val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
+            val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
                 .also { surface.accept(it) }
-        return createTransportationComplex(geometryTransformer, feature, type)
-    }
+            return createTransportationComplex(geometryTransformer, feature, type)
+        }
 
     fun createTransportationComplex(geometryTransformer: GeometryTransformer, feature: Feature, type: Type = Type.NONE):
-            Result<TransportationComplex, Exception> {
+        Result<TransportationComplex, Exception> {
 
-        val transportationComplex = when (feature) {
-            Feature.TRACK -> Track()
-            Feature.ROAD -> Road()
-            Feature.RAILWAY -> Railway()
-            Feature.SQUARE -> Square()
-            Feature.NONE -> TransportationComplex()
-        }
-
-        when (type) {
-            Type.TRAFFICAREA -> {
-                val trafficArea = TrafficArea().apply {
-                    lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it } }
-                val trafficAreaProperty = TrafficAreaProperty(trafficArea)
-                transportationComplex.trafficArea = listOf(trafficAreaProperty)
+            val transportationComplex = when (feature) {
+                Feature.TRACK -> Track()
+                Feature.ROAD -> Road()
+                Feature.RAILWAY -> Railway()
+                Feature.SQUARE -> Square()
+                Feature.NONE -> TransportationComplex()
             }
-            Type.AUXILARYTRAFFICAREA -> {
-                val auxiliaryTrafficArea = AuxiliaryTrafficArea().apply {
-                    lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it } }
-                val auxiliaryTrafficAreaProperty = AuxiliaryTrafficAreaProperty(auxiliaryTrafficArea)
-                transportationComplex.auxiliaryTrafficArea = listOf(auxiliaryTrafficAreaProperty)
+
+            when (type) {
+                Type.TRAFFICAREA -> {
+                    val trafficArea = TrafficArea().apply {
+                        lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+                    }
+                    val trafficAreaProperty = TrafficAreaProperty(trafficArea)
+                    transportationComplex.trafficArea = listOf(trafficAreaProperty)
+                }
+                Type.AUXILARYTRAFFICAREA -> {
+                    val auxiliaryTrafficArea = AuxiliaryTrafficArea().apply {
+                        lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+                    }
+                    val auxiliaryTrafficAreaProperty = AuxiliaryTrafficAreaProperty(auxiliaryTrafficArea)
+                    transportationComplex.auxiliaryTrafficArea = listOf(auxiliaryTrafficAreaProperty)
+                }
+                else ->
+                    transportationComplex.lod2MultiSurface =
+                        geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
             }
-            else -> transportationComplex.lod2MultiSurface =
-                geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+
+            return Result.success(transportationComplex)
         }
-
-        return Result.success(transportationComplex)
-    }
-
 }

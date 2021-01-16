@@ -28,7 +28,6 @@ import io.rtron.std.hasSameSizeAs
 import io.rtron.std.isSorted
 import io.rtron.std.isStrictlySorted
 
-
 /**
  * Represents the sequential concatenation of the provided member functions.
  *
@@ -36,9 +35,9 @@ import io.rtron.std.isStrictlySorted
  * @param absoluteStarts absolute start of the first function
  */
 class ConcatenatedFunction(
-        memberFunctions: List<UnivariateFunction>,
-        absoluteDomains: List<Range<Double>>,
-        absoluteStarts: List<Double>
+    memberFunctions: List<UnivariateFunction>,
+    absoluteDomains: List<Range<Double>>,
+    absoluteStarts: List<Double>
 ) : UnivariateFunction() {
 
     // Properties and Initializers
@@ -48,19 +47,19 @@ class ConcatenatedFunction(
     // Methods
     override fun valueUnbounded(x: Double): Result<Double, Exception> {
         val localMember = container.strictSelectMember(x)
-                .handleFailure { return it }
+            .handleFailure { return it }
         return localMember.member.valueUnbounded(localMember.localParameter)
     }
 
     override fun slopeUnbounded(x: Double): Result<Double, Exception> {
         val localMember = container.strictSelectMember(x)
-                .handleFailure { return it }
+            .handleFailure { return it }
         return localMember.member.slopeUnbounded(localMember.localParameter)
     }
 
     override fun valueInFuzzy(x: Double, tolerance: Double): Result<Double, Exception> {
         val localMember = container.fuzzySelectMember(x, tolerance)
-                .handleFailure { return it }
+            .handleFailure { return it }
         return localMember.member.valueUnbounded(localMember.localParameter)
     }
 
@@ -77,7 +76,6 @@ class ConcatenatedFunction(
         return container.hashCode()
     }
 
-
     companion object {
 
         /**
@@ -93,14 +91,15 @@ class ConcatenatedFunction(
          * @param prependConstant if true, the first linear function is preceded by a constant function
          * @param appendConstant if true, the last linear function is appended by a constant function
          */
-        fun ofLinearFunctions(starts: List<Double>, intercepts: List<Double>, prependConstant: Boolean = false,
-                              appendConstant: Boolean = true): UnivariateFunction {
-            require(starts.isNotEmpty() && intercepts.isNotEmpty())
-            { "List of starts and intercepts must not be empty." }
-            require(starts.hasSameSizeAs(intercepts))
-            { "Equally sized starts and intercepts required." }
-            require(starts.isSorted())
-            { "Start values must be sorted in ascending order." }
+        fun ofLinearFunctions(
+            starts: List<Double>,
+            intercepts: List<Double>,
+            prependConstant: Boolean = false,
+            appendConstant: Boolean = true
+        ): UnivariateFunction {
+            require(starts.isNotEmpty() && intercepts.isNotEmpty()) { "List of starts and intercepts must not be empty." }
+            require(starts.hasSameSizeAs(intercepts)) { "Equally sized starts and intercepts required." }
+            require(starts.isSorted()) { "Start values must be sorted in ascending order." }
 
             // calculate slopes for continuous function
             val deltaIntercepts = intercepts.zipWithNext().map { it.second - it.first }
@@ -110,10 +109,10 @@ class ConcatenatedFunction(
             // prepare linear functions
             val preparedStarts = starts.dropLast(1)
             val preparedLinearFunctions = slopes.zip(intercepts)
-                    .map { LinearFunction(it.first, it.second) }
+                .map { LinearFunction(it.first, it.second) }
             val preparedAbsoluteDomains = starts
-                    .zipWithNext()
-                    .map { Range.closedOpen(it.first, it.second) }
+                .zipWithNext()
+                .map { Range.closedOpen(it.first, it.second) }
 
             // prepend function, if necessary
             val prependedStart = if (prependConstant)
@@ -130,11 +129,11 @@ class ConcatenatedFunction(
             val appendedAbsoluteDomain = if (appendConstant)
                 listOf(Range.atLeast(starts.last())) else emptyList()
 
-
             return ConcatenatedFunction(
-                    prependedFunction + preparedLinearFunctions + appendedFunction,
-                    prependedAbsoluteDomain + preparedAbsoluteDomains + appendedAbsoluteDomain,
-                    prependedStart + preparedStarts + appendedStart)
+                prependedFunction + preparedLinearFunctions + appendedFunction,
+                prependedAbsoluteDomain + preparedAbsoluteDomains + appendedAbsoluteDomain,
+                prependedStart + preparedStarts + appendedStart
+            )
         }
 
         /**
@@ -149,22 +148,23 @@ class ConcatenatedFunction(
          * @param coefficients coefficients of the polynomial function members
          * @param prependConstant if true, the first linear function is preceded by a constant function
          */
-        fun ofPolynomialFunctions(starts: List<Double>, coefficients: List<DoubleArray>, prependConstant: Boolean = false,
-                                  prependConstantValue: Double = Double.NaN): UnivariateFunction {
+        fun ofPolynomialFunctions(
+            starts: List<Double>,
+            coefficients: List<DoubleArray>,
+            prependConstant: Boolean = false,
+            prependConstantValue: Double = Double.NaN
+        ): UnivariateFunction {
 
-            require(starts.isNotEmpty() && coefficients.isNotEmpty())
-            { "List of starts and coefficients must not be empty." }
-            require(starts.hasSameSizeAs(coefficients))
-            { "Equally sized starts and coefficients required." }
-            require(starts.isStrictlySorted())
-            { "Polynomials must be sorted in strict ascending order." }
+            require(starts.isNotEmpty() && coefficients.isNotEmpty()) { "List of starts and coefficients must not be empty." }
+            require(starts.hasSameSizeAs(coefficients)) { "Equally sized starts and coefficients required." }
+            require(starts.isStrictlySorted()) { "Polynomials must be sorted in strict ascending order." }
 
             // prepare polynomial functions and domains
             val polynomialFunctions = coefficients
-                    .map { PolynomialFunction(it) }
+                .map { PolynomialFunction(it) }
             val absoluteDomains = starts
-                    .zipWithNext()
-                    .map { Range.closedOpen(it.first, it.second) } + Range.atLeast(starts.last())
+                .zipWithNext()
+                .map { Range.closedOpen(it.first, it.second) } + Range.atLeast(starts.last())
 
             // prepend function, if necessary
             val prependedStart = if (prependConstant)
@@ -178,12 +178,11 @@ class ConcatenatedFunction(
             val prependedAbsoluteDomain = if (prependConstant)
                 listOf(Range.lessThan(starts.first())) else emptyList()
 
-
             return ConcatenatedFunction(
-                    prependedFunction + polynomialFunctions,
-                    prependedAbsoluteDomain + absoluteDomains,
-                    prependedStart + starts)
+                prependedFunction + polynomialFunctions,
+                prependedAbsoluteDomain + absoluteDomains,
+                prependedStart + starts
+            )
         }
-
     }
 }

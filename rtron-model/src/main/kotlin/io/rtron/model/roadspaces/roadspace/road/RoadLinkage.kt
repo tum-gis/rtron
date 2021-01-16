@@ -16,26 +16,24 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
-import io.rtron.model.roadspaces.topology.junction.JunctionIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
+import io.rtron.model.roadspaces.topology.junction.JunctionIdentifier
 import io.rtron.std.Optional
-
 
 enum class ContactPoint(val relativeIndex: Int) {
     START(0),
     END(-1)
 }
 
-
 /**
  * Contains the topological information about the road.
  */
 data class RoadLinkage(
-        val belongsToJunctionId: Optional<JunctionIdentifier>,
-        val predecessorRoadspaceId: Optional<RoadspaceIdentifier>,
-        val predecessorJunctionId: Optional<JunctionIdentifier>,
-        val predecessorContactPoint: Optional<ContactPoint>,
-        val successorRoadspaceId: Optional<RoadspaceIdentifier>,
-        val successorJunctionId: Optional<JunctionIdentifier>,
-        val successorContactPoint: Optional<ContactPoint>
+    val belongsToJunctionId: Optional<JunctionIdentifier>,
+    val predecessorRoadspaceId: Optional<RoadspaceIdentifier>,
+    val predecessorJunctionId: Optional<JunctionIdentifier>,
+    val predecessorContactPoint: Optional<ContactPoint>,
+    val successorRoadspaceId: Optional<RoadspaceIdentifier>,
+    val successorJunctionId: Optional<JunctionIdentifier>,
+    val successorContactPoint: Optional<ContactPoint>
 )

@@ -19,7 +19,6 @@ package io.rtron.transformer.opendrive2roadspaces.roadspaces
 import io.rtron.model.opendrive.common.EUnitSpeed
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 
-
 /**
  * Transforms units of the OpenDRIVE data model to units of the RoadSpaces data model.
  */

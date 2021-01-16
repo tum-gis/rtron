@@ -16,7 +16,6 @@
 
 package io.rtron.transformer
 
-
 /**
  * Abstract class for all implemented transformer parameters.
  * The transformer parameters are a list of transformer specific variables which influence the model transformations.

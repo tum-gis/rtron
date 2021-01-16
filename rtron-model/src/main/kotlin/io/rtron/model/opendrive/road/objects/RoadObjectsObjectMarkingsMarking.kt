@@ -16,23 +16,27 @@
 
 package io.rtron.model.opendrive.road.objects
 
-import io.rtron.model.opendrive.common.*
-
+import io.rtron.model.opendrive.common.DataQuality
+import io.rtron.model.opendrive.common.ERoadMarkColor
+import io.rtron.model.opendrive.common.ERoadMarkWeight
+import io.rtron.model.opendrive.common.ESideType
+import io.rtron.model.opendrive.common.Include
+import io.rtron.model.opendrive.common.UserData
 
 data class RoadObjectsObjectMarkingsMarking(
-        var cornerReference: List<RoadObjectsObjectMarkingsMarkingCornerReference> = listOf(),
+    var cornerReference: List<RoadObjectsObjectMarkingsMarkingCornerReference> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var side: ESideType = ESideType.UNKNOWN,
-        var weight: ERoadMarkWeight = ERoadMarkWeight.STANDARD,
-        var width: Double = Double.NaN,
-        var color: ERoadMarkColor = ERoadMarkColor.STANDARD,
-        var zOffset: Double = Double.NaN,
-        var spaceLength: Double = Double.NaN,
-        var lineLength: Double = Double.NaN,
-        var startOffset: Double = Double.NaN,
-        var stopOffset: Double = Double.NaN
+    var side: ESideType = ESideType.UNKNOWN,
+    var weight: ERoadMarkWeight = ERoadMarkWeight.STANDARD,
+    var width: Double = Double.NaN,
+    var color: ERoadMarkColor = ERoadMarkColor.STANDARD,
+    var zOffset: Double = Double.NaN,
+    var spaceLength: Double = Double.NaN,
+    var lineLength: Double = Double.NaN,
+    var startOffset: Double = Double.NaN,
+    var stopOffset: Double = Double.NaN
 )

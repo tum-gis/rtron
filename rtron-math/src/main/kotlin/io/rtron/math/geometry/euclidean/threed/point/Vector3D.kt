@@ -34,7 +34,6 @@ fun CMVector3D.toVector3D() = Vector3D(this.x, this.y, this.z)
 /** Conversion from adapted Vector class from JOML. */
 fun JOMLVector3D.toVector3D() = Vector3D(this.x, this.y, this.z)
 
-
 /**
  * Represents a vector in three-dimensional space, whereby its values must be finite.
  *
@@ -43,10 +42,10 @@ fun JOMLVector3D.toVector3D() = Vector3D(this.x, this.y, this.z)
  * @param z z component (applicate) of the vector
  */
 data class Vector3D(
-        val x: Double,
-        val y: Double,
-        val z: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    val x: Double,
+    val y: Double,
+    val z: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractPoint3D() {
 
     // Properties and Initializers
@@ -119,20 +118,18 @@ data class Vector3D(
     fun toVector3DJOML() = JOMLVector3D(this.x, this.y, this.z)
     fun toVector4DJOML(w: Double = 0.0) = JOMLVector4D(this.x, this.y, this.z, w)
 
-
     /**
      * Conversion to a vector in 2D.
      *
      * @param dropAxis axis to be dropped for 2D; selecting the z axis will take the vector (x, y)
      */
     fun toVector2D(dropAxis: Vector3D = Z_AXIS): Vector2D =
-            when (dropAxis.normalized()) {
-                X_AXIS -> Vector2D(y, z)
-                Y_AXIS -> Vector2D(x, z)
-                Z_AXIS -> Vector2D(x, y)
-                else -> throw IllegalArgumentException("Unknown axis selected to drop.")
-            }
-
+        when (dropAxis.normalized()) {
+            X_AXIS -> Vector2D(y, z)
+            Y_AXIS -> Vector2D(x, z)
+            Z_AXIS -> Vector2D(x, y)
+            else -> throw IllegalArgumentException("Unknown axis selected to drop.")
+        }
 
     companion object {
         val ZERO = Vector3D(0.0, 0.0, 0.0)
@@ -145,9 +142,9 @@ data class Vector3D(
          *
          */
         fun of(x: Double, y: Double, z: Double): Result<Vector3D, IllegalArgumentException> =
-                if (!x.isFinite() || !y.isFinite() || !z.isFinite())
-                    Result.error(IllegalArgumentException("Values for x, y, z must be finite."))
-                else Result.success(Vector3D(x, y, z))
+            if (!x.isFinite() || !y.isFinite() || !z.isFinite())
+                Result.error(IllegalArgumentException("Values for x, y, z must be finite."))
+            else Result.success(Vector3D(x, y, z))
     }
 }
 

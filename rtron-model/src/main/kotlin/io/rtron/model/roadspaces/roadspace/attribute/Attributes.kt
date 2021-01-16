@@ -16,7 +16,6 @@
 
 package io.rtron.model.roadspaces.roadspace.attribute
 
-
 /**
  * Abstract class of an attribute.
  */

@@ -44,7 +44,7 @@ enum class EUnitSpeed {
 enum class EUnitMass { KILOGRAM, TON }
 enum class EUnitSlope { PERCENT }
 enum class EUnit {
-    METER, KILOMETER, FEET, MILE,   // EUnitDistance
+    METER, KILOMETER, FEET, MILE, // EUnitDistance
     METER_PER_SECOND, MILES_PER_HOUR, KILOMETER_PER_HOUR, // EUnitSpeed
     KILOGRAM, TON, // EUnitMass
     PERCENT, // EUnit

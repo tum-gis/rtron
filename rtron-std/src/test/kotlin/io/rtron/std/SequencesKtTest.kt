@@ -20,7 +20,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class SequencesKtTest {
 
     @Nested
@@ -70,7 +69,6 @@ internal class SequencesKtTest {
 
             assertThat(actual).isEqualTo(expected)
         }
-
 
         @Test
         fun `empty list should return an empty list`() {
@@ -133,14 +131,14 @@ internal class SequencesKtTest {
             val pair6 = Pair(1, "b")
             val startList = listOf(pair1, pair2, pair3, pair4, pair5, pair6)
             val expectedZips = listOf(
-                    listOf(pair6, pair1, pair2),
-                    listOf(pair3),
-                    listOf(pair4, pair5))
+                listOf(pair6, pair1, pair2),
+                listOf(pair3),
+                listOf(pair4, pair5)
+            )
 
             val actualZips = startList.zipWithConsecutivesEnclosing { it.first }
 
             assertThat(actualZips).isEqualTo(expectedZips)
         }
     }
-
 }

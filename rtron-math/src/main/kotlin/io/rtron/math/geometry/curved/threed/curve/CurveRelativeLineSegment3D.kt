@@ -24,7 +24,6 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.BoundType
 import io.rtron.math.range.Tolerable
 
-
 /**
  * Line segment in a curve relative coordinate system in 3D.
  *
@@ -51,12 +50,19 @@ class CurveRelativeLineSegment3D(
          * Creates a [LineSegment3D], if [start] and [end] [Vector3D] are not fuzzily equal according to the [tolerance].
          *
          */
-        fun of(start: CurveRelativeVector3D, end: CurveRelativeVector3D, tolerance: Double,
-               endBoundType: BoundType = BoundType.CLOSED): Result<CurveRelativeLineSegment3D, IllegalArgumentException> =
+        fun of(
+            start: CurveRelativeVector3D,
+            end: CurveRelativeVector3D,
+            tolerance: Double,
+            endBoundType: BoundType = BoundType.CLOSED
+        ): Result<CurveRelativeLineSegment3D, IllegalArgumentException> =
             if (start.fuzzyEquals(end, tolerance))
-                Result.error(IllegalArgumentException("Start and end vector of a line segment must be different " +
-                        "according to the given tolerance."))
+                Result.error(
+                    IllegalArgumentException(
+                        "Start and end vector of a line segment must be different " +
+                            "according to the given tolerance."
+                    )
+                )
             else Result.success(CurveRelativeLineSegment3D(start, end, tolerance, endBoundType))
     }
-
 }

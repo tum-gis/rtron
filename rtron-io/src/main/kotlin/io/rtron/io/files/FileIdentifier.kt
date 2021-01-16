@@ -32,10 +32,10 @@ interface FileIdentifierInterface {
  * @param fileHashSha256 hash of the file
  */
 data class FileIdentifier(
-        override val fileName: String,
-        override val fileExtension: String,
-        override val filePath: Path,
-        override val fileHashSha256: String
+    override val fileName: String,
+    override val fileExtension: String,
+    override val filePath: Path,
+    override val fileHashSha256: String
 ) : FileIdentifierInterface {
 
     companion object {

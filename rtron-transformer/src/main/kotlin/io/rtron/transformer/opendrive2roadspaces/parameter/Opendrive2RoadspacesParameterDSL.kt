@@ -18,7 +18,6 @@ package io.rtron.transformer.opendrive2roadspaces.parameter
 
 import io.rtron.std.SettableProperty
 
-
 /**
  * DSL Environment for building up [Opendrive2RoadspacesParameters].
  */
@@ -47,8 +46,15 @@ class Opendrive2RoadspacesParametersBuilder {
     private val extrapolateLateralRoadShapesProperty = SettableProperty(defaultParameters.extrapolateLateralRoadShapes)
     var extrapolateLateralRoadShapes by extrapolateLateralRoadShapesProperty
 
-    fun build() = Opendrive2RoadspacesParameters(toleranceProperty, attributesPrefixProperty, crsEpsgProperty,
-            offsetXProperty, offsetYProperty, offsetZProperty, extrapolateLateralRoadShapesProperty)
+    fun build() = Opendrive2RoadspacesParameters(
+        toleranceProperty,
+        attributesPrefixProperty,
+        crsEpsgProperty,
+        offsetXProperty,
+        offsetYProperty,
+        offsetZProperty,
+        extrapolateLateralRoadShapesProperty
+    )
 }
 
 /**
@@ -57,7 +63,7 @@ class Opendrive2RoadspacesParametersBuilder {
  * @param setup DSL environment for defining the parameters
  */
 fun opendrive2RoadspacesParameters(setup: Opendrive2RoadspacesParametersBuilder.() -> Unit):
-        Opendrive2RoadspacesParameters {
-    val builder = Opendrive2RoadspacesParametersBuilder()
-    return builder.apply(setup).build()
-}
+    Opendrive2RoadspacesParameters {
+        val builder = Opendrive2RoadspacesParametersBuilder()
+        return builder.apply(setup).build()
+    }

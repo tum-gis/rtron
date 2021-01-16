@@ -16,15 +16,15 @@
 
 package io.rtron.readerwriter.opendrive
 
-import org.asam.opendrive14.OpenDRIVE
-import org.mapstruct.factory.Mappers
 import io.rtron.io.files.Path
 import io.rtron.model.opendrive.OpendriveModel
+import org.asam.opendrive14.OpenDRIVE
+import org.mapstruct.factory.Mappers
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBException
 
 class Opendrive14Reader(
-        val configuration: OpendriveReaderWriterConfiguration
+    val configuration: OpendriveReaderWriterConfiguration
 ) {
 
     fun createOpendriveModel(file: Path): OpendriveModel {
@@ -41,12 +41,9 @@ class Opendrive14Reader(
             val jaxbContext = JAXBContext.newInstance(OpenDRIVE::class.java)
             val jaxbUnmarshaller = jaxbContext.createUnmarshaller()
             jaxbUnmarshaller.unmarshal(inputFile.toFileJ()) as OpenDRIVE
-
         } catch (e: JAXBException) {
             e.printStackTrace()
             OpenDRIVE()
         }
-
     }
-
 }

@@ -38,14 +38,13 @@ import org.citygml4j.model.citygml.core.CityObjectMember
 import org.citygml4j.model.gml.basicTypes.Code
 import org.citygml4j.util.bbox.BoundingBoxOptions
 
-
 /**
  * Transformer from the RoadSpaces data model to CityGML.
  *
  * @param configuration configuration for the transformation
  */
 class Roadspaces2CitygmlTransformer(
-        val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration
 ) : AbstractTransformer() {
 
     // Properties and Initializers
@@ -77,8 +76,8 @@ class Roadspaces2CitygmlTransformer(
         else transformRoadspacesSequentially(roadspacesModel.roadspaces.values.toList(), roadspacesModel.laneTopology, progressBar)
 
         abstractCityObjects
-                .map { CityObjectMember(it) }
-                .forEach { cityModel.addCityObjectMember(it) }
+            .map { CityObjectMember(it) }
+            .forEach { cityModel.addCityObjectMember(it) }
 
         // create CityGML model
         this.calculateBoundedBy(roadspacesModel.header.coordinateReferenceSystem, cityModel)
@@ -86,14 +85,20 @@ class Roadspaces2CitygmlTransformer(
         return CitygmlModel(cityModel)
     }
 
-    private fun transformRoadspacesSequentially(srcRoadspaces: List<Roadspace>, srcLaneTopology: LaneTopology,
-                                                progressBar: ProgressBar): List<AbstractCityObject> =
-            srcRoadspaces.flatMap {
-                transform(it, srcLaneTopology).also { progressBar.step() }
-            }
+    private fun transformRoadspacesSequentially(
+        srcRoadspaces: List<Roadspace>,
+        srcLaneTopology: LaneTopology,
+        progressBar: ProgressBar
+    ): List<AbstractCityObject> =
+        srcRoadspaces.flatMap {
+            transform(it, srcLaneTopology).also { progressBar.step() }
+        }
 
-    private fun transformRoadspacesConcurrently(srcRoadspaces: List<Roadspace>, srcLaneTopology: LaneTopology,
-                                                progressBar: ProgressBar): List<AbstractCityObject> {
+    private fun transformRoadspacesConcurrently(
+        srcRoadspaces: List<Roadspace>,
+        srcLaneTopology: LaneTopology,
+        progressBar: ProgressBar
+    ): List<AbstractCityObject> {
 
         val resultsDeferred = srcRoadspaces.map {
             GlobalScope.async {
@@ -107,14 +112,14 @@ class Roadspaces2CitygmlTransformer(
      * Transform a single [Roadspace] and add the objects to the [AbstractCityObject].
      */
     private fun transform(srcRoadspace: Roadspace, srcLaneTopology: LaneTopology): List<AbstractCityObject> =
-            _roadspaceLineTransformer.transformRoadReferenceLine(srcRoadspace).toList() +
-                    _roadLanesTransformer.transformRoadCenterLaneLines(srcRoadspace.road) +
-                    _roadLanesTransformer.transformLaneLines(srcRoadspace.road) +
-                    _roadLanesTransformer.transformLaneSurfaces(srcRoadspace.road) +
-                    _roadLanesTransformer.transformLateralFillerSurfaces(srcRoadspace.road) +
-                    _roadLanesTransformer.transformLongitudinalFillerSurfaces(srcRoadspace.road, srcLaneTopology) +
-                    _roadLanesTransformer.transformRoadMarkings(srcRoadspace.road) +
-                    _roadObjectTransformer.transformRoadspaceObjects(srcRoadspace.roadspaceObjects)
+        _roadspaceLineTransformer.transformRoadReferenceLine(srcRoadspace).toList() +
+            _roadLanesTransformer.transformRoadCenterLaneLines(srcRoadspace.road) +
+            _roadLanesTransformer.transformLaneLines(srcRoadspace.road) +
+            _roadLanesTransformer.transformLaneSurfaces(srcRoadspace.road) +
+            _roadLanesTransformer.transformLateralFillerSurfaces(srcRoadspace.road) +
+            _roadLanesTransformer.transformLongitudinalFillerSurfaces(srcRoadspace.road, srcLaneTopology) +
+            _roadLanesTransformer.transformRoadMarkings(srcRoadspace.road) +
+            _roadObjectTransformer.transformRoadspaceObjects(srcRoadspace.roadspaceObjects)
 
     private fun calculateBoundedBy(srcCrs: Result<CoordinateReferenceSystem, Exception>, dstCityModel: CityModel) {
         if (dstCityModel.cityObjectMember.isEmpty()) return

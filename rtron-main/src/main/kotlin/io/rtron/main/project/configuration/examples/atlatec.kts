@@ -20,5 +20,4 @@ configure {
         discretizationStepSize = 0.5
         flattenGenericAttributeSets = true
     }
-
 }

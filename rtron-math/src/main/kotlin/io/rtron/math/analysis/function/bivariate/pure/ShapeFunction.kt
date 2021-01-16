@@ -23,8 +23,7 @@ import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
-import java.util.*
-
+import java.util.SortedMap
 
 /**
  * The bivariate shape function is defined by a list of functions that are parallel to the y axis and placed at
@@ -36,15 +35,14 @@ import java.util.*
  * function
  */
 class ShapeFunction(
-        val functions: SortedMap<Double, UnivariateFunction>,
-        val extrapolateX: Boolean = false,
-        val extrapolateY: Boolean = false
+    val functions: SortedMap<Double, UnivariateFunction>,
+    val extrapolateX: Boolean = false,
+    val extrapolateY: Boolean = false
 ) : BivariateFunction() {
 
     // Properties and Initializers
     init {
-        require(functions.isNotEmpty())
-        { "Must contain cross-sectional functions." }
+        require(functions.isNotEmpty()) { "Must contain cross-sectional functions." }
     }
 
     override val domainX: Range<Double> = Range.all()
@@ -56,7 +54,7 @@ class ShapeFunction(
     // Methods
 
     override fun valueUnbounded(x: Double, y: Double): Result<Double, Exception> {
-        
+
         val xAdjusted = if (extrapolateX) x.coerceIn(minimumX, maximumX) else x
         if (xAdjusted in functions)
             return calculateZ(xAdjusted, y)
@@ -74,34 +72,33 @@ class ShapeFunction(
      * Returns the key of a function, which is located before [x].
      */
     private fun getKeyBefore(x: Double): Result<Double, Exception> = functions
-            .filter { it.key < x }
-            .ifEmpty { return Result.error(IllegalArgumentException("No relevant entry available.")) }
-            .toSortedMap()
-            .lastKey()
-            .let { Result.Success(it) }
+        .filter { it.key < x }
+        .ifEmpty { return Result.error(IllegalArgumentException("No relevant entry available.")) }
+        .toSortedMap()
+        .lastKey()
+        .let { Result.Success(it) }
 
     /**
      * Returns the key of a function, which is located after [x].
      */
     private fun getKeyAfter(x: Double): Result<Double, Exception> = functions
-            .filter { x < it.key }
-            .ifEmpty { return Result.error(IllegalArgumentException("No relevant entry available.")) }
-            .toSortedMap()
-            .firstKey()
-            .let { Result.Success(it) }
+        .filter { x < it.key }
+        .ifEmpty { return Result.error(IllegalArgumentException("No relevant entry available.")) }
+        .toSortedMap()
+        .firstKey()
+        .let { Result.Success(it) }
 
     private fun calculateZ(key: Double, y: Double): Result<Double, Exception> {
         val selectedFunction = functions
-                .getValueResult(key)
-                .handleFailure { return it }
+            .getValueResult(key)
+            .handleFailure { return it }
 
         val yAdjusted = if (!extrapolateY) y
         else y.coerceIn(selectedFunction.domain.lowerEndpointOrNull(), selectedFunction.domain.upperEndpointOrNull())
 
         return selectedFunction
-                .valueUnbounded(yAdjusted)
-                .handleFailure { return it }
-                .let { Result.success(it) }
+            .valueUnbounded(yAdjusted)
+            .handleFailure { return it }
+            .let { Result.success(it) }
     }
-
 }

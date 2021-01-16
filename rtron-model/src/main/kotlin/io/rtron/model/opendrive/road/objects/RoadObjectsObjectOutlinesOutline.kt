@@ -18,28 +18,27 @@ package io.rtron.model.opendrive.road.objects
 
 import io.rtron.model.opendrive.common.*
 
-
 class RoadObjectsObjectOutlinesOutline(
-        var cornerRoad: List<RoadObjectsObjectOutlinesOutlineCornerRoad> = listOf(),
-        var cornerLocal: List<RoadObjectsObjectOutlinesOutlineCornerLocal> = listOf(),
+    var cornerRoad: List<RoadObjectsObjectOutlinesOutlineCornerRoad> = listOf(),
+    var cornerLocal: List<RoadObjectsObjectOutlinesOutlineCornerLocal> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var id: String = "",
-        var fillType: EOutlineFillType = EOutlineFillType.UNKNOWN,
-        var outer: Boolean = true,
-        var closed: Boolean = true,
-        var laneType: ELaneType = ELaneType.NONE
+    var id: String = "",
+    var fillType: EOutlineFillType = EOutlineFillType.UNKNOWN,
+    var outer: Boolean = true,
+    var closed: Boolean = true,
+    var laneType: ELaneType = ELaneType.NONE
 ) {
 
     // Methods
-    fun isPolyhedronUniquelyDefined() = (isPolyhedronDefinedByRoadCorners() && !isPolyhedronDefinedByLocalCorners())
-            || (!isPolyhedronDefinedByRoadCorners() && isPolyhedronDefinedByLocalCorners())
+    fun isPolyhedronUniquelyDefined() = (isPolyhedronDefinedByRoadCorners() && !isPolyhedronDefinedByLocalCorners()) ||
+        (!isPolyhedronDefinedByRoadCorners() && isPolyhedronDefinedByLocalCorners())
 
-    fun isLinearRingUniquelyDefined() = (isLinearRingDefinedByRoadCorners() && !isLinearRingDefinedByLocalCorners())
-            || (!isLinearRingDefinedByRoadCorners() && isLinearRingDefinedByLocalCorners())
+    fun isLinearRingUniquelyDefined() = (isLinearRingDefinedByRoadCorners() && !isLinearRingDefinedByLocalCorners()) ||
+        (!isLinearRingDefinedByRoadCorners() && isLinearRingDefinedByLocalCorners())
 
     /** Returns true, if the provided geometry information correspond to a polyhedron. */
     fun isPolyhedron() = isPolyhedronDefinedByRoadCorners() || isPolyhedronDefinedByLocalCorners()
@@ -56,5 +55,4 @@ class RoadObjectsObjectOutlinesOutline(
         cornerRoad.isNotEmpty() && cornerRoad.all { it.isSetBasePoint() && it.hasZeroHeight() }
     fun isLinearRingDefinedByLocalCorners() =
         cornerLocal.isNotEmpty() && cornerLocal.all { it.isSetBasePoint() && it.hasZeroHeight() }
-
 }

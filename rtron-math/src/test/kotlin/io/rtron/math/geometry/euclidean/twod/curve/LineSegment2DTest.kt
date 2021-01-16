@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
-
 internal class LineSegment2DTest {
 
     @Nested
@@ -90,7 +89,6 @@ internal class LineSegment2DTest {
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
             val curveRelativePoint = CurveRelativeVector1D(5.0)
 
-
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
 
             assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
@@ -127,5 +125,4 @@ internal class LineSegment2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(0.0, 0.0))
         }
     }
-
 }

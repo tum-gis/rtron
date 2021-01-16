@@ -18,14 +18,17 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 if (!JavaVersion.current().isJava11Compatible)
-    logger.warn("This build requires Java ${JavaVersion.VERSION_11}, " +
-            "but version ${JavaVersion.current()} is currently in use.")
+    logger.warn(
+        "This build requires Java ${JavaVersion.VERSION_11}, " +
+            "but version ${JavaVersion.current()} is currently in use."
+    )
 
 plugins {
     base
     java
     kotlin("jvm") version DependencyVersions.kotlin
     id(Plugins.versionChecker) version PluginVersions.versionChecker
+    id(Plugins.ktlint) version PluginVersions.ktlint
 }
 
 allprojects {
@@ -43,6 +46,7 @@ allprojects {
 
 subprojects {
     apply(plugin = "java")
+    apply(plugin = Plugins.ktlint)
 
     dependencies {
         implementation(kotlin(Dependencies.kotlinStandardLibrary))

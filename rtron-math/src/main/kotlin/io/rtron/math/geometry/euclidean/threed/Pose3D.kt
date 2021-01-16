@@ -19,7 +19,6 @@ package io.rtron.math.geometry.euclidean.threed
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 
-
 /**
  * A pose in 3D consists of a position and an orientation.
  * See the wikipedia article on [pose](https://en.wikipedia.org/wiki/Pose_(computer_vision)).
@@ -28,13 +27,13 @@ import io.rtron.math.geometry.euclidean.twod.Pose2D
  * @param rotation orientation
  */
 data class Pose3D(
-        val point: Vector3D = Vector3D.ZERO,
-        val rotation: Rotation3D = Rotation3D.ZERO
+    val point: Vector3D = Vector3D.ZERO,
+    val rotation: Rotation3D = Rotation3D.ZERO
 ) {
 
     // Conversions
     fun toPose2D(dropAxis: Vector3D = Vector3D.Z_AXIS) =
-            Pose2D(point.toVector2D(dropAxis), rotation.toRotation2D(dropAxis))
+        Pose2D(point.toVector2D(dropAxis), rotation.toRotation2D(dropAxis))
 
     override fun toString(): String {
         return "Pose3D(position=$point, rotation=$rotation)"

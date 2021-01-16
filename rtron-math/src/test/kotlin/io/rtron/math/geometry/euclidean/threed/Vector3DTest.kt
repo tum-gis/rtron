@@ -16,16 +16,15 @@
 
 package io.rtron.math.geometry.euclidean.threed
 
+import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.std.HALF_PI
+import io.rtron.math.std.PI
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import io.rtron.math.std.HALF_PI
-import io.rtron.math.std.PI
-
 
 internal class Vector3DTest {
 
@@ -34,7 +33,7 @@ internal class Vector3DTest {
 
         @Test
         fun `adding points with positive coordinates`() {
-            val pointA = Vector3D(1.0,1.0,1.0)
+            val pointA = Vector3D(1.0, 1.0, 1.0)
             val pointB = Vector3D(1.0, 1.0, 1.0)
 
             val actualSum = pointA + pointB
@@ -44,12 +43,12 @@ internal class Vector3DTest {
 
         @Test
         fun `adding points with negative coordinates`() {
-            val pointA = Vector3D(-10.0,-5.0,-1.0)
+            val pointA = Vector3D(-10.0, -5.0, -1.0)
             val pointB = Vector3D(10.0, 5.0, 1.0)
 
             val actualSum = pointA + pointB
 
-            assertThat(actualSum).isEqualTo(Vector3D(0.0,0.0,0.0))
+            assertThat(actualSum).isEqualTo(Vector3D(0.0, 0.0, 0.0))
         }
     }
 
@@ -58,7 +57,7 @@ internal class Vector3DTest {
 
         @Test
         fun `subtracting points with positive coordinates`() {
-            val pointA = Vector3D(4.0, 3.0,2.0)
+            val pointA = Vector3D(4.0, 3.0, 2.0)
             val pointB = Vector3D(2.0, 1.0, 0.0)
 
             val actualDifference = pointA - pointB
@@ -85,7 +84,7 @@ internal class Vector3DTest {
         fun `scalar division of basic point`() {
             val actualResult = Vector3D(2.0, 4.0, 1.0).scalarDivide(4.0)
 
-            assertThat(actualResult).isEqualTo(Vector3D(0.5,1.0,0.25))
+            assertThat(actualResult).isEqualTo(Vector3D(0.5, 1.0, 0.25))
         }
 
         @Test
@@ -108,7 +107,6 @@ internal class Vector3DTest {
 
             assertThat(point).isEqualTo(Vector3D(2.0, 4.0, 1.0))
         }
-
     }
 
     @Nested
@@ -116,7 +114,7 @@ internal class Vector3DTest {
 
         @Test
         fun `half pi angle between axes`() {
-            val pointA = Vector3D(1.0,0.0, 0.0)
+            val pointA = Vector3D(1.0, 0.0, 0.0)
             val pointB = Vector3D(0.0, 1.0, 0.0)
 
             val actualSum = pointA.angle(pointB)
@@ -126,24 +124,21 @@ internal class Vector3DTest {
 
         @Test
         fun `adding points with positive coordinates`() {
-            val pointA = Vector3D(1.0,1.0, 1.0)
+            val pointA = Vector3D(1.0, 1.0, 1.0)
             val pointB = Vector3D(-1.0, -1.0, -1.0)
 
             val actualSum = pointA.angle(pointB)
 
             assertThat(actualSum).isEqualTo(PI)
         }
-
-
     }
-
 
     @Nested
     inner class Equality {
         @Test
         fun `zero point equals zero point`() {
-            val pointA = Vector3D(0.0,0.0,0.0)
-            val pointB = Vector3D(0.0,0.0,0.0)
+            val pointA = Vector3D(0.0, 0.0, 0.0)
+            val pointB = Vector3D(0.0, 0.0, 0.0)
 
             assertTrue(pointA == pointB)
         }
@@ -167,11 +162,9 @@ internal class Vector3DTest {
         @Test
         fun `positive point unequals positive point with epsilon`() {
             val pointA = Vector3D(2.0, 0.0, 2.0)
-            val pointB = Vector3D(0.0,0.0,1.99999)
+            val pointB = Vector3D(0.0, 0.0, 1.99999)
 
             assertFalse(pointA == pointB)
         }
-
     }
-
 }

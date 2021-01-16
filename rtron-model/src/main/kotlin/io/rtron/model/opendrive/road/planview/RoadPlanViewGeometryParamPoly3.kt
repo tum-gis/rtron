@@ -22,22 +22,21 @@ import io.rtron.model.opendrive.common.UserData
 
 enum class ParamPoly3PRange { ARCLENGTH, NORMALIZED }
 
-
 class RoadPlanViewGeometryParamPoly3(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var aU: Double = Double.NaN,
-        var bU: Double = Double.NaN,
-        var cU: Double = Double.NaN,
-        var dU: Double = Double.NaN,
-        var aV: Double = Double.NaN,
-        var bV: Double = Double.NaN,
-        var cV: Double = Double.NaN,
-        var dV: Double = Double.NaN,
+    var aU: Double = Double.NaN,
+    var bU: Double = Double.NaN,
+    var cU: Double = Double.NaN,
+    var dU: Double = Double.NaN,
+    var aV: Double = Double.NaN,
+    var bV: Double = Double.NaN,
+    var cV: Double = Double.NaN,
+    var dV: Double = Double.NaN,
 
-        var pRange: ParamPoly3PRange = ParamPoly3PRange.ARCLENGTH
+    var pRange: ParamPoly3PRange = ParamPoly3PRange.ARCLENGTH
 ) : RoadPlanViewGeometryInterface {
 
     // Properties and Initializers
@@ -47,8 +46,7 @@ class RoadPlanViewGeometryParamPoly3(
     // Methods
 
     override fun isNaN() = aU.isNaN() || bU.isNaN() || cU.isNaN() || dU.isNaN() ||
-            aV.isNaN() || bV.isNaN() || cV.isNaN() || dV.isNaN()
+        aV.isNaN() || bV.isNaN() || cV.isNaN() || dV.isNaN()
 
     fun isNormalized() = pRange == ParamPoly3PRange.NORMALIZED
-
 }

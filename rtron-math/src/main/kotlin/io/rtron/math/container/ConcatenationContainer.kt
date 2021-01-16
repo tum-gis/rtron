@@ -17,11 +17,16 @@
 package io.rtron.math.container
 
 import com.github.kittinunf.result.Result
-import io.rtron.math.range.*
+import io.rtron.math.range.DefinableDomain
+import io.rtron.math.range.Range
+import io.rtron.math.range.RangeSet
+import io.rtron.math.range.containsConsecutivelyIntersectingRanges
+import io.rtron.math.range.fuzzyContains
+import io.rtron.math.range.fuzzyEncloses
+import io.rtron.math.range.shift
 import io.rtron.std.handleSuccess
 import io.rtron.std.hasSameSizeAs
 import io.rtron.std.isSortedBy
-
 
 /**
  * Concatenates a list of [members] with a locally defined domain to a container with an absolutely defined domain.
@@ -33,44 +38,38 @@ import io.rtron.std.isSortedBy
  * @param absoluteStarts absolute starts of the respective member that is defined locally
  */
 class ConcatenationContainer<T : DefinableDomain<Double>>(
-        private val members: List<T>,
-        private val absoluteDomains: List<Range<Double>>,
-        private val absoluteStarts: List<Double>,
-        private val tolerance: Double = 0.0
+    private val members: List<T>,
+    private val absoluteDomains: List<Range<Double>>,
+    private val absoluteStarts: List<Double>,
+    private val tolerance: Double = 0.0
 ) {
 
     // Properties and Initializers
     init {
-        require(members.isNotEmpty())
-        { "Must contain members for concatenation." }
-        require(absoluteDomains.hasSameSizeAs(members))
-        { "Equally sized absoluteDomains and members required." }
-        require(absoluteStarts.hasSameSizeAs(members))
-        { "Equally sized absoluteStart and members required." }
+        require(members.isNotEmpty()) { "Must contain members for concatenation." }
+        require(absoluteDomains.hasSameSizeAs(members)) { "Equally sized absoluteDomains and members required." }
+        require(absoluteStarts.hasSameSizeAs(members)) { "Equally sized absoluteStart and members required." }
 
         // requirement: lower and upper domain boundaries (apart from the first and last entry)
         val absoluteDomainsWithoutStart =
-                if (absoluteDomains.first().hasLowerBound()) absoluteDomains
-                else absoluteDomains.drop(1)
+            if (absoluteDomains.first().hasLowerBound()) absoluteDomains
+            else absoluteDomains.drop(1)
         val absoluteDomainsWithoutEndings =
-                if (absoluteDomainsWithoutStart.last().hasUpperBound()) absoluteDomainsWithoutStart
-                else absoluteDomainsWithoutStart.dropLast(1)
-        require(absoluteDomainsWithoutEndings.all { it.hasLowerBound() && it.hasUpperBound() })
-        { "All absolute domains (apart from the first and last one) must have an upper and lower bound." }
-        require(absoluteDomainsWithoutEndings.isSortedBy { it.lowerEndpointOrNull()!! })
-        { "Provided absolute domains must be sorted." }
+            if (absoluteDomainsWithoutStart.last().hasUpperBound()) absoluteDomainsWithoutStart
+            else absoluteDomainsWithoutStart.dropLast(1)
+        require(absoluteDomainsWithoutEndings.all { it.hasLowerBound() && it.hasUpperBound() }) { "All absolute domains (apart from the first and last one) must have an upper and lower bound." }
+        require(absoluteDomainsWithoutEndings.isSortedBy { it.lowerEndpointOrNull()!! }) { "Provided absolute domains must be sorted." }
 
         // requirement: no intersecting domains
-        require(!absoluteDomains.containsConsecutivelyIntersectingRanges())
-        { "Absolute domains must not contain intersecting ranges." }
-        require(RangeSet(absoluteDomains.toSet()).numberOfDisconnectedRanges() == 1)
-        { "Absolute domains must be connected." }
+        require(!absoluteDomains.containsConsecutivelyIntersectingRanges()) { "Absolute domains must not contain intersecting ranges." }
+        require(RangeSet(absoluteDomains.toSet()).numberOfDisconnectedRanges() == 1) { "Absolute domains must be connected." }
 
-        require(members.zip(absoluteStarts)
+        require(
+            members.zip(absoluteStarts)
                 .map { it.first.domain.shift(it.second) }
                 .zip(absoluteDomains)
-                .all { it.first.fuzzyEncloses(it.second, tolerance) })
-        { "The local domains must be defined everywhere where the absolute (shifted) domain is also defined." }
+                .all { it.first.fuzzyEncloses(it.second, tolerance) }
+        ) { "The local domains must be defined everywhere where the absolute (shifted) domain is also defined." }
     }
 
     val domain = RangeSet(absoluteDomains.toSet()).span()
@@ -92,9 +91,9 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      */
     fun strictSelectMember(parameter: Double): Result<LocalRequest<T>, Exception> {
         val selection = absoluteDomains
-                .withIndex()
-                .filter { parameter in it.value }
-                .map { it.index }
+            .withIndex()
+            .filter { parameter in it.value }
+            .map { it.index }
         return handleSelection(parameter, selection)
     }
 
@@ -109,9 +108,9 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
         strictSelectMember(parameter).handleSuccess { return it }
 
         val selection = absoluteDomains
-                .withIndex()
-                .filter { it.value.fuzzyContains(parameter, tolerance) }
-                .map { it.index }
+            .withIndex()
+            .filter { it.value.fuzzyContains(parameter, tolerance) }
+            .map { it.index }
         return handleSelection(parameter, selection)
     }
 
@@ -123,15 +122,15 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param selection list of selected members
      */
     private fun handleSelection(parameter: Double, selection: List<Int>):
-            Result<LocalRequest<T>, Exception> = when (selection.size) {
+        Result<LocalRequest<T>, Exception> = when (selection.size) {
 
-        0 -> Result.error(
-                IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains."))
-        1 -> {
-            val localParameter = parameter - absoluteStarts[selection.first()]
-            Result.success(LocalRequest(localParameter, members[selection.first()]))
+            0 -> Result.error(
+                IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains.")
+            )
+            1 -> {
+                val localParameter = parameter - absoluteStarts[selection.first()]
+                Result.success(LocalRequest(localParameter, members[selection.first()]))
+            }
+            else -> Result.error(IllegalStateException("Parameter x=$parameter yields multiple members."))
         }
-        else -> Result.error(IllegalStateException("Parameter x=$parameter yields multiple members."))
-    }
-
 }

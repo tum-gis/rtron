@@ -16,19 +16,22 @@
 
 package io.rtron.model.opendrive.road.lanes
 
-import io.rtron.model.opendrive.common.*
-
+import io.rtron.model.opendrive.common.DataQuality
+import io.rtron.model.opendrive.common.ERoadMarkColor
+import io.rtron.model.opendrive.common.ERoadMarkRule
+import io.rtron.model.opendrive.common.Include
+import io.rtron.model.opendrive.common.UserData
 
 class RoadLanesLaneSectionLCRLaneRoadMarkTypeLine(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var length: Double = Double.NaN,
-        var space: Double = Double.NaN,
-        var tOffset: Double = Double.NaN,
-        var SOffset: Double = Double.NaN,
-        var rule: ERoadMarkRule = ERoadMarkRule.NONE,
-        var width: Double = Double.NaN,
-        var color: ERoadMarkColor = ERoadMarkColor.STANDARD
+    var length: Double = Double.NaN,
+    var space: Double = Double.NaN,
+    var tOffset: Double = Double.NaN,
+    var SOffset: Double = Double.NaN,
+    var rule: ERoadMarkRule = ERoadMarkRule.NONE,
+    var width: Double = Double.NaN,
+    var color: ERoadMarkColor = ERoadMarkColor.STANDARD
 )

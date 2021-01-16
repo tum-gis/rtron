@@ -19,7 +19,6 @@ package io.rtron.model.roadspaces.roadspace.road
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
-
 /**
  * Represents a lane within a lane section.
  *
@@ -34,15 +33,15 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * @param attributes information attributes to the lane
  */
 data class Lane(
-        val id: LaneIdentifier,
-        val width: UnivariateFunction,
-        val innerHeightOffset: UnivariateFunction,
-        val outerHeightOffset: UnivariateFunction,
-        val level: Boolean,
-        val roadMarkings: List<RoadMarking>,
-        val predecessors: List<Int>,
-        val successors: List<Int>,
-        val attributes: AttributeList
+    val id: LaneIdentifier,
+    val width: UnivariateFunction,
+    val innerHeightOffset: UnivariateFunction,
+    val outerHeightOffset: UnivariateFunction,
+    val level: Boolean,
+    val roadMarkings: List<RoadMarking>,
+    val predecessors: List<Int>,
+    val successors: List<Int>,
+    val attributes: AttributeList
 ) {
 
     // Properties and Initializers
@@ -50,7 +49,6 @@ data class Lane(
         require(id.isLeft() || id.isRight()) { "Identifier must be either for a left or right lane." }
     }
 }
-
 
 /**
  * Represents the center lane of a lane section. This lane has no width and is therefore geometrically represented as
@@ -62,10 +60,10 @@ data class Lane(
  * @param attributes information attributes to the lane
  */
 data class CenterLane(
-        val id: LaneIdentifier,
-        val level: Boolean = false,
-        val roadMarkings: List<RoadMarking> = emptyList(),
-        val attributes: AttributeList = AttributeList.EMPTY
+    val id: LaneIdentifier,
+    val level: Boolean = false,
+    val roadMarkings: List<RoadMarking> = emptyList(),
+    val attributes: AttributeList = AttributeList.EMPTY
 ) {
     // Properties and Initializers
     init {

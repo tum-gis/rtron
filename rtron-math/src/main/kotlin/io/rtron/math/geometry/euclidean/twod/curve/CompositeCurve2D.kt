@@ -25,24 +25,21 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
 import io.rtron.std.handleFailure
 
-
 /**
  * Represents the sequential concatenation of the [curveMembers].
  *
  * @param curveMembers curves to be concatenated
  */
 data class CompositeCurve2D(
-        val curveMembers: List<AbstractCurve2D>,
-        private val absoluteDomains: List<Range<Double>>,
-        private val absoluteStarts: List<Double>
+    val curveMembers: List<AbstractCurve2D>,
+    private val absoluteDomains: List<Range<Double>>,
+    private val absoluteStarts: List<Double>
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
     init {
-        require(curveMembers.isNotEmpty())
-        { "Must contain at least one curve member." }
-        require(curveMembers.all { it.tolerance == this.tolerance })
-        { "All curveMembers must have the same tolerance." }
+        require(curveMembers.isNotEmpty()) { "Must contain at least one curve member." }
+        require(curveMembers.all { it.tolerance == this.tolerance }) { "All curveMembers must have the same tolerance." }
     }
 
     private val container = ConcatenationContainer(curveMembers, absoluteDomains, absoluteStarts, tolerance)
@@ -51,26 +48,26 @@ data class CompositeCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, Exception> {
+        Result<Vector2D, Exception> {
 
-        val localMember = container
+            val localMember = container
                 .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
                 .handleFailure { return it }
-        val localPoint = CurveRelativeVector1D(localMember.localParameter)
+            val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePointGlobalCS(localPoint)
-    }
+            return localMember.member.calculatePointGlobalCS(localPoint)
+        }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, Exception> {
+        Result<Rotation2D, Exception> {
 
-        val localMember = container
+            val localMember = container
                 .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
                 .handleFailure { return it }
-        val localPoint = CurveRelativeVector1D(localMember.localParameter)
+            val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }
-    }
+            return localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }
+        }
 
     // Conversions
     override fun toString(): String {
@@ -80,5 +77,4 @@ data class CompositeCurve2D(
     /*companion object {
         fun of(vararg curveMembers: AbstractCurve2D) = CompositeCurve2D(curveMembers.toList())
     }*/
-
 }

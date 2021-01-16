@@ -10,7 +10,7 @@ dependencies {
     implementation(kotlin("script-runtime"))
     implementation(Dependencies.kotlinReflect)
     implementation(Dependencies.ktsRunner) {
-        exclude("org.slf4j", "slf4j-simple")    // avoid multiple slf4j bindings
+        exclude("org.slf4j", "slf4j-simple") // avoid multiple slf4j bindings
         exclude("ch.qos.logback", "logback-classic")
     }
 

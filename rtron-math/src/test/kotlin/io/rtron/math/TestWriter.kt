@@ -30,7 +30,6 @@ import io.rtron.math.std.PI
 import io.rtron.math.transform.AffineSequence2D
 import org.junit.jupiter.api.Test
 
-
 object SpiralSegment2DWriter {
 
     @Test
@@ -83,5 +82,4 @@ object SpiralSegment2DWriter {
 
         csvPrinter.flush()
     }
-
 }

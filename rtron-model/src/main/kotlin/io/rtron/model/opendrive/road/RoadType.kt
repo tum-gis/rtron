@@ -19,11 +19,10 @@ package io.rtron.model.opendrive.road
 import io.rtron.model.opendrive.common.CountryCode
 import io.rtron.model.opendrive.common.ERoadType
 
-
 data class RoadType(
-        var roadTypeSpeed: RoadTypeSpeed = RoadTypeSpeed(),
-        // var additionalData: AdditionalData = AdditionalData(),
-        var s: Double = Double.NaN,
-        var type: ERoadType = ERoadType.UNKNOWN,
-        var countryCode: CountryCode = CountryCode()
+    var roadTypeSpeed: RoadTypeSpeed = RoadTypeSpeed(),
+    // var additionalData: AdditionalData = AdditionalData(),
+    var s: Double = Double.NaN,
+    var type: ERoadType = ERoadType.UNKNOWN,
+    var countryCode: CountryCode = CountryCode()
 )

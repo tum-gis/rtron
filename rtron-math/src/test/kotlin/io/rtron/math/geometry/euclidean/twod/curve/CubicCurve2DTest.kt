@@ -30,7 +30,6 @@ import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class CubicCurve2DTest {
 
     @Nested
@@ -71,5 +70,4 @@ internal class CubicCurve2DTest {
             assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
         }
     }
-
 }

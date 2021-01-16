@@ -20,7 +20,6 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.range.Range
 
-
 /**
  * Plane function of the form z = f(x, y) = [slopeX] * x + [slopeY] * y + [intercept].
  *
@@ -29,11 +28,11 @@ import io.rtron.math.range.Range
  * @param intercept [intercept] = f(0, 0)
  */
 class PlaneFunction(
-        val slopeX: Double,
-        val slopeY: Double,
-        val intercept: Double,
-        override val domainX: Range<Double> = Range.all(),
-        override val domainY: Range<Double> = Range.all()
+    val slopeX: Double,
+    val slopeY: Double,
+    val intercept: Double,
+    override val domainX: Range<Double> = Range.all(),
+    override val domainY: Range<Double> = Range.all()
 ) : BivariateFunction() {
 
     // Properties and Initializers

@@ -16,10 +16,9 @@
 
 package io.rtron.model.opendrive.road
 
-
 data class RoadLink(
-        var predecessor: RoadLinkPredecessorSuccessor = RoadLinkPredecessorSuccessor(),
-        var successor: RoadLinkPredecessorSuccessor = RoadLinkPredecessorSuccessor()
-        // TODO: var neighbour
-        // TODO ref additional data
+    var predecessor: RoadLinkPredecessorSuccessor = RoadLinkPredecessorSuccessor(),
+    var successor: RoadLinkPredecessorSuccessor = RoadLinkPredecessorSuccessor()
+    // TODO: var neighbour
+    // TODO ref additional data
 )

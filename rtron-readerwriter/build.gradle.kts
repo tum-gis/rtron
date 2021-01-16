@@ -45,5 +45,4 @@ xjcGeneration {
             javaPackageName = "org.asam.opendrive15"
         }
     }
-
 }

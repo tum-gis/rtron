@@ -23,7 +23,6 @@ import kotlin.math.absoluteValue
 import kotlin.math.floor
 import kotlin.math.sign
 
-
 /**
  * Arranges an array of [Double] with [step] size.
  *
@@ -39,10 +38,8 @@ fun Range<Double>.arrange(step: Double, includeClosedEndPoint: Boolean = false, 
     requireNotNull(upperEndpoint) { "Closed upper bound type required." }
 
     if (includeClosedEndPoint)
-        require(upperBoundType() == BoundType.CLOSED)
-        { "If endpoint shall be included, the BoundType must be closed." }
-    require(lowerEndpoint.isFinite() && upperEndpoint.isFinite())
-    { "Finite endpoints required." }
+        require(upperBoundType() == BoundType.CLOSED) { "If endpoint shall be included, the BoundType must be closed." }
+    require(lowerEndpoint.isFinite() && upperEndpoint.isFinite()) { "Finite endpoints required." }
 
     val numSteps = floor(length / step).toInt()
     val values = (0..numSteps).map { lowerEndpoint + sign(difference) * it * step }
@@ -63,7 +60,8 @@ fun Range<Double>.fuzzyContains(value: Double, tolerance: Double): Boolean = whe
     hasLowerBound() && !hasUpperBound() -> fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance)
     !hasLowerBound() && hasUpperBound() -> fuzzyLessThanOrEquals(value, upperEndpointOrNull()!!, tolerance)
     !hasLowerBound() && !hasUpperBound() -> value in this
-    else -> fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance) &&
+    else ->
+        fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance) &&
             fuzzyLessThanOrEquals(value, upperEndpointOrNull()!!, tolerance)
 }
 
@@ -89,10 +87,11 @@ fun Range<Double>.fuzzyContainsResult(value: Double, tolerance: Double): Result<
  * @return widened [Range]
  */
 fun Range<Double>.widened(lowerWideningValue: Double, upperWideningValue: Double): Range<Double> = Range.rangeOfNullable(
-        lowerBoundType = lowerBoundType(),
-        lowerEndpoint = lowerEndpointOrNull()?.let { it - lowerWideningValue },
-        upperBoundType = upperBoundType(),
-        upperEndpoint = upperEndpointOrNull()?.let { it + upperWideningValue })
+    lowerBoundType = lowerBoundType(),
+    lowerEndpoint = lowerEndpointOrNull()?.let { it - lowerWideningValue },
+    upperBoundType = upperBoundType(),
+    upperEndpoint = upperEndpointOrNull()?.let { it + upperWideningValue }
+)
 
 /**
  * Widens the [Range] by [wideningValue] on the lower and upper bound.
@@ -110,7 +109,7 @@ fun Range<Double>.widened(wideningValue: Double): Range<Double> = widened(wideni
  * @return true, if [other] is enclosed
  */
 fun Range<Double>.fuzzyEncloses(other: Range<Double>, tolerance: Double): Boolean =
-        this.widened(tolerance) encloses other
+    this.widened(tolerance) encloses other
 
 /**
  * Difference between the upper and lower bound of the [Range].
@@ -135,10 +134,11 @@ val Range<Double>.length
  * @return shifted [Range]
  */
 fun Range<Double>.shift(value: Double): Range<Double> = Range.rangeOfNullable(
-        lowerBoundType = this.lowerBoundType(),
-        lowerEndpoint = this.lowerEndpointOrNull()?.let { it + value },
-        upperBoundType = this.upperBoundType(),
-        upperEndpoint = this.upperEndpointOrNull()?.let { it + value })
+    lowerBoundType = this.lowerBoundType(),
+    lowerEndpoint = this.lowerEndpointOrNull()?.let { it + value },
+    upperBoundType = this.upperBoundType(),
+    upperEndpoint = this.upperEndpointOrNull()?.let { it + value }
+)
 
 /**
  * Shift the [Range] so that the lower endpoint is represented by the [value].
@@ -147,7 +147,8 @@ fun Range<Double>.shift(value: Double): Range<Double> = Range.rangeOfNullable(
  * @return shifted [Range]
  */
 fun Range<Double>.shiftLowerEndpointTo(value: Double): Range<Double> = Range.range(
-        lowerBoundType = this.lowerBoundType(),
-        lowerEndpoint = value,
-        upperBoundType = this.upperBoundType(),
-        upperEndpoint = value + this.length)
+    lowerBoundType = this.lowerBoundType(),
+    lowerEndpoint = value,
+    upperBoundType = this.upperBoundType(),
+    upperEndpoint = value + this.length
+)

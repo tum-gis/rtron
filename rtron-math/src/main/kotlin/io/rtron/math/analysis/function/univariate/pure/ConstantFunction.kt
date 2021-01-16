@@ -20,7 +20,6 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 
-
 /**
  * Constant function of a [value] within a [domain].
  *
@@ -28,8 +27,8 @@ import io.rtron.math.range.Range
  * @param domain domain of the constant function
  */
 data class ConstantFunction(
-        val value: Double,
-        override val domain: Range<Double> = Range.all()
+    val value: Double,
+    override val domain: Range<Double> = Range.all()
 ) : UnivariateFunction() {
 
     // Properties and Initializers

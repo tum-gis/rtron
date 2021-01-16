@@ -25,12 +25,11 @@ import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfig
 import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.core.CityModel
 
-
 /**
  * Transforms lines, such as lane boundaries and center lines (RoadSpaces model), to the [CityModel] (CityGML model).
  */
 class RoadspaceLineTransformer(
-        private val configuration: Roadspaces2CitygmlConfiguration
+    private val configuration: Roadspaces2CitygmlConfiguration
 ) {
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
@@ -46,12 +45,14 @@ class RoadspaceLineTransformer(
      */
     fun transformRoadReferenceLine(srcRoadspace: Roadspace): Optional<AbstractCityObject> {
         val abstractCityObject = _genericsModuleBuilder.createGenericObject(srcRoadspace.referenceLine)
-                .handleFailure { _reportLogger.log(it); return Optional.empty() }
+            .handleFailure { _reportLogger.log(it); return Optional.empty() }
 
         _identifierAdder.addIdentifier(srcRoadspace.id, "RoadReferenceLine", abstractCityObject)
-        _attributesAdder.addAttributes(srcRoadspace.id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
-                srcRoadspace.attributes, abstractCityObject)
+        _attributesAdder.addAttributes(
+            srcRoadspace.id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                srcRoadspace.attributes,
+            abstractCityObject
+        )
         return Optional(abstractCityObject)
     }
-
 }

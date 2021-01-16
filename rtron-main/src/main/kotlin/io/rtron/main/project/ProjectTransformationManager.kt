@@ -31,14 +31,13 @@ import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfig
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-
 /**
  * Manages and supervises a single transformation project that can comprise multiple transformation processing steps.
  *
  * @param configuration configuration of the project
  */
 class ProjectTransformationManager(
-        private val configuration: ProjectConfiguration
+    private val configuration: ProjectConfiguration
 ) {
 
     // Properties and Initializers
@@ -50,9 +49,9 @@ class ProjectTransformationManager(
 
     private val userConfiguration = loadConfig()
 
-    private val _opendrive2RoadspacesConfiguration = Opendrive2RoadspacesConfiguration(configuration.projectId, configuration.sourceFileIdentifier, configuration.concurrentProcessing, userConfiguration.opendrive2RoadspacesParameters )
+    private val _opendrive2RoadspacesConfiguration = Opendrive2RoadspacesConfiguration(configuration.projectId, configuration.sourceFileIdentifier, configuration.concurrentProcessing, userConfiguration.opendrive2RoadspacesParameters)
     private val _opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(_opendrive2RoadspacesConfiguration)
-    private val _roadspaces2CitygmlConfiguration = Roadspaces2CitygmlConfiguration(configuration.projectId, configuration.sourceFileIdentifier, configuration.concurrentProcessing, userConfiguration.roadspaces2CitygmlParameters )
+    private val _roadspaces2CitygmlConfiguration = Roadspaces2CitygmlConfiguration(configuration.projectId, configuration.sourceFileIdentifier, configuration.concurrentProcessing, userConfiguration.roadspaces2CitygmlParameters)
     private val _roadspaces2CitygmlTransformer = Roadspaces2CitygmlTransformer(_roadspaces2CitygmlConfiguration)
 
     // Methods
@@ -86,7 +85,7 @@ class ProjectTransformationManager(
      */
     private fun loadConfig(): ProjectUserConfiguration {
         val loadedConfigurations = getConfigurationFilePaths().map { ScriptLoader.load<ProjectUserConfiguration>(it) }
-        return if(loadedConfigurations.isEmpty()) ProjectUserConfiguration() else
+        return if (loadedConfigurations.isEmpty()) ProjectUserConfiguration() else
             loadedConfigurations.reduce { acc, projectConfig -> acc leftMerge projectConfig }
     }
 
@@ -98,5 +97,4 @@ class ProjectTransformationManager(
         val directories = configuration.absoluteSourceFilePath.getParents(configuration.baseSourceFilePath)
         return directories.map { it.resolve(Path("configuration.kts")) }.filter { it.isRegularFile() }
     }
-
 }

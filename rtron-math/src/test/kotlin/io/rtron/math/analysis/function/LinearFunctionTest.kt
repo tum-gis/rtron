@@ -24,7 +24,6 @@ import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class LinearFunctionTest {
 
     @Nested
@@ -56,8 +55,11 @@ internal class LinearFunctionTest {
 
         @Test
         fun `basic creation of linear function with two points`() {
-            val expectedLinearFunction = LinearFunction(-3.0 / 2.0, 13.0 / 2.0,
-                    Range.closed(3.0, 7.0))
+            val expectedLinearFunction = LinearFunction(
+                -3.0 / 2.0,
+                13.0 / 2.0,
+                Range.closed(3.0, 7.0)
+            )
 
             val actualLinearFunction = LinearFunction.ofInclusivePoints(3.0, 2.0, 7.0, -4.0)
 
@@ -71,7 +73,6 @@ internal class LinearFunctionTest {
 
             assertThatIllegalArgumentException().isThrownBy { LinearFunction.ofInclusivePoints(x, y, x, y) }
         }
-
     }
 
     @Nested
@@ -79,8 +80,11 @@ internal class LinearFunctionTest {
 
         @Test
         fun `with positive unit slope`() {
-            val expectedLinearFunction = LinearFunction(1.0, 2.0,
-                    Range.closed(0.0, 2.0))
+            val expectedLinearFunction = LinearFunction(
+                1.0,
+                2.0,
+                Range.closed(0.0, 2.0)
+            )
 
             val actualLinearFunction = LinearFunction.ofInclusiveYValuesAndUnitSlope(2.0, 4.0)
 
@@ -89,13 +93,15 @@ internal class LinearFunctionTest {
 
         @Test
         fun `with negative unit slope`() {
-            val expectedLinearFunction = LinearFunction(-1.0, 17.0,
-                    Range.closed(0.0, 3.0))
+            val expectedLinearFunction = LinearFunction(
+                -1.0,
+                17.0,
+                Range.closed(0.0, 3.0)
+            )
 
             val actualLinearFunction = LinearFunction.ofInclusiveYValuesAndUnitSlope(17.0, 14.0)
 
             assertThat(actualLinearFunction).isEqualTo(expectedLinearFunction)
         }
-
     }
 }

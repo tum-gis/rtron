@@ -20,13 +20,12 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadPlanViewGeometryArc(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var curvature: Double = Double.NaN
+    var curvature: Double = Double.NaN
 ) : RoadPlanViewGeometryInterface {
 
     override fun isNaN() = curvature.isNaN()

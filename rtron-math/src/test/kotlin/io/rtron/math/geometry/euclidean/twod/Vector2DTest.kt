@@ -16,15 +16,13 @@
 
 package io.rtron.math.geometry.euclidean.twod
 
+import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import io.rtron.math.std.HALF_PI
+import io.rtron.math.std.PI
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-
-import io.rtron.math.std.HALF_PI
-import io.rtron.math.std.PI
 import kotlin.math.sqrt
-
 
 internal class Vector2DTest {
 
@@ -58,7 +56,6 @@ internal class Vector2DTest {
         }
     }
 
-
     @Nested
     inner class TestAngleCalculation {
         @Test
@@ -90,6 +87,5 @@ internal class Vector2DTest {
 
             assertThat(actualAngle).isEqualTo(1.5 * PI)
         }
-
     }
 }

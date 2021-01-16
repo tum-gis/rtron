@@ -81,5 +81,4 @@ internal class LineSegment3DTest {
             assertThat(actualResultingVertices).isEqualTo(expectedDistance)
         }
     }
-
 }

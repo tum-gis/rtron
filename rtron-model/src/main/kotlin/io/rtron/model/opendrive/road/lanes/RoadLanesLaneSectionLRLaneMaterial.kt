@@ -20,14 +20,13 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadLanesLaneSectionLRLaneMaterial(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var sOffset: Double = Double.NaN,
-        var surface: String = "",
-        var friction: Double = Double.NaN,
-        var roughness: Double = Double.NaN
+    var sOffset: Double = Double.NaN,
+    var surface: String = "",
+    var friction: Double = Double.NaN,
+    var roughness: Double = Double.NaN
 )

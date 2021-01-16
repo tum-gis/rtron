@@ -22,7 +22,6 @@ import io.rtron.math.range.Range
 import io.rtron.math.range.shiftLowerEndpointTo
 import io.rtron.std.handleFailure
 
-
 /**
  * Cuts out a section from the [completeFunction].
  * The resulting domain of the [SectionedUnivariateFunction] starts at 0.0 and ends at the length of the section.
@@ -31,10 +30,9 @@ import io.rtron.std.handleFailure
  * @param section the range that is cut out from the [completeFunction]'s domain
  */
 class SectionedUnivariateFunction(
-        private val completeFunction: UnivariateFunction,
-        section: Range<Double>
+    private val completeFunction: UnivariateFunction,
+    section: Range<Double>
 ) : UnivariateFunction() {
-
 
     // Properties and Initializers
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
@@ -42,8 +40,8 @@ class SectionedUnivariateFunction(
 
     // Methods
     override fun valueUnbounded(x: Double): Result<Double, Exception> =
-            completeFunction.valueUnbounded(sectionStart + x)
+        completeFunction.valueUnbounded(sectionStart + x)
 
     override fun slopeUnbounded(x: Double): Result<Double, Exception> =
-            completeFunction.slopeUnbounded(sectionStart + x)
+        completeFunction.slopeUnbounded(sectionStart + x)
 }

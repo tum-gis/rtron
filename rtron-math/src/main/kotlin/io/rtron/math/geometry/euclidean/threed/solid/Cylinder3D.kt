@@ -26,7 +26,6 @@ import io.rtron.std.zipWithNextEnclosing
 import kotlin.math.cos
 import kotlin.math.sin
 
-
 /**
  * Represents a cylinder in 3D which center is located at the local coordinate system's origin and raises in the
  * direction of the z axis.
@@ -35,21 +34,18 @@ import kotlin.math.sin
  * @param height height of the cylinder
  */
 data class Cylinder3D(
-        val radius: Double,
-        val height: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
-        private val numberSlices: Int = DEFAULT_NUMBER_SLICES
+    val radius: Double,
+    val height: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
+    private val numberSlices: Int = DEFAULT_NUMBER_SLICES
 ) : AbstractSolid3D() {
 
     // Properties and Initializers
     init {
-        require(radius.isFinite() && radius > 0.0)
-        { "Radius must be finite and greater than zero." }
-        require(height.isFinite() && height > 0.0)
-        { "Height must be finite and greater than zero." }
-        require(numberSlices >= 3)
-        { "Requiring at least three slices to construct a solid." }
+        require(radius.isFinite() && radius > 0.0) { "Radius must be finite and greater than zero." }
+        require(height.isFinite() && height > 0.0) { "Height must be finite and greater than zero." }
+        require(numberSlices >= 3) { "Requiring at least three slices to construct a solid." }
     }
 
     val diameter = radius * 2.0
@@ -63,14 +59,16 @@ data class Cylinder3D(
         val topPolygon = Polygon3D(circleVertices.map { it.toVector3D(z = height) }, tolerance)
 
         val sidePolygons = circleVertices
-                .zipWithNextEnclosing()
-                .map {
-                    Polygon3D.of(it.first.toVector3D(0.0),
-                            it.second.toVector3D(0.0),
-                            it.second.toVector3D(height),
-                            it.first.toVector3D(height),
-                            tolerance = tolerance)
-                }
+            .zipWithNextEnclosing()
+            .map {
+                Polygon3D.of(
+                    it.first.toVector3D(0.0),
+                    it.second.toVector3D(0.0),
+                    it.second.toVector3D(height),
+                    it.first.toVector3D(height),
+                    tolerance = tolerance
+                )
+            }
 
         return Result.success(sidePolygons + basePolygon + topPolygon)
     }
@@ -79,9 +77,9 @@ data class Cylinder3D(
      * Calculates the points in 2D according to the [numberSlices].
      */
     private fun circleVertices(): List<Vector2D> =
-            (0 until numberSlices)
-                    .map { it * TWO_PI / numberSlices }
-                    .map { angle -> Vector2D(radius * cos(angle), radius * sin(angle)) }
+        (0 until numberSlices)
+            .map { it * TWO_PI / numberSlices }
+            .map { angle -> Vector2D(radius * cos(angle), radius * sin(angle)) }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 

@@ -26,7 +26,6 @@ import io.rtron.math.range.Range
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.std.handleFailure
 
-
 /**
  * Represents a parametric cubic curve of the following form:
  * y = f(x) = c0 + c1*x + c2*x^2 + c3*x^3
@@ -35,22 +34,19 @@ import io.rtron.std.handleFailure
  * @param length length of cubic curve which is used for constructing the domain
  */
 class CubicCurve2D(
-        val coefficients: DoubleArray,
-        length: Double,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-        endBoundType: BoundType = BoundType.OPEN
+    val coefficients: DoubleArray,
+    length: Double,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
+    endBoundType: BoundType = BoundType.OPEN
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
 
     init {
-        require(coefficients.size == 4)
-        { "Requiring exactly four coefficients for building a cubic curve." }
-        require(coefficients.all { it.isFinite() })
-        { "All coefficients must be finite." }
-        require(length.isFinite() && length > 0.0)
-        { "Length must be finite and greater than zero." }
+        require(coefficients.size == 4) { "Requiring exactly four coefficients for building a cubic curve." }
+        require(coefficients.all { it.isFinite() }) { "All coefficients must be finite." }
+        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
     }
 
     private val _polynomialFunction by lazy { PolynomialFunction(coefficients) }
@@ -59,21 +55,21 @@ class CubicCurve2D(
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, Exception> {
+        Result<Vector2D, Exception> {
 
-        val x = curveRelativePoint.curvePosition
-        val y = _polynomialFunction.value(curveRelativePoint.curvePosition)
+            val x = curveRelativePoint.curvePosition
+            val y = _polynomialFunction.value(curveRelativePoint.curvePosition)
                 .handleFailure { throw it.error }
-        return Result.success(Vector2D(x, y))
-    }
+            return Result.success(Vector2D(x, y))
+        }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, Exception> {
+        Result<Rotation2D, Exception> {
 
-        val angle = _polynomialFunction.slope(curveRelativePoint.curvePosition)
+            val angle = _polynomialFunction.slope(curveRelativePoint.curvePosition)
                 .handleFailure { throw it.error }
-        return Result.success(Rotation2D(angle))
-    }
+            return Result.success(Rotation2D(angle))
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

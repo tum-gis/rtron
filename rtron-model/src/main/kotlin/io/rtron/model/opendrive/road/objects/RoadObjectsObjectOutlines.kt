@@ -20,13 +20,12 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadObjectsObjectOutlines(
-        var outline: List<RoadObjectsObjectOutlinesOutline> = listOf(),
+    var outline: List<RoadObjectsObjectOutlinesOutline> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality()
 ) {
 
     // Methods
@@ -36,7 +35,6 @@ class RoadObjectsObjectOutlines(
     fun getLinearRingsDefinedByRoadCorners() = outline.filter { it.isLinearRingDefinedByRoadCorners() }
     fun getLinearRingsDefinedByLocalCorners() = outline.filter { it.isLinearRingDefinedByLocalCorners() }
 
-
     fun numberOfPolyhedrons() = getPolyhedronsDefinedByRoadCorners().size + getPolyhedronsDefinedByLocalCorners().size
     fun numberOfLinearRings() = getLinearRingsDefinedByRoadCorners().size + getLinearRingsDefinedByLocalCorners().size
 
@@ -44,5 +42,4 @@ class RoadObjectsObjectOutlines(
     fun containsLinearRings() = numberOfLinearRings() > 0
 
     fun containsGeometries() = containsPolyhedrons() || containsLinearRings()
-
 }

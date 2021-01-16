@@ -19,22 +19,19 @@ package io.rtron.math.geometry.euclidean.threed.surface
 import com.github.kittinunf.result.Result
 import io.rtron.std.handleFailure
 
-
 /**
  * Represents a composition of multiple surface members.
  *
  * @param surfaceMembers surface members to be composited
  */
 class CompositeSurface3D(
-        private val surfaceMembers: List<AbstractSurface3D>
+    private val surfaceMembers: List<AbstractSurface3D>
 ) : AbstractSurface3D() {
 
     // Properties and Initializers
     init {
-        require(surfaceMembers.isNotEmpty())
-        { "Composite surface must contain members." }
-        require(surfaceMembers.all { surfaceMembers.first().tolerance == it.tolerance })
-        { "All surface members must have the same tolerance." }
+        require(surfaceMembers.isNotEmpty()) { "Composite surface must contain members." }
+        require(surfaceMembers.all { surfaceMembers.first().tolerance == it.tolerance }) { "All surface members must have the same tolerance." }
     }
 
     override val tolerance: Double get() = surfaceMembers.first().tolerance

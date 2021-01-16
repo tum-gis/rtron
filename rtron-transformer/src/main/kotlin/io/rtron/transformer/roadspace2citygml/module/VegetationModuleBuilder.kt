@@ -26,12 +26,11 @@ import io.rtron.transformer.roadspace2citygml.transformer.toGmlString
 import org.citygml4j.model.citygml.vegetation.SolitaryVegetationObject
 import org.citygml4j.model.gml.measures.Length
 
-
 /**
  * Builder for city objects of the CityGML Vegetation module.
  */
 class VegetationModuleBuilder(
-        val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Properties and Initializers
@@ -43,8 +42,8 @@ class VegetationModuleBuilder(
         val solitaryVegetationObject = SolitaryVegetationObject()
 
         solitaryVegetationObject.lod1Geometry = geometryTransformer
-                .getGeometryProperty()
-                .handleFailure { return it }
+            .getGeometryProperty()
+            .handleFailure { return it }
         if (geometryTransformer.isSetRotation())
             _attributesAdder.addRotationAttributes(geometryTransformer.rotation, solitaryVegetationObject)
 
@@ -52,8 +51,10 @@ class VegetationModuleBuilder(
         return Result.success(solitaryVegetationObject)
     }
 
-    private fun addAttributes(solitaryVegetationObject: SolitaryVegetationObject,
-                              geometryTransformer: GeometryTransformer) {
+    private fun addAttributes(
+        solitaryVegetationObject: SolitaryVegetationObject,
+        geometryTransformer: GeometryTransformer
+    ) {
 
         if (geometryTransformer.isSetDiameter()) {
             solitaryVegetationObject.trunkDiameter = Length(geometryTransformer.diameter)

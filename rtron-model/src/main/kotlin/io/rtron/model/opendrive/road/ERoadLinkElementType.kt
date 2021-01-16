@@ -16,7 +16,6 @@
 
 package io.rtron.model.opendrive.road
 
-
 enum class ERoadLinkElementType {
     ROAD, JUNCTION
 }

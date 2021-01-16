@@ -26,5 +26,4 @@ abstract class AbstractReaderWriterConfiguration(
 
     // Methods
     fun getReportLogger() = LogManager.getReportLogger(projectId)
-
 }

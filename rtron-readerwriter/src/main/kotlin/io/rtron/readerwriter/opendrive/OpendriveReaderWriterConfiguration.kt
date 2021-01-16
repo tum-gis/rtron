@@ -19,5 +19,5 @@ package io.rtron.readerwriter.opendrive
 import io.rtron.readerwriter.AbstractReaderWriterConfiguration
 
 class OpendriveReaderWriterConfiguration(
-        projectId: String
+    projectId: String
 ) : AbstractReaderWriterConfiguration(projectId)

@@ -82,8 +82,8 @@ class CoordinateReferenceSystem(
         }
 
         private fun parametersToEpsgCode(parameters: String): Result<Int, IllegalArgumentException> {
-            val result = projCRSFactory.readEpsgFromParameters(parameters) ?:
-                return Result.error(IllegalArgumentException("Cannot derive EPSG code from parameters."))
+            val result = projCRSFactory.readEpsgFromParameters(parameters)
+                ?: return Result.error(IllegalArgumentException("Cannot derive EPSG code from parameters."))
 
             return Result.success(result.toInt())
         }

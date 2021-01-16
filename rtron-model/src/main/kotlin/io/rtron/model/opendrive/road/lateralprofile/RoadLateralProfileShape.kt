@@ -20,20 +20,18 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadLateralProfileShape(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var s: Double = Double.NaN,
-        var t: Double = Double.NaN,
-        var a: Double = Double.NaN,
-        var b: Double = Double.NaN,
-        var c: Double = Double.NaN,
-        var d: Double = Double.NaN
+    var s: Double = Double.NaN,
+    var t: Double = Double.NaN,
+    var a: Double = Double.NaN,
+    var b: Double = Double.NaN,
+    var c: Double = Double.NaN,
+    var d: Double = Double.NaN
 ) {
     // Properties and Initializers
     val coefficients get() = doubleArrayOf(a, b, c, d)
-
 }

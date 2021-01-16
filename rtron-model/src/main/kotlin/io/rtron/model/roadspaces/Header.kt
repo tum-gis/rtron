@@ -19,15 +19,14 @@ package io.rtron.model.roadspaces
 import com.github.kittinunf.result.Result
 import io.rtron.math.projection.CoordinateReferenceSystem
 
-
 /**
  * Header of the [RoadspacesModel] containing the model's meta information.
  */
-data class Header (
-        val coordinateReferenceSystem: Result<CoordinateReferenceSystem, Exception>,
+data class Header(
+    val coordinateReferenceSystem: Result<CoordinateReferenceSystem, Exception>,
 
-        val north: Double = Double.NaN,
-        val south: Double = Double.NaN,
-        val east: Double = Double.NaN,
-        val west: Double = Double.NaN
+    val north: Double = Double.NaN,
+    val south: Double = Double.NaN,
+    val east: Double = Double.NaN,
+    val west: Double = Double.NaN
 )

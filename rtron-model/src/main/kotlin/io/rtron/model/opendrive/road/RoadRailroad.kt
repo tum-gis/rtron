@@ -16,8 +16,7 @@
 
 package io.rtron.model.opendrive.road
 
-
 data class RoadRailroad(
-        // TODO
-        var todo: String = "todo"
+    // TODO
+    var todo: String = "todo"
 )

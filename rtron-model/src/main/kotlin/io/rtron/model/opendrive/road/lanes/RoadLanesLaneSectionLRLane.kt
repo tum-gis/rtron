@@ -21,23 +21,22 @@ import io.rtron.model.opendrive.common.ELaneType
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 open class RoadLanesLaneSectionLRLane(
-        var link: RoadLanesLaneSectionLCRLaneLink = RoadLanesLaneSectionLCRLaneLink(),
-        var width: List<RoadLanesLaneSectionLRLaneWidth> = listOf(),
-        var border: List<RoadLanesLaneSectionLRLaneBorder> = listOf(),
-        var roadMark: List<RoadLanesLaneSectionLCRLaneRoadMark> = listOf(),
-        var material: List<RoadLanesLaneSectionLRLaneMaterial> = listOf(),
-        var visibility: List<RoadLanesLaneSectionLRLaneVisibility> = listOf(),
-        var speed: List<RoadLanesLaneSectionLRLaneSpeed> = listOf(),
-        var access: List<RoadLanesLaneSectionLRLaneAccess> = listOf(),
-        var height: List<RoadLanesLaneSectionLRLaneHeight> = listOf(),
-        var rule: List<RoadLanesLaneSectionLRLaneRule> = listOf(),
+    var link: RoadLanesLaneSectionLCRLaneLink = RoadLanesLaneSectionLCRLaneLink(),
+    var width: List<RoadLanesLaneSectionLRLaneWidth> = listOf(),
+    var border: List<RoadLanesLaneSectionLRLaneBorder> = listOf(),
+    var roadMark: List<RoadLanesLaneSectionLCRLaneRoadMark> = listOf(),
+    var material: List<RoadLanesLaneSectionLRLaneMaterial> = listOf(),
+    var visibility: List<RoadLanesLaneSectionLRLaneVisibility> = listOf(),
+    var speed: List<RoadLanesLaneSectionLRLaneSpeed> = listOf(),
+    var access: List<RoadLanesLaneSectionLRLaneAccess> = listOf(),
+    var height: List<RoadLanesLaneSectionLRLaneHeight> = listOf(),
+    var rule: List<RoadLanesLaneSectionLRLaneRule> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var type: ELaneType = ELaneType.NONE,
-        var level: Boolean = false
+    var type: ELaneType = ELaneType.NONE,
+    var level: Boolean = false
 )

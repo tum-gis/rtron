@@ -23,7 +23,6 @@ import io.rtron.math.range.Range
 import io.rtron.math.range.intersectingRange
 import io.rtron.math.range.unionRanges
 
-
 /**
  * Stacks multiple functions and outputs the value according to the defined [operation].
  *
@@ -32,9 +31,9 @@ import io.rtron.math.range.unionRanges
  * @param defaultValue the default value, if one of the member functions is not defined at the requested parameter
  */
 class StackedFunction(
-        private val memberFunctions: List<UnivariateFunction>,
-        private val operation: (operands: List<Double>) -> Double,
-        private val defaultValue: Double = Double.NaN
+    private val memberFunctions: List<UnivariateFunction>,
+    private val operation: (operands: List<Double>) -> Double,
+    private val defaultValue: Double = Double.NaN
 ) : UnivariateFunction() {
 
     // Properties and Initializers
@@ -43,14 +42,16 @@ class StackedFunction(
     }
 
     override val domain: Range<Double> =
-            if (defaultValue.isFinite()) memberFunctions.map { it.domain }.toSet().unionRanges().span()
-            else memberFunctions.map { it.domain }.toSet().intersectingRange()
+        if (defaultValue.isFinite()) memberFunctions.map { it.domain }.toSet().unionRanges().span()
+        else memberFunctions.map { it.domain }.toSet().intersectingRange()
 
     // Secondary Constructors
-    constructor(memberFunction: UnivariateFunction,
-                operation: (operands: List<Double>) -> Double,
-                defaultValue: Double = Double.NaN) :
-            this(listOf(memberFunction), operation, defaultValue)
+    constructor(
+        memberFunction: UnivariateFunction,
+        operation: (operands: List<Double>) -> Double,
+        defaultValue: Double = Double.NaN
+    ) :
+        this(listOf(memberFunction), operation, defaultValue)
 
     // Methods
     override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> {
@@ -96,7 +97,7 @@ class StackedFunction(
          * @param defaultValue used value if one of the [memberFunctions] is not defined at the requested parameter
          */
         fun ofSum(memberFunctions: List<UnivariateFunction>, defaultValue: Double = Double.NaN): StackedFunction =
-                StackedFunction(memberFunctions, { it.sum() }, defaultValue)
+            StackedFunction(memberFunctions, { it.sum() }, defaultValue)
 
         /**
          * Creates a [StackedFunction] which serves sum of each [memberFunctions].
@@ -105,6 +106,6 @@ class StackedFunction(
          * @param defaultValue used value if one of the [memberFunctions] is not defined at the requested parameter
          */
         fun ofSum(vararg memberFunctions: UnivariateFunction, defaultValue: Double = Double.NaN): StackedFunction =
-                StackedFunction(memberFunctions.toList(), { it.sum() }, defaultValue)
+            StackedFunction(memberFunctions.toList(), { it.sum() }, defaultValue)
     }
 }

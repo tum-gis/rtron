@@ -24,7 +24,6 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialFunction as CMPol
 
 fun CMPolynomialFunction.toPolynomialFunction() = PolynomialFunction(this.coefficients)
 
-
 /**
  * Polynomial function of form f(x) = c[0] + c[1]*x + c[2]*x^2 + ... + c\[N]*x^N.
  *
@@ -32,8 +31,8 @@ fun CMPolynomialFunction.toPolynomialFunction() = PolynomialFunction(this.coeffi
  * @param domain domain for which the polynomial function is defined
  */
 data class PolynomialFunction(
-        val coefficients: DoubleArray,
-        override val domain: Range<Double> = Range.all()
+    val coefficients: DoubleArray,
+    override val domain: Range<Double> = Range.all()
 ) : UnivariateFunction() {
 
     // Properties and Initializers
@@ -56,19 +55,19 @@ data class PolynomialFunction(
 
     // Methods
     override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> =
-            Result.success(_polynomialFunction.value(x))
+        Result.success(_polynomialFunction.value(x))
 
     override fun slopeUnbounded(x: Double): Result<Double, IllegalArgumentException> =
-            polynomialDerivative.valueUnbounded(x)
+        polynomialDerivative.valueUnbounded(x)
 
     /**
      * Returns the calculated value of f(x), if [x] is within the function's domain. Otherwise null is returned.
      */
     fun valueOrNull(x: Double): Double? =
-            when (x) {
-                in domain -> _polynomialFunction.value(x)
-                else -> null
-            }
+        when (x) {
+            in domain -> _polynomialFunction.value(x)
+            else -> null
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -100,15 +99,14 @@ data class PolynomialFunction(
          * @param upperBoundType open or closed upper bound type
          */
         fun of(coefficients: DoubleArray, length: Double, upperBoundType: BoundType = BoundType.OPEN):
-                PolynomialFunction {
-            require(length > 0.0) { "Length must be greater than zero." }
+            PolynomialFunction {
+                require(length > 0.0) { "Length must be greater than zero." }
 
-            return when {
-                length.isFinite() -> PolynomialFunction(coefficients, Range.closedX(0.0, length, upperBoundType))
-                length == Double.POSITIVE_INFINITY -> PolynomialFunction(coefficients, Range.atLeast(0.0))
-                else -> throw IllegalArgumentException("Unknown length state")
+                return when {
+                    length.isFinite() -> PolynomialFunction(coefficients, Range.closedX(0.0, length, upperBoundType))
+                    length == Double.POSITIVE_INFINITY -> PolynomialFunction(coefficients, Range.atLeast(0.0))
+                    else -> throw IllegalArgumentException("Unknown length state")
+                }
             }
-        }
     }
-
 }

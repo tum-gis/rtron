@@ -21,13 +21,11 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.std.handleFailure
 
-
 /**
  * Abstract class for a triangulation algorithm in 3D.
  * See the wikipedia article of [polygon triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation).
  */
 abstract class TriangulationAlgorithm {
-
 
     /**
      * Performs the triangulation operation and checks whether all input vertices are still represented

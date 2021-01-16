@@ -22,13 +22,12 @@ import io.rtron.math.std.RAD_TO_DEG
 import io.rtron.math.std.normalizeAngle
 import kotlin.math.atan2
 
-
 /**
  * Represents a rotation anticlockwise in 2D.
  *
  * @param angle angle in radians, whereas the angle 0.0 corresponds to the x-axis
  */
-class Rotation2D (
+class Rotation2D(
     angle: Double
 ) {
 
@@ -40,7 +39,6 @@ class Rotation2D (
 
     /** angle in radians normalized to the interval of [0, 2PI) */
     val angle: Double = normalizeAngle(angle)
-
 
     // Operators
 
@@ -74,7 +72,6 @@ class Rotation2D (
     fun toAngleRadians() = this.angle
     fun toAngleDegree() = this.angle * RAD_TO_DEG
 
-
     companion object {
         val ZERO = Rotation2D(0.0)
 
@@ -88,5 +85,4 @@ class Rotation2D (
          */
         fun of(direction: Vector2D) = Rotation2D(atan2(direction.y, direction.x))
     }
-
 }

@@ -16,42 +16,41 @@
 
 package io.rtron.model.opendrive.common
 
-
 data class UserData(
-        // TODO: sequence
-        var code: String = "",
-        var value: String = ""
+    // TODO: sequence
+    var code: String = "",
+    var value: String = ""
 )
 
 data class Include(
-        var file: String = ""
+    var file: String = ""
 )
 
 data class DataQuality(
-        var error: DataQualityError = DataQualityError(),
-        var rawData: DataQualityRawData = DataQualityRawData()
+    var error: DataQualityError = DataQualityError(),
+    var rawData: DataQualityRawData = DataQualityRawData()
 )
 
 data class DataQualityError(
-        var xyAbsolute: Double = Double.NaN,
-        var zAbsolute: Double = Double.NaN,
-        var xyRelative: Double = Double.NaN,
-        var zRelative: Double = Double.NaN
+    var xyAbsolute: Double = Double.NaN,
+    var zAbsolute: Double = Double.NaN,
+    var xyRelative: Double = Double.NaN,
+    var zRelative: Double = Double.NaN
 )
 
 data class DataQualityRawData(
-        var date: String = "",
-        var source: EDataQualityRawDataSource = EDataQualityRawDataSource.CUSTOM,
-        var sourceComment: String = "",
-        var postProcessing: EDataQualityRawDataPostProcessing = EDataQualityRawDataPostProcessing.RAW,
-        var postProcessingComment: String = ""
+    var date: String = "",
+    var source: EDataQualityRawDataSource = EDataQualityRawDataSource.CUSTOM,
+    var sourceComment: String = "",
+    var postProcessing: EDataQualityRawDataPostProcessing = EDataQualityRawDataPostProcessing.RAW,
+    var postProcessingComment: String = ""
 )
 
 enum class EDataQualityRawDataSource { SENSOR, CADASTER, CUSTOM }
 enum class EDataQualityRawDataPostProcessing { RAW, CLEANED, PROCESSED, FUSED }
 
 data class AdditionalData(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality()
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality()
 )

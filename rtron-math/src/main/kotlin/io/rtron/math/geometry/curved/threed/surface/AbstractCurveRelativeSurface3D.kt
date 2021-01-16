@@ -24,7 +24,6 @@ import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyContainsResult
 import io.rtron.std.handleFailure
 
-
 /**
  * Abstract class for all geometric surface objects in an curve relative coordinate system in 3D.
  */
@@ -42,11 +41,11 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @return point in cartesian coordinates
      */
     fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double = 0.0):
-            Result<Vector3D, Exception> {
+        Result<Vector3D, Exception> {
 
-        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
-        return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset)
-    }
+            this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
+            return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset)
+        }
 
     /**
      * Returns a point in the global cartesian coordinate system that is located on this surface and given by a
@@ -57,5 +56,5 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @return point in cartesian coordinates
      */
     abstract fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-            Result<Vector3D, Exception>
+        Result<Vector3D, Exception>
 }

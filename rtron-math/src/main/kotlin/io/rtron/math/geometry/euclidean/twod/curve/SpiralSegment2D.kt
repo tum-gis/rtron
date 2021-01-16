@@ -29,7 +29,6 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.std.handleFailure
 
-
 /**
  * Spiral curve segment within a defined [domain] that is given by the [curvatureFunction].
  * See wikipedia article on [Euler spiral](https://en.wikipedia.org/wiki/Euler_spiral).
@@ -39,54 +38,49 @@ import io.rtron.std.handleFailure
  *
  */
 class SpiralSegment2D(
-        private val curvatureFunction: LinearFunction,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-        endBoundType: BoundType = BoundType.OPEN
+    private val curvatureFunction: LinearFunction,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
+    endBoundType: BoundType = BoundType.OPEN
 ) : AbstractCurve2D() {
 
     // Properties and Initializers
 
     private val lowerDomainEndpoint =
-            curvatureFunction.domain.lowerEndpointResult().handleFailure { throw it.error }
+        curvatureFunction.domain.lowerEndpointResult().handleFailure { throw it.error }
     private val upperDomainEndpoint =
-            curvatureFunction.domain.upperEndpointResult().handleFailure { throw it.error }
+        curvatureFunction.domain.upperEndpointResult().handleFailure { throw it.error }
     override val domain: Range<Double> =
-            Range.closedX(lowerDomainEndpoint, upperDomainEndpoint, endBoundType)
+        Range.closedX(lowerDomainEndpoint, upperDomainEndpoint, endBoundType)
 
     init {
-        require(lowerDomainEndpoint == 0.0)
-        { "Lower endpoint of domain must be zero (for moving the spiral segment, the affine sequence is preferred)." }
-        require(length.isFinite() && length > 0.0)
-        { "Length must be finite and greater than zero." }
-        require(curvatureFunction.slope.isFinite() && curvatureFunction.slope != 0.0)
-        { "Curvature slope must be finite and not zero (if it's zero use a line or an arc segment)." }
+        require(lowerDomainEndpoint == 0.0) { "Lower endpoint of domain must be zero (for moving the spiral segment, the affine sequence is preferred)." }
+        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
+        require(curvatureFunction.slope.isFinite() && curvatureFunction.slope != 0.0) { "Curvature slope must be finite and not zero (if it's zero use a line or an arc segment)." }
     }
 
     private val _spiral = Spiral2D(curvatureFunction.slope)
     private val _lengthStart =
-            curvatureFunction.startValue.handleFailure { throw it.error } / curvatureFunction.slope
+        curvatureFunction.startValue.handleFailure { throw it.error } / curvatureFunction.slope
     private val _spiralPoseStart = _spiral.calculatePose(_lengthStart)
-
 
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.point }
+        Result<Vector2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.point }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Rotation2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.rotation }
+        Result<Rotation2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.rotation }
 
     private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D):
-            Result<Pose2D, IllegalArgumentException> {
+        Result<Pose2D, IllegalArgumentException> {
 
-        val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)
-        val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(_spiralPoseStart).inverseTransform(poseOnUnitSpiral)
+            val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)
+            val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(_spiralPoseStart).inverseTransform(poseOnUnitSpiral)
 
-        return Result.success(poseOnUnitSpiralStartingAtOrigin)
-    }
-
+            return Result.success(poseOnUnitSpiralStartingAtOrigin)
+        }
 }
 
 fun LinearFunction.Companion.ofSpiralCurvature(curvatureStart: Double, curvatureEnd: Double, length: Double): LinearFunction =
-        ofInclusiveInterceptAndPoint(curvatureStart, length, curvatureEnd)
+    ofInclusiveInterceptAndPoint(curvatureStart, length, curvatureEnd)

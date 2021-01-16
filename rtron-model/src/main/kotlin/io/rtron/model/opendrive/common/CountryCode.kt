@@ -16,7 +16,6 @@
 
 package io.rtron.model.opendrive.common
 
-
 data class CountryCode(
-        var code: String = ""
+    var code: String = ""
 )

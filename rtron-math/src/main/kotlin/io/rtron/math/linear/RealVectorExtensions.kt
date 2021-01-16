@@ -16,7 +16,6 @@
 
 package io.rtron.math.linear
 
-
 /**
  * Returns the dimension of the linear span of a given list of [RealVector].
  * See the wikipedia article on [linear span](https://en.wikipedia.org/wiki/Linear_span).

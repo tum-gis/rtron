@@ -20,23 +20,22 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadPlanViewGeometry(
-        var line: RoadPlanViewGeometryLine = RoadPlanViewGeometryLine(),
-        var spiral: RoadPlanViewGeometrySpiral = RoadPlanViewGeometrySpiral(),
-        var arc: RoadPlanViewGeometryArc = RoadPlanViewGeometryArc(),
-        var poly3: RoadPlanViewGeometryPoly3 = RoadPlanViewGeometryPoly3(),
-        var paramPoly3: RoadPlanViewGeometryParamPoly3 = RoadPlanViewGeometryParamPoly3(),
+    var line: RoadPlanViewGeometryLine = RoadPlanViewGeometryLine(),
+    var spiral: RoadPlanViewGeometrySpiral = RoadPlanViewGeometrySpiral(),
+    var arc: RoadPlanViewGeometryArc = RoadPlanViewGeometryArc(),
+    var poly3: RoadPlanViewGeometryPoly3 = RoadPlanViewGeometryPoly3(),
+    var paramPoly3: RoadPlanViewGeometryParamPoly3 = RoadPlanViewGeometryParamPoly3(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var s: Double = Double.NaN,
-        var x: Double = Double.NaN,
-        var y: Double = Double.NaN,
-        var hdg: Double = Double.NaN,
-        var length: Double = Double.NaN
+    var s: Double = Double.NaN,
+    var x: Double = Double.NaN,
+    var y: Double = Double.NaN,
+    var hdg: Double = Double.NaN,
+    var length: Double = Double.NaN
 ) {
 
     // Methods

@@ -20,16 +20,15 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.transform.AffineSequence3D
 
-
 /**
  * Represents a polyhedron in 3D.
  *
  * @param polygons faces of the polyhedron geometry
  */
 data class Polyhedron3D(
-        val polygons: List<Polygon3D>,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    val polygons: List<Polygon3D>,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSolid3D() {
 
     // Properties and Initializers

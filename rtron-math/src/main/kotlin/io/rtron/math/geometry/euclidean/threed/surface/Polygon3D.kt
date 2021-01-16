@@ -26,16 +26,15 @@ import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.std.distinctConsecutiveEnclosing
 
-
 /**
  * Planar polygon consisting of a list of [vertices].
  *
  * @param vertices vertices of the polygon must be located in a plane
  */
 data class Polygon3D(
-        val vertices: List<Vector3D> = listOf(),
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    val vertices: List<Vector3D> = listOf(),
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D() {
 
     // Properties and Initializers
@@ -48,22 +47,17 @@ data class Polygon3D(
     private val dimensionSpan = innerEdges.map { it.toRealVector() }.dimensionOfSpan()
 
     init {
-        require(numberOfVertices >= 3)
-        { "Not enough vertices provided for constructing a polygon." }
-        require(vertices.distinctConsecutiveEnclosing { it }.size == vertices.size)
-        { "Consecutively following point duplicates found." }
-        require(dimensionSpan >= 2)
-        { "The dimension of the span is too low ($dimensionSpan) which might be caused by colinear vertices." }
-        require(vertices.isPlanar(tolerance))
-        { "The vertices of a polygon must be located in a plane." }
+        require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a polygon." }
+        require(vertices.distinctConsecutiveEnclosing { it }.size == vertices.size) { "Consecutively following point duplicates found." }
+        require(dimensionSpan >= 2) { "The dimension of the span is too low ($dimensionSpan) which might be caused by colinear vertices." }
+        require(vertices.isPlanar(tolerance)) { "The vertices of a polygon must be located in a plane." }
     }
-
 
     // Methods
 
     /** Returns the normal of the polygon. */
     fun getNormal(): Result<Vector3D, IllegalStateException> =
-            this.vertices.calculateNormal().normalized().let { Result.success(it) }
+        this.vertices.calculateNormal().normalized().let { Result.success(it) }
 
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
     fun reversed() = Polygon3D(vertices.reversed(), tolerance, affineSequence)
@@ -76,10 +70,12 @@ data class Polygon3D(
 
     companion object {
         val TETRAGON = of(
-                Vector3D(-1.0, -1.0, 0.0),
-                Vector3D(-1.0, 1.0, 0.0),
-                Vector3D(1.0, 1.0, 0.0),
-                Vector3D(1.0, -1.0, 0.0), tolerance = DEFAULT_TOLERANCE)
+            Vector3D(-1.0, -1.0, 0.0),
+            Vector3D(-1.0, 1.0, 0.0),
+            Vector3D(1.0, 1.0, 0.0),
+            Vector3D(1.0, -1.0, 0.0),
+            tolerance = DEFAULT_TOLERANCE
+        )
 
         /**
          * Constructs a polygon based on the [vectors].
@@ -90,6 +86,6 @@ data class Polygon3D(
          * Constructs a polygon based on a [Triple] of [vectors].
          */
         fun of(vectors: Triple<Vector3D, Vector3D, Vector3D>, tolerance: Double) =
-                Polygon3D(vectors.toList(), tolerance)
+            Polygon3D(vectors.toList(), tolerance)
     }
 }

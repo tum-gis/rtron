@@ -22,31 +22,30 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 data class RoadObjectsObjectRepeat(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var s: Double = Double.NaN,
-        var length: Double = Double.NaN,
-        var distance: Double = Double.NaN,
-        var tStart: Double = Double.NaN,
-        var tEnd: Double = Double.NaN,
-        var heightStart: Double = Double.NaN,
-        var heightEnd: Double = Double.NaN,
-        var zOffsetStart: Double = Double.NaN,
-        var zOffsetEnd: Double = Double.NaN,
-        var widthStart: Double = Double.NaN,
-        var widthEnd: Double = Double.NaN,
+    var s: Double = Double.NaN,
+    var length: Double = Double.NaN,
+    var distance: Double = Double.NaN,
+    var tStart: Double = Double.NaN,
+    var tEnd: Double = Double.NaN,
+    var heightStart: Double = Double.NaN,
+    var heightEnd: Double = Double.NaN,
+    var zOffsetStart: Double = Double.NaN,
+    var zOffsetEnd: Double = Double.NaN,
+    var widthStart: Double = Double.NaN,
+    var widthEnd: Double = Double.NaN,
 
-        // variant 1
-        var lengthStart: Double = Double.NaN,
-        var lengthEnd: Double = Double.NaN,
+    // variant 1
+    var lengthStart: Double = Double.NaN,
+    var lengthEnd: Double = Double.NaN,
 
-        // variant 2
-        var radiusStart: Double = Double.NaN,
-        var radiusEnd: Double = Double.NaN
+    // variant 2
+    var radiusStart: Double = Double.NaN,
+    var radiusEnd: Double = Double.NaN
 ) {
 
     // Methods
@@ -67,7 +66,6 @@ data class RoadObjectsObjectRepeat(
     fun isObjectHeightNonZero() = (!heightStart.isNaN() && heightStart != 0.0) || (!heightEnd.isNaN() && heightEnd != 0.0)
     fun isObjectRadiusNonZero() = (!radiusStart.isNaN() && radiusStart != 0.0) || (!radiusEnd.isNaN() && radiusEnd != 0.0)
 
-
     fun getRoadReferenceLineParameterSection() = Range.closed(s, s + length)
 
     fun getLateralOffsetFunction() = LinearFunction.ofInclusiveInterceptAndPointWithoutNaN(tStart, length, tEnd)
@@ -78,31 +76,30 @@ data class RoadObjectsObjectRepeat(
     fun getObjectHeightFunction() = LinearFunction.ofInclusiveInterceptAndPointWithoutNaN(heightStart, length, heightEnd)
     fun getObjectRadiusFunction() = LinearFunction.ofInclusiveInterceptAndPointWithoutNaN(radiusStart, length, radiusEnd)
 
-
     fun isSet() = isParametricSweep() || isCurve() || isHorizontalLinearRing() || isVerticalLinearRing() ||
-            isRepeatedCuboid() || isRepeatCylinder()
+        isRepeatedCuboid() || isRepeatCylinder()
 
     fun isParametricSweep() = isContinuous() && isSetStartPoint() &&
-            isLengthNonZero() &&
-            isObjectWidthNonZero() && isObjectHeightNonZero()
+        isLengthNonZero() &&
+        isObjectWidthNonZero() && isObjectHeightNonZero()
 
     fun isCurve() = isContinuous() && isSetStartPoint() &&
-            isLengthNonZero() &&
-            isObjectWidthZero() && isObjectHeightZero()
+        isLengthNonZero() &&
+        isObjectWidthZero() && isObjectHeightZero()
 
     fun isHorizontalLinearRing() = isContinuous() && isSetStartPoint() &&
-            isLengthNonZero() &&
-            isObjectWidthNonZero() && isObjectHeightZero()
+        isLengthNonZero() &&
+        isObjectWidthNonZero() && isObjectHeightZero()
 
     fun isVerticalLinearRing() = isContinuous() && isSetStartPoint() &&
-            isLengthNonZero() &&
-            isObjectWidthZero() && isObjectHeightNonZero()
+        isLengthNonZero() &&
+        isObjectWidthZero() && isObjectHeightNonZero()
 
     fun isRepeatedCuboid() = isDiscrete() && isSetStartPoint() &&
-            isLengthNonZero() &&
-            isObjectHeightNonZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
+        isLengthNonZero() &&
+        isObjectHeightNonZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
 
     fun isRepeatCylinder() = isDiscrete() && isSetStartPoint() &&
-            isLengthNonZero() &&
-            isObjectHeightNonZero() && isObjectRadiusNonZero()
+        isLengthNonZero() &&
+        isObjectHeightNonZero() && isObjectRadiusNonZero()
 }

@@ -20,7 +20,6 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyContains
 
-
 /**
  * Function with exactly two parameters of the form z = f(x, y).
  */
@@ -45,8 +44,11 @@ abstract class BivariateFunction {
      */
     fun value(x: Double, y: Double): Result<Double, Exception> {
         return if (x in domainX && y in domainY) valueUnbounded(x, y)
-        else Result.error(IllegalArgumentException(
-                "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."))
+        else Result.error(
+            IllegalArgumentException(
+                "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
+            )
+        )
     }
 
     /**
@@ -59,8 +61,11 @@ abstract class BivariateFunction {
      */
     fun valueInFuzzy(x: Double, y: Double, tolerance: Double): Result<Double, Exception> {
         return if (!domainX.fuzzyContains(x, tolerance) || !domainY.fuzzyContains(y, tolerance))
-            Result.error(IllegalArgumentException(
-                    "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."))
+            Result.error(
+                IllegalArgumentException(
+                    "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
+                )
+            )
         else valueUnbounded(x, y)
     }
 }

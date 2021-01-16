@@ -30,7 +30,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class CompositeCurve2DTest {
 
     @Nested
@@ -52,27 +51,39 @@ internal class CompositeCurve2DTest {
             val affine2 = Affine2D.of(point2, rotation2)
             val affineSequence2 = AffineSequence2D.of(affine2)
             val curveMember2 = SpiralSegment2D(
-                    LinearFunction.ofSpiralCurvature(-0.0000000000000000e+00,
-                            -1.2698412698412698e-01,
-                            3.1746031746031744e+00),
-                    tolerance, affineSequence2)
+                LinearFunction.ofSpiralCurvature(
+                    -0.0000000000000000e+00,
+                    -1.2698412698412698e-01,
+                    3.1746031746031744e+00
+                ),
+                tolerance,
+                affineSequence2
+            )
 
             val point3 = Vector2D(-4.3409250448547327e+00, -4.6416930098216129e+00)
             val rotation3 = Rotation2D(5.8383605706600694e-01)
             val affine3 = Affine2D.of(point3, rotation3)
             val affineSequence3 = AffineSequence2D.of(affine3)
-            val curveMember3 = Arc2D(-1.2698412698412698e-01, 9.1954178989066371e+00, tolerance,
-                    affineSequence3)
+            val curveMember3 = Arc2D(
+                -1.2698412698412698e-01,
+                9.1954178989066371e+00,
+                tolerance,
+                affineSequence3
+            )
 
             val point4 = Vector2D(4.3409256447834164e+00, -4.6416930099218154e+00)
             val rotation4 = Rotation2D(-5.8383605708086783e-01)
             val affine4 = Affine2D.of(point4, rotation4)
             val affineSequence4 = AffineSequence2D.of(affine4)
             val curveMember4 = SpiralSegment2D(
-                    LinearFunction.ofSpiralCurvature(-1.2698412698412698e-01,
-                            -0.0000000000000000e+00,
-                            3.1746031746031744e+00),
-                    tolerance, affineSequence4)
+                LinearFunction.ofSpiralCurvature(
+                    -1.2698412698412698e-01,
+                    -0.0000000000000000e+00,
+                    3.1746031746031744e+00
+                ),
+                tolerance,
+                affineSequence4
+            )
 
             val point5 = Vector2D(6.7269902521255664e+00, -6.7269896521471884e+00)
             val rotation5 = Rotation2D(-7.8539816341104807e-01)
@@ -86,7 +97,6 @@ internal class CompositeCurve2DTest {
             val compositeCurve = CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts.dropLast(1))
             val curveRelativePoint = CurveRelativeVector1D(compositeCurve.length)
 
-
             val actualPoint = compositeCurve.calculatePoseGlobalCS(curveRelativePoint)
 
             assertThat(actualPoint).isInstanceOf(Result.Success::class.java)
@@ -94,5 +104,4 @@ internal class CompositeCurve2DTest {
             assertThat(actualPoint.value.point).isNotEqualTo(Vector2D.ZERO)
         }
     }
-
 }

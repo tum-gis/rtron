@@ -16,12 +16,11 @@
 
 package io.rtron.math.linear
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix
-import org.apache.commons.math3.linear.MatrixUtils
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.reshapeByColumnDimension
+import org.apache.commons.math3.linear.Array2DRowRealMatrix
+import org.apache.commons.math3.linear.MatrixUtils
 import org.apache.commons.math3.linear.RealMatrix as CMRealMatrix
-
 
 /**
  * Real matrix of double values.
@@ -29,7 +28,7 @@ import org.apache.commons.math3.linear.RealMatrix as CMRealMatrix
  * @param rows the rows of the matrix represented as [DoubleArray]
  */
 class RealMatrix(
-        rows: Array<DoubleArray>
+    rows: Array<DoubleArray>
 ) {
 
     // Properties and Initializers
@@ -57,18 +56,15 @@ class RealMatrix(
     /** dimension of matrix as (rowDimension, columnDimension) */
     val dimension get() = Pair(rowDimension, columnDimension)
 
-
     // Secondary Constructors
 
     constructor(matrix: CMRealMatrix) : this(matrix.data)
     constructor(matrix: DoubleArray, columnDimension: Int) : this(matrix.reshapeByColumnDimension(columnDimension))
     constructor(rowVectors: List<RealVector>) : this(rowVectors.map { it.toDoubleArray() }.toTypedArray())
 
-
     // Operators
 
     operator fun get(rowIndex: Int) = getRow(rowIndex)
-
 
     // Methods
 
@@ -101,7 +97,7 @@ class RealMatrix(
      * @return submatrix
      */
     fun getSubMatrix(selectedRows: IntArray, selectedColumns: IntArray) =
-            RealMatrix(_matrix.getSubMatrix(selectedRows, selectedColumns))
+        RealMatrix(_matrix.getSubMatrix(selectedRows, selectedColumns))
 
     /**
      * Returns a submatrix of the complete matrix by only selecting the [selectedRows] and [selectedColumns].
@@ -111,8 +107,7 @@ class RealMatrix(
      * @return submatrix
      */
     fun getSubMatrix(selectedRows: IntRange, selectedColumns: IntRange) =
-            getSubMatrix(selectedRows.toList().toIntArray(), selectedColumns.toList().toIntArray())
-
+        getSubMatrix(selectedRows.toList().toIntArray(), selectedColumns.toList().toIntArray())
 
     /** Returns this matrix multiplied with [other] (return = this x [other]). */
     fun multiply(other: RealMatrix) = RealMatrix(_matrix.multiply(other.toRealMatrixCM()))
@@ -139,8 +134,7 @@ class RealMatrix(
     fun inverse() = RealMatrix(MatrixUtils.inverse(_matrix))
 
     fun normalize(rowIndex: Int, columnIndex: Int): RealMatrix {
-        require(this[rowIndex][columnIndex] != 0.0)
-        { "Normalizing element must not be zero." }
+        require(this[rowIndex][columnIndex] != 0.0) { "Normalizing element must not be zero." }
         return scalarMultiply(1.0 / this[rowIndex][columnIndex])
     }
 
@@ -171,7 +165,6 @@ class RealMatrix(
         return "Matrix(_matrix=$_matrix)"
     }
 
-
     companion object {
 
         /**
@@ -182,13 +175,10 @@ class RealMatrix(
         @kotlin.jvm.JvmName("ofListRealVector")
         fun of(columnVectors: List<RealVector>): RealMatrix {
             val rowDimension = columnVectors.first().dimension
-            require(columnVectors.isNotEmpty())
-            { "No column vectors provided for building a matrix." }
-            require(columnVectors.all { it.dimension == rowDimension })
-            { "Provided column vectors have different dimensions." }
+            require(columnVectors.isNotEmpty()) { "No column vectors provided for building a matrix." }
+            require(columnVectors.all { it.dimension == rowDimension }) { "Provided column vectors have different dimensions." }
 
-            val matrixValues = (0 until rowDimension).fold(emptyList<DoubleArray>())
-            { acc, currentRowIndex -> acc + columnVectors.map { it[currentRowIndex] }.toDoubleArray() }
+            val matrixValues = (0 until rowDimension).fold(emptyList<DoubleArray>()) { acc, currentRowIndex -> acc + columnVectors.map { it[currentRowIndex] }.toDoubleArray() }
 
             return RealMatrix(matrixValues.toTypedArray())
         }
@@ -200,7 +190,7 @@ class RealMatrix(
          */
         @kotlin.jvm.JvmName("ofListVector3D")
         fun of(vectors: List<Vector3D>): RealMatrix =
-                RealMatrix(vectors.map { it.toRealVector() })
+            RealMatrix(vectors.map { it.toRealVector() })
 
         /**
          * Creates an identity [RealMatrix] of the [dimension].
@@ -223,7 +213,5 @@ class RealMatrix(
             val cmMatrix = MatrixUtils.createRealDiagonalMatrix(diagonal.toDoubleArray())
             return RealMatrix(cmMatrix)
         }
-
     }
-
 }

@@ -23,7 +23,6 @@ import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class Polygon3DTest {
 
     @Nested
@@ -57,7 +56,7 @@ internal class Polygon3DTest {
             val pointB = Vector3D(1.0, 1.0, 1.0)
 
             assertThatIllegalArgumentException()
-                    .isThrownBy { Polygon3D(listOf(pointA, pointB, pointA), 0.0) }
+                .isThrownBy { Polygon3D(listOf(pointA, pointB, pointA), 0.0) }
         }
 
         @Test
@@ -67,7 +66,7 @@ internal class Polygon3DTest {
             val pointC = Vector3D(3.0, 4.0, 0.0)
 
             assertThatIllegalArgumentException()
-                    .isThrownBy { Polygon3D(listOf(pointA, pointB, pointC), 0.0) }
+                .isThrownBy { Polygon3D(listOf(pointA, pointB, pointC), 0.0) }
         }
 
         @Test
@@ -78,9 +77,8 @@ internal class Polygon3DTest {
             val pointD = Vector3D(1.0, 1.0, 1.0)
 
             assertThatIllegalArgumentException()
-                    .isThrownBy { Polygon3D(listOf(pointA, pointB, pointC, pointD), 0.0) }
+                .isThrownBy { Polygon3D(listOf(pointA, pointB, pointC, pointD), 0.0) }
         }
-
     }
 
     @Nested
@@ -102,8 +100,15 @@ internal class Polygon3DTest {
 
         @Test
         fun `test planar quadrilateral polygon`() {
-            val planarQuadrilateral = Polygon3D(listOf( Vector3D.ZERO, Vector3D.X_AXIS,
-                Vector3D(1.0, 0.0, 1.0), Vector3D.Z_AXIS), 0.0)
+            val planarQuadrilateral = Polygon3D(
+                listOf(
+                    Vector3D.ZERO,
+                    Vector3D.X_AXIS,
+                    Vector3D(1.0, 0.0, 1.0),
+                    Vector3D.Z_AXIS
+                ),
+                0.0
+            )
             val expectedResult = Vector3D(0.0, -1.0, 0.0)
 
             val actualReturn = planarQuadrilateral.getNormal()
@@ -112,7 +117,5 @@ internal class Polygon3DTest {
             require(actualReturn is Result.Success)
             assertThat(actualReturn.value).isEqualTo(expectedResult)
         }
-
     }
-
 }

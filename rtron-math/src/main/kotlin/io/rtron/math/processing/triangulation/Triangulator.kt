@@ -22,7 +22,6 @@ import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.isPlanar
 import io.rtron.std.handleSuccess
 
-
 @RequiresOptIn(message = "The triangulation functionality is experimental.")
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
@@ -51,13 +50,12 @@ object Triangulator {
 
         // run triangulation algorithms until one succeeds
         val errorStandard = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-                .handleSuccess { return it }
+            .handleSuccess { return it }
         fallbackTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-                .handleSuccess { return it }
+            .handleSuccess { return it }
         fanTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-                .handleSuccess { return it }
+            .handleSuccess { return it }
 
         return Result.error(errorStandard)
     }
-
 }

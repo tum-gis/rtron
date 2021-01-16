@@ -18,7 +18,6 @@ package io.rtron.model.opendrive.header
 
 import io.rtron.model.opendrive.common.AdditionalData
 
-
 data class GeoReference(
-        var additionalData: AdditionalData = AdditionalData()
+    var additionalData: AdditionalData = AdditionalData()
 )

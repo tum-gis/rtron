@@ -43,7 +43,6 @@ internal class CollectionsKtTest {
             assertThat(actualValues).isEqualTo(expectedValues)
         }
 
-
         @Test
         fun `test empty list`() {
             val actualValues = emptyList<String>().distinctConsecutive { it }
@@ -146,10 +145,11 @@ internal class CollectionsKtTest {
         fun `test basic enclosed windowing of character sequence`() {
             val baseSequence = sequenceOf("a", "b", "c", "d")
             val expectedSequence = sequenceOf(
-                    listOf("a", "b", "c"),
-                    listOf("b", "c", "d"),
-                    listOf("c", "d", "a"),
-                    listOf("d", "a", "b"))
+                listOf("a", "b", "c"),
+                listOf("b", "c", "d"),
+                listOf("c", "d", "a"),
+                listOf("d", "a", "b")
+            )
 
             val actualSequence = baseSequence.windowedEnclosing(3)
 
@@ -160,18 +160,17 @@ internal class CollectionsKtTest {
         fun `test basic enclosed windowing of integer sequence`() {
             val baseSequence = sequenceOf(1, 2, 3, 4, 5, 6)
             val expectedSequence = sequenceOf(
-                    listOf(1, 2, 3),
-                    listOf(2, 3, 4),
-                    listOf(3, 4, 5),
-                    listOf(4, 5, 6),
-                    listOf(5, 6, 1),
-                    listOf(6, 1, 2))
+                listOf(1, 2, 3),
+                listOf(2, 3, 4),
+                listOf(3, 4, 5),
+                listOf(4, 5, 6),
+                listOf(5, 6, 1),
+                listOf(6, 1, 2)
+            )
 
             val actualValues = baseSequence.windowedEnclosing(3)
 
             assertThat(actualValues.toList()).isEqualTo(expectedSequence.toList())
         }
-
     }
-
 }

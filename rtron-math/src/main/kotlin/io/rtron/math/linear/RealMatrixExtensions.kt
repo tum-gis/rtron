@@ -20,11 +20,12 @@ package io.rtron.math.linear
  * Appends a [newColumn] to a [RealMatrix].
  */
 fun RealMatrix.appendColumn(newColumn: DoubleArray): RealMatrix {
-    require(this.rowDimension == newColumn.size) {"Wrong dimensions: Matrix has ${this.rowDimension} rows and" +
-            " ${this.columnDimension} and double array has a size of ${newColumn.size}"}
+    require(this.rowDimension == newColumn.size) {
+        "Wrong dimensions: Matrix has ${this.rowDimension} rows and" +
+            " ${this.columnDimension} and double array has a size of ${newColumn.size}"
+    }
 
-    val newData = this.entries.foldIndexed(emptyList<DoubleArray>())
-    { index, acc, currentRow -> acc + (currentRow + newColumn[index])}
+    val newData = this.entries.foldIndexed(emptyList<DoubleArray>()) { index, acc, currentRow -> acc + (currentRow + newColumn[index]) }
 
     return RealMatrix(newData.toTypedArray())
 }
@@ -33,9 +34,10 @@ fun RealMatrix.appendColumn(newColumn: DoubleArray): RealMatrix {
  * Appends a [newRow] to a [RealMatrix].
  */
 fun RealMatrix.appendRow(newRow: DoubleArray): RealMatrix {
-    require(this.columnDimension == newRow.size)
-    { "Wrong dimensions: Matrix has ${this.rowDimension} rows and ${this.columnDimension} and " +
-            "double array has a size of ${newRow.size}" }
+    require(this.columnDimension == newRow.size) {
+        "Wrong dimensions: Matrix has ${this.rowDimension} rows and ${this.columnDimension} and " +
+            "double array has a size of ${newRow.size}"
+    }
 
     val newData = this.entries + newRow
     return RealMatrix(newData)

@@ -16,8 +16,7 @@
 
 package io.rtron.model.opendrive.road
 
-
 data class RoadTypeSpeed(
-        // TODO
-        var todo: String = "todo"
+    // TODO
+    var todo: String = "todo"
 )

@@ -19,7 +19,6 @@ package io.rtron.transformer
 import io.rtron.io.files.FileIdentifier
 import io.rtron.io.logging.LogManager
 
-
 /**
  * Configuration class for a transformer holding general information, such as [projectId] and [sourceFileIdentifier].
  * The transformer specific parameter are provided in [parameters].
@@ -30,10 +29,10 @@ import io.rtron.io.logging.LogManager
  * @param parameters transformer specific parameters
  */
 class TransformerConfiguration<T : AbstractTransformerParameters>(
-        val projectId: String,
-        val sourceFileIdentifier: FileIdentifier,
-        val concurrentProcessing: Boolean,
-        val parameters: T
+    val projectId: String,
+    val sourceFileIdentifier: FileIdentifier,
+    val concurrentProcessing: Boolean,
+    val parameters: T
 ) {
     // Methods
     fun getReportLogger() = LogManager.getReportLogger(projectId)

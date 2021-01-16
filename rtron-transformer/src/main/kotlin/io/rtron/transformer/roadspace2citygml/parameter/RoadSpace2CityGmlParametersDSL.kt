@@ -18,7 +18,6 @@ package io.rtron.transformer.roadspace2citygml.parameter
 
 import io.rtron.std.SettableProperty
 
-
 /**
  * DSL Environment for building up [Roadspaces2CitygmlParameters].
  */
@@ -51,14 +50,15 @@ class Roadspaces2CitygmlParametersBuilder {
     var generateRandomGeometryIds by generateRandomGeometryIdsProperty
 
     fun build() = Roadspaces2CitygmlParameters(
-            gmlIdPrefixProperty,
-            identifierAttributesPrefixProperty,
-            geometryAttributesPrefixProperty,
-            flattenGenericAttributeSetsProperty,
-            discretizationStepSizeProperty,
-            sweepDiscretizationStepSizeProperty,
-            circleSlicesProperty,
-            generateRandomGeometryIdsProperty)
+        gmlIdPrefixProperty,
+        identifierAttributesPrefixProperty,
+        geometryAttributesPrefixProperty,
+        flattenGenericAttributeSetsProperty,
+        discretizationStepSizeProperty,
+        sweepDiscretizationStepSizeProperty,
+        circleSlicesProperty,
+        generateRandomGeometryIdsProperty
+    )
 }
 
 /**

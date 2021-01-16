@@ -24,7 +24,6 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
 
-
 /**
  * Linear function of the form f(x) = [slope] * x + [intercept].
  *
@@ -33,14 +32,14 @@ import kotlin.math.sign
  * @param domain defined domain for the function
  */
 data class LinearFunction(
-        val slope: Double,
-        val intercept: Double = 0.0,
-        override val domain: Range<Double> = Range.all()
+    val slope: Double,
+    val intercept: Double = 0.0,
+    override val domain: Range<Double> = Range.all()
 ) : UnivariateFunction() {
 
     // Methods
     override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> =
-            Result.success(slope * x + intercept)
+        Result.success(slope * x + intercept)
 
     override fun slopeUnbounded(x: Double): Result<Double, IllegalArgumentException> = Result.success(slope)
 
@@ -84,7 +83,6 @@ data class LinearFunction(
             return LinearFunction(slope, intercept, domain)
         }
 
-
         /**
          * Returns a linear function by (0.0, [intercept]) and ([pointX], [pointY]) within a closed parameter range.
          * If the [intercept] or the [pointY] is not finite (e.g. NaN), the respective other value is used.
@@ -123,5 +121,4 @@ data class LinearFunction(
             return LinearFunction(slope, intercept, domain)
         }
     }
-
 }

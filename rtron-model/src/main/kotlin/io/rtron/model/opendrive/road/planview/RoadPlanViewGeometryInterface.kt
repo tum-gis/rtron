@@ -16,7 +16,6 @@
 
 package io.rtron.model.opendrive.road.planview
 
-
 interface RoadPlanViewGeometryInterface {
     fun isNaN(): Boolean
 }

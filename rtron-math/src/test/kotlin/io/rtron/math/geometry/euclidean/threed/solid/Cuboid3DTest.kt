@@ -23,7 +23,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class Cuboid3DTest {
 
     @Nested
@@ -95,6 +94,5 @@ internal class Cuboid3DTest {
             require(actualPolygonsResult is Result.Success)
             assertThat(actualPolygonsResult.value).contains(expectedBasePolygon)
         }
-
     }
 }

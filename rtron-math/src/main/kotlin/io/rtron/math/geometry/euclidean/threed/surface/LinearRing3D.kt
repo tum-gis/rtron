@@ -27,16 +27,15 @@ import io.rtron.math.range.Tolerable
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.std.distinctConsecutiveEnclosing
 
-
 /**
  * Linear ring of a list of [vertices]. The linear ring is not required to be planar.
  *
  * @param vertices vertices for constructing the linear ring
  */
 data class LinearRing3D(
-        val vertices: List<Vector3D>,
-        override val tolerance: Double,
-        override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    val vertices: List<Vector3D>,
+    override val tolerance: Double,
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D(), Tolerable {
 
     // Properties and Initializers
@@ -49,12 +48,9 @@ data class LinearRing3D(
     private val dimensionSpan = innerEdges.map { it.toRealVector() }.dimensionOfSpan()
 
     init {
-        require(numberOfVertices >= 3)
-        { "Not enough vertices provided for constructing a linear ring." }
-        require(vertices.distinctConsecutiveEnclosing { it }.size == vertices.size)
-        { "Consecutively following point duplicates found." }
-        require(dimensionSpan >= 2)
-        { "The dimension of the span is too low ($dimensionSpan), which might be caused by colinear vertices." }
+        require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a linear ring." }
+        require(vertices.distinctConsecutiveEnclosing { it }.size == vertices.size) { "Consecutively following point duplicates found." }
+        require(dimensionSpan >= 2) { "The dimension of the span is too low ($dimensionSpan), which might be caused by colinear vertices." }
     }
 
     // Methods
@@ -64,7 +60,7 @@ data class LinearRing3D(
 
     @OptIn(ExperimentalTriangulator::class)
     override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> =
-            Triangulator.triangulate(this, tolerance)
+        Triangulator.triangulate(this, tolerance)
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 
@@ -75,7 +71,7 @@ data class LinearRing3D(
          * Creates a linear ring based on the provided [vertices].
          */
         fun of(vararg vertices: Vector3D, tolerance: Double = 1E-7) =
-                LinearRing3D(vertices.toList(), tolerance)
+            LinearRing3D(vertices.toList(), tolerance)
 
         /**
          * Creates multiple linear rings from two lists of vertices [leftVertices] and [rightVertices].
@@ -91,7 +87,7 @@ data class LinearRing3D(
             val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
             val linearRingVertices = vertexPairs.zipWithNext()
-                    .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
+                .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
 
             return linearRingVertices.map { LinearRing3D(it, tolerance) }
         }
@@ -105,12 +101,12 @@ data class LinearRing3D(
          * @param rightVertices right vertices for the linear rings construction
          */
         fun ofWithDuplicatesRemoval(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double):
-                Result<List<LinearRing3D>, Exception> {
-            data class VertexPair(val left: Vector3D, val right: Vector3D)
+            Result<List<LinearRing3D>, Exception> {
+                data class VertexPair(val left: Vector3D, val right: Vector3D)
 
-            val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
+                val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
-            return vertexPairs
+                return vertexPairs
                     .asSequence()
                     .zipWithNext()
                     .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
@@ -118,8 +114,6 @@ data class LinearRing3D(
                     .filter { it.distinct().count() >= 3 }
                     .map { LinearRing3D(it, tolerance) }
                     .let { Result.success(it.toList()) }
-        }
-
+            }
     }
-
 }

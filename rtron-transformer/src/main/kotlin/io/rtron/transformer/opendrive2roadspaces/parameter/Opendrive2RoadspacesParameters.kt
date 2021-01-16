@@ -21,22 +21,20 @@ import io.rtron.std.Property
 import io.rtron.transformer.AbstractTransformerParameters
 import io.rtron.transformer.TransformerConfiguration
 
-
 typealias Opendrive2RoadspacesConfiguration = TransformerConfiguration<Opendrive2RoadspacesParameters>
-
 
 /**
  * Transformation parameters for the OpenDRIVE to RoadSpace transformer.
  */
 class Opendrive2RoadspacesParameters(
-        private val toleranceProperty: Property<Double> = Property(1E-7, true),
-        private val attributesPrefixProperty: Property<String> = Property("opendrive_", true),
-        private val crsEpsgProperty: Property<Int> = Property(0, true),
-        private val offsetXProperty: Property<Double> = Property(0.0, true),
-        private val offsetYProperty: Property<Double> = Property(0.0, true),
-        private val offsetZProperty: Property<Double> = Property(0.0, true),
-        private val extrapolateLateralRoadShapesProperty: Property<Boolean> = Property(value = false, isDefault = true)
-        ) : AbstractTransformerParameters() {
+    private val toleranceProperty: Property<Double> = Property(1E-7, true),
+    private val attributesPrefixProperty: Property<String> = Property("opendrive_", true),
+    private val crsEpsgProperty: Property<Int> = Property(0, true),
+    private val offsetXProperty: Property<Double> = Property(0.0, true),
+    private val offsetYProperty: Property<Double> = Property(0.0, true),
+    private val offsetZProperty: Property<Double> = Property(0.0, true),
+    private val extrapolateLateralRoadShapesProperty: Property<Boolean> = Property(value = false, isDefault = true)
+) : AbstractTransformerParameters() {
 
     // Properties and Initializers
 
@@ -86,16 +84,17 @@ class Opendrive2RoadspacesParameters(
      * Merges the [other] parameters into this. See [Property.leftMerge] for the prioritization rules.
      */
     infix fun leftMerge(other: Opendrive2RoadspacesParameters) = Opendrive2RoadspacesParameters(
-            this.toleranceProperty leftMerge other.toleranceProperty,
-            this.attributesPrefixProperty leftMerge other.attributesPrefixProperty,
-            this.crsEpsgProperty leftMerge other.crsEpsgProperty,
-            this.offsetXProperty leftMerge other.offsetXProperty,
-            this.offsetYProperty leftMerge other.offsetYProperty,
-            this.offsetZProperty leftMerge other.offsetZProperty,
-            this.extrapolateLateralRoadShapesProperty leftMerge other.extrapolateLateralRoadShapesProperty)
+        this.toleranceProperty leftMerge other.toleranceProperty,
+        this.attributesPrefixProperty leftMerge other.attributesPrefixProperty,
+        this.crsEpsgProperty leftMerge other.crsEpsgProperty,
+        this.offsetXProperty leftMerge other.offsetXProperty,
+        this.offsetYProperty leftMerge other.offsetYProperty,
+        this.offsetZProperty leftMerge other.offsetZProperty,
+        this.extrapolateLateralRoadShapesProperty leftMerge other.extrapolateLateralRoadShapesProperty
+    )
 
     override fun toString() =
-            "Opendrive2RoadspacesParameters(tolerance=$tolerance, attributesPrefix=$attributesPrefix," +
-                    " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ, " +
-                    "extrapolateLateralRoadShapes=$extrapolateLateralRoadShapes)"
+        "Opendrive2RoadspacesParameters(tolerance=$tolerance, attributesPrefix=$attributesPrefix," +
+            " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ, " +
+            "extrapolateLateralRoadShapes=$extrapolateLateralRoadShapes)"
 }

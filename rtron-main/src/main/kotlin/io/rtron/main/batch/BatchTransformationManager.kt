@@ -29,7 +29,7 @@ import kotlin.time.measureTime
  * @param configuration configuration for the batch processing
  */
 class BatchTransformationManager(
-        private val configuration: BatchConfiguration
+    private val configuration: BatchConfiguration
 ) {
 
     // Properties and Initializers
@@ -75,14 +75,15 @@ class BatchTransformationManager(
      * @return list of paths to supported models within the input path
      */
     private fun getProcessablePaths(): List<Path> =
-            when {
-                this.configuration.inputPath.isRegularFile() -> listOf(this.configuration.inputPath.fileName)
-                this.configuration.inputPath.isDirectory() -> this.configuration.inputPath
-                        .walk(configuration.recursiveDepth)
-                        .filter { it.extension in ReadWriteManager.supportedFileExtensions }
-                        .toList()
-                        .sorted()
-                        .map { this.configuration.inputPath.relativize(it) }
-                else -> emptyList()
-            }
+        when {
+            this.configuration.inputPath.isRegularFile() -> listOf(this.configuration.inputPath.fileName)
+            this.configuration.inputPath.isDirectory() ->
+                this.configuration.inputPath
+                    .walk(configuration.recursiveDepth)
+                    .filter { it.extension in ReadWriteManager.supportedFileExtensions }
+                    .toList()
+                    .sorted()
+                    .map { this.configuration.inputPath.relativize(it) }
+            else -> emptyList()
+        }
 }

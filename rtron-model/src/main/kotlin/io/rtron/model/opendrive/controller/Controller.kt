@@ -16,12 +16,11 @@
 
 package io.rtron.model.opendrive.controller
 
-
 data class Controller(
-        var control: List<ControllerControl> = listOf(),
-        // TODO g_additionalData
+    var control: List<ControllerControl> = listOf(),
+    // TODO g_additionalData
 
-        var id: String = "",
-        var name: String = ""
-        // TODO var sequence: Int = Int.MIN_VALUE
+    var id: String = "",
+    var name: String = ""
+    // TODO var sequence: Int = Int.MIN_VALUE
 )

@@ -19,14 +19,12 @@ package io.rtron.model.roadspaces.topology.junction
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.ModelIdentifierInterface
 
-
 /**
  * Junction identifier interface required for class delegation.
  */
 interface JunctionIdentifierInterface {
     val junctionId: String
 }
-
 
 /**
  * Identifier of a [Junction].
@@ -35,9 +33,9 @@ interface JunctionIdentifierInterface {
  * @param modelIdentifier identifier of the model
  */
 data class JunctionIdentifier(
-        override val junctionId: String,
-        val modelIdentifier: ModelIdentifier
-): JunctionIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
+    override val junctionId: String,
+    val modelIdentifier: ModelIdentifier
+) : JunctionIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
 
     // Conversions
     override fun toString(): String {

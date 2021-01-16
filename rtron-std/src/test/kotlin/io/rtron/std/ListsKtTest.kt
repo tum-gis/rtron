@@ -33,9 +33,10 @@ internal class ListsKtTest {
             val expectedList = listOf(false, false, true, true, false, false, false)
 
             val actualList = listA.moveWindow(
-                    listB,
-                    { baseElement, otherElement -> baseElement && otherElement },
-                    { a, b -> a || b })
+                listB,
+                { baseElement, otherElement -> baseElement && otherElement },
+                { a, b -> a || b }
+            )
 
             assertThat(actualList).isEqualTo(expectedList)
         }
@@ -47,9 +48,9 @@ internal class ListsKtTest {
 
             assertThatIllegalArgumentException().isThrownBy {
                 listA.moveWindow(
-                        listB,
-                        { baseElement, otherElement -> baseElement && otherElement },
-                        { a, b -> a || b }
+                    listB,
+                    { baseElement, otherElement -> baseElement && otherElement },
+                    { a, b -> a || b }
                 )
             }
         }
@@ -61,9 +62,9 @@ internal class ListsKtTest {
 
             assertThatIllegalArgumentException().isThrownBy {
                 listA.moveWindow(
-                        listB,
-                        { baseElement, otherElement -> baseElement && otherElement },
-                        { a, b -> a || b }
+                    listB,
+                    { baseElement, otherElement -> baseElement && otherElement },
+                    { a, b -> a || b }
                 )
             }
         }
@@ -75,10 +76,11 @@ internal class ListsKtTest {
             val expectedList = listOf(false, false, true, true, false)
 
             val actualList = listA.moveWindow(
-                    listB,
-                    { baseElement, otherElement -> baseElement && otherElement },
-                    { a, b -> a || b },
-                    shape = MovingWindowShape.SAME)
+                listB,
+                { baseElement, otherElement -> baseElement && otherElement },
+                { a, b -> a || b },
+                shape = MovingWindowShape.SAME
+            )
 
             assertThat(actualList).isEqualTo(expectedList)
         }
@@ -90,9 +92,10 @@ internal class ListsKtTest {
             val expectedList = listOf(0.0, 2.0, 3.0, 1.0, 0.0, 0.0, 0.0)
 
             val actualList = listA.moveWindow(
-                    listB,
-                    { baseElement, otherElement -> baseElement * otherElement },
-                    { a, b -> a + b })
+                listB,
+                { baseElement, otherElement -> baseElement * otherElement },
+                { a, b -> a + b }
+            )
 
             assertThat(actualList).isEqualTo(expectedList)
         }
@@ -129,8 +132,7 @@ internal class ListsKtTest {
             val mainList = listOf(1, 2, 3, 4, 4, 3, 3, 4, 4, 5, 6, 7, 8)
             val expectedList = listOf(1, 2, 3, 5, 6, 7, 8)
 
-            val actualList = mainList.filterWindowedEnclosing(3)
-            { it[0] == 3 && it[1] == 4 && it[2] == 4 }
+            val actualList = mainList.filterWindowedEnclosing(3) { it[0] == 3 && it[1] == 4 && it[2] == 4 }
 
             assertThat(actualList).isEqualTo(expectedList)
         }

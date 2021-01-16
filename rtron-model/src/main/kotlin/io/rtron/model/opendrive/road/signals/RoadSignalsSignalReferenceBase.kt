@@ -22,19 +22,18 @@ import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectLaneValidity
 
-
 /**
  * Signal Reference Record.
  */
 data class RoadSignalsSignalReferenceBase(
-        var validity: List<RoadObjectsObjectLaneValidity> = listOf(),
+    var validity: List<RoadObjectsObjectLaneValidity> = listOf(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var s: Double = Double.NaN,
-        var t: Double = Double.NaN,
-        var id: String = "",
-        var orientation: EOrientation = EOrientation.NONE
+    var s: Double = Double.NaN,
+    var t: Double = Double.NaN,
+    var id: String = "",
+    var orientation: EOrientation = EOrientation.NONE
 )

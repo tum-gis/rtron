@@ -49,10 +49,10 @@ open class Property<T>(value: T, isDefault: Boolean = false) {
      * @return new property, whereas this property and not-default-properties are prioritized
      */
     infix fun leftMerge(other: Property<T>): Property<T> =
-            when {
-                this.isDefault && other.isNotDefault -> other
-                else -> this
-            }
+        when {
+            this.isDefault && other.isNotDefault -> other
+            else -> this
+        }
 }
 
 /**

@@ -28,7 +28,6 @@ import org.poly2tri.Poly2Tri
 import org.poly2tri.geometry.polygon.Polygon as P2TPolygon
 import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
 
-
 /**
  * Adapts the triangulation algorithm of [Poly2Tri](https://github.com/orbisgis/poly2tri.java).
  */
@@ -65,17 +64,17 @@ class Poly2TriTriangulationAlgorithm() : TriangulationAlgorithm() {
      * Converts the Poly2Tri triangulation results back to a list of [Polygon3D].
      */
     private fun polygonBackConversion(polygon: P2TPolygon, tolerance: Double):
-            Result<List<Polygon3D>, IllegalStateException> {
-        val triangles = polygon.triangles.map {
-            val triangulatedVertices: List<Vector3D> = it.points.map { point -> Vector3D(point.x, point.y, point.z) }
+        Result<List<Polygon3D>, IllegalStateException> {
+            val triangles = polygon.triangles.map {
+                val triangulatedVertices: List<Vector3D> = it.points.map { point -> Vector3D(point.x, point.y, point.z) }
 
-            if(triangulatedVertices.isColinear(tolerance))
-                return Result.error(IllegalStateException("Triangulation failure (colinear vertices)."))
-            return@map Polygon3D(triangulatedVertices, tolerance)
+                if (triangulatedVertices.isColinear(tolerance))
+                    return Result.error(IllegalStateException("Triangulation failure (colinear vertices)."))
+                return@map Polygon3D(triangulatedVertices, tolerance)
+            }
+
+            return Result.success(triangles)
         }
-
-        return Result.success(triangles)
-    }
 
     /**
      * As Poly2Tri ignores the rotation of the triangles, this function reintroduces the original orientation.
@@ -94,5 +93,4 @@ class Poly2TriTriangulationAlgorithm() : TriangulationAlgorithm() {
             else it
         }
     }
-
 }

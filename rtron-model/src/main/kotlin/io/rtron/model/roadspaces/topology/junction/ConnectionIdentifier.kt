@@ -16,14 +16,12 @@
 
 package io.rtron.model.roadspaces.topology.junction
 
-
 /**
  * Connection identifier interface required for class delegation.
  */
 interface ConnectionIdentifierInterface {
     val connectionId: String
 }
-
 
 /**
  * Identifier of a [Connection].
@@ -34,4 +32,4 @@ interface ConnectionIdentifierInterface {
 data class ConnectionIdentifier(
     override val connectionId: String,
     val junctionIdentifier: JunctionIdentifier
-): ConnectionIdentifierInterface, JunctionIdentifierInterface by junctionIdentifier
+) : ConnectionIdentifierInterface, JunctionIdentifierInterface by junctionIdentifier

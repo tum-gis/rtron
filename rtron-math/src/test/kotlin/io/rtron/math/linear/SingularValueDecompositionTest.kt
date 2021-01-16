@@ -21,7 +21,6 @@ import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-
 internal class SingularValueDecompositionTest {
 
     @Nested
@@ -75,9 +74,8 @@ internal class SingularValueDecompositionTest {
 
             assertThat(actualMatrixU.dimension).isEqualTo(expectedMatrixU.dimension)
             assertThat(actualMatrixU.entriesFlattened)
-                    .containsExactly(expectedMatrixU.entriesFlattened, Offset.offset(0.01))
+                .containsExactly(expectedMatrixU.entriesFlattened, Offset.offset(0.01))
         }
-
     }
 
     @Nested
@@ -94,7 +92,7 @@ internal class SingularValueDecompositionTest {
 
             assertThat(actualMatrixS.dimension).isEqualTo(expectedMatrixS.dimension)
             assertThat(actualMatrixS.entriesFlattened)
-                    .containsExactly(expectedMatrixS.entriesFlattened, Offset.offset(0.01))
+                .containsExactly(expectedMatrixS.entriesFlattened, Offset.offset(0.01))
         }
     }
 
@@ -112,8 +110,7 @@ internal class SingularValueDecompositionTest {
 
             assertThat(actualMatrixVT.dimension).isEqualTo(expectedMatrixV.dimension)
             assertThat(actualMatrixVT.entriesFlattened)
-                    .containsExactly(expectedMatrixV.entriesFlattened, Offset.offset(0.01))
+                .containsExactly(expectedMatrixV.entriesFlattened, Offset.offset(0.01))
         }
     }
-
 }

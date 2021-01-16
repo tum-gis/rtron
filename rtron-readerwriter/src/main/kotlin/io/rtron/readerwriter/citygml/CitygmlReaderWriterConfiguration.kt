@@ -19,5 +19,5 @@ package io.rtron.readerwriter.citygml
 import io.rtron.readerwriter.AbstractReaderWriterConfiguration
 
 class CitygmlReaderWriterConfiguration(
-        projectId: String
+    projectId: String
 ) : AbstractReaderWriterConfiguration(projectId)

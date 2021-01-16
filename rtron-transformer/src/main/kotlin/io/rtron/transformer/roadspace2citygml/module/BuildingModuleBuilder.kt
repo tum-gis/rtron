@@ -17,17 +17,16 @@
 package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
+import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.citygml.building.Building
-import io.rtron.std.handleFailure
-
 
 /**
  * Builder for city objects of the CityGML Building module.
  */
 class BuildingModuleBuilder(
-        val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Methods

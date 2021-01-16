@@ -27,7 +27,6 @@ fun CMVector2D.toVector2D() = Vector2D(this.x, this.y)
 /** Conversion from adapted Vector class from JOML. */
 fun JOMLVector2D.toVector2D() = Vector2D(this.x, this.y)
 
-
 /**
  * Represents a vector in two-dimensional space.
  *
@@ -35,8 +34,8 @@ fun JOMLVector2D.toVector2D() = Vector2D(this.x, this.y)
  * @param y y component (ordinate) of the vector
  */
 data class Vector2D(
-        val x: Double,
-        val y: Double
+    val x: Double,
+    val y: Double
 ) : AbstractPoint2D() {
 
     // Properties and Initializers
@@ -51,11 +50,9 @@ data class Vector2D(
     /** L_2 norm of the vector */
     val norm by lazy { _vector2D.norm }
 
-
     // Secondary Constructors
 
     constructor(v: Pair<Double, Double>) : this(v.first, v.second)
-
 
     // Operators
 
@@ -93,7 +90,6 @@ data class Vector2D(
     fun toVector3D(z: Double = 0.0) = Vector3D(this.x, this.y, z)
     fun toVector2DCm() = this._vector2D
     fun toVector2DJOML() = JOMLVector2D(this.x, this.y)
-
 
     companion object {
         val ZERO = Vector2D(0.0, 0.0)

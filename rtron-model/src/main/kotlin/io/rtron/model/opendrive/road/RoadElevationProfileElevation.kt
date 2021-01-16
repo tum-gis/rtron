@@ -16,19 +16,22 @@
 
 package io.rtron.model.opendrive.road
 
-
 class RoadElevationProfileElevation(
-        var s: Double = Double.NaN,
+    var s: Double = Double.NaN,
 
-        var a: Double = Double.NaN,
-        var b: Double = Double.NaN,
-        var c: Double = Double.NaN,
-        var d: Double = Double.NaN
+    var a: Double = Double.NaN,
+    var b: Double = Double.NaN,
+    var c: Double = Double.NaN,
+    var d: Double = Double.NaN
 ) {
     // Properties and Initializers
     val coefficients get() = doubleArrayOf(a, b, c, d)
 
     // Methods
-    fun coefficientsWithOffset(offsetA: Double = 0.0, offsetB: Double = 0.0, offsetC: Double = 0.0,
-                               offsetD: Double = 0.0) = doubleArrayOf(a + offsetA, b + offsetB, c + offsetC, d + offsetD)
+    fun coefficientsWithOffset(
+        offsetA: Double = 0.0,
+        offsetB: Double = 0.0,
+        offsetC: Double = 0.0,
+        offsetD: Double = 0.0
+    ) = doubleArrayOf(a + offsetA, b + offsetB, c + offsetC, d + offsetD)
 }

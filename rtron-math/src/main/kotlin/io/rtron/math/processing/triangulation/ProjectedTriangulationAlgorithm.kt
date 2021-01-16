@@ -24,7 +24,6 @@ import io.rtron.math.transform.Affine3D
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.std.handleFailure
 
-
 /**
  * This algorithm wraps a [triangulationAlgorithm]. Before triangulating the vertices a best fitting plane is estimated
  * and the vertices are projected onto the plane in 2D. After performing the triangulation, the triangulation
@@ -33,20 +32,19 @@ import io.rtron.std.handleFailure
  * @param triangulationAlgorithm actual triangulation algorithm applied after plane projection
  */
 class ProjectedTriangulationAlgorithm(
-        private val triangulationAlgorithm: TriangulationAlgorithm
+    private val triangulationAlgorithm: TriangulationAlgorithm
 ) : TriangulationAlgorithm() {
-
 
     override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception> {
         val projectedVertices = projectVertices(vertices, tolerance)
         val projectedPolygonsTriangulated = triangulationAlgorithm
-                .triangulate(projectedVertices, tolerance)
-                .handleFailure { return it }
+            .triangulate(projectedVertices, tolerance)
+            .handleFailure { return it }
 
         return projectedPolygonsTriangulated
-                .map { constructPolygon(it, projectedVertices, vertices, tolerance) }
-                .handleFailure { return it }
-                .let { Result.success(it) }
+            .map { constructPolygon(it, projectedVertices, vertices, tolerance) }
+            .handleFailure { return it }
+            .let { Result.success(it) }
     }
 
     /**
@@ -63,7 +61,6 @@ class ProjectedTriangulationAlgorithm(
         return affine.transform(vertices)
     }
 
-
     /**
      * Constructs the triangulated polygon with the original vertices in 3D.
      * The list of [allProjectedVertices] and [allOriginalVertices] are compared by their index for constructing
@@ -74,16 +71,20 @@ class ProjectedTriangulationAlgorithm(
      * @param allOriginalVertices list of all original vertices which must have the same order as [allProjectedVertices]
      * @return triangulated [Polygon3D] with the original vertices
      */
-    private fun constructPolygon(projectedPolygon: Polygon3D, allProjectedVertices: List<Vector3D>,
-                                 allOriginalVertices: List<Vector3D>, tolerance: Double): Result<Polygon3D, Exception> {
+    private fun constructPolygon(
+        projectedPolygon: Polygon3D,
+        allProjectedVertices: List<Vector3D>,
+        allOriginalVertices: List<Vector3D>,
+        tolerance: Double
+    ): Result<Polygon3D, Exception> {
 
         if (!allProjectedVertices.containsAll(projectedPolygon.vertices))
             return Result.error(RuntimeException("Triangulation algorithm produced deviating points."))
 
         val constructedPolygon = projectedPolygon.vertices
-                .map { allProjectedVertices.indexOf(it) }
-                .map { allOriginalVertices[it] }
-                .let { Polygon3D(it, tolerance) }
+            .map { allProjectedVertices.indexOf(it) }
+            .map { allOriginalVertices[it] }
+            .let { Polygon3D(it, tolerance) }
         return Result.success(constructedPolygon)
     }
 }

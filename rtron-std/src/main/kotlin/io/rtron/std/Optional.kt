@@ -18,14 +18,13 @@ package io.rtron.std
 
 import com.github.kittinunf.result.Result
 
-
 /**
  * A container object which optionally contains a [value] of type [T].
  *
  * @param value if null, the container is considered empty
  */
 data class Optional<T>(
-        private val value: T?
+    private val value: T?
 ) {
 
     // Operators
@@ -57,7 +56,7 @@ data class Optional<T>(
      * Returns [Result.success] of the [value], if available; otherwise [Result.error] is returned.
      */
     fun getResult(): Result<T, IllegalStateException> =
-            if (isPresent()) Result.success(value!!) else Result.error(IllegalStateException(""))
+        if (isPresent()) Result.success(value!!) else Result.error(IllegalStateException(""))
 
     // Conversions
     override fun toString() = if (value != null) "Optional[$value]" else "Optional.empty"
@@ -67,7 +66,7 @@ data class Optional<T>(
     companion object {
         fun <T> empty() = Optional<T>(null)
 
-        fun <T> of(result: Result<T, Exception>): Optional<T> = result.fold( { Optional(it) }, { empty() } )
+        fun <T> of(result: Result<T, Exception>): Optional<T> = result.fold({ Optional(it) }, { empty() })
     }
 }
 
@@ -76,7 +75,6 @@ inline fun <T, R> Optional<T>.map(transform: (T) -> R): Optional<R> =
     else Optional(transform(this.getOrNull()!!))
 
 infix fun <T> Optional<T>.getOrElse(defaultValue: T): T = getOrNull() ?: defaultValue
-
 
 /**
  * Returns a list of values of type [T], whereby the empty [Optional] are ignored.

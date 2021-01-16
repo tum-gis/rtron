@@ -20,16 +20,15 @@ import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 
-
 class RoadPlanViewGeometryPoly3(
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var a: Double = Double.NaN,
-        var b: Double = Double.NaN,
-        var c: Double = Double.NaN,
-        var d: Double = Double.NaN
+    var a: Double = Double.NaN,
+    var b: Double = Double.NaN,
+    var c: Double = Double.NaN,
+    var d: Double = Double.NaN
 ) : RoadPlanViewGeometryInterface {
 
     // Properties and Initializers

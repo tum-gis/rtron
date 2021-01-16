@@ -20,16 +20,14 @@ import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Road
-import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
-
 
 /**
  * A [Roadspace] is defined along a [referenceLine] and contains the [roadspaceObjects] belonging to the road space.
  */
-data class Roadspace (
-        val id: RoadspaceIdentifier,
-        val referenceLine: Curve3D,
-        val road: Road,
-        val roadspaceObjects: List<RoadspaceObject> = emptyList(),
-        val attributes: AttributeList = AttributeList()
+data class Roadspace(
+    val id: RoadspaceIdentifier,
+    val referenceLine: Curve3D,
+    val road: Road,
+    val roadspaceObjects: List<RoadspaceObject> = emptyList(),
+    val attributes: AttributeList = AttributeList()
 )

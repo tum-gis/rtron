@@ -16,30 +16,63 @@
 
 package io.rtron.readerwriter.opendrive
 
-import org.asam.opendrive14.*
-import org.asam.opendrive14.Include
-import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Outline
-import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Outline.CornerLocal
-import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Outline.CornerRoad
-import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Repeat
-import org.asam.opendrive14.OpenDRIVE.Road.Signals
-import org.asam.opendrive14.Unit
-import org.asam.opendrive14.UserData
-import org.mapstruct.*
 import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.model.opendrive.common.*
+import io.rtron.model.opendrive.common.CountryCode
+import io.rtron.model.opendrive.common.DataQuality
+import io.rtron.model.opendrive.common.EAccessRestrictionType
+import io.rtron.model.opendrive.common.EObjectType
+import io.rtron.model.opendrive.common.EOrientation
+import io.rtron.model.opendrive.common.ERoadMarkRule
+import io.rtron.model.opendrive.common.ERoadMarkType
+import io.rtron.model.opendrive.common.ERoadObjectsObjectParkingSpaceAccess
+import io.rtron.model.opendrive.common.EUnit
+import io.rtron.model.opendrive.common.EUnitSpeed
 import io.rtron.model.opendrive.road.Road
 import io.rtron.model.opendrive.road.lanes.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.road.lateralprofile.RoadLateralProfile
-import io.rtron.model.opendrive.road.objects.*
+import io.rtron.model.opendrive.road.objects.RoadObjects
+import io.rtron.model.opendrive.road.objects.RoadObjectsObject
+import io.rtron.model.opendrive.road.objects.RoadObjectsObjectMaterial
+import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlines
+import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutline
+import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutlineCornerLocal
+import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutlineCornerRoad
+import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.opendrive.road.planview.ParamPoly3PRange
 import io.rtron.model.opendrive.road.signals.RoadSignalsSignal
-import java.util.*
-
+import org.asam.opendrive14.Access
+import org.asam.opendrive14.CenterLane
+import org.asam.opendrive14.Dynamic
+import org.asam.opendrive14.Include
+import org.asam.opendrive14.Lane
+import org.asam.opendrive14.LaneChange
+import org.asam.opendrive14.OpenDRIVE
+import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Outline
+import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Outline.CornerLocal
+import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Outline.CornerRoad
+import org.asam.opendrive14.OpenDRIVE.Road.Objects.Object.Repeat
+import org.asam.opendrive14.OpenDRIVE.Road.Signals
+import org.asam.opendrive14.PRange
+import org.asam.opendrive14.Restriction
+import org.asam.opendrive14.RoadmarkType
+import org.asam.opendrive14.Rule
+import org.asam.opendrive14.SingleSide
+import org.asam.opendrive14.Unit
+import org.asam.opendrive14.UserData
+import org.mapstruct.AfterMapping
+import org.mapstruct.BeforeMapping
+import org.mapstruct.Mapper
+import org.mapstruct.Mapping
+import org.mapstruct.MappingConstants
+import org.mapstruct.MappingTarget
+import org.mapstruct.Mappings
+import org.mapstruct.NullValueCheckStrategy
+import org.mapstruct.ValueMapping
+import org.mapstruct.ValueMappings
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 abstract class Opendrive14Mapper {
@@ -74,34 +107,38 @@ abstract class Opendrive14Mapper {
     @Mapping(source = "object", target = "roadObject")
     abstract fun mapRoadObjects(objects: OpenDRIVE.Road.Objects): RoadObjects
     @AfterMapping
-    fun splitRepeats(srcObjects: OpenDRIVE.Road.Objects,
-                    @MappingTarget targetRoadObjects: RoadObjects) {
+    fun splitRepeats(
+        srcObjects: OpenDRIVE.Road.Objects,
+        @MappingTarget targetRoadObjects: RoadObjects
+    ) {
         // OpenDRIVE 1.4 has a list of Repeat Records and OpenDRIVE 1.5 only one entry
         // Multiple new objects are copied, so that each road object contains only one repeat record
 
         data class SrcTargetObject(val srcObject: OpenDRIVE.Road.Objects.Object, val targetObject: RoadObjectsObject)
         val roadObjectPairs = srcObjects.`object`.zip(targetRoadObjects.roadObject).map { SrcTargetObject(it.first, it.second) }
 
-        roadObjectPairs.forEach {currentObjectPair ->
+        roadObjectPairs.forEach { currentObjectPair ->
             // remove old object, that has already been mapped
             targetRoadObjects.roadObject.toMutableList() -= currentObjectPair.targetObject
             // add repeat entries with dedicated objects and an extra index
             currentObjectPair.srcObject.repeat.forEachIndexed { _, currentRepeat ->
                 val mappedId = currentObjectPair.srcObject.id
-                //val mappedId = "${currentObjectPair.srcObject.id}_${index}"
+                // val mappedId = "${currentObjectPair.srcObject.id}_${index}"
                 val mappedRepeat = mapRoadObjectsObjectRepeat(currentRepeat)
-                targetRoadObjects.roadObject += currentObjectPair.targetObject.copy(id = mappedId,repeat = mappedRepeat)
+                targetRoadObjects.roadObject += currentObjectPair.targetObject.copy(id = mappedId, repeat = mappedRepeat)
             }
         }
     }
 
     @Mappings(
-            Mapping(source = "outline", target = "outlines")
+        Mapping(source = "outline", target = "outlines")
     )
     abstract fun mapRoadObjectsObject(objects: OpenDRIVE.Road.Objects.Object): RoadObjectsObject
     @AfterMapping
-    fun mapOutlines(srcOutline: Outline,
-                         @MappingTarget targetOutline: RoadObjectsObjectOutlines) {
+    fun mapOutlines(
+        srcOutline: Outline,
+        @MappingTarget targetOutline: RoadObjectsObjectOutlines
+    ) {
         val outlineList: MutableList<RoadObjectsObjectOutlinesOutline> = ArrayList()
         outlineList.add(mapOutlinesOutline(srcOutline))
         targetOutline.outline = outlineList
@@ -118,10 +155,12 @@ abstract class Opendrive14Mapper {
     abstract fun mapOutlinesOutline(srcOutline: Outline): RoadObjectsObjectOutlinesOutline
 
     abstract fun mapRoadObjectsObjectOutlinesOutlineCornerRoad(
-            srcOutlineCornerRoad: CornerRoad): RoadObjectsObjectOutlinesOutlineCornerRoad
+        srcOutlineCornerRoad: CornerRoad
+    ): RoadObjectsObjectOutlinesOutlineCornerRoad
 
     abstract fun mapRoadObjectsObjectOutlinesOutlineCornerRoad(
-            srcOutlineCornerLocal: CornerLocal): RoadObjectsObjectOutlinesOutlineCornerLocal
+        srcOutlineCornerLocal: CornerLocal
+    ): RoadObjectsObjectOutlinesOutlineCornerLocal
 
     fun mapMaterialList(srcMaterial: OpenDRIVE.Road.Objects.Object.Material?): List<RoadObjectsObjectMaterial> {
         val materialList: MutableList<RoadObjectsObjectMaterial> = ArrayList()
@@ -134,8 +173,8 @@ abstract class Opendrive14Mapper {
     @ValueMappings(ValueMapping(source = MappingConstants.ANY_REMAINING, target = "UNKNOWN"))
     abstract fun mapRoadObjectsObjectParkingSpaceAccess(access: Access): ERoadObjectsObjectParkingSpaceAccess
 
-    fun mapRoadObjectType(srcType: String): EObjectType
-        = when (srcType.toUpperCase()) {
+    fun mapRoadObjectType(srcType: String): EObjectType =
+        when (srcType.toUpperCase()) {
             EObjectType.NONE.name -> EObjectType.NONE
             EObjectType.OBSTACLE.name -> EObjectType.OBSTACLE
             EObjectType.CAR.name -> EObjectType.CAR
@@ -167,7 +206,7 @@ abstract class Opendrive14Mapper {
 
     fun mapRoadObjectsObjectRepeat(srcRepeatList: List<Repeat>): RoadObjectsObjectRepeat {
         return if (srcRepeatList.isEmpty()) RoadObjectsObjectRepeat()
-            else mapRoadObjectsObjectRepeat(srcRepeatList.first())
+        else mapRoadObjectsObjectRepeat(srcRepeatList.first())
     }
 
     abstract fun mapRoadObjectsObjectRepeat(srcRepeat: Repeat): RoadObjectsObjectRepeat
@@ -175,7 +214,6 @@ abstract class Opendrive14Mapper {
     abstract fun mapUserDataList(userData: List<UserData>): List<io.rtron.model.opendrive.common.UserData>
     abstract fun mapIncludeList(include: List<Include>): List<io.rtron.model.opendrive.common.Include>
     fun mapDataQuality(): DataQuality { return DataQuality() }
-
 
     //
     // Lanes mapping
@@ -221,8 +259,8 @@ abstract class Opendrive14Mapper {
     abstract fun mapSuccessor(srcSuccessor: Lane.Link.Successor): RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
     abstract fun mapSuccessor(srcSuccessor: CenterLane.Link.Successor): RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
 
-    fun mapLaneChange(srcLaneChange: LaneChange): ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
-        = when (srcLaneChange) {
+    fun mapLaneChange(srcLaneChange: LaneChange): ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange =
+        when (srcLaneChange) {
             LaneChange.INCREASE -> ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.INCREASE
             LaneChange.DECREASE -> ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.DECREASE
             LaneChange.BOTH -> ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH
@@ -235,39 +273,38 @@ abstract class Opendrive14Mapper {
     )
     abstract fun map(roadMark: Lane.RoadMark): RoadLanesLaneSectionLCRLaneRoadMark
 
-    fun map(srcType: RoadmarkType): ERoadMarkType = when(srcType) {
-            RoadmarkType.NONE -> ERoadMarkType.NONE
-            RoadmarkType.SOLID -> ERoadMarkType.SOLID
-            RoadmarkType.BROKEN -> ERoadMarkType.BROKEN
-            RoadmarkType.SOLID___SOLID -> ERoadMarkType.SOLID_SOLID
-            RoadmarkType.SOLID___BROKEN -> ERoadMarkType.SOLID_BROKEN
-            RoadmarkType.BROKEN___SOLID -> ERoadMarkType.BROKEN_SOLID
-            RoadmarkType.BROKEN___BROKEN -> ERoadMarkType.BROKEN_BROKEN
-            RoadmarkType.BOTTS___DOTS -> ERoadMarkType.BOTTS_DOTS
-            RoadmarkType.GRASS -> ERoadMarkType.GRASS
-            RoadmarkType.CURB -> ERoadMarkType.CURB
-        }
+    fun map(srcType: RoadmarkType): ERoadMarkType = when (srcType) {
+        RoadmarkType.NONE -> ERoadMarkType.NONE
+        RoadmarkType.SOLID -> ERoadMarkType.SOLID
+        RoadmarkType.BROKEN -> ERoadMarkType.BROKEN
+        RoadmarkType.SOLID___SOLID -> ERoadMarkType.SOLID_SOLID
+        RoadmarkType.SOLID___BROKEN -> ERoadMarkType.SOLID_BROKEN
+        RoadmarkType.BROKEN___SOLID -> ERoadMarkType.BROKEN_SOLID
+        RoadmarkType.BROKEN___BROKEN -> ERoadMarkType.BROKEN_BROKEN
+        RoadmarkType.BOTTS___DOTS -> ERoadMarkType.BOTTS_DOTS
+        RoadmarkType.GRASS -> ERoadMarkType.GRASS
+        RoadmarkType.CURB -> ERoadMarkType.CURB
+    }
 
-
-    fun map(srcRule: Rule): ERoadMarkRule = when(srcRule) {
-            Rule.NO___PASSING -> ERoadMarkRule.NOPASSING
-            Rule.CAUTION -> ERoadMarkRule.CAUTION
-            Rule.NONE -> ERoadMarkRule.NONE
-        }
+    fun map(srcRule: Rule): ERoadMarkRule = when (srcRule) {
+        Rule.NO___PASSING -> ERoadMarkRule.NOPASSING
+        Rule.CAUTION -> ERoadMarkRule.CAUTION
+        Rule.NONE -> ERoadMarkRule.NONE
+    }
 
     fun mapUnit(srcUnit: Unit): EUnitSpeed = when (srcUnit) {
-            Unit.M___S -> EUnitSpeed.METER_PER_SECOND
-            Unit.MPH -> EUnitSpeed.MILES_PER_HOUR
-            Unit.KM___H -> EUnitSpeed.KILOMETER_PER_HOUR
-            else -> EUnitSpeed.UNKNOWN
-        }
+        Unit.M___S -> EUnitSpeed.METER_PER_SECOND
+        Unit.MPH -> EUnitSpeed.MILES_PER_HOUR
+        Unit.KM___H -> EUnitSpeed.KILOMETER_PER_HOUR
+        else -> EUnitSpeed.UNKNOWN
+    }
 
     fun map(srcRestriction: Restriction): EAccessRestrictionType = when (srcRestriction) {
-            Restriction.SIMULATOR -> EAccessRestrictionType.SIMULATOR
-            Restriction.AUTONOMOUS___TRAFFIC -> EAccessRestrictionType.AUTONOMOUS_TRAFFIC
-            Restriction.PEDESTRIAN -> EAccessRestrictionType.PEDESTRIAN
-            Restriction.NONE -> EAccessRestrictionType.NONE
-        }
+        Restriction.SIMULATOR -> EAccessRestrictionType.SIMULATOR
+        Restriction.AUTONOMOUS___TRAFFIC -> EAccessRestrictionType.AUTONOMOUS_TRAFFIC
+        Restriction.PEDESTRIAN -> EAccessRestrictionType.PEDESTRIAN
+        Restriction.NONE -> EAccessRestrictionType.NONE
+    }
 
     fun map(srcDynamic: Dynamic): Boolean = srcDynamic == Dynamic.YES
 
@@ -278,26 +315,26 @@ abstract class Opendrive14Mapper {
     }
 
     fun map(srcUnit: Unit): EUnit = when (srcUnit) {
-            Unit.M -> EUnit.METER
-            Unit.KM -> EUnit.KILOMETER
-            Unit.FT -> EUnit.FEET
-            Unit.MILE -> EUnit.MILE
+        Unit.M -> EUnit.METER
+        Unit.KM -> EUnit.KILOMETER
+        Unit.FT -> EUnit.FEET
+        Unit.MILE -> EUnit.MILE
 
-            Unit.M___S -> EUnit.METER_PER_SECOND
-            Unit.MPH -> EUnit.MILES_PER_HOUR
-            Unit.KM___H -> EUnit.KILOMETER_PER_HOUR
+        Unit.M___S -> EUnit.METER_PER_SECOND
+        Unit.MPH -> EUnit.MILES_PER_HOUR
+        Unit.KM___H -> EUnit.KILOMETER_PER_HOUR
 
-            Unit.KG -> EUnit.KILOGRAM
-            Unit.T -> EUnit.TON
+        Unit.KG -> EUnit.KILOGRAM
+        Unit.T -> EUnit.TON
 
-            Unit.PERCENT -> EUnit.PERCENT
+        Unit.PERCENT -> EUnit.PERCENT
     }
 
     @Mapping(source = "country", target = "countryCode")
     abstract fun mapRoadSignalsSignal(srcSignal: Signals.Signal): RoadSignalsSignal
 
-    fun mapCountryCode(srcCountry: String): CountryCode
-        = when(srcCountry.toUpperCase()) {
+    fun mapCountryCode(srcCountry: String): CountryCode =
+        when (srcCountry.toUpperCase()) {
             "AUSTRALIA" -> CountryCode("AUT")
             "BRAZIL" -> CountryCode("BRA")
             "CHINA" -> CountryCode("CHN")

@@ -39,7 +39,7 @@ import org.citygml4j.model.citygml.transportation.Road as CitygmlRoad
  * Transforms [Road] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
 class RoadsTransformer(
-        private val configuration: Roadspaces2CitygmlConfiguration
+    private val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Properties and Initializers
@@ -57,33 +57,33 @@ class RoadsTransformer(
      * (CityGML model).
      */
     fun transformRoadCenterLaneLines(srcRoad: Road): List<AbstractCityObject> =
-            srcRoad.getAllCenterLanes()
-                    .map { transformLaneLine(it.first, "RoadCenterLaneLine", it.second, it.third) }
-                    .handleAndRemoveFailure { _reportLogger.log(it) }
+        srcRoad.getAllCenterLanes()
+            .map { transformLaneLine(it.first, "RoadCenterLaneLine", it.second, it.third) }
+            .handleAndRemoveFailure { _reportLogger.log(it) }
 
     /**
      * Transforms lane surfaces of a [Road] class (RoadSpaces model) to the [AbstractCityObject] (CityGML model).
      */
     fun transformLaneSurfaces(srcRoad: Road): List<AbstractCityObject> =
-            srcRoad.getAllLanes(configuration.parameters.discretizationStepSize)
-                    .handleAndRemoveFailure { _reportLogger.log(it) }
-                    .map { transformLaneSurface(it.first, "LaneSurface", it.second, it.third) }
-                    .handleAndRemoveFailure { _reportLogger.log(it) }
+        srcRoad.getAllLanes(configuration.parameters.discretizationStepSize)
+            .handleAndRemoveFailure { _reportLogger.log(it) }
+            .map { transformLaneSurface(it.first, "LaneSurface", it.second, it.third) }
+            .handleAndRemoveFailure { _reportLogger.log(it) }
 
     /**
      * Transforms the relevant lines (center line and lane boundaries) of a [Road] class (RoadSpaces model) to
      * the [AbstractCityObject] (CityGML model).
      */
     fun transformLaneLines(srcRoad: Road): List<AbstractCityObject> =
-            srcRoad.getAllLeftLaneBoundaries()
-                    .map { transformLaneLine(it.first, "LeftLaneBoundary", it.second, AttributeList.EMPTY) }
-                    .handleAndRemoveFailure { _reportLogger.log(it) } +
+        srcRoad.getAllLeftLaneBoundaries()
+            .map { transformLaneLine(it.first, "LeftLaneBoundary", it.second, AttributeList.EMPTY) }
+            .handleAndRemoveFailure { _reportLogger.log(it) } +
             srcRoad.getAllRightLaneBoundaries()
-                    .map { transformLaneLine(it.first, "RightLaneBoundary", it.second, AttributeList.EMPTY) }
-                    .handleAndRemoveFailure { _reportLogger.log(it) } +
+                .map { transformLaneLine(it.first, "RightLaneBoundary", it.second, AttributeList.EMPTY) }
+                .handleAndRemoveFailure { _reportLogger.log(it) } +
             srcRoad.getAllCurvesOnLanes(0.5)
-                    .map { transformLaneLine(it.first, "LaneCenterLine", it.second, AttributeList.EMPTY) }
-                    .handleAndRemoveFailure { _reportLogger.log(it) }
+                .map { transformLaneLine(it.first, "LaneCenterLine", it.second, AttributeList.EMPTY) }
+                .handleAndRemoveFailure { _reportLogger.log(it) }
 
     /**
      * Transforms lateral filler surfaces of a [Road] to the [AbstractCityObject] (CityGML model).
@@ -92,8 +92,8 @@ class RoadsTransformer(
      */
     fun transformLateralFillerSurfaces(srcRoad: Road): List<AbstractCityObject> =
         srcRoad.getAllLateralFillerSurfaces(configuration.parameters.discretizationStepSize)
-                .map { transformLaneSurface(it.first, "LateralLaneFillerSurface", it.second, AttributeList.EMPTY) }
-                .handleAndRemoveFailure { _reportLogger.log(it) }
+            .map { transformLaneSurface(it.first, "LateralLaneFillerSurface", it.second, AttributeList.EMPTY) }
+            .handleAndRemoveFailure { _reportLogger.log(it) }
 
     /**
      * Transforms longitudinal filler surfaces to the [AbstractCityObject] (CityGML model).
@@ -101,19 +101,19 @@ class RoadsTransformer(
      * successive streets.
      */
     fun transformLongitudinalFillerSurfaces(srcRoad: Road, srcLaneTopology: LaneTopology): List<AbstractCityObject> =
-            srcRoad.getAllLaneIdentifiers()
-                .flatMap { srcLaneTopology.getLongitudinalFillerSurfaces(it) }
-                .map {
-                    val name = if (it.laneId.isWithinSameRoad(it.successorLaneId))
-                        "LongitudinalLaneFillerSurfaceWithinRoad"
-                    else "LongitudinalLaneFillerSurfaceBetweenRoads"
+        srcRoad.getAllLaneIdentifiers()
+            .flatMap { srcLaneTopology.getLongitudinalFillerSurfaces(it) }
+            .map {
+                val name = if (it.laneId.isWithinSameRoad(it.successorLaneId))
+                    "LongitudinalLaneFillerSurfaceWithinRoad"
+                else "LongitudinalLaneFillerSurfaceBetweenRoads"
 
-                    val attributes = it.successorLaneId
-                            .toAttributes(configuration.parameters.identifierAttributesPrefix + "to_")
+                val attributes = it.successorLaneId
+                    .toAttributes(configuration.parameters.identifierAttributesPrefix + "to_")
 
-                    transformLaneSurface(it.laneId, name, it.surface, attributes)
-                }
-                .handleAndRemoveFailure { _reportLogger.log(it) }
+                transformLaneSurface(it.laneId, name, it.surface, attributes)
+            }
+            .handleAndRemoveFailure { _reportLogger.log(it) }
 
     /**
      * Transforms road markings of a [Road] class (RoadSpaces model) to the [GenericCityObject] (CityGML model).
@@ -124,43 +124,59 @@ class RoadsTransformer(
             .map { transformRoadMarking(it.first, "RoadMarking", it.second, it.third) }
             .handleAndRemoveFailure { _reportLogger.log(it) }
 
-    private fun transformRoadMarking(id: LaneIdentifier, name: String, geometry: AbstractGeometry3D,
-                                     attributes: AttributeList): Result<GenericCityObject, Exception> {
+    private fun transformRoadMarking(
+        id: LaneIdentifier,
+        name: String,
+        geometry: AbstractGeometry3D,
+        attributes: AttributeList
+    ): Result<GenericCityObject, Exception> {
 
         val genericCityObject = _genericsModuleBuilder
-                .createGenericObject(geometry)
-                .handleFailure { return it }
+            .createGenericObject(geometry)
+            .handleFailure { return it }
 
         _identifierAdder.addIdentifier(id, name, genericCityObject)
-        _attributesAdder.addAttributes(id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
-                attributes, genericCityObject)
+        _attributesAdder.addAttributes(
+            id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                attributes,
+            genericCityObject
+        )
         return Result.success(genericCityObject)
     }
 
-    private fun transformLaneSurface(id: LaneIdentifier, name: String, surface: AbstractSurface3D,
-                                     attributes: AttributeList): Result<CitygmlRoad, Exception> {
+    private fun transformLaneSurface(
+        id: LaneIdentifier,
+        name: String,
+        surface: AbstractSurface3D,
+        attributes: AttributeList
+    ): Result<CitygmlRoad, Exception> {
 
         val roadObject = _transportationModuleBuilder
-                .createLaneSurface(surface)
-                .handleFailure { return it }
+            .createLaneSurface(surface)
+            .handleFailure { return it }
 
         _identifierAdder.addIdentifier(id, name, roadObject)
-        _attributesAdder.addAttributes(id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
-                attributes, roadObject)
+        _attributesAdder.addAttributes(
+            id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                attributes,
+            roadObject
+        )
         return Result.success(roadObject)
     }
 
     private fun transformLaneLine(id: LaneIdentifier, name: String, curve: AbstractCurve3D, attributes: AttributeList):
-            Result<GenericCityObject, Exception> {
+        Result<GenericCityObject, Exception> {
 
-        val roadObject = _genericsModuleBuilder
+            val roadObject = _genericsModuleBuilder
                 .createGenericObject(curve)
                 .handleFailure { return it }
 
-        _identifierAdder.addIdentifier(id, name, roadObject)
-        _attributesAdder.addAttributes(id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
-                attributes, roadObject)
-        return Result.success(roadObject)
-    }
-
+            _identifierAdder.addIdentifier(id, name, roadObject)
+            _attributesAdder.addAttributes(
+                id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                    attributes,
+                roadObject
+            )
+            return Result.success(roadObject)
+        }
 }

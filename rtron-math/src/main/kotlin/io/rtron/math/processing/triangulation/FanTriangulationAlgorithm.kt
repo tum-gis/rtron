@@ -30,8 +30,8 @@ class FanTriangulationAlgorithm : TriangulationAlgorithm() {
 
     override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, NoException> {
         val polygons = vertices.filterIndexed { index, _ -> index != 0 }
-                .zipWithNext()
-                .map { Polygon3D(listOf(vertices.first(), it.first, it.second), tolerance) }
+            .zipWithNext()
+            .map { Polygon3D(listOf(vertices.first(), it.first, it.second), tolerance) }
 
         return Result.success(polygons)
     }

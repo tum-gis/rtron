@@ -35,8 +35,7 @@ fun DoubleArray.reshapeByColumnDimension(columnDimension: Int): Array<DoubleArra
  * @return matrix represented as an [Array] (columns) of [DoubleArray] (rows)
  */
 fun DoubleArray.reshapeByRowDimension(rowDimension: Int): Array<DoubleArray> {
-    require(this.size.rem(rowDimension) == 0)
-    { "Not fitting dimensions: Trying to reshape a DoubleArray of size ${this.size}) to rowDimension of $rowDimension." }
+    require(this.size.rem(rowDimension) == 0) { "Not fitting dimensions: Trying to reshape a DoubleArray of size ${this.size}) to rowDimension of $rowDimension." }
 
     PI
     return this.reshapeByColumnDimension(this.size / rowDimension)

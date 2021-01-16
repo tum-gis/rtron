@@ -28,12 +28,11 @@ import org.citygml4j.model.citygml.generics.IntAttribute as GmlIntAttribute
 import org.citygml4j.model.citygml.generics.MeasureAttribute as GmlMeasureAttribute
 import org.citygml4j.model.citygml.generics.StringAttribute as GmlStringAttribute
 
-
 /**
  * Adds [Attribute] and [AttributeList] classes (RoadSpaces model) to an [AbstractCityObject] (CityGML model).
  */
 class AttributesAdder(
-        private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters
 ) {
 
     // Methods
@@ -55,9 +54,9 @@ class AttributesAdder(
      */
     fun addAttributes(attributeList: AttributeList, dstCityObject: AbstractCityObject) {
         attributeList.attributes
-                .filter { it.isNotEmpty() }
-                .flatMap { convertAttribute(it) }
-                .forEach { dstCityObject.addGenericAttribute(it) }
+            .filter { it.isNotEmpty() }
+            .flatMap { convertAttribute(it) }
+            .forEach { dstCityObject.addGenericAttribute(it) }
     }
 
     /**
@@ -68,24 +67,24 @@ class AttributesAdder(
      * @return list of CityGML attributes
      */
     private fun convertAttribute(attribute: Attribute): List<AbstractGenericAttribute> =
-            when (attribute) {
-                is StringAttribute -> listOf(GmlStringAttribute(attribute.name, attribute.value))
-                is IntAttribute -> listOf(GmlIntAttribute(attribute.name, attribute.value))
-                is DoubleAttribute -> listOf(GmlDoubleAttribute(attribute.name, attribute.value))
-                is BooleanAttribute -> listOf(GmlStringAttribute(attribute.name, attribute.value.toString()))
-                is MeasureAttribute -> {
-                    val measure = Measure(attribute.value).apply { uom = attribute.uom.toGmlString() }
-                    val measureAttribute = GmlMeasureAttribute(attribute.name, measure)
-                    val doubleAttribute = GmlDoubleAttribute(attribute.name, attribute.value)
-                    listOf(measureAttribute, doubleAttribute)
-                }
-                is AttributeList -> {
-                    val attributes = attribute.attributes.flatMap { convertAttribute(it) }
-
-                    if (parameters.flattenGenericAttributeSets) attributes
-                    else listOf(GmlGenericAttributeSet(attribute.name, attributes))
-                }
+        when (attribute) {
+            is StringAttribute -> listOf(GmlStringAttribute(attribute.name, attribute.value))
+            is IntAttribute -> listOf(GmlIntAttribute(attribute.name, attribute.value))
+            is DoubleAttribute -> listOf(GmlDoubleAttribute(attribute.name, attribute.value))
+            is BooleanAttribute -> listOf(GmlStringAttribute(attribute.name, attribute.value.toString()))
+            is MeasureAttribute -> {
+                val measure = Measure(attribute.value).apply { uom = attribute.uom.toGmlString() }
+                val measureAttribute = GmlMeasureAttribute(attribute.name, measure)
+                val doubleAttribute = GmlDoubleAttribute(attribute.name, attribute.value)
+                listOf(measureAttribute, doubleAttribute)
             }
+            is AttributeList -> {
+                val attributes = attribute.attributes.flatMap { convertAttribute(it) }
+
+                if (parameters.flattenGenericAttributeSets) attributes
+                else listOf(GmlGenericAttributeSet(attribute.name, attributes))
+            }
+        }
 }
 
 /**

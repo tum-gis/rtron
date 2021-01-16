@@ -25,7 +25,7 @@ import java.io.BufferedReader as JBufferedReader
  * @param filePath path to the file to be read
  */
 class BufferedReader(
-        val filePath: Path
+    val filePath: Path
 ) {
 
     // Properties and Initializers

@@ -23,7 +23,6 @@ import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
 import org.apache.commons.math3.geometry.euclidean.threed.Segment as CMLineSegment3D
 
-
 /**
  * Line segment in 3D defined by a [start] and [end] vector.
  *
@@ -33,10 +32,10 @@ import org.apache.commons.math3.geometry.euclidean.threed.Segment as CMLineSegme
  * @param tolerance allowed tolerance
  */
 class LineSegment3D(
-        val start: Vector3D,
-        val end: Vector3D,
-        override val tolerance: Double,
-        endBoundType: BoundType = BoundType.CLOSED
+    val start: Vector3D,
+    val end: Vector3D,
+    override val tolerance: Double,
+    endBoundType: BoundType = BoundType.CLOSED
 ) : AbstractCurve3D() {
 
     // Properties and Initializers
@@ -77,11 +76,11 @@ class LineSegment3D(
     }
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-            Result<Vector3D, IllegalArgumentException> {
+        Result<Vector3D, IllegalArgumentException> {
 
-        val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
-        return Result.success(point)
-    }
+            val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
+            return Result.success(point)
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -112,11 +111,14 @@ class LineSegment3D(
          *
          */
         fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED):
-                Result<LineSegment3D, IllegalArgumentException> =
-            if (start.fuzzyEquals(end, tolerance))
-                Result.error(IllegalArgumentException("Start and end vector of a line segment must be different " +
-                        "according to the given tolerance."))
-            else Result.success(LineSegment3D(start, end, tolerance, endBoundType))
+            Result<LineSegment3D, IllegalArgumentException> =
+                if (start.fuzzyEquals(end, tolerance))
+                    Result.error(
+                        IllegalArgumentException(
+                            "Start and end vector of a line segment must be different " +
+                                "according to the given tolerance."
+                        )
+                    )
+                else Result.success(LineSegment3D(start, end, tolerance, endBoundType))
     }
-
 }

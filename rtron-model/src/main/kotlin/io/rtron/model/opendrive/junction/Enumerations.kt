@@ -16,7 +16,6 @@
 
 package io.rtron.model.opendrive.junction
 
-
 enum class EJunctionType {
     DEFAULT, VIRTUAL
 }

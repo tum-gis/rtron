@@ -23,19 +23,18 @@ import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
 import io.rtron.std.ContextMessage
 
-
 data class RoadLanesLaneSection(
 
-        var left: RoadLanesLaneSectionLeft = RoadLanesLaneSectionLeft(),
-        var center: RoadLanesLaneSectionCenter = RoadLanesLaneSectionCenter(),
-        var right: RoadLanesLaneSectionRight = RoadLanesLaneSectionRight(),
+    var left: RoadLanesLaneSectionLeft = RoadLanesLaneSectionLeft(),
+    var center: RoadLanesLaneSectionCenter = RoadLanesLaneSectionCenter(),
+    var right: RoadLanesLaneSectionRight = RoadLanesLaneSectionRight(),
 
-        var userData: List<UserData> = listOf(),
-        var include: List<Include> = listOf(),
-        var dataQuality: DataQuality = DataQuality(),
+    var userData: List<UserData> = listOf(),
+    var include: List<Include> = listOf(),
+    var dataQuality: DataQuality = DataQuality(),
 
-        var s: Double = Double.NaN,
-        var singleSide: Boolean = false
+    var s: Double = Double.NaN,
+    var singleSide: Boolean = false
 ) {
     // Properties and Initializers
     val laneSectionStart get() = CurveRelativeVector1D(s)
@@ -46,7 +45,6 @@ data class RoadLanesLaneSection(
     fun getCenterLane() = center.lane.first()
     fun getLeftRightLanes(): Map<Int, RoadLanesLaneSectionLRLane> = left.getLanes() + right.getLanes()
 
-
     fun isProcessable(): Result<ContextMessage<Boolean>, IllegalStateException> {
 
         if (center.getNumberOfLanes() != 1)
@@ -54,7 +52,6 @@ data class RoadLanesLaneSection(
 
         if (left.isEmpty() && right.isEmpty())
             return Result.error(IllegalStateException("Lane section must contain lanes on the left and right."))
-
 
         val infos = mutableListOf<String>()
 
@@ -80,5 +77,4 @@ data class RoadLanesLaneSection(
 
         return Result.success(ContextMessage(true, infos))
     }
-
 }

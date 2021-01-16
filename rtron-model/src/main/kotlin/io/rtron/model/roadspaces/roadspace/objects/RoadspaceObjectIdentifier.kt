@@ -19,7 +19,6 @@ package io.rtron.model.roadspaces.roadspace.objects
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
 
-
 /**
  * Identifier of a lane section containing essential meta information.
  *
@@ -28,9 +27,9 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
  * @param roadspaceIdentifier identifier of the road space
  */
 data class RoadspaceObjectIdentifier(
-        val roadspaceObjectId: String,
-        val roadspaceObjectName: String,
-        val roadspaceIdentifier: RoadspaceIdentifier
+    val roadspaceObjectId: String,
+    val roadspaceObjectName: String,
+    val roadspaceIdentifier: RoadspaceIdentifier
 ) : RoadspaceIdentifierInterface by roadspaceIdentifier {
 
     // Conversions

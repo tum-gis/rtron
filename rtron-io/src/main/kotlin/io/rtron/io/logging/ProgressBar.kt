@@ -22,7 +22,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
-
 /**
  * Progress bar in the console.
  *
@@ -32,9 +31,9 @@ import kotlin.time.toDuration
  */
 @OptIn(ExperimentalTime::class)
 class ProgressBar(
-        private val taskName: String,
-        private val completion: Int,
-        private var currentStatus: Int = 0
+    private val taskName: String,
+    private val completion: Int,
+    private var currentStatus: Int = 0
 ) {
 
     // Properties and Initializers
@@ -57,25 +56,27 @@ class ProgressBar(
     private fun printUpdate() {
         val elapsedTime = getElapsedTime()
         if (elapsedTime > PRINT_AFTER && getElapsedTimeSinceLastUpdate() > PRINT_AT_LEAST) {
-            print("$PREFIX $taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% " +
-                    "[ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]\r")
+            print(
+                "$PREFIX $taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% " +
+                    "[ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]\r"
+            )
             lastPrintUpdateTime = System.currentTimeMillis()
         }
     }
 
     private fun getElapsedTimeSinceLastUpdate(): Duration =
-            (System.currentTimeMillis() - lastPrintUpdateTime).toDuration(DurationUnit.MILLISECONDS)
+        (System.currentTimeMillis() - lastPrintUpdateTime).toDuration(DurationUnit.MILLISECONDS)
 
     private fun getProgressPercent(): Double = 100.0 * (currentStatus.toDouble() / completion.toDouble())
 
     private fun getElapsedTime(): Duration =
-            (System.currentTimeMillis() - startTime).toDuration(DurationUnit.MILLISECONDS)
+        (System.currentTimeMillis() - startTime).toDuration(DurationUnit.MILLISECONDS)
 
     private fun getTotalEstimatedElapsedTime(): Duration =
-            getElapsedTime() * completion.toDouble() / currentStatus.toDouble()
+        getElapsedTime() * completion.toDouble() / currentStatus.toDouble()
 
     private fun getEstimatedTimeOfArrival(): Duration =
-            getElapsedTime() * ((completion.toDouble() / currentStatus.toDouble()) - 1.0)
+        getElapsedTime() * ((completion.toDouble() / currentStatus.toDouble()) - 1.0)
 
     companion object {
 

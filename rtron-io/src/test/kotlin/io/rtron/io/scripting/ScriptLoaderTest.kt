@@ -18,18 +18,17 @@ package io.rtron.io.scripting
 
 import org.assertj.core.api.Assertions.assertThat
 
-
 internal class ScriptLoaderTest {
 
-    //@Test
+    // @Test
     fun `test basic script`() {
-        val script = """
+        val script =
+            """
             listOf("abc", "def")
-        """.trimIndent()
+            """.trimIndent()
 
         val actualResult = ScriptLoader.load<List<String>>(script)
 
         assertThat(actualResult).isEqualTo(listOf("abc", "def"))
     }
-
 }

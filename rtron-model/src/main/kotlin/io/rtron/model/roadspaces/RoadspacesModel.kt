@@ -21,15 +21,14 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.topology.LaneTopology
 
-
 /**
  * The [RoadspacesModel] is a parametric implementation of the objects within a road space and is capable of generating
  * surface based representations. Therefore, it can serve as intermediate model, as it can read the parametric modeling
  * approach of OpenDRIVE and generate the surface based modeling approach of CityGML.
  */
 data class RoadspacesModel(
-        val id: ModelIdentifier,
-        val header: Header,
-        val roadspaces: Map<RoadspaceIdentifier, Roadspace> = mapOf(),
-        val laneTopology: LaneTopology
+    val id: ModelIdentifier,
+    val header: Header,
+    val roadspaces: Map<RoadspaceIdentifier, Roadspace> = mapOf(),
+    val laneTopology: LaneTopology
 ) : AbstractModel()

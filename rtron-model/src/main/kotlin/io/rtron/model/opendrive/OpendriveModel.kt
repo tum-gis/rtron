@@ -22,14 +22,13 @@ import io.rtron.model.opendrive.header.Header
 import io.rtron.model.opendrive.junction.Junction
 import io.rtron.model.opendrive.road.Road
 
-
 /**
  * Implementation of the OpenDRIVE data model according to version 1.6.
  * See the [official page](https://www.asam.net/standards/detail/opendrive/) from ASAM for more.
  */
 data class OpendriveModel(
-        var header: Header = Header(),
-        var road: List<Road> = listOf(),
-        var controller: List<Controller> = listOf(),
-        var junction: List<Junction> = listOf()
+    var header: Header = Header(),
+    var road: List<Road> = listOf(),
+    var controller: List<Controller> = listOf(),
+    var junction: List<Junction> = listOf()
 ) : AbstractModel()

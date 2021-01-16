@@ -24,7 +24,7 @@ import org.w3c.dom.Document
 import javax.xml.parsers.DocumentBuilderFactory
 
 class OpendriveReaderWriter(
-        override val configuration: OpendriveReaderWriterConfiguration
+    override val configuration: OpendriveReaderWriterConfiguration
 ) : AbstractReaderWriter(configuration) {
 
     // Properties and Initializers
@@ -38,11 +38,11 @@ class OpendriveReaderWriter(
     override fun isSupported(model: AbstractModel): Boolean = false
 
     override fun read(filePath: Path): AbstractModel =
-        when(val opendriveVersion = getOpendriveVersion(filePath)) {
+        when (val opendriveVersion = getOpendriveVersion(filePath)) {
             OpendriveVersion(1, 4) -> _opendrive14Reader.createOpendriveModel(filePath)
             OpendriveVersion(1, 5) -> _opendrive14Reader.createOpendriveModel(filePath)
             else -> {
-                _reportLogger.warn("Detected OpenDRIVE version ($opendriveVersion) for which no dedicated reader is available. Experimentally continuing." )
+                _reportLogger.warn("Detected OpenDRIVE version ($opendriveVersion) for which no dedicated reader is available. Experimentally continuing.")
                 _opendrive14Reader.createOpendriveModel(filePath)
             }
         }
@@ -57,13 +57,12 @@ class OpendriveReaderWriter(
         val xmlDoc: Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.toFileJ())
         val header = xmlDoc.getElementsByTagName("header").item(0)
         return OpendriveVersion(
-                revMajor = header.attributes.getNamedItem("revMajor").nodeValue.toInt(),
-                revMinor = header.attributes.getNamedItem("revMinor").nodeValue.toInt()
+            revMajor = header.attributes.getNamedItem("revMajor").nodeValue.toInt(),
+            revMinor = header.attributes.getNamedItem("revMinor").nodeValue.toInt()
         )
     }
 
     companion object {
         val supportedFileExtensions = listOf("xodr", "xodrz")
     }
-
 }

@@ -24,7 +24,6 @@ import java.io.File as JFile
 import java.nio.file.Path as NPath
 import java.nio.file.Paths as NPaths
 
-
 fun NPath.toPath() = Path(this.toString())
 
 /**
@@ -59,8 +58,7 @@ class Path(uri: String = "") : Comparable<Path> {
      * @return sequence of [Path]
      */
     fun walk(maxDepth: Int = Int.MAX_VALUE): Sequence<Path> =
-            Files.walk(_path, maxDepth).asSequence().map { it.toPath() }
-
+        Files.walk(_path, maxDepth).asSequence().map { it.toPath() }
 
     /**
      * Resolves the given path against this path.
@@ -162,5 +160,4 @@ class Path(uri: String = "") : Comparable<Path> {
 
     fun toFileJ(): JFile = _path.toFile()
     fun toFile() = File(this)
-
 }

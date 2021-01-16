@@ -62,8 +62,9 @@ fun <T, K> Iterable<T>.zipWithConsecutives(keySelector: (T) -> K): List<List<T>>
 fun <T, K> Iterable<T>.zipWithConsecutivesEnclosing(keySelector: (T) -> K): List<List<T>> {
     val zippedConsecutively = this.zipWithConsecutives(keySelector)
     return if (this.count() >= 2 &&
-            keySelector(zippedConsecutively.first().first()) == keySelector(zippedConsecutively.last().last()))
+        keySelector(zippedConsecutively.first().first()) == keySelector(zippedConsecutively.last().last())
+    )
         listOf(zippedConsecutively.last() + zippedConsecutively.first()) +
-                zippedConsecutively.subList(1, zippedConsecutively.lastIndex)
+            zippedConsecutively.subList(1, zippedConsecutively.lastIndex)
     else zippedConsecutively
 }

@@ -17,15 +17,15 @@
 package io.rtron.readerwriter.citygml
 
 import com.github.kittinunf.result.Result
-import org.citygml4j.CityGMLContext
-import org.citygml4j.model.module.citygml.CityGMLVersion
 import io.rtron.io.files.Path
 import io.rtron.model.AbstractModel
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.AbstractReaderWriter
+import org.citygml4j.CityGMLContext
+import org.citygml4j.model.module.citygml.CityGMLVersion
 
 class CitygmlReaderWriter(
-        override val configuration: CitygmlReaderWriterConfiguration
+    override val configuration: CitygmlReaderWriterConfiguration
 ) : AbstractReaderWriter(configuration) {
 
     // Properties and Initializers
