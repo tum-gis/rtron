@@ -24,7 +24,11 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.std.mapAndHandleFailureOnOriginal
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspace2citygml.module.*
+import io.rtron.transformer.roadspace2citygml.module.BuildingModuleBuilder
+import io.rtron.transformer.roadspace2citygml.module.CityFurnitureModuleBuilder
+import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
+import io.rtron.transformer.roadspace2citygml.module.TransportationModuleBuilder
+import io.rtron.transformer.roadspace2citygml.module.VegetationModuleBuilder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.core.CityModel

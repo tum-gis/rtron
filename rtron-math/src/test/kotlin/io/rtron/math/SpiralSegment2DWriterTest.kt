@@ -30,7 +30,7 @@ import io.rtron.math.std.PI
 import io.rtron.math.transform.AffineSequence2D
 import org.junit.jupiter.api.Test
 
-object SpiralSegment2DWriter {
+object SpiralSegment2DWriterTest {
 
     @Test
     fun writeSpiralSegment2DToCsvFile() {

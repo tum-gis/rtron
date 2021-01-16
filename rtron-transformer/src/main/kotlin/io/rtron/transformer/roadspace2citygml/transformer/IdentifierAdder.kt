@@ -24,7 +24,7 @@ import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParame
 import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.gml.basicTypes.Code
 import org.citygml4j.util.gmlid.DefaultGMLIdManager
-import java.util.*
+import java.util.UUID
 import kotlin.collections.HashMap
 
 /**

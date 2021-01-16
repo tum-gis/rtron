@@ -18,7 +18,12 @@ package io.rtron.model.opendrive.road.signals
 
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import io.rtron.model.opendrive.common.*
+import io.rtron.model.opendrive.common.CountryCode
+import io.rtron.model.opendrive.common.DataQuality
+import io.rtron.model.opendrive.common.EOrientation
+import io.rtron.model.opendrive.common.EUnit
+import io.rtron.model.opendrive.common.Include
+import io.rtron.model.opendrive.common.UserData
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectLaneValidity
 
 data class RoadSignalsSignal(

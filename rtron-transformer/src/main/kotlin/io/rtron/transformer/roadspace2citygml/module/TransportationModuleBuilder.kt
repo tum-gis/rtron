@@ -21,7 +21,15 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
-import org.citygml4j.model.citygml.transportation.*
+import org.citygml4j.model.citygml.transportation.AuxiliaryTrafficArea
+import org.citygml4j.model.citygml.transportation.AuxiliaryTrafficAreaProperty
+import org.citygml4j.model.citygml.transportation.Railway
+import org.citygml4j.model.citygml.transportation.Road
+import org.citygml4j.model.citygml.transportation.Square
+import org.citygml4j.model.citygml.transportation.Track
+import org.citygml4j.model.citygml.transportation.TrafficArea
+import org.citygml4j.model.citygml.transportation.TrafficAreaProperty
+import org.citygml4j.model.citygml.transportation.TransportationComplex
 
 /**
  * Builder for city objects of the CityGML Transportation module.

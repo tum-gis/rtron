@@ -37,8 +37,12 @@ import org.citygml4j.model.gml.geometry.GeometryProperty
 import org.citygml4j.model.gml.geometry.aggregates.MultiSurface
 import org.citygml4j.model.gml.geometry.aggregates.MultiSurfaceProperty
 import org.citygml4j.model.gml.geometry.complexes.CompositeSurface
-import org.citygml4j.model.gml.geometry.primitives.*
-import java.util.*
+import org.citygml4j.model.gml.geometry.primitives.LineStringProperty
+import org.citygml4j.model.gml.geometry.primitives.Point
+import org.citygml4j.model.gml.geometry.primitives.PointProperty
+import org.citygml4j.model.gml.geometry.primitives.Solid
+import org.citygml4j.model.gml.geometry.primitives.SolidProperty
+import org.citygml4j.model.gml.geometry.primitives.SurfaceProperty
 
 /**
  * Generates a surface based geometry representation for CityGML by visiting the geometry class.

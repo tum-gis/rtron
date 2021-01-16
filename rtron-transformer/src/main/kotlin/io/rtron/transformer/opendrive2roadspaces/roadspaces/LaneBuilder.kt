@@ -29,7 +29,11 @@ import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLRLane
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionLRLaneHeight
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
-import io.rtron.model.roadspaces.roadspace.road.*
+import io.rtron.model.roadspaces.roadspace.road.CenterLane
+import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
+import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
+import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration

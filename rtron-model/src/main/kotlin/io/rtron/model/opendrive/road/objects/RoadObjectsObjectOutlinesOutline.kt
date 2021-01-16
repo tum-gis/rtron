@@ -16,7 +16,11 @@
 
 package io.rtron.model.opendrive.road.objects
 
-import io.rtron.model.opendrive.common.*
+import io.rtron.model.opendrive.common.DataQuality
+import io.rtron.model.opendrive.common.ELaneType
+import io.rtron.model.opendrive.common.EOutlineFillType
+import io.rtron.model.opendrive.common.Include
+import io.rtron.model.opendrive.common.UserData
 
 class RoadObjectsObjectOutlinesOutline(
     var cornerRoad: List<RoadObjectsObjectOutlinesOutlineCornerRoad> = listOf(),

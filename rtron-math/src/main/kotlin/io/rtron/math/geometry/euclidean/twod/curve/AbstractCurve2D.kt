@@ -23,7 +23,11 @@ import io.rtron.math.geometry.euclidean.twod.AbstractGeometry2D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-import io.rtron.math.range.*
+import io.rtron.math.range.BoundType
+import io.rtron.math.range.DefinableDomain
+import io.rtron.math.range.Tolerable
+import io.rtron.math.range.fuzzyContainsResult
+import io.rtron.math.range.length
 import io.rtron.std.handleFailure
 
 /**

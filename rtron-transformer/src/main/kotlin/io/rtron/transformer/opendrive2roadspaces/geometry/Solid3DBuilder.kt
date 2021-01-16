@@ -31,7 +31,12 @@ import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutlineCornerRoad
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
-import io.rtron.std.*
+import io.rtron.std.ContextMessage
+import io.rtron.std.Optional
+import io.rtron.std.handleAndRemoveFailure
+import io.rtron.std.handleFailure
+import io.rtron.std.handleMessage
+import io.rtron.std.map
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
@@ -50,7 +55,7 @@ class Solid3DBuilder(
     // Methods
 
     /**
-     * Builds a list of cubiods from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
+     * Builds a list of cuboids from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
     fun buildCuboids(srcRoadObject: RoadObjectsObject, curveAffine: Affine3D): List<Cuboid3D> {

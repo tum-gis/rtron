@@ -24,7 +24,16 @@ import io.rtron.math.processing.triangulation.ExperimentalTriangulator
 import io.rtron.math.processing.triangulation.Triangulator
 import io.rtron.math.range.Tolerable
 import io.rtron.math.std.DEFAULT_TOLERANCE
-import io.rtron.std.*
+import io.rtron.std.ContextMessage
+import io.rtron.std.Optional
+import io.rtron.std.distinctConsecutiveEnclosing
+import io.rtron.std.filterWindowedEnclosing
+import io.rtron.std.getOrElse
+import io.rtron.std.handleFailure
+import io.rtron.std.map
+import io.rtron.std.unwrapMessages
+import io.rtron.std.zipWithConsecutivesEnclosing
+import io.rtron.std.zipWithNextEnclosing
 
 /**
  * Factory for building [Polyhedron3D] for which multiple preparation steps are required to overcome

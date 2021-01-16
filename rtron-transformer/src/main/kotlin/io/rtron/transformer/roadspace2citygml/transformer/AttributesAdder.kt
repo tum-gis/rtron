@@ -17,7 +17,15 @@
 package io.rtron.transformer.roadspace2citygml.transformer
 
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
-import io.rtron.model.roadspaces.roadspace.attribute.*
+import io.rtron.model.roadspaces.roadspace.attribute.Attribute
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.BooleanAttribute
+import io.rtron.model.roadspaces.roadspace.attribute.DoubleAttribute
+import io.rtron.model.roadspaces.roadspace.attribute.IntAttribute
+import io.rtron.model.roadspaces.roadspace.attribute.MeasureAttribute
+import io.rtron.model.roadspaces.roadspace.attribute.StringAttribute
+import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
+import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
 import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.citygml.generics.AbstractGenericAttribute
