@@ -5,7 +5,7 @@ import io.rtron.main.project.configuration.configure
  * which can be downloaded here: https://zenodo.org/record/4043193
  *
  * This is a configuration file for their OpenDRIVE dataset.
- * To try it out, rename the file to configuration.kts and place it in the same directory as the dataset.
+ * To try it out, rename the file to sample.kts and place it in the same directory as the dataset.
  */
 
 configure {

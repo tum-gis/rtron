@@ -73,15 +73,15 @@ theme:
     - type: orchidSearch
 
 kotlindoc:
-  homePagePermalink:   'modules/:module'
+  homePagePermalink: 'modules/:module'
   sourcePagePermalink: ':moduleType/:module/:sourceDocPath'
   modules:
-    - { name: 'Documentation Component', slug: 'documentation', sourceDirs: './../../../../rtron-documentation/src/main/kotlin/', moduleGroup: 'ui' }
-    - { name: 'CLI Component', slug: 'cli', sourceDirs: './../../../../rtron-cli/src/main/kotlin/', moduleGroup: 'ui' }
-    - { name: 'Main Component', slug: 'main', sourceDirs: './../../../../rtron-main/src/main/kotlin/', moduleGroup: 'batch-processing' }
-    - { name: 'Model Component', slug: 'model', sourceDirs: './../../../../rtron-model/src/main/kotlin/', moduleGroup: 'model-processing' }
-    - { name: 'ReaderWriter Component', slug: 'readerwriter', sourceDirs: './../../../../rtron-readerwriter/src/main/kotlin/', moduleGroup: 'model-processing' }
-    - { name: 'Transformer Component', slug: 'transformer', sourceDirs: './../../../../rtron-transformer/src/main/kotlin/', moduleGroup: 'model-processing' }
-    - { name: 'STD Component', slug: 'std', sourceDirs: './../../../../rtron-std/src/main/kotlin/', moduleGroup: 'utility' }
-    - { name: 'IO Component', slug: 'io', sourceDirs: './../../../../rtron-io/src/main/kotlin/', moduleGroup: 'utility' }
-    - { name: 'Math Component', slug: 'math', sourceDirs: './../../../../rtron-math/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'Documentation Component', slug: 'documentation', sourceDirs: '../../../../rtron-documentation/src/orchid/kotlin/', moduleGroup: 'ui' }
+    - { name: 'CLI Component', slug: 'cli', sourceDirs: '../../../../rtron-cli/src/main/kotlin/', moduleGroup: 'ui' }
+    - { name: 'Main Component', slug: 'main', sourceDirs: '../../../../rtron-main/src/main/kotlin/', moduleGroup: 'batch-processing' }
+    - { name: 'Model Component', slug: 'model', sourceDirs: '../../../../rtron-model/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'ReaderWriter Component', slug: 'readerwriter', sourceDirs: '../../../../rtron-readerwriter/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'Transformer Component', slug: 'transformer', sourceDirs: '../../../../rtron-transformer/src/main/kotlin/', moduleGroup: 'model-processing' }
+    - { name: 'STD Component', slug: 'std', sourceDirs: '../../../../rtron-std/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'IO Component', slug: 'io', sourceDirs: '../../../../rtron-io/src/main/kotlin/', moduleGroup: 'utility' }
+    - { name: 'Math Component', slug: 'math', sourceDirs: '../../../../rtron-math/src/main/kotlin/', moduleGroup: 'utility' }
