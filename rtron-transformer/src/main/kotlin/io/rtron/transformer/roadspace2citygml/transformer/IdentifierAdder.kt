@@ -25,7 +25,7 @@ import org.citygml4j.model.citygml.core.AbstractCityObject
 import org.citygml4j.model.gml.basicTypes.Code
 import org.citygml4j.util.gmlid.DefaultGMLIdManager
 import java.util.UUID
-import kotlin.collections.HashMap
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Adds object identifiers from the RoadSpaces model to an [AbstractCityObject] (CityGML model).
@@ -43,7 +43,7 @@ class IdentifierAdder(
     }
 
     /** count index for already used identifier keys */
-    private val _usedKeyCount = HashMap<String, Int>()
+    private val _usedKeyCount = ConcurrentHashMap<String, Int>()
 
     // Methods
 
@@ -91,7 +91,7 @@ class IdentifierAdder(
      * Generates a unique UUID based on a hash of the [key] (even if the key has already been used).
      */
     private fun generateHashUUID(key: String): String {
-        require(!key.isBlank()) { "The key for generating a hashed UUID must not be blank." }
+        require(key.isNotBlank()) { "The key for generating a hashed UUID must not be blank." }
         val countIndex = _usedKeyCount.getOrDefault(key, 0) + 1
         val keyWithCount = key + '_' + countIndex
 
