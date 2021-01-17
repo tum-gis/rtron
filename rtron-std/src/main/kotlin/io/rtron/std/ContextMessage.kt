@@ -89,3 +89,6 @@ inline fun <V : Any> List<ContextMessage<V>>.handleMessage(block: (ContextMessag
  * @return a [ContextMessage] containing all values and messages of the original list
  */
 fun <V : Any> List<ContextMessage<V>>.unwrapMessages() = ContextMessage(map { it.value }, flatMap { it.messages })
+
+inline fun <V : Any, R : Any> ContextMessage<V>.map(transform: (V) -> R): ContextMessage<R> =
+    ContextMessage(transform(this.value), this.messages)

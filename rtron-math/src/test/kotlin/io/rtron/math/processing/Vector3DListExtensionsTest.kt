@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
-internal class VertexListTest {
+internal class Vector3DListExtensionsTest {
 
     @Nested
     inner class TestTripleIsColinear {
