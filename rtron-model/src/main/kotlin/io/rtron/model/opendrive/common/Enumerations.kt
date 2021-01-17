@@ -16,6 +16,9 @@
 
 package io.rtron.model.opendrive.common
 
+import io.rtron.math.geometry.euclidean.twod.Rotation2D
+import io.rtron.math.std.PI
+
 /**
  * Basic rule for using the road
  */
@@ -143,4 +146,9 @@ enum class EOrientation {
     MINUS,
     /** valid in both directions */
     NONE
+}
+
+fun EOrientation.toRotation2D() = when (this) {
+    EOrientation.MINUS -> Rotation2D(PI)
+    else -> Rotation2D(0.0)
 }

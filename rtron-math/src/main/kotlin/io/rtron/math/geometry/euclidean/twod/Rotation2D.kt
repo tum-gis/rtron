@@ -16,6 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod
 
+import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DEG_TO_RAD
 import io.rtron.math.std.RAD_TO_DEG
@@ -71,6 +72,8 @@ class Rotation2D(
 
     fun toAngleRadians() = this.angle
     fun toAngleDegree() = this.angle * RAD_TO_DEG
+
+    fun toRotation3D(pitch: Double = 0.0, roll: Double = 0.0) = Rotation3D(angle, pitch, roll)
 
     companion object {
         val ZERO = Rotation2D(0.0)

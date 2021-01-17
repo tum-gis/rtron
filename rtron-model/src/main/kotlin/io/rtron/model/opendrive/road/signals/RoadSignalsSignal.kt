@@ -25,6 +25,7 @@ import io.rtron.model.opendrive.common.EOrientation
 import io.rtron.model.opendrive.common.EUnit
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
+import io.rtron.model.opendrive.common.toRotation2D
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectLaneValidity
 
 data class RoadSignalsSignal(
@@ -66,7 +67,8 @@ data class RoadSignalsSignal(
     val referenceLinePointRelativePosition get() = Vector3D(0.0, t, zOffset)
 
     /** rotation of the object relative to the rotation on the road reference line */
-    val referenceLinePointRelativeRotation get() = Rotation3D.of(hOffset, pitch, roll)
+    val referenceLinePointRelativeRotation get() = orientation.toRotation2D().toRotation3D() +
+        Rotation3D.of(hOffset, pitch, roll)
 
     // Methods
     fun isPolygon() = !width.isNaN() && width != 0.0 && !height.isNaN() && height != 0.0

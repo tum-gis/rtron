@@ -59,6 +59,10 @@ class Rotation3D(
     val pitchDegree get() = pitch * RAD_TO_DEG
     val rollDegree get() = roll * RAD_TO_DEG
 
+    // Operators
+    operator fun plus(v: Rotation3D) = Rotation3D(heading + v.heading, pitch + v.pitch, roll + v.roll)
+    operator fun minus(v: Rotation3D) = Rotation3D(heading - v.heading, pitch - v.pitch, roll - v.roll)
+
     // Methods
     fun getMatrix() = RealMatrix(_rotation3D.matrix)
 
