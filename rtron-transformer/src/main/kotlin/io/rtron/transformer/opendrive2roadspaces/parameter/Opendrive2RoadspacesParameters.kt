@@ -41,42 +41,42 @@ class Opendrive2RoadspacesParameters(
     /**
      * allowed tolerance when comparing double values
      */
-    val tolerance by toleranceProperty
+    val tolerance: Double by toleranceProperty
 
     /**
      * prefix of attribute names
      */
-    val attributesPrefix by attributesPrefixProperty
+    val attributesPrefix: String by attributesPrefixProperty
 
     /**
-     * [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system
+     * [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications)
      */
-    val crsEpsg by crsEpsgProperty
+    val crsEpsg: Int by crsEpsgProperty
 
     /**
      * offset by which the model is translated along the x axis
      */
-    val offsetX by offsetXProperty
+    val offsetX: Double by offsetXProperty
 
     /**
      * offset by which the model is translated along the y axis
      */
-    val offsetY by offsetYProperty
+    val offsetY: Double by offsetYProperty
 
     /**
      * offset by which the model is translated along the z axis
      */
-    val offsetZ by offsetZProperty
+    val offsetZ: Double by offsetZProperty
 
     /**
      * offset in the xy plane as vector
      */
-    val offsetXY = Vector2D(offsetX, offsetY)
+    val offsetXY: Vector2D = Vector2D(offsetX, offsetY)
 
     /**
      * linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown)
      */
-    val extrapolateLateralRoadShapes by extrapolateLateralRoadShapesProperty
+    val extrapolateLateralRoadShapes: Boolean by extrapolateLateralRoadShapesProperty
 
     // Methods
 

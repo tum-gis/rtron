@@ -43,42 +43,42 @@ class Roadspaces2CitygmlParameters(
     /**
      * prefix for generated gml ids
      */
-    val gmlIdPrefix by gmlIdPrefixProperty
+    val gmlIdPrefix: String by gmlIdPrefixProperty
 
     /**
      * prefix for identifier attribute names
      */
-    val identifierAttributesPrefix by identifierAttributesPrefixProperty
+    val identifierAttributesPrefix: String by identifierAttributesPrefixProperty
 
     /**
      * prefix for geometry attribute names
      */
-    val geometryAttributesPrefix by geometryAttributesPrefixProperty
+    val geometryAttributesPrefix: String by geometryAttributesPrefixProperty
 
     /**
      * true, if nested attribute lists shall be flattened out
      */
-    val flattenGenericAttributeSets by flattenGenericAttributeSetsProperty
+    val flattenGenericAttributeSets: Boolean by flattenGenericAttributeSetsProperty
 
     /**
      * distance between each discretization step for curves and surfaces
      */
-    val discretizationStepSize by discretizationStepSizeProperty
+    val discretizationStepSize: Double by discretizationStepSizeProperty
 
     /**
      * distance between each discretization step for solid geometries of [ParametricSweep3D]
      */
-    val sweepDiscretizationStepSize by sweepDiscretizationStepSizeProperty
+    val sweepDiscretizationStepSize: Double by sweepDiscretizationStepSizeProperty
 
     /**
      * number of discretization points for a circle or cylinder
      */
-    val circleSlices by circleSlicesProperty
+    val circleSlices: Int by circleSlicesProperty
 
     /**
      * true, if random ids shall be generated for the gml geometries
      */
-    val generateRandomGeometryIds by generateRandomGeometryIdsProperty
+    val generateRandomGeometryIds: Boolean by generateRandomGeometryIdsProperty
 
     // Methods
 
