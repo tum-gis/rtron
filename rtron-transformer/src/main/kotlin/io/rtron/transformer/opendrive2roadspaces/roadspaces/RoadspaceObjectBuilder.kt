@@ -18,7 +18,9 @@ package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
+import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
+import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.model.opendrive.road.signals.RoadSignals
 import io.rtron.model.opendrive.road.signals.RoadSignalsSignal
@@ -91,7 +93,10 @@ class RoadspaceObjectBuilder(
             .handleFailure { return it }
 
         // build attributes
-        val attributes = baseAttributes + buildAttributes(srcRoadObject)
+        val attributes = baseAttributes +
+            buildAttributes(srcRoadObject) +
+            buildAttributes(srcRoadObject.curveRelativePosition) +
+            buildAttributes(srcRoadObject.referenceLinePointRelativeRotation)
 
         // build roadspace object
         val roadspaceObject = RoadspaceObject(roadspaceObjectId, type, geometries, attributes)
@@ -159,6 +164,20 @@ class RoadspaceObjectBuilder(
             attribute("orientation", srcRoadObject.orientation)
         }
 
+    private fun buildAttributes(curveRelativePosition: CurveRelativeVector3D) =
+        attributes("${configuration.parameters.attributesPrefix}curveRelativePosition_") {
+            attribute("curvePosition", curveRelativePosition.curvePosition)
+            attribute("lateralOffset", curveRelativePosition.lateralOffset)
+            attribute("heightOffset", curveRelativePosition.heightOffset)
+        }
+
+    private fun buildAttributes(rotation: Rotation3D) =
+        attributes("${configuration.parameters.attributesPrefix}curveRelativeRotation_") {
+            attribute("heading", rotation.heading)
+            attribute("roll", rotation.roll)
+            attribute("pitch", rotation.pitch)
+        }
+
     fun buildRoadspaceObjects(
         id: RoadspaceIdentifier,
         srcRoadSignals: RoadSignals,
@@ -181,7 +200,10 @@ class RoadspaceObjectBuilder(
         val objectId = RoadspaceObjectIdentifier(srcSignal.id, srcSignal.name, id)
 
         val geometry = buildGeometries(srcSignal, roadReferenceLine).handleFailure { return it }
-        val attributes = baseAttributes + buildAttributes(srcSignal)
+        val attributes = baseAttributes +
+            buildAttributes(srcSignal) +
+            buildAttributes(srcSignal.curveRelativePosition) +
+            buildAttributes(srcSignal.referenceLinePointRelativeRotation)
 
         val roadObject = RoadspaceObject(objectId, RoadObjectType.SIGNAL, geometry, attributes)
         return Result.success(roadObject)

@@ -53,9 +53,9 @@ data class RoadObjectsObject(
 
     var validLength: Double = Double.NaN,
     var orientation: String = "",
-    var hdg: Double = 0.0,
-    var pitch: Double = 0.0,
-    var roll: Double = 0.0,
+    var hdg: Double = Double.NaN,
+    var pitch: Double = Double.NaN,
+    var roll: Double = Double.NaN,
 
     var height: Double = Double.NaN,
 
@@ -72,12 +72,11 @@ data class RoadObjectsObject(
     val referenceLinePointRelativePosition get() = Vector3D(0.0, t, zOffset)
 
     /** rotation of the object relative to the rotation on the road reference line */
-    val referenceLinePointRelativeRotation get() = Rotation3D(hdg, pitch, roll)
+    val referenceLinePointRelativeRotation get() = Rotation3D.of(hdg, pitch, roll)
 
     /** pose of the object relative to the pose on the road reference line */
     val referenceLinePointRelativePose
-        get() =
-            Pose3D(referenceLinePointRelativePosition, referenceLinePointRelativeRotation)
+        get() = Pose3D(referenceLinePointRelativePosition, referenceLinePointRelativeRotation)
 
     // Methods
     fun getPolyhedronsDefinedByRoadCorners(): List<RoadObjectsObjectOutlinesOutline> =

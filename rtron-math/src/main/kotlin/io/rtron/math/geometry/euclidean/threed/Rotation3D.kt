@@ -86,5 +86,15 @@ class Rotation3D(
         private val ROTATION_CONVENTION = RotationConvention.VECTOR_OPERATOR
 
         val ZERO = Rotation3D(0.0, 0.0, 0.0)
+
+        /**
+         * Returns a [Rotation3D] while replacing non-finite values for [heading], [roll] and [pitch] with 0.0.
+         */
+        fun of(heading: Double, roll: Double = 0.0, pitch: Double = 0.0): Rotation3D {
+            val adjustedHeading = if (heading.isFinite()) heading else 0.0
+            val adjustedRoll = if (roll.isFinite()) roll else 0.0
+            val adjustedPitch = if (pitch.isFinite()) pitch else 0.0
+            return Rotation3D(adjustedHeading, adjustedRoll, adjustedPitch)
+        }
     }
 }

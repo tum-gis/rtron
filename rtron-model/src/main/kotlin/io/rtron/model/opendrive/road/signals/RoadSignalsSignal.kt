@@ -17,6 +17,7 @@
 package io.rtron.model.opendrive.road.signals
 
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
+import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.common.CountryCode
 import io.rtron.model.opendrive.common.DataQuality
@@ -61,8 +62,11 @@ data class RoadSignalsSignal(
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
 
-    /** Position of the object relative to the point on the road reference line */
+    /** position of the object relative to the point on the road reference line */
     val referenceLinePointRelativePosition get() = Vector3D(0.0, t, zOffset)
+
+    /** rotation of the object relative to the rotation on the road reference line */
+    val referenceLinePointRelativeRotation get() = Rotation3D.of(hOffset, pitch, roll)
 
     // Methods
     fun isPolygon() = !width.isNaN() && width != 0.0 && !height.isNaN() && height != 0.0
