@@ -17,7 +17,7 @@
 object Project {
     const val name = "rtron"
     const val group = "io.rtron"
-    const val version = "1.1.4"
+    const val version = "1.1.5"
 }
 
 object ProjectComponents {
