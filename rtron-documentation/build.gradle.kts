@@ -17,6 +17,7 @@ dependencies {
     orchidRuntimeOnly("io.github.javaeden.orchid:OrchidSearch:${DependencyVersions.orchid}")
     orchidRuntimeOnly("io.github.javaeden.orchid:OrchidPluginDocs:${DependencyVersions.orchid}")
     orchidRuntimeOnly("io.github.javaeden.orchid:OrchidKotlindoc:${DependencyVersions.orchid}")
+    orchidRuntimeOnly("io.github.javaeden.orchid:OrchidSyntaxHighlighter:${DependencyVersions.orchid}")
 }
 
 orchid {

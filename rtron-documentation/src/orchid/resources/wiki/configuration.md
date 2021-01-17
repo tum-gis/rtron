@@ -11,26 +11,23 @@ r:trån can be configured by adding a script named ``configuration.kts`` into th
 import io.rtron.main.project.configuration.configure
 
 configure {
-
+    // parameter configuration of the OpenDRIVE->RoadSpaces transformer
     opendrive2roadspaces {
-        tolerance = 1E-7
-        attributesPrefix = "opendrive_"
-        crsEpsg = 32632
+        crsEpsg = 32632 // EPSG of the coordinate reference system required for GIS applications
+        offsetX = 0.0 // offset by which the model is translated along the x axis
     }
-
+    // parameter configuration of the RoadSpaces->CityGML transformer
     roadspaces2citygml {
-        discretizationStepSize = 0.5
-        sweepDiscretizationStepSize = 0.3
-        circleSlices = 12
-        flattenGenericAttributeSets = true
+        discretizationStepSize = 0.5 // step size, which is used to discretize continuous functions
     }
 }
 ```
+For example, the transformation requires an [EPSG code](https://de.wikipedia.org/wiki/European_Petroleum_Survey_Group_Geodesy) which defines the coordinate reference system and cannot be directly derived from the OpenDRIVE dataset.
+A complete sample configuration and further examples can be found in the [configuration folder](https://github.com/tum-gis/rtron/tree/master/rtron-main/src/main/resources/configurations) within the repository.
+
 This script is an [internal DSL](https://en.wikipedia.org/wiki/Domain-specific_language) of Kotlin which guarantees type-safety.
 Moreover, a DSL is suitable for describing transformation recipes and complex configurations, such as model mapping rules.
-
 If you want to edit the configuration, [IntelliJ](https://www.jetbrains.com/idea/) is recommended as it has the best support for Kotlin.
-An example configuration script can be found at ``rtron-main/src/main/kotlin/io/rtron/main/project/configuration/examples/configuration.kts``.
 
 
 ## Batch Processing

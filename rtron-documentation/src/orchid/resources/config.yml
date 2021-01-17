@@ -70,7 +70,12 @@ theme:
           moduleGroup: 'utility'
           node: 'packages'
   metaComponents:
-    - type: orchidSearch
+    - type: 'orchidSearch'
+    - type: 'prism'
+      extraCss: ['assets/css/prismFixes.scss']
+      languages:
+        - 'clike'
+        - 'kotlin'
 
 kotlindoc:
   homePagePermalink: 'modules/:module'
