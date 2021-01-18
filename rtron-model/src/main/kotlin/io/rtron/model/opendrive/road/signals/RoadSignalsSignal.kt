@@ -17,6 +17,7 @@
 package io.rtron.model.opendrive.road.signals
 
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
+import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.common.CountryCode
@@ -69,6 +70,10 @@ data class RoadSignalsSignal(
     /** rotation of the object relative to the rotation on the road reference line */
     val referenceLinePointRelativeRotation get() = orientation.toRotation2D().toRotation3D() +
         Rotation3D.of(hOffset, pitch, roll)
+
+    /** pose of the object relative to the pose on the road reference line */
+    val referenceLinePointRelativePose
+        get() = Pose3D(referenceLinePointRelativePosition, referenceLinePointRelativeRotation)
 
     // Methods
     fun isPolygon() = !width.isNaN() && width != 0.0 && !height.isNaN() && height != 0.0
