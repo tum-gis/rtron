@@ -18,14 +18,14 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.4.21"
+    const val kotlin = "1.4.30"
     const val coroutines = "1.4.2"
     const val result = "4.0.0"
     const val ktsRunner = "0.0.8"
 
     // testing
-    const val junit = "5.7.0"
-    const val assertj = "3.18.1"
+    const val junit = "5.7.1"
+    const val assertj = "3.19.0"
     const val mockk = "1.10.5"
 
     // logging
@@ -42,7 +42,7 @@ object DependencyVersions {
     const val jaxbCore = "2.3.0.1"
 
     // object mapping
-    const val mapstruct = "1.4.1.Final"
+    const val mapstruct = "1.4.2.Final"
 
     // io
     const val clikt = "3.1.0"
