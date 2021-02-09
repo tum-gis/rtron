@@ -17,6 +17,7 @@
 package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.success
 import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
@@ -54,8 +55,8 @@ class GenericsModuleBuilder(
         val genericCityObject = GenericCityObject()
         genericCityObject.lod2Geometry = geometryTransformer.getGeometryProperty()
             .handleFailure { return it }
-        if (geometryTransformer.isSetRotation())
-            _attributesAdder.addRotationAttributes(geometryTransformer.rotation, genericCityObject)
+        geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, genericCityObject) }
+
         return Result.success(genericCityObject)
     }
 }

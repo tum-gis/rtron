@@ -57,24 +57,25 @@ class GeometryTransformer(
     // Properties and Initializers
     private val _identifierAdder = IdentifierAdder(parameters, reportLogger)
 
-    lateinit var solidProperty: SolidProperty
-        private set
-    lateinit var multiSurfaceProperty: MultiSurfaceProperty
-        private set
-    lateinit var lineStringProperty: LineStringProperty
-        private set
-    lateinit var pointProperty: PointProperty
-        private set
+    private lateinit var solidProperty: SolidProperty
+    private lateinit var multiSurfaceProperty: MultiSurfaceProperty
+    private lateinit var lineStringProperty: LineStringProperty
+    private lateinit var pointProperty: PointProperty
 
-    lateinit var rotation: Rotation3D
-        private set
-
-    var height: Double = Double.NaN
-        private set
-    var diameter: Double = Double.NaN
-        private set
+    private lateinit var rotation: Rotation3D
+    private var height: Double = Double.NaN
+    private var diameter: Double = Double.NaN
 
     // Methods
+    private fun isSetSolid() = this::solidProperty.isInitialized && solidProperty.isSetGeometry
+    private fun isSetMultiSurface() = this::multiSurfaceProperty.isInitialized && multiSurfaceProperty.isSetGeometry
+    private fun isSetLineString() = this::lineStringProperty.isInitialized && lineStringProperty.isSetGeometry
+    private fun isSetPoint() = this::pointProperty.isInitialized && pointProperty.isSetGeometry
+
+    private fun isSetRotation() = this::rotation.isInitialized
+    private fun isSetHeight() = !height.isNaN()
+    private fun isSetDiameter() = !diameter.isNaN()
+
     fun getSolidProperty(): Result<SolidProperty, IllegalStateException> =
         if (isSetSolid()) Result.success(solidProperty)
         else Result.error(IllegalStateException("No SolidProperty available for geometry."))
@@ -108,15 +109,13 @@ class GeometryTransformer(
         if (isSetRotation()) Result.success(rotation)
         else Result.error(IllegalStateException("No rotation available."))
 
-    private fun isSetSolid() = this::solidProperty.isInitialized && solidProperty.isSetGeometry
-    private fun isSetMultiSurface() = this::multiSurfaceProperty.isInitialized && multiSurfaceProperty.isSetGeometry
-    private fun isSetLineString() = this::lineStringProperty.isInitialized && lineStringProperty.isSetGeometry
-    private fun isSetPoint() = this::pointProperty.isInitialized && pointProperty.isSetGeometry
+    fun getHeight(): Result<Double, IllegalStateException> =
+        if (isSetHeight()) Result.success(height)
+        else Result.error(IllegalStateException("No height available."))
 
-    fun isSetRotation() = this::rotation.isInitialized
-
-    fun isSetHeight() = !height.isNaN()
-    fun isSetDiameter() = !diameter.isNaN()
+    fun getDiameter(): Result<Double, IllegalStateException> =
+        if (isSetDiameter()) Result.success(diameter)
+        else Result.error(IllegalStateException("No diameter available."))
 
     override fun visit(vector3D: Vector3D) {
         val vectorGlobalCS = vector3D.calculatePointGlobalCS()

@@ -17,6 +17,7 @@
 package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.success
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
@@ -38,8 +39,7 @@ class CityFurnitureModuleBuilder(
         val cityFurnitureObject = CityFurniture()
 
         cityFurnitureObject.lod1Geometry = geometryTransformer.getGeometryProperty().handleFailure { return it }
-        if (geometryTransformer.isSetRotation())
-            _attributesAdder.addRotationAttributes(geometryTransformer.rotation, cityFurnitureObject)
+        geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, cityFurnitureObject) }
 
         return Result.success(cityFurnitureObject)
     }

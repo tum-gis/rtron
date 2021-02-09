@@ -120,8 +120,12 @@ class RoadspaceObjectTransformer(
                 )
             if (srcRoadspaceObject.name == "railing")
                 return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "raiseMedian")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
+            if (srcRoadspaceObject.name == "raisedMedian")
+                return _transportationModuleBuilder.createTransportationComplex(
+                    geometryTransformer,
+                    TransportationModuleBuilder.Feature.ROAD,
+                    TransportationModuleBuilder.Type.AUXILARYTRAFFICAREA
+                )
             if (srcRoadspaceObject.name == "trafficLight")
                 return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
             if (srcRoadspaceObject.name == "trafficSign")

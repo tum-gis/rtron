@@ -17,6 +17,7 @@
 package io.rtron.transformer.roadspace2citygml.module
 
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.success
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
@@ -44,8 +45,7 @@ class VegetationModuleBuilder(
         solitaryVegetationObject.lod1Geometry = geometryTransformer
             .getGeometryProperty()
             .handleFailure { return it }
-        if (geometryTransformer.isSetRotation())
-            _attributesAdder.addRotationAttributes(geometryTransformer.rotation, solitaryVegetationObject)
+        geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, solitaryVegetationObject) }
 
         addAttributes(solitaryVegetationObject, geometryTransformer)
         return Result.success(solitaryVegetationObject)
@@ -56,12 +56,13 @@ class VegetationModuleBuilder(
         geometryTransformer: GeometryTransformer
     ) {
 
-        if (geometryTransformer.isSetDiameter()) {
-            solitaryVegetationObject.trunkDiameter = Length(geometryTransformer.diameter)
+        geometryTransformer.getDiameter().success {
+            solitaryVegetationObject.trunkDiameter = Length(it)
             solitaryVegetationObject.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
         }
-        if (geometryTransformer.isSetHeight()) {
-            solitaryVegetationObject.height = Length(geometryTransformer.height)
+
+        geometryTransformer.getHeight().success {
+            solitaryVegetationObject.height = Length(it)
             solitaryVegetationObject.height.uom = UnitOfMeasure.METER.toGmlString()
         }
     }
