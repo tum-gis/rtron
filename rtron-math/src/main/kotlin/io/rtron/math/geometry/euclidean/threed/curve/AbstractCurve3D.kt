@@ -103,5 +103,13 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
             .handleFailure { return it }
             .let { Result.success(it) }
 
+    /**
+     * Returns a discretized curve as a [LineString3D].
+     *
+     * @param step step size between the points
+     */
+    fun calculateLineStringGlobalCS(step: Double): Result<LineString3D, Exception> =
+        calculatePointListGlobalCS(step, true).map { LineString3D(it, tolerance) }
+
     override fun accept(visitor: Geometry3DVisitor) { visitor.visit(this) }
 }

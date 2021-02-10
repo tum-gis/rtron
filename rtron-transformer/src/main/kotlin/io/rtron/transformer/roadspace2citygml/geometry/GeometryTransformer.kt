@@ -22,6 +22,7 @@ import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
+import io.rtron.math.geometry.euclidean.threed.curve.LineString3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
@@ -60,22 +61,14 @@ class GeometryTransformer(
 
     private lateinit var polygonsForSolid: List<Polygon3D>
     private lateinit var polygonsForMultiSurface: List<Polygon3D>
-
-    private lateinit var solidProperty: SolidProperty
-    private lateinit var multiSurfaceProperty: MultiSurfaceProperty
-    private lateinit var lineStringProperty: LineStringProperty
-    private lateinit var pointProperty: PointProperty
+    private lateinit var lineString: LineString3D
+    private lateinit var point: Vector3D
 
     private lateinit var rotation: Rotation3D
     private var height: Double = Double.NaN
     private var diameter: Double = Double.NaN
 
     // Methods
-    private fun isSetSolid() = this::solidProperty.isInitialized && solidProperty.isSetGeometry
-    private fun isSetMultiSurface() = this::multiSurfaceProperty.isInitialized && multiSurfaceProperty.isSetGeometry
-    private fun isSetLineString() = this::lineStringProperty.isInitialized && lineStringProperty.isSetGeometry
-    private fun isSetPoint() = this::pointProperty.isInitialized && pointProperty.isSetGeometry
-
     private fun isSetRotation() = this::rotation.isInitialized
     private fun isSetHeight() = !height.isNaN()
     private fun isSetDiameter() = !diameter.isNaN()
@@ -121,13 +114,30 @@ class GeometryTransformer(
         return Result.success(multiSurfaceProperty)
     }
 
-    fun getLineStringProperty(): Result<LineStringProperty, IllegalStateException> =
-        if (isSetLineString()) Result.success(lineStringProperty)
-        else Result.error(IllegalStateException("No LineStringProperty available for geometry."))
+    fun getLineStringProperty(): Result<LineStringProperty, IllegalStateException> {
+        if (!this::lineString.isInitialized)
+            return Result.error(IllegalStateException("No LineStringProperty available for geometry."))
 
-    fun getPointProperty(): Result<PointProperty, IllegalStateException> =
-        if (isSetPoint()) Result.success(pointProperty)
-        else Result.error(IllegalStateException("No PointProperty available for geometry."))
+        val coordinatesList = lineString.vertices.flatMap { it.toDoubleList() }
+        val lineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
+        val lineStringProperty = LineStringProperty(lineString)
+
+        return Result.success(lineStringProperty)
+    }
+
+    fun getPointProperty(): Result<PointProperty, IllegalStateException> {
+        if (!this::point.isInitialized)
+            return Result.error(IllegalStateException("No PointProperty available for geometry."))
+
+        val directPosition = geometryFactory
+            .createDirectPosition(this.point.toDoubleArray(), DIMENSION)!!
+        val point = Point().apply {
+            pos = directPosition
+            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
+        }
+        val pointProperty = PointProperty(point)
+        return Result.success(pointProperty)
+    }
 
     /**
      * Returns the available corresponding CityGML [GeometryProperty] in the prioritization order: solid,
@@ -154,26 +164,14 @@ class GeometryTransformer(
         else Result.error(IllegalStateException("No diameter available."))
 
     override fun visit(vector3D: Vector3D) {
-        val vectorGlobalCS = vector3D.calculatePointGlobalCS()
-        val directPosition = geometryFactory
-            .createDirectPosition(vectorGlobalCS.toDoubleArray(), DIMENSION)!!
-        val point = Point().apply {
-            pos = directPosition
-            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
-        }
-        this.pointProperty = PointProperty(point)
+        point = vector3D.calculatePointGlobalCS()
         visit(vector3D as AbstractGeometry3D)
     }
 
     override fun visit(abstractCurve3D: AbstractCurve3D) {
 
-        val points = abstractCurve3D.calculatePointListGlobalCS(parameters.discretizationStepSize)
+        lineString = abstractCurve3D.calculateLineStringGlobalCS(parameters.discretizationStepSize)
             .handleFailure { throw it.error }
-            .ifEmpty { return }
-
-        val coordinatesList = points.flatMap { it.toDoubleList() }
-        val lineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
-        this.lineStringProperty = LineStringProperty(lineString)
     }
 
     override fun visit(abstractSurface3D: AbstractSurface3D) {
