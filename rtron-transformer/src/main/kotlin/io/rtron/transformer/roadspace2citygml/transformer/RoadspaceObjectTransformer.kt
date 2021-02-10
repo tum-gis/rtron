@@ -126,6 +126,13 @@ class RoadspaceObjectTransformer(
                     TransportationModuleBuilder.Feature.ROAD,
                     TransportationModuleBuilder.Type.AUXILARYTRAFFICAREA
                 )
+        if (srcRoadspaceObject.name == "trafficIsland")
+            return _transportationModuleBuilder.createTransportationComplex(
+                geometryTransformer,
+                TransportationModuleBuilder.Feature.ROAD,
+                TransportationModuleBuilder.Type.AUXILARYTRAFFICAREA
+            )
+
             if (srcRoadspaceObject.name == "trafficLight")
                 return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
             if (srcRoadspaceObject.name == "trafficSign")

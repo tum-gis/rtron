@@ -32,7 +32,7 @@ class BuildingModuleBuilder(
     // Methods
     fun createBuildingObject(geometryTransformer: GeometryTransformer): Result<Building, Exception> {
         val building = Building()
-        building.lod1Solid = geometryTransformer.getSolidProperty().handleFailure { return it }
+        building.lod1Solid = geometryTransformer.getSolid().handleFailure { return it }
         return Result.success(building)
     }
 }

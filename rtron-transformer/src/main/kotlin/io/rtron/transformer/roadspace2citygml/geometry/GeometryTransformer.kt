@@ -30,6 +30,8 @@ import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
+import io.rtron.math.std.QUARTER_PI
+import io.rtron.math.std.THREE_QUARTER_PI
 import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
@@ -59,8 +61,8 @@ class GeometryTransformer(
     // Properties and Initializers
     private val _identifierAdder = IdentifierAdder(parameters, reportLogger)
 
-    private lateinit var polygonsForSolid: List<Polygon3D>
-    private lateinit var polygonsForMultiSurface: List<Polygon3D>
+    private lateinit var polygonsOfSolid: List<Polygon3D>
+    private lateinit var polygonsOfSurface: List<Polygon3D>
     private lateinit var lineString: LineString3D
     private lateinit var point: Vector3D
 
@@ -73,13 +75,13 @@ class GeometryTransformer(
     private fun isSetHeight() = !height.isNaN()
     private fun isSetDiameter() = !diameter.isNaN()
 
-    fun getSolidProperty(): Result<SolidProperty, IllegalStateException> {
-        if (!this::polygonsForSolid.isInitialized)
+    fun getSolid(): Result<SolidProperty, IllegalStateException> {
+        if (!this::polygonsOfSolid.isInitialized)
             return Result.error(IllegalStateException("No SolidProperty available for geometry."))
 
         val surfaceMembers = ArrayList<SurfaceProperty>()
 
-        polygonsForSolid.forEach {
+        polygonsOfSolid.forEach {
             val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
             if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
             surfaceMembers.add(SurfaceProperty(polygonGml))
@@ -97,24 +99,15 @@ class GeometryTransformer(
         return Result.success(solidProperty)
     }
 
-    fun getMultiSurfaceProperty(): Result<MultiSurfaceProperty, IllegalStateException> {
-        if (!this::polygonsForMultiSurface.isInitialized)
+    fun getMultiSurface(): Result<MultiSurfaceProperty, IllegalStateException> {
+        if (!this::polygonsOfSurface.isInitialized)
             return Result.error(IllegalStateException("No MultiSurfaceProperty available for geometry."))
 
-        val multiSurface = MultiSurface().apply {
-            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
-        }
-        polygonsForMultiSurface.forEach {
-            val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
-            multiSurface.addSurfaceMember(SurfaceProperty(polygonGml))
-        }
-
-        val multiSurfaceProperty = MultiSurfaceProperty(multiSurface)
+        val multiSurfaceProperty = polygonsToMultiSurfaceProperty(polygonsOfSurface)
         return Result.success(multiSurfaceProperty)
     }
 
-    fun getLineStringProperty(): Result<LineStringProperty, IllegalStateException> {
+    fun getLineString(): Result<LineStringProperty, IllegalStateException> {
         if (!this::lineString.isInitialized)
             return Result.error(IllegalStateException("No LineStringProperty available for geometry."))
 
@@ -125,7 +118,7 @@ class GeometryTransformer(
         return Result.success(lineStringProperty)
     }
 
-    fun getPointProperty(): Result<PointProperty, IllegalStateException> {
+    fun getPoint(): Result<PointProperty, IllegalStateException> {
         if (!this::point.isInitialized)
             return Result.error(IllegalStateException("No PointProperty available for geometry."))
 
@@ -141,13 +134,13 @@ class GeometryTransformer(
 
     /**
      * Returns the available corresponding CityGML [GeometryProperty] in the prioritization order: solid,
-     * multi surface, line string and point
+     * multi surface, line string and point.
      */
     fun getGeometryProperty(): Result<GeometryProperty<*>, IllegalStateException> {
-        getSolidProperty().handleSuccess { return it }
-        getMultiSurfaceProperty().handleSuccess { return it }
-        getLineStringProperty().handleSuccess { return it }
-        getPointProperty().handleSuccess { return it }
+        getSolid().handleSuccess { return it }
+        getMultiSurface().handleSuccess { return it }
+        getLineString().handleSuccess { return it }
+        getPoint().handleSuccess { return it }
         return Result.error(IllegalStateException("No adequate geometry found."))
     }
 
@@ -163,6 +156,61 @@ class GeometryTransformer(
         if (isSetDiameter()) Result.success(diameter)
         else Result.error(IllegalStateException("No diameter available."))
 
+    /**
+     * Types of faces according to their orientation.
+     */
+    enum class FaceType {
+        TOP,
+        SIDE,
+        BASE,
+        NONE
+    }
+
+    /**
+     * Returns the [FaceType] according to the [Polygon3D]'s orientation.
+     */
+    private fun Polygon3D.getType(): FaceType {
+        val angleToZ = getNormal().handleFailure { throw it.error }.angle(Vector3D.Z_AXIS)
+
+        return when {
+            angleToZ < QUARTER_PI -> FaceType.TOP
+            angleToZ in QUARTER_PI..THREE_QUARTER_PI -> FaceType.SIDE
+            THREE_QUARTER_PI < angleToZ -> FaceType.BASE
+            else -> FaceType.NONE
+        }
+    }
+
+    /**
+     * Returns either a cutout of a solid geometry (if it exists) or a [MultiSurfaceProperty] itself (if it exists).
+     *
+     * @param solidFaceSelection list of [FaceType] to be cutout of a solid geometry
+     * @return cutout of a solid geometry or a [MultiSurfaceProperty]
+     */
+    fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Result<MultiSurfaceProperty, IllegalStateException>  {
+        getSolidCutout(*solidFaceSelection).handleSuccess { return it }
+        getMultiSurface().handleSuccess { return it }
+
+        return Result.error(IllegalStateException("No cutout of solid or MultiSurfaceProperty available for geometry."))
+    }
+
+    /**
+     * Returns a [MultiSurfaceProperty] constructed of a solid's polygons which have been filtered by [FaceType].
+     *
+     * @param faceSelection list of relevant [FaceType]
+     * @return [MultiSurfaceProperty] of selected polygons from a solid geometry
+     */
+    fun getSolidCutout(vararg faceSelection: FaceType): Result<MultiSurfaceProperty, IllegalStateException> {
+        if (!this::polygonsOfSolid.isInitialized)
+            return Result.error(IllegalStateException("No MultiSurfaceProperty available for geometry."))
+
+        val filteredPolygons = polygonsOfSolid.filter { polygon -> faceSelection.any { it == polygon.getType() } }
+        if (filteredPolygons.isEmpty())
+            return Result.error(IllegalStateException("No polygons selected for constructing a MultiSurface from a solid geometry."))
+
+        val multiSurfaceProperty = polygonsToMultiSurfaceProperty(filteredPolygons)
+        return Result.success(multiSurfaceProperty)
+    }
+
     override fun visit(vector3D: Vector3D) {
         point = vector3D.calculatePointGlobalCS()
         visit(vector3D as AbstractGeometry3D)
@@ -176,7 +224,7 @@ class GeometryTransformer(
 
     override fun visit(abstractSurface3D: AbstractSurface3D) {
         abstractSurface3D.calculatePolygonsGlobalCS().fold(
-            { this.polygonsForMultiSurface = it },
+            { this.polygonsOfSurface = it },
             { reportLogger.log(it) }
         )
         visit(abstractSurface3D as AbstractGeometry3D)
@@ -190,7 +238,7 @@ class GeometryTransformer(
 
     override fun visit(abstractSolid3D: AbstractSolid3D) {
         abstractSolid3D.calculatePolygonsGlobalCS().fold(
-            { this.polygonsForSolid = it },
+            { this.polygonsOfSolid = it },
             { reportLogger.log(it) }
         )
         visit(abstractSolid3D as AbstractGeometry3D)
@@ -211,6 +259,20 @@ class GeometryTransformer(
 
     override fun visit(abstractGeometry3D: AbstractGeometry3D) {
         this.rotation = abstractGeometry3D.affineSequence.solve().extractRotation()
+    }
+
+    private fun polygonsToMultiSurfaceProperty(polygons: List<Polygon3D>): MultiSurfaceProperty {
+        require(polygons.isNotEmpty()) { "Must contain polygons." }
+
+        val multiSurface = MultiSurface().apply {
+            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
+        }
+        polygons.forEach {
+            val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
+            if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
+            multiSurface.addSurfaceMember(SurfaceProperty(polygonGml))
+        }
+        return MultiSurfaceProperty(multiSurface)
     }
 
     companion object {

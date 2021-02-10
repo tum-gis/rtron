@@ -50,7 +50,7 @@ class TransportationModuleBuilder(
             .also { surface.accept(it) }
         val roadObject = Road()
 
-        roadObject.lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+        roadObject.lod2MultiSurface = geometryTransformer.getMultiSurface().handleFailure { return it }
         return Result.success(roadObject)
     }
 
@@ -59,7 +59,7 @@ class TransportationModuleBuilder(
             .also { surface.accept(it) }
 
         val roadObject = Road()
-        roadObject.lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+        roadObject.lod2MultiSurface = geometryTransformer.getMultiSurface().handleFailure { return it }
         return Result.success(roadObject)
     }
 
@@ -85,21 +85,21 @@ class TransportationModuleBuilder(
             when (type) {
                 Type.TRAFFICAREA -> {
                     val trafficArea = TrafficArea().apply {
-                        lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+                        lod2MultiSurface = geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
                     }
                     val trafficAreaProperty = TrafficAreaProperty(trafficArea)
                     transportationComplex.trafficArea = listOf(trafficAreaProperty)
                 }
                 Type.AUXILARYTRAFFICAREA -> {
                     val auxiliaryTrafficArea = AuxiliaryTrafficArea().apply {
-                        lod2MultiSurface = geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+                        lod2MultiSurface = geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
                     }
                     val auxiliaryTrafficAreaProperty = AuxiliaryTrafficAreaProperty(auxiliaryTrafficArea)
                     transportationComplex.auxiliaryTrafficArea = listOf(auxiliaryTrafficAreaProperty)
                 }
                 else ->
                     transportationComplex.lod2MultiSurface =
-                        geometryTransformer.getMultiSurfaceProperty().handleFailure { return it }
+                        geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
             }
 
             return Result.success(transportationComplex)
