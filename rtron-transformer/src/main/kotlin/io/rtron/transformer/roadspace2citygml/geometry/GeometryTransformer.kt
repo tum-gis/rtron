@@ -186,7 +186,7 @@ class GeometryTransformer(
      * @param solidFaceSelection list of [FaceType] to be cutout of a solid geometry
      * @return cutout of a solid geometry or a [MultiSurfaceProperty]
      */
-    fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Result<MultiSurfaceProperty, IllegalStateException>  {
+    fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Result<MultiSurfaceProperty, IllegalStateException> {
         getSolidCutout(*solidFaceSelection).handleSuccess { return it }
         getMultiSurface().handleSuccess { return it }
 
