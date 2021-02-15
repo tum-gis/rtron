@@ -52,6 +52,9 @@ theme:
         - type: 'page'
           title: "Architecture of r:trån"
           itemId: 'Architecture of r:trån'
+        - type: 'page'
+          title: "Feature Support of OpenDRIVE"
+          itemId: 'Feature Support of OpenDRIVE'
         - type: 'separator'
         - type: 'sourcedocModules'
           moduleType:  'kotlindoc'
