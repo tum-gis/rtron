@@ -5,7 +5,10 @@ title: Feature Support of OpenDRIVE
 # Feature Support of OpenDRIVE
 
 In the following a list of OpenDRIVE features supported by r:trån is provided.
-The new Transportation module of CityGML 3.0 will enable a range of new functions including the representation of traffic spaces together with lane topologies [[1](https://doi.org/https://doi.org/10.3390/ijgi9100603), [2](https://doi.org/10.1007/s41064-020-00095-z)].
+The new Transportation module of CityGML 3.0 will enable a range of new functions including the representation of traffic spaces together with detailed lane topologies [[1](https://doi.org/https://doi.org/10.3390/ijgi9100603), [2](https://doi.org/10.1007/s41064-020-00095-z)].
+
+Currently, there is tested support for OpenDRIVE version 1.4, although other versions can also be read and processed experimentally.
+Full support for further versions can be conveniently added due to the [architecture](architecture) of r:trån.
 
 ### Geometry
 
@@ -43,7 +46,10 @@ The new Transportation module of CityGML 3.0 will enable a range of new function
 
 ### Objects
 
-- repeating objects 🟡
+Depending on the availability and characteristic of the parametric OpenDRIVE geometries, [B-Rep](https://en.wikipedia.org/wiki/Boundary_representation) representations are generated.
+Thereby, several geometry corrections are applied (removal of invalid vertices, consecutively following vertex duplicates, ...) and then mapped onto the rich geometry model of [GML](https://www.ogc.org/standards/gml).
+
+- repeating objects 🟡 (almost all supported except rarely used horizontal and vertically repeated linear rings)
 - object outlines 🟢
   - corner roads 🟢
   - corner locals 🟢
