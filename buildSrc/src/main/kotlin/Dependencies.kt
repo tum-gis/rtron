@@ -37,8 +37,8 @@ object DependencyVersions {
 
     // object creation
     const val jakartaActivationApi = "2.0.0"
-    const val jakartaXmlBindApi = "2.3.3"
-    const val jaxb = "2.3.3"
+    const val jakartaXmlBindApi = "3.0.0"
+    const val jaxb = "3.0.0"
 
     // object mapping
     const val mapstruct = "1.4.2.Final"
@@ -60,7 +60,7 @@ object DependencyVersions {
 
     // geo
     const val proj4 = "1.1.1"
-    const val citygml4j = "2.11.2"
+    const val citygml4j = "3.0.0-rc.2"
 }
 
 object Dependencies {
@@ -84,6 +84,7 @@ object Dependencies {
     // object creation
     const val jakartaActivationApi = "jakarta.activation:jakarta.activation-api:${DependencyVersions.jakartaActivationApi}"
     const val jakartaXmlBindApi = "jakarta.xml.bind:jakarta.xml.bind-api:${DependencyVersions.jakartaXmlBindApi}"
+    const val sunJaxbImpl = "com.sun.xml.bind:jaxb-impl:${DependencyVersions.jaxb}"
     const val jaxbRuntime = "org.glassfish.jaxb:jaxb-runtime:${DependencyVersions.jaxb}"
     const val jaxbXjc = "org.glassfish.jaxb:jaxb-xjc:${DependencyVersions.jaxb}"
 

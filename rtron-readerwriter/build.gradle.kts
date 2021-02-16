@@ -13,6 +13,8 @@ dependencies {
     implementation(project(ProjectComponents.inputOutput))
     implementation(project(ProjectComponents.model))
 
+    implementation(Dependencies.jakartaXmlBindApi)
+    implementation(Dependencies.sunJaxbImpl)
     xjc(Dependencies.jakartaXmlBindApi)
     xjc(Dependencies.jaxbRuntime)
     xjc(Dependencies.jaxbXjc)

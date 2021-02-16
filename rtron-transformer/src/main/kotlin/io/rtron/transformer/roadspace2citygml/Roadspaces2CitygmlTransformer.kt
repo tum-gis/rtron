@@ -32,11 +32,9 @@ import io.rtron.transformer.roadspace2citygml.transformer.RoadspaceObjectTransfo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import org.citygml4j.model.citygml.core.AbstractCityObject
-import org.citygml4j.model.citygml.core.CityModel
-import org.citygml4j.model.citygml.core.CityObjectMember
-import org.citygml4j.model.gml.basicTypes.Code
-import org.citygml4j.util.bbox.BoundingBoxOptions
+import org.citygml4j.model.core.AbstractCityObject
+import org.xmlobjects.gml.model.feature.BoundingShape
+import org.xmlobjects.gml.model.geometry.Envelope
 
 /**
  * Transformer from the RoadSpaces data model to CityGML.
@@ -64,10 +62,6 @@ class Roadspaces2CitygmlTransformer(
      */
     fun transform(roadspacesModel: RoadspacesModel): CitygmlModel {
 
-        // general model setup
-        val cityModel = CityModel()
-        cityModel.name = listOf(Code(roadspacesModel.id.modelName))
-
         // transformation of each road space
         _reportLogger.info("Transforming roads spaces with ${configuration.parameters}.")
         val progressBar = ProgressBar("Transforming road spaces", roadspacesModel.roadspaces.size)
@@ -75,14 +69,10 @@ class Roadspaces2CitygmlTransformer(
             transformRoadspacesConcurrently(roadspacesModel.roadspaces.values.toList(), roadspacesModel.laneTopology, progressBar)
         else transformRoadspacesSequentially(roadspacesModel.roadspaces.values.toList(), roadspacesModel.laneTopology, progressBar)
 
-        abstractCityObjects
-            .map { CityObjectMember(it) }
-            .forEach { cityModel.addCityObjectMember(it) }
-
         // create CityGML model
-        this.calculateBoundedBy(roadspacesModel.header.coordinateReferenceSystem, cityModel)
+        val boundingShape = calculateBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
         _reportLogger.info("Completed transformation: RoadspacesModel -> CitygmlModel. ✔")
-        return CitygmlModel(cityModel)
+        return CitygmlModel(roadspacesModel.id.modelName, boundingShape, abstractCityObjects)
     }
 
     private fun transformRoadspacesSequentially(
@@ -121,12 +111,10 @@ class Roadspaces2CitygmlTransformer(
             _roadLanesTransformer.transformRoadMarkings(srcRoadspace.road) +
             _roadObjectTransformer.transformRoadspaceObjects(srcRoadspace.roadspaceObjects)
 
-    private fun calculateBoundedBy(srcCrs: Result<CoordinateReferenceSystem, Exception>, dstCityModel: CityModel) {
-        if (dstCityModel.cityObjectMember.isEmpty()) return
-
-        dstCityModel.boundedBy = dstCityModel.calcBoundedBy(BoundingBoxOptions.defaults())
-        if (dstCityModel.boundedBy != null)
-            srcCrs.success { dstCityModel.boundedBy.envelope.srsName = it.srsName }
-        else _reportLogger.warn("BoundedBy was not calculated correctly.")
+    private fun calculateBoundingShape(srcAbstractCityObjects: List<AbstractCityObject>, srcCrs: Result<CoordinateReferenceSystem, Exception>): BoundingShape {
+        val envelope = Envelope()
+        srcCrs.success { envelope.srsName = it.srsName }
+        srcAbstractCityObjects.forEach { envelope.include(it.computeEnvelope()) }
+        return BoundingShape(envelope)
     }
 }

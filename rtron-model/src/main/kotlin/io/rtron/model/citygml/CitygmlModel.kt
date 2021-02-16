@@ -17,14 +17,19 @@
 package io.rtron.model.citygml
 
 import io.rtron.model.AbstractModel
-import org.citygml4j.model.citygml.core.CityModel
+import org.citygml4j.model.core.AbstractCityObject
+import org.xmlobjects.gml.model.feature.BoundingShape
 
 /**
  * Implementation of the CityGML data model according to version 2.0.
  * See the [official page](https://www.ogc.org/standards/citygml) from the Open Geospatial Consortium (OGC) for more.
  *
- * @param cityModel implementation of the data model by citygml4j
+ * @param name name of the model
+ * @param boundingShape bounding shape containing coordinate reference system
+ * @param cityObjects list of city objects
  */
 class CitygmlModel(
-    val cityModel: CityModel
+    val name: String,
+    val boundingShape: BoundingShape,
+    val cityObjects: List<AbstractCityObject>
 ) : AbstractModel()

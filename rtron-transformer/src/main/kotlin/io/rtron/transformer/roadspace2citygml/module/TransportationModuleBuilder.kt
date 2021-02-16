@@ -21,15 +21,19 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
-import org.citygml4j.model.citygml.transportation.AuxiliaryTrafficArea
-import org.citygml4j.model.citygml.transportation.AuxiliaryTrafficAreaProperty
-import org.citygml4j.model.citygml.transportation.Railway
-import org.citygml4j.model.citygml.transportation.Road
-import org.citygml4j.model.citygml.transportation.Square
-import org.citygml4j.model.citygml.transportation.Track
-import org.citygml4j.model.citygml.transportation.TrafficArea
-import org.citygml4j.model.citygml.transportation.TrafficAreaProperty
-import org.citygml4j.model.citygml.transportation.TransportationComplex
+import org.citygml4j.model.core.AbstractSpaceBoundaryProperty
+import org.citygml4j.model.transportation.AbstractTransportationSpace
+import org.citygml4j.model.transportation.AuxiliaryTrafficArea
+import org.citygml4j.model.transportation.AuxiliaryTrafficSpace
+import org.citygml4j.model.transportation.AuxiliaryTrafficSpaceProperty
+import org.citygml4j.model.transportation.GranularityValue
+import org.citygml4j.model.transportation.Railway
+import org.citygml4j.model.transportation.Road
+import org.citygml4j.model.transportation.Square
+import org.citygml4j.model.transportation.Track
+import org.citygml4j.model.transportation.TrafficArea
+import org.citygml4j.model.transportation.TrafficSpace
+import org.citygml4j.model.transportation.TrafficSpaceProperty
 
 /**
  * Builder for city objects of the CityGML Transportation module.
@@ -38,7 +42,7 @@ class TransportationModuleBuilder(
     val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
-    enum class Feature { TRACK, ROAD, RAILWAY, SQUARE, NONE }
+    enum class Feature { TRACK, ROAD, RAILWAY, SQUARE }
     enum class Type { TRAFFICAREA, AUXILARYTRAFFICAREA, NONE }
 
     // Properties and Initializers
@@ -63,45 +67,40 @@ class TransportationModuleBuilder(
         return Result.success(roadObject)
     }
 
-    fun createTransportationComplex(surface: AbstractSurface3D, feature: Feature, type: Type = Type.NONE):
-        Result<TransportationComplex, Exception> {
+    fun createTransportationSpace(geometryTransformer: GeometryTransformer, feature: Feature, type: Type = Type.NONE):
+        Result<AbstractTransportationSpace, Exception> {
 
-            val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
-                .also { surface.accept(it) }
-            return createTransportationComplex(geometryTransformer, feature, type)
-        }
-
-    fun createTransportationComplex(geometryTransformer: GeometryTransformer, feature: Feature, type: Type = Type.NONE):
-        Result<TransportationComplex, Exception> {
-
-            val transportationComplex = when (feature) {
+            val transportationSpace = when (feature) {
                 Feature.TRACK -> Track()
                 Feature.ROAD -> Road()
                 Feature.RAILWAY -> Railway()
                 Feature.SQUARE -> Square()
-                Feature.NONE -> TransportationComplex()
             }
 
             when (type) {
                 Type.TRAFFICAREA -> {
-                    val trafficArea = TrafficArea().apply {
-                        lod2MultiSurface = geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
-                    }
-                    val trafficAreaProperty = TrafficAreaProperty(trafficArea)
-                    transportationComplex.trafficArea = listOf(trafficAreaProperty)
+                    val trafficArea = TrafficArea()
+                    trafficArea.lod2MultiSurface = geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
+                    val spaceBoundary = AbstractSpaceBoundaryProperty(trafficArea)
+
+                    val trafficSpace = TrafficSpace().apply { addBoundary(spaceBoundary) }
+                    trafficSpace.granularity = GranularityValue.LANE
+                    transportationSpace.trafficSpaces = listOf(TrafficSpaceProperty(trafficSpace))
                 }
                 Type.AUXILARYTRAFFICAREA -> {
-                    val auxiliaryTrafficArea = AuxiliaryTrafficArea().apply {
-                        lod2MultiSurface = geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
-                    }
-                    val auxiliaryTrafficAreaProperty = AuxiliaryTrafficAreaProperty(auxiliaryTrafficArea)
-                    transportationComplex.auxiliaryTrafficArea = listOf(auxiliaryTrafficAreaProperty)
+                    val auxiliaryTrafficArea = AuxiliaryTrafficArea()
+                    auxiliaryTrafficArea.lod2MultiSurface = geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
+                    val spaceBoundary = AbstractSpaceBoundaryProperty(auxiliaryTrafficArea)
+
+                    val auxiliaryTrafficSpace = AuxiliaryTrafficSpace().apply { addBoundary(spaceBoundary) }
+                    auxiliaryTrafficSpace.granularity = GranularityValue.LANE
+                    transportationSpace.auxiliaryTrafficSpaces = listOf(AuxiliaryTrafficSpaceProperty(auxiliaryTrafficSpace))
                 }
                 else ->
-                    transportationComplex.lod2MultiSurface =
+                    transportationSpace.lod2MultiSurface =
                         geometryTransformer.getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE).handleFailure { return it }
             }
 
-            return Result.success(transportationComplex)
+            return Result.success(transportationSpace)
         }
 }

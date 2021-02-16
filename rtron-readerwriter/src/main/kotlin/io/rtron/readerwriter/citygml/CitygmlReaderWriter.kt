@@ -22,15 +22,16 @@ import io.rtron.model.AbstractModel
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.AbstractReaderWriter
 import org.citygml4j.CityGMLContext
-import org.citygml4j.model.module.citygml.CityGMLVersion
+import org.citygml4j.model.CityGMLVersion
+import org.citygml4j.xml.module.citygml.CoreModule
+import java.nio.charset.StandardCharsets
 
 class CitygmlReaderWriter(
     override val configuration: CitygmlReaderWriterConfiguration
 ) : AbstractReaderWriter(configuration) {
 
     // Properties and Initializers
-    private val _citygmlContext = CityGMLContext.getInstance()
-    private val _builder = _citygmlContext.createCityGMLBuilder()!!
+    private val _citygmlContext = CityGMLContext.newInstance()
 
     // Methods
     override fun isSupported(fileExtension: String) = fileExtension in supportedFileExtensions
@@ -43,14 +44,21 @@ class CitygmlReaderWriter(
     override fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
         require(model is CitygmlModel) { "$this received not a CitygmlModel." }
 
-        val out = _builder.createCityGMLOutputFactory(CityGMLVersion.DEFAULT)
+        val version = CityGMLVersion.v2_0
+        val out = _citygmlContext.createCityGMLOutputFactory(version)!!
         val path = directoryPath.resolve(Path("${directoryPath.fileName}.gml"))
-        val writer = out.createCityGMLWriter(path.toFileJ(), "UTF-8")!!
 
-        writer.setPrefixes(CityGMLVersion.DEFAULT)
-        writer.setSchemaLocations(CityGMLVersion.DEFAULT)
-        writer.indentString = "  "
-        writer.write(model.cityModel)
+        val writer = out.createCityGMLChunkWriter(path.toFileJ(), StandardCharsets.UTF_8.name())
+        writer.apply {
+            withIndentString("  ")
+            withDefaultSchemaLocations()
+            withDefaultPrefixes()
+            withDefaultNamespace(CoreModule.of(version).namespaceURI)
+            cityModelInfo.boundedBy = model.boundingShape
+        }
+        model.cityObjects.forEach {
+            writer.writeMember(it)
+        }
         writer.close()
 
         return Result.success(listOf(path))

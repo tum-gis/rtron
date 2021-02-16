@@ -27,14 +27,15 @@ import io.rtron.model.roadspaces.roadspace.attribute.StringAttribute
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
-import org.citygml4j.model.citygml.core.AbstractCityObject
-import org.citygml4j.model.citygml.generics.AbstractGenericAttribute
-import org.citygml4j.model.gml.basicTypes.Measure
-import org.citygml4j.model.citygml.generics.DoubleAttribute as GmlDoubleAttribute
-import org.citygml4j.model.citygml.generics.GenericAttributeSet as GmlGenericAttributeSet
-import org.citygml4j.model.citygml.generics.IntAttribute as GmlIntAttribute
-import org.citygml4j.model.citygml.generics.MeasureAttribute as GmlMeasureAttribute
-import org.citygml4j.model.citygml.generics.StringAttribute as GmlStringAttribute
+import org.citygml4j.model.core.AbstractCityObject
+import org.citygml4j.model.core.AbstractGenericAttribute
+import org.citygml4j.model.core.AbstractGenericAttributeProperty
+import org.xmlobjects.gml.model.basictypes.Measure
+import org.citygml4j.model.generics.DoubleAttribute as GmlDoubleAttribute
+import org.citygml4j.model.generics.GenericAttributeSet as GmlGenericAttributeSet
+import org.citygml4j.model.generics.IntAttribute as GmlIntAttribute
+import org.citygml4j.model.generics.MeasureAttribute as GmlMeasureAttribute
+import org.citygml4j.model.generics.StringAttribute as GmlStringAttribute
 
 /**
  * Adds [Attribute] and [AttributeList] classes (RoadSpaces model) to an [AbstractCityObject] (CityGML model).
@@ -61,10 +62,10 @@ class AttributesAdder(
      * Adds an [attributeList] to the [dstCityObject].
      */
     fun addAttributes(attributeList: AttributeList, dstCityObject: AbstractCityObject) {
-        attributeList.attributes
+        dstCityObject.genericAttributes = dstCityObject.genericAttributes + attributeList.attributes
             .filter { it.isNotEmpty() }
             .flatMap { convertAttribute(it) }
-            .forEach { dstCityObject.addGenericAttribute(it) }
+            .map { AbstractGenericAttributeProperty(it) }
     }
 
     /**
@@ -74,7 +75,7 @@ class AttributesAdder(
      * @param attribute attribute to be converted a
      * @return list of CityGML attributes
      */
-    private fun convertAttribute(attribute: Attribute): List<AbstractGenericAttribute> =
+    private fun convertAttribute(attribute: Attribute): List<AbstractGenericAttribute<*>> =
         when (attribute) {
             is StringAttribute -> listOf(GmlStringAttribute(attribute.name, attribute.value))
             is IntAttribute -> listOf(GmlIntAttribute(attribute.name, attribute.value))
@@ -90,7 +91,7 @@ class AttributesAdder(
                 val attributes = attribute.attributes.flatMap { convertAttribute(it) }
 
                 if (parameters.flattenGenericAttributeSets) attributes
-                else listOf(GmlGenericAttributeSet(attribute.name, attributes))
+                else listOf(GmlGenericAttributeSet(attribute.name, attributes.map { AbstractGenericAttributeProperty(it) }))
             }
         }
 }

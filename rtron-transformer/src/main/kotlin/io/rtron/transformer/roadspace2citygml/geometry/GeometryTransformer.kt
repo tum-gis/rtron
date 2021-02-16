@@ -36,17 +36,18 @@ import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
 import io.rtron.transformer.roadspace2citygml.transformer.IdentifierAdder
-import org.citygml4j.factory.GMLGeometryFactory
-import org.citygml4j.model.gml.geometry.GeometryProperty
-import org.citygml4j.model.gml.geometry.aggregates.MultiSurface
-import org.citygml4j.model.gml.geometry.aggregates.MultiSurfaceProperty
-import org.citygml4j.model.gml.geometry.complexes.CompositeSurface
-import org.citygml4j.model.gml.geometry.primitives.LineStringProperty
-import org.citygml4j.model.gml.geometry.primitives.Point
-import org.citygml4j.model.gml.geometry.primitives.PointProperty
-import org.citygml4j.model.gml.geometry.primitives.Solid
-import org.citygml4j.model.gml.geometry.primitives.SolidProperty
-import org.citygml4j.model.gml.geometry.primitives.SurfaceProperty
+import org.citygml4j.util.geometry.GeometryFactory
+import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve
+import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty
+import org.xmlobjects.gml.model.geometry.aggregates.MultiSurface
+import org.xmlobjects.gml.model.geometry.aggregates.MultiSurfaceProperty
+import org.xmlobjects.gml.model.geometry.primitives.CurveProperty
+import org.xmlobjects.gml.model.geometry.primitives.Point
+import org.xmlobjects.gml.model.geometry.primitives.PointProperty
+import org.xmlobjects.gml.model.geometry.primitives.Shell
+import org.xmlobjects.gml.model.geometry.primitives.Solid
+import org.xmlobjects.gml.model.geometry.primitives.SolidProperty
+import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty
 
 /**
  * Generates a surface based geometry representation for CityGML by visiting the geometry class.
@@ -79,22 +80,15 @@ class GeometryTransformer(
         if (!this::polygonsOfSolid.isInitialized)
             return Result.error(IllegalStateException("No SolidProperty available for geometry."))
 
-        val surfaceMembers = ArrayList<SurfaceProperty>()
-
-        polygonsOfSolid.forEach {
-            val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
+        val gmlPolygons = polygonsOfSolid.map {
+            val polygonGml = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
             if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
-            surfaceMembers.add(SurfaceProperty(polygonGml))
-        }
-        val compositeSurface = CompositeSurface().apply {
-            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
-            surfaceMember = surfaceMembers
+            SurfaceProperty(polygonGml)
         }
 
-        val solid = Solid().apply {
-            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
-            exterior = SurfaceProperty(compositeSurface)
-        }
+        val solid = Solid(Shell(gmlPolygons))
+        if (parameters.generateRandomGeometryIds) solid.id = _identifierAdder.generateRandomUUID()
+
         val solidProperty = SolidProperty(solid)
         return Result.success(solidProperty)
     }
@@ -107,15 +101,17 @@ class GeometryTransformer(
         return Result.success(multiSurfaceProperty)
     }
 
-    fun getLineString(): Result<LineStringProperty, IllegalStateException> {
+    fun getMultiCurve(): Result<MultiCurveProperty, IllegalStateException> {
         if (!this::lineString.isInitialized)
-            return Result.error(IllegalStateException("No LineStringProperty available for geometry."))
+            return Result.error(IllegalStateException("No MultiCurveProperty available for geometry."))
 
         val coordinatesList = lineString.vertices.flatMap { it.toDoubleList() }
         val lineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
-        val lineStringProperty = LineStringProperty(lineString)
+        val curveProperty = CurveProperty(lineString)
+        val multiCurve = MultiCurve(listOf(curveProperty))
 
-        return Result.success(lineStringProperty)
+        val multiCurveProperty = MultiCurveProperty(multiCurve)
+        return Result.success(multiCurveProperty)
     }
 
     fun getPoint(): Result<PointProperty, IllegalStateException> {
@@ -130,18 +126,6 @@ class GeometryTransformer(
         }
         val pointProperty = PointProperty(point)
         return Result.success(pointProperty)
-    }
-
-    /**
-     * Returns the available corresponding CityGML [GeometryProperty] in the prioritization order: solid,
-     * multi surface, line string and point.
-     */
-    fun getGeometryProperty(): Result<GeometryProperty<*>, IllegalStateException> {
-        getSolid().handleSuccess { return it }
-        getMultiSurface().handleSuccess { return it }
-        getLineString().handleSuccess { return it }
-        getPoint().handleSuccess { return it }
-        return Result.error(IllegalStateException("No adequate geometry found."))
     }
 
     fun getRotation(): Result<Rotation3D, IllegalStateException> =
@@ -264,19 +248,19 @@ class GeometryTransformer(
     private fun polygonsToMultiSurfaceProperty(polygons: List<Polygon3D>): MultiSurfaceProperty {
         require(polygons.isNotEmpty()) { "Must contain polygons." }
 
-        val multiSurface = MultiSurface().apply {
-            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
+        val surfaceProperties = polygons.map {
+            val gmlPolygon = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
+            if (parameters.generateRandomGeometryIds) gmlPolygon.id = _identifierAdder.generateRandomUUID()
+            SurfaceProperty(gmlPolygon)
         }
-        polygons.forEach {
-            val polygonGml = geometryFactory.createLinearPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
-            multiSurface.addSurfaceMember(SurfaceProperty(polygonGml))
-        }
+
+        val multiSurface = MultiSurface(surfaceProperties)
+        if (parameters.generateRandomGeometryIds) multiSurface.id = _identifierAdder.generateRandomUUID()
         return MultiSurfaceProperty(multiSurface)
     }
 
     companion object {
-        private val geometryFactory = GMLGeometryFactory()
+        private val geometryFactory = GeometryFactory.newInstance()
         private const val DIMENSION = 3
     }
 }

@@ -30,8 +30,8 @@ import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspace2citygml.module.TransportationModuleBuilder
 import io.rtron.transformer.roadspace2citygml.module.VegetationModuleBuilder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
-import org.citygml4j.model.citygml.core.AbstractCityObject
-import org.citygml4j.model.citygml.core.CityModel
+import org.citygml4j.model.core.AbstractCityObject
+import org.citygml4j.model.core.CityModel
 
 /**
  * Transforms [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
@@ -100,34 +100,34 @@ class RoadspaceObjectTransformer(
             if (srcRoadspaceObject.name == "bench")
                 return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
             if (srcRoadspaceObject.name == "bus")
-                return _transportationModuleBuilder.createTransportationComplex(
+                return _transportationModuleBuilder.createTransportationSpace(
                     geometryTransformer,
                     TransportationModuleBuilder.Feature.ROAD
                 )
             if (srcRoadspaceObject.name == "controllerBox")
                 return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
             if (srcRoadspaceObject.name == "crossWalk")
-                return _transportationModuleBuilder.createTransportationComplex(
+                return _transportationModuleBuilder.createTransportationSpace(
                     geometryTransformer,
                     TransportationModuleBuilder.Feature.ROAD
                 )
             if (srcRoadspaceObject.name == "fence")
                 return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
             if (srcRoadspaceObject.name == "noParkingArea")
-                return _transportationModuleBuilder.createTransportationComplex(
+                return _transportationModuleBuilder.createTransportationSpace(
                     geometryTransformer,
                     TransportationModuleBuilder.Feature.ROAD
                 )
             if (srcRoadspaceObject.name == "railing")
                 return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
             if (srcRoadspaceObject.name == "raisedMedian")
-                return _transportationModuleBuilder.createTransportationComplex(
+                return _transportationModuleBuilder.createTransportationSpace(
                     geometryTransformer,
                     TransportationModuleBuilder.Feature.ROAD,
                     TransportationModuleBuilder.Type.AUXILARYTRAFFICAREA
                 )
             if (srcRoadspaceObject.name == "trafficIsland")
-                return _transportationModuleBuilder.createTransportationComplex(
+                return _transportationModuleBuilder.createTransportationSpace(
                     geometryTransformer,
                     TransportationModuleBuilder.Feature.ROAD,
                     TransportationModuleBuilder.Type.AUXILARYTRAFFICAREA

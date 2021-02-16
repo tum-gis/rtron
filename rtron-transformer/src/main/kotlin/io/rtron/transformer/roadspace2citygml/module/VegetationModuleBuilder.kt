@@ -21,11 +21,12 @@ import com.github.kittinunf.result.success
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.roadspace2citygml.geometry.populateLod1Geometries
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import io.rtron.transformer.roadspace2citygml.transformer.toGmlString
-import org.citygml4j.model.citygml.vegetation.SolitaryVegetationObject
-import org.citygml4j.model.gml.measures.Length
+import org.citygml4j.model.vegetation.SolitaryVegetationObject
+import org.xmlobjects.gml.model.measures.Length
 
 /**
  * Builder for city objects of the CityGML Vegetation module.
@@ -42,9 +43,7 @@ class VegetationModuleBuilder(
     fun createVegetationObject(geometryTransformer: GeometryTransformer): Result<SolitaryVegetationObject, Exception> {
         val solitaryVegetationObject = SolitaryVegetationObject()
 
-        solitaryVegetationObject.lod1Geometry = geometryTransformer
-            .getGeometryProperty()
-            .handleFailure { return it }
+        solitaryVegetationObject.populateLod1Geometries(geometryTransformer).handleFailure { return it }
         geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, solitaryVegetationObject) }
 
         addAttributes(solitaryVegetationObject, geometryTransformer)

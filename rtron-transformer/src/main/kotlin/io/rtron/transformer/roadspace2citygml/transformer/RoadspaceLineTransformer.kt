@@ -22,8 +22,8 @@ import io.rtron.std.Optional
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
-import org.citygml4j.model.citygml.core.AbstractCityObject
-import org.citygml4j.model.citygml.core.CityModel
+import org.citygml4j.model.core.AbstractCityObject
+import org.citygml4j.model.core.CityModel
 
 /**
  * Transforms lines, such as lane boundaries and center lines (RoadSpaces model), to the [CityModel] (CityGML model).

@@ -23,9 +23,10 @@ import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.roadspace2citygml.geometry.populateLod2Geometries
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
-import org.citygml4j.model.citygml.generics.GenericCityObject
+import org.citygml4j.model.generics.GenericOccupiedSpace
 
 /**
  * Builder for city objects of the CityGML Generics module.
@@ -39,24 +40,23 @@ class GenericsModuleBuilder(
     private val _attributesAdder = AttributesAdder(configuration.parameters)
 
     // Methods
-    fun createGenericObject(curve3D: AbstractCurve3D): Result<GenericCityObject, Exception> {
+    fun createGenericObject(curve3D: AbstractCurve3D): Result<GenericOccupiedSpace, Exception> {
         val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
             .also { curve3D.accept(it) }
         return createGenericObject(geometryTransformer)
     }
 
-    fun createGenericObject(abstractGeometry3D: AbstractGeometry3D): Result<GenericCityObject, Exception> {
+    fun createGenericObject(abstractGeometry3D: AbstractGeometry3D): Result<GenericOccupiedSpace, Exception> {
         val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
             .also { abstractGeometry3D.accept(it) }
         return createGenericObject(geometryTransformer)
     }
 
-    fun createGenericObject(geometryTransformer: GeometryTransformer): Result<GenericCityObject, Exception> {
-        val genericCityObject = GenericCityObject()
-        genericCityObject.lod2Geometry = geometryTransformer.getGeometryProperty()
-            .handleFailure { return it }
-        geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, genericCityObject) }
+    fun createGenericObject(geometryTransformer: GeometryTransformer): Result<GenericOccupiedSpace, Exception> {
+        val genericCityObject = GenericOccupiedSpace()
+        genericCityObject.populateLod2Geometries(geometryTransformer).handleFailure { return it }
 
+        geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, genericCityObject) }
         return Result.success(genericCityObject)
     }
 }

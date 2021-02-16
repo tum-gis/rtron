@@ -30,10 +30,10 @@ import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspace2citygml.module.TransportationModuleBuilder
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
-import org.citygml4j.model.citygml.core.AbstractCityObject
-import org.citygml4j.model.citygml.core.CityModel
-import org.citygml4j.model.citygml.generics.GenericCityObject
-import org.citygml4j.model.citygml.transportation.Road as CitygmlRoad
+import org.citygml4j.model.core.AbstractCityObject
+import org.citygml4j.model.core.CityModel
+import org.citygml4j.model.generics.GenericOccupiedSpace
+import org.citygml4j.model.transportation.Road as CitygmlRoad
 
 /**
  * Transforms [Road] classes (RoadSpaces model) to the [CityModel] (CityGML model).
@@ -116,9 +116,9 @@ class RoadsTransformer(
             .handleAndRemoveFailure { _reportLogger.log(it) }
 
     /**
-     * Transforms road markings of a [Road] class (RoadSpaces model) to the [GenericCityObject] (CityGML model).
+     * Transforms road markings of a [Road] class (RoadSpaces model) to the [GenericOccupiedSpace] (CityGML model).
      */
-    fun transformRoadMarkings(srcRoad: Road): List<GenericCityObject> =
+    fun transformRoadMarkings(srcRoad: Road): List<GenericOccupiedSpace> =
         srcRoad.getAllRoadMarkings(configuration.parameters.discretizationStepSize)
             .handleAndRemoveFailure { _reportLogger.log(it) }
             .map { transformRoadMarking(it.first, "RoadMarking", it.second, it.third) }
@@ -129,7 +129,7 @@ class RoadsTransformer(
         name: String,
         geometry: AbstractGeometry3D,
         attributes: AttributeList
-    ): Result<GenericCityObject, Exception> {
+    ): Result<GenericOccupiedSpace, Exception> {
 
         val genericCityObject = _genericsModuleBuilder
             .createGenericObject(geometry)
@@ -165,7 +165,7 @@ class RoadsTransformer(
     }
 
     private fun transformLaneLine(id: LaneIdentifier, name: String, curve: AbstractCurve3D, attributes: AttributeList):
-        Result<GenericCityObject, Exception> {
+        Result<GenericOccupiedSpace, Exception> {
 
             val roadObject = _genericsModuleBuilder
                 .createGenericObject(curve)

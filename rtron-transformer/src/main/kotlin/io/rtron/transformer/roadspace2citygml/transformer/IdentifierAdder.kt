@@ -21,9 +21,9 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
-import org.citygml4j.model.citygml.core.AbstractCityObject
-import org.citygml4j.model.gml.basicTypes.Code
-import org.citygml4j.util.gmlid.DefaultGMLIdManager
+import org.citygml4j.model.core.AbstractCityObject
+import org.xmlobjects.gml.model.basictypes.Code
+import org.xmlobjects.gml.util.id.DefaultIdCreator
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -37,8 +37,8 @@ class IdentifierAdder(
 
     // Properties and Initializers
     private val _checkedIdPrefix by lazy {
-        if (!DefaultGMLIdManager.getInstance()!!.isValidPrefix(parameters.gmlIdPrefix))
-            reportLogger.warnOnce("Unvalid ID prefix configured: ${parameters.gmlIdPrefix}")
+        if (!DefaultIdCreator.newInstance()!!.isValidPrefix(parameters.gmlIdPrefix))
+            reportLogger.warnOnce("Invalid ID prefix configured: ${parameters.gmlIdPrefix}")
         parameters.gmlIdPrefix
     }
 
@@ -53,7 +53,7 @@ class IdentifierAdder(
     fun addIdentifier(id: RoadspaceIdentifier, name: String, dstCityObject: AbstractCityObject) {
         val hashKey = name + '_' + id.roadspaceId + '_' + id.modelIdentifier.fileHashSha256
         dstCityObject.id = generateHashUUID(hashKey)
-        dstCityObject.addName(Code(name))
+        dstCityObject.names = listOf(Code(name))
     }
 
     /**
@@ -65,7 +65,7 @@ class IdentifierAdder(
             id.roadspaceIdentifier.modelIdentifier.fileHashSha256
 
         dstCityObject.id = generateHashUUID(hashKey)
-        dstCityObject.addName(Code(id.roadspaceObjectName))
+        dstCityObject.names = listOf(Code(id.roadspaceObjectName))
     }
 
     /**
@@ -79,7 +79,7 @@ class IdentifierAdder(
             id.laneSectionIdentifier.roadspaceIdentifier.modelIdentifier.fileHashSha256
 
         dstCityObject.id = generateHashUUID(hashKey)
-        dstCityObject.addName(Code(name))
+        dstCityObject.names = listOf(Code(name))
     }
 
     /**
