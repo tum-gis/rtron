@@ -20,7 +20,7 @@ import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspace2citygml.geometry.populateLod1Geometries
+import io.rtron.transformer.roadspace2citygml.geometry.populateLod2Geometries
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import org.citygml4j.model.cityfurniture.CityFurniture
@@ -38,7 +38,7 @@ class CityFurnitureModuleBuilder(
     // Methods
     fun createCityFurnitureObject(geometryTransformer: GeometryTransformer): Result<CityFurniture, Exception> {
         val cityFurnitureObject = CityFurniture()
-        cityFurnitureObject.populateLod1Geometries(geometryTransformer).handleFailure { return it }
+        cityFurnitureObject.populateLod2Geometries(geometryTransformer).handleFailure { return it }
         geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, cityFurnitureObject) }
 
         return Result.success(cityFurnitureObject)
