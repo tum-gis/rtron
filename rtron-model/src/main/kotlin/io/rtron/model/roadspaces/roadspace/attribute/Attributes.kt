@@ -16,41 +16,56 @@
 
 package io.rtron.model.roadspaces.roadspace.attribute
 
+import io.rtron.std.Optional
+
 /**
  * Abstract class of an attribute.
  */
-sealed class Attribute(val name: String) {
-    abstract fun isEmpty(): Boolean
-    fun isNotEmpty() = !isEmpty()
-}
+sealed class Attribute(val name: String)
 
 /**
  * Attribute with a [name] containing a certain string [value].
  */
 class StringAttribute(name: String, val value: String) : Attribute(name) {
-    override fun isEmpty() = value.isEmpty()
+
+    // Properties and Initializers
+    init {
+        require(value.isNotBlank()) { "String value must not be blank." }
+    }
+
+    companion object {
+        fun of(name: String, value: String): Optional<StringAttribute> =
+            if (value.isEmpty()) Optional.empty()
+            else Optional(StringAttribute(name, value))
+    }
 }
 
 /**
  * Attribute with a [name] containing a certain integer [value].
  */
-class IntAttribute(name: String, val value: Int) : Attribute(name) {
-    override fun isEmpty() = value == Int.MIN_VALUE
-}
+class IntAttribute(name: String, val value: Int) : Attribute(name)
 
 /**
  * Attribute with a [name] containing a certain double [value].
  */
 class DoubleAttribute(name: String, val value: Double) : Attribute(name) {
-    override fun isEmpty() = value.isNaN()
+
+    // Properties and Initializers
+    init {
+        require(value.isFinite()) { "Value must be finite." }
+    }
+
+    companion object {
+        fun of(name: String, value: Double): Optional<DoubleAttribute> =
+            if (!value.isFinite()) Optional.empty()
+            else Optional(DoubleAttribute(name, value))
+    }
 }
 
 /**
  * Attribute with a [name] containing a certain boolean [value].
  */
-class BooleanAttribute(name: String, val value: Boolean) : Attribute(name) {
-    override fun isEmpty() = false
-}
+class BooleanAttribute(name: String, val value: Boolean) : Attribute(name)
 
 /**
  * Attribute with a [name] containing a certain double [value] with a [UnitOfMeasure].
@@ -58,7 +73,17 @@ class BooleanAttribute(name: String, val value: Boolean) : Attribute(name) {
  * @param uom unit of measure of the value
  */
 class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) : Attribute(name) {
-    override fun isEmpty() = value.isNaN()
+
+    // Properties and Initializers
+    init {
+        require(value.isFinite()) { "Value must be finite." }
+    }
+
+    companion object {
+        fun of(name: String, value: Double, uom: UnitOfMeasure): Optional<MeasureAttribute> =
+            if (value.isNaN()) Optional.empty()
+            else Optional(MeasureAttribute(name, value, uom))
+    }
 }
 
 /**
@@ -75,7 +100,7 @@ class AttributeList(val attributes: List<Attribute> = listOf(), name: String = "
     }
 
     // Methods
-    override fun isEmpty() = attributes.all { it.isEmpty() }
+    fun isEmpty() = attributes.isEmpty()
 
     companion object {
         val EMPTY = AttributeList(emptyList())

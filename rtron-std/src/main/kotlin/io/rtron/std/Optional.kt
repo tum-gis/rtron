@@ -80,3 +80,8 @@ infix fun <T> Optional<T>.getOrElse(defaultValue: T): T = getOrNull() ?: default
  * Returns a list of values of type [T], whereby the empty [Optional] are ignored.
  */
 fun <T> List<Optional<T>>.unwrapValues(): List<T> = filter { it.isPresent() }.map { it.getOrNull()!! }
+
+/**
+ *
+ */
+inline fun <T : Any?> Optional<T>.present(f: (T) -> Unit) { if (isPresent()) f(getOrNull()!!) }

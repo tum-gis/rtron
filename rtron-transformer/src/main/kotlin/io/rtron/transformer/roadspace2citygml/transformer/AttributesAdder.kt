@@ -63,7 +63,6 @@ class AttributesAdder(
      */
     fun addAttributes(attributeList: AttributeList, dstCityObject: AbstractCityObject) {
         dstCityObject.genericAttributes = dstCityObject.genericAttributes + attributeList.attributes
-            .filter { it.isNotEmpty() }
             .flatMap { convertAttribute(it) }
             .map { AbstractGenericAttributeProperty(it) }
     }
