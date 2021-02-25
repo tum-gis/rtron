@@ -21,9 +21,9 @@ import com.github.kittinunf.result.success
 import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
-import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspace2citygml.geometry.populateLod2Geometries
+import io.rtron.transformer.roadspace2citygml.geometry.LevelOfDetail
+import io.rtron.transformer.roadspace2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import org.citygml4j.model.generics.GenericOccupiedSpace
@@ -54,7 +54,7 @@ class GenericsModuleBuilder(
 
     fun createGenericObject(geometryTransformer: GeometryTransformer): Result<GenericOccupiedSpace, Exception> {
         val genericCityObject = GenericOccupiedSpace()
-        genericCityObject.populateLod2Geometries(geometryTransformer).handleFailure { return it }
+        genericCityObject.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
 
         geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, genericCityObject) }
         return Result.success(genericCityObject)

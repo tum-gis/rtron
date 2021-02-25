@@ -19,7 +19,7 @@ package io.rtron.transformer.roadspace2citygml.module
 import com.github.kittinunf.result.Result
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspace2citygml.geometry.populateLod1Geometries
+import io.rtron.transformer.roadspace2citygml.geometry.populateLod1Geometry
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.building.Building
 
@@ -33,7 +33,7 @@ class BuildingModuleBuilder(
     // Methods
     fun createBuildingObject(geometryTransformer: GeometryTransformer): Result<Building, Exception> {
         val building = Building()
-        building.populateLod1Geometries(geometryTransformer).handleFailure { return it }
+        building.populateLod1Geometry(geometryTransformer).handleFailure { return it }
 
         return Result.success(building)
     }

@@ -17,6 +17,7 @@
 package io.rtron.transformer.roadspace2citygml.geometry
 
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.success
 import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
@@ -32,10 +33,13 @@ import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.math.std.THREE_QUARTER_PI
+import io.rtron.math.transform.Affine3D
 import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
 import io.rtron.transformer.roadspace2citygml.transformer.IdentifierAdder
+import org.citygml4j.model.core.ImplicitGeometry
+import org.citygml4j.model.core.ImplicitGeometryProperty
 import org.citygml4j.util.geometry.GeometryFactory
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty
@@ -139,6 +143,16 @@ class GeometryTransformer(
     fun getDiameter(): Result<Double, IllegalStateException> =
         if (isSetDiameter()) Result.success(diameter)
         else Result.error(IllegalStateException("No diameter available."))
+
+    fun getImplicitGeometry(): Result<ImplicitGeometryProperty, IllegalStateException> {
+        val pointProperty = getPoint().handleFailure { return it }
+
+        val implicitGeometry = ImplicitGeometry().apply { referencePoint = pointProperty }
+        getRotation().success { implicitGeometry.transformationMatrix = Affine3D.of(it).toGmlTransformationMatrix4x4() }
+
+        val implicitGeometryProperty = ImplicitGeometryProperty(implicitGeometry)
+        return Result.success(implicitGeometryProperty)
+    }
 
     /**
      * Types of faces according to their orientation.

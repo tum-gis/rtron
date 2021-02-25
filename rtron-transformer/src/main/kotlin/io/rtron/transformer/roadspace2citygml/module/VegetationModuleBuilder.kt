@@ -21,7 +21,7 @@ import com.github.kittinunf.result.success
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspace2citygml.geometry.populateLod1Geometries
+import io.rtron.transformer.roadspace2citygml.geometry.populateLod1Geometry
 import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
 import io.rtron.transformer.roadspace2citygml.transformer.toGmlString
@@ -43,7 +43,7 @@ class VegetationModuleBuilder(
     fun createVegetationObject(geometryTransformer: GeometryTransformer): Result<SolitaryVegetationObject, Exception> {
         val solitaryVegetationObject = SolitaryVegetationObject()
 
-        solitaryVegetationObject.populateLod1Geometries(geometryTransformer).handleFailure { return it }
+        solitaryVegetationObject.populateLod1Geometry(geometryTransformer).handleFailure { return it }
         geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, solitaryVegetationObject) }
 
         addAttributes(solitaryVegetationObject, geometryTransformer)
