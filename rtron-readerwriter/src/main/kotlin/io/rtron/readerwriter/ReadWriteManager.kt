@@ -20,23 +20,19 @@ import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.AbstractModel
 import io.rtron.readerwriter.citygml.CitygmlReaderWriter
-import io.rtron.readerwriter.citygml.CitygmlReaderWriterConfiguration
 import io.rtron.readerwriter.opendrive.OpendriveReaderWriter
-import io.rtron.readerwriter.opendrive.OpendriveReaderWriterConfiguration
 import io.rtron.std.handleFailure
 
-class ReadWriteManager(projectId: String = "", readerWriterConfigurations: List<AbstractReaderWriterConfiguration>) {
+class ReadWriteManager(projectId: String = "", val readerWriters: List<AbstractReaderWriter>) {
 
     // Properties and Initializers
     private val _reportLogger = LogManager.getReportLogger(projectId)
 
-    private val registeredReaderWriter = readerWriterConfigurations.map(::getConcreteReaderWriter)
-
     // Methods
-    fun isSupported(model: AbstractModel) = registeredReaderWriter.any { it.isSupported(model) }
+    fun isSupported(model: AbstractModel) = readerWriters.any { it.isSupported(model) }
 
     fun read(filePath: Path): AbstractModel {
-        val readers = registeredReaderWriter.filter { it.isSupported(filePath.extension) }
+        val readers = readerWriters.filter { it.isSupported(filePath.extension) }
         require(readers.isNotEmpty()) { "No adequate reader found." }
         require(readers.size <= 1) { "Multiple adequate readers found." }
 
@@ -45,7 +41,7 @@ class ReadWriteManager(projectId: String = "", readerWriterConfigurations: List<
     }
 
     fun write(model: AbstractModel, directoryPath: Path) {
-        val writers = registeredReaderWriter.filter { it.isSupported(model) }
+        val writers = readerWriters.filter { it.isSupported(model) }
         require(writers.isNotEmpty()) { "No adequate writer found." }
         require(writers.size <= 1) { "Multiple adequate writers found." }
 
@@ -53,14 +49,6 @@ class ReadWriteManager(projectId: String = "", readerWriterConfigurations: List<
             .handleFailure { throw it.error }
             .forEach { _reportLogger.info("Completed writing of file ${it.fileName} (around ${it.getFileSizeToDisplay()}). ✔") }
     }
-
-    private fun getConcreteReaderWriter(configuration: AbstractReaderWriterConfiguration): AbstractReaderWriter =
-        when (configuration) {
-            is CitygmlReaderWriterConfiguration -> CitygmlReaderWriter(configuration)
-            is OpendriveReaderWriterConfiguration -> OpendriveReaderWriter(configuration)
-            // register new ReaderWriter classes here
-            else -> throw IllegalArgumentException("Unknown ReaderWriterConfiguration. Registration is required if it is a new one.")
-        }
 
     companion object {
 
@@ -74,7 +62,7 @@ class ReadWriteManager(projectId: String = "", readerWriterConfigurations: List<
             require(multiplyHandledExtensions.isEmpty()) { "A file extensions ${multiplyHandledExtensions.keys} must have a unique ReaderWriter it is handled by." }
         }
 
-        fun of(projectId: String, vararg configuration: AbstractReaderWriterConfiguration) =
-            ReadWriteManager(projectId, configuration.toList())
+        fun of(projectId: String, vararg readerWriters: AbstractReaderWriter) =
+            ReadWriteManager(projectId, readerWriters.toList())
     }
 }

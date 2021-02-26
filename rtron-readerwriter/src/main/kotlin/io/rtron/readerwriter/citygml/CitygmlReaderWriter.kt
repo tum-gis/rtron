@@ -21,14 +21,15 @@ import io.rtron.io.files.Path
 import io.rtron.model.AbstractModel
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.AbstractReaderWriter
+import io.rtron.readerwriter.ReaderWriterConfiguration
+import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterParameters
 import org.citygml4j.CityGMLContext
-import org.citygml4j.model.CityGMLVersion
 import org.citygml4j.xml.module.citygml.CoreModule
 import java.nio.charset.StandardCharsets
 
 class CitygmlReaderWriter(
-    override val configuration: CitygmlReaderWriterConfiguration
-) : AbstractReaderWriter(configuration) {
+    val configuration: ReaderWriterConfiguration<CitygmlReaderWriterParameters>
+) : AbstractReaderWriter() {
 
     // Properties and Initializers
     private val _citygmlContext = CityGMLContext.newInstance()
@@ -44,8 +45,8 @@ class CitygmlReaderWriter(
     override fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
         require(model is CitygmlModel) { "$this received not a CitygmlModel." }
 
-        val version = CityGMLVersion.v2_0
-        val out = _citygmlContext.createCityGMLOutputFactory(version)!!
+        val citygmlVersion = configuration.parameters.version.toGmlCitygml()
+        val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
         val path = directoryPath.resolve(Path("${directoryPath.fileName}.gml"))
 
         val writer = out.createCityGMLChunkWriter(path.toFileJ(), StandardCharsets.UTF_8.name())
@@ -53,7 +54,7 @@ class CitygmlReaderWriter(
             withIndentString("  ")
             withDefaultSchemaLocations()
             withDefaultPrefixes()
-            withDefaultNamespace(CoreModule.of(version).namespaceURI)
+            withDefaultNamespace(CoreModule.of(citygmlVersion).namespaceURI)
             cityModelInfo.boundedBy = model.boundingShape
         }
         model.cityObjects.forEach {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.geometry
+package io.rtron.transformer.roadspaces2citygml.geometry
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success

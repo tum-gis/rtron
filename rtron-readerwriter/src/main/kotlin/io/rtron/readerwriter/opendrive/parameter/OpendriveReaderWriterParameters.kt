@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.citygml
+package io.rtron.readerwriter.opendrive.parameter
 
-import io.rtron.readerwriter.AbstractReaderWriterConfiguration
+import io.rtron.readerwriter.AbstractReaderWriterParameters
+import io.rtron.readerwriter.ReaderWriterConfiguration
+import io.rtron.std.Property
 
-class CitygmlReaderWriterConfiguration(
-    projectId: String
-) : AbstractReaderWriterConfiguration(projectId)
+typealias OpendriveReaderWriterConfiguration = ReaderWriterConfiguration<OpendriveReaderWriterParameters>
+
+class OpendriveReaderWriterParameters() : AbstractReaderWriterParameters() {
+
+    // Methods
+
+    /**
+     * Merges the [other] parameters into this. See [Property.leftMerge] for the prioritization rules.
+     */
+    infix fun leftMerge(other: OpendriveReaderWriterParameters) = OpendriveReaderWriterParameters()
+}

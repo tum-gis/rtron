@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.transformer
+package io.rtron.transformer.roadspaces2citygml.transformer
 
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.std.Optional
 import io.rtron.std.handleFailure
-import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspaces2citygml.module.GenericsModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.CityModel
 

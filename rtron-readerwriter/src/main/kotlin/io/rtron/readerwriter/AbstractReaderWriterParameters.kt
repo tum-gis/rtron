@@ -16,18 +16,4 @@
 
 package io.rtron.readerwriter
 
-import com.github.kittinunf.result.Result
-import io.rtron.io.files.Path
-import io.rtron.model.AbstractModel
-
-abstract class AbstractReaderWriter {
-    // Properties and Initializers
-
-    // Methods
-    abstract fun isSupported(fileExtension: String): Boolean
-    abstract fun isSupported(model: AbstractModel): Boolean
-
-    abstract fun read(filePath: Path): AbstractModel
-
-    abstract fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception>
-}
+abstract class AbstractReaderWriterParameters

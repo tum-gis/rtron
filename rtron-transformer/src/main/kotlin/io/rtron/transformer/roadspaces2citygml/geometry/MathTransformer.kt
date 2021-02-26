@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.geometry
+package io.rtron.transformer.roadspaces2citygml.geometry
 
-enum class LevelOfDetail {
-    ZERO,
-    ONE,
-    TWO,
-    THREE
-}
+import io.rtron.math.transform.Affine3D
+import org.citygml4j.model.core.TransformationMatrix4x4 as GmlTransformationMatrix4x4
+
+fun Affine3D.toGmlTransformationMatrix4x4(): GmlTransformationMatrix4x4 = GmlTransformationMatrix4x4.ofRowMajorList(toDoubleList())

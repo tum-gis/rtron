@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.transformer
+package io.rtron.transformer.roadspaces2citygml.transformer
 
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
@@ -23,13 +23,13 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.std.mapAndHandleFailureOnOriginal
-import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspace2citygml.module.BuildingModuleBuilder
-import io.rtron.transformer.roadspace2citygml.module.CityFurnitureModuleBuilder
-import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
-import io.rtron.transformer.roadspace2citygml.module.TransportationModuleBuilder
-import io.rtron.transformer.roadspace2citygml.module.VegetationModuleBuilder
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.roadspaces2citygml.module.BuildingModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.module.CityFurnitureModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.module.GenericsModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.module.TransportationModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.module.VegetationModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.CityModel
 

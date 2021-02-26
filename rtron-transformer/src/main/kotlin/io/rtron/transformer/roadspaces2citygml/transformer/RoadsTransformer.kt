@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.transformer
+package io.rtron.transformer.roadspaces2citygml.transformer
 
 import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
@@ -27,9 +27,9 @@ import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.topology.LaneTopology
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
-import io.rtron.transformer.roadspace2citygml.module.GenericsModuleBuilder
-import io.rtron.transformer.roadspace2citygml.module.TransportationModuleBuilder
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspaces2citygml.module.GenericsModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.module.TransportationModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.CityModel
 import org.citygml4j.model.generics.GenericOccupiedSpace

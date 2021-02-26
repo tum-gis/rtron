@@ -18,6 +18,7 @@ package io.rtron.readerwriter.opendrive
 
 import io.rtron.io.files.Path
 import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.JAXBException
 import org.asam.opendrive14.OpenDRIVE

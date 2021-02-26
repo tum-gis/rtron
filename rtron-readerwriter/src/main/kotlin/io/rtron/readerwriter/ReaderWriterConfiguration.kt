@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.geometry
+package io.rtron.readerwriter
 
-import io.rtron.math.transform.Affine3D
-import org.citygml4j.model.core.TransformationMatrix4x4 as GmlTransformationMatrix4x4
+import io.rtron.io.logging.LogManager
 
-fun Affine3D.toGmlTransformationMatrix4x4(): GmlTransformationMatrix4x4 = GmlTransformationMatrix4x4.ofRowMajorList(toDoubleList())
+class ReaderWriterConfiguration<T : AbstractReaderWriterParameters>(
+    val projectId: String,
+    val parameters: T
+) {
+
+    // Properties and Initializers
+
+    // Methods
+    fun getReportLogger() = LogManager.getReportLogger(projectId)
+}

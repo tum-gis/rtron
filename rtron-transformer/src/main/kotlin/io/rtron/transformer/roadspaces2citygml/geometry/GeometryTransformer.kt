@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.geometry
+package io.rtron.transformer.roadspaces2citygml.geometry
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success
@@ -36,8 +36,8 @@ import io.rtron.math.std.THREE_QUARTER_PI
 import io.rtron.math.transform.Affine3D
 import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
-import io.rtron.transformer.roadspace2citygml.transformer.IdentifierAdder
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspaces2citygml.transformer.IdentifierAdder
 import org.citygml4j.model.core.ImplicitGeometry
 import org.citygml4j.model.core.ImplicitGeometryProperty
 import org.citygml4j.util.geometry.GeometryFactory

@@ -1,4 +1,5 @@
 import io.rtron.main.project.configuration.configure
+import io.rtron.readerwriter.citygml.CitygmlVersion
 
 configure {
 
@@ -39,5 +40,9 @@ configure {
 
         // true, if random ids shall be generated for the gml geometries
         generateRandomGeometryIds = true
+    }
+
+    citygmlReaderWriter {
+        version = CitygmlVersion.V2_0
     }
 }

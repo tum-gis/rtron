@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive
+package io.rtron.transformer.roadspaces2citygml.geometry
 
-import io.rtron.readerwriter.AbstractReaderWriterConfiguration
-
-class OpendriveReaderWriterConfiguration(
-    projectId: String
-) : AbstractReaderWriterConfiguration(projectId)
+enum class LevelOfDetail {
+    ZERO,
+    ONE,
+    TWO,
+    THREE
+}

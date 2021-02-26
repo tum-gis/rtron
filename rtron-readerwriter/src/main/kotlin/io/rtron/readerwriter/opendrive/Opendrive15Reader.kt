@@ -18,6 +18,7 @@ package io.rtron.readerwriter.opendrive
 
 import io.rtron.io.files.Path
 import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
 
 class Opendrive15Reader(
     val configuration: OpendriveReaderWriterConfiguration

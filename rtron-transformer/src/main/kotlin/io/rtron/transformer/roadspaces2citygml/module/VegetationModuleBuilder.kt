@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.module
+package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.std.handleFailure
-import io.rtron.transformer.roadspace2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspace2citygml.geometry.populateLod1Geometry
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
-import io.rtron.transformer.roadspace2citygml.transformer.AttributesAdder
-import io.rtron.transformer.roadspace2citygml.transformer.toGmlString
+import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.roadspaces2citygml.geometry.populateLod1Geometry
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspaces2citygml.transformer.AttributesAdder
+import io.rtron.transformer.roadspaces2citygml.transformer.toGmlString
 import org.citygml4j.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 

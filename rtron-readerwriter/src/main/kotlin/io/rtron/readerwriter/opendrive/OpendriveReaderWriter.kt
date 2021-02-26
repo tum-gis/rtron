@@ -20,12 +20,13 @@ import com.github.kittinunf.result.Result
 import io.rtron.io.files.Path
 import io.rtron.model.AbstractModel
 import io.rtron.readerwriter.AbstractReaderWriter
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
 import org.w3c.dom.Document
 import javax.xml.parsers.DocumentBuilderFactory
 
 class OpendriveReaderWriter(
-    override val configuration: OpendriveReaderWriterConfiguration
-) : AbstractReaderWriter(configuration) {
+    val configuration: OpendriveReaderWriterConfiguration
+) : AbstractReaderWriter() {
 
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()

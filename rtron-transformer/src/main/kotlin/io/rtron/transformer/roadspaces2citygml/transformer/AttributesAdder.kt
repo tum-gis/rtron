@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.transformer
+package io.rtron.transformer.roadspaces2citygml.transformer
 
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.model.roadspaces.roadspace.attribute.Attribute
@@ -26,7 +26,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.MeasureAttribute
 import io.rtron.model.roadspaces.roadspace.attribute.StringAttribute
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.AbstractGenericAttribute
 import org.citygml4j.model.core.AbstractGenericAttributeProperty

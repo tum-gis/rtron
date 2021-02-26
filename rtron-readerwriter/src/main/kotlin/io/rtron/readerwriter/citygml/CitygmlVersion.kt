@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter
+package io.rtron.readerwriter.citygml
 
-import io.rtron.io.logging.LogManager
+import org.citygml4j.model.CityGMLVersion as GmlCitygmlVersion
 
-abstract class AbstractReaderWriterConfiguration(
-    val projectId: String
-) {
+enum class CitygmlVersion {
+    V1_0,
+    V2_0,
+    V3_0
+}
 
-    // Properties and Initializers
-
-    // Methods
-    fun getReportLogger() = LogManager.getReportLogger(projectId)
+fun CitygmlVersion.toGmlCitygml(): GmlCitygmlVersion = when (this) {
+    CitygmlVersion.V1_0 -> GmlCitygmlVersion.v1_0
+    CitygmlVersion.V2_0 -> GmlCitygmlVersion.v2_0
+    CitygmlVersion.V3_0 -> GmlCitygmlVersion.v3_0
 }

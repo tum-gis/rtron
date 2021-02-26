@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml.parameter
+package io.rtron.transformer.roadspaces2citygml.parameter
 
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D

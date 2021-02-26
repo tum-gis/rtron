@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspace2citygml
+package io.rtron.transformer.roadspaces2citygml
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success
@@ -25,10 +25,10 @@ import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.topology.LaneTopology
 import io.rtron.transformer.AbstractTransformer
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
-import io.rtron.transformer.roadspace2citygml.transformer.RoadsTransformer
-import io.rtron.transformer.roadspace2citygml.transformer.RoadspaceLineTransformer
-import io.rtron.transformer.roadspace2citygml.transformer.RoadspaceObjectTransformer
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspaces2citygml.transformer.RoadsTransformer
+import io.rtron.transformer.roadspaces2citygml.transformer.RoadspaceLineTransformer
+import io.rtron.transformer.roadspaces2citygml.transformer.RoadspaceObjectTransformer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
