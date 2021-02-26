@@ -43,6 +43,6 @@ configure {
     }
 
     citygmlReaderWriter {
-        version = CitygmlVersion.V2_0
+        writeVersions = setOf(CitygmlVersion.V2_0, CitygmlVersion.V3_0)
     }
 }

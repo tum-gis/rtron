@@ -24,20 +24,25 @@ import io.rtron.std.Property
 typealias CitygmlReaderWriterConfiguration = ReaderWriterConfiguration<CitygmlReaderWriterParameters>
 
 class CitygmlReaderWriterParameters(
-    private val versionProperty: Property<CitygmlVersion> = Property(CitygmlVersion.V2_0, true),
+    private val writeVersionsProperty: Property<Set<CitygmlVersion>> = Property(setOf(CitygmlVersion.V2_0), true),
 ) : AbstractReaderWriterParameters() {
 
     // Properties and Initializers
+    init {
+        require(writeVersionsProperty.value.isNotEmpty()) { "At least one CitGML version must be set." }
+    }
 
     /**
-     * version for writing citygml dateset
+     * citygml version for writing dateset
      */
-    val version: CitygmlVersion by versionProperty
+    val writeVersions: Set<CitygmlVersion> by writeVersionsProperty
 
     /**
      * Merges the [other] parameters into this. See [Property.leftMerge] for the prioritization rules.
      */
     infix fun leftMerge(other: CitygmlReaderWriterParameters) = CitygmlReaderWriterParameters(
-        this.versionProperty leftMerge other.versionProperty
+        this.writeVersionsProperty leftMerge other.writeVersionsProperty
     )
+
+    override fun toString() = "CitygmlReaderWriterParameters(writeVersions=$writeVersions)"
 }

@@ -30,4 +30,6 @@ class OpendriveReaderWriterParameters() : AbstractReaderWriterParameters() {
      * Merges the [other] parameters into this. See [Property.leftMerge] for the prioritization rules.
      */
     infix fun leftMerge(other: OpendriveReaderWriterParameters) = OpendriveReaderWriterParameters()
+
+    override fun toString() = "OpendriveReaderWriterParameters()"
 }

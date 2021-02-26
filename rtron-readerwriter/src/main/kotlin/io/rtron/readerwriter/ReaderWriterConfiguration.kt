@@ -23,8 +23,6 @@ class ReaderWriterConfiguration<T : AbstractReaderWriterParameters>(
     val parameters: T
 ) {
 
-    // Properties and Initializers
-
     // Methods
     fun getReportLogger() = LogManager.getReportLogger(projectId)
 }

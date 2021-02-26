@@ -25,11 +25,11 @@ class CitygmlReaderWriterParametersBuilder {
 
     private val defaultParameters = CitygmlReaderWriterParameters()
 
-    private val versionProperty = SettableProperty(defaultParameters.version)
-    var version by versionProperty
+    private val writeVersionsProperty = SettableProperty(defaultParameters.writeVersions)
+    var writeVersions by writeVersionsProperty
 
     fun build() = CitygmlReaderWriterParameters(
-        versionProperty
+        writeVersionsProperty
     )
 }
 

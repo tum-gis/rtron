@@ -23,6 +23,7 @@ import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.AbstractReaderWriter
 import io.rtron.readerwriter.ReaderWriterConfiguration
 import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterParameters
+import io.rtron.std.handleAndRemoveFailure
 import org.citygml4j.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
 import java.nio.charset.StandardCharsets
@@ -32,6 +33,8 @@ class CitygmlReaderWriter(
 ) : AbstractReaderWriter() {
 
     // Properties and Initializers
+    private val _reportLogger = configuration.getReportLogger()
+
     private val _citygmlContext = CityGMLContext.newInstance()
 
     // Methods
@@ -45,11 +48,21 @@ class CitygmlReaderWriter(
     override fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
         require(model is CitygmlModel) { "$this received not a CitygmlModel." }
 
-        val citygmlVersion = configuration.parameters.version.toGmlCitygml()
-        val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
-        val path = directoryPath.resolve(Path("${directoryPath.fileName}.gml"))
+        val version_suffix = configuration.parameters.writeVersions.size > 1
+        val filePaths = configuration.parameters.writeVersions.map { write(model, it, directoryPath, version_suffix) }
+            .handleAndRemoveFailure { _reportLogger.log(it) }
 
-        val writer = out.createCityGMLChunkWriter(path.toFileJ(), StandardCharsets.UTF_8.name())
+        return Result.success(filePaths)
+    }
+
+    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, version_suffix: Boolean): Result<Path, Exception> {
+        val citygmlVersion = version.toGmlCitygml()
+        val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
+
+        val fileName = directoryPath.fileName.toString() + if (version_suffix) "_$version" else "" + ".gml"
+        val filePath = directoryPath.resolve(Path(fileName))
+
+        val writer = out.createCityGMLChunkWriter(filePath.toFileJ(), StandardCharsets.UTF_8.name())
         writer.apply {
             withIndentString("  ")
             withDefaultSchemaLocations()
@@ -62,7 +75,7 @@ class CitygmlReaderWriter(
         }
         writer.close()
 
-        return Result.success(listOf(path))
+        return Result.success(filePath)
     }
 
     companion object {
