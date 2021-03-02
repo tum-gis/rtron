@@ -95,5 +95,13 @@ internal class DoubleRangeExtensionsTest {
 
             assertThat(doubleArrayOf(1.0, 2.0)).isEqualTo(actualValues)
         }
+
+        @Test
+        fun `range with length under epsilon should nevertheless contain the start and end`() {
+            val actualValues = Range.closed(0.0, 1.0E-8)
+                .arrange(0.5, true, 0.0)
+
+            assertThat(doubleArrayOf(0.0, 1.0E-8)).isEqualTo(actualValues)
+        }
     }
 }

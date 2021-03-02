@@ -40,8 +40,9 @@ data class Circle3D(
 
     // Properties and Initializers
     init {
-        require(radius.isFinite() && radius > 0.0) { "Radius must be finite and greater than zero." }
-        require(numberSlices > 0.0) { "Number of slices must be greater than zero." }
+        require(radius.isFinite()) { "Radius value must be finite." }
+        require(radius > tolerance) { "Radius value must be greater than zero and the tolerance threshold." }
+        require(numberSlices > 3) { "Number of slices must be at least three." }
     }
 
     // Methods

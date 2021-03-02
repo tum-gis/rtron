@@ -70,7 +70,7 @@ fun List<Vector3D>.removeRedundantVerticesOnLineSegmentsEnclosing(tolerance: Dou
     if (vertices.size <= 2) return vertices
 
     return vertices.filterWindowedEnclosing(listOf(false, true, false)) {
-        if (it[0].fuzzyEquals(it[2])) return@filterWindowedEnclosing false // it[0].distance(it[1]) < tolerance
+        if (it[0].fuzzyEquals(it[2], tolerance)) return@filterWindowedEnclosing false // it[0].distance(it[1]) < tolerance
         val lineSegment = LineSegment3D(it[0], it[2], tolerance)
         return@filterWindowedEnclosing lineSegment.distance(it[1]) < tolerance
     }

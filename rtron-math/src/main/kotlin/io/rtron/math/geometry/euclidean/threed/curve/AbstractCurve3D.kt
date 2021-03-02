@@ -109,7 +109,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param step step size between the points
      */
     fun calculateLineStringGlobalCS(step: Double): Result<LineString3D, Exception> =
-        calculatePointListGlobalCS(step, true).map { LineString3D(it, tolerance) }
+        calculatePointListGlobalCS(step, true).handleFailure { return it }.let { LineString3D.of(it, tolerance) }
 
     override fun accept(visitor: Geometry3DVisitor) { visitor.visit(this) }
 }

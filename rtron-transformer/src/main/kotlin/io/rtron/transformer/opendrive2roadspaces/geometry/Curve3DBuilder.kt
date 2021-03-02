@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
+import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
@@ -26,6 +27,7 @@ import io.rtron.model.opendrive.road.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.std.filterToStrictSortingBy
+import io.rtron.std.handleFailure
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
@@ -50,13 +52,13 @@ class Curve3DBuilder(
         id: RoadspaceIdentifier,
         srcPlanViewGeometries: List<RoadPlanViewGeometry>,
         srcElevationProfiles: List<RoadElevationProfileElevation>
-    ): Curve3D {
+    ): Result<Curve3D, IllegalArgumentException> {
 
         val planViewCurve2D =
-            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, srcPlanViewGeometries, parameters.offsetXY)
+            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, srcPlanViewGeometries, parameters.offsetXY).handleFailure { return it }
         val heightFunction = buildHeightFunction(id, srcElevationProfiles)
 
-        return Curve3D(planViewCurve2D, heightFunction)
+        return Result.success(Curve3D(planViewCurve2D, heightFunction))
     }
 
     /**

@@ -55,8 +55,10 @@ class SpiralSegment2D(
 
     init {
         require(lowerDomainEndpoint == 0.0) { "Lower endpoint of domain must be zero (for moving the spiral segment, the affine sequence is preferred)." }
-        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
-        require(curvatureFunction.slope.isFinite() && curvatureFunction.slope != 0.0) { "Curvature slope must be finite and not zero (if it's zero use a line or an arc segment)." }
+        require(length.isFinite()) { "Length value must be finite." }
+        require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
+        require(curvatureFunction.slope.isFinite()) { "Curvature slope must be finite." }
+        require(curvatureFunction.slope != 0.0) { "Curvature slope must not be zero (if it's zero use a line or an arc segment)." }
     }
 
     private val _spiral = Spiral2D(curvatureFunction.slope)

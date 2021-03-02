@@ -40,7 +40,8 @@ class CityFurnitureModuleBuilder(
     fun createCityFurnitureObject(geometryTransformer: GeometryTransformer): Result<CityFurniture, Exception> {
         val cityFurnitureObject = CityFurniture()
         cityFurnitureObject.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO).handleFailure { return it }
-        geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, cityFurnitureObject) }
+        if (geometryTransformer.isSetRotation())
+            geometryTransformer.getRotation().handleFailure { return it }.also { _attributesAdder.addRotationAttributes(it, cityFurnitureObject) }
 
         return Result.success(cityFurnitureObject)
     }

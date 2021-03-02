@@ -71,7 +71,7 @@ class RoadspaceBuilder(
             roadspaceId,
             srcRoad.planView.geometry,
             srcRoad.elevationProfile.elevation
-        )
+        ).handleFailure { return it }
         val torsionFunction = _functionBuilder.buildCurveTorsion(
             roadspaceId,
             srcRoad.lateralProfile.superelevation

@@ -371,7 +371,7 @@ class Road(
                 .handleFailure { return it }
 
             // return no lateral filler surface, if there is no gap between the lane surfaces
-            if (leftLaneBoundary.fuzzyEquals(rightLaneBoundary))
+            if (leftLaneBoundary.fuzzyEquals(rightLaneBoundary, geometricalTolerance))
                 return Result.success(null)
 
             return LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary, geometricalTolerance)
@@ -456,8 +456,7 @@ class Road(
             if (roadMarking.width.domain.length < geometricalTolerance)
                 return Result.error(
                     IllegalStateException(
-                        "$laneIdentifier: Road marking's length is almost zero " +
-                            "(below tolerance) and thus no surface can be constructed."
+                        "$laneIdentifier: Road marking's length is zero (or below tolerance threshold) and thus no surface can be constructed."
                     )
                 )
 
@@ -472,7 +471,7 @@ class Road(
                 .handleFailure { throw it.error }.calculatePointListGlobalCS(step).handleFailure { throw it.error }
 
             return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
-                .handleFailure { throw it.error }
+                .handleFailure { return it }
                 .let { CompositeSurface3D(it) }
                 .let { Result.success(it) }
         }

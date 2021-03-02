@@ -22,8 +22,9 @@ import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
 import io.rtron.std.cumulativeSum
-import io.rtron.std.distinctConsecutive
+import io.rtron.std.filterWithNext
 import io.rtron.std.handleFailure
+import io.rtron.std.noneWithNext
 
 /**
  * Curve specified by a sequence of [vertices].
@@ -39,7 +40,7 @@ class LineString3D(
     // Properties and Initializers
     init {
         require(vertices.size >= 2) { "Must at least contain two vertices." }
-        require(vertices.distinctConsecutive { it }.size == vertices.size) { "Consecutively following point duplicates found." }
+        require(vertices.noneWithNext { a, b -> a.fuzzyEquals(b, tolerance) }) { "Must not contain consecutively following point duplicates." }
     }
 
     private val segments = vertices.zipWithNext().map { LineSegment3D(it.first, it.second, tolerance) }
@@ -60,5 +61,14 @@ class LineString3D(
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePointGlobalCS(localPoint)
+    }
+
+    companion object {
+
+        fun of(vertices: List<Vector3D>, tolerance: Double): Result<LineString3D, IllegalArgumentException> {
+            val adjustedVertices = vertices.filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
+            return if (adjustedVertices.size > 1) Result.success(LineString3D(adjustedVertices, tolerance))
+            else Result.error(IllegalArgumentException("Not enough vertices for constructing a line segment."))
+        }
     }
 }

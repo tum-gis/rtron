@@ -14,6 +14,7 @@ import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.topology.junction.Junction
 import io.rtron.model.roadspaces.topology.junction.JunctionIdentifier
 import io.rtron.std.Optional
+import io.rtron.std.filterWithNextEnclosing
 import io.rtron.std.getValueResult
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
@@ -131,6 +132,7 @@ class LaneTopology(
 
             val tolerance = minOf(road.surface.tolerance, successorRoad.surface.tolerance)
             val fillerSurfaceVertices = (currentVertices + successorVertices)
+                .filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
                 .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
 
             return if (fillerSurfaceVertices.size < 3 || fillerSurfaceVertices.isColinear(tolerance)) Optional.empty()

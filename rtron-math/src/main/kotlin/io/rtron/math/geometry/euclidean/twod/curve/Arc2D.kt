@@ -48,7 +48,8 @@ class Arc2D(
     init {
         require(curvature.isFinite()) { "Curvature must be finite." }
         require(curvature != 0.0) { "Curvature must not be zero (use a line segment instead)." }
-        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
+        require(length.isFinite()) { "Length value must be finite." }
+        require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
     }
 
     override val domain: Range<Double> = Range.closedX(0.0, length, endBoundType)

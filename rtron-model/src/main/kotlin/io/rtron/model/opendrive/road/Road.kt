@@ -58,7 +58,7 @@ data class Road(
     fun getJunction(): Optional<String> =
         if (junction.isNotEmpty() && junction != "-1") Optional(junction) else Optional.empty()
 
-    fun isProcessable(tolerance: Double): Result<ContextMessage<Boolean>, IllegalStateException> {
+    fun isProcessable(tolerance: Double): Result<ContextMessage<Unit>, IllegalStateException> {
         val infos = mutableListOf<String>()
 
         val planViewGeometryLengthsSum = planView.geometry.sumByDouble { it.length }
@@ -74,6 +74,6 @@ data class Road(
             infos += "Road contains both a lateral road shape and a lane offset, whereby the combination of shapes " +
                 "and non-linear offsets should be avoided according to the standard."
 
-        return Result.success(ContextMessage(true, infos))
+        return Result.success(ContextMessage(Unit, infos))
     }
 }

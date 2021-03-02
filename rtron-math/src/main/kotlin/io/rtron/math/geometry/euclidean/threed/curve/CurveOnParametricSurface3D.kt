@@ -55,6 +55,7 @@ class CurveOnParametricSurface3D(
 
     init {
         require(domain.isNotEmpty()) { "Domain must not be empty." }
+        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     // Methods

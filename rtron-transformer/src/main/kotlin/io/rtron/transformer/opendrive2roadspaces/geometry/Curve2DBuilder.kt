@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
+import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -64,14 +65,17 @@ class Curve2DBuilder(
         id: RoadspaceIdentifier,
         srcPlanViewGeometryList: List<RoadPlanViewGeometry>,
         offset: Vector2D = Vector2D.ZERO
-    ): CompositeCurve2D {
+    ): Result<CompositeCurve2D, IllegalArgumentException> {
+
+        if (srcPlanViewGeometryList.isEmpty())
+            return Result.error(IllegalArgumentException("No plan view geometries available."))
 
         // prepare
         val srcPlanViewGeometryListAdjusted =
             srcPlanViewGeometryList.filter { it.length > parameters.tolerance }
         if (srcPlanViewGeometryListAdjusted.size < srcPlanViewGeometryList.size)
             reportLogger.warn(
-                "Plan view geometry contains a length value of zero (below tolerance) and " +
+                "Plan view geometry contains a length value of zero (below tolerance threshold) and " +
                     "therefore the curve element can not be constructed.",
                 id.toString()
             )
@@ -87,7 +91,7 @@ class Curve2DBuilder(
             .map { buildPlanViewGeometry(id, it.first, it.second, BoundType.OPEN, offset) } +
             buildPlanViewGeometry(id, srcPlanViewGeometryListAdjusted.last(), lengths.last(), BoundType.CLOSED, offset)
 
-        return CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts)
+        return Result.success(CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts))
     }
 
     /**

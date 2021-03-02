@@ -34,6 +34,13 @@ data class Rectangle3D(
 ) : AbstractSurface3D() {
 
     // Properties and Initializers
+    init {
+        require(length.isFinite()) { "Length value must be finite." }
+        require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
+        require(width.isFinite()) { "Width value must be finite." }
+        require(width > tolerance) { "Width value must be greater than zero and the tolerance threshold." }
+    }
+
     private val halfLength = length / 2.0
     private val halfWidth = width / 2.0
 

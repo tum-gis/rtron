@@ -73,6 +73,11 @@ class RoadBuilder(
     ):
         Result<Road, Exception> {
 
+            // check whether source model is processable
+            srcRoad.lanes.isProcessable(configuration.parameters.tolerance)
+                .map { _reportLogger.log(it, id.toString()) }
+                .handleFailure { return it }
+
             val laneOffset = _functionBuilder.buildLaneOffset(id, srcRoad.lanes)
             val laneSections = srcRoad.lanes.getLaneSectionsWithRanges(srcRoad.length)
                 .mapIndexed { currentId, currentLaneSection ->

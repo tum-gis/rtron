@@ -44,25 +44,30 @@ class VegetationModuleBuilder(
         val solitaryVegetationObject = SolitaryVegetationObject()
 
         solitaryVegetationObject.populateLod1Geometry(geometryTransformer).handleFailure { return it }
-        geometryTransformer.getRotation().success { _attributesAdder.addRotationAttributes(it, solitaryVegetationObject) }
+        if (geometryTransformer.isSetRotation())
+            geometryTransformer.getRotation().handleFailure { return it }.also { _attributesAdder.addRotationAttributes(it, solitaryVegetationObject) }
 
-        addAttributes(solitaryVegetationObject, geometryTransformer)
+        addAttributes(solitaryVegetationObject, geometryTransformer).handleFailure { return it }
         return Result.success(solitaryVegetationObject)
     }
 
     private fun addAttributes(
         solitaryVegetationObject: SolitaryVegetationObject,
         geometryTransformer: GeometryTransformer
-    ) {
+    ): Result<Unit, Exception> {
 
-        geometryTransformer.getDiameter().success {
-            solitaryVegetationObject.trunkDiameter = Length(it)
-            solitaryVegetationObject.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
-        }
+        if (geometryTransformer.isSetDiameter())
+            geometryTransformer.getDiameter().handleFailure { return it }.also {
+                solitaryVegetationObject.trunkDiameter = Length(it)
+                solitaryVegetationObject.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
+            }
 
-        geometryTransformer.getHeight().success {
-            solitaryVegetationObject.height = Length(it)
-            solitaryVegetationObject.height.uom = UnitOfMeasure.METER.toGmlString()
-        }
+        if (geometryTransformer.isSetHeight())
+            geometryTransformer.getHeight().handleFailure { return it }.also {
+                solitaryVegetationObject.height = Length(it)
+                solitaryVegetationObject.height.uom = UnitOfMeasure.METER.toGmlString()
+            }
+
+        return Result.success(Unit)
     }
 }

@@ -31,6 +31,7 @@ import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.filterToStrictSortingBy
+import io.rtron.std.handleAndRemoveFailure
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
 /**
@@ -135,16 +136,18 @@ class FunctionBuilder(
                 return LinearFunction.X_AXIS
             }
 
-            if (srcLaneWidthEntries.first().sOffset > 0.0)
+            val widthEntriesProcessable = srcLaneWidthEntries.map { it.getAsResult() }.handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing width entry.") }
+
+            if (widthEntriesProcessable.first().sOffset > 0.0)
                 this.reportLogger.info(
                     "The width should be defined for the full length of the lane section and" +
                         " thus must also be defined for s=0.0. Not defined positions are interpreted with a width of 0.",
                     id.toString()
                 )
 
-            val widthEntriesAdjusted = srcLaneWidthEntries
+            val widthEntriesAdjusted = widthEntriesProcessable
                 .filterToStrictSortingBy { it.sOffset }
-            if (widthEntriesAdjusted.size < srcLaneWidthEntries.size)
+            if (widthEntriesAdjusted.size < widthEntriesProcessable.size)
                 this.reportLogger.info(
                     "Removing width entries which are not in strict order according to sOffset.",
                     id.toString()

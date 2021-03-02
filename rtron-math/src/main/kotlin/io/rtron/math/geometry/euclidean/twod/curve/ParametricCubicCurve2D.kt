@@ -50,7 +50,8 @@ class ParametricCubicCurve2D(
         require(coefficientsY.size == 4) { "Requiring exactly four y coefficients for building a cubic curve." }
         require(coefficientsX.all { it.isFinite() }) { "All x coefficients must be finite." }
         require(coefficientsY.all { it.isFinite() }) { "All y coefficients must be finite." }
-        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
+        require(length.isFinite()) { "Length value must be finite." }
+        require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
     }
 
     private val _polynomialFunctionX by lazy { PolynomialFunction(coefficientsX) }

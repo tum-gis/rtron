@@ -22,12 +22,18 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyContainsResult
+import io.rtron.math.range.length
 import io.rtron.std.handleFailure
 
 /**
  * Abstract class for all geometric surface objects in an curve relative coordinate system in 3D.
  */
 abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerable {
+
+    // Properties and Initializers
+
+    /** length of the surface along the curve */
+    val length: Double get() = domain.length
 
     // Methods
 

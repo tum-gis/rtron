@@ -16,6 +16,7 @@
 
 package io.rtron.model.opendrive.road.lanes
 
+import com.github.kittinunf.result.Result
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
@@ -33,4 +34,15 @@ class RoadLanesLaneSectionLRLaneWidth(
 ) {
     // Properties and Initializers
     val coefficients get() = doubleArrayOf(a, b, c, d)
+
+    // Methods
+
+    fun getAsResult(): Result<RoadLanesLaneSectionLRLaneWidth, IllegalStateException> {
+        if (!sOffset.isFinite() || sOffset < 0.0)
+            return Result.error(IllegalStateException("Value of sOffset must be finite and positive."))
+        if (coefficients.any { !it.isFinite() })
+            return Result.error(IllegalStateException("Coefficient values must be finite."))
+
+        return Result.success(this)
+    }
 }

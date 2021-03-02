@@ -29,7 +29,7 @@ internal class CollectionsKtTest {
         fun `test basic list with consecutive duplicate at the beginning`() {
             val expectedValues = listOf("a", "b", "c")
 
-            val actualValues = listOf("a", "a", "b", "c").distinctConsecutive { it }
+            val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveBy { it }
 
             assertThat(actualValues).isEqualTo(expectedValues)
         }
@@ -38,21 +38,21 @@ internal class CollectionsKtTest {
         fun `test basic list with same enclosing pair`() {
             val expectedValues = listOf("a", "b", "c", "a")
 
-            val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutive { it }
+            val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveBy { it }
 
             assertThat(actualValues).isEqualTo(expectedValues)
         }
 
         @Test
         fun `test empty list`() {
-            val actualValues = emptyList<String>().distinctConsecutive { it }
+            val actualValues = emptyList<String>().distinctConsecutiveBy { it }
 
             assertThat(actualValues).isEqualTo(emptyList<String>())
         }
 
         @Test
         fun `test list with a single element`() {
-            val actualValues = listOf("a").distinctConsecutive { it }
+            val actualValues = listOf("a").distinctConsecutiveBy { it }
 
             assertThat(actualValues).isEqualTo(listOf("a"))
         }
@@ -65,7 +65,7 @@ internal class CollectionsKtTest {
         fun `test basic list with consecutive duplicate at the beginning`() {
             val expectedValues = listOf("a", "b", "c")
 
-            val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveEnclosing { it }
+            val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveEnclosingBy { it }
 
             assertThat(actualValues).isEqualTo(expectedValues)
         }
@@ -74,7 +74,7 @@ internal class CollectionsKtTest {
         fun `test basic list with same enclosing pair`() {
             val expectedValues = listOf("a", "b", "c")
 
-            val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveEnclosing { it }
+            val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveEnclosingBy { it }
 
             assertThat(actualValues).isEqualTo(expectedValues)
         }
@@ -83,21 +83,21 @@ internal class CollectionsKtTest {
         fun `test removal of multiple consecutive objects`() {
             val expectedValues = listOf("a", "b", "c")
 
-            val actualValues = listOf("a", "b", "b", "b", "c").distinctConsecutiveEnclosing { it }
+            val actualValues = listOf("a", "b", "b", "b", "c").distinctConsecutiveEnclosingBy { it }
 
             assertThat(actualValues).isEqualTo(expectedValues)
         }
 
         @Test
         fun `test empty list`() {
-            val actualValues = emptyList<String>().distinctConsecutiveEnclosing { it }
+            val actualValues = emptyList<String>().distinctConsecutiveEnclosingBy { it }
 
             assertThat(actualValues).isEqualTo(emptyList<String>())
         }
 
         @Test
         fun `test list with a single element`() {
-            val actualValues = listOf("a").distinctConsecutiveEnclosing { it }
+            val actualValues = listOf("a").distinctConsecutiveEnclosingBy { it }
 
             assertThat(actualValues).isEqualTo(listOf("a"))
         }
@@ -171,6 +171,96 @@ internal class CollectionsKtTest {
             val actualValues = baseSequence.windowedEnclosing(3)
 
             assertThat(actualValues.toList()).isEqualTo(expectedSequence.toList())
+        }
+    }
+
+    @Nested
+    inner class TestFilterWithNext {
+
+        @Test
+        fun `test basic enclosed windowing of character sequence`() {
+            val expectedValues = listOf("a", "b", "c")
+
+            val actualValues = listOf("a", "a", "b", "c").filterWithNext { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test basic list with same enclosing pair`() {
+            val expectedValues = listOf("a", "b", "c", "a")
+
+            val actualValues = listOf("a", "a", "b", "c", "a").filterWithNext { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test list with three consecutively following duplicates`() {
+            val expectedValues = listOf("a", "b", "c", "a")
+
+            val actualValues = listOf("a", "a", "a", "b", "b", "c", "a").filterWithNext { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test empty list`() {
+            val actualValues = emptyList<String>().filterWithNext { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(emptyList<String>())
+        }
+
+        @Test
+        fun `test list with a single element`() {
+            val actualValues = listOf("a").filterWithNext { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(listOf("a"))
+        }
+    }
+
+    @Nested
+    inner class TestFilterWithNextEnclosing {
+
+        @Test
+        fun `test basic list with consecutive duplicate at the beginning`() {
+            val expectedValues = listOf("a", "b", "c")
+
+            val actualValues = listOf("a", "a", "b", "c").filterWithNextEnclosing { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test basic list with same enclosing pair`() {
+            val expectedValues = listOf("a", "b", "c")
+
+            val actualValues = listOf("a", "a", "b", "c", "a").filterWithNextEnclosing { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test removal of multiple consecutive objects`() {
+            val expectedValues = listOf("a", "b", "c")
+
+            val actualValues = listOf("a", "b", "b", "b", "c").filterWithNextEnclosing { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(expectedValues)
+        }
+
+        @Test
+        fun `test empty list`() {
+            val actualValues = emptyList<String>().filterWithNextEnclosing { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(emptyList<String>())
+        }
+
+        @Test
+        fun `test list with a single element`() {
+            val actualValues = listOf("a").filterWithNextEnclosing { a, b -> a != b }
+
+            assertThat(actualValues).isEqualTo(listOf("a"))
         }
     }
 }

@@ -16,11 +16,13 @@
 
 package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
+import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
+import io.rtron.math.range.length
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.model.opendrive.common.ERoadMarkType
 import io.rtron.model.opendrive.road.lanes.RoadLanesLaneSectionCenterLane
@@ -35,6 +37,7 @@ import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.filterToStrictSortingBy
+import io.rtron.std.handleAndRemoveFailure
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 
@@ -158,13 +161,15 @@ class LaneBuilder(
             val inner = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
             else ConcatenatedFunction.ofLinearFunctions(
                 heightEntriesAdjusted.map { it.sOffset },
-                heightEntriesAdjusted.map { it.inner }
+                heightEntriesAdjusted.map { it.inner },
+                prependConstant = true
             )
 
             val outer = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
             else ConcatenatedFunction.ofLinearFunctions(
                 heightEntriesAdjusted.map { it.sOffset },
-                heightEntriesAdjusted.map { it.outer }
+                heightEntriesAdjusted.map { it.outer },
+                prependConstant = true
             )
 
             return LaneHeightOffset(inner, outer)
@@ -196,11 +201,13 @@ class LaneBuilder(
 
         if (adjustedSrcRoadMark.isEmpty()) return emptyList()
 
-        return adjustedSrcRoadMark.zipWithNext()
+        val roadMarkingResults = adjustedSrcRoadMark.zipWithNext()
             .filter { it.first.typeAttribute != ERoadMarkType.NONE }
             .map { buildRoadMarking(it.first, it.second.sOffset) } +
             if (adjustedSrcRoadMark.last().typeAttribute != ERoadMarkType.NONE)
                 listOf(buildRoadMarking(adjustedSrcRoadMark.last())) else emptyList()
+
+        return roadMarkingResults.handleAndRemoveFailure { _reportLogger.log(it, id.toString(), "Removing such road markings.") }
     }
 
     /**
@@ -210,10 +217,13 @@ class LaneBuilder(
      * @param domainEndpoint upper domain endpoint for the domain of the road mark
      */
     private fun buildRoadMarking(srcRoadMark: RoadLanesLaneSectionLCRLaneRoadMark, domainEndpoint: Double = Double.NaN):
-        RoadMarking {
+        Result<RoadMarking, Exception> {
 
             val domain = if (domainEndpoint.isNaN()) Range.atLeast(srcRoadMark.sOffset)
             else Range.closed(srcRoadMark.sOffset, domainEndpoint)
+
+            if (domain.length <= configuration.parameters.tolerance)
+                return Result.error(IllegalStateException("Length of road marking is zero (or below tolerance threshold)."))
 
             val width = ConstantFunction(srcRoadMark.width, domain)
 
@@ -226,7 +236,8 @@ class LaneBuilder(
                 attribute("_material", srcRoadMark.material)
             }
 
-            return RoadMarking(width, attributes)
+            val roadMarking = RoadMarking(width, attributes)
+            return Result.success(roadMarking)
         }
 
     private fun buildAttributes(srcCenterLane: RoadLanesLaneSectionCenterLane) =

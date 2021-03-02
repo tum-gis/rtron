@@ -48,18 +48,18 @@ class CitygmlReaderWriter(
     override fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
         require(model is CitygmlModel) { "$this received not a CitygmlModel." }
 
-        val version_suffix = configuration.parameters.writeVersions.size > 1
-        val filePaths = configuration.parameters.writeVersions.map { write(model, it, directoryPath, version_suffix) }
+        val versionSuffix = configuration.parameters.writeVersions.size > 1
+        val filePaths = configuration.parameters.writeVersions.map { write(model, it, directoryPath, versionSuffix) }
             .handleAndRemoveFailure { _reportLogger.log(it) }
 
         return Result.success(filePaths)
     }
 
-    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, version_suffix: Boolean): Result<Path, Exception> {
+    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean): Result<Path, Exception> {
         val citygmlVersion = version.toGmlCitygml()
         val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
-        val fileName = directoryPath.fileName.toString() + if (version_suffix) "_$version" else "" + ".gml"
+        val fileName = directoryPath.fileName.toString() + if (versionSuffix) "_$version" else "" + ".gml"
         val filePath = directoryPath.resolve(Path(fileName))
 
         val writer = out.createCityGMLChunkWriter(filePath.toFileJ(), StandardCharsets.UTF_8.name())

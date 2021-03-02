@@ -18,26 +18,9 @@ package io.rtron.transformer.roadspaces2citygml.geometry
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success
+import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
 import org.citygml4j.model.core.AbstractOccupiedSpace
-
-/**
- * Populates the [lod] implicit geometry of an [AbstractOccupiedSpace] object with the source geometries of the [GeometryTransformer].
- *
- * @param geometryTransformer source geometries
- * @param lod target level of detail
- * @return [Result.success] is returned, if an implicit geometry has been populated; [Result.error], if no implicit geometry could be assigned
- */
-fun AbstractOccupiedSpace.populateImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Result<Unit, IllegalStateException> {
-    when (lod) {
-        LevelOfDetail.ZERO -> throw IllegalArgumentException("An implicit geometry can not be assigned to an AbstractOccupiedSpace at level 0.")
-        LevelOfDetail.ONE -> geometryTransformer.getImplicitGeometry().success { lod1ImplicitRepresentation = it; return Result.success(Unit) }
-        LevelOfDetail.TWO -> geometryTransformer.getImplicitGeometry().success { lod2ImplicitRepresentation = it; return Result.success(Unit) }
-        LevelOfDetail.THREE -> geometryTransformer.getImplicitGeometry().success { lod3ImplicitRepresentation = it; return Result.success(Unit) }
-    }
-
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the $lod implicit geometry of the abstract occupied space."))
-}
 
 /**
  * Populates the [lod] geometry of an [AbstractOccupiedSpace], if available. Otherwise the [lod] implicit geometry of the [GeometryTransformer] is populated.
@@ -46,9 +29,28 @@ fun AbstractOccupiedSpace.populateImplicitGeometry(geometryTransformer: Geometry
  * @param lod target level of detail
  * @return [Result.success] is returned, if a geometry or implicit geometry has been populated; [Result.error], if no geometry could be assigned
  */
-fun AbstractOccupiedSpace.populateGeometryOrImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Result<Unit, IllegalStateException> {
-    populateGeometry(geometryTransformer, lod).handleSuccess { return it }
-    populateImplicitGeometry(geometryTransformer, lod).handleSuccess { return it }
+fun AbstractOccupiedSpace.populateGeometryOrImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Result<Unit, Exception> {
+    val geometryError = populateGeometry(geometryTransformer, lod).handleSuccess { return it }
+    val implicitGeometryError = populateImplicitGeometry(geometryTransformer, lod).handleSuccess { return it }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the $lod geometry or implicit geometry of the abstract occupied space."))
+    return Result.error(Exception("No suitable source geometry found for populating the $lod geometry (${geometryError.message}) or implicit geometry (${implicitGeometryError.message}) of the abstract occupied space."))
+}
+
+/**
+ * Populates the [lod] implicit geometry of an [AbstractOccupiedSpace] object with the source geometries of the [GeometryTransformer].
+ *
+ * @param geometryTransformer source geometries
+ * @param lod target level of detail
+ * @return [Result.success] is returned, if an implicit geometry has been populated; [Result.error], if no implicit geometry could be assigned
+ */
+fun AbstractOccupiedSpace.populateImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Result<Unit, Exception> {
+    if (geometryTransformer.isSetImplicitGeometry())
+        when (lod) {
+            LevelOfDetail.ZERO -> throw IllegalArgumentException("An implicit geometry can not be assigned to an AbstractOccupiedSpace at level 0.")
+            LevelOfDetail.ONE -> geometryTransformer.getImplicitGeometry().handleFailure { return it }.also { lod1ImplicitRepresentation = it; return Result.success(Unit) }
+            LevelOfDetail.TWO -> geometryTransformer.getImplicitGeometry().handleFailure { return it }.also { lod2ImplicitRepresentation = it; return Result.success(Unit) }
+            LevelOfDetail.THREE -> geometryTransformer.getImplicitGeometry().handleFailure { return it }.also { lod3ImplicitRepresentation = it; return Result.success(Unit) }
+        }
+
+    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD $lod implicit geometry of the abstract occupied space."))
 }

@@ -33,6 +33,8 @@ data class CompositeCurve3D(
     init {
         require(curveMembers.isNotEmpty()) { "Must contain at least one curve member." }
         require(curveMembers.all { it.tolerance == this.tolerance }) { "All curveMembers must have the same tolerance." }
+
+        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     private val container = ConcatenationContainer(curveMembers, absoluteDomains, absoluteStarts, tolerance)

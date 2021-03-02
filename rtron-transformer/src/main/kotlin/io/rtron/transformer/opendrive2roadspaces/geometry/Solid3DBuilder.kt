@@ -156,7 +156,7 @@ class Solid3DBuilder(
             val headPoint = curveRelativeOutlineElementGeometry.second
                 .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
 
-            val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint)
+            val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint, tolerance = parameters.tolerance)
             return Result.success(verticalOutlineElement)
         }
 

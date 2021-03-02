@@ -120,7 +120,7 @@ class RoadsTransformer(
      */
     fun transformRoadMarkings(srcRoad: Road): List<GenericOccupiedSpace> =
         srcRoad.getAllRoadMarkings(configuration.parameters.discretizationStepSize)
-            .handleAndRemoveFailure { _reportLogger.log(it) }
+            .handleAndRemoveFailure { _reportLogger.log(it, srcRoad.id.toString(), "Removing such road markings.") }
             .map { transformRoadMarking(it.first, "RoadMarking", it.second, it.third) }
             .handleAndRemoveFailure { _reportLogger.log(it) }
 

@@ -29,6 +29,7 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.curve.AbstractCurve2D
 import io.rtron.math.range.fuzzyContainsResult
 import io.rtron.math.range.fuzzyEncloses
+import io.rtron.math.range.length
 import io.rtron.math.transform.Affine3D
 import io.rtron.std.handleFailure
 
@@ -51,6 +52,8 @@ data class Curve3D(
     init {
         require(heightFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The height function must be defined everywhere where the curveXY is also defined." }
         require(torsionFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The torsion function must be defined everywhere where the curveXY is also defined." }
+
+        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     override val domain get() = curveXY.domain
