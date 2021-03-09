@@ -127,16 +127,17 @@ class FunctionBuilder(
      */
     fun buildLaneWidth(id: LaneIdentifier, srcLaneWidthEntries: List<RoadLanesLaneSectionLRLaneWidth>):
         UnivariateFunction {
-            if (srcLaneWidthEntries.isEmpty()) {
+
+            val widthEntriesProcessable = srcLaneWidthEntries.map { it.getAsResult() }.handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing width entry.") }
+
+            if (widthEntriesProcessable.isEmpty()) {
                 this.reportLogger.info(
-                    "The lane does not contain any width entries. " +
+                    "The lane does not contain any valid width entries. " +
                         "Continuing with a zero width.",
                     id.toString()
                 )
                 return LinearFunction.X_AXIS
             }
-
-            val widthEntriesProcessable = srcLaneWidthEntries.map { it.getAsResult() }.handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing width entry.") }
 
             if (widthEntriesProcessable.first().sOffset > 0.0)
                 this.reportLogger.info(
