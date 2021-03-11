@@ -218,5 +218,4 @@ class Surface3DBuilder(
         val parametricBoundedSurface = ParametricBoundedSurface3D(lowerBoundary, upperBoundary, parameters.tolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
         return listOf(parametricBoundedSurface)
     }
-
 }
