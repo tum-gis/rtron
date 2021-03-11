@@ -23,6 +23,7 @@ import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
+import io.rtron.math.geometry.euclidean.threed.surface.ParametricBoundedSurface3D
 
 /**
  * Visitor interface for 3D geometries. Visitor pattern is applied to separate geometry transformation algorithms
@@ -37,6 +38,8 @@ interface Geometry3DVisitor {
     // surface
     fun visit(abstractSurface3D: AbstractSurface3D)
     fun visit(circle3D: Circle3D)
+    fun visit(parametricBoundedSurface3D: ParametricBoundedSurface3D)
+
     // solid
     fun visit(abstractSolid3D: AbstractSolid3D)
     fun visit(cylinder3D: Cylinder3D)

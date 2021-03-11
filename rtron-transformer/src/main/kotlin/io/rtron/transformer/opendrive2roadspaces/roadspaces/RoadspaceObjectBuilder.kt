@@ -138,10 +138,8 @@ class RoadspaceObjectBuilder(
         geometry += _surface3DBuilder.buildCircles(srcRoadObject, curveAffine)
         geometry += _surface3DBuilder.buildLinearRingsByRoadCorners(id, srcRoadObject, roadReferenceLine)
         geometry += _surface3DBuilder.buildLinearRingsByLocalCorners(id, srcRoadObject, curveAffine)
-        if (srcRoadObject.repeat.isHorizontalLinearRing())
-            _reportLogger.infoOnce("Horizontal linear ring in repeat object is not implemented.")
-        if (srcRoadObject.repeat.isVerticalLinearRing())
-            _reportLogger.infoOnce("Vertical linear ring in repeat object is not implemented.")
+        geometry += _surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(srcRoadObject.repeat, roadReferenceLine)
+        geometry += _surface3DBuilder.buildParametricBoundedSurfacesByVerticalRepeat(srcRoadObject.repeat, roadReferenceLine)
 
         // build up curve geometrical representations
         geometry += _curve3DBuilder.buildCurve3D(srcRoadObject, roadReferenceLine)

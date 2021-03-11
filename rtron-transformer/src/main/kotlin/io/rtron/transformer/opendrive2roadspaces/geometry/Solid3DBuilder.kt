@@ -216,9 +216,9 @@ class Solid3DBuilder(
         if (!srcRoadObject.repeat.isParametricSweep()) return emptyList()
 
         // curve over which the object is moved
-        val sweepReferenceCurve2D =
+        val objectReferenceCurve2D =
             _curve2DBuilder.buildLateralTranslatedCurve(srcRoadObject.repeat, roadReferenceLine)
-        val sweepReferenceHeight =
+        val objectReferenceHeight =
             _functionBuilder.buildStackedHeightFunctionFromRepeat(srcRoadObject.repeat, roadReferenceLine)
 
         // dimensions of the sweep
@@ -226,11 +226,12 @@ class Solid3DBuilder(
         val widthFunction = srcRoadObject.repeat.getObjectWidthFunction()
 
         val parametricSweep3D = ParametricSweep3D(
-            sweepReferenceCurve2D,
-            sweepReferenceHeight,
+            objectReferenceCurve2D,
+            objectReferenceHeight,
             heightFunction,
             widthFunction,
-            parameters.tolerance
+            parameters.tolerance,
+            ParametricSweep3D.DEFAULT_STEP_SIZE
         )
         return listOf(parametricSweep3D)
     }

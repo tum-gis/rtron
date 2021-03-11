@@ -30,6 +30,7 @@ import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
+import io.rtron.math.geometry.euclidean.threed.surface.ParametricBoundedSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.math.std.THREE_QUARTER_PI
@@ -264,7 +265,11 @@ class GeometryTransformer(
     override fun visit(circle3D: Circle3D) {
         val adjustedCircle = circle3D.copy(numberSlices = parameters.circleSlices)
         visit(adjustedCircle as AbstractSurface3D)
-        visit(circle3D as AbstractGeometry3D)
+    }
+
+    override fun visit(parametricBoundedSurface3D: ParametricBoundedSurface3D) {
+        val adjustedParametricBoundedSurface = parametricBoundedSurface3D.copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
+        visit(adjustedParametricBoundedSurface as AbstractSurface3D)
     }
 
     override fun visit(abstractSolid3D: AbstractSolid3D) {
@@ -280,9 +285,9 @@ class GeometryTransformer(
     }
 
     override fun visit(parametricSweep3D: ParametricSweep3D) {
-        val adjustedParametricSweep3D = parametricSweep3D
+        val adjustedParametricSweep = parametricSweep3D
             .copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
-        visit(adjustedParametricSweep3D as AbstractSolid3D)
+        visit(adjustedParametricSweep as AbstractSolid3D)
     }
 
     override fun visit(abstractGeometry3D: AbstractGeometry3D) {

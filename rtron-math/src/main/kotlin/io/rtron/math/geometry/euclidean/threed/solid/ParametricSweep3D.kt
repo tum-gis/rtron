@@ -48,7 +48,7 @@ data class ParametricSweep3D(
     val objectHeightFunction: LinearFunction,
     val objectWidthFunction: LinearFunction,
     override val tolerance: Double,
-    private val discretizationStepSize: Double = DEFAULT_STEP_SIZE
+    private val discretizationStepSize: Double
 ) : AbstractSolid3D(), DefinableDomain<Double>, Tolerable {
 
     // Properties and Initializers
