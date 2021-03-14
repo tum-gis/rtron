@@ -12,70 +12,70 @@ Full support for further versions can be conveniently added due to the [architec
 
 ### Geometry
 
-- straight lines 🟢
-- spirals 🟢
-- arcs 🟢
-- cubic polynomials 🔴 (deprecated anyway)
-- parametric cubic polynomials 🟢
+- straight lines <span style="color: var(--green)">⬤</span>
+- spirals <span style="color: var(--green)">⬤</span>
+- arcs <span style="color: var(--green)">⬤</span>
+- cubic polynomials <span style="color: var(--red)">⬤</span> (deprecated anyway)
+- parametric cubic polynomials <span style="color: var(--green)">⬤</span>
 
 ### Roads
 
-- road linkage 🟡 (used for adding filler surfaces)
-- road type 🟢
-- methods of elevation 🟢
-  - road elevation 🟢
-  - super elevation 🟢
-  - road shape 🟢
-- road surface 🔴
+- road linkage <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
+- road type <span style="color: var(--green)">⬤</span>
+- methods of elevation <span style="color: var(--green)">⬤</span>
+- road elevation <span style="color: var(--green)">⬤</span>
+- super elevation <span style="color: var(--green)">⬤</span>
+- road shape <span style="color: var(--green)">⬤</span>
+- road surface <span style="color: var(--red)">⬤</span>
 
 ### Lanes
 
-- lane sections 🟢
-- lane offset 🟢
-- lane linkage 🟡 (used for adding filler surfaces)
-- lane properties 🟢
-- road markings 🟢
+- lane sections <span style="color: var(--green)">⬤</span>
+- lane offset <span style="color: var(--green)">⬤</span>
+- lane linkage <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
+- lane properties <span style="color: var(--green)">⬤</span>
+- road markings <span style="color: var(--green)">⬤</span>
 
 ### Junctions
 
-- incoming roads 🟡 (used for adding filler surfaces)
-- connecting roads 🟡 (used for adding filler surfaces)
-- road surface 🔴
-- virtual junctions 🔴
-- junction groups 🔴
+- incoming roads <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
+- connecting roads <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
+- road surface <span style="color: var(--red)">⬤</span>
+- virtual junctions <span style="color: var(--red)">⬤</span>
+- junction groups <span style="color: var(--red)">⬤</span>
 
 ### Objects
 
 Depending on the availability and characteristic of the parametric OpenDRIVE geometries, [B-Rep](https://en.wikipedia.org/wiki/Boundary_representation) representations are generated.
 Thereby, several geometry corrections are applied (removal of invalid vertices, consecutively following vertex duplicates, ...) and then mapped onto the rich geometry model of [GML](https://www.ogc.org/standards/gml).
 
-- repeating objects 🟡 (almost all supported except rarely used horizontal and vertically repeated linear rings)
-- object outlines 🟢
-  - corner roads 🟢
-  - corner locals 🟢
-- object material 🟢
-- lane validity for objects 🔴
-- access rules to parking spaces 🔴
-- object marking 🔴
-- object border 🔴
-- object reference 🔴
-- tunnels 🔴
-- bridges 🔴
+- repeating objects <span style="color: var(--green)">⬤</span>
+- object outlines <span style="color: var(--green)">⬤</span>
+  - corner roads <span style="color: var(--green)">⬤</span>
+  - corner locals <span style="color: var(--green)">⬤</span>
+- object material <span style="color: var(--green)">⬤</span>
+- lane validity for objects <span style="color: var(--red)">⬤</span>
+- access rules to parking spaces <span style="color: var(--red)">⬤</span>
+- object marking <span style="color: var(--red)">⬤</span>
+- object border <span style="color: var(--red)">⬤</span>
+- object reference <span style="color: var(--red)">⬤</span>
+- tunnels <span style="color: var(--red)">⬤</span>
+- bridges <span style="color: var(--red)">⬤</span>
 
 ### Signals
 
-- lane validity 🔴
-- signal dependency 🔴
-- links between signals and objects 🔴
-- signal positioning 🟢
-- reuse of signal information 🔴
-- controllers 🔴
+- lane validity <span style="color: var(--red)">⬤</span>
+- signal dependency <span style="color: var(--red)">⬤</span>
+- links between signals and objects <span style="color: var(--red)">⬤</span>
+- signal positioning <span style="color: var(--green)">⬤</span>
+- reuse of signal information <span style="color: var(--red)">⬤</span>
+- controllers <span style="color: var(--red)">⬤</span>
 
 ### Railroads
 
-- railroad tracks 🔴
-- switches 🔴
-- stations 🔴
+- railroad tracks <span style="color: var(--red)">⬤</span>
+- switches <span style="color: var(--red)">⬤</span>
+- stations <span style="color: var(--red)">⬤</span>
 
 
 ## Datasets
