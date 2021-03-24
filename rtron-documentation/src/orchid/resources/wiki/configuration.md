@@ -29,6 +29,29 @@ This script is an [internal DSL](https://en.wikipedia.org/wiki/Domain-specific_l
 Moreover, a DSL is suitable for describing transformation recipes and complex configurations, such as model mapping rules.
 If you want to edit the configuration, [IntelliJ](https://www.jetbrains.com/idea/) is recommended as it has the best support for Kotlin.
 
+## Transformation to CityGML 3.0
+
+To transform an OpenDRIVE dataset to CityGML 3.0, download at least version 1.1.6 at the [releases section](https://github.com/tum-gis/rtron/releases) or checkout the development branch.
+The configuration of the transformation is similar, but has the following additional parameters:
+```kotlin
+import io.rtron.main.project.configuration.configure
+import io.rtron.readerwriter.citygml.CitygmlVersion // don't forget to include the versions
+
+configure {
+    opendrive2roadspaces {
+        crsEpsg = 32632
+    }
+    roadspaces2citygml {
+        // if true, only classes are populated that are also available in CityGML2
+        mappingBackwardsCompatibility = false
+    }
+    // parameter configuration for writing the CityGML dataset
+    citygmlReaderWriter {
+        // set a single or multiple CityGML versions
+        writeVersions = setOf(CitygmlVersion.V2_0, CitygmlVersion.V3_0)
+    }
+}
+```
 
 ## Batch Processing
 
