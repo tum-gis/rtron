@@ -5,7 +5,7 @@ title: Feature Support of OpenDRIVE
 # Feature Support of OpenDRIVE
 
 In the following a list of OpenDRIVE features supported by r:trån is provided.
-The new Transportation module of CityGML 3.0 will enable a range of new functions including the representation of traffic spaces together with detailed lane topologies [[1](https://doi.org/https://doi.org/10.3390/ijgi9100603), [2](https://doi.org/10.1007/s41064-020-00095-z)].
+The new Transportation module of CityGML 3.0 enables a range of new functions including the representation of traffic spaces together with detailed lane topologies [[1](https://doi.org/https://doi.org/10.3390/ijgi9100603), [2](https://doi.org/10.1007/s41064-020-00095-z)].
 
 Currently, there is tested support for OpenDRIVE version 1.4, although other versions can also be read and processed experimentally.
 Full support for further versions can be conveniently added due to the [architecture](architecture) of r:trån.
@@ -20,7 +20,7 @@ Full support for further versions can be conveniently added due to the [architec
 
 ### Roads
 
-- road linkage <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
+- road linkage <span style="color: var(--green)">⬤</span>
 - road type <span style="color: var(--green)">⬤</span>
 - methods of elevation <span style="color: var(--green)">⬤</span>
 - road elevation <span style="color: var(--green)">⬤</span>
@@ -30,16 +30,19 @@ Full support for further versions can be conveniently added due to the [architec
 
 ### Lanes
 
+The lane topology of OpenDRIVE is converted to the new Transportation module of CityGML 3.0.
+This enables routing on the basis of the predecessor and successor relations of the different traffic spaces.
+
 - lane sections <span style="color: var(--green)">⬤</span>
 - lane offset <span style="color: var(--green)">⬤</span>
-- lane linkage <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
+- lane linkage <span style="color: var(--green)">⬤</span>
 - lane properties <span style="color: var(--green)">⬤</span>
 - road markings <span style="color: var(--green)">⬤</span>
 
 ### Junctions
 
-- incoming roads <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
-- connecting roads <span style="color: var(--orange)">⬤</span> (used for adding filler surfaces)
+- incoming roads <span style="color: var(--green)">⬤</span>
+- connecting roads <span style="color: var(--green)">⬤</span>
 - road surface <span style="color: var(--red)">⬤</span>
 - virtual junctions <span style="color: var(--red)">⬤</span>
 - junction groups <span style="color: var(--red)">⬤</span>
