@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.roadspaces2citygml.transformer
+package io.rtron.transformer.roadspaces2citygml.module
 
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
+import io.rtron.model.roadspaces.common.FillerSurface
 import io.rtron.model.roadspaces.roadspace.attribute.Attribute
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.BooleanAttribute
@@ -26,6 +27,11 @@ import io.rtron.model.roadspaces.roadspace.attribute.MeasureAttribute
 import io.rtron.model.roadspaces.roadspace.attribute.StringAttribute
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
+import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
+import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
+import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.AbstractGenericAttribute
@@ -56,6 +62,27 @@ class AttributesAdder(
             attribute("x", rotation.roll)
         }
         addAttributes(attributeList, dstCityObject)
+    }
+
+    fun addAttributes(lane: Lane, dstCityObject: AbstractCityObject) {
+        val attributes = lane.id.toAttributes(parameters.identifierAttributesPrefix) + lane.attributes
+        addAttributes(attributes, dstCityObject)
+    }
+
+    fun addAttributes(roadspaceObject: RoadspaceObject, dstCityObject: AbstractCityObject) {
+        val attributes = roadspaceObject.id.toAttributes(parameters.identifierAttributesPrefix) + roadspaceObject.attributes
+        addAttributes(attributes, dstCityObject)
+    }
+
+    fun addAttributes(fillerSurface: FillerSurface, dstCityObject: AbstractCityObject) {
+        val attributes = fillerSurface.fromLaneId.toAttributes(parameters.identifierAttributesPrefix + "from_") +
+            fillerSurface.toLaneId.toAttributes(parameters.identifierAttributesPrefix + "to_")
+        addAttributes(attributes, dstCityObject)
+    }
+
+    fun addAttributes(laneId: LaneIdentifier, roadMarking: RoadMarking, dstCityObject: AbstractCityObject) {
+        val attributes = laneId.toAttributes(parameters.identifierAttributesPrefix) + roadMarking.attributes
+        addAttributes(attributes, dstCityObject)
     }
 
     /**

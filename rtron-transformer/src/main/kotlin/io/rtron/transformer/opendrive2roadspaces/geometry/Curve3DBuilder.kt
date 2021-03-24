@@ -50,13 +50,13 @@ class Curve3DBuilder(
      */
     fun buildCurve3D(
         id: RoadspaceIdentifier,
-        srcPlanViewGeometries: List<RoadPlanViewGeometry>,
-        srcElevationProfiles: List<RoadElevationProfileElevation>
+        planViewGeometries: List<RoadPlanViewGeometry>,
+        elevationProfiles: List<RoadElevationProfileElevation>
     ): Result<Curve3D, IllegalArgumentException> {
 
         val planViewCurve2D =
-            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, srcPlanViewGeometries, parameters.offsetXY).handleFailure { return it }
-        val heightFunction = buildHeightFunction(id, srcElevationProfiles)
+            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, planViewGeometries, parameters.offsetXY).handleFailure { return it }
+        val heightFunction = buildHeightFunction(id, elevationProfiles)
 
         return Result.success(Curve3D(planViewCurve2D, heightFunction))
     }
@@ -64,13 +64,13 @@ class Curve3DBuilder(
     /**
      * Builds the height function of the OpenDRIVE's elevation profile.
      */
-    private fun buildHeightFunction(id: RoadspaceIdentifier, srcElevationProfiles: List<RoadElevationProfileElevation>):
+    private fun buildHeightFunction(id: RoadspaceIdentifier, elevationProfiles: List<RoadElevationProfileElevation>):
         UnivariateFunction {
-            if (srcElevationProfiles.isEmpty()) return LinearFunction.X_AXIS
+            if (elevationProfiles.isEmpty()) return LinearFunction.X_AXIS
 
-            val elevationEntriesAdjusted = srcElevationProfiles
+            val elevationEntriesAdjusted = elevationProfiles
                 .filterToStrictSortingBy { it.s }
-            if (elevationEntriesAdjusted.size < srcElevationProfiles.size)
+            if (elevationEntriesAdjusted.size < elevationProfiles.size)
                 this.reportLogger.info(
                     "Removing elevation entries which are not placed in strict order " +
                         "according to s.",
@@ -86,15 +86,16 @@ class Curve3DBuilder(
         }
 
     /**
-     * Builds a curve in 3D from OpenDRIVE's road object entry [srcRoadObject].
+     * Builds a curve in 3D from OpenDRIVE's road object entry [roadObject].
      */
-    fun buildCurve3D(srcRoadObject: RoadObjectsObject, roadReferenceLine: Curve3D): List<Curve3D> {
-        if (!srcRoadObject.repeat.isCurve()) return emptyList()
+    fun buildCurve3D(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D): List<Curve3D> {
+        if (!roadObject.repeat.isCurve()) return emptyList()
 
         val curve2D = _curve2DBuilder
-            .buildLateralTranslatedCurve(srcRoadObject.repeat, roadReferenceLine)
+            .buildLateralTranslatedCurve(roadObject.repeat, roadReferenceLine)
+            .handleFailure { reportLogger.log(it, roadObject.id); return emptyList() }
         val heightFunction = _functionBuilder
-            .buildStackedHeightFunctionFromRepeat(srcRoadObject.repeat, roadReferenceLine)
+            .buildStackedHeightFunctionFromRepeat(roadObject.repeat, roadReferenceLine)
 
         val curve3D = Curve3D(curve2D, heightFunction)
         return listOf(curve3D)

@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces.topology.junction
+package io.rtron.model.roadspaces.junction
 
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.model.roadspaces.roadspace.road.ContactPoint
+import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.model.roadspaces.roadspace.road.RelativeLaneIdentifier
 import io.rtron.std.Optional
 import io.rtron.std.getValueResult
-import io.rtron.std.handleFailure
 
 /**
  * Represents the connection of two roads, the incoming road and the connecting road.
  *
  * @param id identifier of the connection
- * @param incomingRoadspaceId identifier of the roadspace which reaches the junction
- * @param connectingRoadspaceId ifdentifier of the roadspace which belongs to the junction
- * @param contactPoint contact point of the connecting road
+ * @param incomingRoadspaceContactPointId identifier of the contact point of the roadspace which reaches the junction
+ * @param connectingRoadspaceContactPointId identifier of the contact point of the roadspace which belongs to the junction
  * @param laneLinks links between the individual lanes
  */
 data class Connection(
     val id: ConnectionIdentifier,
-    val incomingRoadspaceId: RoadspaceIdentifier,
-    val connectingRoadspaceId: RoadspaceIdentifier,
-    val contactPoint: ContactPoint,
-    val laneLinks: Map<Int, Int>
+    val incomingRoadspaceContactPointId: RoadspaceContactPointIdentifier,
+    val connectingRoadspaceContactPointId: RoadspaceContactPointIdentifier,
+    val laneLinks: Map<LaneIdentifier, LaneIdentifier>
 ) {
 
     // Methods
@@ -48,12 +43,9 @@ data class Connection(
      *
      * @param laneIdentifier identifier of the lane for which the linked and succeeding lane shall be found
      */
-    fun getSuccessorLane(laneIdentifier: LaneIdentifier): Optional<RelativeLaneIdentifier> {
-        if (incomingRoadspaceId != laneIdentifier.toRoadspaceIdentifier()) return Optional.empty()
+    fun getSuccessorLane(laneIdentifier: LaneIdentifier): Optional<LaneIdentifier> {
+        if (incomingRoadspaceContactPointId.roadspaceIdentifier != laneIdentifier.toRoadspaceIdentifier()) return Optional.empty()
 
-        return laneLinks.getValueResult(laneIdentifier.laneId)
-            .handleFailure { return Optional.empty() }
-            .let { RelativeLaneIdentifier.of(it, ContactPoint.START.relativeIndex, connectingRoadspaceId) }
-            .let { Optional(it) }
+        return laneLinks.getValueResult(laneIdentifier).let { Optional.of(it) }
     }
 }

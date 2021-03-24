@@ -17,32 +17,42 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.success
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
-import io.rtron.transformer.roadspaces2citygml.transformer.AttributesAdder
 import org.citygml4j.model.cityfurniture.CityFurniture
 
 /**
  * Builder for city objects of the CityGML CityFurniture module.
  */
 class CityFurnitureModuleBuilder(
-    val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration,
+    private val identifierAdder: IdentifierAdder
 ) {
-
     // Properties and Initializers
+    private val _reportLogger = configuration.getReportLogger()
     private val _attributesAdder = AttributesAdder(configuration.parameters)
 
     // Methods
-    fun createCityFurnitureObject(geometryTransformer: GeometryTransformer): Result<CityFurniture, Exception> {
-        val cityFurnitureObject = CityFurniture()
-        cityFurnitureObject.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO).handleFailure { return it }
-        if (geometryTransformer.isSetRotation())
-            geometryTransformer.getRotation().handleFailure { return it }.also { _attributesAdder.addRotationAttributes(it, cityFurnitureObject) }
+    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): Result<CityFurniture, Exception> {
+        val cityFurnitureFeature = CityFurniture()
 
-        return Result.success(cityFurnitureObject)
+        // geometry
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        cityFurnitureFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
+            .handleFailure { return it }
+        if (geometryTransformer.isSetRotation())
+            geometryTransformer.getRotation()
+                .handleFailure { return it }
+                .also { _attributesAdder.addRotationAttributes(it, cityFurnitureFeature) }
+
+        // semantics
+        identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name, cityFurnitureFeature)
+        _attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
+
+        return Result.success(cityFurnitureFeature)
     }
 }

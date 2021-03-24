@@ -41,8 +41,8 @@ class CitygmlReaderWriter(
     override fun isSupported(fileExtension: String) = fileExtension in supportedFileExtensions
     override fun isSupported(model: AbstractModel) = model is CitygmlModel
 
-    override fun read(filePath: Path): AbstractModel {
-        TODO("not implemented")
+    override fun read(filePath: Path): Result<AbstractModel, Exception> {
+        return Result.error(Exception("CityGML Reader not implemented yet."))
     }
 
     override fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
@@ -59,7 +59,7 @@ class CitygmlReaderWriter(
         val citygmlVersion = version.toGmlCitygml()
         val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
-        val fileName = directoryPath.fileName.toString() + if (versionSuffix) "_$version" else "" + ".gml"
+        val fileName = directoryPath.fileName.toString() + (if (versionSuffix) "_$version" else "") + ".gml"
         val filePath = directoryPath.resolve(Path(fileName))
 
         val writer = out.createCityGMLChunkWriter(filePath.toFileJ(), StandardCharsets.UTF_8.name())

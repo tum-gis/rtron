@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces.topology.junction
+package io.rtron.model.roadspaces.junction
 
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.model.roadspaces.roadspace.road.RelativeLaneIdentifier
 import io.rtron.std.unwrapValues
 
 /**
@@ -33,11 +32,13 @@ data class Junction(
 
     // Methods
 
+    fun getConnectingRoadspaceIds() = connections.map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }.distinct()
+
     /**
-     * Returns the successor lane referenced by [RelativeLaneIdentifier], which follow the [laneIdentifier].
+     * Returns the successor lane referenced by [LaneIdentifier], which follow the [laneIdentifier].
      *
      * @param laneIdentifier identifier for which the successor
      */
-    fun getSuccessorLane(laneIdentifier: LaneIdentifier): List<RelativeLaneIdentifier> =
+    fun getSuccessorLane(laneIdentifier: LaneIdentifier): List<LaneIdentifier> =
         connections.map { it.getSuccessorLane(laneIdentifier) }.unwrapValues()
 }

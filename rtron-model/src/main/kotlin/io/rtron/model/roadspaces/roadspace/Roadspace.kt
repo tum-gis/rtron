@@ -26,6 +26,7 @@ import io.rtron.model.roadspaces.roadspace.road.Road
  */
 data class Roadspace(
     val id: RoadspaceIdentifier,
+    val name: String,
     val referenceLine: Curve3D,
     val road: Road,
     val roadspaceObjects: List<RoadspaceObject> = emptyList(),

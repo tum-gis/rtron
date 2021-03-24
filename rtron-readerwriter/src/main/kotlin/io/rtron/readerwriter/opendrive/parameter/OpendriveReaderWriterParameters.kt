@@ -22,7 +22,7 @@ import io.rtron.std.Property
 
 typealias OpendriveReaderWriterConfiguration = ReaderWriterConfiguration<OpendriveReaderWriterParameters>
 
-class OpendriveReaderWriterParameters() : AbstractReaderWriterParameters() {
+class OpendriveReaderWriterParameters : AbstractReaderWriterParameters() {
 
     // Methods
 

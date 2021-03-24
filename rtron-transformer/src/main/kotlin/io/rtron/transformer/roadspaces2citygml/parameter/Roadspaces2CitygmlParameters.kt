@@ -21,6 +21,7 @@ import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
 import io.rtron.std.Property
 import io.rtron.transformer.AbstractTransformerParameters
 import io.rtron.transformer.TransformerConfiguration
+import java.util.regex.Pattern
 
 typealias Roadspaces2CitygmlConfiguration = TransformerConfiguration<Roadspaces2CitygmlParameters>
 
@@ -35,7 +36,9 @@ class Roadspaces2CitygmlParameters(
     private val discretizationStepSizeProperty: Property<Double> = Property(0.7, true),
     private val sweepDiscretizationStepSizeProperty: Property<Double> = Property(ParametricSweep3D.DEFAULT_STEP_SIZE, true),
     private val circleSlicesProperty: Property<Int> = Property(Cylinder3D.DEFAULT_NUMBER_SLICES, true),
-    private val generateRandomGeometryIdsProperty: Property<Boolean> = Property(value = true, isDefault = true)
+    private val generateRandomGeometryIdsProperty: Property<Boolean> = Property(value = true, isDefault = true),
+    private val transformAdditionalRoadLinesProperty: Property<Boolean> = Property(value = false, isDefault = true),
+    private val mappingBackwardsCompatibilityProperty: Property<Boolean> = Property(value = true, isDefault = true)
 ) : AbstractTransformerParameters() {
 
     // Properties and Initializers
@@ -80,6 +83,20 @@ class Roadspaces2CitygmlParameters(
      */
     val generateRandomGeometryIds: Boolean by generateRandomGeometryIdsProperty
 
+    /**
+     * if true, additional road lines, such as the reference line, lane boundaries, etc. are also transformed
+     */
+    val transformAdditionalRoadLines: Boolean by transformAdditionalRoadLinesProperty
+
+    /**
+     * if true, only classes are populated that are also available in CityGML2
+     */
+    val mappingBackwardsCompatibility: Boolean by mappingBackwardsCompatibilityProperty
+
+    init {
+        require(PATTERN_NCNAME.matcher(gmlIdPrefix).matches()) { "Provided gmlIdPrefix ($gmlIdPrefix) requires valid NCName pattern." }
+    }
+
     // Methods
 
     /**
@@ -93,7 +110,9 @@ class Roadspaces2CitygmlParameters(
         this.discretizationStepSizeProperty leftMerge other.discretizationStepSizeProperty,
         this.sweepDiscretizationStepSizeProperty leftMerge other.sweepDiscretizationStepSizeProperty,
         this.circleSlicesProperty leftMerge other.circleSlicesProperty,
-        this.generateRandomGeometryIdsProperty leftMerge other.generateRandomGeometryIdsProperty
+        this.generateRandomGeometryIdsProperty leftMerge other.generateRandomGeometryIdsProperty,
+        this.transformAdditionalRoadLinesProperty leftMerge other.transformAdditionalRoadLinesProperty,
+        this.mappingBackwardsCompatibilityProperty leftMerge other.mappingBackwardsCompatibilityProperty
     )
 
     // Conversions
@@ -101,5 +120,10 @@ class Roadspaces2CitygmlParameters(
         "Roadspaces2CitygmlParameters(gmlIdPrefix=$gmlIdPrefix, identifierAttributesPrefix=$identifierAttributesPrefix, " +
             "flattenGenericAttributeSets=$flattenGenericAttributeSets, discretizationStepSize=$discretizationStepSize, " +
             "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices, " +
-            "generateRandomGeometryIds=$generateRandomGeometryIds)"
+            "generateRandomGeometryIds=$generateRandomGeometryIds, transformAdditionalRoadLines=$transformAdditionalRoadLines, " +
+            "mappingBackwardsCompatibility=$mappingBackwardsCompatibility)"
+
+    companion object {
+        val PATTERN_NCNAME: Pattern = Pattern.compile("[_\\p{L}][-_.\\p{L}0-9]*")!!
+    }
 }

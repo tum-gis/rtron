@@ -14,31 +14,26 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces.roadspace.objects
+package io.rtron.model.roadspaces.roadspace
 
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
-import java.util.UUID
+enum class ContactPoint(val relativeIndex: Int) {
+    START(0),
+    END(-1)
+}
 
 /**
  * Identifier of a lane section containing essential meta information.
  *
- * @param roadspaceObjectId id of the object within the road space
- * @param roadspaceObjectName name of the object within the road space
+ * @param roadspaceContactPoint start or end of roadspace
  * @param roadspaceIdentifier identifier of the road space
  */
-data class RoadspaceObjectIdentifier(
-    val roadspaceObjectId: String,
-    val roadspaceObjectName: String,
+data class RoadspaceContactPointIdentifier(
+    val roadspaceContactPoint: ContactPoint,
     val roadspaceIdentifier: RoadspaceIdentifier
 ) : RoadspaceIdentifierInterface by roadspaceIdentifier {
 
-    // Properties and Initializers
-    val hashKey get() = roadspaceObjectId + '_' + roadspaceIdentifier.roadspaceId + '_' + roadspaceIdentifier.modelIdentifier.fileHashSha256
-    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
-
     // Conversions
     override fun toString(): String {
-        return "RoadspaceObjectIdentifier(roadspaceObjectId=$roadspaceObjectId, roadspaceId=$roadspaceId)"
+        return "RoadspaceObjectIdentifier(roadspaceContactPoint=$roadspaceContactPoint, roadspaceId=$roadspaceId)"
     }
 }

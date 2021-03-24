@@ -40,6 +40,9 @@ configure {
 
         // true, if random ids shall be generated for the gml geometries
         generateRandomGeometryIds = true
+
+        // if true, additional road lines (reference line, lane boundaries) are exported
+        transformAdditionalRoadLines = false
     }
 
     citygmlReaderWriter {

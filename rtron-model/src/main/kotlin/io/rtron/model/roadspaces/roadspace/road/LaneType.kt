@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces.topology.junction
+package io.rtron.model.roadspaces.roadspace.road
 
-/**
- * Connection identifier interface required for class delegation.
- */
-interface ConnectionIdentifierInterface {
-    val connectionId: String
+enum class LaneType {
+    NONE, DRIVING, STOP, SHOULDER, BIKING, SIDEWALK, BORDER, RESTRICTED, PARKING, BIDIRECTIONAL,
+    MEDIAN, SPECIAL_1, SPECIAL_2, SPECIAL_3, ROAD_WORKS, TRAM, RAIL, ENTRY, EXIT, OFF_RAMP, ON_RAMP, CONNECTING_RAMP,
+    BUS, TAXI, HOV, MWY_ENTRY, MWY_EXIT
 }
-
-/**
- * Identifier of a [Connection].
- *
- * @param connectionId id of the junction
- * @param junctionIdentifier identifier of the junction
- */
-data class ConnectionIdentifier(
-    override val connectionId: String,
-    val junctionIdentifier: JunctionIdentifier
-) : ConnectionIdentifierInterface, JunctionIdentifierInterface by junctionIdentifier

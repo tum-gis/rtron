@@ -16,6 +16,8 @@
 
 package io.rtron.readerwriter
 
+import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.onSuccess
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.AbstractModel
@@ -31,13 +33,13 @@ class ReadWriteManager(projectId: String = "", val readerWriters: List<AbstractR
     // Methods
     fun isSupported(model: AbstractModel) = readerWriters.any { it.isSupported(model) }
 
-    fun read(filePath: Path): AbstractModel {
+    fun read(filePath: Path): Result<AbstractModel, Exception> {
         val readers = readerWriters.filter { it.isSupported(filePath.extension) }
         require(readers.isNotEmpty()) { "No adequate reader found." }
         require(readers.size <= 1) { "Multiple adequate readers found." }
 
         return readers.first().read(filePath)
-            .also { _reportLogger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔") }
+            .onSuccess { _reportLogger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔") }
     }
 
     fun write(model: AbstractModel, directoryPath: Path) {

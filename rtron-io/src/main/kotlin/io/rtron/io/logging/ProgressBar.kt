@@ -40,6 +40,10 @@ class ProgressBar(
     private val startTime = System.currentTimeMillis()
     private var lastPrintUpdateTime: Long = 0
 
+    init {
+        printInitial()
+    }
+
     // Methods
     /** Increments progress bar by one step. */
     fun step() {
@@ -51,6 +55,10 @@ class ProgressBar(
     fun stepTo(n: Int) {
         currentStatus = n
         printUpdate()
+    }
+
+    private fun printInitial() {
+        print("$PREFIX $taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% \r")
     }
 
     private fun printUpdate() {

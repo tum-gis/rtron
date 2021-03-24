@@ -33,8 +33,13 @@ import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.length
+import io.rtron.model.roadspaces.common.LateralFillerSurface
+import io.rtron.model.roadspaces.junction.JunctionIdentifier
+import io.rtron.model.roadspaces.roadspace.ContactPoint
+import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.std.Optional
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
 import io.rtron.std.isSortedBy
@@ -99,51 +104,68 @@ class Road(
 
     // Methods
 
-    /**
-     * Returns the identifiers of all lanes as a flattened list.
-     */
-    fun getAllLaneIdentifiers(): List<LaneIdentifier> = laneSections.flatMap { it.lanes.values }.map { it.id }
+    /** Returns the identifiers of all left and right lanes as a flattened list. */
+    fun getAllLeftRightLaneIdentifiers(): List<LaneIdentifier> = getAllLeftRightLanes().map { it.id }
 
-    /**
-     * Returns the identifiers of all lane sections as a list.
-     */
+    /** Returns all left and right lanes as a flattened list. */
+    fun getAllLeftRightLanes(): List<Lane> = laneSections.flatMap { it.lanes.values }
+
+    /** Returns the identifiers of all center lanes as a list. */
+    fun getAllCenterLaneIdentifier(): List<LaneIdentifier> = laneSections.map { it.centerLane.id }
+
+    /** Returns the identifiers of all lanes (center, left and right) as a list. */
+    fun getAllLaneIdentifiers(): List<LaneIdentifier> = getAllCenterLaneIdentifier() + getAllLeftRightLaneIdentifiers()
+
+    /** Returns the identifiers of all lane sections as a list. */
     fun getAllLaneSectionIdentifiers(): List<LaneSectionIdentifier> = laneSections.map { it.id }
 
-    /**
-     * Returns the lane reference line which is a laterally translated road reference line.
-     */
+    /** Returns the lane reference line which is a laterally translated road reference line. */
     fun getLaneReferenceLine(): AbstractCurve3D = CurveOnParametricSurface3D.onCompleteSurface(surface, laneOffset)
 
-    /**
-     * Returns the lane section with the [laneSectionIdentifier]; if it does not exist, an [Result.Failure] is returned.
-     */
+    /** Returns the lane section with the [laneSectionIdentifier]; if it does not exist, an [Result.Failure] is returned. */
     fun getLaneSection(laneSectionIdentifier: LaneSectionIdentifier) =
         laneSections.getValueResult(laneSectionIdentifier.laneSectionId)
 
-    /**
-     * Returns an individual lane referenced by [laneIdentifier]; if it does not exist, an [Result.Failure] is returned.
-     */
+    /** Returns an individual lane referenced by [laneIdentifier]; if it does not exist, an [Result.Failure] is returned. */
     fun getLane(laneIdentifier: LaneIdentifier): Result<Lane, IllegalArgumentException> =
         getLaneSection(laneIdentifier.laneSectionIdentifier)
             .handleFailure { return it }
             .getLane(laneIdentifier.laneId)
 
-    /**
-     * Returns all lane surfaces contained in this road.
-     *
-     * @param step discretization step size
-     * @return a triple of the lane identifier, the lane surface geometry and the lane's attribute list
-     */
-    fun getAllLanes(step: Double): List<Result<Triple<LaneIdentifier, AbstractSurface3D, AttributeList>, Exception>> =
-        getAllLaneIdentifiers().map { id ->
-            val laneSurface = getLaneSurface(id, step).handleFailure { return@map it }
-            val attributes = getAttributeList(id).handleFailure { return@map it }
-            Result.success(Triple(id, laneSurface, attributes))
+    /** Returns true, if road belongs to a junction. */
+    fun isLocatedInJunction() = linkage.belongsToJunctionId.isPresent()
+
+    /** Returns the contact point of the roadspace which connects to the junction with the [junctionIdentifier]. */
+    fun getRoadspaceContactPointToJunction(junctionIdentifier: JunctionIdentifier): Optional<RoadspaceContactPointIdentifier> =
+        when {
+            linkage.predecessorJunctionId equalsValue junctionIdentifier -> Optional(RoadspaceContactPointIdentifier(ContactPoint.START, id))
+            linkage.successorJunctionId equalsValue junctionIdentifier -> Optional(RoadspaceContactPointIdentifier(ContactPoint.END, id))
+            else -> Optional.empty()
         }
 
-    /**
-     * Returns the center line of the road
-     */
+    /** Returns the [LaneSectionIdentifier] (first or last lane section) of the roadspace which is referenced by the
+     * [roadspaceContactPointIdentifier]. */
+    fun getLaneSectionIdentifier(roadspaceContactPointIdentifier: RoadspaceContactPointIdentifier): LaneSectionIdentifier {
+        require(roadspaceContactPointIdentifier.roadspaceIdentifier == id) { "RoadspaceContactIdentifier ($roadspaceContactPointIdentifier) must reference this road (id=$id)." }
+
+        return when (roadspaceContactPointIdentifier.roadspaceContactPoint) {
+            ContactPoint.START -> laneSections.first().id
+            ContactPoint.END -> laneSections.last().id
+        }
+    }
+
+    /** Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road. */
+    fun isInFirstLaneSection(laneIdentifier: LaneIdentifier) =
+        laneIdentifier.laneSectionIdentifier == laneSections.first().id
+
+    /** Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road. */
+    fun isInLastLaneSection(laneIdentifier: LaneIdentifier) =
+        laneIdentifier.laneSectionIdentifier == laneSections.last().id
+
+    /** Returns the number of contained lane sections. */
+    fun numberOfLaneSections(): Int = laneSections.size
+
+    /** Returns the center line of the road. */
     fun getAllCenterLanes(): List<Triple<LaneIdentifier, AbstractCurve3D, AttributeList>> =
         laneSections.map { it.centerLane }.map { element ->
             val line = getCurveOnLaneSectionSurface(element.id.laneSectionIdentifier, element.level)
@@ -157,7 +179,7 @@ class Road(
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
     fun getAllLeftLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
-        getAllLaneIdentifiers().map { id ->
+        getAllLeftRightLaneIdentifiers().map { id ->
             val curve = getLeftLaneBoundary(id).handleFailure { throw it.error }
             Pair(id, curve)
         }
@@ -168,7 +190,7 @@ class Road(
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
     fun getAllRightLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
-        getAllLaneIdentifiers().map { id ->
+        getAllLeftRightLaneIdentifiers().map { id ->
             val curve = getRightLaneBoundary(id).handleFailure { throw it.error }
             Pair(id, curve)
         }
@@ -181,48 +203,34 @@ class Road(
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
     fun getAllCurvesOnLanes(factor: Double): List<Pair<LaneIdentifier, AbstractCurve3D>> =
-        getAllLaneIdentifiers().map { id ->
+        getAllLeftRightLaneIdentifiers().map { id ->
             val curve = getCurveOnLane(id, factor).handleFailure { throw it.error }
             Pair(id, curve)
         }
 
-    /**
-     * Returns all lateral filler surfaces of this road.
-     *
-     * @param step discretization step size
-     * @return lane identifier and the filler surface to the left of the respective lane
-     */
-    fun getAllLateralFillerSurfaces(step: Double): List<Pair<LaneIdentifier, AbstractSurface3D>> =
-        getAllLaneIdentifiers().fold(emptyList()) { acc, id ->
-            val fillerSurface = getLeftLateralFillerSurfaceOrNull(id, step)
-                .handleFailure { throw it.error }
-            if (fillerSurface == null) acc else acc + Pair(id, fillerSurface)
-        }
-
-    /**
-     * Returns all road markings of all lanes and center lanes.
-     *
-     * @param step discretization step size
-     * @return list of the road markings containing it's identifier, geometry and attribute list
-     */
-    fun getAllRoadMarkings(step: Double):
-        List<Result<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>, Exception>> =
-            getAllLaneIdentifiers().flatMap { getRoadMarkings(it, step) } +
-                getAllLaneSectionIdentifiers().flatMap { getCenterRoadMarkings(it, step) }
-
-    /**
-     * Returns the left boundary of an individual lane with [laneIdentifier].
-     */
+    /** Returns the left boundary of an individual lane with [laneIdentifier]. */
     fun getLeftLaneBoundary(laneIdentifier: LaneIdentifier): Result<AbstractCurve3D, Exception> =
-        if (laneIdentifier.isLeft()) getCurveOnLane(laneIdentifier, 1.0)
-        else getCurveOnLane(laneIdentifier, 0.0)
+        if (laneIdentifier.isLeft()) getOuterLaneBoundary(laneIdentifier)
+        else getInnerLaneBoundary(laneIdentifier)
 
-    /**
-     * Returns the right boundary of an individual lane with [laneIdentifier].
-     */
+    /** Returns the right boundary of an individual lane with [laneIdentifier]. */
     fun getRightLaneBoundary(laneIdentifier: LaneIdentifier): Result<AbstractCurve3D, Exception> =
-        if (laneIdentifier.isLeft()) getCurveOnLane(laneIdentifier, 0.0)
-        else getCurveOnLane(laneIdentifier, 1.0)
+        if (laneIdentifier.isLeft()) getInnerLaneBoundary(laneIdentifier)
+        else getOuterLaneBoundary(laneIdentifier)
+
+    /** Returns the inner lane boundary of an individual lane with [laneIdentifier]. */
+    fun getInnerLaneBoundary(laneIdentifier: LaneIdentifier): Result<AbstractCurve3D, Exception> = getCurveOnLane(laneIdentifier, 0.0)
+
+    /** Returns the outer lane boundary of an individual lane with [laneIdentifier]. */
+    fun getOuterLaneBoundary(laneIdentifier: LaneIdentifier): Result<AbstractCurve3D, Exception> = getCurveOnLane(laneIdentifier, 1.0)
+
+    /** Returns the curve of the center lane with [laneSectionIdentifier]. */
+    fun getCurveOfCenterLane(laneSectionIdentifier: LaneSectionIdentifier): Result<AbstractCurve3D, Exception> {
+        val laneSection = getLaneSection(laneSectionIdentifier).handleFailure { return it }
+        val line = getCurveOnLaneSectionSurface(laneSectionIdentifier, laneSection.centerLane.level)
+            .handleFailure { throw it.error }
+        return Result.success(line)
+    }
 
     /**
      * Returns a curve that lies on the road surface and is parallel to the lane boundaries
@@ -231,12 +239,13 @@ class Road(
      * @param factor if the factor is 0.0, the inner lane boundary is returned; if the factor is 1.0, the outer
      * lane boundary is returned; if the factor is 0.5, the center line of the lane is returned
      */
-    private fun getCurveOnLane(
+    fun getCurveOnLane(
         laneIdentifier: LaneIdentifier,
         factor: Double,
         addLateralOffset: UnivariateFunction = ConstantFunction.ZERO
     ):
         Result<AbstractCurve3D, Exception> {
+            require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
             // select the requested lane
             val selectedLaneSection = getLaneSection(laneIdentifier.laneSectionIdentifier)
@@ -330,69 +339,62 @@ class Road(
     }
 
     /**
-     * Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road.
-     */
-    fun isInFirstLaneSection(laneIdentifier: LaneIdentifier) =
-        laneSections.first().id == laneIdentifier.laneSectionIdentifier
-
-    /**
-     * Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road.
-     */
-    fun isInLastLaneSection(laneIdentifier: LaneIdentifier) =
-        laneSections.last().id == laneIdentifier.laneSectionIdentifier
-
-    /**
-     * Returns the number of contained lane sections.
-     */
-    fun numberOfLaneSections(): Int = laneSections.size
-
-    /**
      * Returns the filler surface which closes the gap occurring at the lateral transition of two lane elements.
      * These lateral transitions might contain vertical holes which are caused by e.g. lane height offsets.
-     * If no lateral surface filler is needed due to adjacent lane surfaces, null is returned.
+     * If no lateral surface filler is needed due to adjacent lane surfaces, [Optional.empty] is returned.
      *
      * @param laneIdentifier lane identifier for which the lateral filler surfaces to the left shall be created
      * @param step discretization step size
      */
-    private fun getLeftLateralFillerSurfaceOrNull(laneIdentifier: LaneIdentifier, step: Double):
-        Result<AbstractSurface3D?, Exception> {
+    fun getInnerLateralFillerSurface(laneIdentifier: LaneIdentifier, step: Double):
+        Result<Optional<LateralFillerSurface>, Exception> {
+            require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
-            // return no lateral filler surface, if there is no lane on the left
-            getLane(laneIdentifier.getAdjacentLeftLaneIdentifier())
-                .handleFailure { return Result.success(null) }
-
-            val leftLaneBoundary = getLeftLaneBoundary(laneIdentifier)
+            val innerLaneBoundaryOfThisLaneSampled = getInnerLaneBoundary(laneIdentifier)
                 .handleFailure { return it }
                 .calculatePointListGlobalCS(step)
                 .handleFailure { return it }
-            val rightLaneBoundary = getRightLaneBoundary(laneIdentifier.getAdjacentLeftLaneIdentifier())
+
+            val innerLaneIdentifier = laneIdentifier.getAdjacentInnerLaneIdentifier()
+
+            val outerLaneBoundaryOfInnerLane = if (innerLaneIdentifier.isCenter()) getCurveOfCenterLane(innerLaneIdentifier.laneSectionIdentifier) else getOuterLaneBoundary(innerLaneIdentifier)
+            val outerLaneBoundaryOfInnerLaneSampled = outerLaneBoundaryOfInnerLane
                 .handleFailure { return it }
                 .calculatePointListGlobalCS(step)
                 .handleFailure { return it }
 
             // return no lateral filler surface, if there is no gap between the lane surfaces
-            if (leftLaneBoundary.fuzzyEquals(rightLaneBoundary, geometricalTolerance))
-                return Result.success(null)
+            if (innerLaneBoundaryOfThisLaneSampled.fuzzyEquals(outerLaneBoundaryOfInnerLaneSampled, geometricalTolerance))
+                return Result.success(Optional.empty())
+
+            val leftLaneBoundary = if (laneIdentifier.isLeft()) outerLaneBoundaryOfInnerLaneSampled else innerLaneBoundaryOfThisLaneSampled
+            val rightLaneBoundary = if (laneIdentifier.isLeft()) innerLaneBoundaryOfThisLaneSampled else outerLaneBoundaryOfInnerLaneSampled
 
             return LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary, geometricalTolerance)
                 .handleFailure { return it }
                 .let { CompositeSurface3D(it) }
-                .let { Result.success(it) }
+                .let { LateralFillerSurface(laneIdentifier, innerLaneIdentifier, it) }
+                .let { Result.success(Optional(it)) }
         }
 
+    fun getRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
+        List<Result<Pair<RoadMarking, AbstractGeometry3D>, Exception>> =
+            if (laneIdentifier.isCenter()) getCenterRoadMarkings(laneIdentifier, step) else getLeftRightRoadMarkings(laneIdentifier, step)
+
     /**
-     * Returns all road markings of the center lane of the lane section with [laneSectionIdentifier].
+     * Returns all road markings of the center lane of the lane section with [LaneIdentifier].
      *
-     * @param laneSectionIdentifier identifier for which the road markings shall be returned
+     * @param laneIdentifier identifier of lane (must represent a center lane) for which the road markings shall be returned
      * @param step discretization step size
      */
-    private fun getCenterRoadMarkings(laneSectionIdentifier: LaneSectionIdentifier, step: Double):
-        List<Result<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>, Exception>> {
+    private fun getCenterRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
+        List<Result<Pair<RoadMarking, AbstractGeometry3D>, Exception>> {
+            require(laneIdentifier.isCenter()) { "Identifier of lane must represent a center lane." }
 
-            val centerLane = getLaneSection(laneSectionIdentifier).handleFailure { throw it.error }.centerLane
+            val centerLane = getLaneSection(laneIdentifier.laneSectionIdentifier).handleFailure { throw it.error }.centerLane
 
             return centerLane.roadMarkings.map {
-                Result.success(Triple(centerLane.id, getCenterRoadMarkingGeometry(centerLane, it, step), it.attributes))
+                Result.success(it to getCenterRoadMarkingGeometry(centerLane, it, step))
             }
         }
 
@@ -431,16 +433,19 @@ class Road(
      * @param laneIdentifier lane identifier for which the road markings shall be returned
      * @param step discretization step size
      */
-    private fun getRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
-        List<Result<Triple<LaneIdentifier, AbstractGeometry3D, AttributeList>, Exception>> =
-            getLane(laneIdentifier)
+    private fun getLeftRightRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
+        List<Result<Pair<RoadMarking, AbstractGeometry3D>, Exception>> {
+            require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
+
+            return getLane(laneIdentifier)
                 .handleFailure { throw it.error }
                 .roadMarkings
                 .map { currentRoadMarking ->
                     val geometry = getRoadMarkingGeometry(laneIdentifier, currentRoadMarking, step)
                         .handleFailure { return@map it }
-                    Result.success(Triple(laneIdentifier, geometry, currentRoadMarking.attributes))
+                    Result.success(currentRoadMarking to geometry)
                 }
+        }
 
     /**
      * Returns the geometry of a [roadMarking] which is attached to a lane with [laneIdentifier].
@@ -476,9 +481,7 @@ class Road(
                 .let { Result.success(it) }
         }
 
-    /**
-     * Returns the curve position domains of each lane section.
-     */
+    /** Returns the curve position domains of each lane section. */
     private fun getLaneSectionCurvePositionDomains(): List<Range<Double>> {
         val laneSectionDomains = laneSections
             .map { it.curvePositionStart.curvePosition }
@@ -493,10 +496,4 @@ class Road(
 
         return laneSectionDomains + lastLaneSectionDomain
     }
-
-    private fun getAttributeList(laneIdentifier: LaneIdentifier): Result<AttributeList, IllegalArgumentException> =
-        getLane(laneIdentifier)
-            .handleFailure { return it }
-            .attributes
-            .let { Result.success(it) }
 }

@@ -26,6 +26,7 @@ import io.rtron.readerwriter.citygml.CitygmlReaderWriter
 import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterConfiguration
 import io.rtron.readerwriter.opendrive.OpendriveReaderWriter
 import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
+import io.rtron.std.handleFailure
 import io.rtron.transformer.opendrive2roadspaces.Opendrive2RoadspacesTransformer
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.roadspaces2citygml.Roadspaces2CitygmlTransformer
@@ -70,7 +71,8 @@ class ProjectTransformationManager(
 
         val timeElapsed = measureTime {
             // read
-            val opendriveModel = _readWriteManager.read(configuration.absoluteSourceFilePath) as OpendriveModel
+            val opendriveModel = _readWriteManager.read(configuration.absoluteSourceFilePath)
+                .handleFailure { _reportLogger.log(it, "", "Transformation project can not be continued."); return } as OpendriveModel
 
             // transform
             val roadspacesModel = _opendrive2RoadspacesTransformer.transform(opendriveModel)

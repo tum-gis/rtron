@@ -17,14 +17,13 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.success
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspaces2citygml.geometry.populateLod1Geometry
+import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
+import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
-import io.rtron.transformer.roadspaces2citygml.transformer.AttributesAdder
-import io.rtron.transformer.roadspaces2citygml.transformer.toGmlString
 import org.citygml4j.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 
@@ -32,40 +31,46 @@ import org.xmlobjects.gml.model.measures.Length
  * Builder for city objects of the CityGML Vegetation module.
  */
 class VegetationModuleBuilder(
-    val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration,
+    private val identifierAdder: IdentifierAdder
 ) {
-
     // Properties and Initializers
+    private val _reportLogger = configuration.getReportLogger()
     private val _attributesAdder = AttributesAdder(configuration.parameters)
 
     // Methods
 
-    fun createVegetationObject(geometryTransformer: GeometryTransformer): Result<SolitaryVegetationObject, Exception> {
-        val solitaryVegetationObject = SolitaryVegetationObject()
+    fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): Result<SolitaryVegetationObject, Exception> {
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
-        solitaryVegetationObject.populateLod1Geometry(geometryTransformer).handleFailure { return it }
+        solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO).handleFailure { return it }
         if (geometryTransformer.isSetRotation())
-            geometryTransformer.getRotation().handleFailure { return it }.also { _attributesAdder.addRotationAttributes(it, solitaryVegetationObject) }
+            geometryTransformer.getRotation().handleFailure { return it }.also { _attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature) }
+        addAttributes(solitaryVegetationObjectFeature, geometryTransformer).handleFailure { return it }
 
-        addAttributes(solitaryVegetationObject, geometryTransformer).handleFailure { return it }
-        return Result.success(solitaryVegetationObject)
+        // semantics
+        identifierAdder.addUniqueIdentifier(roadspaceObject.id, solitaryVegetationObjectFeature)
+        _attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
+
+        return Result.success(solitaryVegetationObjectFeature)
     }
 
     private fun addAttributes(
-        solitaryVegetationObject: SolitaryVegetationObject,
+        solitaryVegetationObjectFeature: SolitaryVegetationObject,
         geometryTransformer: GeometryTransformer
     ): Result<Unit, Exception> {
 
         if (geometryTransformer.isSetDiameter())
             geometryTransformer.getDiameter().handleFailure { return it }.also {
-                solitaryVegetationObject.trunkDiameter = Length(it)
-                solitaryVegetationObject.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
+                solitaryVegetationObjectFeature.trunkDiameter = Length(it)
+                solitaryVegetationObjectFeature.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
             }
 
         if (geometryTransformer.isSetHeight())
             geometryTransformer.getHeight().handleFailure { return it }.also {
-                solitaryVegetationObject.height = Length(it)
-                solitaryVegetationObject.height.uom = UnitOfMeasure.METER.toGmlString()
+                solitaryVegetationObjectFeature.height = Length(it)
+                solitaryVegetationObjectFeature.height.uom = UnitOfMeasure.METER.toGmlString()
             }
 
         return Result.success(Unit)

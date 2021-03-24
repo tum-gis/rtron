@@ -29,7 +29,6 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.curve.AbstractCurve2D
 import io.rtron.math.range.fuzzyContainsResult
 import io.rtron.math.range.fuzzyEncloses
-import io.rtron.math.range.length
 import io.rtron.math.transform.Affine3D
 import io.rtron.std.handleFailure
 

@@ -17,48 +17,87 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.success
-import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
-import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
+import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
+import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
-import io.rtron.transformer.roadspaces2citygml.transformer.AttributesAdder
 import org.citygml4j.model.generics.GenericOccupiedSpace
 
 /**
  * Builder for city objects of the CityGML Generics module.
  */
 class GenericsModuleBuilder(
-    val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration,
+    private val identifierAdder: IdentifierAdder
 ) {
-
     // Properties and Initializers
-    private val _reportLogger: Logger = configuration.getReportLogger()
+    private val _reportLogger = configuration.getReportLogger()
     private val _attributesAdder = AttributesAdder(configuration.parameters)
 
     // Methods
-    fun createGenericObject(curve3D: AbstractCurve3D): Result<GenericOccupiedSpace, Exception> {
-        val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
-            .also { curve3D.accept(it) }
-        return createGenericObject(geometryTransformer)
+    fun createGenericOccupiedSpaceFeature(roadspaceObject: RoadspaceObject): Result<GenericOccupiedSpace, Exception> {
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(geometryTransformer).handleFailure { return it }
+
+        // semantics
+        identifierAdder.addUniqueIdentifier(roadspaceObject.id, genericOccupiedSpace)
+        _attributesAdder.addAttributes(roadspaceObject, genericOccupiedSpace)
+
+        return Result.success(genericOccupiedSpace)
     }
 
-    fun createGenericObject(abstractGeometry3D: AbstractGeometry3D): Result<GenericOccupiedSpace, Exception> {
-        val geometryTransformer = GeometryTransformer(configuration.parameters, _reportLogger)
-            .also { abstractGeometry3D.accept(it) }
-        return createGenericObject(geometryTransformer)
-    }
+    fun createGenericOccupiedSpaceFeature(id: LaneIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList):
+        Result<GenericOccupiedSpace, Exception> {
 
-    fun createGenericObject(geometryTransformer: GeometryTransformer): Result<GenericOccupiedSpace, Exception> {
-        val genericCityObject = GenericOccupiedSpace()
-        genericCityObject.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
+            val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).handleFailure { return it }
 
-        if (geometryTransformer.isSetRotation())
-            geometryTransformer.getRotation().handleFailure { return it }.also { _attributesAdder.addRotationAttributes(it, genericCityObject) }
-        return Result.success(genericCityObject)
-    }
+            identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
+            _attributesAdder.addAttributes(
+                id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                    attributes,
+                genericOccupiedSpace
+            )
+            return Result.success(genericOccupiedSpace)
+        }
+
+    fun createGenericOccupiedSpaceFeature(id: RoadspaceIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList):
+        Result<GenericOccupiedSpace, Exception> {
+            val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).handleFailure { return it }
+
+            identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
+            _attributesAdder.addAttributes(
+                id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                    attributes,
+                genericOccupiedSpace
+            )
+            return Result.success(genericOccupiedSpace)
+        }
+
+    private fun createGenericOccupiedSpaceFeature(abstractGeometry: AbstractGeometry3D):
+        Result<GenericOccupiedSpace, Exception> {
+            val geometryTransformer = GeometryTransformer(configuration.parameters)
+                .also { abstractGeometry.accept(it) }
+            return createGenericOccupiedSpaceFeature(geometryTransformer)
+        }
+
+    private fun createGenericOccupiedSpaceFeature(geometryTransformer: GeometryTransformer):
+        Result<GenericOccupiedSpace, Exception> {
+            val genericOccupiedSpaceFeature = GenericOccupiedSpace()
+
+            // geometry
+            genericOccupiedSpaceFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
+            if (geometryTransformer.isSetRotation())
+                geometryTransformer.getRotation()
+                    .handleFailure { return it }
+                    .also { _attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature) }
+
+            return Result.success(genericOccupiedSpaceFeature)
+        }
 }

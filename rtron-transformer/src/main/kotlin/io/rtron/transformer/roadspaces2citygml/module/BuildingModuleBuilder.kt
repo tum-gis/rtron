@@ -17,9 +17,11 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.roadspaces2citygml.geometry.populateLod1Geometry
+import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
+import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.building.Building
 
@@ -27,14 +29,26 @@ import org.citygml4j.model.building.Building
  * Builder for city objects of the CityGML Building module.
  */
 class BuildingModuleBuilder(
-    val configuration: Roadspaces2CitygmlConfiguration
+    val configuration: Roadspaces2CitygmlConfiguration,
+    private val identifierAdder: IdentifierAdder
 ) {
+    // Properties and Initializers
+    private val _reportLogger = configuration.getReportLogger()
+    private val _attributesAdder = AttributesAdder(configuration.parameters)
 
     // Methods
-    fun createBuildingObject(geometryTransformer: GeometryTransformer): Result<Building, Exception> {
-        val building = Building()
-        building.populateLod1Geometry(geometryTransformer).handleFailure { return it }
+    fun createBuildingFeature(roadspaceObject: RoadspaceObject): Result<Building, Exception> {
+        val buildingFeature = Building()
 
-        return Result.success(building)
+        // geometry
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE)
+            .handleFailure { return it }
+
+        // semantics
+        identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name, buildingFeature)
+        _attributesAdder.addAttributes(roadspaceObject, buildingFeature)
+
+        return Result.success(buildingFeature)
     }
 }

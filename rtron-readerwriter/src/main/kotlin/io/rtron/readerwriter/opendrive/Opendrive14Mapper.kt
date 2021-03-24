@@ -74,6 +74,12 @@ import org.mapstruct.NullValueCheckStrategy
 import org.mapstruct.ValueMapping
 import org.mapstruct.ValueMappings
 
+/**
+ * Returns upper case string variations (with or without '_') of string.
+ */
+fun String.toUpperCaseVariations(): List<String> =
+    listOf(toUpperCase(), replace("_", "").toUpperCase())
+
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 abstract class Opendrive14Mapper {
 
@@ -175,32 +181,22 @@ abstract class Opendrive14Mapper {
 
     fun mapRoadObjectType(srcType: String): EObjectType =
         when (srcType.toUpperCase()) {
-            EObjectType.NONE.name -> EObjectType.NONE
-            EObjectType.OBSTACLE.name -> EObjectType.OBSTACLE
-            EObjectType.CAR.name -> EObjectType.CAR
-            EObjectType.POLE.name -> EObjectType.POLE
-            EObjectType.TREE.name -> EObjectType.TREE
-            EObjectType.VEGETATION.name -> EObjectType.VEGETATION
-            EObjectType.BARRIER.name -> EObjectType.BARRIER
-            EObjectType.BUILDING.name -> EObjectType.BUILDING
-            EObjectType.PARKING_SPACE.name -> EObjectType.PARKING_SPACE
-            EObjectType.PATCH.name -> EObjectType.PATCH
-            EObjectType.RAILING.name -> EObjectType.RAILING
-            EObjectType.TRAFFIC_ISLAND.name -> EObjectType.TRAFFIC_ISLAND
-            EObjectType.CROSSWALK.name -> EObjectType.CROSSWALK
-            EObjectType.STREET_LAMP.name -> EObjectType.STREET_LAMP
-            EObjectType.GANTRY.name -> EObjectType.GANTRY
-            EObjectType.SOUND_BARRIER.name -> EObjectType.SOUND_BARRIER
-            EObjectType.TRUCK.name -> EObjectType.TRUCK
-            EObjectType.VAN.name -> EObjectType.VAN
-            EObjectType.BUS.name -> EObjectType.BUS
-            EObjectType.TRAILER.name -> EObjectType.TRAILER
-            EObjectType.BIKE.name -> EObjectType.BIKE
-            EObjectType.MOTORBIKE.name -> EObjectType.MOTORBIKE
-            EObjectType.TRAM.name -> EObjectType.TRAM
-            EObjectType.TRAIN.name -> EObjectType.TRAIN
-            EObjectType.PEDESTRIAN.name -> EObjectType.PEDESTRIAN
-            EObjectType.WIND.name -> EObjectType.WIND
+            in EObjectType.NONE.name.toUpperCaseVariations() -> EObjectType.NONE
+            in EObjectType.OBSTACLE.name.toUpperCaseVariations() -> EObjectType.OBSTACLE
+            in EObjectType.POLE.name.toUpperCaseVariations() -> EObjectType.POLE
+            in EObjectType.TREE.name.toUpperCaseVariations() -> EObjectType.TREE
+            in EObjectType.VEGETATION.name.toUpperCaseVariations() -> EObjectType.VEGETATION
+            in EObjectType.BARRIER.name.toUpperCaseVariations() -> EObjectType.BARRIER
+            in EObjectType.BUILDING.name.toUpperCaseVariations() -> EObjectType.BUILDING
+            in EObjectType.PARKING_SPACE.name.toUpperCaseVariations() -> EObjectType.PARKING_SPACE
+            in EObjectType.PATCH.name.toUpperCaseVariations() -> EObjectType.PATCH
+            in EObjectType.RAILING.name.toUpperCaseVariations() -> EObjectType.RAILING
+            in EObjectType.TRAFFIC_ISLAND.name.toUpperCaseVariations() -> EObjectType.TRAFFIC_ISLAND
+            in EObjectType.CROSSWALK.name.toUpperCaseVariations() -> EObjectType.CROSSWALK
+            in EObjectType.STREET_LAMP.name.toUpperCaseVariations() -> EObjectType.STREET_LAMP
+            in EObjectType.GANTRY.name.toUpperCaseVariations() -> EObjectType.GANTRY
+            in EObjectType.SOUND_BARRIER.name.toUpperCaseVariations() -> EObjectType.SOUND_BARRIER
+            in EObjectType.ROAD_MARK.name.toUpperCaseVariations() -> EObjectType.ROAD_MARK
             else -> EObjectType.NONE
         }
 

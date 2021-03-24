@@ -28,8 +28,8 @@ class HeaderBuilder(
 ) {
 
     // Methods
-    fun buildHeader(srcHeader: OdrHeader): Header {
-        val crs = buildCoordinateSystem(srcHeader.geoReference)
+    fun buildHeader(header: OdrHeader): Header {
+        val crs = buildCoordinateSystem(header.geoReference)
 
         return Header(coordinateReferenceSystem = crs)
     }
@@ -37,10 +37,10 @@ class HeaderBuilder(
     /**
      * Builds the [CoordinateReferenceSystem] for the [Header].
      */
-    private fun buildCoordinateSystem(srcGeoReference: String): Result<CoordinateReferenceSystem, Exception> {
+    private fun buildCoordinateSystem(geoReference: String): Result<CoordinateReferenceSystem, Exception> {
 
         CoordinateReferenceSystem.of(configuration.parameters.crsEpsg).handleSuccess { return it }
-        CoordinateReferenceSystem.of(srcGeoReference).handleSuccess { return it }
+        CoordinateReferenceSystem.of(geoReference).handleSuccess { return it }
         return Result.error(IllegalStateException("Unknown coordinate reference system."))
     }
 }

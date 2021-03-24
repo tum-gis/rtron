@@ -33,28 +33,20 @@ data class Optional<T>(
      * Returns true, if the [value] of this equals the [otherValue].
      * If no value [isPresent], false is returned.
      */
-    infix fun equalsValue(otherValue: T): Boolean = getResult().handleFailure { return false } == otherValue
+    infix fun equalsValue(otherValue: T): Boolean = handleEmpty { return false } == otherValue
 
     // Methods
 
-    /**
-     * Returns true, if no value is present.
-     */
+    /** Returns true, if no value is present. */
     fun isEmpty(): Boolean = value == null
 
-    /**
-     * Returns true, if a value is present.
-     */
+    /** Returns true, if a value is present. */
     fun isPresent(): Boolean = value != null
 
-    /**
-     * Returns a value, if available; otherwise null is returned.
-     */
+    /** Returns a value, if available; otherwise null is returned. */
     fun getOrNull(): T? = value
 
-    /**
-     * Returns [Result.success] of the [value], if available; otherwise [Result.error] is returned.
-     */
+    /** Returns [Result.success] of the [value], if available; otherwise [Result.error] is returned. */
     fun getResult(): Result<T, IllegalStateException> =
         if (isPresent()) Result.success(value!!) else Result.error(IllegalStateException(""))
 
@@ -70,18 +62,20 @@ data class Optional<T>(
     }
 }
 
+/** Map the [T] of [Optional] to [R], if present. */
 inline fun <T, R> Optional<T>.map(transform: (T) -> R): Optional<R> =
     if (isEmpty()) Optional.empty()
     else Optional(transform(this.getOrNull()!!))
 
+/** Returns [T], if present, and the [defaultValue] otherwise. */
 infix fun <T> Optional<T>.getOrElse(defaultValue: T): T = getOrNull() ?: defaultValue
 
-/**
- * Returns a list of values of type [T], whereby the empty [Optional] are ignored.
- */
+/** Returns a list of values of type [T], whereby the empty [Optional] are ignored. */
 fun <T> List<Optional<T>>.unwrapValues(): List<T> = filter { it.isPresent() }.map { it.getOrNull()!! }
 
-/**
- *
- */
+/** Execute [f] on the value of type [T], if present. */
 inline fun <T : Any?> Optional<T>.present(f: (T) -> Unit) { if (isPresent()) f(getOrNull()!!) }
+
+/** Handle the [Optional.empty] with [block] and return the [V]. */
+inline fun <V : Any?> Optional<V>.handleEmpty(block: (Optional<V>) -> Nothing): V =
+    if (isPresent()) getOrNull()!! else block(this)

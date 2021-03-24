@@ -20,6 +20,7 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
+import io.rtron.math.processing.isColinear
 import io.rtron.math.processing.isPlanar
 import io.rtron.math.processing.triangulation.ExperimentalTriangulator
 import io.rtron.math.processing.triangulation.Triangulator
@@ -111,11 +112,14 @@ data class LinearRing3D(
                 val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
                 val linearRings: List<LinearRing3D> = vertexPairs
+                    .asSequence()
                     .zipWithNext()
                     .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
                     .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
                     .filter { it.distinct().count() >= 3 }
+                    .filter { !it.isColinear(tolerance) }
                     .map { LinearRing3D(it, tolerance) }
+                    .toList()
 
                 return if (linearRings.isEmpty()) Result.error(IllegalArgumentException("Not enough valid linear rings could be constructed."))
                 else Result.success(linearRings)

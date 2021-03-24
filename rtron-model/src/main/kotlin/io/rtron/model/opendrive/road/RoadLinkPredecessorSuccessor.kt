@@ -35,8 +35,8 @@ data class RoadLinkPredecessorSuccessor(
 
     // Methods
 
-    fun getRoadPredecessorSuccessor(): Optional<String> =
-        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.ROAD) Optional(elementId)
+    fun getRoadPredecessorSuccessor(): Optional<Pair<String, EContactPoint>> =
+        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.ROAD) Optional(elementId to contactPoint)
         else Optional.empty()
 
     fun getJunctionPredecessorSuccessor(): Optional<String> =

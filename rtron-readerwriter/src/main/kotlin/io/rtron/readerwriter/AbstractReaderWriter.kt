@@ -27,7 +27,7 @@ abstract class AbstractReaderWriter {
     abstract fun isSupported(fileExtension: String): Boolean
     abstract fun isSupported(model: AbstractModel): Boolean
 
-    abstract fun read(filePath: Path): AbstractModel
+    abstract fun read(filePath: Path): Result<AbstractModel, Exception>
 
     abstract fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception>
 }

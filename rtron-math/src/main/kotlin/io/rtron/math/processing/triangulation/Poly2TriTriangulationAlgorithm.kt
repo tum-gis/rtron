@@ -31,7 +31,7 @@ import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
 /**
  * Adapts the triangulation algorithm of [Poly2Tri](https://github.com/orbisgis/poly2tri.java).
  */
-class Poly2TriTriangulationAlgorithm() : TriangulationAlgorithm() {
+class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
 
     override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception> {
 

@@ -22,17 +22,21 @@ import io.rtron.io.logging.ProgressBar
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
-import io.rtron.model.roadspaces.roadspace.Roadspace
-import io.rtron.model.roadspaces.topology.LaneTopology
+import io.rtron.std.getValueResult
+import io.rtron.std.handleFailure
+import io.rtron.std.unwrapValues
 import io.rtron.transformer.AbstractTransformer
+import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
+import io.rtron.transformer.roadspaces2citygml.module.TransportationModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.transformer.RoadsTransformer
-import io.rtron.transformer.roadspaces2citygml.transformer.RoadspaceLineTransformer
 import io.rtron.transformer.roadspaces2citygml.transformer.RoadspaceObjectTransformer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.citygml4j.model.core.AbstractCityObject
+import org.citygml4j.model.transportation.Road
+import org.citygml4j.model.transportation.TrafficSpaceProperty
 import org.xmlobjects.gml.model.feature.BoundingShape
 import org.xmlobjects.gml.model.geometry.Envelope
 
@@ -48,9 +52,10 @@ class Roadspaces2CitygmlTransformer(
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
 
-    private val _roadspaceLineTransformer = RoadspaceLineTransformer(configuration)
-    private val _roadObjectTransformer = RoadspaceObjectTransformer(configuration)
-    private val _roadLanesTransformer = RoadsTransformer(configuration)
+    private val identifierAdder = IdentifierAdder(configuration.parameters)
+    private val _transportationModuleBuilder = TransportationModuleBuilder(configuration, identifierAdder)
+    private val _roadObjectTransformer = RoadspaceObjectTransformer(configuration, identifierAdder)
+    private val _roadLanesTransformer = RoadsTransformer(configuration, identifierAdder)
 
     // Methods
 
@@ -64,10 +69,9 @@ class Roadspaces2CitygmlTransformer(
 
         // transformation of each road space
         _reportLogger.info("Transforming roads spaces with ${configuration.parameters}.")
-        val progressBar = ProgressBar("Transforming road spaces", roadspacesModel.roadspaces.size)
         val abstractCityObjects = if (configuration.concurrentProcessing)
-            transformRoadspacesConcurrently(roadspacesModel.roadspaces.values.toList(), roadspacesModel.laneTopology, progressBar)
-        else transformRoadspacesSequentially(roadspacesModel.roadspaces.values.toList(), roadspacesModel.laneTopology, progressBar)
+            transformRoadspacesConcurrently(roadspacesModel)
+        else transformRoadspacesSequentially(roadspacesModel)
 
         // create CityGML model
         val boundingShape = calculateBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
@@ -76,45 +80,90 @@ class Roadspaces2CitygmlTransformer(
     }
 
     private fun transformRoadspacesSequentially(
-        srcRoadspaces: List<Roadspace>,
-        srcLaneTopology: LaneTopology,
-        progressBar: ProgressBar
-    ): List<AbstractCityObject> =
-        srcRoadspaces.flatMap {
-            transform(it, srcLaneTopology).also { progressBar.step() }
-        }
-
-    private fun transformRoadspacesConcurrently(
-        srcRoadspaces: List<Roadspace>,
-        srcLaneTopology: LaneTopology,
-        progressBar: ProgressBar
+        roadspacesModel: RoadspacesModel
     ): List<AbstractCityObject> {
 
-        val resultsDeferred = srcRoadspaces.map {
-            GlobalScope.async {
-                transform(it, srcLaneTopology).also { progressBar.step() }
-            }
-        }
-        return runBlocking { resultsDeferred.flatMap { it.await() } }
+        // build objects
+        val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
+        val roadFeatures = roadspacesModel
+            .getAllRoadspaceNames()
+            .map { _roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() } }
+            .unwrapValues()
+
+
+        val roadspaceObjectsProgressBar = ProgressBar("Transforming roadspace objects", roadspacesModel.numberOfRoadspaces)
+        val roadspaceObjects = roadspacesModel.getAllRoadspaces().flatMap { _roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects).also { roadspaceObjectsProgressBar.step() } }
+
+        val additionalRoadLines = if (configuration.parameters.transformAdditionalRoadLines) {
+            val additionalRoadLinesProgressBar = ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
+            roadspacesModel.getAllRoadspaces().flatMap { _roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() } }
+        } else emptyList()
+
+        addLaneTopology(roadspacesModel, roadFeatures)
+        return roadFeatures + roadspaceObjects + additionalRoadLines
     }
 
-    /**
-     * Transform a single [Roadspace] and add the objects to the [AbstractCityObject].
-     */
-    private fun transform(srcRoadspace: Roadspace, srcLaneTopology: LaneTopology): List<AbstractCityObject> =
-        _roadspaceLineTransformer.transformRoadReferenceLine(srcRoadspace).toList() +
-            _roadLanesTransformer.transformRoadCenterLaneLines(srcRoadspace.road) +
-            _roadLanesTransformer.transformLaneLines(srcRoadspace.road) +
-            _roadLanesTransformer.transformLaneSurfaces(srcRoadspace.road) +
-            _roadLanesTransformer.transformLateralFillerSurfaces(srcRoadspace.road) +
-            _roadLanesTransformer.transformLongitudinalFillerSurfaces(srcRoadspace.road, srcLaneTopology) +
-            _roadLanesTransformer.transformRoadMarkings(srcRoadspace.road) +
-            _roadObjectTransformer.transformRoadspaceObjects(srcRoadspace.roadspaceObjects)
+    private fun transformRoadspacesConcurrently(
+        roadspacesModel: RoadspacesModel
+    ): List<AbstractCityObject> {
 
-    private fun calculateBoundingShape(srcAbstractCityObjects: List<AbstractCityObject>, srcCrs: Result<CoordinateReferenceSystem, Exception>): BoundingShape {
+        // build objects
+        val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
+        val roadFeaturesDeferred = roadspacesModel
+            .getAllRoadspaceNames()
+            .map {
+                GlobalScope.async {
+                    _roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() }
+                }
+            }
+
+        val roadspaceObjectsProgressBar = ProgressBar("Transforming roadspace objects", roadspacesModel.numberOfRoadspaces)
+        val roadspaceObjectsDeferred = roadspacesModel.getAllRoadspaces().map {
+            GlobalScope.async {
+                _roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects)
+                    .also { roadspaceObjectsProgressBar.step() }
+            }
+        }
+
+        val additionalRoadLinesDeferred = if (configuration.parameters.transformAdditionalRoadLines) {
+            val additionalRoadLinesProgressBar = ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
+            roadspacesModel.getAllRoadspaces().map {
+                GlobalScope.async {
+                    _roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
+                }
+            }
+        } else emptyList()
+
+        val roadFeatures = runBlocking { roadFeaturesDeferred.map { it.await() }.unwrapValues() }
+        val roadspaceObjects = runBlocking { roadspaceObjectsDeferred.flatMap { it.await() } }
+        val additionalRoadLines = runBlocking { additionalRoadLinesDeferred.flatMap { it.await() } }
+
+        addLaneTopology(roadspacesModel, roadFeatures)
+        return roadFeatures + roadspaceObjects + additionalRoadLines
+    }
+
+    private fun addLaneTopology(roadspacesModel: RoadspacesModel, dstTransportationSpaces: List<Road>) {
+        val trafficSpaceProperties = dstTransportationSpaces.flatMap { it.trafficSpaces } + dstTransportationSpaces.flatMap { it.sections }.flatMap { it.`object`.trafficSpaces }
+        val trafficSpacePropertiesAdjusted = trafficSpaceProperties.filter { it.`object`.id != null }
+
+        val lanesMap = roadspacesModel.getAllLeftRightLanes().map { configuration.parameters.gmlIdPrefix + it.id.hashedId to it }.toMap()
+        trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
+            val currentLane = lanesMap.getValueResult(currentTrafficSpace.`object`.id).handleFailure { throw it.error }
+            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).handleFailure { throw it.error }
+            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).handleFailure { throw it.error }
+
+            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceProperty(configuration.parameters.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceProperty(configuration.parameters.gmlIdPrefix + it.hashedId) }
+        }
+    }
+
+    private fun calculateBoundingShape(
+        abstractCityObjects: List<AbstractCityObject>,
+        crs: Result<CoordinateReferenceSystem, Exception>
+    ): BoundingShape {
         val envelope = Envelope()
-        srcCrs.success { envelope.srsName = it.srsName }
-        srcAbstractCityObjects.forEach { envelope.include(it.computeEnvelope()) }
+        crs.success { envelope.srsName = it.srsName }
+        abstractCityObjects.forEach { envelope.include(it.computeEnvelope()) }
         return BoundingShape(envelope)
     }
 }

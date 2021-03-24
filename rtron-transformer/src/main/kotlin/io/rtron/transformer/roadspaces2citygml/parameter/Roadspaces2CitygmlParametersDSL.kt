@@ -49,6 +49,12 @@ class Roadspaces2CitygmlParametersBuilder {
     private val generateRandomGeometryIdsProperty = SettableProperty(defaultParameters.generateRandomGeometryIds)
     var generateRandomGeometryIds by generateRandomGeometryIdsProperty
 
+    private val transformAdditionalRoadLinesProperty = SettableProperty(defaultParameters.transformAdditionalRoadLines)
+    var transformAdditionalRoadLines by transformAdditionalRoadLinesProperty
+
+    private val mappingBackwardsCompatibilityProperty = SettableProperty(defaultParameters.mappingBackwardsCompatibility)
+    var mappingBackwardsCompatibility by mappingBackwardsCompatibilityProperty
+
     fun build() = Roadspaces2CitygmlParameters(
         gmlIdPrefixProperty,
         identifierAttributesPrefixProperty,
@@ -57,7 +63,9 @@ class Roadspaces2CitygmlParametersBuilder {
         discretizationStepSizeProperty,
         sweepDiscretizationStepSizeProperty,
         circleSlicesProperty,
-        generateRandomGeometryIdsProperty
+        generateRandomGeometryIdsProperty,
+        transformAdditionalRoadLinesProperty,
+        mappingBackwardsCompatibilityProperty
     )
 }
 

@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces.roadspace
+package io.rtron.model.roadspaces.junction
 
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.ModelIdentifierInterface
 import java.util.UUID
 
 /**
- * Road space identifier interface required for class delegation.
+ * Junction identifier interface required for class delegation.
  */
-interface RoadspaceIdentifierInterface {
-    val roadspaceId: String
+interface JunctionIdentifierInterface {
+    val junctionId: String
 }
 
 /**
- * Identifier of a road space containing essential meta information.
+ * Identifier of a [Junction].
  *
- * @param roadspaceId id of the road space
+ * @param junctionId id of the junction
  * @param modelIdentifier identifier of the model
  */
-data class RoadspaceIdentifier(
-    override val roadspaceId: String,
+data class JunctionIdentifier(
+    override val junctionId: String,
     val modelIdentifier: ModelIdentifier
-) : RoadspaceIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
+) : JunctionIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
 
     // Properties and Initializers
-    val hashKey get() = roadspaceId + '_' + modelIdentifier.fileHashSha256
+    val hashKey get() = junctionId + '_' + modelIdentifier.fileHashSha256
     val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
 
     // Conversions
     override fun toString(): String {
-        return "RoadspaceIdentifier(roadspaceId=$roadspaceId)"
+        return "JunctionIdentifier(junctionId=$junctionId)"
     }
 }

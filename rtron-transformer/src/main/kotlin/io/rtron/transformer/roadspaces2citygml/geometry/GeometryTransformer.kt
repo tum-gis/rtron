@@ -18,7 +18,6 @@ package io.rtron.transformer.roadspaces2citygml.geometry
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.success
-import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
@@ -35,10 +34,11 @@ import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.math.std.THREE_QUARTER_PI
 import io.rtron.math.transform.Affine3D
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
+import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
-import io.rtron.transformer.roadspaces2citygml.transformer.IdentifierAdder
 import org.citygml4j.model.core.ImplicitGeometry
 import org.citygml4j.model.core.ImplicitGeometryProperty
 import org.citygml4j.util.geometry.GeometryFactory
@@ -60,12 +60,11 @@ import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty
  * @param parameters parameters for the geometry transformation, such as discretization step sizes
  */
 class GeometryTransformer(
-    val parameters: Roadspaces2CitygmlParameters,
-    private val reportLogger: Logger
+    val parameters: Roadspaces2CitygmlParameters
 ) : Geometry3DVisitor {
 
     // Properties and Initializers
-    private val _identifierAdder = IdentifierAdder(parameters, reportLogger)
+    private val _identifierAdder = IdentifierAdder(parameters)
 
     private lateinit var polygonsOfSolidResult: Result<List<Polygon3D>, Exception>
     private lateinit var polygonsOfSurfaceResult: Result<List<Polygon3D>, Exception>
@@ -222,8 +221,10 @@ class GeometryTransformer(
      * @return cutout of a solid geometry or a [MultiSurfaceProperty]
      */
     fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Result<MultiSurfaceProperty, IllegalStateException> {
-        getSolidCutout(*solidFaceSelection).handleSuccess { return it }
-        getMultiSurface().handleSuccess { return it }
+        if (isSetSolid())
+            getSolidCutout(*solidFaceSelection).handleSuccess { return it }
+        if (isSetMultiSurface())
+            getMultiSurface().handleSuccess { return it }
 
         return Result.error(IllegalStateException("No cutout of solid or MultiSurfaceProperty available for geometry."))
     }
@@ -311,5 +312,12 @@ class GeometryTransformer(
     companion object {
         private val geometryFactory = GeometryFactory.newInstance()
         private const val DIMENSION = 3
+
+        fun of(roadspaceObject: RoadspaceObject, parameters: Roadspaces2CitygmlParameters): GeometryTransformer {
+            require(roadspaceObject.geometry.size == 1) { "Roadspace object must contain exactly one geometrical representation." }
+            val currentGeometricPrimitive = roadspaceObject.geometry.first()
+
+            return GeometryTransformer(parameters).also { currentGeometricPrimitive.accept(it) }
+        }
     }
 }

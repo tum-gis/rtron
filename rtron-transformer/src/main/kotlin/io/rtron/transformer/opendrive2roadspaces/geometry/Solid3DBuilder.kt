@@ -58,16 +58,16 @@ class Solid3DBuilder(
      * Builds a list of cuboids from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCuboids(srcRoadObject: RoadObjectsObject, curveAffine: Affine3D): List<Cuboid3D> {
+    fun buildCuboids(roadObject: RoadObjectsObject, curveAffine: Affine3D): List<Cuboid3D> {
         val cuboidList = mutableListOf<Cuboid3D>()
 
-        if (srcRoadObject.isCuboid()) {
-            val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
+        if (roadObject.isCuboid()) {
+            val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cuboidList += Cuboid3D(srcRoadObject.length, srcRoadObject.width, srcRoadObject.height, parameters.tolerance, affineSequence)
+            cuboidList += Cuboid3D(roadObject.length, roadObject.width, roadObject.height, parameters.tolerance, affineSequence)
         }
 
-        if (srcRoadObject.repeat.isRepeatedCuboid())
+        if (roadObject.repeat.isRepeatedCuboid())
             this.reportLogger.infoOnce("Geometry RepeatedCuboids not implemented yet.")
 
         return cuboidList
@@ -77,16 +77,16 @@ class Solid3DBuilder(
      * Builds a list of cylinders from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCylinders(srcRoadObject: RoadObjectsObject, curveAffine: Affine3D): List<Cylinder3D> {
+    fun buildCylinders(roadObject: RoadObjectsObject, curveAffine: Affine3D): List<Cylinder3D> {
         val cylinderList = mutableListOf<Cylinder3D>()
 
-        if (srcRoadObject.isCylinder()) {
-            val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
+        if (roadObject.isCylinder()) {
+            val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cylinderList += Cylinder3D(srcRoadObject.radius, srcRoadObject.height, parameters.tolerance, affineSequence)
+            cylinderList += Cylinder3D(roadObject.radius, roadObject.height, parameters.tolerance, affineSequence)
         }
 
-        if (srcRoadObject.repeat.isRepeatCylinder())
+        if (roadObject.repeat.isRepeatCylinder())
             this.reportLogger.infoOnce("Geometry RepeatedCylinder not implemented yet.")
 
         return cylinderList
@@ -96,17 +96,17 @@ class Solid3DBuilder(
      * Builds a list of polyhedrons from OpenDRIVE road objects defined by road corner outlines.
      *
      * @param id identifier of the road space object for error logging
-     * @param srcRoadObject road object of OpenDRIVE
+     * @param roadObject road object of OpenDRIVE
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      * @return list of polyhedrons
      */
     fun buildPolyhedronsByRoadCorners(
         id: RoadspaceObjectIdentifier,
-        srcRoadObject: RoadObjectsObject,
+        roadObject: RoadObjectsObject,
         roadReferenceLine: Curve3D
     ): List<Polyhedron3D> {
 
-        return srcRoadObject.getPolyhedronsDefinedByRoadCorners()
+        return roadObject.getPolyhedronsDefinedByRoadCorners()
             .map { buildPolyhedronByRoadCorners(id, it, roadReferenceLine) }
             .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
             .handleMessage { reportLogger.log(it, id.toString()) }
@@ -117,13 +117,13 @@ class Solid3DBuilder(
      */
     private fun buildPolyhedronByRoadCorners(
         id: RoadspaceObjectIdentifier,
-        srcOutline: RoadObjectsObjectOutlinesOutline,
+        outline: RoadObjectsObjectOutlinesOutline,
         referenceLine: Curve3D
     ): Result<ContextMessage<Polyhedron3D>, Exception> {
-        require(srcOutline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
+        require(outline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
 
-        val validCornerRoadElements = srcOutline.cornerRoad.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
-        if (validCornerRoadElements.size < srcOutline.cornerRoad.size)
+        val validCornerRoadElements = outline.cornerRoad.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
+        if (validCornerRoadElements.size < outline.cornerRoad.size)
             reportLogger.info(
                 "Removing at least one outline element due to a negative height value.",
                 id.toString()
@@ -139,16 +139,16 @@ class Solid3DBuilder(
     /**
      * Builds a vertical outline element from OpenDRIVE's road corner element and it's height.
      *
-     * @param srcCornerRoad road corner element of OpenDRIVE which defines one corner of a road object
+     * @param cornerRoad road corner element of OpenDRIVE which defines one corner of a road object
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      */
     private fun buildVerticalOutlineElement(
-        srcCornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad,
+        cornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad,
         roadReferenceLine: Curve3D
     ):
         Result<Polyhedron3DFactory.VerticalOutlineElement, Exception> {
 
-            val curveRelativeOutlineElementGeometry = srcCornerRoad.getPoints()
+            val curveRelativeOutlineElementGeometry = cornerRoad.getPoints()
                 .handleFailure { return it }
 
             val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
@@ -164,19 +164,19 @@ class Solid3DBuilder(
      * Builds a list of polyhedrons from OpenDRIVE road objects defined by local corner outlines.
      *
      * @param id identifier of the road space object for error logging
-     * @param srcRoadObject road object of OpenDRIVE
+     * @param roadObject road object of OpenDRIVE
      * @param curveAffine affine transformation matrix from the curve
      * @return list of polyhedrons
      */
     fun buildPolyhedronsByLocalCorners(
         id: RoadspaceObjectIdentifier,
-        srcRoadObject: RoadObjectsObject,
+        roadObject: RoadObjectsObject,
         curveAffine: Affine3D
     ): List<Polyhedron3D> {
-        val objectAffine = Affine3D.of(srcRoadObject.referenceLinePointRelativePose)
+        val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
-        return srcRoadObject.getPolyhedronsDefinedByLocalCorners()
+        return roadObject.getPolyhedronsDefinedByLocalCorners()
             .map { buildPolyhedronByLocalCorners(id, it) }
             .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
             .handleMessage { reportLogger.log(it, id.toString()) }
@@ -186,12 +186,12 @@ class Solid3DBuilder(
     /**
      * Builds a single polyhedron from an OpenDRIVE road object defined by local corner outlines.
      */
-    private fun buildPolyhedronByLocalCorners(id: RoadspaceObjectIdentifier, srcOutline: RoadObjectsObjectOutlinesOutline):
+    private fun buildPolyhedronByLocalCorners(id: RoadspaceObjectIdentifier, outline: RoadObjectsObjectOutlinesOutline):
         Result<ContextMessage<Polyhedron3D>, Exception> {
-            require(srcOutline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
+            require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
 
-            val validCornerLocalElements = srcOutline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
-            if (validCornerLocalElements.size < srcOutline.cornerLocal.size)
+            val validCornerLocalElements = outline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
+            if (validCornerLocalElements.size < outline.cornerLocal.size)
                 reportLogger.info(
                     "Removing at least one outline element due to a negative height value.",
                     id.toString()
@@ -209,21 +209,22 @@ class Solid3DBuilder(
     /**
      * Builds a parametric sweep from OpenDRIVE road objects defined by the repeat entries.
      *
-     * @param srcRoadObject road object of OpenDRIVE
+     * @param roadObject road object of OpenDRIVE
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      */
-    fun buildParametricSweeps(srcRoadObject: RoadObjectsObject, roadReferenceLine: Curve3D): List<ParametricSweep3D> {
-        if (!srcRoadObject.repeat.isParametricSweep()) return emptyList()
+    fun buildParametricSweeps(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D): List<ParametricSweep3D> {
+        if (!roadObject.repeat.isParametricSweep()) return emptyList()
 
         // curve over which the object is moved
         val objectReferenceCurve2D =
-            _curve2DBuilder.buildLateralTranslatedCurve(srcRoadObject.repeat, roadReferenceLine)
+            _curve2DBuilder.buildLateralTranslatedCurve(roadObject.repeat, roadReferenceLine)
+                .handleFailure { reportLogger.log(it, roadObject.id); return emptyList() }
         val objectReferenceHeight =
-            _functionBuilder.buildStackedHeightFunctionFromRepeat(srcRoadObject.repeat, roadReferenceLine)
+            _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObject.repeat, roadReferenceLine)
 
         // dimensions of the sweep
-        val heightFunction = srcRoadObject.repeat.getObjectHeightFunction()
-        val widthFunction = srcRoadObject.repeat.getObjectWidthFunction()
+        val heightFunction = roadObject.repeat.getObjectHeightFunction()
+        val widthFunction = roadObject.repeat.getObjectWidthFunction()
 
         val parametricSweep3D = ParametricSweep3D(
             objectReferenceCurve2D,

@@ -17,19 +17,19 @@
 package io.rtron.transformer.roadspaces2citygml.transformer
 
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.map
 import io.rtron.io.logging.Logger
-import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
-import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.std.handleFailure
+import io.rtron.std.Optional
 import io.rtron.std.mapAndHandleFailureOnOriginal
-import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
+import io.rtron.std.unwrapValues
 import io.rtron.transformer.roadspaces2citygml.module.BuildingModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.module.CityFurnitureModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.module.GenericsModuleBuilder
-import io.rtron.transformer.roadspaces2citygml.module.TransportationModuleBuilder
+import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.roadspaces2citygml.module.VegetationModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspaces2citygml.router.RoadspaceObjectRouter
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.CityModel
 
@@ -37,130 +37,44 @@ import org.citygml4j.model.core.CityModel
  * Transforms [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
 class RoadspaceObjectTransformer(
-    private val configuration: Roadspaces2CitygmlConfiguration
+    private val configuration: Roadspaces2CitygmlConfiguration,
+    private val identifierAdder: IdentifierAdder
 ) {
 
     // Properties and Initializers
     private val _reportLogger: Logger = configuration.getReportLogger()
 
-    private val _identifierAdder = IdentifierAdder(configuration.parameters, _reportLogger)
-    private val _attributesAdder = AttributesAdder(configuration.parameters)
-    private val _genericsModuleBuilder = GenericsModuleBuilder(configuration)
-    private val _buildingModuleBuilder = BuildingModuleBuilder(configuration)
-    private val _cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(configuration)
-    private val _transportationModuleBuilder = TransportationModuleBuilder(configuration)
-    private val _vegetationModuleBuilder = VegetationModuleBuilder(configuration)
+    private val _genericsModuleBuilder = GenericsModuleBuilder(configuration, identifierAdder)
+    private val _buildingModuleBuilder = BuildingModuleBuilder(configuration, identifierAdder)
+    private val _cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(configuration, identifierAdder)
+    private val _vegetationModuleBuilder = VegetationModuleBuilder(configuration, identifierAdder)
 
     // Methods
 
     /**
-     * Transforms a list of [srcRoadspaceObjects] (RoadSpaces model) to the [AbstractCityObject] (CityGML model).
+     * Transforms a list of [roadspaceObjects] (RoadSpaces model) to the [AbstractCityObject] (CityGML model).
      */
-    fun transformRoadspaceObjects(srcRoadspaceObjects: List<RoadspaceObject>): List<AbstractCityObject> =
-        srcRoadspaceObjects.mapAndHandleFailureOnOriginal(
+    fun transformRoadspaceObjects(roadspaceObjects: List<RoadspaceObject>): List<AbstractCityObject> =
+        roadspaceObjects.mapAndHandleFailureOnOriginal(
             { transformSingleRoadspaceObject(it) },
             { result, original -> _reportLogger.log(result, original.id.toString()) }
-        )
-
-    private fun transformSingleRoadspaceObject(srcRoadspaceObject: RoadspaceObject): Result<AbstractCityObject, Exception> {
-        val geometryTransformer = createGeometryTransformer(srcRoadspaceObject)
-        val abstractCityObject = createAbstractCityObject(srcRoadspaceObject, geometryTransformer)
-            .handleFailure { return it }
-
-        _identifierAdder.addIdentifier(srcRoadspaceObject.id, abstractCityObject)
-        _attributesAdder.addAttributes(
-            srcRoadspaceObject.id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
-                srcRoadspaceObject.attributes,
-            abstractCityObject
-        )
-
-        return Result.success(abstractCityObject)
-    }
-
-    private fun createGeometryTransformer(srcRoadspaceObject: RoadspaceObject): GeometryTransformer {
-        require(srcRoadspaceObject.geometry.size == 1) { "Roadspace object must contain exactly one geometrical representation." }
-        val currentGeometricPrimitive = srcRoadspaceObject.geometry.first()
-
-        return GeometryTransformer(configuration.parameters, _reportLogger)
-            .also { currentGeometricPrimitive.accept(it) }
-    }
+        ).unwrapValues()
 
     /**
      * Creates a city object (CityGML model) from the [RoadspaceObject] and it's geometry.
      * Contains the rules which determine the CityGML feature types from the [RoadspaceObject].
      *
-     * @param srcRoadspaceObject road space object from the RoadSpaces model
-     * @param geometryTransformer transformed geometry
+     * @param roadspaceObject road space object from the RoadSpaces model
      * @return city object (CityGML model)
      */
-    private fun createAbstractCityObject(srcRoadspaceObject: RoadspaceObject, geometryTransformer: GeometryTransformer):
-        Result<AbstractCityObject, Exception> {
-
-            // based on object name
-            if (srcRoadspaceObject.name == "bench")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "bus")
-                return _transportationModuleBuilder.createTransportationSpace(
-                    geometryTransformer,
-                    TransportationModuleBuilder.Feature.ROAD
-                )
-            if (srcRoadspaceObject.name == "controllerBox")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "crossWalk")
-                return _transportationModuleBuilder.createTransportationSpace(
-                    geometryTransformer,
-                    TransportationModuleBuilder.Feature.ROAD
-                )
-            if (srcRoadspaceObject.name == "fence")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "noParkingArea")
-                return _transportationModuleBuilder.createTransportationSpace(
-                    geometryTransformer,
-                    TransportationModuleBuilder.Feature.ROAD
-                )
-            if (srcRoadspaceObject.name == "railing")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "raisedMedian")
-                return _transportationModuleBuilder.createTransportationSpace(
-                    geometryTransformer,
-                    TransportationModuleBuilder.Feature.ROAD,
-                    TransportationModuleBuilder.Type.AUXILARYTRAFFICAREA
-                )
-            if (srcRoadspaceObject.name == "trafficIsland")
-                return _transportationModuleBuilder.createTransportationSpace(
-                    geometryTransformer,
-                    TransportationModuleBuilder.Feature.ROAD,
-                    TransportationModuleBuilder.Type.AUXILARYTRAFFICAREA
-                )
-
-            if (srcRoadspaceObject.name == "trafficLight")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "trafficSign")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "tree")
-                return _vegetationModuleBuilder.createVegetationObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "unknown")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.name == "wall")
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-
-            // based on object type
-            if (srcRoadspaceObject.type == RoadObjectType.BARRIER)
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.type == RoadObjectType.TREE)
-                return _vegetationModuleBuilder.createVegetationObject(geometryTransformer)
-            if (srcRoadspaceObject.type == RoadObjectType.VEGETATION)
-                return _vegetationModuleBuilder.createVegetationObject(geometryTransformer)
-            if (srcRoadspaceObject.type == RoadObjectType.BUILDING)
-                return _buildingModuleBuilder.createBuildingObject(geometryTransformer)
-            if (srcRoadspaceObject.type == RoadObjectType.STREET_LAMP)
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.type == RoadObjectType.SIGNAL)
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-            if (srcRoadspaceObject.type == RoadObjectType.POLE)
-                return _cityFurnitureModuleBuilder.createCityFurnitureObject(geometryTransformer)
-
-            // if no rule for object name and type, create a generic city object
-            return _genericsModuleBuilder.createGenericObject(geometryTransformer)
+    private fun transformSingleRoadspaceObject(roadspaceObject: RoadspaceObject): Result<Optional<AbstractCityObject>, Exception> =
+        when (RoadspaceObjectRouter.route(roadspaceObject)) {
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> _buildingModuleBuilder.createBuildingFeature(roadspaceObject).map { Optional(it) }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> _cityFurnitureModuleBuilder.createCityFurnitureFeature(roadspaceObject).map { Optional(it) }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> _genericsModuleBuilder.createGenericOccupiedSpaceFeature(roadspaceObject).map { Optional(it) }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> Result.success(Optional.empty())
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> Result.success(Optional.empty())
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> Result.success(Optional.empty())
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT -> _vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).map { Optional(it) }
         }
 }
