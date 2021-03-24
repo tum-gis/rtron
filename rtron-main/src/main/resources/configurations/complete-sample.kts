@@ -43,6 +43,9 @@ configure {
 
         // if true, additional road lines (reference line, lane boundaries) are exported
         transformAdditionalRoadLines = false
+
+        // if true, only classes are populated that are also available in CityGML2
+        mappingBackwardsCompatibility = false
     }
 
     citygmlReaderWriter {

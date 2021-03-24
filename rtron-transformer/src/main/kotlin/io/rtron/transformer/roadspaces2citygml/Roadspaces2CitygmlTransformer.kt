@@ -90,7 +90,6 @@ class Roadspaces2CitygmlTransformer(
             .map { _roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() } }
             .unwrapValues()
 
-
         val roadspaceObjectsProgressBar = ProgressBar("Transforming roadspace objects", roadspacesModel.numberOfRoadspaces)
         val roadspaceObjects = roadspacesModel.getAllRoadspaces().flatMap { _roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects).also { roadspaceObjectsProgressBar.step() } }
 
