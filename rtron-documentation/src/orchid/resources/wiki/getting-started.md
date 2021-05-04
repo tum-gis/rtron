@@ -3,8 +3,12 @@
 
 # Getting Started
 
+## Sample Datasets
 
-## Preliminaries
+Download some sample OpenDRIVE datasets of the city of Ingolstadt from the company [3D Mapping Solutions](https://www.3d-mapping.de/en/customer-area/demo-data) (initial registration required).
+Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets) provides a list of further OpenDRIVE datasets.
+
+## Prerequisites
 
 r:trån requires JDK 11 or later versions.
 
@@ -24,9 +28,9 @@ brew tap AdoptOpenJDK/openjdk
 brew cask install adoptopenjdk11
 ```
 
-## Usage
+## Installation
 
-Download the executable jar at the [releases section](https://github.com/tum-gis/rtron/releases) or build it yourself:
+Download the executable jar at the [releases section](https://github.com/tum-gis/rtron/releases) or build r:trån yourself:
 ```bash
 git clone https://github.com/tum-gis/rtron.git
 cd rtron
@@ -35,60 +39,44 @@ cd rtron
 cd rtron-cli/build/libs
 ```
 
-Let it run:
+## Usage
+
+Start the transformations by running:
 ```bash
-java -jar rtron-*.jar
-    Usage: rtron [OPTIONS] INPUTPATH OUTPUTPATH
-    
-      r:trån transforms road networks described in OpenDRIVE into the virtual 3D
-      city model standard CityGML.
-    
-    Options:
-      --version       Show the version and exit
-      --no-recursive  Do not search recursively for input files in given
-                      input directory
-      --concurrent    Enable concurrent processing during the
-                      transformation of a model (experimental)
-      -c, --clean     Clean output directory by deleting its
-                      current content before starting
-      -h, --help      Show this message and exit
-    
-    Arguments:
-      INPUTPATH   Path to the directory containing OpenDRIVE datasets
-      OUTPUTPATH  Path to the output directory into which the
-                  transformed CityGML models are written
+java -jar rtron.jar ./input-datasets ./output-datasets
 ```
+
 
 ## Batch Processing
 
 Assuming there are multiple OpenDRIVE datasets contained in the input path, for example like this:
 ```bash
-tree ./opendrive-datasets
-  ./opendrive-datasets
-  ├── asam.net
-  │   ├── Ex_Line-Spiral-Arc.xodr
-  │   └── UC_ParamPoly3.xodr
-  └── opendrive.org
-      └── CrossingComplex8Course.xodr
+tree ./input-datasets
+  ./input-datasets
+  ├── 3d-mapping.de
+  │   ├── Ingolstadt_City_Hall.xodr
+  │   └── Ingolstadt_Intersection.xodr
+  └── asam.net
+      └── Ex_Line-Spiral-Arc.xodr
 ```
 r:trån then recursively iterates over all models and generates the respective CityGML datasets.
 The directory structure is preserved and report logs are added:
 
 ```bash
-java -jar rtron-*.jar ./opendrive-datasets ./citygml-datasets
+java -jar rtron-*.jar ./input-datasets ./output-datasets
 
-tree ./citygml-datasets
-  ./citygml-datasets
-  ├── asam.net
-  │   ├── Ex_Line-Spiral-Arc
-  │   │   ├── Ex_Line-Spiral-Arc.gml
+tree ./output-datasets
+  ./output-datasets
+  ├── 3d-mapping.de
+  │   ├── Ingolstadt_City_Hall
+  │   │   ├── Ingolstadt_City_Hall.gml
   │   │   └── report.log
-  │   └── UC_ParamPoly3
-  │       ├── report.log
-  │       └── UC_ParamPoly3.gml
-  ├── general.log
-  └── opendrive.org
-      └── CrossingComplex8Course
-          ├── CrossingComplex8Course.gml
-          └── report.log
+  │   └── Ingolstadt_Intersection
+  │       ├── Ingolstadt_Intersection.gml
+  │       └── report.log
+  ├── asam.net
+  │   └── Ex_Line-Spiral-Arc
+  │       ├── Ex_Line-Spiral-Arc.gml
+  │       └── report.log
+  └── general.log
 ```

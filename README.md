@@ -31,7 +31,7 @@ This enables you to
 * load your models into a [desktop GIS](https://rtron.io/demos/desktop-gis)
 * [compare and validate](https://rtron.io/demos/model-validation) your models with models from other data sources
 
-## :gear: Prerequisites 
+## :gear: Preliminaries 
 
 Download some sample OpenDRIVE datasets of the city of Ingolstadt from the company [3D Mapping Solutions](https://www.3d-mapping.de/en/customer-area/demo-data) (initial registration required).
 Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets) provides a list of further OpenDRIVE datasets.

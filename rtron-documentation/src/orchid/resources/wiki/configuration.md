@@ -58,20 +58,20 @@ configure {
 Usually the transformation parameters are similar per project.
 To simplify parametrization for batch processing transformations, r:trån supports nested configurations:
 ```bash
-tree ./opendrive-datasets 
-  ./opendrive-datasets
-  ├── asam.net
+tree ./input-datasets 
+  ./input-datasets
+  ├── 3d-mapping.de
   │   ├── configuration.kts
+  │   ├── Ingolstadt_City_Hall.xodr
+  │   └── Ingolstadt_Intersection.xodr
+  ├── asam.net
   │   ├── Ex_Line-Spiral-Arc.xodr
   │   └── UC_ParamPoly3.xodr
-  ├── configuration.kts
-  └── opendrive.org
-      ├── configuration.kts
-      └── CrossingComplex8Course.xodr
+  └── configuration.kts
 ```
 
-A parameter in ``./opendrive-datasets/asam.net/configuration.kts`` will overwrite the equally named parameter in ``./opendrive-datasets/configuration.kts``.
-All parameters provided in ``./opendrive-datasets/configuration.kts`` will also apply to the subdirectories, in case there is no parameter overwriting.
+A parameter in ``./input-datasets/3d-mapping.de/configuration.kts`` will overwrite the equally named parameter in ``./input-datasets/configuration.kts``.
+All parameters provided in ``./input-datasets/configuration.kts`` will also apply to the subdirectories, in case there is no parameter overwriting.
 Default values are used, if no parameters are provided.
 
 ## Java Virtual Machine (JVM)
@@ -79,5 +79,5 @@ Default values are used, if no parameters are provided.
 If larger OpenDRIVE datasets are to be transformed, the JVM should be provided with enough heap space:
 
 ```bash
-java -Xmx50G -jar rtron-*.jar ./opendrive-datasets ./citygml-datasets
+java -Xmx50G -jar rtron-*.jar ./input-datasets ./output-datasets
 ```
