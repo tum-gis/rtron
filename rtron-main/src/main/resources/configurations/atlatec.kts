@@ -5,7 +5,7 @@ import io.rtron.main.project.configuration.configure
  * https://www.atlatec.de/getsampledata.html
  *
  * This is a configuration file for their San Francisco OpenDRIVE dataset.
- * To try it out, rename the file to sample.kts and place it in the same directory as the dataset.
+ * To try it out, rename the file to configuration.kts and place it in the same directory as the dataset.
  */
 
 configure {

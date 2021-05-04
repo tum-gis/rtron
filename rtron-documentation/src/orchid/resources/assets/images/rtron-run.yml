@@ -1,0 +1,232 @@
+# configuration for https://terminalizer.com
+
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: zsh
+  
+  # Specify the current working directory path
+  # the default is the current working directory path
+  cwd: ~/Desktop
+  
+  # Export additional ENV variables
+  env:
+    recording: true
+  
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 104
+  
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 20
+  
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+  
+  # Quality
+  # 1 - 100
+  quality: 100
+  
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+  
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: 20000
+  
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: floating
+    title: null
+    style:
+      boxShadow: none
+      margin: 0px
+  
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+  
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+  
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "DroidSansMono Nerd Font"
+  
+  # The size of the font
+  fontSize: 30
+  
+  # The height of lines
+  lineHeight: 1
+  
+  # The spacing between letters
+  letterSpacing: 0
+  
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fe5c5c"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#aedff4"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#fe5c5c"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#aedff4"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+  
+# Records, feel free to edit them
+records:
+  - delay: 16
+    content: "\r\e[0m\e[27m\e[24m\e[J\e[0m\e[49m\e[39m\e[0m\e[49m\e[38;5;76m❯\e[0m\e[38;5;76m\e[49m\e[38;5;76m\e[0m\e[38;5;76m\e[49m\e[30m\e[0m\e[30m\e[49m\e[39m \e[0m\e[49m\e[39m\e[K\e[101C\e[0m\e[49m\e[39m\e[101D\e[?1h\e=\e[?2004h"
+  - delay: 1000
+    content: t
+  - delay: 215
+    content: r
+  - delay: 384
+    content: e
+  - delay: 160
+    content: e
+  - delay: 216
+    content: ' '
+  - delay: 752
+    content: .
+  - delay: 512
+    content: /
+  - delay: 800
+    content: "\e[?1l\e>\e[?25l\e[?2004l\r\r\e[0m\e[27m\e[24m\e[J\e[0m\e[49m\e[27m\e[24m\e[38;5;76m❯\e[0m\e[38;5;76m\e[49m\e[39m\e[27m\e[24m tree ./\e[K\e[?12l\e[?25h\r\r\n\e]2;tree ./\a\e]1;tree\a\e[01;34m./\e[00m\r\n├── \e[01;34minput-datasets\e[00m\r\n│\_\_ ├── 3D_Mapping_Solutions_Ingolstadt_City_Hall.xodr\r\n│\_\_ ├── 3D_Mapping_Solutions_Ingolstadt_Intersection.xodr\r\n│\_\_ └── configuration.kts\r\n├── \e[01;34moutput-datasets\e[00m\r\n└── \e[01;31mrtron.jar\e[00m\r\n\r\n2 directories, 4 files\r\n\e[1m\e[7m%\e[27m\e[1m\e[0m                                                                                                       \r \r\e]2;\r\e[0m\e[27m\e[24m\e[J\e[0m\e[49m\e[39m\e[0m\e[49m\e[38;5;76m❯\e[0m\e[38;5;76m\e[49m\e[38;5;76m\e[0m\e[38;5;76m\e[49m\e[30m\e[0m\e[30m\e[49m\e[39m \e[0m\e[49m\e[39m\e[K\e[101C\e[0m\e[49m\e[39m\e[101D\e[?1h\e=\e[?2004h"
+  - delay: 2114
+    content: j
+  - delay: 216
+    content: a
+  - delay: 176
+    content: v
+  - delay: 64
+    content: a
+  - delay: 128
+    content: ' '
+  - delay: 664
+    content: '-'
+  - delay: 344
+    content: j
+  - delay: 168
+    content: a
+  - delay: 104
+    content: r
+  - delay: 136
+    content: ' '
+  - delay: 408
+    content: r
+  - delay: 168
+    content: "tron.jar "
+  - delay: 172
+    content: .
+  - delay: 171
+    content: /
+  - delay: 496
+    content: i
+  - delay: 108
+    content: "nput-datasets "
+  - delay: 596
+    content: .
+  - delay: 480
+    content: /
+  - delay: 784
+    content: o
+  - delay: 252
+    content: "utput-datasets "
+  - delay: 552
+    content: "\e[?1l\e>\e[?25l\e[?2004l\r\r\e[0m\e[27m\e[24m\e[J\e[0m\e[49m\e[27m\e[24m\e[38;5;76m❯\e[0m\e[38;5;76m\e[49m\e[39m\e[27m\e[24m java -jar rtron.jar ./input-datasets ./output-datasets\e[K\e[1C\e[?12l\e[?25h\r\r\n\e]2;java -jar rtron.jar ./input-datasets ./output-datasets\a\e]1;java\a"
+  - delay: 380
+    content: "21:02:18 INFO  general - Starting batch transformations.\r\n"
+  - delay: 1648
+    content: "21:02:19 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Starting transformation chain. \U0001F4AA\U0001F4AA\U0001F4AA\r\n"
+  - delay: 607
+    content: "21:02:20 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Completed read-in of file 3D_Mapping_Solutions_Ingolstadt_City_Hall.xodr (around 3 MB). ✔\r\n21:02:20 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Transforming roads with Opendrive2RoadspacesParameters(tolerance=1.0E-7, attributesPrefix=opendrive_, crsEpsg=32632, offsetX=0.0, offsetY=0.0, offsetZ=0.0, extrapolateLateralRoadShapes=false).\r\n"
+  - delay: 1510
+    content: "Progress: Transforming roads 1/71 1% [ET 116ms, ETA 8.19s]\r"
+  - delay: 180
+    content: "Progress: Transforming roads 3/71 4% [ET 139ms, ETA 3.15s]\r"
+  - delay: 180
+    content: "Progress: Transforming roads 6/71 8% [ET 247ms, ETA 2.68s]\r"
+  - delay: 90
+    content: "Progress: Transforming roads 9/71 13% [ET 270ms, ETA 1.86s]\r"
+  - delay: 80
+    content: "Progress: Transforming roads 18/71 25% [ET 335ms, ETA 986ms]\r"
+  - delay: 7
+    content: "Progress: Transforming roads 30/71 42% [ET 361ms, ETA 493ms]\rProgress: Transforming roads 33/71 46% [ET 362ms, ETA 417ms]\rProgress: Transforming roads 37/71 52% [ET 363ms, ETA 334ms]\rProgress: Transforming roads 38/71 54% [ET 365ms, ETA 317ms]\rProgress: Transforming roads 40/71 56% [ET 367ms, ETA 284ms]\rProgress: Transforming roads 42/71 59% [ET 368ms, ETA 254ms]\rProgress: Transforming roads 43/71 61% [ET 369ms, ETA 240ms]\rProgress: Transforming roads 44/71 62% [ET 371ms, ETA 228ms]\rProgress: Transforming roads 45/71 63% [ET 372ms, ETA 215ms]\rProgress: Transforming roads 46/71 65% [ET 373ms, ETA 203ms]\rProgress: Transforming roads 49/71 69% [ET 375ms, ETA 168ms]\rProgress: Transforming roads 53/71 75% [ET 376ms, ETA 128ms]\rProgress: Transforming roads 54/71 76% [ET 377ms, ETA 119ms]\rProgress: Transforming roads 55/71 77% [ET 380ms, ETA 111ms]\rProgress: Transforming roads 56/71 79% [ET 382ms, ETA 102ms]\rProgress: Transforming roads 57/71 80% [ET 383ms, ETA 94.1ms]\rProgress: Transforming roads 59/71 83% [ET 384ms, ETA 78.1ms]\rProgress: Transforming roads 61/71 86% [ET 387ms, ETA 63.4ms]\rProgress: Transforming roads 63/71 89% [ET 388ms, ETA 49.3ms]\rProgress: Transforming roads 64/71 90% [ET 389ms, ETA 42.5ms]\rProgress: Transforming roads 65/71 92% [ET 390ms, ETA 36.0ms]\rProgress: Transforming roads 68/71 96% [ET 391ms, ETA 17.3ms]\rProgress: Transforming roads 70/71 99% [ET 392ms, ETA 5.60ms]\rProgress: Transforming roads 71/71 100% [ET 393ms, ETA 0s]\r21:02:20 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Completed transformation: OpenDRIVE -> RoadspacesModel. ✔\r\n21:02:20 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Transforming roads spaces with Roadspaces2CitygmlParameters(gmlIdPrefix=UUID_, identifierAttributesPrefix=identifier_, flattenGenericAttributeSets=true, discretizationStepSize=0.5, sweepDiscretizationStepSize=0.3, circleSlices=16, generateRandomGeometryIds=true).\r\n"
+  - delay: 257
+    content: "Progress: Transforming road spaces 1/71 1% [ET 257ms, ETA 18.0s]\r"
+  - delay: 170
+    content: "Progress: Transforming road spaces 9/71 13% [ET 1.30s, ETA 8.99s]\r"
+  - delay: 400
+    content: "Progress: Transforming road spaces 13/71 18% [ET 1.47s, ETA 6.58s]\r"
+  - delay: 160
+    content: "Progress: Transforming road spaces 41/71 58% [ET 2.25s, ETA 1.64s]\r"
+  - delay: 60
+    content: "Progress: Transforming road spaces 53/71 75% [ET 2.32s, ETA 788ms]\r"
+  - delay: 330
+    content: "Progress: Transforming road spaces 61/71 86% [ET 2.45s, ETA 402ms]\r"
+  - delay: 80
+    content: "Progress: Transforming road spaces 68/71 96% [ET 2.50s, ETA 110ms]\r"
+  - delay: 550
+    content: "21:02:23 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Completed transformation: RoadspacesModel -> CitygmlModel. ✔\r\n"
+  - delay: 862
+    content: "21:02:24 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Completed writing of file 3D_Mapping_Solutions_Ingolstadt_City_Hall.gml (around 68 MB). ✔\r\n21:02:24 INFO  3D_Mapping_Solutions_Ingolstadt_City_Hall - Completed transformation chain after 4.47s. ✔✔✔\r\n\r\n"
+  - delay: 51
+    content: "\r\e[0m\e[27m\e[24m\e[J\e[0m\e[49m\e[39m\e[0m\e[49m\e[38;5;76m❯\e[0m\e[38;5;76m\e[49m\e[38;5;76m\e[0m\e[38;5;76m\e[49m\e[30m\e[0m\e[30m\e[49m\e[39m \e[0m\e[49m\e[39m\e[K\e[97C\e[0m\e[49m\e[38;5;101m 8s\e[0m\e[38;5;101m\e[49m\e[38;5;101m\e[0m\e[38;5;101m\e[49m\e[38;5;101m\e[0m\e[38;5;101m\e[49m\e[39m\e[101D\e[?1h\e=\e[?2004h"
+  - delay: 1561
+    content: t
+  - delay: 108
+    content: r
+  - delay: 82
+    content: e
+  - delay: 72
+    content: e
+  - delay: 100
+    content: ' '
+  - delay: 320
+    content: .
+  - delay: 200
+    content: /
+  - delay: 1080
+    content: "\e[?1l\e>\e[?25l\e[?2004l\r\r\e[0m\e[27m\e[24m\e[J\e[0m\e[49m\e[27m\e[24m\e[38;5;76m❯\e[0m\e[38;5;76m\e[49m\e[39m\e[27m\e[24m tree ./\e[K\e[?12l\e[?25h\r\r\n\e]2;tree ./\a\e]1;tree\a\e[01;34m./\e[00m\r\n├── \e[01;34minput-datasets\e[00m\r\n│\_\_ ├── 3D_Mapping_Solutions_Ingolstadt_City_Hall.xodr\r\n│\_\_ ├── 3D_Mapping_Solutions_Ingolstadt_Intersection.xodr\r\n│\_\_ └── configuration.kts\r\n├── \e[01;34moutput-datasets\e[00m\r\n│\_\_ ├── \e[01;34m3D_Mapping_Solutions_Ingolstadt_City_Hall\e[00m\r\n│\_\_ │\_\_ ├── 3D_Mapping_Solutions_Ingolstadt_City_Hall.gml\r\n│\_\_ │\_\_ └── report.log\r\n│\_\_ ├── \e[01;34m3D_Mapping_Solutions_Ingolstadt_Intersection\e[00m\r\n│\_\_ │\_\_ ├── 3D_Mapping_Solutions_Ingolstadt_Intersection.gml\r\n│\_\_ │\_\_ └── report.log\r\n│\_\_ └── general.log\r\n└── \e[01;31mrtron.jar\e[00m\r\n\r\n4 directories, 9 files\r\n\e[1m\e[7m%\e[27m\e[1m\e[0m                                                                                                       \r"
+  - delay: 10
+    content: "\r\e[0m\e[27m\e[24m\e[J\e[0m\e[49m\e[39m\e[0m\e[49m\e[38;5;76m❯\e[0m\e[38;5;76m\e[49m\e[38;5;76m\e[0m\e[38;5;76m\e[49m\e[30m\e[0m\e[30m\e[49m\e[39m \e[0m\e[49m\e[39m\e[K\e[101C\e[0m\e[49m\e[39m\e[101D\e[?1h\e=\e[?2004h"
+  - delay: 10000
+    content: ' '

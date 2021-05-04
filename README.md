@@ -31,15 +31,26 @@ This enables you to
 * load your models into a [desktop GIS](https://rtron.io/demos/desktop-gis)
 * [compare and validate](https://rtron.io/demos/model-validation) your models with models from other data sources
 
+## :gear: Prerequisites 
+
+Download some sample OpenDRIVE datasets of the city of Ingolstadt from the company [3D Mapping Solutions](https://www.3d-mapping.de/en/customer-area/demo-data) (initial registration required).
+Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets) provides a list of further OpenDRIVE datasets.
+
+## :construction_worker: Installation
+
+In order to use r:trån, an installation of JDK 11 or later is required.
+Then, download the executable jar at the [releases section](https://github.com/tum-gis/rtron/releases) or build r:trån yourself:
+```bash
+git clone https://github.com/tum-gis/rtron.git && cd rtron
+
+./gradlew shadowJar # build the uber-jar
+cd rtron-cli/build/libs
+```
+
 ## :rocket: Usage
 
-In order to use r:trån you need JDK 11 or later.
-Download the executable jar at the [releases section](https://github.com/tum-gis/rtron/releases) and let it run:
-
-![running rtron](rtron-documentation/src/orchid/resources/assets/images/rtron-run.gif)
-
-Configure your transformation by placing a script named ``configuration.kts`` into the directory of your OpenDRIVE datasets:
-
+Configure your transformation by placing a script named ``configuration.kts`` into the directory of your OpenDRIVE datasets.
+A list of more sample configurations can be obtained in [this directory](https://github.com/tum-gis/rtron/tree/main/rtron-main/src/main/resources/configurations).
 ```kotlin
 import io.rtron.main.project.configuration.configure
 
@@ -47,7 +58,7 @@ configure {
 
     opendrive2roadspaces {
         attributesPrefix = "opendrive_"
-        crsEpsg = 32632
+        crsEpsg = 32632 // EPSG code
     }
 
     roadspaces2citygml {
@@ -56,20 +67,13 @@ configure {
 }
 ```
 
-r:trån can [recursively](https://rtron.io/wiki/configuration) iterate over OpenDRIVE datasets contained in the input directory.
-
-## :construction_worker: Building
-
-Clone the repo and let gradle build it:
-
+Start the transformations by running:
 ```bash
-./gradlew shadowJar # build the uber-jar
-
-cd rtron-cli/build/libs
-java -jar rtron-*.jar
+java -jar rtron.jar ./input-datasets ./output-datasets
 ```
 
-You're good to go :muscle:
+r:trån [recursively](https://rtron.io/wiki/configuration) iterates over all OpenDRIVE datasets contained in the input directory:
+<p align="center"><img src="rtron-documentation/src/orchid/resources/assets/images/rtron-run.gif?raw=true"/></p>
 
 ## :hammer_and_wrench: Contributing
 
