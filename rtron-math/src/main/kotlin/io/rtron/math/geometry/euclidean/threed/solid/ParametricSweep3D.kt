@@ -48,7 +48,7 @@ data class ParametricSweep3D(
     val objectHeightFunction: LinearFunction,
     val objectWidthFunction: LinearFunction,
     override val tolerance: Double,
-    private val discretizationStepSize: Double = DEFAULT_STEP_SIZE
+    private val discretizationStepSize: Double
 ) : AbstractSolid3D(), DefinableDomain<Double>, Tolerable {
 
     // Properties and Initializers
@@ -56,10 +56,13 @@ data class ParametricSweep3D(
         require(absoluteHeight.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The absolute height function must be defined everywhere where the referenceCurveXY is also defined." }
         require(objectHeightFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The object height function must be defined everywhere where the referenceCurveXY is also defined." }
         require(objectWidthFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The object width function must be defined everywhere where the referenceCurveXY is also defined." }
+        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     override val domain: Range<Double>
         get() = referenceCurveXY.domain
+
+    val length get() = referenceCurveXY.length
 
     /** upper left curve of the sweep (perspective in the direction of the reference curve) */
     private val upperLeftCurve: Curve3D
@@ -133,7 +136,8 @@ data class ParametricSweep3D(
                 upperLeftVertices.first(),
                 upperRightVertices.first(),
                 lowerRightVertices.first(),
-                lowerLeftVertices.first()
+                lowerLeftVertices.first(),
+                tolerance = tolerance
             )
             linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
         }
@@ -142,7 +146,8 @@ data class ParametricSweep3D(
                 upperLeftVertices.last(),
                 lowerLeftVertices.last(),
                 lowerRightVertices.last(),
-                upperRightVertices.last()
+                upperRightVertices.last(),
+                tolerance = tolerance
             )
             linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
         }

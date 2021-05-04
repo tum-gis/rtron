@@ -46,6 +46,10 @@ class SectionedCurveRelativeParametricSurface3D(
     override val tolerance: Double get() = completeCurveRelativeSurface.tolerance
     private val sectionStart = section.lowerEndpointResult().handleFailure { throw it.error }
 
+    init {
+        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
+    }
+
     // Methods
     override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
         Result<Vector3D, Exception> {

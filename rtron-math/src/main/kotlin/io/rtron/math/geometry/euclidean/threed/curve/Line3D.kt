@@ -38,7 +38,8 @@ class Line3D(
 
     // Properties and Initializers
     init {
-        require(point1 != point2) { "Identical points provided for constructing a line." }
+        require(point1 != point2) { "Points must not be identical." }
+        require(point1.fuzzyUnequals(point2, tolerance)) { "Points must be different by at least the tolerance threshold." }
     }
 
     /** adapted line class of Apache Commons Math */

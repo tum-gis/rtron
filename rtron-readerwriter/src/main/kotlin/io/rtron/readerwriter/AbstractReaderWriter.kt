@@ -20,17 +20,14 @@ import com.github.kittinunf.result.Result
 import io.rtron.io.files.Path
 import io.rtron.model.AbstractModel
 
-abstract class AbstractReaderWriter(
-    open val configuration: AbstractReaderWriterConfiguration
-) {
-
+abstract class AbstractReaderWriter {
     // Properties and Initializers
 
     // Methods
     abstract fun isSupported(fileExtension: String): Boolean
     abstract fun isSupported(model: AbstractModel): Boolean
 
-    abstract fun read(filePath: Path): AbstractModel
+    abstract fun read(filePath: Path): Result<AbstractModel, Exception>
 
     abstract fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception>
 }

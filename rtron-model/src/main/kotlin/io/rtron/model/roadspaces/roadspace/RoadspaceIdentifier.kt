@@ -18,6 +18,7 @@ package io.rtron.model.roadspaces.roadspace
 
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.ModelIdentifierInterface
+import java.util.UUID
 
 /**
  * Road space identifier interface required for class delegation.
@@ -29,7 +30,6 @@ interface RoadspaceIdentifierInterface {
 /**
  * Identifier of a road space containing essential meta information.
  *
- * @param roadspaceName name of the road space
  * @param roadspaceId id of the road space
  * @param modelIdentifier identifier of the model
  */
@@ -37,6 +37,10 @@ data class RoadspaceIdentifier(
     override val roadspaceId: String,
     val modelIdentifier: ModelIdentifier
 ) : RoadspaceIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
+
+    // Properties and Initializers
+    val hashKey get() = roadspaceId + '_' + modelIdentifier.fileHashSha256
+    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
 
     // Conversions
     override fun toString(): String {

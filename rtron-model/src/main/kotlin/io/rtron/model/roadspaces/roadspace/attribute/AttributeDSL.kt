@@ -17,6 +17,7 @@
 package io.rtron.model.roadspaces.roadspace.attribute
 
 import io.rtron.std.Optional
+import io.rtron.std.present
 
 /**
  * Environment for describing and building attribute lists.
@@ -32,7 +33,7 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: String) {
-        attributes += StringAttribute(namePrefix + name, value)
+        StringAttribute.of(namePrefix + name, value).present { attributes += it }
     }
 
     fun attribute(name: String, value: Int) {
@@ -40,7 +41,7 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: Double) {
-        attributes += DoubleAttribute(namePrefix + name, value)
+        DoubleAttribute.of(namePrefix + name, value).present { attributes += it }
     }
 
     fun attribute(name: String, value: Boolean) {
@@ -48,12 +49,11 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: Double, unitOfMeasure: UnitOfMeasure) {
-        attributes += MeasureAttribute(namePrefix + name, value, unitOfMeasure)
+        MeasureAttribute.of(namePrefix + name, value, unitOfMeasure).present { attributes += it }
     }
 
     fun attribute(name: String, optionalValue: Optional<String>) {
-        if (optionalValue.isPresent())
-            attributes += StringAttribute(namePrefix + name, optionalValue.getOrNull()!!)
+        optionalValue.present { attributes += StringAttribute(namePrefix + name, it) }
     }
 
     /**

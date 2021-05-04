@@ -40,7 +40,8 @@ class LineSegment3D(
 
     // Properties and Initializers
     init {
-        require(start != end) { "Start and end vector of a line segment must be different." }
+        require(start != end) { "Start and end vector must not be identical." }
+        require(start.fuzzyUnequals(end, tolerance)) { "Start and end vector must be different by at least the tolerance threshold." }
     }
 
     override val domain = Range.closedX(0.0, start.distance(end), endBoundType)

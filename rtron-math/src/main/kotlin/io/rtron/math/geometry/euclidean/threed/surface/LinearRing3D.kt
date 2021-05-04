@@ -20,12 +20,14 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
+import io.rtron.math.processing.isColinear
 import io.rtron.math.processing.isPlanar
 import io.rtron.math.processing.triangulation.ExperimentalTriangulator
 import io.rtron.math.processing.triangulation.Triangulator
 import io.rtron.math.range.Tolerable
 import io.rtron.math.transform.AffineSequence3D
-import io.rtron.std.distinctConsecutiveEnclosing
+import io.rtron.std.filterWithNextEnclosing
+import io.rtron.std.noneWithNextEnclosing
 
 /**
  * Linear ring of a list of [vertices]. The linear ring is not required to be planar.
@@ -49,8 +51,8 @@ data class LinearRing3D(
 
     init {
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a linear ring." }
-        require(vertices.distinctConsecutiveEnclosing { it }.size == vertices.size) { "Consecutively following point duplicates found." }
-        require(dimensionSpan >= 2) { "The dimension of the span is too low ($dimensionSpan), which might be caused by colinear vertices." }
+        require(vertices.noneWithNextEnclosing { a, b -> a.fuzzyEquals(b, tolerance) }) { "Consecutively following point duplicates found." }
+        require(dimensionSpan >= 2) { "The dimension of the span is too low ($dimensionSpan), which might be caused by colinear vertices (all vertices located on a line)." }
     }
 
     // Methods
@@ -70,7 +72,7 @@ data class LinearRing3D(
         /**
          * Creates a linear ring based on the provided [vertices].
          */
-        fun of(vararg vertices: Vector3D, tolerance: Double = 1E-7) =
+        fun of(vararg vertices: Vector3D, tolerance: Double) =
             LinearRing3D(vertices.toList(), tolerance)
 
         /**
@@ -81,9 +83,10 @@ data class LinearRing3D(
          * @param rightVertices right vertices for the linear rings construction
          */
         fun of(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double): List<LinearRing3D> {
+            require(leftVertices.size >= 2) { "At least two left vertices required." }
+            require(rightVertices.size >= 2) { "At least two right vertices required." }
 
             data class VertexPair(val left: Vector3D, val right: Vector3D)
-
             val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
             val linearRingVertices = vertexPairs.zipWithNext()
@@ -102,18 +105,24 @@ data class LinearRing3D(
          */
         fun ofWithDuplicatesRemoval(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double):
             Result<List<LinearRing3D>, Exception> {
-                data class VertexPair(val left: Vector3D, val right: Vector3D)
+                require(leftVertices.size >= 2) { "At least two left vertices required." }
+                require(rightVertices.size >= 2) { "At least two right vertices required." }
 
+                data class VertexPair(val left: Vector3D, val right: Vector3D)
                 val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
-                return vertexPairs
+                val linearRings: List<LinearRing3D> = vertexPairs
                     .asSequence()
                     .zipWithNext()
                     .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
-                    .map { currentVertices -> currentVertices.distinctConsecutiveEnclosing { it } }
+                    .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
                     .filter { it.distinct().count() >= 3 }
+                    .filter { !it.isColinear(tolerance) }
                     .map { LinearRing3D(it, tolerance) }
-                    .let { Result.success(it.toList()) }
+                    .toList()
+
+                return if (linearRings.isEmpty()) Result.error(IllegalArgumentException("Not enough valid linear rings could be constructed."))
+                else Result.success(linearRings)
             }
     }
 }

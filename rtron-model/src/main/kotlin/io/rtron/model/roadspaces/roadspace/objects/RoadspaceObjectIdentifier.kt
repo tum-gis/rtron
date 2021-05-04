@@ -18,6 +18,7 @@ package io.rtron.model.roadspaces.roadspace.objects
 
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
+import java.util.UUID
 
 /**
  * Identifier of a lane section containing essential meta information.
@@ -31,6 +32,10 @@ data class RoadspaceObjectIdentifier(
     val roadspaceObjectName: String,
     val roadspaceIdentifier: RoadspaceIdentifier
 ) : RoadspaceIdentifierInterface by roadspaceIdentifier {
+
+    // Properties and Initializers
+    val hashKey get() = roadspaceObjectId + '_' + roadspaceIdentifier.roadspaceId + '_' + roadspaceIdentifier.modelIdentifier.fileHashSha256
+    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
 
     // Conversions
     override fun toString(): String {

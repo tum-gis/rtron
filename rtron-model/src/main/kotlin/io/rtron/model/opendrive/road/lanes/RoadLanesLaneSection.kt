@@ -45,7 +45,7 @@ data class RoadLanesLaneSection(
     fun getCenterLane() = center.lane.first()
     fun getLeftRightLanes(): Map<Int, RoadLanesLaneSectionLRLane> = left.getLanes() + right.getLanes()
 
-    fun isProcessable(): Result<ContextMessage<Boolean>, IllegalStateException> {
+    fun isProcessable(): Result<ContextMessage<Unit>, IllegalStateException> {
 
         if (center.getNumberOfLanes() != 1)
             return Result.error(IllegalStateException("Lane section should contain exactly one center lane."))
@@ -75,6 +75,6 @@ data class RoadLanesLaneSection(
                 infos += "Right lanes should be ordered in a descending manner."
         }
 
-        return Result.success(ContextMessage(true, infos))
+        return Result.success(ContextMessage(Unit, infos))
     }
 }

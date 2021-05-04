@@ -19,7 +19,6 @@ package io.rtron.model.roadspaces.roadspace.objects
 enum class RoadObjectType {
     NONE,
     OBSTACLE,
-    CAR,
     POLE,
     TREE,
     VEGETATION,
@@ -33,15 +32,6 @@ enum class RoadObjectType {
     STREET_LAMP,
     GANTRY,
     SOUND_BARRIER,
-    TRUCK,
-    VAN,
-    BUS,
-    TRAILER,
-    BIKE,
-    MOTORBIKE,
-    TRAM,
-    TRAIN,
-    PEDESTRIAN,
-    WIND,
+    ROAD_MARK,
     SIGNAL
 }

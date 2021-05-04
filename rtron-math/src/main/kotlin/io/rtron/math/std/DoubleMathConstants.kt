@@ -43,6 +43,8 @@ const val TWO_PI = 2.0 * PI
 const val HALF_PI = 0.5 * PI
 /** Value of PI/4 as double. (45 degrees) */
 const val QUARTER_PI = 0.25 * PI
+/** Value of PI3/4 as double. (135 degrees) */
+const val THREE_QUARTER_PI = 0.75 * PI
 
 /** Value of 1/PI as double. */
 const val INV_PI = 1.0 / PI

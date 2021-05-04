@@ -20,12 +20,14 @@ import com.github.kittinunf.result.Result
 import io.rtron.io.files.Path
 import io.rtron.model.AbstractModel
 import io.rtron.readerwriter.AbstractReaderWriter
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
+import io.rtron.std.handleFailure
 import org.w3c.dom.Document
 import javax.xml.parsers.DocumentBuilderFactory
 
 class OpendriveReaderWriter(
-    override val configuration: OpendriveReaderWriterConfiguration
-) : AbstractReaderWriter(configuration) {
+    val configuration: OpendriveReaderWriterConfiguration
+) : AbstractReaderWriter() {
 
     // Properties and Initializers
     private val _reportLogger = configuration.getReportLogger()
@@ -37,8 +39,10 @@ class OpendriveReaderWriter(
     override fun isSupported(fileExtension: String) = fileExtension in supportedFileExtensions
     override fun isSupported(model: AbstractModel): Boolean = false
 
-    override fun read(filePath: Path): AbstractModel =
-        when (val opendriveVersion = getOpendriveVersion(filePath)) {
+    override fun read(filePath: Path): Result<AbstractModel, Exception> {
+        val opendriveVersion = getOpendriveVersion(filePath).handleFailure { return it }
+
+        val model = when (opendriveVersion) {
             OpendriveVersion(1, 4) -> _opendrive14Reader.createOpendriveModel(filePath)
             OpendriveVersion(1, 5) -> _opendrive14Reader.createOpendriveModel(filePath)
             else -> {
@@ -47,19 +51,27 @@ class OpendriveReaderWriter(
             }
         }
 
+        return Result.success(model)
+    }
+
     override fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
         return Result.error(UnsupportedOperationException("Not implemented"))
     }
 
     data class OpendriveVersion(val revMajor: Int = 0, val revMinor: Int = 0)
-    private fun getOpendriveVersion(file: Path): OpendriveVersion {
+    private fun getOpendriveVersion(file: Path): Result<OpendriveVersion, Exception> {
 
         val xmlDoc: Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.toFileJ())
         val header = xmlDoc.getElementsByTagName("header").item(0)
-        return OpendriveVersion(
-            revMajor = header.attributes.getNamedItem("revMajor").nodeValue.toInt(),
-            revMinor = header.attributes.getNamedItem("revMinor").nodeValue.toInt()
+
+        val revMajor = header.attributes.getNamedItem("revMajor") ?: return Result.error(IllegalStateException("Major version of OpenDRIVE dataset is not identifiable."))
+        val revMinor = header.attributes.getNamedItem("revMinor") ?: return Result.error(IllegalStateException("Minor version of OpenDRIVE dataset is not identifiable."))
+
+        val opendriveVersion = OpendriveVersion(
+            revMajor = revMajor.nodeValue.toInt(),
+            revMinor = revMinor.nodeValue.toInt()
         )
+        return Result.success(opendriveVersion)
     }
 
     companion object {

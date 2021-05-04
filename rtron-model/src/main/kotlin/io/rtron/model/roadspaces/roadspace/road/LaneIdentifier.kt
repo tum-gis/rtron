@@ -16,7 +16,10 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import io.rtron.math.std.sign
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
+import java.util.UUID
+import kotlin.math.abs
 
 /**
  * Identifier of a lane containing essential meta information.
@@ -29,22 +32,41 @@ data class LaneIdentifier(
     val laneSectionIdentifier: LaneSectionIdentifier
 ) : LaneSectionIdentifierInterface by laneSectionIdentifier {
 
+    // Properties and Initializers
+    val hashKey get() = laneId.toString() + '_' +
+        laneSectionIdentifier.laneSectionId + '_' +
+        laneSectionIdentifier.roadspaceIdentifier.roadspaceId + '_' +
+        laneSectionIdentifier.roadspaceIdentifier.modelIdentifier.fileHashSha256
+    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
+
     // Methods
 
     fun isLeft() = laneId > 0
     fun isCenter() = laneId == 0
     fun isRight() = laneId < 0
 
-    /** Returns the identifier for the adjacent lane to the left. */
-    fun getAdjacentLeftLaneIdentifier(): LaneIdentifier {
-        val requestedLaneId = if (laneId == -1) 1 else laneId + 1
-        return LaneIdentifier(requestedLaneId, this.laneSectionIdentifier)
-    }
+    /** Returns the [LaneIdentifier] of the lane which is located adjacently inner (towards the reference line) to the
+     * lane of this identifier.  */
+    fun getAdjacentInnerLaneIdentifier(): LaneIdentifier =
+        LaneIdentifier(sign(laneId) * (abs(laneId) - 1), laneSectionIdentifier)
 
-    /**
-     * Returns true, if the [other] lane is located within the same roadspace as the lane with this identifier.
-     */
+    /** Returns the [LaneIdentifier] of the lane which is located adjacently outer (in the opposite direction of the
+     * reference line) to the lane of this identifier.  */
+    fun getAdjacentOuterLaneIdentifier(): LaneIdentifier =
+        LaneIdentifier(sign(laneId) * (abs(laneId) + 1), laneSectionIdentifier)
+
+    /** Returns the identifier for the adjacent lane to the left. */
+    fun getAdjacentLeftLaneIdentifier(): LaneIdentifier = LaneIdentifier(laneId + 1, laneSectionIdentifier)
+
+    /** Returns the identifier for the adjacent lane to the right. */
+    fun getAdjacentRightLaneIdentifier(): LaneIdentifier = LaneIdentifier(laneId - 1, laneSectionIdentifier)
+
+    /** Returns true, if the [other] lane is located within the same roadspace as the lane with this identifier. */
     fun isWithinSameRoad(other: LaneIdentifier) = toRoadspaceIdentifier() == other.toRoadspaceIdentifier()
+
+    /** Returns true, if the [other] lane is located laterally adjacent (same lane section) to this lane. */
+    fun isLaterallyAdjacent(other: LaneIdentifier): Boolean =
+        getAdjacentInnerLaneIdentifier() == other || getAdjacentOuterLaneIdentifier() == other
 
     // Conversions
     override fun toString() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
@@ -54,32 +76,5 @@ data class LaneIdentifier(
 
         fun of(laneId: Int, laneSectionId: Int, roadspaceIdentifier: RoadspaceIdentifier) =
             LaneIdentifier(laneId, LaneSectionIdentifier(laneSectionId, roadspaceIdentifier))
-    }
-}
-
-/**
- * Relative identifier of lanes, whereby the [laneSectionIdentifier] is of [RelativeLaneSectionIdentifier].
- */
-data class RelativeLaneIdentifier(
-    val laneId: Int,
-    val laneSectionIdentifier: RelativeLaneSectionIdentifier
-) : LaneSectionIdentifierInterface by laneSectionIdentifier {
-
-    // Methods
-
-    /**
-     * Returns an absolute [LaneIdentifier]
-     *
-     * @param size number of lane sections in list (last index + 1)
-     */
-    fun toAbsoluteLaneIdentifier(size: Int) =
-        LaneIdentifier(laneId, laneSectionIdentifier.toAbsoluteLaneSectionIdentifier(size))
-
-    // Conversions
-    fun toRoadspaceIdentifier() = laneSectionIdentifier.roadspaceIdentifier
-
-    companion object {
-        fun of(laneId: Int, laneSectionId: Int, roadspaceIdentifier: RoadspaceIdentifier) =
-            RelativeLaneIdentifier(laneId, RelativeLaneSectionIdentifier(laneSectionId, roadspaceIdentifier))
     }
 }

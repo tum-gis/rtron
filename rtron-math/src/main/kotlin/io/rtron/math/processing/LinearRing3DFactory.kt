@@ -20,7 +20,7 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.std.ContextMessage
-import io.rtron.std.distinctConsecutiveEnclosing
+import io.rtron.std.filterWithNextEnclosing
 
 /**
  * Factory for building [LinearRing3D] for which multiple preparation steps are required to overcome
@@ -42,7 +42,7 @@ object LinearRing3DFactory {
                 vertices.dropLast(1) else vertices
 
             // remove consecutively following point duplicates
-            val verticesWithoutPointDuplicates = verticesWithoutClosing.distinctConsecutiveEnclosing { it }
+            val verticesWithoutPointDuplicates = verticesWithoutClosing.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
             if (verticesWithoutPointDuplicates.size < verticesWithoutClosing.size)
                 infos += "Removing at least one consecutively following point duplicate."
 

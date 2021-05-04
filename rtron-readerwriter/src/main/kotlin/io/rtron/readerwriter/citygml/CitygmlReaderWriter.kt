@@ -21,39 +21,61 @@ import io.rtron.io.files.Path
 import io.rtron.model.AbstractModel
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.AbstractReaderWriter
+import io.rtron.readerwriter.ReaderWriterConfiguration
+import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterParameters
+import io.rtron.std.handleAndRemoveFailure
 import org.citygml4j.CityGMLContext
-import org.citygml4j.model.module.citygml.CityGMLVersion
+import org.citygml4j.xml.module.citygml.CoreModule
+import java.nio.charset.StandardCharsets
 
 class CitygmlReaderWriter(
-    override val configuration: CitygmlReaderWriterConfiguration
-) : AbstractReaderWriter(configuration) {
+    val configuration: ReaderWriterConfiguration<CitygmlReaderWriterParameters>
+) : AbstractReaderWriter() {
 
     // Properties and Initializers
-    private val _citygmlContext = CityGMLContext.getInstance()
-    private val _builder = _citygmlContext.createCityGMLBuilder()!!
+    private val _reportLogger = configuration.getReportLogger()
+
+    private val _citygmlContext = CityGMLContext.newInstance()
 
     // Methods
     override fun isSupported(fileExtension: String) = fileExtension in supportedFileExtensions
     override fun isSupported(model: AbstractModel) = model is CitygmlModel
 
-    override fun read(filePath: Path): AbstractModel {
-        TODO("not implemented")
+    override fun read(filePath: Path): Result<AbstractModel, Exception> {
+        return Result.error(Exception("CityGML Reader not implemented yet."))
     }
 
     override fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
         require(model is CitygmlModel) { "$this received not a CitygmlModel." }
 
-        val out = _builder.createCityGMLOutputFactory(CityGMLVersion.DEFAULT)
-        val path = directoryPath.resolve(Path("${directoryPath.fileName}.gml"))
-        val writer = out.createCityGMLWriter(path.toFileJ(), "UTF-8")!!
+        val versionSuffix = configuration.parameters.writeVersions.size > 1
+        val filePaths = configuration.parameters.writeVersions.map { write(model, it, directoryPath, versionSuffix) }
+            .handleAndRemoveFailure { _reportLogger.log(it) }
 
-        writer.setPrefixes(CityGMLVersion.DEFAULT)
-        writer.setSchemaLocations(CityGMLVersion.DEFAULT)
-        writer.indentString = "  "
-        writer.write(model.cityModel)
+        return Result.success(filePaths)
+    }
+
+    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean): Result<Path, Exception> {
+        val citygmlVersion = version.toGmlCitygml()
+        val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
+
+        val fileName = directoryPath.fileName.toString() + (if (versionSuffix) "_$version" else "") + ".gml"
+        val filePath = directoryPath.resolve(Path(fileName))
+
+        val writer = out.createCityGMLChunkWriter(filePath.toFileJ(), StandardCharsets.UTF_8.name())
+        writer.apply {
+            withIndentString("  ")
+            withDefaultSchemaLocations()
+            withDefaultPrefixes()
+            withDefaultNamespace(CoreModule.of(citygmlVersion).namespaceURI)
+            cityModelInfo.boundedBy = model.boundingShape
+        }
+        model.cityObjects.forEach {
+            writer.writeMember(it)
+        }
         writer.close()
 
-        return Result.success(listOf(path))
+        return Result.success(filePath)
     }
 
     companion object {

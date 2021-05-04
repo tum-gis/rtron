@@ -18,10 +18,11 @@ package io.rtron.readerwriter.opendrive
 
 import io.rtron.io.files.Path
 import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
+import jakarta.xml.bind.JAXBContext
+import jakarta.xml.bind.JAXBException
 import org.asam.opendrive14.OpenDRIVE
 import org.mapstruct.factory.Mappers
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBException
 
 class Opendrive14Reader(
     val configuration: OpendriveReaderWriterConfiguration

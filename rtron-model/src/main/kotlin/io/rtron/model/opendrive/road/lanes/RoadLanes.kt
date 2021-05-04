@@ -16,10 +16,12 @@
 
 package io.rtron.model.opendrive.road.lanes
 
+import com.github.kittinunf.result.Result
 import io.rtron.math.range.Range
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
+import io.rtron.std.ContextMessage
 
 data class RoadLanes(
     var laneOffset: List<RoadLanesLaneOffset> = listOf(),
@@ -45,5 +47,15 @@ data class RoadLanes(
             .zipWithNext()
             .map { Range.closed(it.first.s, it.second.s) to it.first } +
             (Range.closed(laneSection.last().s, lastLaneSectionEnd) to laneSection.last())
+    }
+
+    fun isProcessable(tolerance: Double): Result<ContextMessage<Unit>, IllegalStateException> {
+        require(tolerance.isFinite() && tolerance > 0.0) { "Tolerance value must be finite and positive." }
+
+        if (laneSection.zipWithNext().any { it.second.s - it.first.s <= tolerance })
+            return Result.error(IllegalStateException("At least one lane section has a length of zero (or below the tolerance threshold)."))
+
+        val infos = mutableListOf<String>()
+        return Result.success(ContextMessage(Unit, infos))
     }
 }

@@ -23,7 +23,7 @@ package io.rtron.std
  * @param selector if the resulting elements of the selector is equal, the duplicates are being removed
  * @return list without consecutive duplicates
  */
-inline fun <T, K> Iterable<T>.distinctConsecutive(crossinline selector: (T) -> K): List<T> {
+inline fun <T, K> Iterable<T>.distinctConsecutiveBy(crossinline selector: (T) -> K): List<T> {
     if (this is Collection && isEmpty()) return emptyList()
     if (this.count() == 1) return this.toList()
 
@@ -39,7 +39,7 @@ inline fun <T, K> Iterable<T>.distinctConsecutive(crossinline selector: (T) -> K
  * @param selector if the resulting elements of the selector is equal, the duplicates are being removed
  * @return list without consecutive duplicates (also potentially enclosing duplicates)
  */
-inline fun <T, K> Iterable<T>.distinctConsecutiveEnclosing(crossinline selector: (T) -> K): List<T> {
+inline fun <T, K> Iterable<T>.distinctConsecutiveEnclosingBy(crossinline selector: (T) -> K): List<T> {
     if (this is Collection && isEmpty()) return emptyList()
     if (this.count() == 1) return this.toList()
 
@@ -106,3 +106,48 @@ fun <T> Sequence<T>.windowedEnclosing(size: Int, step: Int = 1): Sequence<List<T
  * @return true, if all lists have the same size
  */
 fun <T, K> Collection<T>.hasSameSizeAs(vararg others: Collection<K>) = others.all { it.size == this.size }
+
+/**
+ * Returns a list containing only elements where the pair of it and its successor matches the given [predicate].
+ * The last element is always included.
+ */
+inline fun <T> Iterable<T>.filterWithNext(crossinline predicate: (a: T, b: T) -> Boolean): List<T> {
+    if (this is Collection && isEmpty()) return emptyList()
+    if (this.count() == 1) return this.toList()
+
+    return this.zipWithNext().filter { predicate(it.first, it.second) }.map { it.first } + this.last()
+}
+
+/**
+ * Returns a list containing only elements where the pair of it and its successor (including the enclosing pair) matches the given [predicate].
+ */
+inline fun <T> Iterable<T>.filterWithNextEnclosing(crossinline predicate: (a: T, b: T) -> Boolean): List<T> {
+    if (this is Collection && isEmpty()) return emptyList()
+    if (this.count() == 1) return this.toList()
+
+    return this.zipWithNextEnclosing().filter { predicate(it.first, it.second) }.map { it.first }
+}
+
+/**
+ * Returns true, if at least one consecutively following pair matches the [predicate].
+ */
+inline fun <T> Iterable<T>.anyWithNext(crossinline predicate: (a: T, b: T) -> Boolean): Boolean =
+    this.zipWithNext().any { predicate(it.first, it.second) }
+
+/**
+ * Returns true, if at least one consecutively  following pair (including the enclosing pair) matches the [predicate].
+ */
+inline fun <T> Iterable<T>.anyWithNextEnclosing(crossinline predicate: (a: T, b: T) -> Boolean): Boolean =
+    this.zipWithNextEnclosing().any { predicate(it.first, it.second) }
+
+/**
+ * Returns true, if no consecutively following pair matches the [predicate].
+ */
+inline fun <T> Iterable<T>.noneWithNext(crossinline predicate: (a: T, b: T) -> Boolean): Boolean =
+    this.zipWithNext().none { predicate(it.first, it.second) }
+
+/**
+ * Returns true, if no consecutively following pair (including the enclosing pair) matches the [predicate].
+ */
+inline fun <T> Iterable<T>.noneWithNextEnclosing(crossinline predicate: (a: T, b: T) -> Boolean): Boolean =
+    this.zipWithNextEnclosing().none { predicate(it.first, it.second) }

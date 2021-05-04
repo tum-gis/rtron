@@ -41,6 +41,7 @@ data class Lane(
     val roadMarkings: List<RoadMarking>,
     val predecessors: List<Int>,
     val successors: List<Int>,
+    val type: LaneType,
     val attributes: AttributeList
 ) {
 
@@ -63,6 +64,7 @@ data class CenterLane(
     val id: LaneIdentifier,
     val level: Boolean = false,
     val roadMarkings: List<RoadMarking> = emptyList(),
+    val type: LaneType = LaneType.NONE,
     val attributes: AttributeList = AttributeList.EMPTY
 ) {
     // Properties and Initializers

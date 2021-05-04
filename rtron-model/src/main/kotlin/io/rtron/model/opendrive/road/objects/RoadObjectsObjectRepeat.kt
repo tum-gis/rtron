@@ -76,7 +76,7 @@ data class RoadObjectsObjectRepeat(
     fun getObjectHeightFunction() = LinearFunction.ofInclusiveInterceptAndPointWithoutNaN(heightStart, length, heightEnd)
     fun getObjectRadiusFunction() = LinearFunction.ofInclusiveInterceptAndPointWithoutNaN(radiusStart, length, radiusEnd)
 
-    fun isSet() = isParametricSweep() || isCurve() || isHorizontalLinearRing() || isVerticalLinearRing() ||
+    fun isSet() = isParametricSweep() || isCurve() || isHorizontalParametricBoundedSurface() || isVerticalParametricBoundedSurface() ||
         isRepeatedCuboid() || isRepeatCylinder()
 
     fun isParametricSweep() = isContinuous() && isSetStartPoint() &&
@@ -87,11 +87,11 @@ data class RoadObjectsObjectRepeat(
         isLengthNonZero() &&
         isObjectWidthZero() && isObjectHeightZero()
 
-    fun isHorizontalLinearRing() = isContinuous() && isSetStartPoint() &&
+    fun isHorizontalParametricBoundedSurface() = isContinuous() && isSetStartPoint() &&
         isLengthNonZero() &&
         isObjectWidthNonZero() && isObjectHeightZero()
 
-    fun isVerticalLinearRing() = isContinuous() && isSetStartPoint() &&
+    fun isVerticalParametricBoundedSurface() = isContinuous() && isSetStartPoint() &&
         isLengthNonZero() &&
         isObjectWidthZero() && isObjectHeightNonZero()
 

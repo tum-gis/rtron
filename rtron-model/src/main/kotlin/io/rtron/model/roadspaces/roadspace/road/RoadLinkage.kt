@@ -16,24 +16,41 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import io.rtron.model.roadspaces.junction.JunctionIdentifier
+import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.model.roadspaces.topology.junction.JunctionIdentifier
 import io.rtron.std.Optional
-
-enum class ContactPoint(val relativeIndex: Int) {
-    START(0),
-    END(-1)
-}
+import io.rtron.std.present
 
 /**
  * Contains the topological information about the road.
  */
 data class RoadLinkage(
     val belongsToJunctionId: Optional<JunctionIdentifier>,
-    val predecessorRoadspaceId: Optional<RoadspaceIdentifier>,
+    val predecessorRoadspaceContactPointId: Optional<RoadspaceContactPointIdentifier>,
     val predecessorJunctionId: Optional<JunctionIdentifier>,
-    val predecessorContactPoint: Optional<ContactPoint>,
-    val successorRoadspaceId: Optional<RoadspaceIdentifier>,
-    val successorJunctionId: Optional<JunctionIdentifier>,
-    val successorContactPoint: Optional<ContactPoint>
-)
+    val successorRoadspaceContactPointId: Optional<RoadspaceContactPointIdentifier>,
+    val successorJunctionId: Optional<JunctionIdentifier>
+) {
+    // Properties and Initializers
+    init {
+        require(!(predecessorRoadspaceContactPointId.isPresent() && predecessorJunctionId.isPresent())) { "Predecessor must be either a roadspace or junction or neither." }
+        require(!(successorRoadspaceContactPointId.isPresent() && successorJunctionId.isPresent())) { "Successor must be either a roadspace or junction or neither." }
+
+        belongsToJunctionId.present {
+            require(predecessorJunctionId.isEmpty()) { "If a road belongs to a junction (id=$it), a predecessing junction must not exist." }
+            require(successorJunctionId.isEmpty()) { "If a road belongs to a junction (id=$it), a successing junction must not exist." }
+        }
+    }
+
+    // Methods
+
+    /** Returns a list of [RoadspaceIdentifier] of roadspaces which is referred to (predecessor and/or successor).  */
+    fun getAllUsedRoadspaceIds(): List<RoadspaceIdentifier> =
+        (predecessorRoadspaceContactPointId.toList() + successorRoadspaceContactPointId.toList())
+            .map { it.roadspaceIdentifier }.distinct()
+
+    /** Returns a list of [JunctionIdentifier] of junctions which is referred to (belongs to, predecessor, successor).  */
+    fun getAllUsedJunctionIds(): List<JunctionIdentifier> =
+        (belongsToJunctionId.toList() + predecessorJunctionId.toList() + successorJunctionId.toList()).distinct()
+}

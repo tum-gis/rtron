@@ -13,10 +13,11 @@ dependencies {
     implementation(project(ProjectComponents.inputOutput))
     implementation(project(ProjectComponents.model))
 
+    implementation(Dependencies.jakartaXmlBindApi)
+    implementation(Dependencies.sunJaxbImpl)
     xjc(Dependencies.jakartaXmlBindApi)
-    xjc(Dependencies.jaxbImpl)
+    xjc(Dependencies.jaxbRuntime)
     xjc(Dependencies.jaxbXjc)
-    xjc(Dependencies.jaxbCore)
     xjc(Dependencies.jakartaActivationApi)
 
     // object mapping

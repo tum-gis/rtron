@@ -28,4 +28,10 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 data class RoadMarking(
     val width: ConstantFunction,
     val attributes: AttributeList
-)
+) {
+
+    // Properties and Initializers
+    init {
+        require(width.domain.isNotEmpty()) { "The domain of the road marking's width must not be empty." }
+    }
+}

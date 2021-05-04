@@ -40,9 +40,12 @@ data class Cuboid3D(
 
     // Properties and Initializers
     init {
-        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
-        require(width.isFinite() && width > 0.0) { "Width must be finite and greater than zero." }
-        require(height.isFinite() && height > 0.0) { "Height must be finite and greater than zero." }
+        require(length.isFinite()) { "Length value must be finite." }
+        require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
+        require(width.isFinite()) { "Width value must be finite." }
+        require(width > tolerance) { "Width value must be greater than zero and the tolerance threshold." }
+        require(height.isFinite()) { "Height value must be finite." }
+        require(height > tolerance) { "Height value must be greater than zero and the tolerance threshold." }
     }
 
     private val halfLength = length / 2.0

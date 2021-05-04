@@ -44,6 +44,7 @@ class CurveRelativeParametricSurface3D(
 
     init {
         require(heightFunction.domainX.fuzzyEncloses(baseCurve.domain, tolerance)) { "The height function must be defined everywhere where the referenceLine is also defined." }
+        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     // Methods

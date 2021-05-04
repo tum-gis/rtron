@@ -21,7 +21,6 @@ import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.CurveRelativeAbstractGeometry3D
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.math.std.fuzzyEquals as doubleFuzzyEquals
 
 /**
@@ -51,10 +50,12 @@ data class CurveRelativeVector3D(
      * Returns true, if [curvePosition], [lateralOffset] and [heightOffset] are all fuzzily equal with a tolerance
      * of [epsilon].
      */
-    fun fuzzyEquals(o: CurveRelativeVector3D, epsilon: Double = DEFAULT_TOLERANCE) =
+    fun fuzzyEquals(o: CurveRelativeVector3D, epsilon: Double) =
         doubleFuzzyEquals(this.curvePosition, o.curvePosition, epsilon) &&
             doubleFuzzyEquals(this.lateralOffset, o.lateralOffset, epsilon) &&
             doubleFuzzyEquals(this.heightOffset, o.heightOffset, epsilon)
+
+    fun fuzzyUnequals(o: CurveRelativeVector3D, epsilon: Double) = !fuzzyEquals(o, epsilon)
 
     // Methods
     fun getCartesianCurveOffset() = Vector3D(0.0, lateralOffset, heightOffset)

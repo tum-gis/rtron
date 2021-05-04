@@ -108,7 +108,7 @@ data class RoadObjectsObject(
     /** Returns true, if the provided geometry information correspond to a point. */
     fun isPoint() = !isCuboid() && !isRectangle() && !isCylinder() && !outlines.containsGeometries() && !repeat.isSet()
 
-    fun isProcessable(): Result<ContextMessage<Boolean>, IllegalStateException> {
+    fun isProcessable(): Result<ContextMessage<Unit>, IllegalStateException> {
 
         if (outlines.outline.any { it.isPolyhedron() && !it.isPolyhedronUniquelyDefined() })
             return Result.error(
@@ -128,6 +128,6 @@ data class RoadObjectsObject(
             infos += "Road object contains a polyhedron with non-zero height, but the height of the road " +
                 "object element is $height."
 
-        return Result.success(ContextMessage(true, infos))
+        return Result.success(ContextMessage(Unit, infos))
     }
 }

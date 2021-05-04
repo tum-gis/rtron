@@ -141,6 +141,7 @@ class Affine3D(
     fun toMatrix4JOML() = JOMLMatrix4d(this._matrix)
     fun toRealMatrix() = this._matrixTransposed.toRealMatrix()
     fun toDoubleArray(): DoubleArray = this._matrixTransposed.get(DoubleArray(16))
+    fun toDoubleList(): List<Double> = toDoubleArray().toList()
 
     override fun toString(): String {
         return "Affine3D(_matrix=$_matrix)"

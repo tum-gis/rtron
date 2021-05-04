@@ -22,14 +22,13 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.roadspace.Roadspace
-import io.rtron.model.roadspaces.topology.LaneTopology
 import io.rtron.std.handleAndRemoveFailureIndexed
 import io.rtron.transformer.AbstractTransformer
 import io.rtron.transformer.TransformerConfiguration
 import io.rtron.transformer.opendrive2roadspaces.header.HeaderBuilder
+import io.rtron.transformer.opendrive2roadspaces.junction.JunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.transformer.opendrive2roadspaces.roadspaces.RoadspaceBuilder
-import io.rtron.transformer.opendrive2roadspaces.topology.TopologyBuilder
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -48,7 +47,7 @@ class Opendrive2RoadspacesTransformer(
 
     private val _headerBuilder = HeaderBuilder(configuration)
     private val _roadspaceBuilder = RoadspaceBuilder(configuration)
-    private val _topologyBuilder = TopologyBuilder(configuration)
+    private val _junctionBuilder = JunctionBuilder(configuration)
 
     // Methods
 
@@ -78,14 +77,12 @@ class Opendrive2RoadspacesTransformer(
 
         val roadspaces = roadspacesResults.handleAndRemoveFailureIndexed { index, failure ->
             _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}", "Removing road.")
-        }.map { it.id to it }.toMap()
+        }
 
         val junctions = opendriveModel.junction
-            .map { _topologyBuilder.buildJunction(modelIdentifier, it) }
-            .map { it.id to it }.toMap()
-        val laneTopology = LaneTopology(roadspaces, junctions)
+            .map { _junctionBuilder.buildJunction(modelIdentifier, it, roadspaces) }
 
-        return RoadspacesModel(modelIdentifier, header, roadspaces, laneTopology)
+        return RoadspacesModel(modelIdentifier, header, roadspaces, junctions)
             .also { _reportLogger.info("Completed transformation: OpenDRIVE -> RoadspacesModel. ✔") }
     }
 

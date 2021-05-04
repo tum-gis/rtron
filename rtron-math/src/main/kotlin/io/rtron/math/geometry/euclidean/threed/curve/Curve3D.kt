@@ -51,6 +51,8 @@ data class Curve3D(
     init {
         require(heightFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The height function must be defined everywhere where the curveXY is also defined." }
         require(torsionFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The torsion function must be defined everywhere where the curveXY is also defined." }
+
+        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     override val domain get() = curveXY.domain

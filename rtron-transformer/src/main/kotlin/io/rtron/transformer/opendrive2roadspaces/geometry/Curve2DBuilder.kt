@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
+import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -35,6 +36,7 @@ import io.rtron.math.geometry.euclidean.twod.curve.SpiralSegment2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
+import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.length
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.math.transform.Affine2D
@@ -57,97 +59,103 @@ class Curve2DBuilder(
     /**
      * Builds a concatenated curve in 2D for the OpenDRIVE's plan view elements.
      *
-     * @param srcPlanViewGeometryList source geometry curve segments of OpenDRIVE
+     * @param planViewGeometryList source geometry curve segments of OpenDRIVE
      * @param offset applied translational offset
      */
     fun buildCurve2DFromPlanViewGeometries(
         id: RoadspaceIdentifier,
-        srcPlanViewGeometryList: List<RoadPlanViewGeometry>,
+        planViewGeometryList: List<RoadPlanViewGeometry>,
         offset: Vector2D = Vector2D.ZERO
-    ): CompositeCurve2D {
+    ): Result<CompositeCurve2D, IllegalArgumentException> {
+
+        if (planViewGeometryList.isEmpty())
+            return Result.error(IllegalArgumentException("No plan view geometries available."))
 
         // prepare
-        val srcPlanViewGeometryListAdjusted =
-            srcPlanViewGeometryList.filter { it.length > parameters.tolerance }
-        if (srcPlanViewGeometryListAdjusted.size < srcPlanViewGeometryList.size)
+        val planViewGeometryListAdjusted =
+            planViewGeometryList.filter { it.length > parameters.tolerance }
+        if (planViewGeometryListAdjusted.size < planViewGeometryList.size)
             reportLogger.warn(
-                "Plan view geometry contains a length value of zero (below tolerance) and " +
+                "Plan view geometry contains a length value of zero (below tolerance threshold) and " +
                     "therefore the curve element can not be constructed.",
                 id.toString()
             )
 
+        if (planViewGeometryListAdjusted.isEmpty())
+            return Result.error(IllegalArgumentException("No valid plan view geometries available."))
+
         // construct composite curve
-        val absoluteStarts: List<Double> = srcPlanViewGeometryListAdjusted.map { it.s }
+        val absoluteStarts: List<Double> = planViewGeometryListAdjusted.map { it.s }
         val absoluteDomains: List<Range<Double>> = absoluteStarts
             .zipWithNext().map { Range.closedOpen(it.first, it.second) } +
-            Range.closed(absoluteStarts.last(), absoluteStarts.last() + srcPlanViewGeometryListAdjusted.last().length)
+            Range.closed(absoluteStarts.last(), absoluteStarts.last() + planViewGeometryListAdjusted.last().length)
         val lengths: List<Double> = absoluteDomains.map { it.length }
 
-        val curveMembers = srcPlanViewGeometryListAdjusted.zip(lengths).dropLast(1)
+        val curveMembers = planViewGeometryListAdjusted.zip(lengths).dropLast(1)
             .map { buildPlanViewGeometry(id, it.first, it.second, BoundType.OPEN, offset) } +
-            buildPlanViewGeometry(id, srcPlanViewGeometryListAdjusted.last(), lengths.last(), BoundType.CLOSED, offset)
+            buildPlanViewGeometry(id, planViewGeometryListAdjusted.last(), lengths.last(), BoundType.CLOSED, offset)
 
-        return CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts)
+        return Result.success(CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts))
     }
 
     /**
      * Builds a single curve element in 2D for the OpenDRIVE's plan view element.
      *
-     * @param srcGeometry source geometry element of OpenDRIVE
+     * @param geometry source geometry element of OpenDRIVE
      * @param length length of the constructed curve element
      * @param endBoundType applied end bound type for the curve element
      * @param offset applied translational offset
      */
     private fun buildPlanViewGeometry(
         id: RoadspaceIdentifier,
-        srcGeometry: RoadPlanViewGeometry,
+        geometry: RoadPlanViewGeometry,
         length: Double,
         endBoundType: BoundType = BoundType.OPEN,
         offset: Vector2D = Vector2D.ZERO
     ): AbstractCurve2D {
 
-        if (!fuzzyEquals(srcGeometry.length, length, parameters.tolerance))
+        if (!fuzzyEquals(geometry.length, length, parameters.tolerance))
             reportLogger.warn(
-                "Plan view geometry element (s=${srcGeometry.s}) contains a length value " +
+                "Plan view geometry element (s=${geometry.s}) contains a length value " +
                     "that does not match the start value of the next geometry element.",
                 id.toString()
             )
 
-        val startPose = Pose2D(Vector2D(srcGeometry.x, srcGeometry.y), Rotation2D(srcGeometry.hdg))
+        val startPose = Pose2D(Vector2D(geometry.x, geometry.y), Rotation2D(geometry.hdg))
         val affineSequence = AffineSequence2D.of(Affine2D.of(offset), Affine2D.of(startPose))
 
         return when {
-            srcGeometry.isSpiral() -> {
+            geometry.isSpiral() -> {
                 val curvatureFunction = LinearFunction.ofInclusiveInterceptAndPoint(
-                    srcGeometry.spiral.curvStart,
+                    geometry.spiral.curvStart,
                     length,
-                    srcGeometry.spiral.curvEnd
+                    geometry.spiral.curvEnd
                 )
                 SpiralSegment2D(curvatureFunction, parameters.tolerance, affineSequence, endBoundType)
             }
-            srcGeometry.isArc() -> {
+            geometry.isArc() -> {
                 Arc2D(
-                    srcGeometry.arc.curvature,
+                    geometry.arc.curvature,
                     length,
                     parameters.tolerance,
                     affineSequence,
                     endBoundType
                 )
             }
-            srcGeometry.isPoly3() -> {
+            geometry.isPoly3() -> {
                 CubicCurve2D(
-                    srcGeometry.poly3.coefficients,
+                    geometry.poly3.coefficients,
                     length,
                     parameters.tolerance,
                     affineSequence,
                     endBoundType
                 )
             }
-            srcGeometry.isParamPoly3() && srcGeometry.paramPoly3.isNormalized() -> {
+            geometry.isParamPoly3() && geometry.paramPoly3.isNormalized() -> {
                 val parameterTransformation: (CurveRelativeVector1D) -> CurveRelativeVector1D = { it / length }
                 val baseCurve = ParametricCubicCurve2D(
-                    srcGeometry.paramPoly3.coefficientsU,
-                    srcGeometry.paramPoly3.coefficientsV,
+                    geometry.paramPoly3.coefficientsU,
+                    geometry.paramPoly3.coefficientsV,
                     1.0,
                     parameters.tolerance,
                     affineSequence,
@@ -159,10 +167,10 @@ class Curve2DBuilder(
                     Range.closedX(0.0, length, endBoundType)
                 )
             }
-            srcGeometry.isParamPoly3() && !srcGeometry.paramPoly3.isNormalized() -> {
+            geometry.isParamPoly3() && !geometry.paramPoly3.isNormalized() -> {
                 ParametricCubicCurve2D(
-                    srcGeometry.paramPoly3.coefficientsU,
-                    srcGeometry.paramPoly3.coefficientsV,
+                    geometry.paramPoly3.coefficientsU,
+                    geometry.paramPoly3.coefficientsV,
                     length,
                     parameters.tolerance,
                     affineSequence,
@@ -179,9 +187,15 @@ class Curve2DBuilder(
      * Builds the function for laterally translating the [roadReferenceLine] which is inter alia required for the
      * building of road objects.
      */
-    fun buildLateralTranslatedCurve(srcRepeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
-        LateralTranslatedCurve2D {
-            val section = SectionedCurve2D(roadReferenceLine.curveXY, srcRepeat.getRoadReferenceLineParameterSection())
-            return LateralTranslatedCurve2D(section, srcRepeat.getLateralOffsetFunction(), parameters.tolerance)
+    fun buildLateralTranslatedCurve(repeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
+        Result<LateralTranslatedCurve2D, IllegalArgumentException> {
+            val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
+
+            if (!roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, parameters.tolerance))
+                return Result.error(IllegalArgumentException("Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance."))
+
+            val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
+            val lateralTranslatedCurve = LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), parameters.tolerance)
+            return Result.success(lateralTranslatedCurve)
         }
 }

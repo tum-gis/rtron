@@ -16,20 +16,35 @@
 
 package io.rtron.main.project.configuration
 
+import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterParameters
+import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterParametersBuilder
+import io.rtron.readerwriter.citygml.parameter.citygmlReaderWriterParameters
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterParameters
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterParametersBuilder
+import io.rtron.readerwriter.opendrive.parameter.opendriveReaderWriterParameters
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParametersBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.opendrive2RoadspacesParameters
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParametersBuilder
-import io.rtron.transformer.roadspace2citygml.parameter.roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParametersBuilder
+import io.rtron.transformer.roadspaces2citygml.parameter.roadspaces2CitygmlParameters
 
 class ConfigurationBuilder {
 
     // Properties and Initializers
+    private var opendriveReaderWriterParameters = OpendriveReaderWriterParameters()
+    private var citygmlReaderWriterParameters = CitygmlReaderWriterParameters()
     private var opendrive2RoadspacesParameters = Opendrive2RoadspacesParameters()
     private var roadspace2CitygmlParameters = Roadspaces2CitygmlParameters()
 
     // Methods
+
+    fun opendriveReaderWriter(setup: OpendriveReaderWriterParametersBuilder.() -> Unit) {
+        opendriveReaderWriterParameters = opendriveReaderWriterParameters(setup)
+    }
+    fun citygmlReaderWriter(setup: CitygmlReaderWriterParametersBuilder.() -> Unit) {
+        citygmlReaderWriterParameters = citygmlReaderWriterParameters(setup)
+    }
     fun opendrive2roadspaces(setup: Opendrive2RoadspacesParametersBuilder.() -> Unit) {
         opendrive2RoadspacesParameters = opendrive2RoadspacesParameters(setup)
     }
@@ -37,7 +52,7 @@ class ConfigurationBuilder {
         roadspace2CitygmlParameters = roadspaces2CitygmlParameters(setup)
     }
 
-    fun build() = ProjectUserConfiguration(opendrive2RoadspacesParameters, roadspace2CitygmlParameters)
+    fun build() = ProjectUserConfiguration(opendriveReaderWriterParameters, citygmlReaderWriterParameters, opendrive2RoadspacesParameters, roadspace2CitygmlParameters)
 }
 
 fun configure(setup: ConfigurationBuilder.() -> Unit): ProjectUserConfiguration {

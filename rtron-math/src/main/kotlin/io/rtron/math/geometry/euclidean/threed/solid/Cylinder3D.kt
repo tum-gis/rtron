@@ -43,8 +43,10 @@ data class Cylinder3D(
 
     // Properties and Initializers
     init {
-        require(radius.isFinite() && radius > 0.0) { "Radius must be finite and greater than zero." }
-        require(height.isFinite() && height > 0.0) { "Height must be finite and greater than zero." }
+        require(radius.isFinite()) { "Radius value must be finite." }
+        require(radius > tolerance) { "Radius value must be greater than zero and the tolerance threshold." }
+        require(height.isFinite()) { "Height value must be finite." }
+        require(height > tolerance) { "Height value must be greater than zero and the tolerance threshold." }
         require(numberSlices >= 3) { "Requiring at least three slices to construct a solid." }
     }
 

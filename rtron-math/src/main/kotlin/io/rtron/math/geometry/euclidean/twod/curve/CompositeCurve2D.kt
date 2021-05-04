@@ -46,6 +46,10 @@ data class CompositeCurve2D(
     override val domain get() = container.domain
     override val tolerance get() = curveMembers.first().tolerance
 
+    init {
+        require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
+    }
+
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector2D, Exception> {

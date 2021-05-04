@@ -24,7 +24,7 @@ import io.rtron.math.processing.calculateNormal
 import io.rtron.math.processing.isPlanar
 import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.math.transform.AffineSequence3D
-import io.rtron.std.distinctConsecutiveEnclosing
+import io.rtron.std.noneWithNextEnclosing
 
 /**
  * Planar polygon consisting of a list of [vertices].
@@ -48,7 +48,7 @@ data class Polygon3D(
 
     init {
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a polygon." }
-        require(vertices.distinctConsecutiveEnclosing { it }.size == vertices.size) { "Consecutively following point duplicates found." }
+        require(vertices.noneWithNextEnclosing { a, b -> a.fuzzyEquals(b, tolerance) }) { "Consecutively following point duplicates found." }
         require(dimensionSpan >= 2) { "The dimension of the span is too low ($dimensionSpan) which might be caused by colinear vertices." }
         require(vertices.isPlanar(tolerance)) { "The vertices of a polygon must be located in a plane." }
     }

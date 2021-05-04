@@ -20,14 +20,14 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.Polyhedron3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
+import io.rtron.math.linear.dimensionOfSpan
 import io.rtron.math.processing.triangulation.ExperimentalTriangulator
 import io.rtron.math.processing.triangulation.Triangulator
 import io.rtron.math.range.Tolerable
-import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.std.ContextMessage
 import io.rtron.std.Optional
-import io.rtron.std.distinctConsecutiveEnclosing
 import io.rtron.std.filterWindowedEnclosing
+import io.rtron.std.filterWithNextEnclosing
 import io.rtron.std.getOrElse
 import io.rtron.std.handleFailure
 import io.rtron.std.map
@@ -85,7 +85,7 @@ object Polyhedron3DFactory {
         val basePoint: Vector3D,
         val leftHeadPoint: Optional<Vector3D>,
         val rightHeadPoint: Optional<Vector3D> = Optional.empty(),
-        override val tolerance: Double = DEFAULT_TOLERANCE
+        override val tolerance: Double
     ) : Tolerable {
 
         // Properties and Initializers
@@ -95,13 +95,13 @@ object Polyhedron3DFactory {
 
             if (leftHeadPoint.isPresent()) {
                 val leftHeadPointValue = leftHeadPoint.getResult().handleFailure { throw it.error }
-                require(!basePoint.fuzzyEquals(leftHeadPointValue, tolerance)) { "Left head point must not be fuzzily equal to base point." }
+                require(basePoint.fuzzyUnequals(leftHeadPointValue, tolerance)) { "Left head point must be fuzzily unequal to base point." }
 
                 if (rightHeadPoint.isPresent()) {
                     val rightHeadPointValue = rightHeadPoint.getResult().handleFailure { throw it.error }
-                    require(!basePoint.fuzzyEquals(rightHeadPointValue, tolerance)) { "Right head point must not be fuzzily equal to base point." }
+                    require(basePoint.fuzzyUnequals(rightHeadPointValue, tolerance)) { "Right head point must be fuzzily unequal to base point." }
 
-                    require(!leftHeadPointValue.fuzzyEquals(rightHeadPointValue)) { "Left head point must not be fuzzily equal to the right point." }
+                    require(leftHeadPointValue.fuzzyUnequals(rightHeadPointValue, tolerance)) { "Left head point must be fuzzily unequal to the right point." }
                 }
             }
         }
@@ -143,7 +143,7 @@ object Polyhedron3DFactory {
                 val headPoints = leftHeadPoint.toList() + rightHeadPoint.toList()
 
                 // remove head points that are fuzzily equal to base point
-                val prepHeadPoints = headPoints.filter { !it.fuzzyEquals(basePoint, tolerance) }
+                val prepHeadPoints = headPoints.filter { it.fuzzyUnequals(basePoint, tolerance) }
                 if (prepHeadPoints.size < headPoints.size)
                     infos += "Height of outline element must be above tolerance."
 
@@ -229,7 +229,7 @@ object Polyhedron3DFactory {
             val infos = mutableListOf<String>()
 
             // remove consecutively following line segment duplicates
-            val elementsWithoutDuplicates = verticalOutlineElements.distinctConsecutiveEnclosing { it }
+            val elementsWithoutDuplicates = verticalOutlineElements.filterWithNextEnclosing { a, b -> a.basePoint.fuzzyUnequals(b.basePoint, tolerance) }
             if (elementsWithoutDuplicates.size < verticalOutlineElements.size)
                 infos += "Removing at least one consecutively following line segment duplicate."
 
@@ -242,6 +242,12 @@ object Polyhedron3DFactory {
                 .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
             if (cleanedElements.size < elementsWithoutDuplicates.size)
                 infos += "Removing consecutively following side duplicates of the form (…, A, B, A, …)."
+
+            // if the base points of the outline element are located on a line (or point)
+            val innerBaseEdges = cleanedElements.map { it.basePoint }.filterIndexed { index, _ -> index != 0 }.map { it - cleanedElements.first().basePoint }
+            val dimensionOfSpan = innerBaseEdges.map { it.toRealVector() }.dimensionOfSpan()
+            if (dimensionOfSpan < 2)
+                return Result.error(IllegalStateException("A polyhedron requires at least three valid outline elements, which are not colinear (located on a line)."))
 
             val elements: ContextMessage<List<VerticalOutlineElement>> = cleanedElements
                 .zipWithConsecutivesEnclosing { it.basePoint }

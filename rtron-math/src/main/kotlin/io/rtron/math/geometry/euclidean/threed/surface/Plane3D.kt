@@ -36,6 +36,10 @@ data class Plane3D(
 ) {
 
     // Properties and Initializers
+    init {
+        require(normal.norm > tolerance) { "Norm of normal must be greater than zero and the tolerance threshold." }
+    }
+
     private val _plane = CMPlane(point.toVector3DCm(), normal.toVector3DCm(), tolerance)
 
     /** first canonical vector u of the plane */

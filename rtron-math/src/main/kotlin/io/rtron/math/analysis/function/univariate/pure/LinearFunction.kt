@@ -97,7 +97,7 @@ data class LinearFunction(
 
             val adjustedIntercept = if (intercept.isFinite()) intercept else pointY
             val adjustedPointY = if (pointY.isFinite()) pointY else intercept
-            return LinearFunction.Companion.ofInclusiveInterceptAndPoint(adjustedIntercept, pointX, adjustedPointY)
+            return ofInclusiveInterceptAndPoint(adjustedIntercept, pointX, adjustedPointY)
         }
 
         /**

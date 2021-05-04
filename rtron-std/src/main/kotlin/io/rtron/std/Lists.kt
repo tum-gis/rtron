@@ -102,7 +102,7 @@ fun List<Boolean>.moveWindow(window: List<Boolean>, shape: MovingWindowShape = M
  * Return: A, B, A, B
  *
  * @receiver list on which the window filter is applied
- * @param dropIndices the list of [Boolean] indicating the the indices that are dropped in the case of a
+ * @param dropIndices the list of [Boolean] indicating the indices that are dropped in the case of a
  * matching [predicate]
  * @param predicate if the [predicate] returns true, the indices are dropped according to the [dropIndices]
  * @return list without elements which match the [predicate]

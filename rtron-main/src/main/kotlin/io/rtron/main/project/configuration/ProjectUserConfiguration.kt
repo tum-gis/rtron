@@ -16,10 +16,14 @@
 
 package io.rtron.main.project.configuration
 
+import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterParameters
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterParameters
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
 
 data class ProjectUserConfiguration(
+    val opendriveReaderWriterParameters: OpendriveReaderWriterParameters = OpendriveReaderWriterParameters(),
+    val citygmlReaderWriterParameters: CitygmlReaderWriterParameters = CitygmlReaderWriterParameters(),
     val opendrive2RoadspacesParameters: Opendrive2RoadspacesParameters = Opendrive2RoadspacesParameters(),
     val roadspaces2CitygmlParameters: Roadspaces2CitygmlParameters = Roadspaces2CitygmlParameters()
 ) {
@@ -27,6 +31,8 @@ data class ProjectUserConfiguration(
     // Methods
     infix fun leftMerge(other: ProjectUserConfiguration) =
         ProjectUserConfiguration(
+            opendriveReaderWriterParameters = this.opendriveReaderWriterParameters leftMerge other.opendriveReaderWriterParameters,
+            citygmlReaderWriterParameters = this.citygmlReaderWriterParameters leftMerge other.citygmlReaderWriterParameters,
             opendrive2RoadspacesParameters = this.opendrive2RoadspacesParameters leftMerge other.opendrive2RoadspacesParameters,
             roadspaces2CitygmlParameters = this.roadspaces2CitygmlParameters leftMerge other.roadspaces2CitygmlParameters
         )

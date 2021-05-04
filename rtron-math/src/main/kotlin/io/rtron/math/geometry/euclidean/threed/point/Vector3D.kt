@@ -20,10 +20,10 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.linear.RealVector
-import io.rtron.math.std.DEFAULT_TOLERANCE
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.std.hasSameSizeAs
 import kotlin.math.atan2
+import io.rtron.math.std.fuzzyEquals as doubleFuzzyEquals
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D as CMVector3D
 import org.joml.Vector3d as JOMLVector3D
 import org.joml.Vector4d as JOMLVector4D
@@ -72,7 +72,10 @@ data class Vector3D(
     operator fun unaryPlus() = Vector3D(x, y, z)
     operator fun unaryMinus() = Vector3D(-x, -y, -z)
 
-    fun fuzzyEquals(o: Vector3D, epsilon: Double = DEFAULT_TOLERANCE) = distance(o) < epsilon
+    fun fuzzyEquals(o: Vector3D, epsilon: Double) = doubleFuzzyEquals(this.x, o.x, epsilon) &&
+        doubleFuzzyEquals(this.y, o.y, epsilon) &&
+        doubleFuzzyEquals(this.z, o.z, epsilon)
+    fun fuzzyUnequals(o: Vector3D, epsilon: Double) = !fuzzyEquals(o, epsilon)
 
     // Methods
 
@@ -154,7 +157,7 @@ data class Vector3D(
  * @param other other list of vectors to be compared
  * @param tolerance allowed tolerance for fuzzy equal evaluation
  */
-fun List<Vector3D>.fuzzyEquals(other: List<Vector3D>, tolerance: Double = DEFAULT_TOLERANCE): Boolean {
+fun List<Vector3D>.fuzzyEquals(other: List<Vector3D>, tolerance: Double): Boolean {
     require(this.hasSameSizeAs(other)) { "Lists must have the same size." }
     return this.zip(other).all { it.first.fuzzyEquals(it.second, tolerance) }
 }

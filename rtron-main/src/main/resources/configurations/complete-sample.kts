@@ -1,4 +1,5 @@
 import io.rtron.main.project.configuration.configure
+import io.rtron.readerwriter.citygml.CitygmlVersion
 
 configure {
 
@@ -39,5 +40,15 @@ configure {
 
         // true, if random ids shall be generated for the gml geometries
         generateRandomGeometryIds = true
+
+        // if true, additional road lines (reference line, lane boundaries) are exported
+        transformAdditionalRoadLines = false
+
+        // if true, only classes are populated that are also available in CityGML2
+        mappingBackwardsCompatibility = false
+    }
+
+    citygmlReaderWriter {
+        writeVersions = setOf(CitygmlVersion.V2_0, CitygmlVersion.V3_0)
     }
 }

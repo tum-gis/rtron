@@ -46,7 +46,8 @@ class CubicCurve2D(
     init {
         require(coefficients.size == 4) { "Requiring exactly four coefficients for building a cubic curve." }
         require(coefficients.all { it.isFinite() }) { "All coefficients must be finite." }
-        require(length.isFinite() && length > 0.0) { "Length must be finite and greater than zero." }
+        require(length.isFinite()) { "Length value must be finite." }
+        require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
     }
 
     private val _polynomialFunction by lazy { PolynomialFunction(coefficients) }

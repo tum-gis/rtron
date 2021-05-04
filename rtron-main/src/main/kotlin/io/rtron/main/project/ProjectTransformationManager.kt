@@ -22,12 +22,15 @@ import io.rtron.io.scripting.ScriptLoader
 import io.rtron.main.project.configuration.ProjectUserConfiguration
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.ReadWriteManager
-import io.rtron.readerwriter.citygml.CitygmlReaderWriterConfiguration
-import io.rtron.readerwriter.opendrive.OpendriveReaderWriterConfiguration
+import io.rtron.readerwriter.citygml.CitygmlReaderWriter
+import io.rtron.readerwriter.citygml.parameter.CitygmlReaderWriterConfiguration
+import io.rtron.readerwriter.opendrive.OpendriveReaderWriter
+import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
+import io.rtron.std.handleFailure
 import io.rtron.transformer.opendrive2roadspaces.Opendrive2RoadspacesTransformer
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
-import io.rtron.transformer.roadspace2citygml.Roadspaces2CitygmlTransformer
-import io.rtron.transformer.roadspace2citygml.parameter.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.roadspaces2citygml.Roadspaces2CitygmlTransformer
+import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -43,11 +46,13 @@ class ProjectTransformationManager(
     // Properties and Initializers
     private val _reportLogger = LogManager.getReportLogger(this.configuration.reportLoggerName, this.configuration.reportLoggingPath)
 
-    private val _opendriveReaderWriterConfiguration = OpendriveReaderWriterConfiguration(configuration.projectId)
-    private val _citygmlReaderWriterConfiguration = CitygmlReaderWriterConfiguration(configuration.projectId)
-    private val _readWriteManager = ReadWriteManager.of(configuration.projectId, _opendriveReaderWriterConfiguration, _citygmlReaderWriterConfiguration)
-
     private val userConfiguration = loadConfig()
+
+    private val _opendriveReaderWriterConfiguration = OpendriveReaderWriterConfiguration(configuration.projectId, userConfiguration.opendriveReaderWriterParameters)
+    private val _opendriveReaderWriter = OpendriveReaderWriter(_opendriveReaderWriterConfiguration)
+    private val _citygmlReaderWriterConfiguration = CitygmlReaderWriterConfiguration(configuration.projectId, userConfiguration.citygmlReaderWriterParameters)
+    private val _citygmlReaderWriter = CitygmlReaderWriter(_citygmlReaderWriterConfiguration)
+    private val _readWriteManager = ReadWriteManager.of(configuration.projectId, _opendriveReaderWriter, _citygmlReaderWriter)
 
     private val _opendrive2RoadspacesConfiguration = Opendrive2RoadspacesConfiguration(configuration.projectId, configuration.sourceFileIdentifier, configuration.concurrentProcessing, userConfiguration.opendrive2RoadspacesParameters)
     private val _opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(_opendrive2RoadspacesConfiguration)
@@ -66,7 +71,8 @@ class ProjectTransformationManager(
 
         val timeElapsed = measureTime {
             // read
-            val opendriveModel = _readWriteManager.read(configuration.absoluteSourceFilePath) as OpendriveModel
+            val opendriveModel = _readWriteManager.read(configuration.absoluteSourceFilePath)
+                .handleFailure { _reportLogger.log(it, "", "Transformation project can not be continued."); return } as OpendriveModel
 
             // transform
             val roadspacesModel = _opendrive2RoadspacesTransformer.transform(opendriveModel)

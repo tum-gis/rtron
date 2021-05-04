@@ -18,14 +18,14 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.4.21"
+    const val kotlin = "1.4.30"
     const val coroutines = "1.4.2"
     const val result = "4.0.0"
     const val ktsRunner = "0.0.8"
 
     // testing
-    const val junit = "5.7.0"
-    const val assertj = "3.18.1"
+    const val junit = "5.7.1"
+    const val assertj = "3.19.0"
     const val mockk = "1.10.5"
 
     // logging
@@ -37,12 +37,11 @@ object DependencyVersions {
 
     // object creation
     const val jakartaActivationApi = "2.0.0"
-    const val jakartaXmlBindApi = "2.3.3"
-    const val jaxb = "2.3.3"
-    const val jaxbCore = "2.3.0.1"
+    const val jakartaXmlBindApi = "3.0.0"
+    const val jaxb = "3.0.0"
 
     // object mapping
-    const val mapstruct = "1.4.1.Final"
+    const val mapstruct = "1.4.2.Final"
 
     // io
     const val clikt = "3.1.0"
@@ -61,7 +60,7 @@ object DependencyVersions {
 
     // geo
     const val proj4 = "1.1.1"
-    const val citygml4j = "2.11.2"
+    const val citygml4j = "3.0.0-rc.2"
 }
 
 object Dependencies {
@@ -85,9 +84,9 @@ object Dependencies {
     // object creation
     const val jakartaActivationApi = "jakarta.activation:jakarta.activation-api:${DependencyVersions.jakartaActivationApi}"
     const val jakartaXmlBindApi = "jakarta.xml.bind:jakarta.xml.bind-api:${DependencyVersions.jakartaXmlBindApi}"
-    const val jaxbImpl = "com.sun.xml.bind:jaxb-impl:${DependencyVersions.jaxb}"
-    const val jaxbXjc = "com.sun.xml.bind:jaxb-xjc:${DependencyVersions.jaxb}"
-    const val jaxbCore = "com.sun.xml.bind:jaxb-core:${DependencyVersions.jaxbCore}"
+    const val sunJaxbImpl = "com.sun.xml.bind:jaxb-impl:${DependencyVersions.jaxb}"
+    const val jaxbRuntime = "org.glassfish.jaxb:jaxb-runtime:${DependencyVersions.jaxb}"
+    const val jaxbXjc = "org.glassfish.jaxb:jaxb-xjc:${DependencyVersions.jaxb}"
 
     // object mapping
     const val mapstruct = "org.mapstruct:mapstruct:${DependencyVersions.mapstruct}"
