@@ -32,10 +32,6 @@ import org.apache.logging.log4j.core.Logger as L4JCoreLogger
 object LogManager {
 
     // Properties and Initializers
-    init {
-        // disable logging of libraries
-        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "OFF")
-    }
     private val loggerContext = LoggerContext.getContext(false)!!
     private val loggerConfiguration = loggerContext.configuration!!
     private val loggers = mutableMapOf<String, Logger>()

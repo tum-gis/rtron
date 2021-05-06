@@ -36,9 +36,6 @@ allprojects {
     version = Project.version
 
     repositories {
-        maven {
-            url = uri(MavenSources.ktsRunner)
-        }
         mavenCentral()
         jcenter()
     }

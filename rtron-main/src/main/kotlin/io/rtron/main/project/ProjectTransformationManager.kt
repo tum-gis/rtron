@@ -18,7 +18,6 @@ package io.rtron.main.project
 
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
-import io.rtron.io.scripting.ScriptLoader
 import io.rtron.main.project.configuration.ProjectUserConfiguration
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.ReadWriteManager
@@ -90,9 +89,7 @@ class ProjectTransformationManager(
      * Loads all applicable configurations in the project directory and then merges them.
      */
     private fun loadConfig(): ProjectUserConfiguration {
-        val loadedConfigurations = getConfigurationFilePaths().map { ScriptLoader.load<ProjectUserConfiguration>(it) }
-        return if (loadedConfigurations.isEmpty()) ProjectUserConfiguration() else
-            loadedConfigurations.reduce { acc, projectConfig -> acc leftMerge projectConfig }
+        return ProjectUserConfiguration()
     }
 
     /**

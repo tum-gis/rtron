@@ -16,7 +16,6 @@
 
 
 object MavenSources {
-    const val ktsRunner = "https://dl.bintray.com/s1m0nw1/KtsRunner"
     const val bintrayOrchid = "https://kotlin.bintray.com/kotlinx/"
     const val jitpackOrchid = "https://jitpack.io"
 }

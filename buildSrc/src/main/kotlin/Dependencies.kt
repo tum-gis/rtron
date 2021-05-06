@@ -21,7 +21,6 @@ object DependencyVersions {
     const val kotlin = "1.4.30"
     const val coroutines = "1.4.2"
     const val result = "4.0.0"
-    const val ktsRunner = "0.0.8"
 
     // testing
     const val junit = "5.7.1"
@@ -69,7 +68,6 @@ object Dependencies {
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${DependencyVersions.coroutines}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${DependencyVersions.kotlin}"
     const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
-    const val ktsRunner = "de.swirtz:ktsRunner:${DependencyVersions.ktsRunner}"
 
     // testing
     const val junit = "org.junit.jupiter:junit-jupiter:${DependencyVersions.junit}"
