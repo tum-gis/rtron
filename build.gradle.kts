@@ -29,21 +29,24 @@ plugins {
     kotlin("jvm") version DependencyVersions.kotlin
     id(Plugins.versionChecker) version PluginVersions.versionChecker
     id(Plugins.ktlint) version PluginVersions.ktlint
+    `maven-publish`
+    signing
 }
 
 allprojects {
     group = Project.group
     version = Project.version
+    val projectName = name
+
+    apply(plugin = "java")
+    apply(plugin = Plugins.ktlint)
+    apply(plugin = "maven-publish")
+    apply(plugin = "signing")
 
     repositories {
         mavenCentral()
         jcenter()
     }
-}
-
-subprojects {
-    apply(plugin = "java")
-    apply(plugin = Plugins.ktlint)
 
     dependencies {
         implementation(kotlin(Dependencies.kotlinStandardLibrary))
@@ -61,6 +64,66 @@ subprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    publishing {
+        apply(plugin = "maven-publish")
+
+        publications {
+            create<MavenPublication>("mavenJava") {
+                groupId = Project.group
+                artifactId = projectName
+                version = Project.version
+
+                from(components["java"])
+
+                pom {
+                    name.set(projectName)
+                    // description.set("")
+                    url.set("https://rtron.io")
+                    licenses {
+                        license {
+                            name.set("The Apache License, Version 2.0")
+                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("b-schwab")
+                            name.set("Benedikt Schwab")
+                            email.set("benedikt.schwab@tum.de")
+                        }
+                    }
+                    scm {
+                        url.set("https://github.com/tum-gis/rtron")
+                        connection.set("scm:git:git@github.com:tum-gis/rtron.git")
+                        developerConnection.set("scm:git@github.com:tum-gis/rtron.git")
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                val snapshotsRepoUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                val releasesRepoUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+
+                credentials {
+                    username = System.getenv("MAVEN_USERNAME")
+                    password = System.getenv("MAVEN_PASSWORD")
+                }
+            }
+        }
+    }
+
+    signing {
+        sign(publishing.publications["mavenJava"])
     }
 }
 
