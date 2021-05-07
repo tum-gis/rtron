@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
@@ -32,11 +33,9 @@ import io.rtron.model.opendrive.road.objects.RoadObjectsObjectOutlinesOutlineCor
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
 import io.rtron.std.ContextMessage
-import io.rtron.std.Optional
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
-import io.rtron.std.map
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 
@@ -200,7 +199,7 @@ class Solid3DBuilder(
             val verticalOutlineElements = validCornerLocalElements
                 .map { it.getPoints() }
                 .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
-                .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, Optional.empty(), parameters.tolerance) }
+                .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, none(), parameters.tolerance) }
                 .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
 
             return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, parameters.tolerance)

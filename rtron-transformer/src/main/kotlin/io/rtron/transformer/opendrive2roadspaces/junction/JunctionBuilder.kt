@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.junction
 
+import arrow.core.getOrElse
 import com.github.kittinunf.result.Result
 import io.rtron.model.opendrive.junction.JunctionConnection
 import io.rtron.model.roadspaces.ModelIdentifier
@@ -28,7 +29,6 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.std.getOrElse
 import io.rtron.std.handleEmpty
 import io.rtron.std.mapAndHandleFailureOnOriginal
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
@@ -61,7 +61,7 @@ class JunctionBuilder(
 
         val connectingRoadspaceId = RoadspaceIdentifier(connection.connectingRoad, id.modelIdentifier)
         val connectingRoadspace = roadspaces.find { it.id == connectingRoadspaceId } ?: return Result.error(Exception("Connecting roadspace with $connectingRoadspaceId does not exist."))
-        val connectingRoadspaceContactPoint = connection.contactPoint.toContactPoint() getOrElse ContactPoint.START
+        val connectingRoadspaceContactPoint = connection.contactPoint.toContactPoint().getOrElse { ContactPoint.START }
         val connectingRoadspaceContactPointId = RoadspaceContactPointIdentifier(connectingRoadspaceContactPoint, connectingRoadspaceId)
 
         val incomingLaneSectionId = incomingRoadspace.road.getLaneSectionIdentifier(incomingRoadspaceContactPointId)

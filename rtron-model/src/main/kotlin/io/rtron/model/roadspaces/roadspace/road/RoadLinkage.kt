@@ -16,26 +16,26 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import arrow.core.Option
 import io.rtron.model.roadspaces.junction.JunctionIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.std.Optional
 import io.rtron.std.present
 
 /**
  * Contains the topological information about the road.
  */
 data class RoadLinkage(
-    val belongsToJunctionId: Optional<JunctionIdentifier>,
-    val predecessorRoadspaceContactPointId: Optional<RoadspaceContactPointIdentifier>,
-    val predecessorJunctionId: Optional<JunctionIdentifier>,
-    val successorRoadspaceContactPointId: Optional<RoadspaceContactPointIdentifier>,
-    val successorJunctionId: Optional<JunctionIdentifier>
+    val belongsToJunctionId: Option<JunctionIdentifier>,
+    val predecessorRoadspaceContactPointId: Option<RoadspaceContactPointIdentifier>,
+    val predecessorJunctionId: Option<JunctionIdentifier>,
+    val successorRoadspaceContactPointId: Option<RoadspaceContactPointIdentifier>,
+    val successorJunctionId: Option<JunctionIdentifier>
 ) {
     // Properties and Initializers
     init {
-        require(!(predecessorRoadspaceContactPointId.isPresent() && predecessorJunctionId.isPresent())) { "Predecessor must be either a roadspace or junction or neither." }
-        require(!(successorRoadspaceContactPointId.isPresent() && successorJunctionId.isPresent())) { "Successor must be either a roadspace or junction or neither." }
+        require(!(predecessorRoadspaceContactPointId.isDefined() && predecessorJunctionId.isDefined())) { "Predecessor must be either a roadspace or junction or neither." }
+        require(!(successorRoadspaceContactPointId.isDefined() && successorJunctionId.isDefined())) { "Successor must be either a roadspace or junction or neither." }
 
         belongsToJunctionId.present {
             require(predecessorJunctionId.isEmpty()) { "If a road belongs to a junction (id=$it), a predecessing junction must not exist." }

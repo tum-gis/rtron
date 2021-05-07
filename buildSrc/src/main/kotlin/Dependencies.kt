@@ -20,6 +20,7 @@ object DependencyVersions {
     // standard libraries
     const val kotlin = "1.5.0"
     const val coroutines = "1.4.3"
+    const val arrow = "0.13.2"
     const val result = "4.0.0"
 
     // testing
@@ -66,6 +67,7 @@ object Dependencies {
     // standard libraries
     const val kotlinStandardLibrary = "stdlib-jdk8"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${DependencyVersions.coroutines}"
+    const val arrowCore = "io.arrow-kt:arrow-core:${DependencyVersions.arrow}"
     const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
 
     // testing

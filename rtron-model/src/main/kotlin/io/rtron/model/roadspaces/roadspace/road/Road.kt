@@ -16,6 +16,9 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.SectionedUnivariateFunction
@@ -39,7 +42,7 @@ import io.rtron.model.roadspaces.roadspace.ContactPoint
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
-import io.rtron.std.Optional
+import io.rtron.std.equalsValue
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
 import io.rtron.std.isSortedBy
@@ -133,14 +136,14 @@ class Road(
             .getLane(laneIdentifier.laneId)
 
     /** Returns true, if road belongs to a junction. */
-    fun isLocatedInJunction() = linkage.belongsToJunctionId.isPresent()
+    fun isLocatedInJunction() = linkage.belongsToJunctionId.isDefined()
 
     /** Returns the contact point of the roadspace which connects to the junction with the [junctionIdentifier]. */
-    fun getRoadspaceContactPointToJunction(junctionIdentifier: JunctionIdentifier): Optional<RoadspaceContactPointIdentifier> =
+    fun getRoadspaceContactPointToJunction(junctionIdentifier: JunctionIdentifier): Option<RoadspaceContactPointIdentifier> =
         when {
-            linkage.predecessorJunctionId equalsValue junctionIdentifier -> Optional(RoadspaceContactPointIdentifier(ContactPoint.START, id))
-            linkage.successorJunctionId equalsValue junctionIdentifier -> Optional(RoadspaceContactPointIdentifier(ContactPoint.END, id))
-            else -> Optional.empty()
+            linkage.predecessorJunctionId equalsValue junctionIdentifier -> Some(RoadspaceContactPointIdentifier(ContactPoint.START, id))
+            linkage.successorJunctionId equalsValue junctionIdentifier -> Some(RoadspaceContactPointIdentifier(ContactPoint.END, id))
+            else -> none()
         }
 
     /** Returns the [LaneSectionIdentifier] (first or last lane section) of the roadspace which is referenced by the
@@ -347,7 +350,7 @@ class Road(
      * @param step discretization step size
      */
     fun getInnerLateralFillerSurface(laneIdentifier: LaneIdentifier, step: Double):
-        Result<Optional<LateralFillerSurface>, Exception> {
+        Result<Option<LateralFillerSurface>, Exception> {
             require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
             val innerLaneBoundaryOfThisLaneSampled = getInnerLaneBoundary(laneIdentifier)
@@ -365,7 +368,7 @@ class Road(
 
             // return no lateral filler surface, if there is no gap between the lane surfaces
             if (innerLaneBoundaryOfThisLaneSampled.fuzzyEquals(outerLaneBoundaryOfInnerLaneSampled, geometricalTolerance))
-                return Result.success(Optional.empty())
+                return Result.success(none())
 
             val leftLaneBoundary = if (laneIdentifier.isLeft()) outerLaneBoundaryOfInnerLaneSampled else innerLaneBoundaryOfThisLaneSampled
             val rightLaneBoundary = if (laneIdentifier.isLeft()) innerLaneBoundaryOfThisLaneSampled else outerLaneBoundaryOfInnerLaneSampled
@@ -374,7 +377,7 @@ class Road(
                 .handleFailure { return it }
                 .let { CompositeSurface3D(it) }
                 .let { LateralFillerSurface(laneIdentifier, innerLaneIdentifier, it) }
-                .let { Result.success(Optional(it)) }
+                .let { Result.success(Some(it)) }
         }
 
     fun getRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):

@@ -16,9 +16,11 @@
 
 package io.rtron.model.opendrive.road
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import io.rtron.model.opendrive.common.AdditionalData
 import io.rtron.model.opendrive.common.EContactPoint
-import io.rtron.std.Optional
 
 data class RoadLinkPredecessorSuccessor(
     var additionalData: AdditionalData = AdditionalData(),
@@ -35,11 +37,11 @@ data class RoadLinkPredecessorSuccessor(
 
     // Methods
 
-    fun getRoadPredecessorSuccessor(): Optional<Pair<String, EContactPoint>> =
-        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.ROAD) Optional(elementId to contactPoint)
-        else Optional.empty()
+    fun getRoadPredecessorSuccessor(): Option<Pair<String, EContactPoint>> =
+        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.ROAD) Some(elementId to contactPoint)
+        else none()
 
-    fun getJunctionPredecessorSuccessor(): Optional<String> =
-        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.JUNCTION) Optional(elementId)
-        else Optional.empty()
+    fun getJunctionPredecessorSuccessor(): Option<String> =
+        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.JUNCTION) Some(elementId)
+        else none()
 }

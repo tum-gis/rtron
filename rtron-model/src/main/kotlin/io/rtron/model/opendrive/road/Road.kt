@@ -16,6 +16,9 @@
 
 package io.rtron.model.opendrive.road
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.model.opendrive.common.DataQuality
@@ -28,7 +31,6 @@ import io.rtron.model.opendrive.road.objects.RoadObjects
 import io.rtron.model.opendrive.road.planview.RoadPlanView
 import io.rtron.model.opendrive.road.signals.RoadSignals
 import io.rtron.std.ContextMessage
-import io.rtron.std.Optional
 
 data class Road(
     var link: RoadLink = RoadLink(),
@@ -55,8 +57,8 @@ data class Road(
 
     // Methods
 
-    fun getJunction(): Optional<String> =
-        if (junction.isNotEmpty() && junction != "-1") Optional(junction) else Optional.empty()
+    fun getJunction(): Option<String> =
+        if (junction.isNotEmpty() && junction != "-1") Some(junction) else none()
 
     fun isProcessable(tolerance: Double): Result<ContextMessage<Unit>, IllegalStateException> {
         val infos = mutableListOf<String>()

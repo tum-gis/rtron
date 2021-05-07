@@ -11,5 +11,6 @@ dependencies {
 
     implementation(project(ProjectComponents.model))
 
+    implementation(Dependencies.arrowCore)
     implementation(Dependencies.citygml4j)
 }

@@ -16,6 +16,10 @@
 
 package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.getOrElse
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
@@ -34,10 +38,7 @@ import io.rtron.model.roadspaces.roadspace.road.LaneSection
 import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
-import io.rtron.std.Optional
-import io.rtron.std.getOrElse
 import io.rtron.std.handleFailure
-import io.rtron.std.map
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
@@ -144,12 +145,12 @@ class RoadBuilder(
             .map { JunctionIdentifier(it, id.modelIdentifier) }
 
         val predecessorRoadspaceContactPointId = road.link.predecessor.getRoadPredecessorSuccessor()
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint() getOrElse ContactPoint.START, RoadspaceIdentifier(it.first, id.modelIdentifier)) }
+            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint().getOrElse { ContactPoint.START }, RoadspaceIdentifier(it.first, id.modelIdentifier)) }
         val predecessorJunctionId = road.link.predecessor.getJunctionPredecessorSuccessor()
             .map { JunctionIdentifier(it, id.modelIdentifier) }
 
         val successorRoadspaceContactPointId = road.link.successor.getRoadPredecessorSuccessor()
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint() getOrElse ContactPoint.START, RoadspaceIdentifier(it.first, id.modelIdentifier)) }
+            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint().getOrElse { ContactPoint.START }, RoadspaceIdentifier(it.first, id.modelIdentifier)) }
         val successorJunctionId = road.link.successor.getJunctionPredecessorSuccessor()
             .map { JunctionIdentifier(it, id.modelIdentifier) }
 
@@ -168,9 +169,9 @@ class RoadBuilder(
         }
 }
 
-fun EContactPoint.toContactPoint(default: Optional<ContactPoint> = Optional.empty()) =
+fun EContactPoint.toContactPoint(default: Option<ContactPoint> = none()) =
     when (this) {
-        EContactPoint.START -> Optional(ContactPoint.START)
-        EContactPoint.END -> Optional(ContactPoint.END)
+        EContactPoint.START -> Some(ContactPoint.START)
+        EContactPoint.END -> Some(ContactPoint.END)
         EContactPoint.UNKNOWN -> default
     }

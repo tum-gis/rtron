@@ -16,13 +16,15 @@
 
 package io.rtron.model.opendrive.road.objects
 
+import arrow.core.Option
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
-import io.rtron.std.Optional
+import io.rtron.std.toOption
 
 class RoadObjectsObjectOutlinesOutlineCornerLocal(
     var userData: List<UserData> = listOf(),
@@ -42,10 +44,10 @@ class RoadObjectsObjectOutlinesOutlineCornerLocal(
 
     fun getBasePoint() = Vector3D.of(u, v, z)
     fun isSetBasePoint() = getBasePoint() is Result.Success
-    fun getHeadPoint(): Optional<Vector3D> =
-        if (hasZeroHeight()) Optional.empty()
-        else Optional.of(Vector3D.of(u, v, z + height))
+    fun getHeadPoint(): Option<Vector3D> =
+        if (hasZeroHeight()) none()
+        else Vector3D.of(u, v, z + height).toOption()
 
-    fun getPoints(): Result<Pair<Vector3D, Optional<Vector3D>>, Exception> =
+    fun getPoints(): Result<Pair<Vector3D, Option<Vector3D>>, Exception> =
         getBasePoint().map { Pair(it, getHeadPoint()) }
 }

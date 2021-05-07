@@ -16,7 +16,9 @@
 
 package io.rtron.model.roadspaces.roadspace.attribute
 
-import io.rtron.std.Optional
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 
 /**
  * Abstract class of an attribute.
@@ -34,9 +36,9 @@ class StringAttribute(name: String, val value: String) : Attribute(name) {
     }
 
     companion object {
-        fun of(name: String, value: String): Optional<StringAttribute> =
-            if (value.isEmpty()) Optional.empty()
-            else Optional(StringAttribute(name, value))
+        fun of(name: String, value: String): Option<StringAttribute> =
+            if (value.isEmpty()) none()
+            else Some(StringAttribute(name, value))
     }
 }
 
@@ -56,9 +58,9 @@ class DoubleAttribute(name: String, val value: Double) : Attribute(name) {
     }
 
     companion object {
-        fun of(name: String, value: Double): Optional<DoubleAttribute> =
-            if (!value.isFinite()) Optional.empty()
-            else Optional(DoubleAttribute(name, value))
+        fun of(name: String, value: Double): Option<DoubleAttribute> =
+            if (!value.isFinite()) none()
+            else Some(DoubleAttribute(name, value))
     }
 }
 
@@ -80,9 +82,9 @@ class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) 
     }
 
     companion object {
-        fun of(name: String, value: Double, uom: UnitOfMeasure): Optional<MeasureAttribute> =
-            if (value.isNaN()) Optional.empty()
-            else Optional(MeasureAttribute(name, value, uom))
+        fun of(name: String, value: Double, uom: UnitOfMeasure): Option<MeasureAttribute> =
+            if (value.isNaN()) none()
+            else Some(MeasureAttribute(name, value, uom))
     }
 }
 

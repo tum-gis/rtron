@@ -16,10 +16,12 @@
 
 package io.rtron.model.roadspaces.junction
 
+import arrow.core.Option
+import arrow.core.none
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.std.Optional
 import io.rtron.std.getValueResult
+import io.rtron.std.toOption
 
 /**
  * Represents the connection of two roads, the incoming road and the connecting road.
@@ -43,9 +45,9 @@ data class Connection(
      *
      * @param laneIdentifier identifier of the lane for which the linked and succeeding lane shall be found
      */
-    fun getSuccessorLane(laneIdentifier: LaneIdentifier): Optional<LaneIdentifier> {
-        if (incomingRoadspaceContactPointId.roadspaceIdentifier != laneIdentifier.toRoadspaceIdentifier()) return Optional.empty()
+    fun getSuccessorLane(laneIdentifier: LaneIdentifier): Option<LaneIdentifier> {
+        if (incomingRoadspaceContactPointId.roadspaceIdentifier != laneIdentifier.toRoadspaceIdentifier()) return none()
 
-        return laneLinks.getValueResult(laneIdentifier).let { Optional.of(it) }
+        return laneLinks.getValueResult(laneIdentifier).toOption()
     }
 }

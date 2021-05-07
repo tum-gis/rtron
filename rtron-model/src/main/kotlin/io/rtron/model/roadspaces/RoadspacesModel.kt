@@ -16,6 +16,9 @@
 
 package io.rtron.model.roadspaces
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
@@ -33,13 +36,12 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
-import io.rtron.std.Optional
+import io.rtron.std.equalsValue
 import io.rtron.std.filterWithNextEnclosing
 import io.rtron.std.getValueResult
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleEmpty
 import io.rtron.std.handleFailure
-import io.rtron.std.map
 import io.rtron.std.unwrapValues
 
 /**
@@ -139,9 +141,9 @@ class RoadspacesModel(
             .handleFailure { throw it.error }.road
 
         return when {
-            road.isInFirstLaneSection(laneId) && road.linkage.predecessorRoadspaceContactPointId.isPresent() ->
+            road.isInFirstLaneSection(laneId) && road.linkage.predecessorRoadspaceContactPointId.isDefined() ->
                 getPredecessorLanesBetweenRoads(laneId)
-            road.isInFirstLaneSection(laneId) && road.linkage.predecessorJunctionId.isPresent() ->
+            road.isInFirstLaneSection(laneId) && road.linkage.predecessorJunctionId.isDefined() ->
                 getPredecessorLanesBetweenRoadsInJunction(laneId)
             !road.isInFirstLaneSection(laneId) -> getPredecessorLanesWithinRoad(laneId)
             else -> return Result.success(emptyList())
@@ -159,9 +161,9 @@ class RoadspacesModel(
             .handleFailure { throw it.error }.road
 
         return when {
-            road.isInLastLaneSection(laneId) && road.linkage.successorRoadspaceContactPointId.isPresent() ->
+            road.isInLastLaneSection(laneId) && road.linkage.successorRoadspaceContactPointId.isDefined() ->
                 getSuccessorLanesBetweenRoads(laneId)
-            road.isInLastLaneSection(laneId) && road.linkage.successorJunctionId.isPresent() ->
+            road.isInLastLaneSection(laneId) && road.linkage.successorJunctionId.isDefined() ->
                 getSuccessorLanesBetweenRoadsInJunction(laneId)
             !road.isInLastLaneSection(laneId) -> getSuccessorLanesWithinRoad(laneId)
             else -> return Result.success(emptyList())
@@ -182,7 +184,7 @@ class RoadspacesModel(
      * @param successorLaneId identifier of the second lane
      */
     private fun getLongitudinalFillerSurface(laneId: LaneIdentifier, successorLaneId: LaneIdentifier):
-        Optional<FillerSurface> {
+        Option<FillerSurface> {
 
             val road = roadspaces
                 .getValueResult(laneId.laneSectionIdentifier.roadspaceIdentifier)
@@ -190,13 +192,13 @@ class RoadspacesModel(
             val successorRoad = roadspaces
                 .getValueResult(successorLaneId.laneSectionIdentifier.roadspaceIdentifier)
                 .handleFailure { throw it.error }.road
-            val surface = buildFillerSurfaceGeometry(laneId, successorLaneId, road, successorRoad).handleEmpty { return Optional.empty() }
+            val surface = buildFillerSurfaceGeometry(laneId, successorLaneId, road, successorRoad).handleEmpty { return none() }
 
             val fillerSurface = when {
                 laneId.isWithinSameRoad(successorLaneId) -> LongitudinalFillerSurfaceWithinRoad(laneId, successorLaneId, surface)
                 else -> LongitudinalFillerSurfaceBetweenRoads(laneId, successorLaneId, surface)
             }
-            return Optional(fillerSurface)
+            return Some(fillerSurface)
         }
 
     /**
@@ -213,7 +215,7 @@ class RoadspacesModel(
         road: Road,
         successorRoad: Road
     ):
-        Optional<AbstractSurface3D> {
+        Option<AbstractSurface3D> {
 
             val currentVertices = listOf(road.getLeftLaneBoundary(laneId), road.getRightLaneBoundary(laneId))
                 .handleFailure { throw it.error }
@@ -227,7 +229,7 @@ class RoadspacesModel(
 
             val successorLaneBoundaries =
                 listOf(successorRoad.getRightLaneBoundary(successorLaneId), successorRoad.getLeftLaneBoundary(successorLaneId))
-                    .handleFailure { return Optional.empty() }
+                    .handleFailure { return none() }
 
             val successorVertices = when (successorContactStart) {
                 true -> successorLaneBoundaries.map { it.calculateStartPointGlobalCS() }
@@ -239,8 +241,8 @@ class RoadspacesModel(
                 .filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
                 .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
 
-            return if (fillerSurfaceVertices.size < 3 || fillerSurfaceVertices.isColinear(tolerance)) Optional.empty()
-            else Optional(LinearRing3D(fillerSurfaceVertices, tolerance))
+            return if (fillerSurfaceVertices.size < 3 || fillerSurfaceVertices.isColinear(tolerance)) none()
+            else Some(LinearRing3D(fillerSurfaceVertices, tolerance))
         }
 
     /**

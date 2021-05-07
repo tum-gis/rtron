@@ -16,6 +16,9 @@
 
 package io.rtron.std
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.github.kittinunf.result.Result
 
 /**
@@ -152,3 +155,5 @@ inline fun <T, V : Any?, E : Exception> Iterable<T>.mapAndHandleFailureOnOrigina
         }
     }
 }
+
+fun <V : Any?, E : Exception> Result<V, E>.toOption(): Option<V> = fold({ Some(it) }, { none() })

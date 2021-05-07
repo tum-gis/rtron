@@ -16,6 +16,8 @@
 
 package io.rtron.model.opendrive.road.objects
 
+import arrow.core.Option
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -23,7 +25,7 @@ import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
 import io.rtron.model.opendrive.common.UserData
-import io.rtron.std.Optional
+import io.rtron.std.toOption
 
 class RoadObjectsObjectOutlinesOutlineCornerRoad(
     var userData: List<UserData> = listOf(),
@@ -45,10 +47,10 @@ class RoadObjectsObjectOutlinesOutlineCornerRoad(
 
     fun getBasePoint() = CurveRelativeVector3D.of(s, t, dz)
     fun isSetBasePoint(): Boolean = getBasePoint() is Result.Success
-    fun getHeadPoint(): Optional<CurveRelativeVector3D> =
-        if (hasZeroHeight()) Optional.empty()
-        else Optional.of(CurveRelativeVector3D.of(s, t, dz + height))
+    fun getHeadPoint(): Option<CurveRelativeVector3D> =
+        if (hasZeroHeight()) none()
+        else CurveRelativeVector3D.of(s, t, dz + height).toOption()
 
-    fun getPoints(): Result<Pair<CurveRelativeVector3D, Optional<CurveRelativeVector3D>>, Exception> =
+    fun getPoints(): Result<Pair<CurveRelativeVector3D, Option<CurveRelativeVector3D>>, Exception> =
         getBasePoint().map { Pair(it, getHeadPoint()) }
 }

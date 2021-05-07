@@ -16,6 +16,10 @@
 
 package io.rtron.math.processing
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.getOrElse
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.Polyhedron3D
@@ -25,12 +29,10 @@ import io.rtron.math.processing.triangulation.ExperimentalTriangulator
 import io.rtron.math.processing.triangulation.Triangulator
 import io.rtron.math.range.Tolerable
 import io.rtron.std.ContextMessage
-import io.rtron.std.Optional
 import io.rtron.std.filterWindowedEnclosing
 import io.rtron.std.filterWithNextEnclosing
-import io.rtron.std.getOrElse
+import io.rtron.std.getResult
 import io.rtron.std.handleFailure
-import io.rtron.std.map
 import io.rtron.std.unwrapMessages
 import io.rtron.std.zipWithConsecutivesEnclosing
 import io.rtron.std.zipWithNextEnclosing
@@ -83,21 +85,21 @@ object Polyhedron3DFactory {
      */
     data class VerticalOutlineElement(
         val basePoint: Vector3D,
-        val leftHeadPoint: Optional<Vector3D>,
-        val rightHeadPoint: Optional<Vector3D> = Optional.empty(),
+        val leftHeadPoint: Option<Vector3D>,
+        val rightHeadPoint: Option<Vector3D> = none(),
         override val tolerance: Double
     ) : Tolerable {
 
         // Properties and Initializers
         init {
-            if (rightHeadPoint.isPresent())
-                require(leftHeadPoint.isPresent()) { "Left head point must be present, if right head point is present." }
+            if (rightHeadPoint.isDefined())
+                require(leftHeadPoint.isDefined()) { "Left head point must be present, if right head point is present." }
 
-            if (leftHeadPoint.isPresent()) {
+            if (leftHeadPoint.isDefined()) {
                 val leftHeadPointValue = leftHeadPoint.getResult().handleFailure { throw it.error }
                 require(basePoint.fuzzyUnequals(leftHeadPointValue, tolerance)) { "Left head point must be fuzzily unequal to base point." }
 
-                if (rightHeadPoint.isPresent()) {
+                if (rightHeadPoint.isDefined()) {
                     val rightHeadPointValue = rightHeadPoint.getResult().handleFailure { throw it.error }
                     require(basePoint.fuzzyUnequals(rightHeadPointValue, tolerance)) { "Right head point must be fuzzily unequal to base point." }
 
@@ -106,12 +108,12 @@ object Polyhedron3DFactory {
             }
         }
 
-        private val leftLength: Double get() = leftHeadPoint.map { basePoint.distance(it) } getOrElse 0.0
-        private val rightLength: Double get() = rightHeadPoint.map { basePoint.distance(it) } getOrElse 0.0
+        private val leftLength: Double get() = leftHeadPoint.map { basePoint.distance(it) }.getOrElse { 0.0 }
+        private val rightLength: Double get() = rightHeadPoint.map { basePoint.distance(it) }.getOrElse { 0.0 }
 
         // Methods
-        fun containsHeadPoint() = leftHeadPoint.isPresent() || rightHeadPoint.isPresent()
-        fun containsOneHeadPoint() = leftHeadPoint.isPresent() && rightHeadPoint.isEmpty()
+        fun containsHeadPoint() = leftHeadPoint.isDefined() || rightHeadPoint.isDefined()
+        fun containsOneHeadPoint() = leftHeadPoint.isDefined() && rightHeadPoint.isEmpty()
 
         fun getVerticesAsLeftBoundary(): List<Vector3D> {
             val midPoint = if (containsOneHeadPoint() || leftLength < rightLength) leftHeadPoint.toList()
@@ -124,7 +126,7 @@ object Polyhedron3DFactory {
             return listOf(basePoint) + midPoint + leftHeadPoint.toList()
         }
 
-        fun getHeadPointAdjacentToTheRight() = if (rightHeadPoint.isPresent()) rightHeadPoint else leftHeadPoint
+        fun getHeadPointAdjacentToTheRight() = if (rightHeadPoint.isDefined()) rightHeadPoint else leftHeadPoint
 
         fun getHighestPointAdjacentToTheTop(): List<Vector3D> =
             if (containsHeadPoint()) leftHeadPoint.toList() + rightHeadPoint.toList()
@@ -134,8 +136,8 @@ object Polyhedron3DFactory {
 
             fun of(
                 basePoint: Vector3D,
-                leftHeadPoint: Optional<Vector3D>,
-                rightHeadPoint: Optional<Vector3D>,
+                leftHeadPoint: Option<Vector3D>,
+                rightHeadPoint: Option<Vector3D>,
                 tolerance: Double
             ): ContextMessage<VerticalOutlineElement> {
 
@@ -166,8 +168,8 @@ object Polyhedron3DFactory {
             fun of(basePoint: Vector3D, headPoints: List<Vector3D>, tolerance: Double): VerticalOutlineElement {
                 require(headPoints.size <= 2) { "Must contain not more than two head points." }
 
-                val leftHeadPoint = if (headPoints.isNotEmpty()) Optional(headPoints.first()) else Optional.empty()
-                val rightHeadPont = if (headPoints.size == 2) Optional(headPoints.last()) else Optional.empty()
+                val leftHeadPoint = if (headPoints.isNotEmpty()) Some(headPoints.first()) else none()
+                val rightHeadPont = if (headPoints.size == 2) Some(headPoints.last()) else none()
 
                 return VerticalOutlineElement(basePoint, leftHeadPoint, rightHeadPont, tolerance)
             }
@@ -210,14 +212,14 @@ object Polyhedron3DFactory {
         leftElement: VerticalOutlineElement,
         rightElement: VerticalOutlineElement,
         tolerance: Double
-    ): Optional<LinearRing3D> {
+    ): Option<LinearRing3D> {
 
         if (!leftElement.containsHeadPoint() && !rightElement.containsHeadPoint())
-            return Optional.empty()
+            return none()
 
         val vertices = rightElement.getVerticesAsRightBoundary() + leftElement.getVerticesAsLeftBoundary().reversed()
         val linearRing = LinearRing3D(vertices, tolerance)
-        return Optional(linearRing)
+        return Some(linearRing)
     }
 
     /**

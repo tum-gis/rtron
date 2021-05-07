@@ -16,6 +16,8 @@
 
 package io.rtron.transformer.roadspaces2citygml.transformer
 
+import arrow.core.Option
+import arrow.core.Some
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.common.FillerSurface
 import io.rtron.model.roadspaces.junction.JunctionIdentifier
@@ -25,7 +27,6 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
-import io.rtron.std.Optional
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.transformer.roadspaces2citygml.module.GenericsModuleBuilder
@@ -58,7 +59,7 @@ class RoadsTransformer(
 
     // Methods
 
-    fun transformRoad(roadspaceName: String, roadspacesModel: RoadspacesModel): Optional<CitygmlRoad> {
+    fun transformRoad(roadspaceName: String, roadspacesModel: RoadspacesModel): Option<CitygmlRoad> {
         val roadFeature = _transportationModuleBuilder.createRoad()
         if (roadspaceName.isNotEmpty())
             roadFeature.names.add(Code(roadspaceName))
@@ -69,7 +70,7 @@ class RoadsTransformer(
         val roads = roadspacesModel.getAllRoadspaceIdentifiersNotLocatedInJunctions(roadspaceName)
         roads.forEach { addSection(it, roadspacesModel, roadFeature) }
 
-        return Optional(roadFeature)
+        return Some(roadFeature)
     }
 
     private fun addIntersectionOrLink(junctionId: JunctionIdentifier, roadspaceName: String, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad) {

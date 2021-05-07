@@ -16,7 +16,7 @@
 
 package io.rtron.model.roadspaces.roadspace.attribute
 
-import io.rtron.std.Optional
+import arrow.core.Option
 import io.rtron.std.present
 
 /**
@@ -52,7 +52,7 @@ class AttributeListBuilder(
         MeasureAttribute.of(namePrefix + name, value, unitOfMeasure).present { attributes += it }
     }
 
-    fun attribute(name: String, optionalValue: Optional<String>) {
+    fun attribute(name: String, optionalValue: Option<String>) {
         optionalValue.present { attributes += StringAttribute(namePrefix + name, it) }
     }
 

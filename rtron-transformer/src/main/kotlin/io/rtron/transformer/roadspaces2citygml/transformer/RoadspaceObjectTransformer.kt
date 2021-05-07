@@ -16,11 +16,13 @@
 
 package io.rtron.transformer.roadspaces2citygml.transformer
 
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.io.logging.Logger
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.std.Optional
 import io.rtron.std.mapAndHandleFailureOnOriginal
 import io.rtron.std.unwrapValues
 import io.rtron.transformer.roadspaces2citygml.module.BuildingModuleBuilder
@@ -67,14 +69,14 @@ class RoadspaceObjectTransformer(
      * @param roadspaceObject road space object from the RoadSpaces model
      * @return city object (CityGML model)
      */
-    private fun transformSingleRoadspaceObject(roadspaceObject: RoadspaceObject): Result<Optional<AbstractCityObject>, Exception> =
+    private fun transformSingleRoadspaceObject(roadspaceObject: RoadspaceObject): Result<Option<AbstractCityObject>, Exception> =
         when (RoadspaceObjectRouter.route(roadspaceObject)) {
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> _buildingModuleBuilder.createBuildingFeature(roadspaceObject).map { Optional(it) }
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> _cityFurnitureModuleBuilder.createCityFurnitureFeature(roadspaceObject).map { Optional(it) }
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> _genericsModuleBuilder.createGenericOccupiedSpaceFeature(roadspaceObject).map { Optional(it) }
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> Result.success(Optional.empty())
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> Result.success(Optional.empty())
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> Result.success(Optional.empty())
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT -> _vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).map { Optional(it) }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> _buildingModuleBuilder.createBuildingFeature(roadspaceObject).map { Some(it) }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> _cityFurnitureModuleBuilder.createCityFurnitureFeature(roadspaceObject).map { Some(it) }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> _genericsModuleBuilder.createGenericOccupiedSpaceFeature(roadspaceObject).map { Some(it) }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> Result.success(none())
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> Result.success(none())
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> Result.success(none())
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT -> _vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).map { Some(it) }
         }
 }

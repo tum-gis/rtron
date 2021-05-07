@@ -5,5 +5,6 @@ plugins {
 kotlinProject()
 
 dependencies {
+    implementation(Dependencies.arrowCore)
     implementation(Dependencies.guava)
 }
