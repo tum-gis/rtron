@@ -19,17 +19,17 @@ package io.rtron.io.logging
 import com.github.kittinunf.result.Result
 import com.vdurmont.emoji.EmojiParser
 import io.rtron.std.ContextMessage
+import mu.KLogger
+import mu.KotlinLogging
 import org.apache.commons.lang3.SystemUtils
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger as L4JLogger
 
 /**
  * Logger for operation messages. Building of [Logger]s is provided by [LogManager].
  *
- * @param logger adapted [org.apache.logging.log4j.Logger] logger.
+ * @param logger adapted [KotlinLogging] logger.
  */
 class Logger(
-    private val logger: L4JLogger = LogManager.getLogger()
+    private val logger: KLogger
 ) {
 
     // Properties and Initializers
@@ -160,10 +160,4 @@ class Logger(
     private fun warn(message: String, force: Boolean = false) {
         if (message.isNotEmpty() || force) logger.warn(message)
     }
-
-    // Conversions
-    /**
-     * Reveals the adapted logger.
-     */
-    fun toL4JLogger() = logger
 }

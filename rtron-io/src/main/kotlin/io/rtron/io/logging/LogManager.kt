@@ -17,14 +17,7 @@
 package io.rtron.io.logging
 
 import io.rtron.io.files.Path
-import org.apache.logging.log4j.core.Appender
-import org.apache.logging.log4j.core.LoggerContext
-import org.apache.logging.log4j.core.appender.RollingFileAppender
-import org.apache.logging.log4j.core.appender.rolling.SizeBasedTriggeringPolicy
-import org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy
-import org.apache.logging.log4j.core.layout.PatternLayout
-import org.apache.logging.log4j.LogManager as L4JLogManager
-import org.apache.logging.log4j.core.Logger as L4JCoreLogger
+import mu.KotlinLogging
 
 /**
  * LogManager creates and parametrizes the [Logger] instances.
@@ -32,8 +25,6 @@ import org.apache.logging.log4j.core.Logger as L4JCoreLogger
 object LogManager {
 
     // Properties and Initializers
-    private val loggerContext = LoggerContext.getContext(false)!!
-    private val loggerConfiguration = loggerContext.configuration!!
     private val loggers = mutableMapOf<String, Logger>()
 
     // Methods
@@ -46,7 +37,7 @@ object LogManager {
      */
     fun getReportLogger(name: String, logFilePath: Path): Logger {
         val logger = getReportLogger(name)
-        (logger.toL4JLogger() as L4JCoreLogger).addAppender(getAppender(name, logFilePath))
+        // (logger.toL4JLogger() as L4JCoreLogger).addAppender(getAppender(name, logFilePath))
 
         return logger
     }
@@ -57,33 +48,5 @@ object LogManager {
      *
      * @param name if a logger with the same name has already be initialized
      */
-    fun getReportLogger(name: String) = loggers.getOrPut(name) { Logger(L4JLogManager.getLogger(name)) }
-
-    private fun getAppender(name: String, logFilePath: Path): Appender {
-        val layout = PatternLayout.newBuilder()
-            .withConfiguration(loggerConfiguration)
-            .withPattern("%d{ISO8601} %-5level %msg%n")
-            .build()
-
-        val appender = (
-            RollingFileAppender.newBuilder<RollingFileAppenderBuilder>()
-                as RollingFileAppender.Builder<RollingFileAppenderBuilder>
-            ).apply {
-            setConfiguration(loggerConfiguration)
-            setName(name)
-            withFileName(logFilePath.toString())
-            setLayout(layout)
-            withFilePattern("build/logs/rtron-%d{MM-dd-yyyy}.log.gz")
-            withPolicy(SizeBasedTriggeringPolicy.createPolicy("10KB"))
-            withPolicy(TimeBasedTriggeringPolicy.newBuilder().withInterval(1).build())
-        }.build()
-
-        return appender.apply { start() }
-    }
+    fun getReportLogger(name: String) = loggers.getOrPut(name) { Logger(KotlinLogging.logger(name)) }
 }
-
-/**
- * Necessary workaround for adding log4j appenders in Kotlin.
- * See [stackoverflow](https://stackoverflow.com/a/50565929) for the workaround.
- */
-private class RollingFileAppenderBuilder : RollingFileAppender.Builder<RollingFileAppenderBuilder>()

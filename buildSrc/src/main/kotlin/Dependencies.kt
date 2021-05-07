@@ -28,7 +28,7 @@ object DependencyVersions {
     const val mockk = "1.10.5"
 
     // logging
-    const val log4j = "2.14.0"
+    const val kotlinLogging = "2.0.6"
     const val slf4jSimple = "1.7.30"
 
     // documentation
@@ -66,7 +66,6 @@ object Dependencies {
     // standard libraries
     const val kotlinStandardLibrary = "stdlib-jdk8"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${DependencyVersions.coroutines}"
-    const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${DependencyVersions.kotlin}"
     const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
 
     // testing
@@ -75,8 +74,7 @@ object Dependencies {
     const val mockk = "io.mockk:mockk:${DependencyVersions.mockk}"
 
     // logging
-    const val log4jApi = "org.apache.logging.log4j:log4j-api:${DependencyVersions.log4j}"
-    const val log4jCore = "org.apache.logging.log4j:log4j-core:${DependencyVersions.log4j}"
+    const val kotlinLogging = "io.github.microutils:kotlin-logging:${DependencyVersions.kotlinLogging}"
     const val slf4jSimple = "org.slf4j:slf4j-simple:${DependencyVersions.slf4jSimple}"
 
     // object creation
