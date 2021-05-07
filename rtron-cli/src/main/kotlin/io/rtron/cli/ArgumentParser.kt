@@ -50,7 +50,7 @@ class ColorHelpFormatter : CliktHelpFormatter() {
 class ArgumentParser : CliktCommand(
     name = "rtron".toLowerCase(),
     help =
-        """r:trån transforms road networks described in OpenDRIVE into the virtual 3D city model standard CityGML.""".trimMargin(),
+    """r:trån transforms road networks described in OpenDRIVE into the virtual 3D city model standard CityGML.""".trimMargin(),
     printHelpOnEmptyArgs = true
 ) {
 
