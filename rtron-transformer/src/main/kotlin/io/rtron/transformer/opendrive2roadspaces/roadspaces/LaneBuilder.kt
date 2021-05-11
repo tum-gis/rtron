@@ -17,6 +17,7 @@
 package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
 import com.github.kittinunf.result.Result
+import io.rtron.io.logging.LogManager
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
@@ -39,7 +40,7 @@ import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for [Lane] objects of the RoadSpaces data model.
@@ -49,8 +50,8 @@ class LaneBuilder(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
-    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration.parameters)
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration)
 
     // Methods
 
@@ -193,7 +194,7 @@ class LaneBuilder(
         val curvePositionDomainEnd = curvePositionDomain.upperEndpointOrNull()!!
         val adjustedSrcRoadMark = roadMark
             .filter { it.sOffset in curvePositionDomain }
-            .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, configuration.parameters.tolerance) }
+            .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, configuration.tolerance) }
         if (adjustedSrcRoadMark.size < roadMark.size)
             _reportLogger.warn(
                 "Road mark entries have been removed, as the sOffset is not located within " +
@@ -224,12 +225,12 @@ class LaneBuilder(
             val domain = if (domainEndpoint.isNaN()) Range.atLeast(roadMark.sOffset)
             else Range.closed(roadMark.sOffset, domainEndpoint)
 
-            if (domain.length <= configuration.parameters.tolerance)
+            if (domain.length <= configuration.tolerance)
                 return Result.error(IllegalStateException("Length of road marking is zero (or below tolerance threshold)."))
 
             val width = ConstantFunction(roadMark.width, domain)
 
-            val attributes = attributes("${configuration.parameters.attributesPrefix}roadMarking") {
+            val attributes = attributes("${configuration.attributesPrefix}roadMarking") {
                 attribute("_curvePositionStart", roadMark.sOffset)
                 attribute("_width", roadMark.width)
                 attribute("_type", roadMark.typeAttribute.toString())
@@ -243,7 +244,7 @@ class LaneBuilder(
         }
 
     private fun buildAttributes(centerLane: RoadLanesLaneSectionCenterLane) =
-        attributes("${configuration.parameters.attributesPrefix}lane_") {
+        attributes("${configuration.attributesPrefix}lane_") {
             attribute("type", centerLane.type.toString())
             attribute("level", centerLane.level)
 
@@ -260,7 +261,7 @@ class LaneBuilder(
         }
 
     private fun buildAttributes(leftRightLane: RoadLanesLaneSectionLRLane) =
-        attributes("${configuration.parameters.attributesPrefix}lane_") {
+        attributes("${configuration.attributesPrefix}lane_") {
             attribute("type", leftRightLane.type.toString())
             attribute("level", leftRightLane.level)
 

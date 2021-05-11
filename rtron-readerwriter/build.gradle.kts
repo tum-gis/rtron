@@ -49,3 +49,7 @@ xjcGeneration {
         }
     }
 }
+
+tasks.named<Jar>("sourcesJar") {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}

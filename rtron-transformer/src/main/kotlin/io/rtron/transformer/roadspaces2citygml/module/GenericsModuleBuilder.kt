@@ -17,6 +17,7 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
+import io.rtron.io.logging.LogManager
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -24,26 +25,26 @@ import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.handleFailure
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.generics.GenericOccupiedSpace
 
 /**
  * Builder for city objects of the CityGML Generics module.
  */
 class GenericsModuleBuilder(
-    val configuration: Roadspaces2CitygmlConfiguration,
+    private val configuration: Roadspaces2CitygmlConfiguration,
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
-    private val _attributesAdder = AttributesAdder(configuration.parameters)
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
     fun createGenericOccupiedSpaceFeature(roadspaceObject: RoadspaceObject): Result<GenericOccupiedSpace, Exception> {
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val genericOccupiedSpace = createGenericOccupiedSpaceFeature(geometryTransformer).handleFailure { return it }
 
         // semantics
@@ -60,7 +61,7 @@ class GenericsModuleBuilder(
 
             identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
             _attributesAdder.addAttributes(
-                id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                id.toAttributes(configuration.identifierAttributesPrefix) +
                     attributes,
                 genericOccupiedSpace
             )
@@ -73,7 +74,7 @@ class GenericsModuleBuilder(
 
             identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
             _attributesAdder.addAttributes(
-                id.toAttributes(configuration.parameters.identifierAttributesPrefix) +
+                id.toAttributes(configuration.identifierAttributesPrefix) +
                     attributes,
                 genericOccupiedSpace
             )
@@ -82,7 +83,7 @@ class GenericsModuleBuilder(
 
     private fun createGenericOccupiedSpaceFeature(abstractGeometry: AbstractGeometry3D):
         Result<GenericOccupiedSpace, Exception> {
-            val geometryTransformer = GeometryTransformer(configuration.parameters)
+            val geometryTransformer = GeometryTransformer(configuration)
                 .also { abstractGeometry.accept(it) }
             return createGenericOccupiedSpaceFeature(geometryTransformer)
         }

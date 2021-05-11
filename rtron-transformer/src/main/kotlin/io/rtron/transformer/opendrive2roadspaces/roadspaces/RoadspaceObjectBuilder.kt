@@ -18,6 +18,7 @@ package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
+import io.rtron.io.logging.LogManager
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
@@ -34,11 +35,11 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
 import io.rtron.std.handleAndRemoveFailureIndexed
 import io.rtron.std.handleFailure
 import io.rtron.std.mapAndHandleFailureOnOriginal
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
 import io.rtron.transformer.opendrive2roadspaces.geometry.Solid3DBuilder
 import io.rtron.transformer.opendrive2roadspaces.geometry.Surface3DBuilder
 import io.rtron.transformer.opendrive2roadspaces.geometry.Vector3DBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.objects.RoadObjects as OpendriveRoadObjects
 import io.rtron.model.opendrive.road.objects.RoadObjectsObject as OpendriveRoadObject
 
@@ -50,11 +51,11 @@ class RoadspaceObjectBuilder(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
-    private val _solid3DBuilder = Solid3DBuilder(_reportLogger, configuration.parameters)
-    private val _surface3DBuilder = Surface3DBuilder(_reportLogger, configuration.parameters)
-    private val _curve3DBuilder = Curve3DBuilder(_reportLogger, configuration.parameters)
+    private val _solid3DBuilder = Solid3DBuilder(_reportLogger, configuration)
+    private val _surface3DBuilder = Surface3DBuilder(_reportLogger, configuration)
+    private val _curve3DBuilder = Curve3DBuilder(_reportLogger, configuration)
     private val _vector3DBuilder = Vector3DBuilder()
 
     // Methods
@@ -171,7 +172,7 @@ class RoadspaceObjectBuilder(
     }
 
     private fun buildAttributes(roadObject: OpendriveRoadObject) =
-        attributes("${configuration.parameters.attributesPrefix}roadObject_") {
+        attributes("${configuration.attributesPrefix}roadObject_") {
             attribute("type", roadObject.type.toString())
             attribute("subtype", roadObject.subtype)
             attribute("dynamic", roadObject.dynamic)
@@ -180,14 +181,14 @@ class RoadspaceObjectBuilder(
         }
 
     private fun buildAttributes(curveRelativePosition: CurveRelativeVector3D) =
-        attributes("${configuration.parameters.attributesPrefix}curveRelativePosition_") {
+        attributes("${configuration.attributesPrefix}curveRelativePosition_") {
             attribute("curvePosition", curveRelativePosition.curvePosition)
             attribute("lateralOffset", curveRelativePosition.lateralOffset)
             attribute("heightOffset", curveRelativePosition.heightOffset)
         }
 
     private fun buildAttributes(rotation: Rotation3D) =
-        attributes("${configuration.parameters.attributesPrefix}curveRelativeRotation_") {
+        attributes("${configuration.attributesPrefix}curveRelativeRotation_") {
             attribute("heading", rotation.heading)
             attribute("roll", rotation.roll)
             attribute("pitch", rotation.pitch)
@@ -225,7 +226,7 @@ class RoadspaceObjectBuilder(
     }
 
     private fun buildAttributes(signal: RoadSignalsSignal): AttributeList =
-        attributes("${configuration.parameters.attributesPrefix}roadSignal_") {
+        attributes("${configuration.attributesPrefix}roadSignal_") {
             attribute("dynamic", signal.dynamic)
             attribute("orientation", signal.orientation.toString())
             attribute("countryCode", signal.countryCode.code)

@@ -64,13 +64,6 @@ class Logger(
     }
 
     /**
-     * Start a new logging paragraph.
-     */
-    fun infoParagraph() {
-        println()
-    }
-
-    /**
      * Log an warning message only once. Later warn requests are ignored.
      *
      * @param message warn message to be logged once
@@ -99,7 +92,16 @@ class Logger(
     /**
      * Log an error [message].
      */
-    fun error(message: String) { this.logger.error(message) }
+    fun error(message: String) {
+        logger.error(message)
+    }
+
+    /**
+     * Log a debug [message].
+     */
+    fun debug(message: String) {
+        logger.debug(message)
+    }
 
     /**
      * Log out the exception of a [failure].

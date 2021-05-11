@@ -63,7 +63,7 @@ data class Road(
     fun isProcessable(tolerance: Double): Result<ContextMessage<Unit>, IllegalStateException> {
         val infos = mutableListOf<String>()
 
-        val planViewGeometryLengthsSum = planView.geometry.sumByDouble { it.length }
+        val planViewGeometryLengthsSum = planView.geometry.sumOf { it.length }
         if (!fuzzyEquals(planViewGeometryLengthsSum, length, tolerance))
             return Result.error(
                 IllegalStateException(

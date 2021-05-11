@@ -37,8 +37,8 @@ import io.rtron.math.transform.Affine3D
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
 import org.citygml4j.model.core.ImplicitGeometry
 import org.citygml4j.model.core.ImplicitGeometryProperty
 import org.citygml4j.util.geometry.GeometryFactory
@@ -57,14 +57,14 @@ import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty
 /**
  * Generates a surface based geometry representation for CityGML by visiting the geometry class.
  *
- * @param parameters parameters for the geometry transformation, such as discretization step sizes
+ * @param configuration parameters for the geometry transformation, such as discretization step sizes
  */
 class GeometryTransformer(
-    val parameters: Roadspaces2CitygmlParameters
+    val configuration: Roadspaces2CitygmlConfiguration
 ) : Geometry3DVisitor {
 
     // Properties and Initializers
-    private val _identifierAdder = IdentifierAdder(parameters)
+    private val _identifierAdder = IdentifierAdder(configuration)
 
     private lateinit var polygonsOfSolidResult: Result<List<Polygon3D>, Exception>
     private lateinit var polygonsOfSurfaceResult: Result<List<Polygon3D>, Exception>
@@ -95,12 +95,12 @@ class GeometryTransformer(
 
         val gmlPolygons = polygonsOfSolid.map {
             val polygonGml = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
+            if (configuration.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
             SurfaceProperty(polygonGml)
         }
 
         val solid = Solid(Shell(gmlPolygons))
-        if (parameters.generateRandomGeometryIds) solid.id = _identifierAdder.generateRandomUUID()
+        if (configuration.generateRandomGeometryIds) solid.id = _identifierAdder.generateRandomUUID()
 
         val solidProperty = SolidProperty(solid)
         return Result.success(solidProperty)
@@ -144,7 +144,7 @@ class GeometryTransformer(
             .createDirectPosition(point.toDoubleArray(), DIMENSION)!!
         val gmlPoint = Point().apply {
             pos = directPosition
-            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
+            if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
         val pointProperty = PointProperty(gmlPoint)
         return Result.success(pointProperty)
@@ -255,7 +255,7 @@ class GeometryTransformer(
 
     override fun visit(abstractCurve3D: AbstractCurve3D) {
 
-        multiCurveResult = abstractCurve3D.calculateLineStringGlobalCS(parameters.discretizationStepSize)
+        multiCurveResult = abstractCurve3D.calculateLineStringGlobalCS(configuration.discretizationStepSize)
     }
 
     override fun visit(abstractSurface3D: AbstractSurface3D) {
@@ -264,12 +264,12 @@ class GeometryTransformer(
     }
 
     override fun visit(circle3D: Circle3D) {
-        val adjustedCircle = circle3D.copy(numberSlices = parameters.circleSlices)
+        val adjustedCircle = circle3D.copy(numberSlices = configuration.circleSlices)
         visit(adjustedCircle as AbstractSurface3D)
     }
 
     override fun visit(parametricBoundedSurface3D: ParametricBoundedSurface3D) {
-        val adjustedParametricBoundedSurface = parametricBoundedSurface3D.copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
+        val adjustedParametricBoundedSurface = parametricBoundedSurface3D.copy(discretizationStepSize = configuration.sweepDiscretizationStepSize)
         visit(adjustedParametricBoundedSurface as AbstractSurface3D)
     }
 
@@ -281,13 +281,13 @@ class GeometryTransformer(
     override fun visit(cylinder3D: Cylinder3D) {
         this.height = cylinder3D.height
         this.diameter = cylinder3D.diameter
-        val adjustedCylinder = cylinder3D.copy(numberSlices = parameters.circleSlices)
+        val adjustedCylinder = cylinder3D.copy(numberSlices = configuration.circleSlices)
         visit(adjustedCylinder as AbstractSolid3D)
     }
 
     override fun visit(parametricSweep3D: ParametricSweep3D) {
         val adjustedParametricSweep = parametricSweep3D
-            .copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
+            .copy(discretizationStepSize = configuration.sweepDiscretizationStepSize)
         visit(adjustedParametricSweep as AbstractSolid3D)
     }
 
@@ -300,12 +300,12 @@ class GeometryTransformer(
 
         val surfaceProperties = polygons.map {
             val gmlPolygon = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) gmlPolygon.id = _identifierAdder.generateRandomUUID()
+            if (configuration.generateRandomGeometryIds) gmlPolygon.id = _identifierAdder.generateRandomUUID()
             SurfaceProperty(gmlPolygon)
         }
 
         val multiSurface = MultiSurface(surfaceProperties)
-        if (parameters.generateRandomGeometryIds) multiSurface.id = _identifierAdder.generateRandomUUID()
+        if (configuration.generateRandomGeometryIds) multiSurface.id = _identifierAdder.generateRandomUUID()
         return MultiSurfaceProperty(multiSurface)
     }
 
@@ -313,11 +313,11 @@ class GeometryTransformer(
         private val geometryFactory = GeometryFactory.newInstance()
         private const val DIMENSION = 3
 
-        fun of(roadspaceObject: RoadspaceObject, parameters: Roadspaces2CitygmlParameters): GeometryTransformer {
+        fun of(roadspaceObject: RoadspaceObject, configuration: Roadspaces2CitygmlConfiguration): GeometryTransformer {
             require(roadspaceObject.geometry.size == 1) { "Roadspace object must contain exactly one geometrical representation." }
             val currentGeometricPrimitive = roadspaceObject.geometry.first()
 
-            return GeometryTransformer(parameters).also { currentGeometricPrimitive.accept(it) }
+            return GeometryTransformer(configuration).also { currentGeometricPrimitive.accept(it) }
         }
     }
 }

@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
+package io.rtron.readerwriter.opendrive.configuration
 
-object PluginVersions {
-    const val ktlint = "10.0.0"
-    const val xjc = "1.6"
-    const val versionChecker = "0.38.0"
-    const val orchid = "0.21.1"
-}
-
-object Plugins {
-    const val ktlint = "org.jlleitschuh.gradle.ktlint"
-    const val xjc = "com.github.edeandrea.xjc-generation"
-    const val versionChecker = "com.github.ben-manes.versions"
-    const val orchid = "com.eden.orchidPlugin"
+class OpendriveReaderConfigurationBuilder(
+    val projectId: String
+) {
+    // Methods
+    fun build() = OpendriveReaderConfiguration(
+        projectId
+    )
 }

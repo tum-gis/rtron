@@ -78,7 +78,7 @@ import org.mapstruct.ValueMappings
  * Returns upper case string variations (with or without '_') of string.
  */
 fun String.toUpperCaseVariations(): List<String> =
-    listOf(toUpperCase(), replace("_", "").toUpperCase())
+    listOf(uppercase(), replace("_", "").uppercase())
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 abstract class Opendrive14Mapper {
@@ -180,7 +180,7 @@ abstract class Opendrive14Mapper {
     abstract fun mapRoadObjectsObjectParkingSpaceAccess(access: Access): ERoadObjectsObjectParkingSpaceAccess
 
     fun mapRoadObjectType(srcType: String): EObjectType =
-        when (srcType.toUpperCase()) {
+        when (srcType.uppercase()) {
             in EObjectType.NONE.name.toUpperCaseVariations() -> EObjectType.NONE
             in EObjectType.OBSTACLE.name.toUpperCaseVariations() -> EObjectType.OBSTACLE
             in EObjectType.POLE.name.toUpperCaseVariations() -> EObjectType.POLE
@@ -330,7 +330,7 @@ abstract class Opendrive14Mapper {
     abstract fun mapRoadSignalsSignal(srcSignal: Signals.Signal): RoadSignalsSignal
 
     fun mapCountryCode(srcCountry: String): CountryCode =
-        when (srcCountry.toUpperCase()) {
+        when (srcCountry.uppercase()) {
             "AUSTRALIA" -> CountryCode("AUT")
             "BRAZIL" -> CountryCode("BRA")
             "CHINA" -> CountryCode("CHN")

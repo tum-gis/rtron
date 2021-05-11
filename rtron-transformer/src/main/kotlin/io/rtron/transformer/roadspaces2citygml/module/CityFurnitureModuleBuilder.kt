@@ -17,31 +17,32 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
+import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.cityfurniture.CityFurniture
 
 /**
  * Builder for city objects of the CityGML CityFurniture module.
  */
 class CityFurnitureModuleBuilder(
-    val configuration: Roadspaces2CitygmlConfiguration,
+    private val configuration: Roadspaces2CitygmlConfiguration,
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
-    private val _attributesAdder = AttributesAdder(configuration.parameters)
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
     fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): Result<CityFurniture, Exception> {
         val cityFurnitureFeature = CityFurniture()
 
         // geometry
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         cityFurnitureFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
             .handleFailure { return it }
         if (geometryTransformer.isSetRotation())

@@ -18,6 +18,7 @@ package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
+import io.rtron.io.logging.LogManager
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.analysis.function.bivariate.pure.ShapeFunction
@@ -29,8 +30,8 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.std.handleFailure
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
 
 /**
@@ -40,10 +41,10 @@ class RoadspaceBuilder(
     private val configuration: Opendrive2RoadspacesConfiguration
 ) {
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
-    private val _curve3DBuilder = Curve3DBuilder(_reportLogger, configuration.parameters)
-    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration.parameters)
+    private val _curve3DBuilder = Curve3DBuilder(_reportLogger, configuration)
+    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration)
 
     private val _roadBuilder = RoadBuilder(configuration)
     private val _roadObjectBuilder = RoadspaceObjectBuilder(configuration)
@@ -61,7 +62,7 @@ class RoadspaceBuilder(
 
         // check whether source model is processable
         val roadspaceId = RoadspaceIdentifier(road.id, modelId)
-        road.isProcessable(configuration.parameters.tolerance)
+        road.isProcessable(configuration.tolerance)
             .map { _reportLogger.log(it, roadspaceId.toString()) }
             .handleFailure { return it }
 
@@ -122,12 +123,12 @@ class RoadspaceBuilder(
             return ShapeFunction(
                 lateralFunctions,
                 extrapolateX = true,
-                extrapolateY = configuration.parameters.extrapolateLateralRoadShapes
+                extrapolateY = configuration.extrapolateLateralRoadShapes
             )
         }
 
     private fun buildAttributes(road: OpendriveRoad) =
-        attributes("${configuration.parameters.attributesPrefix}road_") {
+        attributes("${configuration.attributesPrefix}road_") {
             attribute("length", road.length)
             attribute("junction", road.getJunction())
             attribute("rule", road.rule.toString())

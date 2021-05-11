@@ -18,10 +18,10 @@ package io.rtron.readerwriter.opendrive
 
 import io.rtron.io.files.Path
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
+import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguration
 
 class Opendrive15Reader(
-    val configuration: OpendriveReaderWriterConfiguration
+    val configuration: OpendriveReaderConfiguration
 ) {
 
     fun createOpendriveModel(file: Path): OpendriveModel {

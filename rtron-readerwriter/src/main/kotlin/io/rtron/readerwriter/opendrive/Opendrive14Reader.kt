@@ -17,21 +17,22 @@
 package io.rtron.readerwriter.opendrive
 
 import io.rtron.io.files.Path
+import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.readerwriter.opendrive.parameter.OpendriveReaderWriterConfiguration
+import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguration
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.JAXBException
 import org.asam.opendrive14.OpenDRIVE
 import org.mapstruct.factory.Mappers
 
 class Opendrive14Reader(
-    val configuration: OpendriveReaderWriterConfiguration
+    val configuration: OpendriveReaderConfiguration
 ) {
 
     fun createOpendriveModel(file: Path): OpendriveModel {
         val opendrive14 = unmarshalFile(file)
         val converter = Mappers.getMapper(Opendrive14Mapper::class.java)
-        converter.reportLogger = configuration.getReportLogger()
+        converter.reportLogger = LogManager.getReportLogger(configuration.projectId)
 
         return converter.mapModel(opendrive14)
     }

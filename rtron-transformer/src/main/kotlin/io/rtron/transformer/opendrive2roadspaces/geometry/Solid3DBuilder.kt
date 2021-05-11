@@ -37,19 +37,19 @@ import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for solid geometries in 3D from the OpenDRIVE data model.
  */
 class Solid3DBuilder(
     private val reportLogger: Logger,
-    private val parameters: Opendrive2RoadspacesParameters
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(reportLogger, parameters)
-    private val _curve2DBuilder = Curve2DBuilder(reportLogger, parameters)
+    private val _functionBuilder = FunctionBuilder(reportLogger, configuration)
+    private val _curve2DBuilder = Curve2DBuilder(reportLogger, configuration)
 
     // Methods
 
@@ -63,7 +63,7 @@ class Solid3DBuilder(
         if (roadObject.isCuboid()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cuboidList += Cuboid3D(roadObject.length, roadObject.width, roadObject.height, parameters.tolerance, affineSequence)
+            cuboidList += Cuboid3D(roadObject.length, roadObject.width, roadObject.height, configuration.tolerance, affineSequence)
         }
 
         if (roadObject.repeat.isRepeatedCuboid())
@@ -82,7 +82,7 @@ class Solid3DBuilder(
         if (roadObject.isCylinder()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cylinderList += Cylinder3D(roadObject.radius, roadObject.height, parameters.tolerance, affineSequence)
+            cylinderList += Cylinder3D(roadObject.radius, roadObject.height, configuration.tolerance, affineSequence)
         }
 
         if (roadObject.repeat.isRepeatCylinder())
@@ -132,7 +132,7 @@ class Solid3DBuilder(
             .map { buildVerticalOutlineElement(it, referenceLine) }
             .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
 
-        return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, parameters.tolerance)
+        return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, configuration.tolerance)
     }
 
     /**
@@ -155,7 +155,7 @@ class Solid3DBuilder(
             val headPoint = curveRelativeOutlineElementGeometry.second
                 .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
 
-            val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint, tolerance = parameters.tolerance)
+            val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint, tolerance = configuration.tolerance)
             return Result.success(verticalOutlineElement)
         }
 
@@ -199,10 +199,10 @@ class Solid3DBuilder(
             val verticalOutlineElements = validCornerLocalElements
                 .map { it.getPoints() }
                 .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
-                .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, none(), parameters.tolerance) }
+                .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, none(), configuration.tolerance) }
                 .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
 
-            return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, parameters.tolerance)
+            return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, configuration.tolerance)
         }
 
     /**
@@ -230,7 +230,7 @@ class Solid3DBuilder(
             objectReferenceHeight,
             heightFunction,
             widthFunction,
-            parameters.tolerance,
+            configuration.tolerance,
             ParametricSweep3D.DEFAULT_STEP_SIZE
         )
         return listOf(parametricSweep3D)

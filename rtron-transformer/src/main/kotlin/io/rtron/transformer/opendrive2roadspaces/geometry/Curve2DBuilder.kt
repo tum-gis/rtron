@@ -44,14 +44,14 @@ import io.rtron.math.transform.AffineSequence2D
 import io.rtron.model.opendrive.road.objects.RoadObjectsObjectRepeat
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for curves in 2D from the OpenDRIVE data model.
  */
 class Curve2DBuilder(
     private val reportLogger: Logger,
-    private val parameters: Opendrive2RoadspacesParameters
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Methods
@@ -73,7 +73,7 @@ class Curve2DBuilder(
 
         // prepare
         val planViewGeometryListAdjusted =
-            planViewGeometryList.filter { it.length > parameters.tolerance }
+            planViewGeometryList.filter { it.length > configuration.tolerance }
         if (planViewGeometryListAdjusted.size < planViewGeometryList.size)
             reportLogger.warn(
                 "Plan view geometry contains a length value of zero (below tolerance threshold) and " +
@@ -114,7 +114,7 @@ class Curve2DBuilder(
         offset: Vector2D = Vector2D.ZERO
     ): AbstractCurve2D {
 
-        if (!fuzzyEquals(geometry.length, length, parameters.tolerance))
+        if (!fuzzyEquals(geometry.length, length, configuration.tolerance))
             reportLogger.warn(
                 "Plan view geometry element (s=${geometry.s}) contains a length value " +
                     "that does not match the start value of the next geometry element.",
@@ -131,13 +131,13 @@ class Curve2DBuilder(
                     length,
                     geometry.spiral.curvEnd
                 )
-                SpiralSegment2D(curvatureFunction, parameters.tolerance, affineSequence, endBoundType)
+                SpiralSegment2D(curvatureFunction, configuration.tolerance, affineSequence, endBoundType)
             }
             geometry.isArc() -> {
                 Arc2D(
                     geometry.arc.curvature,
                     length,
-                    parameters.tolerance,
+                    configuration.tolerance,
                     affineSequence,
                     endBoundType
                 )
@@ -146,7 +146,7 @@ class Curve2DBuilder(
                 CubicCurve2D(
                     geometry.poly3.coefficients,
                     length,
-                    parameters.tolerance,
+                    configuration.tolerance,
                     affineSequence,
                     endBoundType
                 )
@@ -157,7 +157,7 @@ class Curve2DBuilder(
                     geometry.paramPoly3.coefficientsU,
                     geometry.paramPoly3.coefficientsV,
                     1.0,
-                    parameters.tolerance,
+                    configuration.tolerance,
                     affineSequence,
                     endBoundType
                 )
@@ -172,13 +172,13 @@ class Curve2DBuilder(
                     geometry.paramPoly3.coefficientsU,
                     geometry.paramPoly3.coefficientsV,
                     length,
-                    parameters.tolerance,
+                    configuration.tolerance,
                     affineSequence,
                     endBoundType
                 )
             }
             else -> {
-                LineSegment2D(length, parameters.tolerance, affineSequence, endBoundType)
+                LineSegment2D(length, configuration.tolerance, affineSequence, endBoundType)
             }
         }
     }
@@ -191,11 +191,11 @@ class Curve2DBuilder(
         Result<LateralTranslatedCurve2D, IllegalArgumentException> {
             val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
 
-            if (!roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, parameters.tolerance))
+            if (!roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, configuration.tolerance))
                 return Result.error(IllegalArgumentException("Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance."))
 
             val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
-            val lateralTranslatedCurve = LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), parameters.tolerance)
+            val lateralTranslatedCurve = LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), configuration.tolerance)
             return Result.success(lateralTranslatedCurve)
         }
 }

@@ -37,12 +37,9 @@ class ProgressBar(
 ) {
 
     // Properties and Initializers
+    private val logger = LogManager.getReportLogger("Progress")
     private val startTime = System.currentTimeMillis()
     private var lastPrintUpdateTime: Long = 0
-
-    init {
-        printInitial()
-    }
 
     // Methods
     /** Increments progress bar by one step. */
@@ -57,16 +54,15 @@ class ProgressBar(
         printUpdate()
     }
 
-    private fun printInitial() {
-        print("$PREFIX $taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% \r")
-    }
+    /** Returns true, if the task of the progress bar is completed */
+    fun isCompleted() = currentStatus >= completion
 
     private fun printUpdate() {
         val elapsedTime = getElapsedTime()
-        if (elapsedTime > PRINT_AFTER && getElapsedTimeSinceLastUpdate() > PRINT_AT_LEAST) {
-            print(
-                "$PREFIX $taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% " +
-                    "[ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]\r"
+        if (elapsedTime > PRINT_AFTER && (getElapsedTimeSinceLastUpdate() > PRINT_AT_LEAST || isCompleted())) {
+            logger.info(
+                "$taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% " +
+                    "[ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]"
             )
             lastPrintUpdateTime = System.currentTimeMillis()
         }
@@ -89,18 +85,13 @@ class ProgressBar(
     companion object {
 
         /**
-         * Prefix of the progress bar.
-         */
-        const val PREFIX = "Progress:"
-
-        /**
          * Starts printing the progress bar after the duration of [PRINT_AFTER].
          */
-        val PRINT_AFTER = 0.toDuration(DurationUnit.SECONDS)
+        val PRINT_AFTER = 10.toDuration(DurationUnit.SECONDS)
 
         /**
          * Print updates only after the duration of [PRINT_AT_LEAST] has elapsed.
          */
-        val PRINT_AT_LEAST = 0.toDuration(DurationUnit.SECONDS)
+        val PRINT_AT_LEAST = 10.toDuration(DurationUnit.SECONDS)
     }
 }

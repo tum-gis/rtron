@@ -32,7 +32,7 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.AbstractGenericAttribute
 import org.citygml4j.model.core.AbstractGenericAttributeProperty
@@ -47,7 +47,7 @@ import org.citygml4j.model.generics.StringAttribute as GmlStringAttribute
  * Adds [Attribute] and [AttributeList] classes (RoadSpaces model) to an [AbstractCityObject] (CityGML model).
  */
 class AttributesAdder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Methods
@@ -56,7 +56,7 @@ class AttributesAdder(
      * Adds the angle values of a [Rotation3D] in radians to the [dstCityObject].
      */
     fun addRotationAttributes(rotation: Rotation3D, dstCityObject: AbstractCityObject) {
-        val attributeList = attributes("${parameters.geometryAttributesPrefix}rotation_") {
+        val attributeList = attributes("${configuration.geometryAttributesPrefix}rotation_") {
             attribute("z", rotation.heading)
             attribute("y", rotation.pitch)
             attribute("x", rotation.roll)
@@ -65,23 +65,23 @@ class AttributesAdder(
     }
 
     fun addAttributes(lane: Lane, dstCityObject: AbstractCityObject) {
-        val attributes = lane.id.toAttributes(parameters.identifierAttributesPrefix) + lane.attributes
+        val attributes = lane.id.toAttributes(configuration.identifierAttributesPrefix) + lane.attributes
         addAttributes(attributes, dstCityObject)
     }
 
     fun addAttributes(roadspaceObject: RoadspaceObject, dstCityObject: AbstractCityObject) {
-        val attributes = roadspaceObject.id.toAttributes(parameters.identifierAttributesPrefix) + roadspaceObject.attributes
+        val attributes = roadspaceObject.id.toAttributes(configuration.identifierAttributesPrefix) + roadspaceObject.attributes
         addAttributes(attributes, dstCityObject)
     }
 
     fun addAttributes(fillerSurface: FillerSurface, dstCityObject: AbstractCityObject) {
-        val attributes = fillerSurface.fromLaneId.toAttributes(parameters.identifierAttributesPrefix + "from_") +
-            fillerSurface.toLaneId.toAttributes(parameters.identifierAttributesPrefix + "to_")
+        val attributes = fillerSurface.fromLaneId.toAttributes(configuration.identifierAttributesPrefix + "from_") +
+            fillerSurface.toLaneId.toAttributes(configuration.identifierAttributesPrefix + "to_")
         addAttributes(attributes, dstCityObject)
     }
 
     fun addAttributes(laneId: LaneIdentifier, roadMarking: RoadMarking, dstCityObject: AbstractCityObject) {
-        val attributes = laneId.toAttributes(parameters.identifierAttributesPrefix) + roadMarking.attributes
+        val attributes = laneId.toAttributes(configuration.identifierAttributesPrefix) + roadMarking.attributes
         addAttributes(attributes, dstCityObject)
     }
 
@@ -116,7 +116,7 @@ class AttributesAdder(
             is AttributeList -> {
                 val attributes = attribute.attributes.flatMap { convertAttribute(it) }
 
-                if (parameters.flattenGenericAttributeSets) attributes
+                if (configuration.flattenGenericAttributeSets) attributes
                 else listOf(GmlGenericAttributeSet(attribute.name, attributes.map { AbstractGenericAttributeProperty(it) }))
             }
         }

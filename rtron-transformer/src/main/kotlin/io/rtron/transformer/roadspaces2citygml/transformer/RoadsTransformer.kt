@@ -18,6 +18,7 @@ package io.rtron.transformer.roadspaces2citygml.transformer
 
 import arrow.core.Option
 import arrow.core.Some
+import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.common.FillerSurface
 import io.rtron.model.roadspaces.junction.JunctionIdentifier
@@ -29,10 +30,10 @@ import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.roadspaces2citygml.module.TransportationModuleBuilder
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.router.LaneRouter
 import io.rtron.transformer.roadspaces2citygml.router.RoadspaceObjectRouter
 import org.citygml4j.model.core.AbstractCityObject
@@ -52,7 +53,7 @@ class RoadsTransformer(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
     private val _genericsModuleBuilder = GenericsModuleBuilder(configuration, identifierAdder)
     private val _transportationModuleBuilder = TransportationModuleBuilder(configuration, identifierAdder)
@@ -78,9 +79,9 @@ class RoadsTransformer(
             .handleFailure { throw it.error }
             .sortedBy { it.name }
 
-        if (roadspacesInJunction.first().name == roadspaceName && configuration.parameters.mappingBackwardsCompatibility) {
+        if (roadspacesInJunction.first().name == roadspaceName && configuration.mappingBackwardsCompatibility) {
             roadspacesInJunction.forEach { addRoadspace(it, roadspacesModel, dstRoad) }
-        } else if (roadspacesInJunction.first().name == roadspaceName && !configuration.parameters.mappingBackwardsCompatibility) {
+        } else if (roadspacesInJunction.first().name == roadspaceName && !configuration.mappingBackwardsCompatibility) {
             val intersectionFeature = _transportationModuleBuilder.createIntersection()
             roadspacesInJunction.forEach { addRoadspace(it, roadspacesModel, intersectionFeature) }
             dstRoad.intersections.add(IntersectionProperty(intersectionFeature))
@@ -92,7 +93,7 @@ class RoadsTransformer(
     private fun addSection(roadspaceId: RoadspaceIdentifier, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad) {
         val roadspace = roadspacesModel.getRoadspace(roadspaceId).handleFailure { throw it.error }
 
-        if (configuration.parameters.mappingBackwardsCompatibility) {
+        if (configuration.mappingBackwardsCompatibility) {
             addRoadspace(roadspace, roadspacesModel, dstRoad)
         } else {
             val sectionFeature = _transportationModuleBuilder.createSection()
@@ -139,11 +140,11 @@ class RoadsTransformer(
     private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace) {
         val lane = road.getLane(id)
             .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }
-        val surface = road.getLaneSurface(id, configuration.parameters.discretizationStepSize)
+        val surface = road.getLaneSurface(id, configuration.discretizationStepSize)
             .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }
         val centerLine = road.getCurveOnLane(id, 0.5)
             .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }
-        val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, configuration.parameters.discretizationStepSize)
+        val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, configuration.discretizationStepSize)
             .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }.toList()
         val fillerSurfaces = innerLateralFillerSurface + longitudinalFillerSurfaces
 
@@ -168,7 +169,7 @@ class RoadsTransformer(
     }
 
     private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace) {
-        road.getRoadMarkings(id, configuration.parameters.discretizationStepSize)
+        road.getRoadMarkings(id, configuration.discretizationStepSize)
             .handleAndRemoveFailure { _reportLogger.log(it, id.toString(), "Removing road markings.") }
             .forEach { _transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace) }
     }

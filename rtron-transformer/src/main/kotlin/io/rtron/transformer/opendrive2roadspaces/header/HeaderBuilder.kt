@@ -20,7 +20,7 @@ import com.github.kittinunf.result.Result
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.roadspaces.Header
 import io.rtron.std.handleSuccess
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.header.Header as OdrHeader
 
 class HeaderBuilder(
@@ -39,7 +39,7 @@ class HeaderBuilder(
      */
     private fun buildCoordinateSystem(geoReference: String): Result<CoordinateReferenceSystem, Exception> {
 
-        CoordinateReferenceSystem.of(configuration.parameters.crsEpsg).handleSuccess { return it }
+        CoordinateReferenceSystem.of(configuration.crsEpsg).handleSuccess { return it }
         CoordinateReferenceSystem.of(geoReference).handleSuccess { return it }
         return Result.error(IllegalStateException("Unknown coordinate reference system."))
     }

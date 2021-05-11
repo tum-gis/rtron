@@ -18,6 +18,7 @@ package io.rtron.transformer.opendrive2roadspaces.junction
 
 import arrow.core.getOrElse
 import com.github.kittinunf.result.Result
+import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.junction.JunctionConnection
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.junction.Connection
@@ -31,7 +32,7 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.handleEmpty
 import io.rtron.std.mapAndHandleFailureOnOriginal
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.opendrive2roadspaces.roadspaces.toContactPoint
 import io.rtron.model.opendrive.junction.Junction as OpendriveJunction
 
@@ -39,7 +40,7 @@ class JunctionBuilder(
     private val configuration: Opendrive2RoadspacesConfiguration
 ) {
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
     // Methods
     fun buildJunction(id: ModelIdentifier, junction: OpendriveJunction, roadspaces: List<Roadspace>): Junction {

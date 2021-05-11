@@ -17,17 +17,16 @@
 package io.rtron.transformer.opendrive2roadspaces
 
 import com.github.kittinunf.result.Result
+import io.rtron.io.logging.LogManager
 import io.rtron.io.logging.ProgressBar
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.std.handleAndRemoveFailureIndexed
-import io.rtron.transformer.AbstractTransformer
-import io.rtron.transformer.TransformerConfiguration
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.opendrive2roadspaces.junction.JunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
 import io.rtron.transformer.opendrive2roadspaces.roadspaces.RoadspaceBuilder
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -39,11 +38,11 @@ import kotlinx.coroutines.runBlocking
  * @param configuration configuration for the transformation
  */
 class Opendrive2RoadspacesTransformer(
-    val configuration: TransformerConfiguration<Opendrive2RoadspacesParameters>
-) : AbstractTransformer() {
+    val configuration: Opendrive2RoadspacesConfiguration
+) {
 
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
     private val _headerBuilder = HeaderBuilder(configuration)
     private val _roadspaceBuilder = RoadspaceBuilder(configuration)
@@ -58,7 +57,7 @@ class Opendrive2RoadspacesTransformer(
      * @return transformed RoadSpaces model as output
      */
     fun transform(opendriveModel: OpendriveModel): RoadspacesModel {
-        _reportLogger.info("Transforming roads with ${configuration.parameters}.")
+        _reportLogger.info("${this.javaClass.simpleName} with $configuration.")
 
         // general model information
         val header = _headerBuilder.buildHeader(opendriveModel.header)
@@ -83,7 +82,7 @@ class Opendrive2RoadspacesTransformer(
             .map { _junctionBuilder.buildJunction(modelIdentifier, it, roadspaces) }
 
         return RoadspacesModel(modelIdentifier, header, roadspaces, junctions)
-            .also { _reportLogger.info("Completed transformation: OpenDRIVE -> RoadspacesModel. ✔") }
+            .also { _reportLogger.info("${this.javaClass.simpleName}: Completed transformation. ✔") }
     }
 
     private fun transformRoadspacesSequentially(

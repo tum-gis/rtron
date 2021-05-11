@@ -22,6 +22,7 @@ import arrow.core.getOrElse
 import arrow.core.none
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
+import io.rtron.io.logging.LogManager
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.shiftLowerEndpointTo
@@ -40,20 +41,20 @@ import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
 import io.rtron.std.handleFailure
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
 
 /**
  * Builder for [Road] objects of the RoadSpaces data model.
  */
 class RoadBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
+    val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
-    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration.parameters)
+    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration)
     private val _laneBuilder = LaneBuilder(configuration)
 
     // Methods
@@ -77,7 +78,7 @@ class RoadBuilder(
         Result<Road, Exception> {
 
             // check whether source model is processable
-            road.lanes.isProcessable(configuration.parameters.tolerance)
+            road.lanes.isProcessable(configuration.tolerance)
                 .map { _reportLogger.log(it, id.toString()) }
                 .handleFailure { return it }
 
@@ -164,7 +165,7 @@ class RoadBuilder(
     }
 
     private fun buildAttributes(laneSection: RoadLanesLaneSection) =
-        attributes("${configuration.parameters.attributesPrefix}laneSection_") {
+        attributes("${configuration.attributesPrefix}laneSection_") {
             attribute("curvePositionStart", laneSection.laneSectionStart.curvePosition)
         }
 }

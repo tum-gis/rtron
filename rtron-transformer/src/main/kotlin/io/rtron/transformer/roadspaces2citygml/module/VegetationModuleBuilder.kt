@@ -17,13 +17,14 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
+import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 
@@ -31,17 +32,17 @@ import org.xmlobjects.gml.model.measures.Length
  * Builder for city objects of the CityGML Vegetation module.
  */
 class VegetationModuleBuilder(
-    val configuration: Roadspaces2CitygmlConfiguration,
+    private val configuration: Roadspaces2CitygmlConfiguration,
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
-    private val _attributesAdder = AttributesAdder(configuration.parameters)
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
 
     fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): Result<SolitaryVegetationObject, Exception> {
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
         solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO).handleFailure { return it }

@@ -29,19 +29,19 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.handleFailure
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for curves in 3D from the OpenDRIVE data model.
  */
 class Curve3DBuilder(
     private val reportLogger: Logger,
-    private val parameters: Opendrive2RoadspacesParameters
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(reportLogger, parameters)
-    private val _curve2DBuilder = Curve2DBuilder(reportLogger, parameters)
+    private val _functionBuilder = FunctionBuilder(reportLogger, configuration)
+    private val _curve2DBuilder = Curve2DBuilder(reportLogger, configuration)
 
     // Methods
 
@@ -55,7 +55,7 @@ class Curve3DBuilder(
     ): Result<Curve3D, IllegalArgumentException> {
 
         val planViewCurve2D =
-            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, planViewGeometries, parameters.offsetXY).handleFailure { return it }
+            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, planViewGeometries, configuration.offsetXY).handleFailure { return it }
         val heightFunction = buildHeightFunction(id, elevationProfiles)
 
         return Result.success(Curve3D(planViewCurve2D, heightFunction))
@@ -79,7 +79,7 @@ class Curve3DBuilder(
 
             return ConcatenatedFunction.ofPolynomialFunctions(
                 elevationEntriesAdjusted.map { it.s },
-                elevationEntriesAdjusted.map { it.coefficientsWithOffset(offsetA = parameters.offsetZ) },
+                elevationEntriesAdjusted.map { it.coefficientsWithOffset(offsetA = configuration.offsetZ) },
                 prependConstant = true,
                 prependConstantValue = 0.0
             )

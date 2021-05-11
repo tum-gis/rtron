@@ -20,7 +20,7 @@ import io.rtron.model.roadspaces.junction.JunctionIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlParameters
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractCityObject
 import org.xmlobjects.gml.model.basictypes.Code
 import java.util.UUID
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Adds object identifiers from the RoadSpaces model to an [AbstractCityObject] (CityGML model).
  */
 class IdentifierAdder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val configuration: Roadspaces2CitygmlConfiguration
 ) {
 
     // Properties and Initializers
@@ -44,13 +44,13 @@ class IdentifierAdder(
     // Methods
 
     /** Returns the GML identifier (with prefix) of the [id]. */
-    fun getGmlIdentifier(id: JunctionIdentifier) = parameters.gmlIdPrefix + id.hashedId
+    fun getGmlIdentifier(id: JunctionIdentifier) = configuration.gmlIdPrefix + id.hashedId
 
     /** Returns the GML identifier (with prefix) of the [id]. */
-    fun getGmlIdentifier(id: RoadspaceObjectIdentifier) = parameters.gmlIdPrefix + id.hashedId
+    fun getGmlIdentifier(id: RoadspaceObjectIdentifier) = configuration.gmlIdPrefix + id.hashedId
 
     /** Returns the GML identifier (with prefix) of the [id]. */
-    fun getGmlIdentifier(id: LaneIdentifier) = parameters.gmlIdPrefix + id.hashedId
+    fun getGmlIdentifier(id: LaneIdentifier) = configuration.gmlIdPrefix + id.hashedId
 
     /**
      * Adds the hashed id and the name of the [RoadspaceIdentifier] to the [dstCityObject], whereby the [id] can only be
@@ -100,7 +100,7 @@ class IdentifierAdder(
     }
 
     /** Returns a completely random id. */
-    fun generateRandomUUID(): String = parameters.gmlIdPrefix + UUID.randomUUID().toString()
+    fun generateRandomUUID(): String = configuration.gmlIdPrefix + UUID.randomUUID().toString()
 
     /** Generates a unique UUID based on a hash of the [key] (even if the key has already been used). */
     private fun generateHashUUID(key: String): String {
@@ -110,7 +110,7 @@ class IdentifierAdder(
 
         val uuid = UUID.nameUUIDFromBytes(keyWithCount.toByteArray()).toString()
         usedKeyCount[key] = countIndex
-        return (parameters.gmlIdPrefix + uuid).also { addUniqueIdentifierUsageRecord(it) }
+        return (configuration.gmlIdPrefix + uuid).also { addUniqueIdentifierUsageRecord(it) }
     }
 
     /** Adds the [id] to the usage record and throws an [IllegalArgumentException], when the [id] was already used. */

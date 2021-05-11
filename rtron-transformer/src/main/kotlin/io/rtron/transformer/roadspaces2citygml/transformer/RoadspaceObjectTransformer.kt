@@ -21,16 +21,16 @@ import arrow.core.Some
 import arrow.core.none
 import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
-import io.rtron.io.logging.Logger
+import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.mapAndHandleFailureOnOriginal
 import io.rtron.std.unwrapValues
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.module.BuildingModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.module.CityFurnitureModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.roadspaces2citygml.module.VegetationModuleBuilder
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.router.RoadspaceObjectRouter
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.core.CityModel
@@ -44,7 +44,7 @@ class RoadspaceObjectTransformer(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger: Logger = configuration.getReportLogger()
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
     private val _genericsModuleBuilder = GenericsModuleBuilder(configuration, identifierAdder)
     private val _buildingModuleBuilder = BuildingModuleBuilder(configuration, identifierAdder)

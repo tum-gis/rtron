@@ -32,14 +32,14 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.handleAndRemoveFailure
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for functions of the OpenDRIVE data model.
  */
 class FunctionBuilder(
     private val reportLogger: Logger,
-    private val parameters: Opendrive2RoadspacesParameters
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Methods

@@ -38,19 +38,19 @@ import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.opendrive2roadspaces.parameter.Opendrive2RoadspacesParameters
+import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for surface geometries in 3D from the OpenDRIVE data model.
  */
 class Surface3DBuilder(
     private val reportLogger: Logger,
-    private val parameters: Opendrive2RoadspacesParameters
+    private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(reportLogger, parameters)
-    private val _curve2DBuilder = Curve2DBuilder(reportLogger, parameters)
+    private val _functionBuilder = FunctionBuilder(reportLogger, configuration)
+    private val _curve2DBuilder = Curve2DBuilder(reportLogger, configuration)
 
     // Methods
 
@@ -64,7 +64,7 @@ class Surface3DBuilder(
         if (roadObject.isRectangle()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            rectangleList += Rectangle3D(roadObject.length, roadObject.width, parameters.tolerance, affineSequence)
+            rectangleList += Rectangle3D(roadObject.length, roadObject.width, configuration.tolerance, affineSequence)
         }
 
         if (roadObject.repeat.isRepeatedCuboid())
@@ -83,7 +83,7 @@ class Surface3DBuilder(
         if (roadObject.isCircle()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            circleList += Circle3D(roadObject.radius, parameters.tolerance, affineSequence)
+            circleList += Circle3D(roadObject.radius, configuration.tolerance, affineSequence)
         }
 
         if (roadObject.repeat.isRepeatCylinder())
@@ -117,7 +117,7 @@ class Surface3DBuilder(
                 .map { buildVertices(it, referenceLine) }
                 .handleAndRemoveFailure { reportLogger.log(it) }
 
-            return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
+            return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
         }
 
     /**
@@ -161,7 +161,7 @@ class Surface3DBuilder(
                 .map { it.getBasePoint() }
                 .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline point.") }
 
-            return LinearRing3DFactory.buildFromVertices(vertices, parameters.tolerance)
+            return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
         }
 
     /**
@@ -190,7 +190,7 @@ class Surface3DBuilder(
         val rightBoundaryCurve2D = objectReferenceCurve2D.addLateralTranslation(widthFunction, +0.5)
         val rightBoundary = Curve3D(rightBoundaryCurve2D, objectReferenceHeight)
 
-        val parametricBoundedSurface = ParametricBoundedSurface3D(leftBoundary, rightBoundary, parameters.tolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
+        val parametricBoundedSurface = ParametricBoundedSurface3D(leftBoundary, rightBoundary, configuration.tolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
         return listOf(parametricBoundedSurface)
     }
 
@@ -219,7 +219,7 @@ class Surface3DBuilder(
         val upperBoundaryHeight = StackedFunction.ofSum(objectReferenceHeight, heightFunction, defaultValue = 0.0)
         val upperBoundary = Curve3D(objectReferenceCurve2D, upperBoundaryHeight)
 
-        val parametricBoundedSurface = ParametricBoundedSurface3D(lowerBoundary, upperBoundary, parameters.tolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
+        val parametricBoundedSurface = ParametricBoundedSurface3D(lowerBoundary, upperBoundary, configuration.tolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
         return listOf(parametricBoundedSurface)
     }
 }

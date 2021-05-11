@@ -344,7 +344,7 @@ class Road(
     /**
      * Returns the filler surface which closes the gap occurring at the lateral transition of two lane elements.
      * These lateral transitions might contain vertical holes which are caused by e.g. lane height offsets.
-     * If no lateral surface filler is needed due to adjacent lane surfaces, [Optional.empty] is returned.
+     * If no lateral surface filler is needed due to adjacent lane surfaces, [Option<Nothing>] is returned.
      *
      * @param laneIdentifier lane identifier for which the lateral filler surfaces to the left shall be created
      * @param step discretization step size

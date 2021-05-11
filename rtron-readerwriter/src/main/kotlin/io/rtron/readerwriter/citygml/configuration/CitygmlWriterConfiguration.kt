@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
+package io.rtron.readerwriter.citygml.configuration
 
-object PluginVersions {
-    const val ktlint = "10.0.0"
-    const val xjc = "1.6"
-    const val versionChecker = "0.38.0"
-    const val orchid = "0.21.1"
-}
+import io.rtron.readerwriter.citygml.CitygmlVersion
 
-object Plugins {
-    const val ktlint = "org.jlleitschuh.gradle.ktlint"
-    const val xjc = "com.github.edeandrea.xjc-generation"
-    const val versionChecker = "com.github.ben-manes.versions"
-    const val orchid = "com.eden.orchidPlugin"
+data class CitygmlWriterConfiguration(
+    val projectId: String,
+    val versions: Set<CitygmlVersion>
+) {
+    // Properties and Initializers
+    init {
+        require(versions.isNotEmpty()) { "At least one CitGML version must be set." }
+    }
 }

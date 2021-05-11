@@ -17,6 +17,7 @@
 package io.rtron.transformer.roadspaces2citygml.module
 
 import com.github.kittinunf.result.Result
+import io.rtron.io.logging.LogManager
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
@@ -29,10 +30,10 @@ import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.handleFailure
+import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
-import io.rtron.transformer.roadspaces2citygml.parameter.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractSpaceBoundaryProperty
 import org.citygml4j.model.transportation.AbstractTransportationSpace
 import org.citygml4j.model.transportation.AuxiliaryTrafficArea
@@ -69,8 +70,8 @@ class TransportationModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _reportLogger = configuration.getReportLogger()
-    private val _attributesAdder = AttributesAdder(configuration.parameters)
+    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
     fun createRoad() = Road()
@@ -87,7 +88,7 @@ class TransportationModuleBuilder(
         identifierAdder.addUniqueIdentifier(lane.id, trafficSpaceFeature)
 
         // line representation of lane
-        val centerLineGeometryTransformer = GeometryTransformer(configuration.parameters).also { centerLine.accept(it) }
+        val centerLineGeometryTransformer = GeometryTransformer(configuration).also { centerLine.accept(it) }
         trafficSpaceFeature.populateLod2Geometry(centerLineGeometryTransformer)
 
         // surface representation of lane
@@ -128,7 +129,7 @@ class TransportationModuleBuilder(
         identifierAdder.addUniqueIdentifier(lane.id, auxiliaryTrafficSpaceFeature)
 
         // line representation
-        val centerLineGeometryTransformer = GeometryTransformer(configuration.parameters).also { centerLine.accept(it) }
+        val centerLineGeometryTransformer = GeometryTransformer(configuration).also { centerLine.accept(it) }
         auxiliaryTrafficSpaceFeature.populateLod2Geometry(centerLineGeometryTransformer)
 
         // surface representation
@@ -158,7 +159,7 @@ class TransportationModuleBuilder(
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
 
         // surface representation
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val trafficArea = createTrafficAreaFeature(geometryTransformer)
             .handleFailure { _reportLogger.log(it, roadspaceObject.id.toString()); return }
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
@@ -176,7 +177,7 @@ class TransportationModuleBuilder(
         val auxiliaryTrafficSpaceFeature = createAuxiliaryTrafficSpaceFeature(TransportationGranularityValue.LANE)
 
         // surface representation
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val auxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(geometryTransformer)
             .handleFailure { _reportLogger.log(it, roadspaceObject.id.toString()); return }
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficArea))
@@ -194,7 +195,7 @@ class TransportationModuleBuilder(
         val markingFeature = Marking()
 
         // geometry
-        val geometryTransformer = GeometryTransformer(configuration.parameters).also { geometry.accept(it) }
+        val geometryTransformer = GeometryTransformer(configuration).also { geometry.accept(it) }
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
 
         // semantics
@@ -210,7 +211,7 @@ class TransportationModuleBuilder(
         val markingFeature = Marking()
 
         // geometry
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration.parameters)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
 
         // semantics
@@ -235,7 +236,7 @@ class TransportationModuleBuilder(
     }
 
     private fun createTrafficAreaFeature(abstractGeometry: AbstractGeometry3D): Result<TrafficArea, Exception> {
-        val geometryTransformer = GeometryTransformer(configuration.parameters)
+        val geometryTransformer = GeometryTransformer(configuration)
             .also { abstractGeometry.accept(it) }
         return createTrafficAreaFeature(geometryTransformer)
     }
@@ -249,7 +250,7 @@ class TransportationModuleBuilder(
     }
 
     private fun createAuxiliaryTrafficAreaFeature(abstractGeometry: AbstractGeometry3D): Result<AuxiliaryTrafficArea, Exception> {
-        val geometryTransformer = GeometryTransformer(configuration.parameters)
+        val geometryTransformer = GeometryTransformer(configuration)
             .also { abstractGeometry.accept(it) }
         return createAuxiliaryTrafficAreaFeature(geometryTransformer)
     }

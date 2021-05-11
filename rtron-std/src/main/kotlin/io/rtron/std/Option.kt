@@ -20,7 +20,7 @@ import arrow.core.Option
 import com.github.kittinunf.result.Result
 
 /**
- * Returns true, if the [value] of this equals the [otherValue].
+ * Returns true, if the value of this equals the [otherValue].
  * If no value [isDefined], false is returned.
  */
 infix fun <T> Option<T>.equalsValue(otherValue: T): Boolean = handleEmpty { return false } == otherValue
