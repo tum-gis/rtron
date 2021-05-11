@@ -36,44 +36,121 @@ This enables you to
 Download some sample OpenDRIVE datasets of the city of Ingolstadt from the company [3D Mapping Solutions](https://www.3d-mapping.de/en/customer-area/demo-data) (initial registration required).
 Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets) provides a list of further OpenDRIVE datasets.
 
-## :gear: Installation
-
-In order to use r:trån, an installation of JDK 11 or later is required.
-Then, download the executable jar at the [releases section](https://github.com/tum-gis/rtron/releases) or build r:trån yourself:
-```bash
-git clone https://github.com/tum-gis/rtron.git && cd rtron
-
-./gradlew shadowJar # build the uber-jar
-cd rtron-cli/build/libs
-```
-
 ## :rocket: Usage
 
-Configure your transformation by placing a script named ``configuration.kts`` into the directory of your OpenDRIVE datasets.
-A list of more sample configurations can be obtained in [this directory](https://github.com/tum-gis/rtron/tree/main/rtron-main/src/main/resources/configurations).
+There are three main variants of usage:
+
+1. edit the behaviour and execute the run scripts
+2. deploy the resulting run scripts
+3. use r:trån as a library for your own project
+  
+### :gear: Edit and execute the run scripts
+
+Clone the repository:
+
+```bash
+git clone https://github.com/tum-gis/rtron.git
+```
+
+Actually, you can customize the run scripts of r:trån with all editors, but an IDE provides convenient suggestions and autocompletion.
+Thus, install the community edition of [IntelliJ](https://www.jetbrains.com/idea/download) and open the cloned r:trån project.
+Navigate to the script [rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts](rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts) and execute it by hitting `Menu` ➔ `Run` ➔ `Run…` (or Alt+Shift+F10):
+
 ```kotlin
-import io.rtron.main.project.configuration.configure
+import io.rtron.main.project.processAllFiles
+import io.rtron.readerwriter.citygml.CitygmlVersion
 
-configure {
+/**
+ * This function iterates over all files contained in the input directory that have the
+ * extension "xodr".
+ */
+processAllFiles(
+    inInputDirectory = "/path/to/input-datasets", // TODO: adjust path
+    withExtension = "xodr",
+    toOutputDirectory = "/path/to/output-datasets" // TODO: adjust path
+)
+{
+    // Within this block the transformations can be defined by the user. For example:
 
-    opendrive2roadspaces {
-        attributesPrefix = "opendrive_"
-        crsEpsg = 32632 // EPSG code
+    // 1. Read the OpenDRIVE dataset into memory:
+    val opendriveModel = readOpendriveModel(inputFilePath)
+
+    // 2. Transform the OpenDRIVE model to an intermediary representation (the RoadSpaces model):
+    val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
+        // Within this blocks, the transformation is parametrized:
+
+        // EPSG code of the coordinate reference system (needed by GIS applications)
+        crsEpsg = 32632
     }
 
-    roadspaces2citygml {
+    // 3. Transform the RoadSpaces model to a CityGML model:
+    val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
+        // true, if nested attribute lists shall be flattened out
+        flattenGenericAttributeSets = true
+
+        // distance between each discretization step for curves and surfaces
         discretizationStepSize = 0.5
+    }
+
+    // 4. Write the CityGML model to the output directory:
+    writeCitygmlModel(citygmlModel) {
+
+        // set the CityGML versions for writing
+        versions = setOf(CitygmlVersion.V2_0)
     }
 }
 ```
 
-Start the transformations by running:
+After the execution is completed, the directory ``/path/to/output-datasets`` should contain the converted CityGML2 datasets.
+For more details, visit the [website](https://rtron.io/wiki/edit-and-execute-the-run-scripts).
+
+### :package: Deploy the run scripts
+
+In order to run the r:trån scripts in deployment environments, [kscript](https://github.com/holgerbrandl/kscript) needs to be installed.
+kscript provides enhanced scripting support for Kotlin and is capable of executing the *.kts scripts contained in this [directory](rtron-main/src/main/resources/scripts).
+
+[sdkman](https://sdkman.io/install) is a tool for managing software development kits and conveniently installs [kotlin](https://kotlinlang.org/) and [kscript](https://github.com/holgerbrandl/kscript#installation):
 ```bash
-java -jar rtron.jar ./input-datasets ./output-datasets
+curl -s "https://get.sdkman.io" | bash     # install sdkman
+source "$HOME/.sdkman/bin/sdkman-init.sh"  # add sdkman to PATH
+
+sdk install java # install java
+sdk install kotlin # install Kotlin
+sdk install kscript # install kscript
+```
+If you are on Windows, kscript can be installed into a [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
+Otherwise, [docker containers](https://github.com/holgerbrandl/kscript#run-with-docker) for kscript are also available.
+
+Once the environment is ready, the r:trån scripts can be executed: 
+```bash
+# download the script ...
+curl https://raw.githubusercontent.com/tum-gis/rtron/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts
+
+# and simply execute it (dependencies are resolved automatically)
+kscript ./convert-opendrive-to-citygml2-simple.kts
 ```
 
-r:trån [recursively](https://rtron.io/wiki/configuration) iterates over all OpenDRIVE datasets contained in the input directory:
-<p align="center"><img src="rtron-documentation/src/orchid/resources/assets/images/rtron-run.gif?raw=true"/></p>
+### :recycle: Use r:trån as library (experimental)
+
+r:trån is a collection of software components for spatio-semantic road space models, as described in the [architecture](https://rtron.io/architecture/).
+To use its functionality in another Kotlin or Java project, add the dependency to the respective component using Gradle:
+
+```gradle
+dependencies {
+  implementation("io.rtron:rtron-main:1.2.0")
+  implementation("io.rtron:rtron-readerwriter:1.2.0")
+}
+```
+
+To add a dependency using Maven:
+```xml
+<dependency>
+  <groupId>io.rtron</groupId>
+  <artifactId>rtron-main</artifactId>
+  <version>1.2.0</version>
+</dependency>
+```
+
 
 ## :hammer_and_wrench: Contributing
 

@@ -22,11 +22,8 @@ object Project {
 
 object ProjectComponents {
     // user interface layer
-    const val commandLineInterface = ":rtron-cli"
-    const val documentation = ":rtron-documentation"
-
-    // batch processing layer
     const val main = ":rtron-main"
+    const val documentation = ":rtron-documentation"
 
     // model transformation layer
     const val model = ":rtron-model"

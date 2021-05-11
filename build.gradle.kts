@@ -84,7 +84,7 @@ allprojects {
 
                 pom {
                     name.set(projectName)
-                    description.set("rtron component $projectName.")
+                    description.set("Component '$projectName' of ${Project.name}.")
                     url.set("https://rtron.io")
                     licenses {
                         license {
