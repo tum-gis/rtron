@@ -10,8 +10,8 @@ r:trån is structured in components on different layers.
     <img src="/assets/media/components.svg" alt="component diagram">
 </p>
 
-The *main* component coordinates the batch processing of a collection of input datasets.
-This includes the resolving of nested [configuration scripts](wiki/configuration) to parametrize batch processing projects.
+To flexibly design new conversion recipes for models, the *main* component provides the infrastructure to create and run transformation scripts.
+This is achieved via an [internal Kotlin DSL](https://kotlinlang.org/docs/type-safe-builders.html) that allows parameterization as well as easy assembly of new transformation blocks.
 
 The model transformation layer is concerned with the transformation chain of a single input file containing the source model.
 The source model is read by the *readerwriter* component.
@@ -36,7 +36,11 @@ To keep the model transformation layer lean, supporting functionality is provide
 The *math* component comprises the affine transformation matrices, uni- and bivariate functions as well as geometries. 
 To decouple the geometry classes from the B-rep generation functions in the *transformer* component, the visitor pattern is applied.
 
-## Custom Writers
+## Custom Reader/Writers
 
-Since the data model of OpenDRIVE is already implemented to a large extent, the functionality can be used to develop custom writers for other formats.
+Since the data model of OpenDRIVE is already implemented to a large extent, the functionality can be used to develop e.g. custom writers for other formats.
 For developing a custom writer, add its model implementation to the *model* component, a transformer from the RoadSpaces to the custom model and a writer to the *readerwriter* component.
+
+## Custom Transforms
+
+Besides, custom model processes can be realized by implementing new transformers in the *transformer* component and then be composed by scripts in the *main* component.

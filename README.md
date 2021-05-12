@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/tum-gis/rtron/releases" title="Latest Release"><img src="https://img.shields.io/github/v/release/tum-gis/rtron?style=for-the-badge"></a>
+    <a href="https://search.maven.org/search?q=io.rtron" title="Latest Release"><img src="https://img.shields.io/maven-central/v/io.rtron/rtron-main?style=for-the-badge"></a>
     <a href="https://github.com/tum-gis/rtron/actions" title="Build Status"><img src="https://img.shields.io/github/workflow/status/tum-gis/rtron/CI?style=for-the-badge"></a>
     <a href="https://github.com/tum-gis/rtron/issues" title="Open Issues"><img src="https://img.shields.io/github/issues/tum-gis/rtron?style=for-the-badge&logo=Github"></a>
     <a title="Language"><img src="https://img.shields.io/github/languages/top/tum-gis/rtron.svg?style=for-the-badge&logo=Kotlin&logoColor=white"></a>
