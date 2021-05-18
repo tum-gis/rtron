@@ -1,7 +1,7 @@
 <p align="center"><a href="https://rtron.io" target="_blank" rel="noopener noreferrer"><img width="500" src="rtron-documentation/src/orchid/resources/assets/images/logo.png" alt="rtron logo"></a></p>
 
 <p align="center">
-    <em>a road space model transformer for OpenDRIVE, CityGML and beyond</em>
+    <em>a road space model transformer library for OpenDRIVE, CityGML and beyond</em>
     <br />
     <a href="https://rtron.io">View Demos</a>
     ·
