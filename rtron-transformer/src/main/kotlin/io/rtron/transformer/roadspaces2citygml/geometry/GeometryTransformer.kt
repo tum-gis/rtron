@@ -42,6 +42,7 @@ import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
 import org.citygml4j.model.core.ImplicitGeometry
 import org.citygml4j.model.core.ImplicitGeometryProperty
 import org.citygml4j.util.geometry.GeometryFactory
+import org.xmlobjects.gml.model.geometry.DirectPosition
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty
 import org.xmlobjects.gml.model.geometry.aggregates.MultiSurface
@@ -140,10 +141,8 @@ class GeometryTransformer(
         check(isSetPoint()) { "Point geometry is not available." }
         val point = pointResult.handleFailure { return it }
 
-        val directPosition = geometryFactory
-            .createDirectPosition(point.toDoubleArray(), DIMENSION)!!
         val gmlPoint = Point().apply {
-            pos = directPosition
+            pos = createDirectPosition(point)
             if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
         val pointProperty = PointProperty(gmlPoint)
@@ -180,8 +179,18 @@ class GeometryTransformer(
     fun getImplicitGeometry(): Result<ImplicitGeometryProperty, Exception> {
         check(isSetPoint()) { "ImplicitGeometry is not available." }
 
-        val pointProperty = getPoint().handleFailure { return it }
-        val implicitGeometry = ImplicitGeometry().apply { referencePoint = pointProperty }
+        val referencePointProperty = getPoint().handleFailure { return it }
+        val relativePointGeometry = Point().apply {
+            pos = createDirectPosition(Vector3D.ZERO)
+            if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
+        }
+
+        val implicitGeometry = ImplicitGeometry().apply {
+            referencePoint = referencePointProperty
+            relativeGeometry = PointProperty(relativePointGeometry)
+
+            if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
+        }
 
         if (isSetRotation())
             getRotation().success { implicitGeometry.transformationMatrix = Affine3D.of(it).toGmlTransformationMatrix4x4() }
@@ -254,7 +263,6 @@ class GeometryTransformer(
     }
 
     override fun visit(abstractCurve3D: AbstractCurve3D) {
-
         multiCurveResult = abstractCurve3D.calculateLineStringGlobalCS(configuration.discretizationStepSize)
     }
 
@@ -308,6 +316,9 @@ class GeometryTransformer(
         if (configuration.generateRandomGeometryIds) multiSurface.id = _identifierAdder.generateRandomUUID()
         return MultiSurfaceProperty(multiSurface)
     }
+
+    private fun createDirectPosition(vector3D: Vector3D): DirectPosition =
+        geometryFactory.createDirectPosition(vector3D.toDoubleArray(), DIMENSION)!!
 
     companion object {
         private val geometryFactory = GeometryFactory.newInstance()
