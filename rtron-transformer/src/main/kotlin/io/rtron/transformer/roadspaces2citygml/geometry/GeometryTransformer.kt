@@ -179,18 +179,11 @@ class GeometryTransformer(
     fun getImplicitGeometry(): Result<ImplicitGeometryProperty, Exception> {
         check(isSetPoint()) { "ImplicitGeometry is not available." }
 
-        val referencePointProperty = getPoint().handleFailure { return it }
-        val relativePointGeometry = Point().apply {
-            pos = createDirectPosition(Vector3D.ZERO)
-            if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
-        }
-
         val implicitGeometry = ImplicitGeometry().apply {
-            referencePoint = referencePointProperty
-            relativeGeometry = PointProperty(relativePointGeometry)
-
+            referencePoint = getPoint().handleFailure { return it }
             if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
+        implicitGeometry.libraryObject = ""
 
         if (isSetRotation())
             getRotation().success { implicitGeometry.transformationMatrix = Affine3D.of(it).toGmlTransformationMatrix4x4() }
