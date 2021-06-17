@@ -35,6 +35,8 @@ tasks.withType<KotlinCompile> {
 
 xjcGeneration {
 
+    defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
+
     schemas {
         create("opendrive14") {
             schemaFile = "opendrive14/OpenDRIVE_1.4H.xsd"
