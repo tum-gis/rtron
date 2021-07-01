@@ -18,8 +18,8 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.5.0"
-    const val coroutines = "1.4.3"
+    const val kotlin = "1.5.20"
+    const val coroutines = "1.5.0"
     const val arrow = "0.13.2"
     const val result = "4.0.0"
 
