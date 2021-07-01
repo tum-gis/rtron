@@ -113,19 +113,19 @@ class RoadspaceBuilder(
     private fun buildLateralRoadShape(id: RoadspaceIdentifier, lateralProfileShapeList: List<RoadLateralProfileShape>):
         BivariateFunction {
 
-            if (lateralProfileShapeList.isEmpty()) return PlaneFunction.ZERO
+        if (lateralProfileShapeList.isEmpty()) return PlaneFunction.ZERO
 
-            val lateralFunctions = lateralProfileShapeList
-                .groupBy { it.s }
-                .mapValues { _functionBuilder.buildLateralShape(id, it.value) }
-                .toSortedMap()
+        val lateralFunctions = lateralProfileShapeList
+            .groupBy { it.s }
+            .mapValues { _functionBuilder.buildLateralShape(id, it.value) }
+            .toSortedMap()
 
-            return ShapeFunction(
-                lateralFunctions,
-                extrapolateX = true,
-                extrapolateY = configuration.extrapolateLateralRoadShapes
-            )
-        }
+        return ShapeFunction(
+            lateralFunctions,
+            extrapolateX = true,
+            extrapolateY = configuration.extrapolateLateralRoadShapes
+        )
+    }
 
     private fun buildAttributes(road: OpendriveRoad) =
         attributes("${configuration.attributesPrefix}road_") {

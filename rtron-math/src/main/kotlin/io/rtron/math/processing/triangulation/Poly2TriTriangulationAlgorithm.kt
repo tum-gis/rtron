@@ -65,16 +65,16 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
      */
     private fun polygonBackConversion(polygon: P2TPolygon, tolerance: Double):
         Result<List<Polygon3D>, IllegalStateException> {
-            val triangles = polygon.triangles.map {
-                val triangulatedVertices: List<Vector3D> = it.points.map { point -> Vector3D(point.x, point.y, point.z) }
+        val triangles = polygon.triangles.map {
+            val triangulatedVertices: List<Vector3D> = it.points.map { point -> Vector3D(point.x, point.y, point.z) }
 
-                if (triangulatedVertices.isColinear(tolerance))
-                    return Result.error(IllegalStateException("Triangulation failure (colinear vertices)."))
-                return@map Polygon3D(triangulatedVertices, tolerance)
-            }
-
-            return Result.success(triangles)
+            if (triangulatedVertices.isColinear(tolerance))
+                return Result.error(IllegalStateException("Triangulation failure (colinear vertices)."))
+            return@map Polygon3D(triangulatedVertices, tolerance)
         }
+
+        return Result.success(triangles)
+    }
 
     /**
      * As Poly2Tri ignores the rotation of the triangles, this function reintroduces the original orientation.

@@ -238,16 +238,16 @@ class RoadspaceObjectBuilder(
     private fun buildGeometries(signal: RoadSignalsSignal, roadReferenceLine: Curve3D):
         Result<List<AbstractGeometry3D>, Exception> {
 
-            val curveAffine = roadReferenceLine
-                .calculateAffine(signal.curveRelativePosition.toCurveRelative1D())
-                .handleFailure { return it }
+        val curveAffine = roadReferenceLine
+            .calculateAffine(signal.curveRelativePosition.toCurveRelative1D())
+            .handleFailure { return it }
 
-            val geometry = mutableListOf<AbstractGeometry3D>()
-            if (geometry.isEmpty())
-                geometry += _vector3DBuilder
-                    .buildVector3Ds(signal, curveAffine, force = true)
-                    .handleFailure { throw it.error }
+        val geometry = mutableListOf<AbstractGeometry3D>()
+        if (geometry.isEmpty())
+            geometry += _vector3DBuilder
+                .buildVector3Ds(signal, curveAffine, force = true)
+                .handleFailure { throw it.error }
 
-            return Result.success(geometry)
-        }
+        return Result.success(geometry)
+    }
 }

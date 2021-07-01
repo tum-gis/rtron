@@ -142,41 +142,41 @@ class LaneBuilder(
     private fun buildLaneHeightOffset(id: LaneIdentifier, laneHeights: List<RoadLanesLaneSectionLRLaneHeight>):
         LaneHeightOffset {
 
-            // remove consecutively duplicated height entries
-            val heightEntriesDistinct = laneHeights.filterToStrictSortingBy { it.sOffset }
-            if (heightEntriesDistinct.size < laneHeights.size)
-                _reportLogger.info(
-                    "Removing lane height entries which are placed not in strict order according " +
-                        "to sOffset.",
-                    id.toString()
-                )
-
-            // filter non-finite entries
-            val heightEntriesAdjusted = heightEntriesDistinct
-                .filter { it.inner.isFinite() && it.outer.isFinite() }
-            if (heightEntriesAdjusted.size < heightEntriesDistinct.size)
-                _reportLogger.warn(
-                    "Removing at least one lane height entry, since no valid values are provided.",
-                    id.toString()
-                )
-
-            // build the inner and outer height offset functions
-            val inner = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
-            else ConcatenatedFunction.ofLinearFunctions(
-                heightEntriesAdjusted.map { it.sOffset },
-                heightEntriesAdjusted.map { it.inner },
-                prependConstant = true
+        // remove consecutively duplicated height entries
+        val heightEntriesDistinct = laneHeights.filterToStrictSortingBy { it.sOffset }
+        if (heightEntriesDistinct.size < laneHeights.size)
+            _reportLogger.info(
+                "Removing lane height entries which are placed not in strict order according " +
+                    "to sOffset.",
+                id.toString()
             )
 
-            val outer = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
-            else ConcatenatedFunction.ofLinearFunctions(
-                heightEntriesAdjusted.map { it.sOffset },
-                heightEntriesAdjusted.map { it.outer },
-                prependConstant = true
+        // filter non-finite entries
+        val heightEntriesAdjusted = heightEntriesDistinct
+            .filter { it.inner.isFinite() && it.outer.isFinite() }
+        if (heightEntriesAdjusted.size < heightEntriesDistinct.size)
+            _reportLogger.warn(
+                "Removing at least one lane height entry, since no valid values are provided.",
+                id.toString()
             )
 
-            return LaneHeightOffset(inner, outer)
-        }
+        // build the inner and outer height offset functions
+        val inner = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
+        else ConcatenatedFunction.ofLinearFunctions(
+            heightEntriesAdjusted.map { it.sOffset },
+            heightEntriesAdjusted.map { it.inner },
+            prependConstant = true
+        )
+
+        val outer = if (heightEntriesAdjusted.isEmpty()) LinearFunction.X_AXIS
+        else ConcatenatedFunction.ofLinearFunctions(
+            heightEntriesAdjusted.map { it.sOffset },
+            heightEntriesAdjusted.map { it.outer },
+            prependConstant = true
+        )
+
+        return LaneHeightOffset(inner, outer)
+    }
 
     /**
      * Builds a list of road markings ([roadMark]).
@@ -222,26 +222,26 @@ class LaneBuilder(
     private fun buildRoadMarking(roadMark: RoadLanesLaneSectionLCRLaneRoadMark, domainEndpoint: Double = Double.NaN):
         Result<RoadMarking, Exception> {
 
-            val domain = if (domainEndpoint.isNaN()) Range.atLeast(roadMark.sOffset)
-            else Range.closed(roadMark.sOffset, domainEndpoint)
+        val domain = if (domainEndpoint.isNaN()) Range.atLeast(roadMark.sOffset)
+        else Range.closed(roadMark.sOffset, domainEndpoint)
 
-            if (domain.length <= configuration.tolerance)
-                return Result.error(IllegalStateException("Length of road marking is zero (or below tolerance threshold)."))
+        if (domain.length <= configuration.tolerance)
+            return Result.error(IllegalStateException("Length of road marking is zero (or below tolerance threshold)."))
 
-            val width = ConstantFunction(roadMark.width, domain)
+        val width = ConstantFunction(roadMark.width, domain)
 
-            val attributes = attributes("${configuration.attributesPrefix}roadMarking") {
-                attribute("_curvePositionStart", roadMark.sOffset)
-                attribute("_width", roadMark.width)
-                attribute("_type", roadMark.typeAttribute.toString())
-                attribute("_weight", roadMark.weight.toString())
-                attribute("_color", roadMark.color.toString())
-                attribute("_material", roadMark.material)
-            }
-
-            val roadMarking = RoadMarking(width, attributes)
-            return Result.success(roadMarking)
+        val attributes = attributes("${configuration.attributesPrefix}roadMarking") {
+            attribute("_curvePositionStart", roadMark.sOffset)
+            attribute("_width", roadMark.width)
+            attribute("_type", roadMark.typeAttribute.toString())
+            attribute("_weight", roadMark.weight.toString())
+            attribute("_color", roadMark.color.toString())
+            attribute("_material", roadMark.material)
         }
+
+        val roadMarking = RoadMarking(width, attributes)
+        return Result.success(roadMarking)
+    }
 
     private fun buildAttributes(centerLane: RoadLanesLaneSectionCenterLane) =
         attributes("${configuration.attributesPrefix}lane_") {

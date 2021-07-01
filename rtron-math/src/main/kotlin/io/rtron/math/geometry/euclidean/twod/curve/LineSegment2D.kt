@@ -62,9 +62,9 @@ class LineSegment2D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector2D, Exception> {
 
-            val point = Vector2D(curveRelativePoint.curvePosition, 0.0)
-            return Result.success(point)
-        }
+        val point = Vector2D(curveRelativePoint.curvePosition, 0.0)
+        return Result.success(point)
+    }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Rotation2D, Exception> = Result.success(Rotation2D.ZERO)

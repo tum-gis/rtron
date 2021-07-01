@@ -52,28 +52,28 @@ object Polyhedron3DFactory {
     fun buildFromVerticalOutlineElements(outlineElements: List<VerticalOutlineElement>, tolerance: Double):
         Result<ContextMessage<Polyhedron3D>, Exception> {
 
-            // prepare vertical outline elements
-            val preparedOutlineElementsWithContext = prepareOutlineElements(outlineElements, tolerance)
-                .handleFailure { return it }
-            val messages = preparedOutlineElementsWithContext.messages
-            val preparedOutlineElements = preparedOutlineElementsWithContext.value
+        // prepare vertical outline elements
+        val preparedOutlineElementsWithContext = prepareOutlineElements(outlineElements, tolerance)
+            .handleFailure { return it }
+        val messages = preparedOutlineElementsWithContext.messages
+        val preparedOutlineElements = preparedOutlineElementsWithContext.value
 
-            // construct faces
-            val baseFace = LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }, tolerance)
-            val topFace = LinearRing3D(preparedOutlineElements.flatMap { it.getHighestPointAdjacentToTheTop() }, tolerance)
-            val sideFaces: List<LinearRing3D> = preparedOutlineElements
-                .zipWithNextEnclosing()
-                .flatMap { buildSideFace(it.first, it.second, tolerance).toList() }
+        // construct faces
+        val baseFace = LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }, tolerance)
+        val topFace = LinearRing3D(preparedOutlineElements.flatMap { it.getHighestPointAdjacentToTheTop() }, tolerance)
+        val sideFaces: List<LinearRing3D> = preparedOutlineElements
+            .zipWithNextEnclosing()
+            .flatMap { buildSideFace(it.first, it.second, tolerance).toList() }
 
-            // triangulate faces
-            val triangulatedFaces = (sideFaces + baseFace + topFace)
-                .map { Triangulator.triangulate(it, tolerance) }
-                .handleFailure { return it }
-                .flatten()
+        // triangulate faces
+        val triangulatedFaces = (sideFaces + baseFace + topFace)
+            .map { Triangulator.triangulate(it, tolerance) }
+            .handleFailure { return it }
+            .flatten()
 
-            val polyhedron = ContextMessage(Polyhedron3D(triangulatedFaces, tolerance), messages)
-            return Result.success(polyhedron)
-        }
+        val polyhedron = ContextMessage(Polyhedron3D(triangulatedFaces, tolerance), messages)
+        return Result.success(polyhedron)
+    }
 
     /**
      * A vertical outline element is represented by a [basePoint] and an optional [leftHeadPoint] and [rightHeadPoint].
@@ -228,34 +228,34 @@ object Polyhedron3DFactory {
     private fun prepareOutlineElements(verticalOutlineElements: List<VerticalOutlineElement>, tolerance: Double):
         Result<ContextMessage<List<VerticalOutlineElement>>, Exception> {
 
-            val infos = mutableListOf<String>()
+        val infos = mutableListOf<String>()
 
-            // remove consecutively following line segment duplicates
-            val elementsWithoutDuplicates = verticalOutlineElements.filterWithNextEnclosing { a, b -> a.basePoint.fuzzyUnequals(b.basePoint, tolerance) }
-            if (elementsWithoutDuplicates.size < verticalOutlineElements.size)
-                infos += "Removing at least one consecutively following line segment duplicate."
+        // remove consecutively following line segment duplicates
+        val elementsWithoutDuplicates = verticalOutlineElements.filterWithNextEnclosing { a, b -> a.basePoint.fuzzyUnequals(b.basePoint, tolerance) }
+        if (elementsWithoutDuplicates.size < verticalOutlineElements.size)
+            infos += "Removing at least one consecutively following line segment duplicate."
 
-            // if there are not enough points to construct a polyhedron
-            if (elementsWithoutDuplicates.size < 3)
-                return Result.error(IllegalStateException("A polyhedron requires at least three valid outline elements."))
+        // if there are not enough points to construct a polyhedron
+        if (elementsWithoutDuplicates.size < 3)
+            return Result.error(IllegalStateException("A polyhedron requires at least three valid outline elements."))
 
-            // remove consecutively following side duplicates of the form (…, A, B, A, …)
-            val cleanedElements = elementsWithoutDuplicates
-                .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
-            if (cleanedElements.size < elementsWithoutDuplicates.size)
-                infos += "Removing consecutively following side duplicates of the form (…, A, B, A, …)."
+        // remove consecutively following side duplicates of the form (…, A, B, A, …)
+        val cleanedElements = elementsWithoutDuplicates
+            .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
+        if (cleanedElements.size < elementsWithoutDuplicates.size)
+            infos += "Removing consecutively following side duplicates of the form (…, A, B, A, …)."
 
-            // if the base points of the outline element are located on a line (or point)
-            val innerBaseEdges = cleanedElements.map { it.basePoint }.filterIndexed { index, _ -> index != 0 }.map { it - cleanedElements.first().basePoint }
-            val dimensionOfSpan = innerBaseEdges.map { it.toRealVector() }.dimensionOfSpan()
-            if (dimensionOfSpan < 2)
-                return Result.error(IllegalStateException("A polyhedron requires at least three valid outline elements, which are not colinear (located on a line)."))
+        // if the base points of the outline element are located on a line (or point)
+        val innerBaseEdges = cleanedElements.map { it.basePoint }.filterIndexed { index, _ -> index != 0 }.map { it - cleanedElements.first().basePoint }
+        val dimensionOfSpan = innerBaseEdges.map { it.toRealVector() }.dimensionOfSpan()
+        if (dimensionOfSpan < 2)
+            return Result.error(IllegalStateException("A polyhedron requires at least three valid outline elements, which are not colinear (located on a line)."))
 
-            val elements: ContextMessage<List<VerticalOutlineElement>> = cleanedElements
-                .zipWithConsecutivesEnclosing { it.basePoint }
-                .map { VerticalOutlineElement.of(it, tolerance) }
-                .unwrapMessages()
+        val elements: ContextMessage<List<VerticalOutlineElement>> = cleanedElements
+            .zipWithConsecutivesEnclosing { it.basePoint }
+            .map { VerticalOutlineElement.of(it, tolerance) }
+            .unwrapMessages()
 
-            return Result.success(elements)
-        }
+        return Result.success(elements)
+    }
 }

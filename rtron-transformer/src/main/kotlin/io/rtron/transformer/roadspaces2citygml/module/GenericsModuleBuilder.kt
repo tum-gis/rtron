@@ -57,48 +57,48 @@ class GenericsModuleBuilder(
     fun createGenericOccupiedSpaceFeature(id: LaneIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList):
         Result<GenericOccupiedSpace, Exception> {
 
-            val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).handleFailure { return it }
+        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).handleFailure { return it }
 
-            identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
-            _attributesAdder.addAttributes(
-                id.toAttributes(configuration.identifierAttributesPrefix) +
-                    attributes,
-                genericOccupiedSpace
-            )
-            return Result.success(genericOccupiedSpace)
-        }
+        identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
+        _attributesAdder.addAttributes(
+            id.toAttributes(configuration.identifierAttributesPrefix) +
+                attributes,
+            genericOccupiedSpace
+        )
+        return Result.success(genericOccupiedSpace)
+    }
 
     fun createGenericOccupiedSpaceFeature(id: RoadspaceIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList):
         Result<GenericOccupiedSpace, Exception> {
-            val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).handleFailure { return it }
+        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).handleFailure { return it }
 
-            identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
-            _attributesAdder.addAttributes(
-                id.toAttributes(configuration.identifierAttributesPrefix) +
-                    attributes,
-                genericOccupiedSpace
-            )
-            return Result.success(genericOccupiedSpace)
-        }
+        identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
+        _attributesAdder.addAttributes(
+            id.toAttributes(configuration.identifierAttributesPrefix) +
+                attributes,
+            genericOccupiedSpace
+        )
+        return Result.success(genericOccupiedSpace)
+    }
 
     private fun createGenericOccupiedSpaceFeature(abstractGeometry: AbstractGeometry3D):
         Result<GenericOccupiedSpace, Exception> {
-            val geometryTransformer = GeometryTransformer(configuration)
-                .also { abstractGeometry.accept(it) }
-            return createGenericOccupiedSpaceFeature(geometryTransformer)
-        }
+        val geometryTransformer = GeometryTransformer(configuration)
+            .also { abstractGeometry.accept(it) }
+        return createGenericOccupiedSpaceFeature(geometryTransformer)
+    }
 
     private fun createGenericOccupiedSpaceFeature(geometryTransformer: GeometryTransformer):
         Result<GenericOccupiedSpace, Exception> {
-            val genericOccupiedSpaceFeature = GenericOccupiedSpace()
+        val genericOccupiedSpaceFeature = GenericOccupiedSpace()
 
-            // geometry
-            genericOccupiedSpaceFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            if (geometryTransformer.isSetRotation())
-                geometryTransformer.getRotation()
-                    .handleFailure { return it }
-                    .also { _attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature) }
+        // geometry
+        genericOccupiedSpaceFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
+        if (geometryTransformer.isSetRotation())
+            geometryTransformer.getRotation()
+                .handleFailure { return it }
+                .also { _attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature) }
 
-            return Result.success(genericOccupiedSpaceFeature)
-        }
+        return Result.success(genericOccupiedSpaceFeature)
+    }
 }

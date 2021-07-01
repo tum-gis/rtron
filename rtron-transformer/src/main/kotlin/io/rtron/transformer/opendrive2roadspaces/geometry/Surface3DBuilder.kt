@@ -113,25 +113,25 @@ class Surface3DBuilder(
     private fun buildLinearRingByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D):
         Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
 
-            val vertices = outline.cornerRoad
-                .map { buildVertices(it, referenceLine) }
-                .handleAndRemoveFailure { reportLogger.log(it) }
+        val vertices = outline.cornerRoad
+            .map { buildVertices(it, referenceLine) }
+            .handleAndRemoveFailure { reportLogger.log(it) }
 
-            return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
-        }
+        return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
+    }
 
     /**
      * Builds a vertex from the OpenDRIVE road corner element.
      */
     private fun buildVertices(cornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad, referenceLine: Curve3D):
         Result<Vector3D, Exception> {
-            val affine = referenceLine.calculateAffine(cornerRoad.curveRelativePosition)
-                .handleFailure { return it }
-            val basePoint = cornerRoad.getBasePoint()
-                .handleFailure { return it }
-                .let { affine.transform(it.getCartesianCurveOffset()) }
-            return Result.success(basePoint)
-        }
+        val affine = referenceLine.calculateAffine(cornerRoad.curveRelativePosition)
+            .handleFailure { return it }
+        val basePoint = cornerRoad.getBasePoint()
+            .handleFailure { return it }
+            .let { affine.transform(it.getCartesianCurveOffset()) }
+        return Result.success(basePoint)
+    }
 
     /**
      * Builds a list of linear rings from an OpenDRIVE road object defined by local corner outlines.
@@ -157,12 +157,12 @@ class Surface3DBuilder(
     private fun buildLinearRingByLocalCorners(id: RoadspaceObjectIdentifier, outline: RoadObjectsObjectOutlinesOutline):
         Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
 
-            val vertices = outline.cornerLocal
-                .map { it.getBasePoint() }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline point.") }
+        val vertices = outline.cornerLocal
+            .map { it.getBasePoint() }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline point.") }
 
-            return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
-        }
+        return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
+    }
 
     /**
      * Builds a parametric bounded surface from OpenDRIVE road objects defined by repeat entries representing a horizontal surface.

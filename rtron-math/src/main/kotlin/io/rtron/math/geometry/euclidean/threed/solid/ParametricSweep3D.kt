@@ -160,12 +160,12 @@ data class ParametricSweep3D(
 
     private fun createPolygons(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>):
         Result<List<Polygon3D>, Exception> =
-            LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
-                .handleFailure { return it }
-                .map { it.calculatePolygonsGlobalCS() }
-                .handleFailure { return it }
-                .flatten()
-                .let { Result.success(it) }
+        LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
+            .handleFailure { return it }
+            .map { it.calculatePolygonsGlobalCS() }
+            .handleFailure { return it }
+            .flatten()
+            .let { Result.success(it) }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 

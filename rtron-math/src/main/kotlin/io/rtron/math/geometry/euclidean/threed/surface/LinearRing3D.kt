@@ -105,24 +105,24 @@ data class LinearRing3D(
          */
         fun ofWithDuplicatesRemoval(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double):
             Result<List<LinearRing3D>, Exception> {
-                require(leftVertices.size >= 2) { "At least two left vertices required." }
-                require(rightVertices.size >= 2) { "At least two right vertices required." }
+            require(leftVertices.size >= 2) { "At least two left vertices required." }
+            require(rightVertices.size >= 2) { "At least two right vertices required." }
 
-                data class VertexPair(val left: Vector3D, val right: Vector3D)
-                val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
+            data class VertexPair(val left: Vector3D, val right: Vector3D)
+            val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
-                val linearRings: List<LinearRing3D> = vertexPairs
-                    .asSequence()
-                    .zipWithNext()
-                    .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
-                    .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
-                    .filter { it.distinct().count() >= 3 }
-                    .filter { !it.isColinear(tolerance) }
-                    .map { LinearRing3D(it, tolerance) }
-                    .toList()
+            val linearRings: List<LinearRing3D> = vertexPairs
+                .asSequence()
+                .zipWithNext()
+                .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
+                .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
+                .filter { it.distinct().count() >= 3 }
+                .filter { !it.isColinear(tolerance) }
+                .map { LinearRing3D(it, tolerance) }
+                .toList()
 
-                return if (linearRings.isEmpty()) Result.error(IllegalArgumentException("Not enough valid linear rings could be constructed."))
-                else Result.success(linearRings)
-            }
+            return if (linearRings.isEmpty()) Result.error(IllegalArgumentException("Not enough valid linear rings could be constructed."))
+            else Result.success(linearRings)
+        }
     }
 }

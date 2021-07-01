@@ -66,24 +66,24 @@ class Curve3DBuilder(
      */
     private fun buildHeightFunction(id: RoadspaceIdentifier, elevationProfiles: List<RoadElevationProfileElevation>):
         UnivariateFunction {
-            if (elevationProfiles.isEmpty()) return LinearFunction.X_AXIS
+        if (elevationProfiles.isEmpty()) return LinearFunction.X_AXIS
 
-            val elevationEntriesAdjusted = elevationProfiles
-                .filterToStrictSortingBy { it.s }
-            if (elevationEntriesAdjusted.size < elevationProfiles.size)
-                this.reportLogger.info(
-                    "Removing elevation entries which are not placed in strict order " +
-                        "according to s.",
-                    id.toString()
-                )
-
-            return ConcatenatedFunction.ofPolynomialFunctions(
-                elevationEntriesAdjusted.map { it.s },
-                elevationEntriesAdjusted.map { it.coefficientsWithOffset(offsetA = configuration.offsetZ) },
-                prependConstant = true,
-                prependConstantValue = 0.0
+        val elevationEntriesAdjusted = elevationProfiles
+            .filterToStrictSortingBy { it.s }
+        if (elevationEntriesAdjusted.size < elevationProfiles.size)
+            this.reportLogger.info(
+                "Removing elevation entries which are not placed in strict order " +
+                    "according to s.",
+                id.toString()
             )
-        }
+
+        return ConcatenatedFunction.ofPolynomialFunctions(
+            elevationEntriesAdjusted.map { it.s },
+            elevationEntriesAdjusted.map { it.coefficientsWithOffset(offsetA = configuration.offsetZ) },
+            prependConstant = true,
+            prependConstantValue = 0.0
+        )
+    }
 
     /**
      * Builds a curve in 3D from OpenDRIVE's road object entry [roadObject].

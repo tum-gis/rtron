@@ -257,10 +257,10 @@ class TransportationModuleBuilder(
 
     private fun createAuxiliaryTrafficAreaFeature(geometryTransformer: GeometryTransformer):
         Result<AuxiliaryTrafficArea, Exception> {
-            val auxiliaryTrafficAreaFeature = AuxiliaryTrafficArea()
-            auxiliaryTrafficAreaFeature.lod2MultiSurface = geometryTransformer
-                .getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
-                .handleFailure { return it }
-            return Result.success(auxiliaryTrafficAreaFeature)
-        }
+        val auxiliaryTrafficAreaFeature = AuxiliaryTrafficArea()
+        auxiliaryTrafficAreaFeature.lod2MultiSurface = geometryTransformer
+            .getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
+            .handleFailure { return it }
+        return Result.success(auxiliaryTrafficAreaFeature)
+    }
 }

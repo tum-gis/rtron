@@ -108,17 +108,17 @@ data class LaneSection(
     fun getLaneHeightOffset(laneIdentifier: LaneIdentifier, factor: Double):
         Result<UnivariateFunction, IllegalArgumentException> {
 
-            val inner = getInnerLaneHeightOffset(laneIdentifier).handleFailure { return it }
-            val outer = getOuterLaneHeightOffset(laneIdentifier).handleFailure { return it }
-            val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
-            return Result.success(laneHeightOffset)
-        }
+        val inner = getInnerLaneHeightOffset(laneIdentifier).handleFailure { return it }
+        val outer = getOuterLaneHeightOffset(laneIdentifier).handleFailure { return it }
+        val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
+        return Result.success(laneHeightOffset)
+    }
 
     private fun getOuterLaneHeightOffset(laneIdentifier: LaneIdentifier):
         Result<UnivariateFunction, IllegalArgumentException> =
-            getLane(laneIdentifier).map { it.outerHeightOffset }
+        getLane(laneIdentifier).map { it.outerHeightOffset }
 
     private fun getInnerLaneHeightOffset(laneIdentifier: LaneIdentifier):
         Result<UnivariateFunction, IllegalArgumentException> =
-            getLane(laneIdentifier).map { it.innerHeightOffset }
+        getLane(laneIdentifier).map { it.innerHeightOffset }
 }

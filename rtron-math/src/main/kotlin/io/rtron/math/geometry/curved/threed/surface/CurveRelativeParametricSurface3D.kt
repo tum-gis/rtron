@@ -51,13 +51,13 @@ class CurveRelativeParametricSurface3D(
     override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
         Result<Vector3D, Exception> {
 
-            val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
-                .handleFailure { throw it.error }
-            val surfaceHeight = heightFunction
-                .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)
-                .handleFailure { throw it.error }
-            val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
+        val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
+            .handleFailure { throw it.error }
+        val surfaceHeight = heightFunction
+            .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)
+            .handleFailure { throw it.error }
+        val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
 
-            return Result.success(affine.transform(offset))
-        }
+        return Result.success(affine.transform(offset))
+    }
 }

@@ -53,28 +53,28 @@ data class LateralTranslatedCurve2D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector2D, Exception> {
 
-            val curveAffine = baseCurve.calculatePoseGlobalCS(curveRelativePoint)
-                .handleFailure { return it }
-                .let { Affine2D.of(it) }
+        val curveAffine = baseCurve.calculatePoseGlobalCS(curveRelativePoint)
+            .handleFailure { return it }
+            .let { Affine2D.of(it) }
 
-            val translation = calculateTranslation(curveRelativePoint)
-                .handleFailure { return it }.lateralOffset
+        val translation = calculateTranslation(curveRelativePoint)
+            .handleFailure { return it }.lateralOffset
 
-            val point = curveAffine.transform(Vector2D(0.0, translation))
-            return Result.success(point)
-        }
+        val point = curveAffine.transform(Vector2D(0.0, translation))
+        return Result.success(point)
+    }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Rotation2D, Exception> {
 
-            val curveRotation = baseCurve.calculateRotationGlobalCS(curveRelativePoint)
+        val curveRotation = baseCurve.calculateRotationGlobalCS(curveRelativePoint)
+            .handleFailure { throw it.error }
+        val lateralTranslationSlope =
+            lateralTranslationFunction.slopeInFuzzy(curveRelativePoint.curvePosition, tolerance)
                 .handleFailure { throw it.error }
-            val lateralTranslationSlope =
-                lateralTranslationFunction.slopeInFuzzy(curveRelativePoint.curvePosition, tolerance)
-                    .handleFailure { throw it.error }
-            val lateralTranslationRotation = Rotation2D(lateralTranslationSlope)
-            return Result.success(curveRotation + lateralTranslationRotation)
-        }
+        val lateralTranslationRotation = Rotation2D(lateralTranslationSlope)
+        return Result.success(curveRotation + lateralTranslationRotation)
+    }
 
     /**
      * Returns a [LateralTranslatedCurve2D] with an additional translation of [lateralTranslationFunction].
@@ -85,12 +85,12 @@ data class LateralTranslatedCurve2D(
      */
     fun addLateralTranslation(lateralTranslationFunction: UnivariateFunction, multiplier: Double = 1.0):
         LateralTranslatedCurve2D {
-            require(multiplier.isFinite()) { "Multiplier must be finite." }
+        require(multiplier.isFinite()) { "Multiplier must be finite." }
 
-            val lateralFunctions = listOf(this.lateralTranslationFunction, lateralTranslationFunction)
-            val stacked = StackedFunction(lateralFunctions, { it[0] + multiplier * it[1] })
-            return copy(lateralTranslationFunction = stacked)
-        }
+        val lateralFunctions = listOf(this.lateralTranslationFunction, lateralTranslationFunction)
+        val stacked = StackedFunction(lateralFunctions, { it[0] + multiplier * it[1] })
+        return copy(lateralTranslationFunction = stacked)
+    }
 
     /**
      * Returns the lateral translation at the [curveRelativePoint].
@@ -98,11 +98,11 @@ data class LateralTranslatedCurve2D(
     private fun calculateTranslation(curveRelativePoint: CurveRelativeVector1D):
         Result<CurveRelativeVector2D, Exception> {
 
-            val translation = lateralTranslationFunction
-                .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-                .handleFailure { return it }
-                .let { CurveRelativeVector2D(curveRelativePoint.curvePosition, it) }
+        val translation = lateralTranslationFunction
+            .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
+            .handleFailure { return it }
+            .let { CurveRelativeVector2D(curveRelativePoint.curvePosition, it) }
 
-            return Result.success(translation)
-        }
+        return Result.success(translation)
+    }
 }

@@ -100,13 +100,13 @@ data class PolynomialFunction(
          */
         fun of(coefficients: DoubleArray, length: Double, upperBoundType: BoundType = BoundType.OPEN):
             PolynomialFunction {
-                require(length > 0.0) { "Length must be greater than zero." }
+            require(length > 0.0) { "Length must be greater than zero." }
 
-                return when {
-                    length.isFinite() -> PolynomialFunction(coefficients, Range.closedX(0.0, length, upperBoundType))
-                    length == Double.POSITIVE_INFINITY -> PolynomialFunction(coefficients, Range.atLeast(0.0))
-                    else -> throw IllegalArgumentException("Unknown length state")
-                }
+            return when {
+                length.isFinite() -> PolynomialFunction(coefficients, Range.closedX(0.0, length, upperBoundType))
+                length == Double.POSITIVE_INFINITY -> PolynomialFunction(coefficients, Range.atLeast(0.0))
+                else -> throw IllegalArgumentException("Unknown length state")
             }
+        }
     }
 }

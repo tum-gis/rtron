@@ -79,9 +79,9 @@ class LineSegment3D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector3D, IllegalArgumentException> {
 
-            val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
-            return Result.success(point)
-        }
+        val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
+        return Result.success(point)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -113,13 +113,13 @@ class LineSegment3D(
          */
         fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED):
             Result<LineSegment3D, IllegalArgumentException> =
-                if (start.fuzzyEquals(end, tolerance))
-                    Result.error(
-                        IllegalArgumentException(
-                            "Start and end vector of a line segment must be different " +
-                                "according to the given tolerance."
-                        )
+            if (start.fuzzyEquals(end, tolerance))
+                Result.error(
+                    IllegalArgumentException(
+                        "Start and end vector of a line segment must be different " +
+                            "according to the given tolerance."
                     )
-                else Result.success(LineSegment3D(start, end, tolerance, endBoundType))
+                )
+            else Result.success(LineSegment3D(start, end, tolerance, endBoundType))
     }
 }

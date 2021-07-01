@@ -54,10 +54,10 @@ class SectionedCurveRelativeParametricSurface3D(
     override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
         Result<Vector3D, Exception> {
 
-            val pointOnCompleteSurface = CurveRelativeVector2D(
-                sectionStart + curveRelativePoint.curvePosition,
-                curveRelativePoint.lateralOffset
-            )
-            return completeCurveRelativeSurface.calculatePointGlobalCS(pointOnCompleteSurface, addHeightOffset)
-        }
+        val pointOnCompleteSurface = CurveRelativeVector2D(
+            sectionStart + curveRelativePoint.curvePosition,
+            curveRelativePoint.lateralOffset
+        )
+        return completeCurveRelativeSurface.calculatePointGlobalCS(pointOnCompleteSurface, addHeightOffset)
+    }
 }
