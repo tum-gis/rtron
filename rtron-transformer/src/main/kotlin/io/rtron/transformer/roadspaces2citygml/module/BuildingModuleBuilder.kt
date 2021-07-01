@@ -25,6 +25,10 @@ import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import org.citygml4j.model.building.Building
+import org.citygml4j.model.construction.GroundSurface
+import org.citygml4j.model.construction.RoofSurface
+import org.citygml4j.model.construction.WallSurface
+import org.citygml4j.model.core.AbstractSpaceBoundaryProperty
 
 /**
  * Builder for city objects of the CityGML Building module.
@@ -39,16 +43,48 @@ class BuildingModuleBuilder(
 
     // Methods
     fun createBuildingFeature(roadspaceObject: RoadspaceObject): Result<Building, Exception> {
-        val buildingFeature = Building()
 
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
-        buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE)
-            .handleFailure { return it }
+
+        val buildingFeatureResult = if (geometryTransformer.isSetSolid()) createLod2Building(geometryTransformer) else createLod1Building(geometryTransformer)
+        val buildingFeature = buildingFeatureResult.handleFailure { return it }
 
         // semantics
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name, buildingFeature)
         _attributesAdder.addAttributes(roadspaceObject, buildingFeature)
+
+        return Result.success(buildingFeature)
+    }
+
+    /**
+     * Creates a building feature with individual roof, ground and wall surfaces.
+     * In order to cut out the respective geometries of the roof, ground and wall, a solid must be set in the [geometryTransformer].
+     */
+    private fun createLod2Building(geometryTransformer: GeometryTransformer): Result<Building, Exception> {
+        require(geometryTransformer.isSetSolid()) { "Solid geometry is required to create an LoD2 building." }
+        val buildingFeature = Building()
+
+        val roofSurfaceFeature = RoofSurface()
+        roofSurfaceFeature.lod2MultiSurface = geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).handleFailure { return it }
+        buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
+
+        val groundSurfaceFeature = GroundSurface()
+        groundSurfaceFeature.lod2MultiSurface = geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).handleFailure { return it }
+        buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
+
+        geometryTransformer.getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE).handleFailure { return it }.forEach {
+            val wallSurfaceFeature = WallSurface()
+            wallSurfaceFeature.lod2MultiSurface = it
+            buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(wallSurfaceFeature))
+        }
+
+        return Result.success(buildingFeature)
+    }
+
+    private fun createLod1Building(geometryTransformer: GeometryTransformer): Result<Building, Exception> {
+        val buildingFeature = Building()
+        buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE).handleFailure { return it }
 
         return Result.success(buildingFeature)
     }
