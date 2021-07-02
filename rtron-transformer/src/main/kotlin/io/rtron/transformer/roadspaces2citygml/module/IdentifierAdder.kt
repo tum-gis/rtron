@@ -73,30 +73,33 @@ class IdentifierAdder(
         dstCityObject.id = getGmlIdentifier(id).also { addUniqueIdentifierUsageRecord(it) }
     }
 
-    /** Adds a pseudo random hash id (hash based on the [id] and the [name]) to the [dstCityObject]. */
+    /** Adds a pseudo random hash id (hash based on the [id] and the [name]) and [name] to the [dstCityObject]. */
     fun addIdentifier(id: RoadspaceIdentifier, name: String, dstCityObject: AbstractCityObject) {
         val hashKey = name + '_' + id.hashKey
         dstCityObject.id = generateHashUUID(hashKey)
         dstCityObject.names = listOf(Code(name))
     }
 
-    /** Adds a pseudo random hash id (hash based on the [id] and the [name]) to the [dstCityObject]. */
+    /** Adds a pseudo random hash id (hash based on the [id] and the [name]) and [name] to the [dstCityObject]. */
     fun addIdentifier(id: LaneIdentifier, name: String, dstCityObject: AbstractCityObject) {
         val hashKey = name + '_' + id.hashedId
         dstCityObject.id = generateHashUUID(hashKey)
         dstCityObject.names = listOf(Code(name))
     }
 
-    /**
-     * Adds the hashed id and the name of the [RoadspaceObjectIdentifier] to the [dstCityObject], whereby the [id] can
-     * only be assigned once (otherwise an [IllegalArgumentException] is thrown).
-     *
-     * @param id identifier to be added to the [dstCityObject]
-     */
+    /** Adds a pseudo random hash id (hash based on the [id] and the [name]) and [name] to the [dstCityObject]. */
     fun addIdentifier(id: RoadspaceObjectIdentifier, name: String, dstCityObject: AbstractCityObject) {
         val hashKey = name + '_' + id.hashedId
         dstCityObject.id = generateHashUUID(hashKey)
         dstCityObject.names = listOf(Code(name))
+    }
+
+    /** Adds a pseudo random hash id (hash based on the [id], [name], [subName], [index]) and [name]-[subName] to
+     * the [dstCityObject]. */
+    fun addDetailedIdentifier(id: RoadspaceObjectIdentifier, name: String, subName: String, index: Int = 0, dstCityObject: AbstractCityObject) {
+        val hashKey = name + '_' + subName + '_' + index + '_' + id.hashedId
+        dstCityObject.id = generateHashUUID(hashKey)
+        dstCityObject.names = listOf(Code("$name-$subName"))
     }
 
     /** Returns a completely random id. */
