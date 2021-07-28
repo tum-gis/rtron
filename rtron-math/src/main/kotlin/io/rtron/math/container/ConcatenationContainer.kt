@@ -124,13 +124,13 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
     private fun handleSelection(parameter: Double, selection: List<Int>):
         Result<LocalRequest<T>, Exception> = when (selection.size) {
 
-            0 -> Result.error(
-                IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains.")
-            )
-            1 -> {
-                val localParameter = parameter - absoluteStarts[selection.first()]
-                Result.success(LocalRequest(localParameter, members[selection.first()]))
-            }
-            else -> Result.error(IllegalStateException("Parameter x=$parameter yields multiple members."))
+        0 -> Result.error(
+            IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains.")
+        )
+        1 -> {
+            val localParameter = parameter - absoluteStarts[selection.first()]
+            Result.success(LocalRequest(localParameter, members[selection.first()]))
         }
+        else -> Result.error(IllegalStateException("Parameter x=$parameter yields multiple members."))
+    }
 }

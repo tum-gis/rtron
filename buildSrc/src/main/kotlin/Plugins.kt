@@ -16,9 +16,9 @@
 
 
 object PluginVersions {
-    const val ktlint = "10.0.0"
+    const val ktlint = "10.1.0"
     const val xjc = "1.6"
-    const val versionChecker = "0.38.0"
+    const val versionChecker = "0.39.0"
     const val orchid = "0.21.1"
 }
 

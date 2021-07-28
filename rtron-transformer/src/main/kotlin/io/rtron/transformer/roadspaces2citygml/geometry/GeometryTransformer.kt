@@ -17,6 +17,7 @@
 package io.rtron.transformer.roadspaces2citygml.geometry
 
 import com.github.kittinunf.result.Result
+import com.github.kittinunf.result.map
 import com.github.kittinunf.result.success
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
@@ -232,12 +233,34 @@ class GeometryTransformer(
     }
 
     /**
-     * Returns a [MultiSurfaceProperty] constructed of a solid's polygons which have been filtered by [FaceType].
+     * Returns a single [MultiSurfaceProperty] constructed of a solid's polygons which have been filtered by [FaceType].
      *
      * @param faceSelection list of relevant [FaceType]
-     * @return [MultiSurfaceProperty] of selected polygons from a solid geometry
+     * @return [MultiSurfaceProperty] constructed of selected polygons from a solid geometry
      */
     fun getSolidCutout(vararg faceSelection: FaceType): Result<MultiSurfaceProperty, Exception> {
+        val filteredPolygons = getFilteredPolygonsOfSolid(*faceSelection).handleFailure { return it }
+
+        val multiSurfaceProperty = polygonsToMultiSurfaceProperty(filteredPolygons)
+        return Result.success(multiSurfaceProperty)
+    }
+
+    /**
+     * Returns a list of individual [MultiSurfaceProperty], whereas each is based on solid's polygon filtered by
+     * [FaceType].
+     *
+     * @param faceSelection list of relevant [FaceType]
+     * @return list of [MultiSurfaceProperty], each constructed from an individual polygon of the solid geometry
+     */
+    fun getIndividualSolidCutouts(vararg faceSelection: FaceType): Result<List<MultiSurfaceProperty>, Exception> {
+        val filteredPolygons = getFilteredPolygonsOfSolid(*faceSelection).handleFailure { return it }
+
+        return filteredPolygons
+            .map { polygonsToMultiSurfaceProperty(listOf(it)) }
+            .let { Result.success(it) }
+    }
+
+    private fun getFilteredPolygonsOfSolid(vararg faceSelection: FaceType): Result<List<Polygon3D>, Exception> {
         if (!this::polygonsOfSolidResult.isInitialized)
             return Result.error(IllegalStateException("No MultiSurfaceProperty available for geometry."))
         val polygonsOfSolid = polygonsOfSolidResult.handleFailure { return it }
@@ -246,8 +269,7 @@ class GeometryTransformer(
         if (filteredPolygons.isEmpty())
             return Result.error(IllegalStateException("No polygons selected for constructing a MultiSurface from a solid geometry."))
 
-        val multiSurfaceProperty = polygonsToMultiSurfaceProperty(filteredPolygons)
-        return Result.success(multiSurfaceProperty)
+        return Result.success(filteredPolygons)
     }
 
     override fun visit(vector3D: Vector3D) {

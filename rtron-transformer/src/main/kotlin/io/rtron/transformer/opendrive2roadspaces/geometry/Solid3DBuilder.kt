@@ -147,17 +147,17 @@ class Solid3DBuilder(
     ):
         Result<Polyhedron3DFactory.VerticalOutlineElement, Exception> {
 
-            val curveRelativeOutlineElementGeometry = cornerRoad.getPoints()
-                .handleFailure { return it }
+        val curveRelativeOutlineElementGeometry = cornerRoad.getPoints()
+            .handleFailure { return it }
 
-            val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
-                .handleFailure { return it }
-            val headPoint = curveRelativeOutlineElementGeometry.second
-                .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
+        val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
+            .handleFailure { return it }
+        val headPoint = curveRelativeOutlineElementGeometry.second
+            .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
 
-            val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint, tolerance = configuration.tolerance)
-            return Result.success(verticalOutlineElement)
-        }
+        val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint, tolerance = configuration.tolerance)
+        return Result.success(verticalOutlineElement)
+    }
 
     /**
      * Builds a list of polyhedrons from OpenDRIVE road objects defined by local corner outlines.
@@ -187,23 +187,23 @@ class Solid3DBuilder(
      */
     private fun buildPolyhedronByLocalCorners(id: RoadspaceObjectIdentifier, outline: RoadObjectsObjectOutlinesOutline):
         Result<ContextMessage<Polyhedron3D>, Exception> {
-            require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
+        require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
 
-            val validCornerLocalElements = outline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
-            if (validCornerLocalElements.size < outline.cornerLocal.size)
-                reportLogger.info(
-                    "Removing at least one outline element due to a negative height value.",
-                    id.toString()
-                )
+        val validCornerLocalElements = outline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
+        if (validCornerLocalElements.size < outline.cornerLocal.size)
+            reportLogger.info(
+                "Removing at least one outline element due to a negative height value.",
+                id.toString()
+            )
 
-            val verticalOutlineElements = validCornerLocalElements
-                .map { it.getPoints() }
-                .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
-                .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, none(), configuration.tolerance) }
-                .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
+        val verticalOutlineElements = validCornerLocalElements
+            .map { it.getPoints() }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
+            .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, none(), configuration.tolerance) }
+            .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
 
-            return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, configuration.tolerance)
-        }
+        return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, configuration.tolerance)
+    }
 
     /**
      * Builds a parametric sweep from OpenDRIVE road objects defined by the repeat entries.

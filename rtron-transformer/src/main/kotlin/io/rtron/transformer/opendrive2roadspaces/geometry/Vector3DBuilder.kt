@@ -40,11 +40,11 @@ class Vector3DBuilder {
      */
     fun buildVector3Ds(roadObject: RoadObjectsObject, curveAffine: Affine3D, force: Boolean = false):
         Result<Vector3D, IllegalArgumentException> =
-            if (roadObject.isPoint() || force) {
-                val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
-                val vector = Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
-                Result.success(vector)
-            } else Result.error(IllegalArgumentException("Not a point geometry."))
+        if (roadObject.isPoint() || force) {
+            val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
+            val vector = Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
+            Result.success(vector)
+        } else Result.error(IllegalArgumentException("Not a point geometry."))
 
     /**
      * Builds a single point from an OpenDRIVE road signal. The building of a point is suppressed, if a more detailed
@@ -56,9 +56,9 @@ class Vector3DBuilder {
      */
     fun buildVector3Ds(roadSignal: RoadSignalsSignal, curveAffine: Affine3D, force: Boolean = false):
         Result<Vector3D, IllegalArgumentException> =
-            if (roadSignal.isPoint() || force) {
-                val objectAffine = Affine3D.of(roadSignal.referenceLinePointRelativePose)
-                val vector = Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
-                Result.success(vector)
-            } else Result.error(IllegalArgumentException("Not a point geometry."))
+        if (roadSignal.isPoint() || force) {
+            val objectAffine = Affine3D.of(roadSignal.referenceLinePointRelativePose)
+            val vector = Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
+            Result.success(vector)
+        } else Result.error(IllegalArgumentException("Not a point geometry."))
 }

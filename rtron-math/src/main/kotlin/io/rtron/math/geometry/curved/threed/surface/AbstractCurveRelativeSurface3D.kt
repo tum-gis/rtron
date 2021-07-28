@@ -49,9 +49,9 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
     fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double = 0.0):
         Result<Vector3D, Exception> {
 
-            this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
-            return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset)
-        }
+        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
+        return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset)
+    }
 
     /**
      * Returns a point in the global cartesian coordinate system that is located on this surface and given by a

@@ -64,13 +64,13 @@ data class ParameterTransformedCurve2D(
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector2D, Exception> {
-            val transformedPoint = transformationFunction(curveRelativePoint)
-            return baseCurve.calculatePointGlobalCS(transformedPoint)
-        }
+        val transformedPoint = transformationFunction(curveRelativePoint)
+        return baseCurve.calculatePointGlobalCS(transformedPoint)
+    }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Rotation2D, Exception> {
-            val transformedPoint = transformationFunction(curveRelativePoint)
-            return baseCurve.calculateRotationGlobalCS(transformedPoint)
-        }
+        val transformedPoint = transformationFunction(curveRelativePoint)
+        return baseCurve.calculateRotationGlobalCS(transformedPoint)
+    }
 }

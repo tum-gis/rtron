@@ -77,31 +77,31 @@ class RoadBuilder(
     ):
         Result<Road, Exception> {
 
-            // check whether source model is processable
-            road.lanes.isProcessable(configuration.tolerance)
-                .map { _reportLogger.log(it, id.toString()) }
-                .handleFailure { return it }
+        // check whether source model is processable
+        road.lanes.isProcessable(configuration.tolerance)
+            .map { _reportLogger.log(it, id.toString()) }
+            .handleFailure { return it }
 
-            val laneOffset = _functionBuilder.buildLaneOffset(id, road.lanes)
-            val laneSections = road.lanes.getLaneSectionsWithRanges(road.length)
-                .mapIndexed { currentId, currentLaneSection ->
-                    buildLaneSection(
-                        LaneSectionIdentifier(currentId, id),
-                        currentLaneSection.first,
-                        currentLaneSection.second,
-                        baseAttributes
-                    )
-                }
-                .handleFailure { return it }
+        val laneOffset = _functionBuilder.buildLaneOffset(id, road.lanes)
+        val laneSections = road.lanes.getLaneSectionsWithRanges(road.length)
+            .mapIndexed { currentId, currentLaneSection ->
+                buildLaneSection(
+                    LaneSectionIdentifier(currentId, id),
+                    currentLaneSection.first,
+                    currentLaneSection.second,
+                    baseAttributes
+                )
+            }
+            .handleFailure { return it }
 
-            if (laneSections.isEmpty())
-                return Result.error(IllegalArgumentException("Road element contains no valid lane sections."))
+        if (laneSections.isEmpty())
+            return Result.error(IllegalArgumentException("Road element contains no valid lane sections."))
 
-            val roadLinkage = buildRoadLinkage(id, road)
+        val roadLinkage = buildRoadLinkage(id, road)
 
-            val roadspaceRoad = Road(id, roadSurface, roadSurfaceWithoutTorsion, laneOffset, laneSections, roadLinkage)
-            return Result.success(roadspaceRoad)
-        }
+        val roadspaceRoad = Road(id, roadSurface, roadSurfaceWithoutTorsion, laneOffset, laneSections, roadLinkage)
+        return Result.success(roadspaceRoad)
+    }
 
     /**
      * Builds a [LaneSection] which corresponds to OpenDRIVE's concept of lane sections.
@@ -114,31 +114,31 @@ class RoadBuilder(
     ):
         Result<LaneSection, Exception> {
 
-            // check whether source model is processable
-            laneSection.isProcessable()
-                .map { _reportLogger.log(it, laneSectionIdentifier.toString()) }
-                .handleFailure { return it }
+        // check whether source model is processable
+        laneSection.isProcessable()
+            .map { _reportLogger.log(it, laneSectionIdentifier.toString()) }
+            .handleFailure { return it }
 
-            val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
+        val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
 
-            val laneSectionAttributes = buildAttributes(laneSection)
-            val lanes = laneSection.getLeftRightLanes()
-                .map { (currentLaneId, currentSrcLane) ->
-                    val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
-                    val attributes = baseAttributes + laneSectionAttributes
-                    _laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
-                }
+        val laneSectionAttributes = buildAttributes(laneSection)
+        val lanes = laneSection.getLeftRightLanes()
+            .map { (currentLaneId, currentSrcLane) ->
+                val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
+                val attributes = baseAttributes + laneSectionAttributes
+                _laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
+            }
 
-            val centerLane = _laneBuilder.buildCenterLane(
-                laneSectionIdentifier,
-                localCurvePositionDomain,
-                laneSection.center.lane,
-                baseAttributes
-            )
+        val centerLane = _laneBuilder.buildCenterLane(
+            laneSectionIdentifier,
+            localCurvePositionDomain,
+            laneSection.center.lane,
+            baseAttributes
+        )
 
-            val roadspaceLaneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
-            return Result.success(roadspaceLaneSection)
-        }
+        val roadspaceLaneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
+        return Result.success(roadspaceLaneSection)
+    }
 
     private fun buildRoadLinkage(id: RoadspaceIdentifier, road: OpendriveRoad): RoadLinkage {
 

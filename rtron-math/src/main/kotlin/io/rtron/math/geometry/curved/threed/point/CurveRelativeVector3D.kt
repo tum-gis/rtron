@@ -73,8 +73,8 @@ data class CurveRelativeVector3D(
          */
         fun of(curvePosition: Double, lateralOffset: Double, heightOffset: Double):
             Result<CurveRelativeVector3D, IllegalArgumentException> =
-                if (!curvePosition.isFinite() || !lateralOffset.isFinite() || !heightOffset.isFinite())
-                    Result.error(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
-                else Result.success(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
+            if (!curvePosition.isFinite() || !lateralOffset.isFinite() || !heightOffset.isFinite())
+                Result.error(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
+            else Result.success(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
     }
 }

@@ -82,23 +82,23 @@ class Arc2D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector2D, IllegalArgumentException> {
 
-            // angle in radians between start point of the arc and given curve position
-            val curvePositionAngle =
-                Rotation2D(TWO_PI * (curveRelativePoint.curvePosition / circumference) * curvatureSign)
+        // angle in radians between start point of the arc and given curve position
+        val curvePositionAngle =
+            Rotation2D(TWO_PI * (curveRelativePoint.curvePosition / circumference) * curvatureSign)
 
-            // calculate offset to center of the arc
-            val offsetToCenterVector =
-                Affine2D.of(startAngle + curvePositionAngle).transform(Vector2D.X_AXIS).scalarMultiply(radius)
+        // calculate offset to center of the arc
+        val offsetToCenterVector =
+            Affine2D.of(startAngle + curvePositionAngle).transform(Vector2D.X_AXIS).scalarMultiply(radius)
 
-            val point = center + offsetToCenterVector
-            return Result.success(point)
-        }
+        val point = center + offsetToCenterVector
+        return Result.success(point)
+    }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Rotation2D, IllegalArgumentException> {
-            val rotation = Rotation2D(curveRelativePoint.curvePosition * curvature)
-            return Result.success(rotation)
-        }
+        val rotation = Rotation2D(curveRelativePoint.curvePosition * curvature)
+        return Result.success(rotation)
+    }
 
     // Conversions
     override fun toString(): String {

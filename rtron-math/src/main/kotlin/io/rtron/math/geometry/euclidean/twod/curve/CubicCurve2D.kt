@@ -58,19 +58,19 @@ class CubicCurve2D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector2D, Exception> {
 
-            val x = curveRelativePoint.curvePosition
-            val y = _polynomialFunction.value(curveRelativePoint.curvePosition)
-                .handleFailure { throw it.error }
-            return Result.success(Vector2D(x, y))
-        }
+        val x = curveRelativePoint.curvePosition
+        val y = _polynomialFunction.value(curveRelativePoint.curvePosition)
+            .handleFailure { throw it.error }
+        return Result.success(Vector2D(x, y))
+    }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Rotation2D, Exception> {
 
-            val angle = _polynomialFunction.slope(curveRelativePoint.curvePosition)
-                .handleFailure { throw it.error }
-            return Result.success(Rotation2D(angle))
-        }
+        val angle = _polynomialFunction.slope(curveRelativePoint.curvePosition)
+            .handleFailure { throw it.error }
+        return Result.success(Rotation2D(angle))
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

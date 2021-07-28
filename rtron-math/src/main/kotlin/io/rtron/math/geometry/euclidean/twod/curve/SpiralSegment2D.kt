@@ -77,11 +77,11 @@ class SpiralSegment2D(
     private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D):
         Result<Pose2D, IllegalArgumentException> {
 
-            val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)
-            val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(_spiralPoseStart).inverseTransform(poseOnUnitSpiral)
+        val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)
+        val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(_spiralPoseStart).inverseTransform(poseOnUnitSpiral)
 
-            return Result.success(poseOnUnitSpiralStartingAtOrigin)
-        }
+        return Result.success(poseOnUnitSpiralStartingAtOrigin)
+    }
 }
 
 fun LinearFunction.Companion.ofSpiralCurvature(curvatureStart: Double, curvatureEnd: Double, length: Double): LinearFunction =

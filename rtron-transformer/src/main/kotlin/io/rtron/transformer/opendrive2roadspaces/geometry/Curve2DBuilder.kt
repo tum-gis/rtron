@@ -189,13 +189,13 @@ class Curve2DBuilder(
      */
     fun buildLateralTranslatedCurve(repeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
         Result<LateralTranslatedCurve2D, IllegalArgumentException> {
-            val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
+        val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
 
-            if (!roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, configuration.tolerance))
-                return Result.error(IllegalArgumentException("Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance."))
+        if (!roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, configuration.tolerance))
+            return Result.error(IllegalArgumentException("Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance."))
 
-            val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
-            val lateralTranslatedCurve = LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), configuration.tolerance)
-            return Result.success(lateralTranslatedCurve)
-        }
+        val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
+        val lateralTranslatedCurve = LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), configuration.tolerance)
+        return Result.success(lateralTranslatedCurve)
+    }
 }

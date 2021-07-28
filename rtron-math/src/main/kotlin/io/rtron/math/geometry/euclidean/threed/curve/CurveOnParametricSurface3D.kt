@@ -83,10 +83,10 @@ class CurveOnParametricSurface3D(
         ):
             CurveOnParametricSurface3D {
 
-                require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
-                require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The height offset function must be defined everywhere where the baseSurface is also defined." }
+            require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
+            require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The height offset function must be defined everywhere where the baseSurface is also defined." }
 
-                return CurveOnParametricSurface3D(baseSurface, lateralOffsetFunction, heightOffsetFunction)
-            }
+            return CurveOnParametricSurface3D(baseSurface, lateralOffsetFunction, heightOffsetFunction)
+        }
     }
 }

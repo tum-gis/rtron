@@ -54,24 +54,24 @@ data class CompositeCurve2D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Vector2D, Exception> {
 
-            val localMember = container
-                .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-                .handleFailure { return it }
-            val localPoint = CurveRelativeVector1D(localMember.localParameter)
+        val localMember = container
+            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
+            .handleFailure { return it }
+        val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-            return localMember.member.calculatePointGlobalCS(localPoint)
-        }
+        return localMember.member.calculatePointGlobalCS(localPoint)
+    }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Result<Rotation2D, Exception> {
 
-            val localMember = container
-                .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-                .handleFailure { return it }
-            val localPoint = CurveRelativeVector1D(localMember.localParameter)
+        val localMember = container
+            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
+            .handleFailure { return it }
+        val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-            return localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }
-        }
+        return localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }
+    }
 
     // Conversions
     override fun toString(): String {
