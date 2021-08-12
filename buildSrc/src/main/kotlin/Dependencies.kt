@@ -18,8 +18,8 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.5.20"
-    const val coroutines = "1.5.0"
+    const val kotlin = "1.5.21"
+    const val coroutines = "1.5.1"
     const val arrow = "0.13.2"
     const val result = "4.0.0"
 
@@ -29,8 +29,8 @@ object DependencyVersions {
     const val mockk = "1.12.0"
 
     // logging
-    const val kotlinLogging = "2.0.8"
-    const val slf4jSimple = "1.7.31"
+    const val kotlinLogging = "2.0.10"
+    const val slf4jSimple = "1.7.32"
 
     // documentation
     const val orchid = "0.21.1"
@@ -38,14 +38,14 @@ object DependencyVersions {
     // object creation
     const val jakartaActivationApi = "2.0.1"
     const val jakartaXmlBindApi = "3.0.1"
-    const val jaxb = "3.0.1"
+    const val jaxb = "3.0.2"
 
     // object mapping
     const val mapstruct = "1.4.2.Final"
 
     // io
     const val commonsIO = "2.10.0"
-    const val commonsCSV = "1.8"
+    const val commonsCSV = "1.9.0"
     const val commonsLang = "3.12.0"
     const val emojiJava = "5.1.1"
 
