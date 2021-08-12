@@ -44,7 +44,7 @@ object DependencyVersions {
     const val mapstruct = "1.4.2.Final"
 
     // io
-    const val commonsIO = "2.10.0"
+    const val commonsIO = "2.11.0"
     const val commonsCSV = "1.9.0"
     const val commonsLang = "3.12.0"
     const val emojiJava = "5.1.1"
