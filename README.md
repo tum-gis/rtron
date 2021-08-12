@@ -159,7 +159,7 @@ Therefore, bug fixes, issue reports and contributions are greatly appreciated.
 
 ## :mortar_board: Research
 
-If you are interested in the concepts and a first application of r:trån, have a look at our [recent paper](https://doi.org/10.3390/su12093799).
+If you are interested in the concepts and a first application of r:trån, have a look at our [paper](https://doi.org/10.3390/su12093799).
 Based on the consistent models now available in OpenDRIVE and CityGML, we generate several target formats for setting up a distributed environment simulation.
 
 ```plain
