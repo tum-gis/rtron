@@ -19,6 +19,7 @@ package io.rtron.main.project
 import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
+import io.rtron.main.system.JavaVersion
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.roadspaces.RoadspacesModel
@@ -92,8 +93,11 @@ fun processAllFiles(inInputDirectory: String, withExtension: String, toOutputDir
  */
 @OptIn(ExperimentalTime::class)
 fun processAllFiles(inInputDirectory: String, withExtensions: Set<String>, toOutputDirectory: String = inInputDirectory + "_output", recursive: Boolean = true, process: Project.() -> Unit) {
-
     val generalLogger = LogManager.getReportLogger("general")
+    if (!JavaVersion.CURRENT.isAtLeast(11, 0)) {
+        generalLogger.error("Requiring a Java version of at least 11 (current Java version is ${JavaVersion.CURRENT}).")
+        return
+    }
 
     val inputDirectoryPath = Path(inInputDirectory)
     val outputDirectoryPath = Path(toOutputDirectory)
