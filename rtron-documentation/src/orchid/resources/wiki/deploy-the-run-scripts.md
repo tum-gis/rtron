@@ -21,7 +21,7 @@ Otherwise, [docker containers](https://github.com/holgerbrandl/kscript#run-with-
 Once the environment is ready, the r:trån scripts can be executed:
 ```bash
 # download the script ...
-curl https://raw.githubusercontent.com/tum-gis/rtron/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts
+curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts --output convert-opendrive-to-citygml2-simple.kts
 
 # and simply execute it (dependencies are resolved automatically)
 kscript ./convert-opendrive-to-citygml2-simple.kts
