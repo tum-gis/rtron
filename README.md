@@ -144,7 +144,7 @@ Also note that the script must now reference paths in the container file system 
 ### :recycle: Use r:trån as library (experimental)
 
 r:trån is a collection of software components for spatio-semantic road space models, as described in the [architecture](https://rtron.io/architecture/).
-To use its functionality in another Kotlin or Java project, add the [dependency](https://mvnrepository.com/artifact/io.rtron) to the respective component using Gradle:
+To use its functionality in another [Kotlin or Java project](https://github.com/tum-gis/sample-projects-using-rtron), add the [dependency](https://mvnrepository.com/artifact/io.rtron) to the respective component using Gradle:
 
 ```gradle
 dependencies {
