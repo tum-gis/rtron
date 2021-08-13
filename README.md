@@ -131,14 +131,14 @@ kscript ./convert-opendrive-to-citygml2-simple.kts
 
 ### :whale: Deploy the run scripts via docker
 
-With a [Docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron).
+With a [docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron).
 Adjust ``/adjust/path/...`` to your host system's paths and execute the following command: 
 ```bash
 docker run -v /adjust/path/to/input-datasets:/project/input \
            -v /adjust/path/to/output-datasets:/project/output \
            -i rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
 ```
-Also, make sure that the container paths (``/project/input``, ``/project/output``) are referenced in the script.
+Also note that the script must now reference paths in the container file system (``/project/input``, ``/project/output``).
 
 
 ### :recycle: Use r:trån as library (experimental)
