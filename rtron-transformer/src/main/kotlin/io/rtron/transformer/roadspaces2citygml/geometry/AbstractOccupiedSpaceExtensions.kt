@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Chair of Geoinformatics, Technical University of Munich
+ * Copyright 2019-2022 Chair of Geoinformatics, Technical University of Munich
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
