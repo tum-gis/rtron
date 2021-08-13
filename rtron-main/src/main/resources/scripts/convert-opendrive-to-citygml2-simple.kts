@@ -8,8 +8,6 @@
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlVersion
 
-val homeDirectory: String = System.getProperty("user.home")
-
 /**
  * This function iterates over all files contained in the input directory that have the extension "xodr".
  */
