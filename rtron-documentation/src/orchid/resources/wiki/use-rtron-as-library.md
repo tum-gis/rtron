@@ -4,7 +4,7 @@
 # Use r:trån as Library (experimental)
 
 r:trån is a collection of software components for spatio-semantic road space models, as described in the [architecture](https://rtron.io/architecture/).
-To use its functionality in another Kotlin or Java project, add the dependency to the respective component using Gradle:
+To use its functionality in another Kotlin or Java project, add the [dependency](https://mvnrepository.com/artifact/io.rtron) to the respective component using Gradle:
 
 ```text
 dependencies {
