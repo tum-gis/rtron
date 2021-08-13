@@ -40,9 +40,9 @@ Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets
 
 There are three main variants of usage:
 
-1. edit the behaviour and execute the run scripts
-2. deploy the resulting run scripts
-3. use r:trån as a library for your own project
+* edit the behaviour and execute the run scripts
+* deploy the resulting run scripts (via kscript directly or docker)
+* use r:trån as a library for your own project
   
 ### :gear: Edit and execute the run scripts
 
@@ -104,7 +104,7 @@ processAllFiles(
 After the execution is completed, the directory ``/path/to/output-datasets`` should contain the converted CityGML2 datasets.
 For more details, visit the [website](https://rtron.io/wiki/edit-and-execute-the-run-scripts).
 
-### :package: Deploy the run scripts
+### :package: Deploy the run scripts via kscript
 
 In order to run the r:trån scripts in deployment environments, [kscript](https://github.com/holgerbrandl/kscript) needs to be installed.
 kscript provides enhanced scripting support for Kotlin and is capable of executing the *.kts scripts contained in this [directory](rtron-main/src/main/resources/scripts).
@@ -118,8 +118,7 @@ sdk install java # install java
 sdk install kotlin # install Kotlin
 sdk install kscript # install kscript
 ```
-If you are on Windows, kscript can be installed into a [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
-Otherwise, [docker containers](https://github.com/holgerbrandl/kscript#run-with-docker) for kscript are also available.
+If you are on Windows, the deployment via docker is recommended.
 
 Once the environment is ready, the r:trån scripts can be executed: 
 ```bash
@@ -129,6 +128,18 @@ curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/re
 # and simply execute it (dependencies are resolved automatically)
 kscript ./convert-opendrive-to-citygml2-simple.kts
 ```
+
+### :whale: Deploy the run scripts via docker
+
+With a [Docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron).
+Adjust ``/adjust/path/...`` to your host system's paths and execute the following command: 
+```bash
+docker run -v /adjust/path/to/input-datasets:/project/input \
+           -v /adjust/path/to/output-datasets:/project/output \
+           -i rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
+```
+Also, make sure that the container paths (``/project/input``, ``/project/output``) are referenced in the script.
+
 
 ### :recycle: Use r:trån as library (experimental)
 
