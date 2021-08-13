@@ -12,12 +12,10 @@
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlVersion
 
-val homeDirectory: String = System.getProperty("user.home")
-
 processAllFiles(
-    inInputDirectory = "$homeDirectory/Desktop/input-datasets",
+    inInputDirectory = "/project/input", // adjust path to directory of input datasets
     withExtension = "xodr",
-    toOutputDirectory = "$homeDirectory/Desktop/output-datasets"
+    toOutputDirectory = "/project/output" // adjust path to output directory
 )
 {
 

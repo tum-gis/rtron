@@ -14,9 +14,9 @@ val homeDirectory: String = System.getProperty("user.home")
  * This function iterates over all files contained in the input directory that have the extension "xodr".
  */
 processAllFiles(
-    inInputDirectory = "$homeDirectory/Desktop/input-datasets",
+    inInputDirectory = "/project/input", // adjust path to directory of input datasets
     withExtension = "xodr",
-    toOutputDirectory = "$homeDirectory/Desktop/output-datasets"
+    toOutputDirectory = "/project/output" // adjust path to output directory
 )
 {
     // Within this block the transformations can be defined by the user. For example:
