@@ -41,14 +41,13 @@ class CitygmlWriter(
     fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
         require(model is CitygmlModel) { "$this received not a CitygmlModel." }
 
-        val versionSuffix = configuration.versions.size > 1
-        val filePaths = configuration.versions.map { write(model, it, directoryPath, versionSuffix) }
+        val filePaths = configuration.versions.map { write(model, it, directoryPath) }
             .handleAndRemoveFailure { _reportLogger.log(it) }
 
         return Result.success(filePaths)
     }
 
-    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean): Result<Path, Exception> {
+    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean = true): Result<Path, Exception> {
         val citygmlVersion = version.toGmlCitygml()
         val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
