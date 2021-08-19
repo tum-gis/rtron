@@ -123,7 +123,8 @@ If you are on Windows, the deployment via docker is recommended.
 Once the environment is ready, the r:trån scripts can be executed: 
 ```bash
 # download the script ...
-curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts --output convert-opendrive-to-citygml2-simple.kts
+curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts \ 
+    --output convert-opendrive-to-citygml2-simple.kts
 
 # and simply execute it (dependencies are resolved automatically)
 kscript ./convert-opendrive-to-citygml2-simple.kts
@@ -131,11 +132,14 @@ kscript ./convert-opendrive-to-citygml2-simple.kts
 
 ### :whale: Deploy the run scripts via docker
 
-With a [docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron).
-Adjust ``/adjust/path/...`` to your host system's paths and execute the following command: 
+With a [docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron). First, download the example script:
 ```bash
-curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts --output convert-opendrive-to-citygml2-simple.kts
+curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts \
+    --output convert-opendrive-to-citygml2-simple.kts
+```
 
+Then, adapt ``/adjust/path/...`` to your host system's paths and run the execution: 
+```bash
 docker run -v /adjust/path/to/input-datasets:/project/input \
            -v /adjust/path/to/output-datasets:/project/output \
            -i rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
