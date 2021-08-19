@@ -31,7 +31,7 @@ This enables you to
 * load your models into a [desktop GIS](https://rtron.io/demos/desktop-gis)
 * [compare and validate](https://rtron.io/demos/model-validation) your models with models from other data sources
 
-## :inbox_tray: Datasets 
+## :inbox_tray: Datasets
 
 Download some sample OpenDRIVE datasets of the city of Ingolstadt from the company [3D Mapping Solutions](https://www.3d-mapping.de/en/customer-area/demo-data) (initial registration required).
 Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets) provides a list of further OpenDRIVE datasets.
@@ -43,7 +43,7 @@ There are three main variants of usage:
 * edit the behaviour and execute the run scripts
 * deploy the resulting run scripts (via kscript directly or docker)
 * use r:trån as a library for your own project
-  
+
 ### :gear: Edit and execute the run scripts
 
 Clone the repository:
@@ -120,7 +120,7 @@ sdk install kscript # install kscript
 ```
 If you are on Windows, the deployment via docker is recommended.
 
-Once the environment is ready, the r:trån scripts can be executed: 
+Once the environment is ready, the r:trån scripts can be executed:
 ```bash
 # download the script ...
 curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts \ 
@@ -138,13 +138,19 @@ curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/re
     --output convert-opendrive-to-citygml2-simple.kts
 ```
 
-Then, adapt ``/adjust/path/...`` to your host system's paths and run the execution: 
+Then, adapt ``/adjust/path/...`` to your host system's paths and run the execution:
 ```bash
-docker run -v /adjust/path/to/input-datasets:/project/input \
+docker run -i --name rtron --rm
+           -v /adjust/path/to/input-datasets:/project/input \
            -v /adjust/path/to/output-datasets:/project/output \
-           -i rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
+           rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
 ```
 Also note that the script must now reference paths in the container file system (``/project/input``, ``/project/output``).
+
+To cancel the process, run this command in another terminal:
+```bash
+docker rm -f rtron
+```
 
 
 ### :recycle: Use r:trån as library (experimental)
@@ -162,9 +168,9 @@ dependencies {
 To add a dependency using Maven:
 ```xml
 <dependency>
-  <groupId>io.rtron</groupId>
-  <artifactId>rtron-main</artifactId>
-  <version>1.2.0</version>
+    <groupId>io.rtron</groupId>
+    <artifactId>rtron-main</artifactId>
+    <version>1.2.0</version>
 </dependency>
 ```
 

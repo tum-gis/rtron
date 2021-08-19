@@ -32,11 +32,22 @@ kscript ./convert-opendrive-to-citygml2-simple.kts
 
 ## Via Docker
 
-With a [docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron).
-Adjust ``/adjust/path/...`` to your host system's paths and execute the following command:
+With a [docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron). First, download the example script:
 ```bash
-docker run -v /adjust/path/to/input-datasets:/project/input \
+curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts \
+    --output convert-opendrive-to-citygml2-simple.kts
+```
+
+Then, adapt ``/adjust/path/...`` to your host system's paths and run the execution:
+```bash
+docker run -i --name rtron --rm
+           -v /adjust/path/to/input-datasets:/project/input \
            -v /adjust/path/to/output-datasets:/project/output \
-           -i rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
+           rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
 ```
 Also note that the script must now reference paths in the container file system (``/project/input``, ``/project/output``).
+
+To cancel the process, run this command in another terminal:
+```bash
+docker rm -f rtron
+```
