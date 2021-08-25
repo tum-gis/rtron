@@ -40,7 +40,7 @@ curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/re
 
 Then, adapt ``/adjust/path/...`` to your host system's paths and run the execution:
 ```bash
-docker run -i --name rtron --rm
+docker run -i --name rtron --rm \
            -v /adjust/path/to/input-datasets:/project/input \
            -v /adjust/path/to/output-datasets:/project/output \
            rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
