@@ -18,7 +18,7 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.5.21"
+    const val kotlin = "1.5.30"
     const val coroutines = "1.5.1"
     const val arrow = "0.13.2"
     const val result = "4.0.0"
@@ -29,7 +29,7 @@ object DependencyVersions {
     const val mockk = "1.12.0"
 
     // logging
-    const val kotlinLogging = "2.0.10"
+    const val kotlinLogging = "2.0.11"
     const val slf4jSimple = "1.7.32"
 
     // documentation
