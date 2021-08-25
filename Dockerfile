@@ -23,7 +23,7 @@ RUN curl -s "https://get.sdkman.io" | bash && \
     sdk install kscript 3.1.0
 
 # Download rtron dependency
-ARG RTRON_VERSION="1.2.0"
+ARG RTRON_VERSION="1.2.1"
 ENV RTRON_VERSION=$RTRON_VERSION
 RUN source /root/.sdkman/bin/sdkman-init.sh && /usr/bin/env kscript "@file:DependsOn(\"io.rtron:rtron-main:$RTRON_VERSION\")"
 
