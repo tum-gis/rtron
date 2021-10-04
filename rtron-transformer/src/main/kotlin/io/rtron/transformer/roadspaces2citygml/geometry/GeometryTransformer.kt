@@ -340,7 +340,7 @@ class GeometryTransformer(
         private const val DIMENSION = 3
 
         fun of(roadspaceObject: RoadspaceObject, configuration: Roadspaces2CitygmlConfiguration): GeometryTransformer {
-            require(roadspaceObject.geometry.size == 1) { "Roadspace object must contain exactly one geometrical representation." }
+            require(roadspaceObject.geometry.size == 1) { "Roadspace object (${roadspaceObject.id}) must contain exactly one geometrical representation." }
             val currentGeometricPrimitive = roadspaceObject.geometry.first()
 
             return GeometryTransformer(configuration).also { currentGeometricPrimitive.accept(it) }
