@@ -43,9 +43,8 @@ class OpendriveReader(
 
         val model = when (opendriveVersion) {
             OpendriveVersion(1, 4) -> _opendrive14Reader.createOpendriveModel(filePath)
-            OpendriveVersion(1, 5) -> _opendrive14Reader.createOpendriveModel(filePath)
             else -> {
-                _reportLogger.warn("Detected OpenDRIVE version ($opendriveVersion) for which no dedicated reader is available. Experimentally continuing.")
+                _reportLogger.warn("Detected OpenDRIVE version ($opendriveVersion) for which no dedicated reader is implemented (yet). Experimentally continuing.")
                 _opendrive14Reader.createOpendriveModel(filePath)
             }
         }

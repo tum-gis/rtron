@@ -93,17 +93,19 @@ data class RoadObjectsObject(
 
     /** Returns true, if the provided geometry information correspond to a cuboid. */
     fun isCuboid() = !length.isNaN() && length > 0.0 && !width.isNaN() && width > 0.0 &&
-        !height.isNaN() && height > 0.0 && !outlines.containsGeometries()
+        !height.isNaN() && height > 0.0 && !outlines.containsGeometries() && !repeat.isSet()
 
     /** Returns true, if the provided geometry information correspond to a rectangle. */
     fun isRectangle() = !length.isNaN() && length > 0.0 && !width.isNaN() && width > 0.0 &&
-        (height.isNaN() || height == 0.0) && !outlines.containsGeometries()
+        (height.isNaN() || height == 0.0) && !outlines.containsGeometries() && !repeat.isSet()
 
     /** Returns true, if the provided geometry information correspond to a cylinder. */
-    fun isCylinder() = !radius.isNaN() && !height.isNaN() && radius > 0.0 && height > 0.0
+    fun isCylinder() = !radius.isNaN() && radius > 0.0 && !height.isNaN() && height > 0.0 &&
+        !outlines.containsGeometries() && !repeat.isSet()
 
     /** Returns true, if the provided geometry information correspond to a circle. */
-    fun isCircle() = !radius.isNaN() && radius > 0.0 && (height.isNaN() || height == 0.0)
+    fun isCircle() = !radius.isNaN() && radius > 0.0 && (height.isNaN() || height == 0.0) &&
+        !outlines.containsGeometries() && !repeat.isSet()
 
     /** Returns true, if the provided geometry information correspond to a point. */
     fun isPoint() = !isCuboid() && !isRectangle() && !isCylinder() && !outlines.containsGeometries() && !repeat.isSet()
