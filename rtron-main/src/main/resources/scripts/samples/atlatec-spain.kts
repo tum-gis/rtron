@@ -2,7 +2,7 @@
 /*
 @file:KotlinOpts("-J-Xmx50g")
 @file:CompilerOpts("-jvm-target 1.8")
-@file:DependsOn("io.rtron:rtron-main:1.2.1")
+@file:DependsOn("io.rtron:rtron-main:1.2.2")
 */
 
 /**

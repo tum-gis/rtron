@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.2] - 2021-10-14
+### Fixed
+- stop breaking for a specific parameter combination for road objects
+
 ## [1.2.1] - 2021-08-25
 ### Added
 - added Docker support for deployment
