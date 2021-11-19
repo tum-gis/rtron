@@ -38,7 +38,7 @@ For example, list all priority road signs ``(roadSignal_type = '306')`` sorted b
 ```postgresql
 SELECT
       cog0.strval as identifier_sourceFileName,
-      cog1.intval as identifier_roadObjectId,
+      cog1.strval as identifier_roadObjectId,
       cog2.strval as identifier_roadObjectName,
       cog3.strval as opendrive_roadSignal_type,
       ST_Distance(city_furniture.lod2_implicit_ref_point, 'SRID=32632;POINT(678195.4482485768 5403954.957612606 414.94568122784835)'::geometry) as distance
