@@ -8,8 +8,8 @@ To use its functionality in another [Kotlin or Java project](https://github.com/
 
 ```text
 dependencies {
-  implementation("io.rtron:rtron-main:1.2.1")
-  implementation("io.rtron:rtron-readerwriter:1.2.1")
+  implementation("io.rtron:rtron-main:1.2.2")
+  implementation("io.rtron:rtron-readerwriter:1.2.2")
 }
 ```
 
@@ -18,6 +18,6 @@ To add a dependency using Maven:
 <dependency>
   <groupId>io.rtron</groupId>
   <artifactId>rtron-main</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
 </dependency>
 ```

@@ -114,7 +114,7 @@ kscript provides enhanced scripting support for Kotlin and is capable of executi
 curl -s "https://get.sdkman.io" | bash     # install sdkman
 source "$HOME/.sdkman/bin/sdkman-init.sh"  # add sdkman to PATH
 
-sdk install java # install java
+sdk install java 11.0.12-zulu # install java
 sdk install kotlin # install Kotlin
 sdk install kscript # install kscript
 ```
@@ -160,8 +160,8 @@ To use its functionality in another [Kotlin or Java project](https://github.com/
 
 ```gradle
 dependencies {
-  implementation("io.rtron:rtron-main:1.2.1")
-  implementation("io.rtron:rtron-readerwriter:1.2.1")
+  implementation("io.rtron:rtron-main:1.2.2")
+  implementation("io.rtron:rtron-readerwriter:1.2.2")
 }
 ```
 
@@ -170,7 +170,7 @@ To add a dependency using Maven:
 <dependency>
     <groupId>io.rtron</groupId>
     <artifactId>rtron-main</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 

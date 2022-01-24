@@ -38,10 +38,10 @@ For example, list all priority road signs ``(roadSignal_type = '306')`` sorted b
 ```postgresql
 SELECT
       cog0.strval as identifier_sourceFileName,
-      cog1.intval as identifier_roadObjectId,
+      cog1.strval as identifier_roadObjectId,
       cog2.strval as identifier_roadObjectName,
       cog3.strval as opendrive_roadSignal_type,
-      ST_Distance(city_furniture.lod1_other_geom, 'SRID=32632;POINT(678195.4482485768 5403954.957612606 414.94568122784835)'::geometry) as distance
+      ST_Distance(city_furniture.lod2_implicit_ref_point, 'SRID=32632;POINT(678195.4482485768 5403954.957612606 414.94568122784835)'::geometry) as distance
 FROM
      city_furniture
 INNER JOIN cityobject_genericattrib cog0 ON cog0.cityobject_id = city_furniture.id AND cog0.attrname = 'identifier_sourceFileName'
@@ -50,7 +50,7 @@ INNER JOIN cityobject_genericattrib cog2 ON cog2.cityobject_id = city_furniture.
 INNER JOIN cityobject_genericattrib cog3 ON cog3.cityobject_id = city_furniture.id AND cog3.attrname = 'opendrive_roadSignal_type'
 WHERE cog3.strval = '306'
 ORDER BY
-  city_furniture.lod1_other_geom <#>
+  city_furniture.lod2_implicit_ref_point <#>
   'SRID=32632;POINT(678195.4482485768 5403954.957612606 414.94568122784835)'::geometry
 ```
 
