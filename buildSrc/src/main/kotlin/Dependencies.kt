@@ -18,19 +18,19 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.5.30"
-    const val coroutines = "1.5.1"
-    const val arrow = "0.13.2"
+    const val kotlin = "1.6.10"
+    const val coroutines = "1.6.0"
+    const val arrow = "1.0.1"
     const val result = "4.0.0"
 
     // testing
-    const val junit = "5.7.2"
-    const val assertj = "3.20.2"
-    const val mockk = "1.12.0"
+    const val junit = "5.8.2"
+    const val assertj = "3.22.0"
+    const val mockk = "1.12.2"
 
     // logging
-    const val kotlinLogging = "2.0.11"
-    const val slf4jSimple = "1.7.32"
+    const val kotlinLogging = "2.1.21"
+    const val slf4jSimple = "1.7.33"
 
     // documentation
     const val orchid = "0.21.1"
@@ -50,13 +50,13 @@ object DependencyVersions {
     const val emojiJava = "5.1.1"
 
     // math
-    const val guava = "30.1.1-jre"
+    const val guava = "31.0.1-jre"
     const val commonsMath = "3.6.1"
-    const val joml = "1.10.1"
+    const val joml = "1.10.3"
     const val poly2tri = "0.1.2"
 
     // geo
-    const val proj4 = "1.1.3"
+    const val proj4 = "1.1.4"
     const val citygml4j = "3.0.0-rc.2"
 }
 
