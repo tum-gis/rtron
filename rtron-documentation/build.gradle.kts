@@ -6,7 +6,7 @@ plugins {
 kotlinProject()
 
 repositories {
-    maven(url = MavenSources.bintrayOrchid)
+    maven(url = MavenSources.bintray)
     maven(url = MavenSources.jitpack)
 }
 
