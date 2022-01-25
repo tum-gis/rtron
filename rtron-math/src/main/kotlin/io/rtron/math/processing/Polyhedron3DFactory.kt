@@ -233,7 +233,7 @@ object Polyhedron3DFactory {
         // remove consecutively following line segment duplicates
         val elementsWithoutDuplicates = verticalOutlineElements.filterWithNextEnclosing { a, b -> a.basePoint.fuzzyUnequals(b.basePoint, tolerance) }
         if (elementsWithoutDuplicates.size < verticalOutlineElements.size)
-            infos += "Removing at least one consecutively following line segment duplicate."
+            infos += "Ignoring at least one consecutively following line segment duplicate."
 
         // if there are not enough points to construct a polyhedron
         if (elementsWithoutDuplicates.size < 3)
@@ -243,7 +243,7 @@ object Polyhedron3DFactory {
         val cleanedElements = elementsWithoutDuplicates
             .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
         if (cleanedElements.size < elementsWithoutDuplicates.size)
-            infos += "Removing consecutively following side duplicates of the form (…, A, B, A, …)."
+            infos += "Ignoring consecutively following side duplicates of the form (…, A, B, A, …)."
 
         // if the base points of the outline element are located on a line (or point)
         val innerBaseEdges = cleanedElements.map { it.basePoint }.filterIndexed { index, _ -> index != 0 }.map { it - cleanedElements.first().basePoint }

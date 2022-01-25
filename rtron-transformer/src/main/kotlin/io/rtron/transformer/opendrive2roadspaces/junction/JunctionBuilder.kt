@@ -47,7 +47,7 @@ class JunctionBuilder(
         val junctionId = JunctionIdentifier(junction.id, id)
         val connections = junction.connection.mapAndHandleFailureOnOriginal(
             { buildConnection(junctionId, it, roadspaces) },
-            { result, original -> _reportLogger.log(result, ConnectionIdentifier(original.id, junctionId).toString(), "Removing connection.") }
+            { result, original -> _reportLogger.log(result, ConnectionIdentifier(original.id, junctionId).toString(), "Ignoring connection.") }
         )
 
         return Junction(junctionId, connections)

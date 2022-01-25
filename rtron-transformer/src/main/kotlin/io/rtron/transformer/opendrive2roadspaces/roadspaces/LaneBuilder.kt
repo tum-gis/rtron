@@ -146,7 +146,7 @@ class LaneBuilder(
         val heightEntriesDistinct = laneHeights.filterToStrictSortingBy { it.sOffset }
         if (heightEntriesDistinct.size < laneHeights.size)
             _reportLogger.info(
-                "Removing lane height entries which are placed not in strict order according " +
+                "Ignoring lane height entries which are placed not in strict order according " +
                     "to sOffset.",
                 id.toString()
             )
@@ -156,7 +156,7 @@ class LaneBuilder(
             .filter { it.inner.isFinite() && it.outer.isFinite() }
         if (heightEntriesAdjusted.size < heightEntriesDistinct.size)
             _reportLogger.warn(
-                "Removing at least one lane height entry, since no valid values are provided.",
+                "Ignoring at least one lane height entry, since no valid values are provided.",
                 id.toString()
             )
 
@@ -210,7 +210,7 @@ class LaneBuilder(
             if (adjustedSrcRoadMark.last().typeAttribute != ERoadMarkType.NONE)
                 listOf(buildRoadMarking(adjustedSrcRoadMark.last())) else emptyList()
 
-        return roadMarkingResults.handleAndRemoveFailure { _reportLogger.log(it, id.toString(), "Removing such road markings.") }
+        return roadMarkingResults.handleAndRemoveFailure { _reportLogger.log(it, id.toString(), "Ignoring such road markings.") }
     }
 
     /**

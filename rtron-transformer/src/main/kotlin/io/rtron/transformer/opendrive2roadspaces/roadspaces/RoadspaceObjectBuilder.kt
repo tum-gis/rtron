@@ -203,7 +203,7 @@ class RoadspaceObjectBuilder(
         roadSignals.signal
             .mapAndHandleFailureOnOriginal(
                 { buildRoadSignalsSignal(id, it, roadReferenceLine, baseAttributes) },
-                { failure, original -> _reportLogger.log(failure, RoadspaceObjectIdentifier(original.id, original.name, id).toString(), "Removing signal object.") }
+                { failure, original -> _reportLogger.log(failure, RoadspaceObjectIdentifier(original.id, original.name, id).toString(), "Ignoring signal object.") }
             )
 
     private fun buildRoadSignalsSignal(

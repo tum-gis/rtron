@@ -57,7 +57,7 @@ class FunctionBuilder(
             .filterToStrictSortingBy { it.s }
         if (superelevationEntriesAdjusted.size < superelevation.size)
             this.reportLogger.info(
-                "Removing superelevation entries which are not placed in strict order" +
+                "Ignoring superelevation entries which are not placed in strict order" +
                     " according to s.",
                 id.toString()
             )
@@ -84,7 +84,7 @@ class FunctionBuilder(
             .filterToStrictSortingBy { it.t }
         if (lateralProfileEntriesAdjusted.size < roadLateralProfileShape.size)
             this.reportLogger.info(
-                "Removing lateral profile entries which are not placed in strict order " +
+                "Ignoring lateral profile entries which are not placed in strict order " +
                     "according to t.",
                 id.toString()
             )
@@ -105,7 +105,7 @@ class FunctionBuilder(
         val laneOffsetEntriesAdjusted = lanes.laneOffset.filterToStrictSortingBy { it.s }
         if (laneOffsetEntriesAdjusted.size < lanes.laneOffset.size)
             this.reportLogger.info(
-                "Removing lane offset entries which are not placed in strict order " +
+                "Ignoring lane offset entries which are not placed in strict order " +
                     "according to s.",
                 id.toString()
             )
@@ -128,7 +128,7 @@ class FunctionBuilder(
     fun buildLaneWidth(id: LaneIdentifier, laneWidthEntries: List<RoadLanesLaneSectionLRLaneWidth>):
         UnivariateFunction {
 
-        val widthEntriesProcessable = laneWidthEntries.map { it.getAsResult() }.handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing width entry.") }
+        val widthEntriesProcessable = laneWidthEntries.map { it.getAsResult() }.handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring width entry.") }
 
         if (widthEntriesProcessable.isEmpty()) {
             this.reportLogger.info(
@@ -150,7 +150,7 @@ class FunctionBuilder(
             .filterToStrictSortingBy { it.sOffset }
         if (widthEntriesAdjusted.size < widthEntriesProcessable.size)
             this.reportLogger.info(
-                "Removing width entries which are not in strict order according to sOffset.",
+                "Ignoring width entries which are not in strict order according to sOffset.",
                 id.toString()
             )
 

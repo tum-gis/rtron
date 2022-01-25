@@ -44,18 +44,18 @@ object LinearRing3DFactory {
         // remove consecutively following point duplicates
         val verticesWithoutPointDuplicates = verticesWithoutClosing.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
         if (verticesWithoutPointDuplicates.size < verticesWithoutClosing.size)
-            infos += "Removing at least one consecutively following point duplicate."
+            infos += "Ignoring at least one consecutively following point duplicate."
 
         // remove consecutively following side duplicates
         val verticesWithoutSideDuplicates = verticesWithoutPointDuplicates.removeConsecutiveSideDuplicates()
         if (verticesWithoutSideDuplicates.size != verticesWithoutPointDuplicates.size)
-            infos += "Removing at least one consecutively following side duplicate of the form (…, A, B, A,…)."
+            infos += "Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…)."
 
         // remove vertices that are located on a line anyway
         val preparedVertices = verticesWithoutSideDuplicates
             .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
         if (preparedVertices.size < verticesWithoutSideDuplicates.size)
-            infos += "Removing at least one vertex due to linear redundancy."
+            infos += "Ignoring at least one vertex due to linear redundancy."
 
         // if there are not enough points to construct a linear ring
         if (preparedVertices.size <= 2)

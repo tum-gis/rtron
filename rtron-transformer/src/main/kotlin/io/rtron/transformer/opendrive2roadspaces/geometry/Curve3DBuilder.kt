@@ -72,7 +72,7 @@ class Curve3DBuilder(
             .filterToStrictSortingBy { it.s }
         if (elevationEntriesAdjusted.size < elevationProfiles.size)
             this.reportLogger.info(
-                "Removing elevation entries which are not placed in strict order " +
+                "Ignoring elevation entries which are not placed in strict order " +
                     "according to s.",
                 id.toString()
             )

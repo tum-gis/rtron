@@ -75,7 +75,7 @@ class Opendrive2RoadspacesTransformer(
             else transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar)
 
         val roadspaces = roadspacesResults.handleAndRemoveFailureIndexed { index, failure ->
-            _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}", "Removing road.")
+            _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}", "Ignoring road.")
         }
 
         val junctions = opendriveModel.junction

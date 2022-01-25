@@ -124,13 +124,13 @@ class Solid3DBuilder(
         val validCornerRoadElements = outline.cornerRoad.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
         if (validCornerRoadElements.size < outline.cornerRoad.size)
             reportLogger.info(
-                "Removing at least one outline element due to a negative height value.",
+                "Ignoring at least one outline element due to a negative height value.",
                 id.toString()
             )
 
         val verticalOutlineElements = validCornerRoadElements
             .map { buildVerticalOutlineElement(it, referenceLine) }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring outline element.") }
 
         return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, configuration.tolerance)
     }
@@ -192,15 +192,15 @@ class Solid3DBuilder(
         val validCornerLocalElements = outline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
         if (validCornerLocalElements.size < outline.cornerLocal.size)
             reportLogger.info(
-                "Removing at least one outline element due to a negative height value.",
+                "Ignoring at least one outline element due to a negative height value.",
                 id.toString()
             )
 
         val verticalOutlineElements = validCornerLocalElements
             .map { it.getPoints() }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline element.") }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring outline element.") }
             .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, none(), configuration.tolerance) }
-            .handleMessage { reportLogger.log(it, id.toString(), "Removing outline element.") }
+            .handleMessage { reportLogger.log(it, id.toString(), "Ignoring outline element.") }
 
         return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, configuration.tolerance)
     }

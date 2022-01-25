@@ -51,7 +51,7 @@ data class RoadLanesLaneSection(
             return Result.error(IllegalStateException("Lane section should contain exactly one center lane."))
 
         if (left.isEmpty() && right.isEmpty())
-            return Result.error(IllegalStateException("Lane section must contain lanes on the left and right."))
+            return Result.error(IllegalStateException("Lane section should contain lanes at least on the left or on the right side."))
 
         val infos = mutableListOf<String>()
 

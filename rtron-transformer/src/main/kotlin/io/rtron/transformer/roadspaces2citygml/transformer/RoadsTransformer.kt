@@ -139,13 +139,13 @@ class RoadsTransformer(
 
     private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace) {
         val lane = road.getLane(id)
-            .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }
+            .handleFailure { _reportLogger.log(it, id.toString(), "Ignoring lane."); return }
         val surface = road.getLaneSurface(id, configuration.discretizationStepSize)
-            .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }
+            .handleFailure { _reportLogger.log(it, id.toString(), "Ignoring lane."); return }
         val centerLine = road.getCurveOnLane(id, 0.5)
-            .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }
+            .handleFailure { _reportLogger.log(it, id.toString(), "Ignoring lane."); return }
         val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, configuration.discretizationStepSize)
-            .handleFailure { _reportLogger.log(it, id.toString(), "Removing lane."); return }.toList()
+            .handleFailure { _reportLogger.log(it, id.toString(), "Ignoring lane."); return }.toList()
         val fillerSurfaces = innerLateralFillerSurface + longitudinalFillerSurfaces
 
         when (LaneRouter.route(lane)) {
@@ -170,7 +170,7 @@ class RoadsTransformer(
 
     private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace) {
         road.getRoadMarkings(id, configuration.discretizationStepSize)
-            .handleAndRemoveFailure { _reportLogger.log(it, id.toString(), "Removing road markings.") }
+            .handleAndRemoveFailure { _reportLogger.log(it, id.toString(), "Ignoring road markings.") }
             .forEach { _transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace) }
     }
 }

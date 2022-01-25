@@ -159,7 +159,7 @@ class Surface3DBuilder(
 
         val vertices = outline.cornerLocal
             .map { it.getBasePoint() }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Removing outline point.") }
+            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring outline point.") }
 
         return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
     }
@@ -177,7 +177,7 @@ class Surface3DBuilder(
         // curve over which the object is moved
         val objectReferenceCurve2D =
             _curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine)
-                .handleFailure { reportLogger.log(it, id.toString(), "Removing object."); return emptyList() }
+                .handleFailure { reportLogger.log(it, id.toString(), "Ignoring object."); return emptyList() }
         val objectReferenceHeight =
             _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
 
@@ -207,7 +207,7 @@ class Surface3DBuilder(
         // curve over which the object is moved
         val objectReferenceCurve2D =
             _curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine)
-                .handleFailure { reportLogger.log(it, id.toString(), "Removing object."); return emptyList() }
+                .handleFailure { reportLogger.log(it, id.toString(), "Ignoring object."); return emptyList() }
         val objectReferenceHeight =
             _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
 
