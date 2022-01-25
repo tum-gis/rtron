@@ -41,7 +41,9 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = Plugins.ktlint)
     apply(plugin = "maven-publish")
-    apply(plugin = "signing")
+    if (!project.hasProperty(BuildPropertyNames.skipSigning)) {
+        apply(plugin = "signing")
+    }
 
     repositories {
         mavenCentral()
@@ -122,8 +124,10 @@ allprojects {
         }
     }
 
-    signing {
-        sign(publishing.publications["mavenJava"])
+    if (!project.hasProperty(BuildPropertyNames.skipSigning)) {
+        signing {
+            sign(publishing.publications["mavenJava"])
+        }
     }
 }
 

@@ -7,7 +7,7 @@ kotlinProject()
 
 repositories {
     maven(url = MavenSources.bintrayOrchid)
-    maven(url = MavenSources.jitpackOrchid)
+    maven(url = MavenSources.jitpack)
 }
 
 dependencies {

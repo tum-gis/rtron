@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-
-object MavenSources {
-    const val bintrayOrchid = "https://kotlin.bintray.com/kotlinx/"
-    const val jitpack = "https://jitpack.io"
+object BuildPropertyNames {
+    const val skipSigning = "skip.signing"
 }
