@@ -62,7 +62,7 @@ object DependencyVersions {
 
 object Dependencies {
     // standard libraries
-    const val kotlinStandardLibrary = "stdlib-jdk8"
+    const val kotlinStandardLibrary = "stdlib-jdk8:${DependencyVersions.kotlin}"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${DependencyVersions.coroutines}"
     const val arrowCore = "io.arrow-kt:arrow-core:${DependencyVersions.arrow}"
     const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
