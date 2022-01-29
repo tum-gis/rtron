@@ -44,6 +44,8 @@ object DependencyVersions {
     const val mapstruct = "1.4.2.Final"
 
     // io
+    const val clikt = "3.4.0"
+    const val mordant = "1.2.1"
     const val commonsIO = "2.11.0"
     const val commonsCSV = "1.9.0"
     const val commonsLang = "3.12.0"
@@ -88,6 +90,8 @@ object Dependencies {
     const val mapstructProcessor = "org.mapstruct:mapstruct-processor:${DependencyVersions.mapstruct}"
 
     // io
+    const val clikt = "com.github.ajalt.clikt:clikt:${DependencyVersions.clikt}"
+    const val mordant = "com.github.ajalt:mordant:${DependencyVersions.mordant}"
     const val commonsIO = "commons-io:commons-io:${DependencyVersions.commonsIO}"
     const val commonsCSV = "org.apache.commons:commons-csv:${DependencyVersions.commonsCSV}"
     const val commonsLang = "org.apache.commons:commons-lang3:${DependencyVersions.commonsLang}"

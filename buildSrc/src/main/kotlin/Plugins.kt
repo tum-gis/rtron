@@ -16,6 +16,7 @@
 
 
 object PluginVersions {
+    const val shadowjar = "6.1.0"
     const val ktlint = "10.2.1"
     const val xjc = "1.6"
     const val versionChecker = "0.41.0"
@@ -23,6 +24,7 @@ object PluginVersions {
 }
 
 object Plugins {
+    const val shadowjar = "com.github.johnrengelman.shadow"
     const val ktlint = "org.jlleitschuh.gradle.ktlint"
     const val xjc = "com.github.edeandrea.xjc-generation"
     const val versionChecker = "com.github.ben-manes.versions"
