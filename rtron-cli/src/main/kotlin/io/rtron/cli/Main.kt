@@ -22,15 +22,10 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.versionOption
 import io.rtron.cli.opendrive2citygml2.SubcommandOpendriveToCitygml2
+import io.rtron.cli.opendrive2citygml2.SubcommandOpendriveToCitygml3
 
 class MainCommand : CliktCommand(name = "rtron") {
     override fun run() = Unit
-}
-
-class Drop : CliktCommand(help = "Drop the database") {
-    override fun run() {
-        echo("Dropped the database.")
-    }
 }
 
 /**
@@ -40,5 +35,5 @@ class Drop : CliktCommand(help = "Drop the database") {
  */
 fun main(args: Array<String>) = MainCommand()
     .versionOption("1.2.2")
-    .subcommands(SubcommandOpendriveToCitygml2(), Drop())
+    .subcommands(SubcommandOpendriveToCitygml2(), SubcommandOpendriveToCitygml3())
     .main(args)
