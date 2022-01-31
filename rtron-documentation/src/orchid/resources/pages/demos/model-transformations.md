@@ -18,5 +18,6 @@ Moreover, FME provides a [variety of transformers](https://www.safe.com/transfor
 
 ## References
 
+- [Webinar](https://www.safe.com/webinars/how-to-easily-read-and-write-citygml-data-without-coding/) on how to easily read and write CityGML data (without coding) with FME
 - [Webinar](https://www.safe.com/webinars/your-data-in-unreal-how-to-bring-your-data-into-real-time-environments/) on how to bring various models into the Unreal Game engine with FME
 - [Article](https://community.safe.com/s/article/creating-and-using-geometry-instances) on how to swap primitive geometries with HD model assets
