@@ -59,7 +59,7 @@ object DependencyVersions {
 
     // geo
     const val proj4 = "1.1.4"
-    const val citygml4j = "3.0.0-rc.2"
+    const val citygml4j = "eacbbc4954"
 }
 
 object Dependencies {
@@ -105,5 +105,5 @@ object Dependencies {
 
     // geo
     const val proj4 = "org.locationtech.proj4j:proj4j:${DependencyVersions.proj4}"
-    const val citygml4j = "org.citygml4j:citygml4j:${DependencyVersions.citygml4j}"
+    const val citygml4j = "com.github.citygml4j:citygml4j:${DependencyVersions.citygml4j}"
 }

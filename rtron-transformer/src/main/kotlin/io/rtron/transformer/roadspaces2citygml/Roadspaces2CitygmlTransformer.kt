@@ -36,7 +36,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.citygml4j.model.core.AbstractCityObject
 import org.citygml4j.model.transportation.Road
-import org.citygml4j.model.transportation.TrafficSpaceProperty
+import org.citygml4j.model.transportation.TrafficSpaceReference
 import org.xmlobjects.gml.model.feature.BoundingShape
 import org.xmlobjects.gml.model.geometry.Envelope
 
@@ -151,8 +151,8 @@ class Roadspaces2CitygmlTransformer(
             val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).handleFailure { throw it.error }
             val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).handleFailure { throw it.error }
 
-            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceProperty(configuration.gmlIdPrefix + it.hashedId) }
-            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceProperty(configuration.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
         }
     }
 

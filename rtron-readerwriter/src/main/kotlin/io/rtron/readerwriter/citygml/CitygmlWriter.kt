@@ -56,7 +56,7 @@ class CitygmlWriter(
 
         val writer = out.createCityGMLChunkWriter(filePath.toFileJ(), StandardCharsets.UTF_8.name())
         writer.apply {
-            withIndentString("  ")
+            withIndent("  ")
             withDefaultSchemaLocations()
             withDefaultPrefixes()
             withDefaultNamespace(CoreModule.of(citygmlVersion).namespaceURI)

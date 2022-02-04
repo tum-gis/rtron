@@ -48,6 +48,8 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
+        maven(url = MavenSources.sonatypeSnapshot)
+        maven(url = MavenSources.jitpack)
     }
 
     dependencies {
