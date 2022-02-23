@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.std.DEFAULT_TOLERANCE
@@ -111,9 +111,9 @@ data class Cuboid3D(
     )
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> {
         val polygons = listOf(basePolygon, elevatedPolygon, frontPolygon, leftPolygon, backPolygon, rightPolygon)
-        return Result.success(polygons)
+        return Either.Right(polygons)
     }
 
     // Conversions

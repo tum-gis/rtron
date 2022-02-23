@@ -16,11 +16,12 @@
 
 package io.rtron.transformer.roadspaces2citygml.module
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
@@ -41,39 +42,39 @@ class VegetationModuleBuilder(
 
     // Methods
 
-    fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): Result<SolitaryVegetationObject, Exception> {
+    fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): Either<Exception, SolitaryVegetationObject> {
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
-        solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO).handleFailure { return it }
+        solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO).toResult().handleFailure { return Either.Left(it.error) }
         if (geometryTransformer.isSetRotation())
-            geometryTransformer.getRotation().handleFailure { return it }.also { _attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature) }
-        addAttributes(solitaryVegetationObjectFeature, geometryTransformer).handleFailure { return it }
+            geometryTransformer.getRotation().toResult().handleFailure { return Either.Left(it.error) }.also { _attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature) }
+        addAttributes(solitaryVegetationObjectFeature, geometryTransformer).toResult().handleFailure { return Either.Left(it.error) }
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, solitaryVegetationObjectFeature)
         _attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
 
-        return Result.success(solitaryVegetationObjectFeature)
+        return Either.Right(solitaryVegetationObjectFeature)
     }
 
     private fun addAttributes(
         solitaryVegetationObjectFeature: SolitaryVegetationObject,
         geometryTransformer: GeometryTransformer
-    ): Result<Unit, Exception> {
+    ): Either<Exception, Unit> {
 
         if (geometryTransformer.isSetDiameter())
-            geometryTransformer.getDiameter().handleFailure { return it }.also {
+            geometryTransformer.getDiameter().toResult().handleFailure { return Either.Left(it.error) }.also {
                 solitaryVegetationObjectFeature.trunkDiameter = Length(it)
                 solitaryVegetationObjectFeature.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
             }
 
         if (geometryTransformer.isSetHeight())
-            geometryTransformer.getHeight().handleFailure { return it }.also {
+            geometryTransformer.getHeight().toResult().handleFailure { return Either.Left(it.error) }.also {
                 solitaryVegetationObjectFeature.height = Length(it)
                 solitaryVegetationObjectFeature.height.uom = UnitOfMeasure.METER.toGmlString()
             }
 
-        return Result.success(Unit)
+        return Either.Right(Unit)
     }
 }

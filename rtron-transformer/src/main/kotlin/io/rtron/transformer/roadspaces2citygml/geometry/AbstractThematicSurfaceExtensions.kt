@@ -16,17 +16,18 @@
 
 package io.rtron.transformer.roadspaces2citygml.geometry
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.success
+import arrow.core.Either
 import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import org.citygml4j.model.core.AbstractThematicSurface
 
-fun AbstractThematicSurface.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
-    val lod2MultiSurfaceError = populateLod2MultiSurface(geometryTransformer).handleSuccess { return it }
-    val lod0GeometryError = populateLod0Geometry(geometryTransformer).handleSuccess { return it }
+fun AbstractThematicSurface.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
+    val lod2MultiSurfaceError = populateLod2MultiSurface(geometryTransformer).toResult().handleSuccess { return it.toEither() }
+    val lod0GeometryError = populateLod0Geometry(geometryTransformer).toResult().handleSuccess { return it.toEither() }
 
-    return Result.error(Exception("No suitable source geometry found for populating the LoD2 multi surface (${lod2MultiSurfaceError.message}) or LoD0 geometry (${lod0GeometryError.message}) of the abstract thematic surface."))
+    return Either.Left(Exception("No suitable source geometry found for populating the LoD2 multi surface (${lod2MultiSurfaceError.message}) or LoD0 geometry (${lod0GeometryError.message}) of the abstract thematic surface."))
 }
 
 /**
@@ -34,9 +35,9 @@ fun AbstractThematicSurface.populateLod2MultiSurfaceOrLod0Geometry(geometryTrans
  *
  * @param geometryTransformer source geometries
  * @param lod target level of detail
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractThematicSurface.populateGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Result<Unit, Exception> =
+fun AbstractThematicSurface.populateGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<Exception, Unit> =
     when (lod) {
         LevelOfDetail.ZERO -> populateLod0Geometry(geometryTransformer)
         LevelOfDetail.ONE -> populateLod1MultiSurface(geometryTransformer)
@@ -48,52 +49,52 @@ fun AbstractThematicSurface.populateGeometry(geometryTransformer: GeometryTransf
  * Populates the LoD0 geometry of an [AbstractThematicSurface] object with the source geometries of the [GeometryTransformer].
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractThematicSurface.populateLod0Geometry(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractThematicSurface.populateLod0Geometry(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetMultiSurface())
-        geometryTransformer.getMultiSurface().handleFailure { return it }.also { lod0MultiSurface = it; return Result.success(Unit) }
+        geometryTransformer.getMultiSurface().toResult().handleFailure { return Either.Left(it.error) }.also { lod0MultiSurface = it; return Either.Right(Unit) }
     if (geometryTransformer.isSetMultiCurve())
-        geometryTransformer.getMultiCurve().handleFailure { return it }.also { lod0MultiCurve = it; return Result.success(Unit) }
+        geometryTransformer.getMultiCurve().toResult().handleFailure { return Either.Left(it.error) }.also { lod0MultiCurve = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD0 geometry of the abstract thematic surface."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD0 geometry of the abstract thematic surface."))
 }
 
 /**
  * Populates the LoD1 geometry of an [AbstractThematicSurface] object with the source geometries of the [GeometryTransformer].
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractThematicSurface.populateLod1MultiSurface(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractThematicSurface.populateLod1MultiSurface(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetMultiSurface())
-        geometryTransformer.getMultiSurface().handleFailure { return it }.also { lod1MultiSurface = it; return Result.success(Unit) }
+        geometryTransformer.getMultiSurface().toResult().handleFailure { return Either.Left(it.error) }.also { lod1MultiSurface = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD1 multi surface of the abstract thematic surface."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD1 multi surface of the abstract thematic surface."))
 }
 
 /**
  * Populates the LoD2 geometry of an [AbstractThematicSurface] object with the source geometries of the [GeometryTransformer].
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractThematicSurface.populateLod2MultiSurface(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractThematicSurface.populateLod2MultiSurface(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetMultiSurface())
-        geometryTransformer.getMultiSurface().handleFailure { return it }.also { lod2MultiSurface = it; return Result.success(Unit) }
+        geometryTransformer.getMultiSurface().toResult().handleFailure { return Either.Left(it.error) }.also { lod2MultiSurface = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD2 multi surface of the abstract thematic surface."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD2 multi surface of the abstract thematic surface."))
 }
 
 /**
  * Populates the LoD3 geometry of an [AbstractThematicSurface] object with the source geometries of the [GeometryTransformer].
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractThematicSurface.populateLod3MultiSurface(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractThematicSurface.populateLod3MultiSurface(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetMultiSurface())
-        geometryTransformer.getMultiSurface().handleFailure { return it }.also { lod3MultiSurface = it; return Result.success(Unit) }
+        geometryTransformer.getMultiSurface().toResult().handleFailure { return Either.Left(it.error) }.also { lod3MultiSurface = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD3 multi surface of the abstract thematic surface."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD3 multi surface of the abstract thematic surface."))
 }

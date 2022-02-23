@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
@@ -37,6 +37,8 @@ import io.rtron.std.ContextMessage
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
@@ -102,8 +104,8 @@ class Surface3DBuilder(
     ): List<LinearRing3D> {
 
         return roadObject.getLinearRingsDefinedByRoadCorners()
-            .map { buildLinearRingByRoadCorners(it, referenceLine) }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .map { buildLinearRingByRoadCorners(it, referenceLine).toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString()) }
             .handleMessage { reportLogger.log(it, id.toString()) }
     }
 
@@ -111,11 +113,11 @@ class Surface3DBuilder(
      * Builds a single linear ring from an OpenDRIVE road object defined by road corner outlines.
      */
     private fun buildLinearRingByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D):
-        Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
+        Either<IllegalArgumentException, ContextMessage<LinearRing3D>> {
 
         val vertices = outline.cornerRoad
-            .map { buildVertices(it, referenceLine) }
-            .handleAndRemoveFailure { reportLogger.log(it) }
+            .map { buildVertices(it, referenceLine).toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither()) }
 
         return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
     }
@@ -124,13 +126,15 @@ class Surface3DBuilder(
      * Builds a vertex from the OpenDRIVE road corner element.
      */
     private fun buildVertices(cornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad, referenceLine: Curve3D):
-        Result<Vector3D, Exception> {
+        Either<Exception, Vector3D> {
         val affine = referenceLine.calculateAffine(cornerRoad.curveRelativePosition)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         val basePoint = cornerRoad.getBasePoint()
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
             .let { affine.transform(it.getCartesianCurveOffset()) }
-        return Result.success(basePoint)
+        return Either.Right(basePoint)
     }
 
     /**
@@ -145,8 +149,8 @@ class Surface3DBuilder(
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
         return roadObject.getLinearRingsDefinedByLocalCorners()
-            .map { buildLinearRingByLocalCorners(id, it) }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .map { buildLinearRingByLocalCorners(id, it).toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString()) }
             .handleMessage { reportLogger.log(it, id.toString()) }
             .map { it.copy(affineSequence = affineSequence) }
     }
@@ -155,11 +159,11 @@ class Surface3DBuilder(
      * Builds a single linear ring from an OpenDRIVE road object defined by local corner outlines.
      */
     private fun buildLinearRingByLocalCorners(id: RoadspaceObjectIdentifier, outline: RoadObjectsObjectOutlinesOutline):
-        Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
+        Either<IllegalArgumentException, ContextMessage<LinearRing3D>> {
 
         val vertices = outline.cornerLocal
-            .map { it.getBasePoint() }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring outline point.") }
+            .map { it.getBasePoint().toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString(), "Ignoring outline point.") }
 
         return LinearRing3DFactory.buildFromVertices(vertices, configuration.tolerance)
     }
@@ -177,7 +181,8 @@ class Surface3DBuilder(
         // curve over which the object is moved
         val objectReferenceCurve2D =
             _curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine)
-                .handleFailure { reportLogger.log(it, id.toString(), "Ignoring object."); return emptyList() }
+                .toResult()
+                .handleFailure { reportLogger.log(it.toEither(), id.toString(), "Ignoring object."); return emptyList() }
         val objectReferenceHeight =
             _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
 
@@ -207,7 +212,8 @@ class Surface3DBuilder(
         // curve over which the object is moved
         val objectReferenceCurve2D =
             _curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine)
-                .handleFailure { reportLogger.log(it, id.toString(), "Ignoring object."); return emptyList() }
+                .toResult()
+                .handleFailure { reportLogger.log(it.toEither(), id.toString(), "Ignoring object."); return emptyList() }
         val objectReferenceHeight =
             _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
 

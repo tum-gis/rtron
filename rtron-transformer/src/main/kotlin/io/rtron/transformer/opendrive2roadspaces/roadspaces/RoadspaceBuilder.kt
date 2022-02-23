@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.map
 import io.rtron.io.logging.LogManager
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
@@ -29,6 +29,7 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.opendrive2roadspaces.geometry.Curve3DBuilder
@@ -58,20 +59,21 @@ class RoadspaceBuilder(
      * @param road source OpenDRIVE model
      * @return transformed [Roadspace]
      */
-    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Result<Roadspace, Exception> {
+    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Exception, Roadspace> {
 
         // check whether source model is processable
         val roadspaceId = RoadspaceIdentifier(road.id, modelId)
         road.isProcessable(configuration.tolerance)
             .map { _reportLogger.log(it, roadspaceId.toString()) }
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
 
         // build up road reference line
         val roadReferenceLine = _curve3DBuilder.buildCurve3D(
             roadspaceId,
             road.planView.geometry,
             road.elevationProfile.elevation
-        ).handleFailure { return it }
+        ).toResult().handleFailure { return Either.Left(it.error) }
         val torsionFunction = _functionBuilder.buildCurveTorsion(
             roadspaceId,
             road.lateralProfile.superelevation
@@ -91,7 +93,8 @@ class RoadspaceBuilder(
         // build up the road containing only lane sections, lanes (no road side objects)
         val roadspaceRoad = _roadBuilder
             .buildRoad(roadspaceId, road, roadSurface, roadSurfaceWithoutTorsion, attributes)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
 
         // build up the road space objects (OpenDRIVE: road objects & signals)
         val roadspaceObjects =
@@ -107,7 +110,7 @@ class RoadspaceBuilder(
             roadspaceObjects = roadspaceObjects,
             attributes = attributes
         )
-        return Result.success(roadspace)
+        return Either.Right(roadspace)
     }
 
     private fun buildLateralRoadShape(id: RoadspaceIdentifier, lateralProfileShapeList: List<RoadLateralProfileShape>):

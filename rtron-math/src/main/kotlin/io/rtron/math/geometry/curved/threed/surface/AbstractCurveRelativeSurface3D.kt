@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.curved.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.DefinableDomain
@@ -24,6 +24,7 @@ import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyContainsResult
 import io.rtron.math.range.length
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Abstract class for all geometric surface objects in an curve relative coordinate system in 3D.
@@ -47,9 +48,9 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @return point in cartesian coordinates
      */
     fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double = 0.0):
-        Result<Vector3D, Exception> {
+        Either<Exception, Vector3D> {
 
-        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
+        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).toResult().handleFailure { return Either.Left(it.error) }
         return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset)
     }
 
@@ -62,5 +63,5 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @return point in cartesian coordinates
      */
     abstract fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-        Result<Vector3D, Exception>
+        Either<Exception, Vector3D>
 }

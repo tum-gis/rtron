@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.AbstractGeometry2D
@@ -29,6 +29,7 @@ import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyContainsResult
 import io.rtron.math.range.length
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Abstract class for all geometric curve objects in 2D.
@@ -53,9 +54,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Result<Vector2D, Exception> {
+    fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector2D> {
 
-        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
+        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).toResult().handleFailure { return Either.Left(it.error) }
         return calculatePointLocalCSUnbounded(curveRelativePoint)
     }
 
@@ -67,7 +68,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return point in cartesian coordinates
      */
     protected abstract fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception>
+        Either<Exception, Vector2D>
 
     /**
      * Returns the orientation in the local cartesian coordinate system that is tangential to this curve at a given
@@ -77,9 +78,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates for which the orientation is to be calculated
      * @return orientation tangential to this curve
      */
-    fun calculateRotationLocalCS(curveRelativePoint: CurveRelativeVector1D): Result<Rotation2D, Exception> {
+    fun calculateRotationLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Rotation2D> {
 
-        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
+        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).toResult().handleFailure { return Either.Left(it.error) }
         return calculateRotationLocalCSUnbounded(curveRelativePoint)
     }
 
@@ -91,7 +92,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return orientation tangential to this curve
      */
     protected abstract fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception>
+        Either<Exception, Rotation2D>
 
     /**
      * Returns the global point in the global cartesian coordinate system that is located on this curve and given by a
@@ -101,7 +102,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Result<Vector2D, Exception> =
+    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector2D> =
         calculatePointLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
 
     /**
@@ -111,7 +112,7 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates for which the orientation is to be calculated
      * @return orientation tangential to this curve
      */
-    fun calculateRotationGlobalCS(curveRelativePoint: CurveRelativeVector1D): Result<Rotation2D, Exception> =
+    fun calculateRotationGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Rotation2D> =
         calculateRotationLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
 
     /**
@@ -120,9 +121,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint pose is calculated on the [curveRelativePoint]
      * @return pose whereby the orientation is tangential to this curve
      */
-    fun calculatePoseGlobalCS(curveRelativePoint: CurveRelativeVector1D): Result<Pose2D, Exception> {
-        val point = calculatePointGlobalCS(curveRelativePoint).handleFailure { return it }
-        val rotation = calculateRotationGlobalCS(curveRelativePoint).handleFailure { return it }
-        return Result.success(Pose2D(point, rotation))
+    fun calculatePoseGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Pose2D> {
+        val point = calculatePointGlobalCS(curveRelativePoint).toResult().handleFailure { return Either.Left(it.error) }
+        val rotation = calculateRotationGlobalCS(curveRelativePoint).toResult().handleFailure { return Either.Left(it.error) }
+        return Either.Right(Pose2D(point, rotation))
     }
 }

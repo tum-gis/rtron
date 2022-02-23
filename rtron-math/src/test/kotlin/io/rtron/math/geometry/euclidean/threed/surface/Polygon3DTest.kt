@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
@@ -93,8 +93,8 @@ internal class Polygon3DTest {
 
             val actualReturn = triangle.getNormal()
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value).isEqualTo(Vector3D.Z_AXIS)
         }
 
@@ -113,8 +113,8 @@ internal class Polygon3DTest {
 
             val actualReturn = planarQuadrilateral.getNormal()
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value).isEqualTo(expectedResult)
         }
     }

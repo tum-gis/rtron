@@ -16,7 +16,7 @@
 
 package io.rtron.math.range
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.math.std.fuzzyLessThanOrEquals
 import kotlin.math.absoluteValue
@@ -66,16 +66,16 @@ fun Range<Double>.fuzzyContains(value: Double, tolerance: Double): Boolean = whe
 }
 
 /**
- * Returns [Result.Success], if the [value] is fuzzily contained within this [Range] by the [tolerance].
+ * Returns [Either.Right], if the [value] is fuzzily contained within this [Range] by the [tolerance].
  *
  * @param value value to be checked
  * @param tolerance allowed tolerance fuzziness
- * @return [Result.Success], if [value] is fuzzily contained; [Result.Failure], otherwise
+ * @return [Either.Right], if [value] is fuzzily contained; [Either.Left], otherwise
  */
-fun Range<Double>.fuzzyContainsResult(value: Double, tolerance: Double): Result<Boolean, IllegalArgumentException> =
+fun Range<Double>.fuzzyContainsResult(value: Double, tolerance: Double): Either<IllegalArgumentException, Boolean> =
     when (this.fuzzyContains(value, tolerance)) {
-        true -> Result.success(true)
-        false -> Result.error(IllegalArgumentException("Value ($value) is not fuzzily contained in range $this."))
+        true -> Either.Right(true)
+        false -> Either.Left(IllegalArgumentException("Value ($value) is not fuzzily contained in range $this."))
     }
 
 /**

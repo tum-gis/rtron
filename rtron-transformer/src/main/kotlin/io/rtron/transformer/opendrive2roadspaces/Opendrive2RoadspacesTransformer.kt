@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.LogManager
 import io.rtron.io.logging.ProgressBar
 import io.rtron.model.opendrive.OpendriveModel
@@ -24,6 +24,8 @@ import io.rtron.model.roadspaces.ModelIdentifier
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.std.handleAndRemoveFailureIndexed
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.opendrive2roadspaces.junction.JunctionBuilder
@@ -74,8 +76,8 @@ class Opendrive2RoadspacesTransformer(
             if (configuration.concurrentProcessing) transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar)
             else transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar)
 
-        val roadspaces = roadspacesResults.handleAndRemoveFailureIndexed { index, failure ->
-            _reportLogger.log(failure, "RoadId=${opendriveModel.road[index].id}", "Ignoring road.")
+        val roadspaces = roadspacesResults.map { it.toResult() }.handleAndRemoveFailureIndexed { index, failure ->
+            _reportLogger.log(failure.toEither(), "RoadId=${opendriveModel.road[index].id}", "Ignoring road.")
         }
 
         val junctions = opendriveModel.junction
@@ -89,7 +91,7 @@ class Opendrive2RoadspacesTransformer(
         modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<Result<Roadspace, Exception>> =
+    ): List<Either<Exception, Roadspace>> =
         opendriveModel.road.map {
             _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
         }
@@ -98,7 +100,7 @@ class Opendrive2RoadspacesTransformer(
         modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<Result<Roadspace, Exception>> {
+    ): List<Either<Exception, Roadspace>> {
         val roadspacesDeferred = opendriveModel.road.map {
             GlobalScope.async {
                 _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }

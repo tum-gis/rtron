@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.curved.threed.point
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.CurveRelativeAbstractGeometry3D
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
@@ -72,9 +72,9 @@ data class CurveRelativeVector3D(
          * values is not finite, an error is returned.
          */
         fun of(curvePosition: Double, lateralOffset: Double, heightOffset: Double):
-            Result<CurveRelativeVector3D, IllegalArgumentException> =
+            Either<IllegalArgumentException, CurveRelativeVector3D> =
             if (!curvePosition.isFinite() || !lateralOffset.isFinite() || !heightOffset.isFinite())
-                Result.error(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
-            else Result.success(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
+                Either.Left(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
+            else Either.Right(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
     }
 }

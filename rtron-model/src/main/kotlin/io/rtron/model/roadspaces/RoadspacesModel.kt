@@ -16,10 +16,10 @@
 
 package io.rtron.model.roadspaces
 
+import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.none
-import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.processing.isColinear
@@ -42,6 +42,7 @@ import io.rtron.std.getValueResult
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleEmpty
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import io.rtron.std.unwrapValues
 
 /**
@@ -125,10 +126,10 @@ class RoadspacesModel(
             .distinct()
 
     /** Returns a list of [Roadspace]s that belong to the junction with [junctionIdentifier]. */
-    fun getRoadspacesWithinJunction(junctionIdentifier: JunctionIdentifier): Result<List<Roadspace>, Exception> {
-        val junction = getJunction(junctionIdentifier).handleFailure { return it }
-        val connectingRoadspaces = junction.getConnectingRoadspaceIds().map { getRoadspace(it) }.handleFailure { return it }
-        return Result.success(connectingRoadspaces)
+    fun getRoadspacesWithinJunction(junctionIdentifier: JunctionIdentifier): Either<Exception, List<Roadspace>> {
+        val junction = getJunction(junctionIdentifier).handleFailure { return Either.Left(it.error) }
+        val connectingRoadspaces = junction.getConnectingRoadspaceIds().map { getRoadspace(it) }.handleFailure { return Either.Left(it.error) }
+        return Either.Right(connectingRoadspaces)
     }
 
     /**
@@ -136,7 +137,7 @@ class RoadspacesModel(
      *
      * @param laneId lane identifier for which the predecessor lanes shall be found
      */
-    fun getPredecessorLaneIdentifiers(laneId: LaneIdentifier): Result<List<LaneIdentifier>, IllegalArgumentException> {
+    fun getPredecessorLaneIdentifiers(laneId: LaneIdentifier): Either<IllegalArgumentException, List<LaneIdentifier>> {
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
 
@@ -146,7 +147,7 @@ class RoadspacesModel(
             road.isInFirstLaneSection(laneId) && road.linkage.predecessorJunctionId.isDefined() ->
                 getPredecessorLanesBetweenRoadsInJunction(laneId)
             !road.isInFirstLaneSection(laneId) -> getPredecessorLanesWithinRoad(laneId)
-            else -> return Result.success(emptyList())
+            else -> return Either.Right(emptyList())
         }
     }
 
@@ -155,7 +156,7 @@ class RoadspacesModel(
      *
      * @param laneId lane identifier for which the successor lanes shall be found
      */
-    fun getSuccessorLaneIdentifiers(laneId: LaneIdentifier): Result<List<LaneIdentifier>, IllegalArgumentException> {
+    fun getSuccessorLaneIdentifiers(laneId: LaneIdentifier): Either<IllegalArgumentException, List<LaneIdentifier>> {
 
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
@@ -166,15 +167,15 @@ class RoadspacesModel(
             road.isInLastLaneSection(laneId) && road.linkage.successorJunctionId.isDefined() ->
                 getSuccessorLanesBetweenRoadsInJunction(laneId)
             !road.isInLastLaneSection(laneId) -> getSuccessorLanesWithinRoad(laneId)
-            else -> return Result.success(emptyList())
+            else -> return Either.Right(emptyList())
         }
     }
 
-    fun getFillerSurfaces(laneId: LaneIdentifier): Result<List<FillerSurface>, Exception> {
-        val successorLaneIds = getSuccessorLaneIdentifiers(laneId).handleFailure { return it }
+    fun getFillerSurfaces(laneId: LaneIdentifier): Either<Exception, List<FillerSurface>> {
+        val successorLaneIds = getSuccessorLaneIdentifiers(laneId).toResult().handleFailure { return Either.Left(it.error) }
 
         val fillerSurfaces = successorLaneIds.map { getLongitudinalFillerSurface(laneId, it) }.unwrapValues()
-        return Result.success(fillerSurfaces)
+        return Either.Right(fillerSurfaces)
     }
 
     /**
@@ -218,8 +219,9 @@ class RoadspacesModel(
         Option<AbstractSurface3D> {
 
         val currentVertices = listOf(road.getLeftLaneBoundary(laneId), road.getRightLaneBoundary(laneId))
+            .map { it.toResult() }
             .handleFailure { throw it.error }
-            .map { it.calculateEndPointGlobalCS() }
+            .map { it.calculateEndPointGlobalCS().toResult() }
             .handleFailure { throw it.error }
 
         // false, if the successor lane is connected by it's end (leads to swapping of the vertices)
@@ -229,11 +231,12 @@ class RoadspacesModel(
 
         val successorLaneBoundaries =
             listOf(successorRoad.getRightLaneBoundary(successorLaneId), successorRoad.getLeftLaneBoundary(successorLaneId))
+                .map { it.toResult() }
                 .handleFailure { return none() }
 
         val successorVertices = when (successorContactStart) {
-            true -> successorLaneBoundaries.map { it.calculateStartPointGlobalCS() }
-            false -> successorLaneBoundaries.map { it.calculateEndPointGlobalCS() }.reversed()
+            true -> successorLaneBoundaries.map { it.calculateStartPointGlobalCS().toResult() }
+            false -> successorLaneBoundaries.map { it.calculateEndPointGlobalCS().toResult() }.reversed()
         }.handleAndRemoveFailure { throw it.error }
 
         val tolerance = minOf(road.surface.tolerance, successorRoad.surface.tolerance)
@@ -251,16 +254,17 @@ class RoadspacesModel(
      * @param laneId lane identifier, which must not be located within the last section of the road
      */
     private fun getPredecessorLanesWithinRoad(laneId: LaneIdentifier):
-        Result<List<LaneIdentifier>, IllegalArgumentException> {
+        Either<IllegalArgumentException, List<LaneIdentifier>> {
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
         check(!road.isInFirstLaneSection(laneId)) { "Current lane must not be located in the first lane section of the road." }
 
         return road.getLane(laneId)
+            .toResult()
             .handleFailure { throw it.error }
             .predecessors
             .map { LaneIdentifier(it, laneId.laneSectionIdentifier.getPreviousLaneSectionIdentifier()) }
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 
     /**
@@ -269,16 +273,17 @@ class RoadspacesModel(
      * @param laneId lane identifier, which must not be located within the last section of the road
      */
     private fun getSuccessorLanesWithinRoad(laneId: LaneIdentifier):
-        Result<List<LaneIdentifier>, IllegalArgumentException> {
+        Either<IllegalArgumentException, List<LaneIdentifier>> {
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
         check(!road.isInLastLaneSection(laneId)) { "Current lane must not be located in the last lane section of the road." }
 
         return road.getLane(laneId)
+            .toResult()
             .handleFailure { throw it.error }
             .successors
             .map { LaneIdentifier(it, laneId.laneSectionIdentifier.getNextLaneSectionIdentifier()) }
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 
     /**
@@ -288,7 +293,7 @@ class RoadspacesModel(
      * road
      */
     private fun getPredecessorLanesBetweenRoads(laneId: LaneIdentifier):
-        Result<List<LaneIdentifier>, IllegalArgumentException> {
+        Either<IllegalArgumentException, List<LaneIdentifier>> {
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
         val roadPredecessorRoadspaceContactPoint = road.linkage
@@ -296,14 +301,15 @@ class RoadspacesModel(
             .handleEmpty { throw IllegalArgumentException("Current road must have a predecessor road.") }
 
         val predecessorRoad = roadspaces.getValueResult(roadPredecessorRoadspaceContactPoint.roadspaceIdentifier)
-            .handleFailure { return Result.success(emptyList()) }.road
+            .handleFailure { return Either.Right(emptyList()) }.road
         val predecessorLaneSectionIdentifier = predecessorRoad.getLaneSectionIdentifier(roadPredecessorRoadspaceContactPoint)
 
         return road.getLane(laneId)
+            .toResult()
             .handleFailure { throw it.error }
             .successors
             .map { LaneIdentifier(it, predecessorLaneSectionIdentifier) }
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 
     /**
@@ -313,7 +319,7 @@ class RoadspacesModel(
      * another road
      */
     private fun getSuccessorLanesBetweenRoads(laneId: LaneIdentifier):
-        Result<List<LaneIdentifier>, IllegalArgumentException> {
+        Either<IllegalArgumentException, List<LaneIdentifier>> {
 
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
@@ -322,14 +328,15 @@ class RoadspacesModel(
             .handleEmpty { throw IllegalArgumentException("Current road must have a successor road.") }
 
         val successorRoad = roadspaces.getValueResult(roadSuccessorRoadspaceContactPoint.roadspaceIdentifier)
-            .handleFailure { return Result.success(emptyList()) }.road
+            .handleFailure { return Either.Right(emptyList()) }.road
         val successorLaneSectionIdentifier = successorRoad.getLaneSectionIdentifier(roadSuccessorRoadspaceContactPoint)
 
         return road.getLane(laneId)
+            .toResult()
             .handleFailure { throw it.error }
             .successors
             .map { LaneIdentifier(it, successorLaneSectionIdentifier) }
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 
     /**
@@ -339,7 +346,7 @@ class RoadspacesModel(
      * a junction
      */
     private fun getPredecessorLanesBetweenRoadsInJunction(laneId: LaneIdentifier):
-        Result<List<LaneIdentifier>, IllegalArgumentException> {
+        Either<IllegalArgumentException, List<LaneIdentifier>> {
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
         check(road.isInFirstLaneSection(laneId)) { "Current lane must be located in the last lane section of the road." }
@@ -347,11 +354,11 @@ class RoadspacesModel(
 
         val predecessorJunction = junctions
             .getValueResult(predecessorJunctionId)
-            .handleFailure { return Result.success(emptyList()) }
+            .handleFailure { return Either.Right(emptyList()) }
 
         return predecessorJunction
             .getSuccessorLane(laneId)
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 
     /**
@@ -361,7 +368,7 @@ class RoadspacesModel(
      * a junction
      */
     private fun getSuccessorLanesBetweenRoadsInJunction(laneId: LaneIdentifier):
-        Result<List<LaneIdentifier>, IllegalArgumentException> {
+        Either<IllegalArgumentException, List<LaneIdentifier>> {
         val road = roadspaces.getValueResult(laneId.toRoadspaceIdentifier())
             .handleFailure { throw it.error }.road
         check(road.isInLastLaneSection(laneId)) { "Current lane must be located in the last lane section of the road." }
@@ -369,10 +376,10 @@ class RoadspacesModel(
 
         val successorJunction = junctions
             .getValueResult(successorJunctionId)
-            .handleFailure { return Result.success(emptyList()) }
+            .handleFailure { return Either.Right(emptyList()) }
 
         return successorJunction
             .getSuccessorLane(laneId)
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 }

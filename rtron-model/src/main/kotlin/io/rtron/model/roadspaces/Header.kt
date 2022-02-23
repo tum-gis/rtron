@@ -16,14 +16,14 @@
 
 package io.rtron.model.roadspaces
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.projection.CoordinateReferenceSystem
 
 /**
  * Header of the [RoadspacesModel] containing the model's meta information.
  */
 data class Header(
-    val coordinateReferenceSystem: Result<CoordinateReferenceSystem, Exception>,
+    val coordinateReferenceSystem: Either<Exception, CoordinateReferenceSystem>,
 
     val north: Double = Double.NaN,
     val south: Double = Double.NaN,

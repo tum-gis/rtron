@@ -16,13 +16,15 @@
 
 package io.rtron.readerwriter.citygml
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.AbstractModel
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
 import io.rtron.std.handleAndRemoveFailure
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import org.citygml4j.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
 import java.nio.charset.StandardCharsets
@@ -38,16 +40,17 @@ class CitygmlWriter(
 
     // Methods
 
-    fun write(model: AbstractModel, directoryPath: Path): Result<List<Path>, Exception> {
+    fun write(model: AbstractModel, directoryPath: Path): Either<Exception, List<Path>> {
         require(model is CitygmlModel) { "$this received not a CitygmlModel." }
 
         val filePaths = configuration.versions.map { write(model, it, directoryPath) }
-            .handleAndRemoveFailure { _reportLogger.log(it) }
+            .map { it.toResult() }
+            .handleAndRemoveFailure { _reportLogger.log(it.toEither()) }
 
-        return Result.success(filePaths)
+        return Either.Right(filePaths)
     }
 
-    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean = true): Result<Path, Exception> {
+    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean = true): Either<Exception, Path> {
         val citygmlVersion = version.toGmlCitygml()
         val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
@@ -68,7 +71,7 @@ class CitygmlWriter(
 
         writer.close()
         _reportLogger.info("Completed writing of file $fileName (around ${filePath.getFileSizeToDisplay()}). ✔")
-        return Result.success(filePath)
+        return Either.Right(filePath)
     }
 
     companion object {

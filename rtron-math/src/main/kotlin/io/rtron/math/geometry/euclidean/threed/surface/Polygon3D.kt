@@ -16,8 +16,8 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
+import arrow.core.Either
 import com.github.kittinunf.result.NoException
-import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
 import io.rtron.math.processing.calculateNormal
@@ -56,13 +56,13 @@ data class Polygon3D(
     // Methods
 
     /** Returns the normal of the polygon. */
-    fun getNormal(): Result<Vector3D, IllegalStateException> =
-        this.vertices.calculateNormal().normalized().let { Result.success(it) }
+    fun getNormal(): Either<IllegalStateException, Vector3D> =
+        this.vertices.calculateNormal().normalized().let { Either.Right(it) }
 
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
     fun reversed() = Polygon3D(vertices.reversed(), tolerance, affineSequence)
 
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, NoException> = Result.success(listOf(this))
+    override fun calculatePolygonsLocalCS(): Either<NoException, List<Polygon3D>> = Either.Right(listOf(this))
 
     // Conversions
     /** Returns the coordinates of all vertices as a flattened list */

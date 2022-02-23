@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -66,10 +66,10 @@ class Curve2DBuilder(
         id: RoadspaceIdentifier,
         planViewGeometryList: List<RoadPlanViewGeometry>,
         offset: Vector2D = Vector2D.ZERO
-    ): Result<CompositeCurve2D, IllegalArgumentException> {
+    ): Either<IllegalArgumentException, CompositeCurve2D> {
 
         if (planViewGeometryList.isEmpty())
-            return Result.error(IllegalArgumentException("No plan view geometries available."))
+            return Either.Left(IllegalArgumentException("No plan view geometries available."))
 
         // prepare
         val planViewGeometryListAdjusted =
@@ -82,7 +82,7 @@ class Curve2DBuilder(
             )
 
         if (planViewGeometryListAdjusted.isEmpty())
-            return Result.error(IllegalArgumentException("No valid plan view geometries available."))
+            return Either.Left(IllegalArgumentException("No valid plan view geometries available."))
 
         // construct composite curve
         val absoluteStarts: List<Double> = planViewGeometryListAdjusted.map { it.s }
@@ -95,7 +95,7 @@ class Curve2DBuilder(
             .map { buildPlanViewGeometry(id, it.first, it.second, BoundType.OPEN, offset) } +
             buildPlanViewGeometry(id, planViewGeometryListAdjusted.last(), lengths.last(), BoundType.CLOSED, offset)
 
-        return Result.success(CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts))
+        return Either.Right(CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts))
     }
 
     /**
@@ -188,14 +188,14 @@ class Curve2DBuilder(
      * building of road objects.
      */
     fun buildLateralTranslatedCurve(repeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
-        Result<LateralTranslatedCurve2D, IllegalArgumentException> {
+        Either<IllegalArgumentException, LateralTranslatedCurve2D> {
         val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
 
         if (!roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, configuration.tolerance))
-            return Result.error(IllegalArgumentException("Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance."))
+            return Either.Left(IllegalArgumentException("Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance."))
 
         val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
         val lateralTranslatedCurve = LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), configuration.tolerance)
-        return Result.success(lateralTranslatedCurve)
+        return Either.Right(lateralTranslatedCurve)
     }
 }

@@ -16,11 +16,11 @@
 
 package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
+import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.none
-import com.github.kittinunf.result.Result
 import com.github.kittinunf.result.map
 import io.rtron.io.logging.LogManager
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
@@ -40,6 +40,7 @@ import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
@@ -75,12 +76,13 @@ class RoadBuilder(
         roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D,
         baseAttributes: AttributeList
     ):
-        Result<Road, Exception> {
+        Either<Exception, Road> {
 
         // check whether source model is processable
         road.lanes.isProcessable(configuration.tolerance)
             .map { _reportLogger.log(it, id.toString()) }
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
 
         val laneOffset = _functionBuilder.buildLaneOffset(id, road.lanes)
         val laneSections = road.lanes.getLaneSectionsWithRanges(road.length)
@@ -92,15 +94,16 @@ class RoadBuilder(
                     baseAttributes
                 )
             }
-            .handleFailure { return it }
+            .map { it.toResult() }
+            .handleFailure { return Either.Left(it.error) }
 
         if (laneSections.isEmpty())
-            return Result.error(IllegalArgumentException("Road element contains no valid lane sections."))
+            return Either.Left(IllegalArgumentException("Road element contains no valid lane sections."))
 
         val roadLinkage = buildRoadLinkage(id, road)
 
         val roadspaceRoad = Road(id, roadSurface, roadSurfaceWithoutTorsion, laneOffset, laneSections, roadLinkage)
-        return Result.success(roadspaceRoad)
+        return Either.Right(roadspaceRoad)
     }
 
     /**
@@ -112,12 +115,13 @@ class RoadBuilder(
         laneSection: RoadLanesLaneSection,
         baseAttributes: AttributeList
     ):
-        Result<LaneSection, Exception> {
+        Either<Exception, LaneSection> {
 
         // check whether source model is processable
         laneSection.isProcessable()
             .map { _reportLogger.log(it, laneSectionIdentifier.toString()) }
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
 
         val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
 
@@ -137,7 +141,7 @@ class RoadBuilder(
         )
 
         val roadspaceLaneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
-        return Result.success(roadspaceLaneSection)
+        return Either.Right(roadspaceLaneSection)
     }
 
     private fun buildRoadLinkage(id: RoadspaceIdentifier, road: OpendriveRoad): RoadLinkage {

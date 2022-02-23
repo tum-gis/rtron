@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.transform.AffineSequence3D
 import org.assertj.core.api.Assertions.assertThat
@@ -34,8 +34,8 @@ internal class Cylinder3DTest {
 
             val actualPolygonsResult = cylinder.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Result.Success::class.java)
-            require(actualPolygonsResult is Result.Success)
+            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
+            require(actualPolygonsResult is Either.Right)
             assertTrue(actualPolygonsResult.value.any { polygon -> polygon.vertices.any { it.z == 0.0 } })
         }
     }

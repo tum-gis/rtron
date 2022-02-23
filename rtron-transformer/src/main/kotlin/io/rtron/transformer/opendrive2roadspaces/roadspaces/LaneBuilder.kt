@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.roadspaces
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.LogManager
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
@@ -39,6 +39,8 @@ import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.handleAndRemoveFailure
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
@@ -210,7 +212,9 @@ class LaneBuilder(
             if (adjustedSrcRoadMark.last().typeAttribute != ERoadMarkType.NONE)
                 listOf(buildRoadMarking(adjustedSrcRoadMark.last())) else emptyList()
 
-        return roadMarkingResults.handleAndRemoveFailure { _reportLogger.log(it, id.toString(), "Ignoring such road markings.") }
+        return roadMarkingResults
+            .map { it.toResult() }
+            .handleAndRemoveFailure { _reportLogger.log(it.toEither(), id.toString(), "Ignoring such road markings.") }
     }
 
     /**
@@ -220,13 +224,13 @@ class LaneBuilder(
      * @param domainEndpoint upper domain endpoint for the domain of the road mark
      */
     private fun buildRoadMarking(roadMark: RoadLanesLaneSectionLCRLaneRoadMark, domainEndpoint: Double = Double.NaN):
-        Result<RoadMarking, Exception> {
+        Either<Exception, RoadMarking> {
 
         val domain = if (domainEndpoint.isNaN()) Range.atLeast(roadMark.sOffset)
         else Range.closed(roadMark.sOffset, domainEndpoint)
 
         if (domain.length <= configuration.tolerance)
-            return Result.error(IllegalStateException("Length of road marking is zero (or below tolerance threshold)."))
+            return Either.Left(IllegalStateException("Length of road marking is zero (or below tolerance threshold)."))
 
         val width = ConstantFunction(roadMark.width, domain)
 
@@ -240,7 +244,7 @@ class LaneBuilder(
         }
 
         val roadMarking = RoadMarking(width, attributes)
-        return Result.success(roadMarking)
+        return Either.Right(roadMarking)
     }
 
     private fun buildAttributes(centerLane: RoadLanesLaneSectionCenterLane) =

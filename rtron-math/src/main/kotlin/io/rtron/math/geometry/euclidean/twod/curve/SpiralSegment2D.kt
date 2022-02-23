@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -28,6 +28,7 @@ import io.rtron.math.range.Range
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Spiral curve segment within a defined [domain] that is given by the [curvatureFunction].
@@ -47,9 +48,9 @@ class SpiralSegment2D(
     // Properties and Initializers
 
     private val lowerDomainEndpoint =
-        curvatureFunction.domain.lowerEndpointResult().handleFailure { throw it.error }
+        curvatureFunction.domain.lowerEndpointResult().toResult().handleFailure { throw it.error }
     private val upperDomainEndpoint =
-        curvatureFunction.domain.upperEndpointResult().handleFailure { throw it.error }
+        curvatureFunction.domain.upperEndpointResult().toResult().handleFailure { throw it.error }
     override val domain: Range<Double> =
         Range.closedX(lowerDomainEndpoint, upperDomainEndpoint, endBoundType)
 
@@ -63,24 +64,24 @@ class SpiralSegment2D(
 
     private val _spiral = Spiral2D(curvatureFunction.slope)
     private val _lengthStart =
-        curvatureFunction.startValue.handleFailure { throw it.error } / curvatureFunction.slope
+        curvatureFunction.startValue.toResult().handleFailure { throw it.error } / curvatureFunction.slope
     private val _spiralPoseStart = _spiral.calculatePose(_lengthStart)
 
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.point }
+        Either<Exception, Vector2D> = calculatePoseLocalCS(curveRelativePoint).map { it.point }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception> = calculatePoseLocalCS(curveRelativePoint).map { it.rotation }
+        Either<Exception, Rotation2D> = calculatePoseLocalCS(curveRelativePoint).map { it.rotation }
 
     private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D):
-        Result<Pose2D, IllegalArgumentException> {
+        Either<IllegalArgumentException, Pose2D> {
 
         val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)
         val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(_spiralPoseStart).inverseTransform(poseOnUnitSpiral)
 
-        return Result.success(poseOnUnitSpiralStartingAtOrigin)
+        return Either.Right(poseOnUnitSpiralStartingAtOrigin)
     }
 }
 

@@ -32,6 +32,8 @@ import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.handleAndRemoveFailure
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
@@ -128,7 +130,7 @@ class FunctionBuilder(
     fun buildLaneWidth(id: LaneIdentifier, laneWidthEntries: List<RoadLanesLaneSectionLRLaneWidth>):
         UnivariateFunction {
 
-        val widthEntriesProcessable = laneWidthEntries.map { it.getAsResult() }.handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring width entry.") }
+        val widthEntriesProcessable = laneWidthEntries.map { it.getAsResult().toResult() }.handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString(), "Ignoring width entry.") }
 
         if (widthEntriesProcessable.isEmpty()) {
             this.reportLogger.info(

@@ -16,11 +16,13 @@
 
 package io.rtron.math.processing.triangulation
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.isPlanar
 import io.rtron.std.handleSuccess
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 
 @RequiresOptIn(message = "The triangulation functionality is experimental.")
 @Retention(AnnotationRetention.BINARY)
@@ -43,19 +45,22 @@ object Triangulator {
      *
      * @param linearRing linear ring to be triangulated
      */
-    fun triangulate(linearRing: LinearRing3D, tolerance: Double): Result<List<Polygon3D>, Exception> {
+    fun triangulate(linearRing: LinearRing3D, tolerance: Double): Either<Exception, List<Polygon3D>> {
 
         if (linearRing.vertices.isPlanar(tolerance))
-            return Result.success(listOf(Polygon3D(linearRing.vertices, tolerance)))
+            return Either.Right(listOf(Polygon3D(linearRing.vertices, tolerance)))
 
         // run triangulation algorithms until one succeeds
         val errorStandard = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-            .handleSuccess { return it }
+            .toResult()
+            .handleSuccess { return it.toEither() }
         fallbackTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-            .handleSuccess { return it }
+            .toResult()
+            .handleSuccess { return it.toEither() }
         fanTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-            .handleSuccess { return it }
+            .toResult()
+            .handleSuccess { return it.toEither() }
 
-        return Result.error(errorStandard)
+        return Either.Left(errorStandard)
     }
 }

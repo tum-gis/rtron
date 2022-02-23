@@ -16,7 +16,7 @@
 
 package io.rtron.model.opendrive.road.lanes
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.range.Range
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
@@ -49,13 +49,13 @@ data class RoadLanes(
             (Range.closed(laneSection.last().s, lastLaneSectionEnd) to laneSection.last())
     }
 
-    fun isProcessable(tolerance: Double): Result<ContextMessage<Unit>, IllegalStateException> {
+    fun isProcessable(tolerance: Double): Either<IllegalStateException, ContextMessage<Unit>> {
         require(tolerance.isFinite() && tolerance > 0.0) { "Tolerance value must be finite and positive." }
 
         if (laneSection.zipWithNext().any { it.second.s - it.first.s <= tolerance })
-            return Result.error(IllegalStateException("At least one lane section has a length of zero (or below the tolerance threshold)."))
+            return Either.Left(IllegalStateException("At least one lane section has a length of zero (or below the tolerance threshold)."))
 
         val infos = mutableListOf<String>()
-        return Result.success(ContextMessage(Unit, infos))
+        return Either.Right(ContextMessage(Unit, infos))
     }
 }

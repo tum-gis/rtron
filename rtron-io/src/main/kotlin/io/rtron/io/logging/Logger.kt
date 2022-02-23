@@ -16,7 +16,7 @@
 
 package io.rtron.io.logging
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.vdurmont.emoji.EmojiParser
 import io.rtron.std.ContextMessage
 import mu.KLogger
@@ -108,8 +108,8 @@ class Logger(
      *
      * @param failure failure message to be logged
      */
-    fun log(failure: Result.Failure<Exception>, prefix: String = "", suffix: String = "") {
-        log(failure.getException(), prefix, suffix)
+    fun log(failure: Either.Left<Exception>, prefix: String = "", suffix: String = "") {
+        log(failure.value, prefix, suffix)
     }
 
     /**
@@ -136,7 +136,7 @@ class Logger(
      *
      * @param result contains the message to be logged
      */
-    fun log(result: Result<ContextMessage<Any>, Exception>, prefix: String = "", suffix: String = "") {
+    fun log(result: Either<Exception, ContextMessage<Any>>, prefix: String = "", suffix: String = "") {
         result.fold({ log(it, prefix, suffix) }, { log(it, prefix, suffix) })
     }
 

@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -99,8 +99,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point).isEqualTo(Vector2D.ZERO)
         }
 
@@ -111,8 +111,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(1.0, 1.0))
         }
 
@@ -122,8 +122,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(0.0)
         }
 
@@ -134,8 +134,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(HALF_PI)
         }
     }
@@ -153,8 +153,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(3.0, 5.0))
         }
 
@@ -169,8 +169,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(2.0, 6.0))
         }
 
@@ -184,8 +184,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point.x).isCloseTo(point.x, Offset.offset(DBL_EPSILON_4))
             assertThat(actualReturn.value.point.y).isCloseTo(point.y, Offset.offset(DBL_EPSILON_4))
         }
@@ -200,8 +200,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(HALF_PI)
         }
 
@@ -216,8 +216,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(PI)
         }
 
@@ -232,8 +232,8 @@ internal class Arc2DTest {
 
             val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(PI + HALF_PI)
         }
     }

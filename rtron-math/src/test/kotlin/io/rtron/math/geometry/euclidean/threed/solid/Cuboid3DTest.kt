@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import org.assertj.core.api.Assertions.assertThat
@@ -34,8 +34,8 @@ internal class Cuboid3DTest {
 
             val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Result.Success::class.java)
-            require(actualPolygonsResult is Result.Success)
+            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
+            require(actualPolygonsResult is Either.Right)
             assertThat(actualPolygonsResult.value).hasSize(6)
         }
 
@@ -52,8 +52,8 @@ internal class Cuboid3DTest {
 
             val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Result.Success::class.java)
-            require(actualPolygonsResult is Result.Success)
+            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
+            require(actualPolygonsResult is Either.Right)
             assertThat(actualPolygonsResult.value).contains(expectedBasePolygon)
         }
 
@@ -71,8 +71,8 @@ internal class Cuboid3DTest {
 
             val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Result.Success::class.java)
-            require(actualPolygonsResult is Result.Success)
+            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
+            require(actualPolygonsResult is Either.Right)
             assertThat(actualPolygonsResult.value).contains(expectedBasePolygon)
         }
 
@@ -90,8 +90,8 @@ internal class Cuboid3DTest {
 
             val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Result.Success::class.java)
-            require(actualPolygonsResult is Result.Success)
+            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
+            require(actualPolygonsResult is Either.Right)
             assertThat(actualPolygonsResult.value).contains(expectedBasePolygon)
         }
     }

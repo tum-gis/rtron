@@ -16,7 +16,7 @@
 
 package io.rtron.model.opendrive.road.objects
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
@@ -110,10 +110,10 @@ data class RoadObjectsObject(
     /** Returns true, if the provided geometry information correspond to a point. */
     fun isPoint() = !isCuboid() && !isRectangle() && !isCylinder() && !outlines.containsGeometries() && !repeat.isSet()
 
-    fun isProcessable(): Result<ContextMessage<Unit>, IllegalStateException> {
+    fun isProcessable(): Either<IllegalStateException, ContextMessage<Unit>> {
 
         if (outlines.outline.any { it.isPolyhedron() && !it.isPolyhedronUniquelyDefined() })
-            return Result.error(
+            return Either.Left(
                 IllegalStateException(
                     "Road object has mixed outline definitions. This is " +
                         "not allowed according to the standard."
@@ -130,6 +130,6 @@ data class RoadObjectsObject(
             infos += "Road object contains a polyhedron with non-zero height, but the height of the road " +
                 "object element is $height."
 
-        return Result.success(ContextMessage(Unit, infos))
+        return Either.Right(ContextMessage(Unit, infos))
     }
 }

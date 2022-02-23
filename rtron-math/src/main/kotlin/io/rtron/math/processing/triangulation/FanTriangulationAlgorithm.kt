@@ -16,8 +16,8 @@
 
 package io.rtron.math.processing.triangulation
 
+import arrow.core.Either
 import com.github.kittinunf.result.NoException
-import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 
@@ -28,11 +28,11 @@ import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
  */
 class FanTriangulationAlgorithm : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, NoException> {
+    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<NoException, List<Polygon3D>> {
         val polygons = vertices.filterIndexed { index, _ -> index != 0 }
             .zipWithNext()
             .map { Polygon3D(listOf(vertices.first(), it.first, it.second), tolerance) }
 
-        return Result.success(polygons)
+        return Either.Right(polygons)
     }
 }

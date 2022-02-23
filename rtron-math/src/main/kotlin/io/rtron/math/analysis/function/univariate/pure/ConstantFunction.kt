@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function.univariate.pure
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 
@@ -40,9 +40,9 @@ data class ConstantFunction(
     infix fun timesValue(other: Double): ConstantFunction = copy(value = this.value * other)
 
     // Methods
-    override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> = Result.success(value)
+    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> = Either.Right(value)
 
-    override fun slopeUnbounded(x: Double): Result<Double, IllegalArgumentException> = Result.success(0.0)
+    override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> = Either.Right(0.0)
 
     companion object {
         val ZERO = ConstantFunction(0.0)

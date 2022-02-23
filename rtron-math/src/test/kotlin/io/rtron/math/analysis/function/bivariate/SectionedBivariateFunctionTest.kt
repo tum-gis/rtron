@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function.bivariate
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.bivariate.combination.SectionedBivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.range.Range
@@ -36,7 +36,7 @@ internal class SectionedBivariateFunctionTest {
 
             val actualResult = sectionedPlane.value(0.0, 0.0)
 
-            require(actualResult is Result.Success)
+            require(actualResult is Either.Right)
             assertThat(actualResult.value).isEqualTo(1.0)
         }
     }

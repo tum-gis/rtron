@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.map
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
@@ -30,12 +30,12 @@ abstract class AbstractSurface3D : AbstractGeometry3D(), Tolerable {
     /**
      * Calculates the polygons for the respective surface geometry within the local coordinate system of the surface.
      */
-    abstract fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception>
+    abstract fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>>
 
     /**
      * Calculates the polygons for the respective surface geometry and transforms it to the global coordinate system.
      */
-    fun calculatePolygonsGlobalCS(): Result<List<Polygon3D>, Exception> =
+    fun calculatePolygonsGlobalCS(): Either<Exception, List<Polygon3D>> =
         calculatePolygonsLocalCS().map { affineSequence.solve().transform(it) }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)

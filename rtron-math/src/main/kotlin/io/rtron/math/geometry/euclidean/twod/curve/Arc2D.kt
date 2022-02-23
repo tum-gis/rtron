@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -80,7 +80,7 @@ class Arc2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, IllegalArgumentException> {
+        Either<IllegalArgumentException, Vector2D> {
 
         // angle in radians between start point of the arc and given curve position
         val curvePositionAngle =
@@ -91,13 +91,13 @@ class Arc2D(
             Affine2D.of(startAngle + curvePositionAngle).transform(Vector2D.X_AXIS).scalarMultiply(radius)
 
         val point = center + offsetToCenterVector
-        return Result.success(point)
+        return Either.Right(point)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, IllegalArgumentException> {
+        Either<IllegalArgumentException, Rotation2D> {
         val rotation = Rotation2D(curveRelativePoint.curvePosition * curvature)
-        return Result.success(rotation)
+        return Either.Right(rotation)
     }
 
     // Conversions

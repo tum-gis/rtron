@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -25,6 +25,7 @@ import io.rtron.std.cumulativeSum
 import io.rtron.std.filterWithNext
 import io.rtron.std.handleFailure
 import io.rtron.std.noneWithNext
+import io.rtron.std.toResult
 
 /**
  * Curve specified by a sequence of [vertices].
@@ -54,10 +55,11 @@ class LineString3D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Result<Vector3D, Exception> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector3D> {
         val localMember = container
             .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePointGlobalCS(localPoint)
@@ -65,10 +67,10 @@ class LineString3D(
 
     companion object {
 
-        fun of(vertices: List<Vector3D>, tolerance: Double): Result<LineString3D, IllegalArgumentException> {
+        fun of(vertices: List<Vector3D>, tolerance: Double): Either<IllegalArgumentException, LineString3D> {
             val adjustedVertices = vertices.filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
-            return if (adjustedVertices.size > 1) Result.success(LineString3D(adjustedVertices, tolerance))
-            else Result.error(IllegalArgumentException("Not enough vertices for constructing a line segment."))
+            return if (adjustedVertices.size > 1) Either.Right(LineString3D(adjustedVertices, tolerance))
+            else Either.Left(IllegalArgumentException("Not enough vertices for constructing a line segment."))
         }
     }
 }

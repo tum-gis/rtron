@@ -16,8 +16,8 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
+import arrow.core.Either
 import arrow.core.none
-import com.github.kittinunf.result.Result
 import io.rtron.io.logging.Logger
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.threed.solid.Cuboid3D
@@ -36,6 +36,8 @@ import io.rtron.std.ContextMessage
 import io.rtron.std.handleAndRemoveFailure
 import io.rtron.std.handleFailure
 import io.rtron.std.handleMessage
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
@@ -106,8 +108,8 @@ class Solid3DBuilder(
     ): List<Polyhedron3D> {
 
         return roadObject.getPolyhedronsDefinedByRoadCorners()
-            .map { buildPolyhedronByRoadCorners(id, it, roadReferenceLine) }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .map { buildPolyhedronByRoadCorners(id, it, roadReferenceLine).toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString()) }
             .handleMessage { reportLogger.log(it, id.toString()) }
     }
 
@@ -118,7 +120,7 @@ class Solid3DBuilder(
         id: RoadspaceObjectIdentifier,
         outline: RoadObjectsObjectOutlinesOutline,
         referenceLine: Curve3D
-    ): Result<ContextMessage<Polyhedron3D>, Exception> {
+    ): Either<Exception, ContextMessage<Polyhedron3D>> {
         require(outline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
 
         val validCornerRoadElements = outline.cornerRoad.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
@@ -129,8 +131,8 @@ class Solid3DBuilder(
             )
 
         val verticalOutlineElements = validCornerRoadElements
-            .map { buildVerticalOutlineElement(it, referenceLine) }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring outline element.") }
+            .map { buildVerticalOutlineElement(it, referenceLine).toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString(), "Ignoring outline element.") }
 
         return Polyhedron3DFactory.buildFromVerticalOutlineElements(verticalOutlineElements, configuration.tolerance)
     }
@@ -145,18 +147,20 @@ class Solid3DBuilder(
         cornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad,
         roadReferenceLine: Curve3D
     ):
-        Result<Polyhedron3DFactory.VerticalOutlineElement, Exception> {
+        Either<Exception, Polyhedron3DFactory.VerticalOutlineElement> {
 
         val curveRelativeOutlineElementGeometry = cornerRoad.getPoints()
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
 
         val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         val headPoint = curveRelativeOutlineElementGeometry.second
-            .map { point -> roadReferenceLine.transform(point).handleFailure { return it } }
+            .map { point -> roadReferenceLine.transform(point).toResult().handleFailure { return Either.Left(it.error) } }
 
         val verticalOutlineElement = Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint, tolerance = configuration.tolerance)
-        return Result.success(verticalOutlineElement)
+        return Either.Right(verticalOutlineElement)
     }
 
     /**
@@ -176,8 +180,8 @@ class Solid3DBuilder(
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
         return roadObject.getPolyhedronsDefinedByLocalCorners()
-            .map { buildPolyhedronByLocalCorners(id, it) }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString()) }
+            .map { buildPolyhedronByLocalCorners(id, it).toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString()) }
             .handleMessage { reportLogger.log(it, id.toString()) }
             .map { it.copy(affineSequence = affineSequence) }
     }
@@ -186,7 +190,7 @@ class Solid3DBuilder(
      * Builds a single polyhedron from an OpenDRIVE road object defined by local corner outlines.
      */
     private fun buildPolyhedronByLocalCorners(id: RoadspaceObjectIdentifier, outline: RoadObjectsObjectOutlinesOutline):
-        Result<ContextMessage<Polyhedron3D>, Exception> {
+        Either<Exception, ContextMessage<Polyhedron3D>> {
         require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
 
         val validCornerLocalElements = outline.cornerLocal.filter { it.hasZeroHeight() || it.hasPositiveHeight() }
@@ -197,8 +201,8 @@ class Solid3DBuilder(
             )
 
         val verticalOutlineElements = validCornerLocalElements
-            .map { it.getPoints() }
-            .handleAndRemoveFailure { reportLogger.log(it, id.toString(), "Ignoring outline element.") }
+            .map { it.getPoints().toResult() }
+            .handleAndRemoveFailure { reportLogger.log(it.toEither(), id.toString(), "Ignoring outline element.") }
             .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.first, it.second, none(), configuration.tolerance) }
             .handleMessage { reportLogger.log(it, id.toString(), "Ignoring outline element.") }
 
@@ -217,7 +221,8 @@ class Solid3DBuilder(
         // curve over which the object is moved
         val objectReferenceCurve2D =
             _curve2DBuilder.buildLateralTranslatedCurve(roadObject.repeat, roadReferenceLine)
-                .handleFailure { reportLogger.log(it, roadObject.id); return emptyList() }
+                .toResult()
+                .handleFailure { reportLogger.log(it.toEither(), roadObject.id); return emptyList() }
         val objectReferenceHeight =
             _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObject.repeat, roadReferenceLine)
 

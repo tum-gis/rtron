@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -53,7 +53,7 @@ data class Cylinder3D(
     val diameter = radius * 2.0
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> {
 
         val circleVertices = circleVertices()
 
@@ -72,7 +72,7 @@ data class Cylinder3D(
                 )
             }
 
-        return Result.success(sidePolygons + basePolygon + topPolygon)
+        return Either.Right(sidePolygons + basePolygon + topPolygon)
     }
 
     /**

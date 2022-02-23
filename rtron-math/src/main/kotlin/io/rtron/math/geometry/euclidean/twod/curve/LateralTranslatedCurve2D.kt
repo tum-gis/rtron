@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -27,6 +27,7 @@ import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.transform.Affine2D
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Laterally translates a [baseCurve] by a [lateralTranslationFunction]. This enables for example the representation
@@ -51,29 +52,31 @@ data class LateralTranslatedCurve2D(
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception> {
+        Either<Exception, Vector2D> {
 
         val curveAffine = baseCurve.calculatePoseGlobalCS(curveRelativePoint)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
             .let { Affine2D.of(it) }
 
         val translation = calculateTranslation(curveRelativePoint)
-            .handleFailure { return it }.lateralOffset
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }.lateralOffset
 
         val point = curveAffine.transform(Vector2D(0.0, translation))
-        return Result.success(point)
+        return Either.Right(point)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception> {
+        Either<Exception, Rotation2D> {
 
         val curveRotation = baseCurve.calculateRotationGlobalCS(curveRelativePoint)
-            .handleFailure { throw it.error }
+            .toResult().handleFailure { throw it.error }
         val lateralTranslationSlope =
             lateralTranslationFunction.slopeInFuzzy(curveRelativePoint.curvePosition, tolerance)
-                .handleFailure { throw it.error }
+                .toResult().handleFailure { throw it.error }
         val lateralTranslationRotation = Rotation2D(lateralTranslationSlope)
-        return Result.success(curveRotation + lateralTranslationRotation)
+        return Either.Right(curveRotation + lateralTranslationRotation)
     }
 
     /**
@@ -96,13 +99,14 @@ data class LateralTranslatedCurve2D(
      * Returns the lateral translation at the [curveRelativePoint].
      */
     private fun calculateTranslation(curveRelativePoint: CurveRelativeVector1D):
-        Result<CurveRelativeVector2D, Exception> {
+        Either<Exception, CurveRelativeVector2D> {
 
         val translation = lateralTranslationFunction
             .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
             .let { CurveRelativeVector2D(curveRelativePoint.curvePosition, it) }
 
-        return Result.success(translation)
+        return Either.Right(translation)
     }
 }

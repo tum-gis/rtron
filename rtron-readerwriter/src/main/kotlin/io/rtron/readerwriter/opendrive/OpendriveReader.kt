@@ -16,12 +16,13 @@
 
 package io.rtron.readerwriter.opendrive
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguration
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import org.w3c.dom.Document
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -39,7 +40,7 @@ class OpendriveReader(
 
     fun read(filePath: Path): OpendriveModel {
 
-        val opendriveVersion = getOpendriveVersion(filePath).handleFailure { throw it.error }
+        val opendriveVersion = getOpendriveVersion(filePath).toResult().handleFailure { throw it.error }
 
         val model = when (opendriveVersion) {
             OpendriveVersion(1, 4) -> _opendrive14Reader.createOpendriveModel(filePath)
@@ -53,19 +54,19 @@ class OpendriveReader(
     }
 
     private data class OpendriveVersion(val revMajor: Int = 0, val revMinor: Int = 0)
-    private fun getOpendriveVersion(file: Path): Result<OpendriveVersion, IllegalStateException> {
+    private fun getOpendriveVersion(file: Path): Either<IllegalStateException, OpendriveVersion> {
 
         val xmlDoc: Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.toFileJ())
         val header = xmlDoc.getElementsByTagName("header").item(0)
 
-        val revMajor = header.attributes.getNamedItem("revMajor") ?: return Result.error(IllegalStateException("Major version of OpenDRIVE dataset is not identifiable."))
-        val revMinor = header.attributes.getNamedItem("revMinor") ?: return Result.error(IllegalStateException("Minor version of OpenDRIVE dataset is not identifiable."))
+        val revMajor = header.attributes.getNamedItem("revMajor") ?: return Either.Left(IllegalStateException("Major version of OpenDRIVE dataset is not identifiable."))
+        val revMinor = header.attributes.getNamedItem("revMinor") ?: return Either.Left(IllegalStateException("Minor version of OpenDRIVE dataset is not identifiable."))
 
         val opendriveVersion = OpendriveVersion(
             revMajor = revMajor.nodeValue.toInt(),
             revMinor = revMinor.nodeValue.toInt()
         )
-        return Result.success(opendriveVersion)
+        return Either.Right(opendriveVersion)
     }
 
     companion object {

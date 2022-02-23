@@ -16,7 +16,7 @@
 
 package io.rtron.math.projection
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -32,7 +32,7 @@ internal class CoordinateReferenceSystemTest {
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
-            require(actualCrsResult is Result.Success)
+            require(actualCrsResult is Either.Right)
             assertThat(actualCrsResult.value.name).isEqualTo(crsName)
         }
 
@@ -42,7 +42,7 @@ internal class CoordinateReferenceSystemTest {
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
-            require(actualCrsResult is Result.Success)
+            require(actualCrsResult is Either.Right)
             assertThat(actualCrsResult.value.name).isEqualTo(crsName)
         }
 
@@ -52,7 +52,7 @@ internal class CoordinateReferenceSystemTest {
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
-            require(actualCrsResult is Result.Success)
+            require(actualCrsResult is Either.Right)
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(4326)
         }
 
@@ -62,7 +62,7 @@ internal class CoordinateReferenceSystemTest {
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
-            require(actualCrsResult is Result.Success)
+            require(actualCrsResult is Either.Right)
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(32632)
         }
 
@@ -72,7 +72,7 @@ internal class CoordinateReferenceSystemTest {
 
             val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
 
-            require(actualCrsResult is Result.Success)
+            require(actualCrsResult is Either.Right)
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(32632)
         }
 
@@ -82,7 +82,7 @@ internal class CoordinateReferenceSystemTest {
 
             val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
 
-            require(actualCrsResult is Result.Success)
+            require(actualCrsResult is Either.Right)
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(4326)
         }
     }

@@ -16,8 +16,8 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
+import arrow.core.Either
 import com.github.kittinunf.result.NoException
-import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.TWO_PI
@@ -46,13 +46,13 @@ data class Circle3D(
     }
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, NoException> {
+    override fun calculatePolygonsLocalCS(): Either<NoException, List<Polygon3D>> {
         val polygon = (0 until numberSlices)
             .map { TWO_PI * it / numberSlices }
             .map { calculatePoint(it) }
             .let { Polygon3D(it, tolerance) }
 
-        return Result.success(listOf(polygon))
+        return Either.Right(listOf(polygon))
     }
 
     /** Calculates a point the circle based on the [angle] around the origin. */

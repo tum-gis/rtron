@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.roadspaces2citygml.geometry
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.map
 import com.github.kittinunf.result.success
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
@@ -38,6 +38,8 @@ import io.rtron.math.transform.Affine3D
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
 import io.rtron.std.handleSuccess
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
 import org.citygml4j.model.core.ImplicitGeometry
@@ -68,10 +70,10 @@ class GeometryTransformer(
     // Properties and Initializers
     private val _identifierAdder = IdentifierAdder(configuration)
 
-    private lateinit var polygonsOfSolidResult: Result<List<Polygon3D>, Exception>
-    private lateinit var polygonsOfSurfaceResult: Result<List<Polygon3D>, Exception>
-    private lateinit var multiCurveResult: Result<LineString3D, Exception>
-    private lateinit var pointResult: Result<Vector3D, Exception>
+    private lateinit var polygonsOfSolidResult: Either<Exception, List<Polygon3D>>
+    private lateinit var polygonsOfSurfaceResult: Either<Exception, List<Polygon3D>>
+    private lateinit var multiCurveResult: Either<Exception, LineString3D>
+    private lateinit var pointResult: Either<Exception, Vector3D>
 
     private lateinit var rotation: Rotation3D
     private var height: Double = Double.NaN
@@ -91,9 +93,9 @@ class GeometryTransformer(
     /**
      * Returns the result of the created solid geometry. If no solid geometry is available, an [IllegalStateException] is thrown.
      */
-    fun getSolid(): Result<SolidProperty, Exception> {
+    fun getSolid(): Either<Exception, SolidProperty> {
         check(isSetSolid()) { "Solid geometry is not available." }
-        val polygonsOfSolid = polygonsOfSolidResult.handleFailure { return it }
+        val polygonsOfSolid = polygonsOfSolidResult.toResult().handleFailure { return Either.Left(it.error) }
 
         val gmlPolygons = polygonsOfSolid.map {
             val polygonGml = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
@@ -105,26 +107,26 @@ class GeometryTransformer(
         if (configuration.generateRandomGeometryIds) solid.id = _identifierAdder.generateRandomUUID()
 
         val solidProperty = SolidProperty(solid)
-        return Result.success(solidProperty)
+        return Either.Right(solidProperty)
     }
 
     /**
      * Returns the result of the created multi surface geometry. If no multi surface geometry is available, an [IllegalStateException] is thrown.
      */
-    fun getMultiSurface(): Result<MultiSurfaceProperty, Exception> {
+    fun getMultiSurface(): Either<Exception, MultiSurfaceProperty> {
         check(isSetMultiSurface()) { "MultiSurface geometry is not available." }
-        val polygonsOfSurface = polygonsOfSurfaceResult.handleFailure { return it }
+        val polygonsOfSurface = polygonsOfSurfaceResult.toResult().handleFailure { return it.toEither() }
 
         val multiSurfaceProperty = polygonsToMultiSurfaceProperty(polygonsOfSurface)
-        return Result.success(multiSurfaceProperty)
+        return Either.Right(multiSurfaceProperty)
     }
 
     /**
      * Returns the result of the created multi curve geometry. If no multi curve geometry is available, an [IllegalStateException] is thrown.
      */
-    fun getMultiCurve(): Result<MultiCurveProperty, Exception> {
+    fun getMultiCurve(): Either<Exception, MultiCurveProperty> {
         check(isSetMultiCurve()) { "MultiCurve geometry is not available." }
-        val lineString = multiCurveResult.handleFailure { return it }
+        val lineString = multiCurveResult.toResult().handleFailure { return it.toEither() }
 
         val coordinatesList = lineString.vertices.flatMap { it.toDoubleList() }
         val gmlLineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
@@ -132,65 +134,65 @@ class GeometryTransformer(
         val multiCurve = MultiCurve(listOf(curveProperty))
 
         val multiCurveProperty = MultiCurveProperty(multiCurve)
-        return Result.success(multiCurveProperty)
+        return Either.Right(multiCurveProperty)
     }
 
     /**
      * Returns the result of the created point geometry. If no point geometry is available, an [IllegalStateException] is thrown.
      */
-    fun getPoint(): Result<PointProperty, Exception> {
+    fun getPoint(): Either<Exception, PointProperty> {
         check(isSetPoint()) { "Point geometry is not available." }
-        val point = pointResult.handleFailure { return it }
+        val point = pointResult.toResult().handleFailure { return it.toEither() }
 
         val gmlPoint = Point().apply {
             pos = createDirectPosition(point)
             if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
         val pointProperty = PointProperty(gmlPoint)
-        return Result.success(pointProperty)
+        return Either.Right(pointProperty)
     }
 
     /**
      * Returns the result of the rotation. If no rotation value is available, an [IllegalStateException] is thrown.
      */
-    fun getRotation(): Result<Rotation3D, IllegalStateException> {
+    fun getRotation(): Either<IllegalStateException, Rotation3D> {
         check(isSetRotation()) { "Rotation is not available." }
-        return Result.success(rotation)
+        return Either.Right(rotation)
     }
 
     /**
      * Returns the result of the height value. If no height value is available, an [IllegalStateException] is thrown.
      */
-    fun getHeight(): Result<Double, IllegalStateException> {
+    fun getHeight(): Either<IllegalStateException, Double> {
         check(isSetHeight()) { "Height is not available." }
-        return Result.success(height)
+        return Either.Right(height)
     }
 
     /**
      * Returns the result of the diameter value. If no diameter value is available, an [IllegalStateException] is thrown.
      */
-    fun getDiameter(): Result<Double, IllegalStateException> {
+    fun getDiameter(): Either<IllegalStateException, Double> {
         check(isSetDiameter()) { "Diameter is not available." }
-        return Result.success(diameter)
+        return Either.Right(diameter)
     }
 
     /**
      * Returns the result of the created implicit geometry. If no implicit geometry is available, an [IllegalStateException] is thrown.
      */
-    fun getImplicitGeometry(): Result<ImplicitGeometryProperty, Exception> {
+    fun getImplicitGeometry(): Either<Exception, ImplicitGeometryProperty> {
         check(isSetPoint()) { "ImplicitGeometry is not available." }
 
         val implicitGeometry = ImplicitGeometry().apply {
-            referencePoint = getPoint().handleFailure { return it }
+            referencePoint = getPoint().toResult().handleFailure { return it.toEither() }
             if (configuration.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
         }
         implicitGeometry.libraryObject = ""
 
         if (isSetRotation())
-            getRotation().success { implicitGeometry.transformationMatrix = Affine3D.of(it).toGmlTransformationMatrix4x4() }
+            getRotation().toResult().success { implicitGeometry.transformationMatrix = Affine3D.of(it).toGmlTransformationMatrix4x4() }
 
         val implicitGeometryProperty = ImplicitGeometryProperty(implicitGeometry)
-        return Result.success(implicitGeometryProperty)
+        return Either.Right(implicitGeometryProperty)
     }
 
     /**
@@ -207,7 +209,7 @@ class GeometryTransformer(
      * Returns the [FaceType] according to the [Polygon3D]'s orientation.
      */
     private fun Polygon3D.getType(): FaceType {
-        val angleToZ = getNormal().handleFailure { throw it.error }.angle(Vector3D.Z_AXIS)
+        val angleToZ = getNormal().toResult().handleFailure { throw it.error }.angle(Vector3D.Z_AXIS)
 
         return when {
             angleToZ < QUARTER_PI -> FaceType.TOP
@@ -223,13 +225,13 @@ class GeometryTransformer(
      * @param solidFaceSelection list of [FaceType] to be cutout of a solid geometry
      * @return cutout of a solid geometry or a [MultiSurfaceProperty]
      */
-    fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Result<MultiSurfaceProperty, IllegalStateException> {
+    fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Either<IllegalStateException, MultiSurfaceProperty> {
         if (isSetSolid())
-            getSolidCutout(*solidFaceSelection).handleSuccess { return it }
+            getSolidCutout(*solidFaceSelection).toResult().handleSuccess { return it.toEither() }
         if (isSetMultiSurface())
-            getMultiSurface().handleSuccess { return it }
+            getMultiSurface().toResult().handleSuccess { return it.toEither() }
 
-        return Result.error(IllegalStateException("No cutout of solid or MultiSurfaceProperty available for geometry."))
+        return Either.Left(IllegalStateException("No cutout of solid or MultiSurfaceProperty available for geometry."))
     }
 
     /**
@@ -238,11 +240,11 @@ class GeometryTransformer(
      * @param faceSelection list of relevant [FaceType]
      * @return [MultiSurfaceProperty] constructed of selected polygons from a solid geometry
      */
-    fun getSolidCutout(vararg faceSelection: FaceType): Result<MultiSurfaceProperty, Exception> {
-        val filteredPolygons = getFilteredPolygonsOfSolid(*faceSelection).handleFailure { return it }
+    fun getSolidCutout(vararg faceSelection: FaceType): Either<Exception, MultiSurfaceProperty> {
+        val filteredPolygons = getFilteredPolygonsOfSolid(*faceSelection).toResult().handleFailure { return it.toEither() }
 
         val multiSurfaceProperty = polygonsToMultiSurfaceProperty(filteredPolygons)
-        return Result.success(multiSurfaceProperty)
+        return Either.Right(multiSurfaceProperty)
     }
 
     /**
@@ -252,28 +254,28 @@ class GeometryTransformer(
      * @param faceSelection list of relevant [FaceType]
      * @return list of [MultiSurfaceProperty], each constructed from an individual polygon of the solid geometry
      */
-    fun getIndividualSolidCutouts(vararg faceSelection: FaceType): Result<List<MultiSurfaceProperty>, Exception> {
-        val filteredPolygons = getFilteredPolygonsOfSolid(*faceSelection).handleFailure { return it }
+    fun getIndividualSolidCutouts(vararg faceSelection: FaceType): Either<Exception, List<MultiSurfaceProperty>> {
+        val filteredPolygons = getFilteredPolygonsOfSolid(*faceSelection).toResult().handleFailure { return Either.Left(it.error) }
 
         return filteredPolygons
             .map { polygonsToMultiSurfaceProperty(listOf(it)) }
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 
-    private fun getFilteredPolygonsOfSolid(vararg faceSelection: FaceType): Result<List<Polygon3D>, Exception> {
+    private fun getFilteredPolygonsOfSolid(vararg faceSelection: FaceType): Either<Exception, List<Polygon3D>> {
         if (!this::polygonsOfSolidResult.isInitialized)
-            return Result.error(IllegalStateException("No MultiSurfaceProperty available for geometry."))
-        val polygonsOfSolid = polygonsOfSolidResult.handleFailure { return it }
+            return Either.Left(IllegalStateException("No MultiSurfaceProperty available for geometry."))
+        val polygonsOfSolid = polygonsOfSolidResult.toResult().handleFailure { return Either.Left(it.error) }
 
         val filteredPolygons = polygonsOfSolid.filter { polygon -> faceSelection.any { it == polygon.getType() } }
         if (filteredPolygons.isEmpty())
-            return Result.error(IllegalStateException("No polygons selected for constructing a MultiSurface from a solid geometry."))
+            return Either.Left(IllegalStateException("No polygons selected for constructing a MultiSurface from a solid geometry."))
 
-        return Result.success(filteredPolygons)
+        return Either.Right(filteredPolygons)
     }
 
     override fun visit(vector3D: Vector3D) {
-        pointResult = Result.success(vector3D.calculatePointGlobalCS())
+        pointResult = Either.Right(vector3D.calculatePointGlobalCS())
         visit(vector3D as AbstractGeometry3D)
     }
 

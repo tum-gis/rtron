@@ -16,10 +16,11 @@
 
 package io.rtron.transformer.roadspaces2citygml.module
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
@@ -38,22 +39,24 @@ class CityFurnitureModuleBuilder(
     private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
-    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): Result<CityFurniture, Exception> {
+    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): Either<Exception, CityFurniture> {
         val cityFurnitureFeature = CityFurniture()
 
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         cityFurnitureFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         if (geometryTransformer.isSetRotation())
             geometryTransformer.getRotation()
-                .handleFailure { return it }
+                .toResult()
+                .handleFailure { return Either.Left(it.error) }
                 .also { _attributesAdder.addRotationAttributes(it, cityFurnitureFeature) }
 
         // semantics
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name, cityFurnitureFeature)
         _attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 
-        return Result.success(cityFurnitureFeature)
+        return Either.Right(cityFurnitureFeature)
     }
 }

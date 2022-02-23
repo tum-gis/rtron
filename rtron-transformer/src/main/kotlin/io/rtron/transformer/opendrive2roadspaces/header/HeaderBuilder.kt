@@ -16,10 +16,12 @@
 
 package io.rtron.transformer.opendrive2roadspaces.header
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.roadspaces.Header
 import io.rtron.std.handleSuccess
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.header.Header as OdrHeader
 
@@ -37,10 +39,10 @@ class HeaderBuilder(
     /**
      * Builds the [CoordinateReferenceSystem] for the [Header].
      */
-    private fun buildCoordinateSystem(geoReference: String): Result<CoordinateReferenceSystem, Exception> {
+    private fun buildCoordinateSystem(geoReference: String): Either<Exception, CoordinateReferenceSystem> {
 
-        CoordinateReferenceSystem.of(configuration.crsEpsg).handleSuccess { return it }
-        CoordinateReferenceSystem.of(geoReference).handleSuccess { return it }
-        return Result.error(IllegalStateException("Unknown coordinate reference system."))
+        CoordinateReferenceSystem.of(configuration.crsEpsg).toResult().handleSuccess { return it.toEither() }
+        CoordinateReferenceSystem.of(geoReference).toResult().handleSuccess { return it.toEither() }
+        return Either.Left(IllegalStateException("Unknown coordinate reference system."))
     }
 }

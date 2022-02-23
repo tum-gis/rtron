@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.transform.AffineSequence3D
 
@@ -37,5 +37,5 @@ data class Polyhedron3D(
     }
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> = Result.success(polygons)
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> = Either.Right(polygons)
 }

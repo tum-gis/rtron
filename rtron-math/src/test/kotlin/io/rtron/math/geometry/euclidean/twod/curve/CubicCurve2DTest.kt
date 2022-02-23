@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -46,8 +46,8 @@ internal class CubicCurve2DTest {
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point.x).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.rotation.angle).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
@@ -64,8 +64,8 @@ internal class CubicCurve2DTest {
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point.x).isCloseTo(-1.0, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
         }

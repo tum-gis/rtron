@@ -16,7 +16,7 @@
 
 package io.rtron.math
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.csv.CSVPrinter
 import io.rtron.io.files.Path
 import io.rtron.math.analysis.Fresnel
@@ -47,7 +47,7 @@ object SpiralSegment2DWriterTest {
 
         for (currentPosition in curvatureRange.domain.arrange(0.1, false, 0.0)) {
             val ret = spiralSegment.calculatePoseGlobalCS(CurveRelativeVector1D(currentPosition))
-            require(ret is Result.Success)
+            require(ret is Either.Right)
             csvPrinter.printRecord(currentPosition.toString(), ret.value.point.x.toString(), ret.value.point.y.toString())
         }
 

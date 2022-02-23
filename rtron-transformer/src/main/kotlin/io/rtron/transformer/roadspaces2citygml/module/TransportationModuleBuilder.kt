@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.roadspaces2citygml.module
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.LogManager
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
@@ -30,6 +30,8 @@ import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.handleFailure
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.populateLod2Geometry
@@ -93,7 +95,8 @@ class TransportationModuleBuilder(
 
         // surface representation of lane
         val trafficArea = createTrafficAreaFeature(surface)
-            .handleFailure { _reportLogger.log(it, lane.id.toString()); return }
+            .toResult()
+            .handleFailure { _reportLogger.log(it.toEither(), lane.id.toString()); return }
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
 
         identifierAdder.addIdentifier(lane.id, "Lane", trafficArea)
@@ -102,7 +105,8 @@ class TransportationModuleBuilder(
         // filler surfaces
         fillerSurfaces.forEach { fillerSurface ->
             val fillerTrafficArea = createTrafficAreaFeature(fillerSurface.surface)
-                .handleFailure { _reportLogger.log(it, lane.id.toString()); return }
+                .toResult()
+                .handleFailure { _reportLogger.log(it.toEither(), lane.id.toString()); return }
 
             identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerTrafficArea)
             _attributesAdder.addAttributes(fillerSurface, fillerTrafficArea)
@@ -134,7 +138,8 @@ class TransportationModuleBuilder(
 
         // surface representation
         val auxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(surface)
-            .handleFailure { _reportLogger.log(it, lane.id.toString()); return }
+            .toResult()
+            .handleFailure { _reportLogger.log(it.toEither(), lane.id.toString()); return }
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficArea))
 
         identifierAdder.addIdentifier(lane.id, "Lane", auxiliaryTrafficArea)
@@ -143,7 +148,8 @@ class TransportationModuleBuilder(
         // filler surfaces
         fillerSurfaces.forEach { fillerSurface ->
             val fillerAuxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(fillerSurface.surface)
-                .handleFailure { _reportLogger.log(it, lane.id.toString()); return }
+                .toResult()
+                .handleFailure { _reportLogger.log(it.toEither(), lane.id.toString()); return }
 
             identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerAuxiliaryTrafficArea)
             _attributesAdder.addAttributes(fillerSurface, fillerAuxiliaryTrafficArea)
@@ -161,7 +167,8 @@ class TransportationModuleBuilder(
         // surface representation
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val trafficArea = createTrafficAreaFeature(geometryTransformer)
-            .handleFailure { _reportLogger.log(it, roadspaceObject.id.toString()); return }
+            .toResult()
+            .handleFailure { _reportLogger.log(it.toEither(), roadspaceObject.id.toString()); return }
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
 
         // semantics
@@ -179,7 +186,8 @@ class TransportationModuleBuilder(
         // surface representation
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val auxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(geometryTransformer)
-            .handleFailure { _reportLogger.log(it, roadspaceObject.id.toString()); return }
+            .toResult()
+            .handleFailure { _reportLogger.log(it.toEither(), roadspaceObject.id.toString()); return }
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficArea))
 
         // semantics
@@ -235,32 +243,34 @@ class TransportationModuleBuilder(
         return auxiliaryTrafficSpaceFeature
     }
 
-    private fun createTrafficAreaFeature(abstractGeometry: AbstractGeometry3D): Result<TrafficArea, Exception> {
+    private fun createTrafficAreaFeature(abstractGeometry: AbstractGeometry3D): Either<Exception, TrafficArea> {
         val geometryTransformer = GeometryTransformer(configuration)
             .also { abstractGeometry.accept(it) }
         return createTrafficAreaFeature(geometryTransformer)
     }
 
-    private fun createTrafficAreaFeature(geometryTransformer: GeometryTransformer): Result<TrafficArea, Exception> {
+    private fun createTrafficAreaFeature(geometryTransformer: GeometryTransformer): Either<Exception, TrafficArea> {
         val trafficAreaFeature = TrafficArea()
         trafficAreaFeature.lod2MultiSurface = geometryTransformer
             .getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
-            .handleFailure { return it }
-        return Result.success(trafficAreaFeature)
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
+        return Either.Right(trafficAreaFeature)
     }
 
-    private fun createAuxiliaryTrafficAreaFeature(abstractGeometry: AbstractGeometry3D): Result<AuxiliaryTrafficArea, Exception> {
+    private fun createAuxiliaryTrafficAreaFeature(abstractGeometry: AbstractGeometry3D): Either<Exception, AuxiliaryTrafficArea> {
         val geometryTransformer = GeometryTransformer(configuration)
             .also { abstractGeometry.accept(it) }
         return createAuxiliaryTrafficAreaFeature(geometryTransformer)
     }
 
     private fun createAuxiliaryTrafficAreaFeature(geometryTransformer: GeometryTransformer):
-        Result<AuxiliaryTrafficArea, Exception> {
+        Either<Exception, AuxiliaryTrafficArea> {
         val auxiliaryTrafficAreaFeature = AuxiliaryTrafficArea()
         auxiliaryTrafficAreaFeature.lod2MultiSurface = geometryTransformer
             .getSolidCutoutOrSurface(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
-            .handleFailure { return it }
-        return Result.success(auxiliaryTrafficAreaFeature)
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
+        return Either.Right(auxiliaryTrafficAreaFeature)
     }
 }

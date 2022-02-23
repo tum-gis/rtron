@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.map
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -24,6 +24,7 @@ import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Represents the sequential concatenation of the [curveMembers].
@@ -52,22 +53,24 @@ data class CompositeCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception> {
+        Either<Exception, Vector2D> {
 
         val localMember = container
             .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePointGlobalCS(localPoint)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception> {
+        Either<Exception, Rotation2D> {
 
         val localMember = container
             .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }

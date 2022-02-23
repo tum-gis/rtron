@@ -16,7 +16,7 @@
 
 package io.rtron.model.opendrive.road.lanes
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.Include
@@ -45,13 +45,13 @@ data class RoadLanesLaneSection(
     fun getCenterLane() = center.lane.first()
     fun getLeftRightLanes(): Map<Int, RoadLanesLaneSectionLRLane> = left.getLanes() + right.getLanes()
 
-    fun isProcessable(): Result<ContextMessage<Unit>, IllegalStateException> {
+    fun isProcessable(): Either<IllegalStateException, ContextMessage<Unit>> {
 
         if (center.getNumberOfLanes() != 1)
-            return Result.error(IllegalStateException("Lane section should contain exactly one center lane."))
+            return Either.Left(IllegalStateException("Lane section should contain exactly one center lane."))
 
         if (left.isEmpty() && right.isEmpty())
-            return Result.error(IllegalStateException("Lane section should contain lanes at least on the left or on the right side."))
+            return Either.Left(IllegalStateException("Lane section should contain lanes at least on the left or on the right side."))
 
         val infos = mutableListOf<String>()
 
@@ -60,7 +60,7 @@ data class RoadLanesLaneSection(
             val expectedIds = (left.getNumberOfLanes() downTo 1).toList()
 
             if (!leftLaneIds.containsAll(expectedIds))
-                return Result.error(IllegalStateException("Left lanes have missing IDs."))
+                return Either.Left(IllegalStateException("Left lanes have missing IDs."))
             if (leftLaneIds != leftLaneIds.sortedDescending())
                 infos += "Left lanes should be ordered in a descending manner."
         }
@@ -70,11 +70,11 @@ data class RoadLanesLaneSection(
             val expectedIds = (-1 downTo -right.getNumberOfLanes()).toList()
 
             if (!rightLaneIds.containsAll(expectedIds))
-                return Result.error(IllegalStateException("Right lanes have missing IDs."))
+                return Either.Left(IllegalStateException("Right lanes have missing IDs."))
             if (rightLaneIds != rightLaneIds.sortedDescending())
                 infos += "Right lanes should be ordered in a descending manner."
         }
 
-        return Result.success(ContextMessage(Unit, infos))
+        return Either.Right(ContextMessage(Unit, infos))
     }
 }

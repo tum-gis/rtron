@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.point
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.linear.RealVector
@@ -144,10 +144,10 @@ data class Vector3D(
          * Creates a [Vector3D], if each component is finite. Otherwise it will return a Result.Error.
          *
          */
-        fun of(x: Double, y: Double, z: Double): Result<Vector3D, IllegalArgumentException> =
+        fun of(x: Double, y: Double, z: Double): Either<IllegalArgumentException, Vector3D> =
             if (!x.isFinite() || !y.isFinite() || !z.isFinite())
-                Result.error(IllegalArgumentException("Values for x, y, z must be finite."))
-            else Result.success(Vector3D(x, y, z))
+                Either.Left(IllegalArgumentException("Values for x, y, z must be finite."))
+            else Either.Right(Vector3D(x, y, z))
     }
 }
 

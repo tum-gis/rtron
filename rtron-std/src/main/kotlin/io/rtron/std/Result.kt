@@ -16,10 +16,14 @@
 
 package io.rtron.std
 
+import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.none
 import com.github.kittinunf.result.Result
+
+fun <E : Exception, V : Any?> Either<E, V>.toResult(): Result<V, E> = this.fold({ Result.Failure(it) }, { Result.Success(it) })
+fun <E : Exception, V : Any?> Result<V, E>.toEither(): Either<E, V> = this.fold({ Either.Right(it) }, { Either.Left(it) })
 
 /**
  * Handle the [Result.Success] with [block] and return the [Result.Failure].

@@ -7,6 +7,8 @@ kotlinProject()
 dependencies {
     implementation(project(ProjectComponents.standard))
 
+    implementation(Dependencies.arrowCore)
+
     // logging
     implementation(Dependencies.kotlinLogging)
     implementation(Dependencies.slf4jSimple)

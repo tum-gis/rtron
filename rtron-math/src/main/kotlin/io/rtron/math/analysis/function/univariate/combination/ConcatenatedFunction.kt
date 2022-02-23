@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function.univariate.combination
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -27,6 +27,7 @@ import io.rtron.std.handleFailure
 import io.rtron.std.hasSameSizeAs
 import io.rtron.std.isSorted
 import io.rtron.std.isStrictlySorted
+import io.rtron.std.toResult
 
 /**
  * Represents the sequential concatenation of the provided member functions.
@@ -45,21 +46,24 @@ class ConcatenatedFunction(
     override val domain: Range<Double> get() = container.domain
 
     // Methods
-    override fun valueUnbounded(x: Double): Result<Double, Exception> {
+    override fun valueUnbounded(x: Double): Either<Exception, Double> {
         val localMember = container.strictSelectMember(x)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         return localMember.member.valueUnbounded(localMember.localParameter)
     }
 
-    override fun slopeUnbounded(x: Double): Result<Double, Exception> {
+    override fun slopeUnbounded(x: Double): Either<Exception, Double> {
         val localMember = container.strictSelectMember(x)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         return localMember.member.slopeUnbounded(localMember.localParameter)
     }
 
-    override fun valueInFuzzy(x: Double, tolerance: Double): Result<Double, Exception> {
+    override fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> {
         val localMember = container.fuzzySelectMember(x, tolerance)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
         return localMember.member.valueUnbounded(localMember.localParameter)
     }
 
@@ -171,7 +175,7 @@ class ConcatenatedFunction(
                 listOf(Double.MIN_VALUE) else emptyList()
             val prependedFunction = if (prependConstant) {
                 val prependValue = if (prependConstantValue.isFinite()) prependConstantValue else
-                    polynomialFunctions.first().value(0.0).handleFailure { throw it.error }
+                    polynomialFunctions.first().value(0.0).toResult().handleFailure { throw it.error }
 
                 listOf(ConstantFunction(prependValue))
             } else emptyList()

@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.DBL_EPSILON
@@ -64,8 +64,8 @@ internal class LineString3DTest {
 
             val actualReturn = lineString.calculatePointGlobalCS(CurveRelativeVector1D(5.0))
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.x).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.y).isCloseTo(5.0, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.z).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
@@ -81,8 +81,8 @@ internal class LineString3DTest {
 
             val actualReturn = lineString.calculatePointGlobalCS(CurveRelativeVector1D(2.5))
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.x).isCloseTo(0.5, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.z).isCloseTo(0.0, Offset.offset(DBL_EPSILON))

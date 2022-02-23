@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function.bivariate.pure
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.range.Range
 
@@ -43,8 +43,8 @@ class PlaneFunction(
     }
 
     // Methods
-    override fun valueUnbounded(x: Double, y: Double): Result<Double, Exception> {
-        return Result.success(intercept + slopeX * x + slopeY * y)
+    override fun valueUnbounded(x: Double, y: Double): Either<Exception, Double> {
+        return Either.Right(intercept + slopeX * x + slopeY * y)
     }
 
     companion object {

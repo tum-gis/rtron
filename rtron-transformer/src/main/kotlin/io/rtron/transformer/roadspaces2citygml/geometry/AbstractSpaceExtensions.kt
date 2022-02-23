@@ -16,9 +16,9 @@
 
 package io.rtron.transformer.roadspaces2citygml.geometry
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.success
+import arrow.core.Either
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import org.citygml4j.model.core.AbstractSpace
 
 /**
@@ -26,9 +26,9 @@ import org.citygml4j.model.core.AbstractSpace
  *
  * @param geometryTransformer source geometries
  * @param lod target level of detail
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Result<Unit, Exception> =
+fun AbstractSpace.populateGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<Exception, Unit> =
     when (lod) {
         LevelOfDetail.ZERO -> populateLod0Geometry(geometryTransformer)
         LevelOfDetail.ONE -> populateLod1Geometry(geometryTransformer)
@@ -40,13 +40,13 @@ fun AbstractSpace.populateGeometry(geometryTransformer: GeometryTransformer, lod
  * Populates the LoD0 point geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod0Geometry(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractSpace.populateLod0Geometry(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetPoint())
-        geometryTransformer.getPoint().handleFailure { return it }.also { lod0Point = it; return Result.success(Unit) }
+        geometryTransformer.getPoint().toResult().handleFailure { return Either.Left(it.error) }.also { lod0Point = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD0 geometry of the abstract space."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD0 geometry of the abstract space."))
 }
 
 /**
@@ -54,13 +54,13 @@ fun AbstractSpace.populateLod0Geometry(geometryTransformer: GeometryTransformer)
  * So only the solid geometry are populated at LoD1 (since multiSurface, multiCurve are not available at this LoD).
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod1Geometry(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractSpace.populateLod1Geometry(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetSolid())
-        geometryTransformer.getSolid().handleFailure { return it }.also { lod1Solid = it; return Result.success(Unit) }
+        geometryTransformer.getSolid().toResult().handleFailure { return Either.Left(it.error) }.also { lod1Solid = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD1 geometry of the abstract space."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD1 geometry of the abstract space."))
 }
 
 /**
@@ -68,17 +68,17 @@ fun AbstractSpace.populateLod1Geometry(geometryTransformer: GeometryTransformer)
  * Only the first available geometry type is populated, with the prioritization order being: solid, multiSurface, multiCurve.
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod2Geometry(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractSpace.populateLod2Geometry(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetSolid())
-        geometryTransformer.getSolid().handleFailure { return it }.also { lod2Solid = it; return Result.success(Unit) }
+        geometryTransformer.getSolid().toResult().handleFailure { return Either.Left(it.error) }.also { lod2Solid = it; return Either.Right(Unit) }
     if (geometryTransformer.isSetMultiSurface())
-        geometryTransformer.getMultiSurface().handleFailure { return it }.also { lod2MultiSurface = it; return Result.success(Unit) }
+        geometryTransformer.getMultiSurface().toResult().handleFailure { return Either.Left(it.error) }.also { lod2MultiSurface = it; return Either.Right(Unit) }
     if (geometryTransformer.isSetMultiCurve())
-        geometryTransformer.getMultiCurve().handleFailure { return it }.also { lod2MultiCurve = it; return Result.success(Unit) }
+        geometryTransformer.getMultiCurve().toResult().handleFailure { return Either.Left(it.error) }.also { lod2MultiCurve = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD2 geometry of the abstract space."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD2 geometry of the abstract space."))
 }
 
 /**
@@ -86,15 +86,15 @@ fun AbstractSpace.populateLod2Geometry(geometryTransformer: GeometryTransformer)
  * Only the first available geometry type is populated, with the prioritization order being: solid, multiSurface, multiCurve.
  *
  * @param geometryTransformer source geometries
- * @return [Result.success] is returned, if a geometry has been populated; [Result.error], if no adequate geometry could be assigned
+ * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod3Geometry(geometryTransformer: GeometryTransformer): Result<Unit, Exception> {
+fun AbstractSpace.populateLod3Geometry(geometryTransformer: GeometryTransformer): Either<Exception, Unit> {
     if (geometryTransformer.isSetSolid())
-        geometryTransformer.getSolid().handleFailure { return it }.also { lod3Solid = it; return Result.success(Unit) }
+        geometryTransformer.getSolid().toResult().handleFailure { return Either.Left(it.error) }.also { lod3Solid = it; return Either.Right(Unit) }
     if (geometryTransformer.isSetMultiSurface())
-        geometryTransformer.getMultiSurface().handleFailure { return it }.also { lod3MultiSurface = it; return Result.success(Unit) }
+        geometryTransformer.getMultiSurface().toResult().handleFailure { return Either.Left(it.error) }.also { lod3MultiSurface = it; return Either.Right(Unit) }
     if (geometryTransformer.isSetMultiCurve())
-        geometryTransformer.getMultiCurve().handleFailure { return it }.also { lod3MultiCurve = it; return Result.success(Unit) }
+        geometryTransformer.getMultiCurve().toResult().handleFailure { return Either.Left(it.error) }.also { lod3MultiCurve = it; return Either.Right(Unit) }
 
-    return Result.error(IllegalStateException("No suitable source geometry found for populating the LoD3 geometry of the abstract space."))
+    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD3 geometry of the abstract space."))
 }

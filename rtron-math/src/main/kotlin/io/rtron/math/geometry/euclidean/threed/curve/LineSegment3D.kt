@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.BoundType
@@ -77,10 +77,10 @@ class LineSegment3D(
     }
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector3D, IllegalArgumentException> {
+        Either<IllegalArgumentException, Vector3D> {
 
         val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
-        return Result.success(point)
+        return Either.Right(point)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -112,14 +112,14 @@ class LineSegment3D(
          *
          */
         fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED):
-            Result<LineSegment3D, IllegalArgumentException> =
+            Either<IllegalArgumentException, LineSegment3D> =
             if (start.fuzzyEquals(end, tolerance))
-                Result.error(
+                Either.Left(
                     IllegalArgumentException(
                         "Start and end vector of a line segment must be different " +
                             "according to the given tolerance."
                     )
                 )
-            else Result.success(LineSegment3D(start, end, tolerance, endBoundType))
+            else Either.Right(LineSegment3D(start, end, tolerance, endBoundType))
     }
 }

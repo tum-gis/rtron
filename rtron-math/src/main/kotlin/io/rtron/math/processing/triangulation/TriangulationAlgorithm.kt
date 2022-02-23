@@ -16,10 +16,11 @@
 
 package io.rtron.math.processing.triangulation
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Abstract class for a triangulation algorithm in 3D.
@@ -34,15 +35,15 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    fun triangulateChecked(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception> {
+    fun triangulateChecked(vertices: List<Vector3D>, tolerance: Double): Either<Exception, List<Polygon3D>> {
 
-        val triangles = triangulate(vertices, tolerance).handleFailure { return it }
+        val triangles = triangulate(vertices, tolerance).toResult().handleFailure { return Either.Left(it.error) }
 
         val newVertices = triangles.flatMap { it.vertices }
         if (newVertices.any { it !in vertices })
-            return Result.error(RuntimeException("Triangulation algorithm produces different vertices."))
+            return Either.Left(RuntimeException("Triangulation algorithm produces different vertices."))
 
-        return Result.success(triangles)
+        return Either.Right(triangles)
     }
 
     /**
@@ -51,5 +52,5 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    internal abstract fun triangulate(vertices: List<Vector3D>, tolerance: Double): Result<List<Polygon3D>, Exception>
+    internal abstract fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<Exception, List<Polygon3D>>
 }

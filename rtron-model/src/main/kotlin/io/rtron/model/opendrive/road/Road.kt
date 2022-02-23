@@ -16,10 +16,10 @@
 
 package io.rtron.model.opendrive.road
 
+import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.none
-import com.github.kittinunf.result.Result
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.model.opendrive.common.DataQuality
 import io.rtron.model.opendrive.common.ETrafficRule
@@ -60,12 +60,12 @@ data class Road(
     fun getJunction(): Option<String> =
         if (junction.isNotEmpty() && junction != "-1") Some(junction) else none()
 
-    fun isProcessable(tolerance: Double): Result<ContextMessage<Unit>, IllegalStateException> {
+    fun isProcessable(tolerance: Double): Either<IllegalStateException, ContextMessage<Unit>> {
         val infos = mutableListOf<String>()
 
         val planViewGeometryLengthsSum = planView.geometry.sumOf { it.length }
         if (!fuzzyEquals(planViewGeometryLengthsSum, length, tolerance))
-            return Result.error(
+            return Either.Left(
                 IllegalStateException(
                     "Given length of road (${this.length}) is different than " +
                         "the sum of the individual plan view elements ($planViewGeometryLengthsSum)."
@@ -76,6 +76,6 @@ data class Road(
             infos += "Road contains both a lateral road shape and a lane offset, whereby the combination of shapes " +
                 "and non-linear offsets should be avoided according to the standard."
 
-        return Result.success(ContextMessage(Unit, infos))
+        return Either.Right(ContextMessage(Unit, infos))
     }
 }

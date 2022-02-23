@@ -13,4 +13,6 @@ dependencies {
     implementation(project(ProjectComponents.transformer))
 
     implementation(kotlin("script-runtime"))
+
+    implementation(Dependencies.arrowCore)
 }

@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function.univariate.pure
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 import kotlin.math.abs
@@ -38,10 +38,10 @@ data class LinearFunction(
 ) : UnivariateFunction() {
 
     // Methods
-    override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> =
-        Result.success(slope * x + intercept)
+    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> =
+        Either.Right(slope * x + intercept)
 
-    override fun slopeUnbounded(x: Double): Result<Double, IllegalArgumentException> = Result.success(slope)
+    override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> = Either.Right(slope)
 
     companion object {
 

@@ -16,7 +16,7 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
@@ -26,6 +26,8 @@ import io.rtron.math.range.Range
 import io.rtron.math.std.sign
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import kotlin.math.abs
 
 /**
@@ -68,9 +70,9 @@ data class LaneSection(
         this(id, curvePositionDomain, lanes.map { it.id.laneId to it }.toMap(), centerLane)
 
     // Methods
-    fun getLane(laneId: Int): Result<Lane, IllegalArgumentException> = lanes.getValueResult(laneId)
-    fun getLane(laneIdentifier: LaneIdentifier): Result<Lane, IllegalArgumentException> =
-        lanes.getValueResult(laneIdentifier.laneId)
+    fun getLane(laneId: Int): Either<IllegalArgumentException, Lane> = lanes.getValueResult(laneId).toEither()
+    fun getLane(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, Lane> =
+        lanes.getValueResult(laneIdentifier.laneId).toEither()
 
     /**
      * Returns the lateral offset function located on a lane with [laneId].
@@ -79,11 +81,11 @@ data class LaneSection(
      * @param factor if the [factor] is 0.0 the inner lane boundary is returned. If the [factor] is 1.0 the outer lane
      * boundary is returned. An offset function within the middle of the lane is achieved by a [factor] of 0.5.
      */
-    fun getLateralLaneOffset(laneId: Int, factor: Double): Result<UnivariateFunction, Exception> {
+    fun getLateralLaneOffset(laneId: Int, factor: Double): Either<Exception, UnivariateFunction> {
         val selectedLanes = (1..abs(laneId)).toList()
             .map { sign(laneId) * it }
-            .map { getLane(it) }
-            .handleFailure { return it }
+            .map { getLane(it).toResult() }
+            .handleFailure { return Either.Left(it.error) }
 
         val currentLane = selectedLanes.last()
         val innerLaneBoundaryOffset = selectedLanes.dropLast(1)
@@ -94,7 +96,7 @@ data class LaneSection(
             listOf(innerLaneBoundaryOffset, currentLane.width),
             { sign(laneId) * (it[0] + factor * it[1]) }
         )
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
     }
 
     /**
@@ -106,19 +108,19 @@ data class LaneSection(
      * of the lane is achieved by a [factor] of 0.5.
      */
     fun getLaneHeightOffset(laneIdentifier: LaneIdentifier, factor: Double):
-        Result<UnivariateFunction, IllegalArgumentException> {
+        Either<IllegalArgumentException, UnivariateFunction> {
 
-        val inner = getInnerLaneHeightOffset(laneIdentifier).handleFailure { return it }
-        val outer = getOuterLaneHeightOffset(laneIdentifier).handleFailure { return it }
+        val inner = getInnerLaneHeightOffset(laneIdentifier).toResult().handleFailure { return Either.Left(it.error) }
+        val outer = getOuterLaneHeightOffset(laneIdentifier).toResult().handleFailure { return Either.Left(it.error) }
         val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
-        return Result.success(laneHeightOffset)
+        return Either.Right(laneHeightOffset)
     }
 
     private fun getOuterLaneHeightOffset(laneIdentifier: LaneIdentifier):
-        Result<UnivariateFunction, IllegalArgumentException> =
+        Either<IllegalArgumentException, UnivariateFunction> =
         getLane(laneIdentifier).map { it.outerHeightOffset }
 
     private fun getInnerLaneHeightOffset(laneIdentifier: LaneIdentifier):
-        Result<UnivariateFunction, IllegalArgumentException> =
+        Either<IllegalArgumentException, UnivariateFunction> =
         getLane(laneIdentifier).map { it.innerHeightOffset }
 }

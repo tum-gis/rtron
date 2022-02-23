@@ -16,7 +16,7 @@
 
 package io.rtron.math.container
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Range
 import io.rtron.math.range.RangeSet
@@ -27,6 +27,8 @@ import io.rtron.math.range.shift
 import io.rtron.std.handleSuccess
 import io.rtron.std.hasSameSizeAs
 import io.rtron.std.isSortedBy
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 
 /**
  * Concatenates a list of [members] with a locally defined domain to a container with an absolutely defined domain.
@@ -89,7 +91,7 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      *
      * @param parameter absolute parameter
      */
-    fun strictSelectMember(parameter: Double): Result<LocalRequest<T>, Exception> {
+    fun strictSelectMember(parameter: Double): Either<Exception, LocalRequest<T>> {
         val selection = absoluteDomains
             .withIndex()
             .filter { parameter in it.value }
@@ -104,8 +106,8 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param parameter absolute parameter
      * @param tolerance applied tolerance for the fuzzy selection
      */
-    fun fuzzySelectMember(parameter: Double, tolerance: Double): Result<LocalRequest<T>, Exception> {
-        strictSelectMember(parameter).handleSuccess { return it }
+    fun fuzzySelectMember(parameter: Double, tolerance: Double): Either<Exception, LocalRequest<T>> {
+        strictSelectMember(parameter).toResult().handleSuccess { return it.toEither() }
 
         val selection = absoluteDomains
             .withIndex()
@@ -122,15 +124,15 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param selection list of selected members
      */
     private fun handleSelection(parameter: Double, selection: List<Int>):
-        Result<LocalRequest<T>, Exception> = when (selection.size) {
+        Either<Exception, LocalRequest<T>> = when (selection.size) {
 
-        0 -> Result.error(
+        0 -> Either.Left(
             IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains.")
         )
         1 -> {
             val localParameter = parameter - absoluteStarts[selection.first()]
-            Result.success(LocalRequest(localParameter, members[selection.first()]))
+            Either.Right(LocalRequest(localParameter, members[selection.first()]))
         }
-        else -> Result.error(IllegalStateException("Parameter x=$parameter yields multiple members."))
+        else -> Either.Left(IllegalStateException("Parameter x=$parameter yields multiple members."))
     }
 }

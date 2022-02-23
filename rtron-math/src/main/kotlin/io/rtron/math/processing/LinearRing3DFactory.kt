@@ -16,7 +16,7 @@
 
 package io.rtron.math.processing
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.std.ContextMessage
@@ -32,7 +32,7 @@ object LinearRing3DFactory {
      * Builds a [LinearRing3D] from a list of vertices by filtering and preparing the vertices.
      */
     fun buildFromVertices(vertices: List<Vector3D>, tolerance: Double):
-        Result<ContextMessage<LinearRing3D>, IllegalArgumentException> {
+        Either<IllegalArgumentException, ContextMessage<LinearRing3D>> {
         require(vertices.isNotEmpty()) { "List of vertices must not be empty." }
 
         val infos = mutableListOf<String>()
@@ -59,9 +59,9 @@ object LinearRing3DFactory {
 
         // if there are not enough points to construct a linear ring
         if (preparedVertices.size <= 2)
-            return Result.error(IllegalArgumentException("A linear ring requires at least three valid vertices."))
+            return Either.Left(IllegalArgumentException("A linear ring requires at least three valid vertices."))
 
         val linearRing = LinearRing3D(preparedVertices, tolerance)
-        return Result.success(ContextMessage(linearRing, infos))
+        return Either.Right(ContextMessage(linearRing, infos))
     }
 }

@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
@@ -61,7 +61,7 @@ data class LinearRing3D(
     fun isPlanar() = vertices.isPlanar(tolerance)
 
     @OptIn(ExperimentalTriangulator::class)
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> =
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> =
         Triangulator.triangulate(this, tolerance)
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
@@ -104,7 +104,7 @@ data class LinearRing3D(
          * @param rightVertices right vertices for the linear rings construction
          */
         fun ofWithDuplicatesRemoval(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double):
-            Result<List<LinearRing3D>, Exception> {
+            Either<Exception, List<LinearRing3D>> {
             require(leftVertices.size >= 2) { "At least two left vertices required." }
             require(rightVertices.size >= 2) { "At least two right vertices required." }
 
@@ -121,8 +121,8 @@ data class LinearRing3D(
                 .map { LinearRing3D(it, tolerance) }
                 .toList()
 
-            return if (linearRings.isEmpty()) Result.error(IllegalArgumentException("Not enough valid linear rings could be constructed."))
-            else Result.success(linearRings)
+            return if (linearRings.isEmpty()) Either.Left(IllegalArgumentException("Not enough valid linear rings could be constructed."))
+            else Either.Right(linearRings)
         }
     }
 }

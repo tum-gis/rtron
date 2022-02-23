@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
@@ -32,6 +32,7 @@ import io.rtron.math.range.Range
 import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Represents a parametric sweep in 3D. This refers to a geometry solid, which is defined by a [referenceCurveXY].
@@ -96,22 +97,22 @@ data class ParametricSweep3D(
 
     /** lower left curve of the sweep as a list of points */
     private val lowerLeftVertices by lazy {
-        lowerLeftCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        lowerLeftCurve.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
     }
 
     /** lower right curve of the sweep as a list of points */
     private val lowerRightVertices by lazy {
-        lowerRightCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        lowerRightCurve.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
     }
 
     /** upper left curve of the sweep as a list of points */
     private val upperLeftVertices by lazy {
-        upperLeftCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        upperLeftCurve.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
     }
 
     /** upper right curve of the sweep as a list of points */
     private val upperRightVertices by lazy {
-        upperRightCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        upperRightCurve.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
     }
 
     init {
@@ -122,13 +123,13 @@ data class ParametricSweep3D(
     }
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> {
 
         // calculate the side faces
-        val basePolygons = createPolygons(lowerLeftVertices, lowerRightVertices) getOrElse { emptyList() }
-        val topPolygons = createPolygons(upperRightVertices, upperLeftVertices) getOrElse { emptyList() }
-        val leftPolygons = createPolygons(upperLeftVertices, lowerLeftVertices) getOrElse { emptyList() }
-        val rightPolygons = createPolygons(lowerRightVertices, upperRightVertices) getOrElse { emptyList() }
+        val basePolygons = createPolygons(lowerLeftVertices, lowerRightVertices).toResult() getOrElse { emptyList() }
+        val topPolygons = createPolygons(upperRightVertices, upperLeftVertices).toResult() getOrElse { emptyList() }
+        val leftPolygons = createPolygons(upperLeftVertices, lowerLeftVertices).toResult() getOrElse { emptyList() }
+        val rightPolygons = createPolygons(lowerRightVertices, upperRightVertices).toResult() getOrElse { emptyList() }
 
         // calculate the start and end faces
         val startPolygons = run {
@@ -139,7 +140,7 @@ data class ParametricSweep3D(
                 lowerLeftVertices.first(),
                 tolerance = tolerance
             )
-            linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
+            linearRing.calculatePolygonsGlobalCS().toResult() getOrElse { emptyList() }
         }
         val endPolygons = run {
             val linearRing = LinearRing3D.of(
@@ -149,23 +150,24 @@ data class ParametricSweep3D(
                 upperRightVertices.last(),
                 tolerance = tolerance
             )
-            linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
+            linearRing.calculatePolygonsGlobalCS().toResult() getOrElse { emptyList() }
         }
 
         // combine all polygons
         val allPolygons = basePolygons + topPolygons + leftPolygons + rightPolygons +
             startPolygons + endPolygons
-        return Result.success(allPolygons)
+        return Either.Right(allPolygons)
     }
 
     private fun createPolygons(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>):
-        Result<List<Polygon3D>, Exception> =
+        Either<Exception, List<Polygon3D>> =
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
-            .handleFailure { return it }
-            .map { it.calculatePolygonsGlobalCS() }
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
+            .map { it.calculatePolygonsGlobalCS().toResult() }
+            .handleFailure { return Either.Left(it.error) }
             .flatten()
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 

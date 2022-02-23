@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.opendrive2roadspaces.geometry
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
@@ -28,6 +28,8 @@ import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.handleFailure
+import io.rtron.std.toEither
+import io.rtron.std.toResult
 import io.rtron.transformer.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
@@ -52,13 +54,13 @@ class Curve3DBuilder(
         id: RoadspaceIdentifier,
         planViewGeometries: List<RoadPlanViewGeometry>,
         elevationProfiles: List<RoadElevationProfileElevation>
-    ): Result<Curve3D, IllegalArgumentException> {
+    ): Either<IllegalArgumentException, Curve3D> {
 
         val planViewCurve2D =
-            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, planViewGeometries, configuration.offsetXY).handleFailure { return it }
+            _curve2DBuilder.buildCurve2DFromPlanViewGeometries(id, planViewGeometries, configuration.offsetXY).toResult().handleFailure { return Either.Left(it.error) }
         val heightFunction = buildHeightFunction(id, elevationProfiles)
 
-        return Result.success(Curve3D(planViewCurve2D, heightFunction))
+        return Either.Right(Curve3D(planViewCurve2D, heightFunction))
     }
 
     /**
@@ -93,7 +95,8 @@ class Curve3DBuilder(
 
         val curve2D = _curve2DBuilder
             .buildLateralTranslatedCurve(roadObject.repeat, roadReferenceLine)
-            .handleFailure { reportLogger.log(it, roadObject.id); return emptyList() }
+            .toResult()
+            .handleFailure { reportLogger.log(it.toEither(), roadObject.id); return emptyList() }
         val heightFunction = _functionBuilder
             .buildStackedHeightFunctionFromRepeat(roadObject.repeat, roadReferenceLine)
 

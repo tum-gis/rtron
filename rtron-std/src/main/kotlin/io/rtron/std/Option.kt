@@ -16,8 +16,8 @@
 
 package io.rtron.std
 
+import arrow.core.Either
 import arrow.core.Option
-import com.github.kittinunf.result.Result
 
 /**
  * Returns true, if the value of this equals the [otherValue].
@@ -35,5 +35,5 @@ inline fun <T : Any?> Option<T>.present(f: (T) -> Unit) { if (isDefined()) f(orN
 inline fun <V : Any?> Option<V>.handleEmpty(block: (Option<V>) -> Nothing): V =
     if (isDefined()) orNull()!! else block(this)
 
-fun <T> Option<T>.getResult(): Result<T, IllegalStateException> =
-    if (isDefined()) Result.success(orNull()!!) else Result.error(IllegalStateException(""))
+fun <T> Option<T>.getResult(): Either<IllegalStateException, T> =
+    if (isDefined()) Either.Right(orNull()!!) else Either.Left(IllegalStateException(""))

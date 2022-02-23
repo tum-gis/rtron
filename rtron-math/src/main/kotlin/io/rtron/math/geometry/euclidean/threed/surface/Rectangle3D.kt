@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.transform.AffineSequence3D
 
@@ -50,8 +50,8 @@ data class Rectangle3D(
     private val lowerRightPoint = Vector3D(halfLength, -halfWidth, 0.0)
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> {
         val vertices = listOf(upperRightPoint, upperLeftPoint, lowerLeftPoint, lowerRightPoint)
-        return Result.success(listOf(Polygon3D(vertices, tolerance)))
+        return Either.Right(listOf(Polygon3D(vertices, tolerance)))
     }
 }

@@ -16,11 +16,12 @@
 
 package io.rtron.transformer.roadspaces2citygml.module
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.roadspaces2citygml.geometry.LevelOfDetail
@@ -43,41 +44,42 @@ class BuildingModuleBuilder(
     private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
-    fun createBuildingFeature(roadspaceObject: RoadspaceObject): Result<Building, Exception> {
+    fun createBuildingFeature(roadspaceObject: RoadspaceObject): Either<Exception, Building> {
 
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
 
         val buildingFeatureResult = if (geometryTransformer.isSetSolid()) createLod2Building(roadspaceObject.id, geometryTransformer) else createLod1Building(geometryTransformer)
-        val buildingFeature = buildingFeatureResult.handleFailure { return it }
+        val buildingFeature = buildingFeatureResult.toResult().handleFailure { return Either.Left(it.error) }
 
         // semantics
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name, buildingFeature)
         _attributesAdder.addAttributes(roadspaceObject, buildingFeature)
 
-        return Result.success(buildingFeature)
+        return Either.Right(buildingFeature)
     }
 
     /**
      * Creates a building feature with individual roof, ground and wall surfaces.
      * In order to cut out the respective geometries of the roof, ground and wall, a solid must be set in the [geometryTransformer].
      */
-    private fun createLod2Building(id: RoadspaceObjectIdentifier, geometryTransformer: GeometryTransformer): Result<Building, Exception> {
+    private fun createLod2Building(id: RoadspaceObjectIdentifier, geometryTransformer: GeometryTransformer): Either<Exception, Building> {
         require(geometryTransformer.isSetSolid()) { "Solid geometry is required to create an LoD2 building." }
         val buildingFeature = Building()
 
         val roofSurfaceFeature = RoofSurface()
-        roofSurfaceFeature.lod2MultiSurface = geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).handleFailure { return it }
+        roofSurfaceFeature.lod2MultiSurface = geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).toResult().handleFailure { return Either.Left(it.error) }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
         identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "RoofSurface", dstCityObject = roofSurfaceFeature)
 
         val groundSurfaceFeature = GroundSurface()
-        groundSurfaceFeature.lod2MultiSurface = geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).handleFailure { return it }
+        groundSurfaceFeature.lod2MultiSurface = geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).toResult().handleFailure { return Either.Left(it.error) }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
         identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "FloorSurface", dstCityObject = groundSurfaceFeature)
 
         geometryTransformer.getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE)
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
             .forEachIndexed { index, multiSurfaceProperty ->
                 val wallSurfaceFeature = WallSurface()
                 wallSurfaceFeature.lod2MultiSurface = multiSurfaceProperty
@@ -85,13 +87,13 @@ class BuildingModuleBuilder(
                 identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "WallSurface", index, wallSurfaceFeature)
             }
 
-        return Result.success(buildingFeature)
+        return Either.Right(buildingFeature)
     }
 
-    private fun createLod1Building(geometryTransformer: GeometryTransformer): Result<Building, Exception> {
+    private fun createLod1Building(geometryTransformer: GeometryTransformer): Either<Exception, Building> {
         val buildingFeature = Building()
-        buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE).handleFailure { return it }
+        buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE).toResult().handleFailure { return Either.Left(it.error) }
 
-        return Result.success(buildingFeature)
+        return Either.Right(buildingFeature)
     }
 }

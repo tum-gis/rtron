@@ -16,12 +16,13 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Range
 import io.rtron.math.range.Tolerable
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 data class ParametricBoundedSurface3D(
     val leftBoundary: Curve3D,
@@ -43,22 +44,23 @@ data class ParametricBoundedSurface3D(
         get() = leftBoundary.length
 
     private val leftVertices by lazy {
-        leftBoundary.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        leftBoundary.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
     }
 
     private val rightVertices by lazy {
-        rightBoundary.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        rightBoundary.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
     }
 
     // Methods
 
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> =
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> =
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
-            .handleFailure { return it }
-            .map { it.calculatePolygonsGlobalCS() }
-            .handleFailure { return it }
+            .toResult()
+            .handleFailure { return Either.Left(it.error) }
+            .map { it.calculatePolygonsGlobalCS().toResult() }
+            .handleFailure { return Either.Left(it.error) }
             .flatten()
-            .let { Result.success(it) }
+            .let { Either.Right(it) }
 
     companion object {
         const val DEFAULT_STEP_SIZE: Double = 0.3 // used for tesselation

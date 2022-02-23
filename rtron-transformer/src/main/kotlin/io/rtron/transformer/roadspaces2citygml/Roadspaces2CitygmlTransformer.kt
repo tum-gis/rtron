@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.roadspaces2citygml
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.github.kittinunf.result.success
 import io.rtron.io.logging.LogManager
 import io.rtron.io.logging.ProgressBar
@@ -25,6 +25,7 @@ import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 import io.rtron.std.unwrapValues
 import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.roadspaces2citygml.module.IdentifierAdder
@@ -148,8 +149,8 @@ class Roadspaces2CitygmlTransformer(
         val lanesMap = roadspacesModel.getAllLeftRightLanes().map { configuration.gmlIdPrefix + it.id.hashedId to it }.toMap()
         trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
             val currentLane = lanesMap.getValueResult(currentTrafficSpace.`object`.id).handleFailure { throw it.error }
-            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).handleFailure { throw it.error }
-            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).handleFailure { throw it.error }
+            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).toResult().handleFailure { throw it.error }
+            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).toResult().handleFailure { throw it.error }
 
             currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
             currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
@@ -158,10 +159,10 @@ class Roadspaces2CitygmlTransformer(
 
     private fun calculateBoundingShape(
         abstractCityObjects: List<AbstractCityObject>,
-        crs: Result<CoordinateReferenceSystem, Exception>
+        crs: Either<Exception, CoordinateReferenceSystem>
     ): BoundingShape {
         val envelope = Envelope()
-        crs.success { envelope.srsName = it.srsName }
+        crs.toResult().success { envelope.srsName = it.srsName }
         abstractCityObjects.forEach { envelope.include(it.computeEnvelope()) }
         return BoundingShape(envelope)
     }

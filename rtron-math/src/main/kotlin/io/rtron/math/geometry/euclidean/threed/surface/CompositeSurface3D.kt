@@ -16,8 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.std.handleFailure
+import io.rtron.std.toResult
 
 /**
  * Represents a composition of multiple surface members.
@@ -40,8 +41,8 @@ class CompositeSurface3D(
     constructor(surfaceMember: AbstractSurface3D) : this(listOf(surfaceMember))
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
-        val polygons = surfaceMembers.map { it.calculatePolygonsGlobalCS() }.handleFailure { return it }.flatten()
-        return Result.success(polygons)
+    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> {
+        val polygons = surfaceMembers.map { it.calculatePolygonsGlobalCS().toResult() }.handleFailure { return Either.Left(it.error) }.flatten()
+        return Either.Right(polygons)
     }
 }
