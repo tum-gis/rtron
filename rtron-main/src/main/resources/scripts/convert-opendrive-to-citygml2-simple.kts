@@ -9,7 +9,8 @@ import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlVersion
 
 /**
- * This function iterates over all files contained in the input directory that have the extension "xodr".
+ * This script converts OpenDRIVE datasets to CityGML2 by iterating over all files with the extension "xodr" in the
+ * input directory.
  */
 processAllFiles(
     inInputDirectory = "/project/input", // adjust path to directory of input datasets

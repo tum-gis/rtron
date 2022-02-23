@@ -5,13 +5,12 @@
 @file:DependsOn("io.rtron:rtron-main:1.2.2")
 */
 
-/**
- * This script lists all the different configuration options to transform OpenDRIVE to CityGML.
- */
-
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlVersion
 
+/**
+ * This script lists all the different configuration options to transform OpenDRIVE to CityGML.
+ */
 processAllFiles(
     inInputDirectory = "/project/input", // adjust path to directory of input datasets
     withExtension = "xodr",

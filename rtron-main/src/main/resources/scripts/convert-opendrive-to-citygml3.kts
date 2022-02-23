@@ -10,9 +10,8 @@ import io.rtron.readerwriter.citygml.CitygmlVersion
 
 /**
  * This script converts OpenDRIVE datasets to CityGML3.
- * Make sure to disable the backwards compatibility option and
+ * Make sure to disable the backwards compatibility option and to enable the writing of CityGML3.
  */
-
 processAllFiles(
     inInputDirectory = "/project/input", // adjust path to directory of input datasets
     withExtension = "xodr",
