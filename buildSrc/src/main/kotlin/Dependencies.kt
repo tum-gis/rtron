@@ -30,13 +30,13 @@ object DependencyVersions {
 
     // logging
     const val kotlinLogging = "2.1.21"
-    const val slf4jSimple = "1.7.33"
+    const val slf4jSimple = "1.7.36"
 
     // documentation
     const val orchid = "0.21.1"
 
     // object creation
-    const val jakartaActivationApi = "2.0.1"
+    const val jakartaActivationApi = "2.1.0"
     const val jakartaXmlBindApi = "3.0.1"
     const val jaxb = "3.0.2"
 
@@ -54,7 +54,7 @@ object DependencyVersions {
     // math
     const val guava = "31.0.1-jre"
     const val commonsMath = "3.6.1"
-    const val joml = "1.10.3"
+    const val joml = "1.10.4"
     const val poly2tri = "0.1.2"
 
     // geo
