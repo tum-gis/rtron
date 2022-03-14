@@ -18,7 +18,7 @@ processAllFiles(
 )
 {
 
-    val opendriveModel = readOpendriveModel(inputFilePath)
+    val opendriveModel = readOpendriveModel(inputFilePath).fold( { logger.warn(it.message); return@processAllFiles }, { it }) // TODO
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
         // allowed tolerance when comparing double values
         tolerance = 1E-7

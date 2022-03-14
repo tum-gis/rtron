@@ -16,6 +16,7 @@
 
 package io.rtron.main.project
 
+import arrow.core.Either
 import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
@@ -26,6 +27,7 @@ import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.readerwriter.citygml.CitygmlWriter
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfigurationBuilder
 import io.rtron.readerwriter.opendrive.OpendriveReader
+import io.rtron.readerwriter.opendrive.OpendriveReaderException
 import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfigurationBuilder
 import io.rtron.transformer.opendrive2roadspaces.Opendrive2RoadspacesTransformer
 import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfigurationBuilder
@@ -43,12 +45,14 @@ class Project(val projectId: String, val inputFilePath: Path, val outputDirector
 
     val inputFileIdentifier = FileIdentifier.of(inputFilePath)
 
+    val logger = LogManager.getReportLogger("project")
+
     /** enable concurrent processing during the transformation of a model*/
     var concurrentProcessing: Boolean = false
 
     // Methods
 
-    fun readOpendriveModel(filePath: Path, setup: OpendriveReaderConfigurationBuilder.() -> Unit = {}): OpendriveModel {
+    fun readOpendriveModel(filePath: Path, setup: OpendriveReaderConfigurationBuilder.() -> Unit = {}): Either<OpendriveReaderException, OpendriveModel> {
         val builder = OpendriveReaderConfigurationBuilder(projectId)
         val configuration = builder.apply(setup).build()
         return OpendriveReader(configuration).read(filePath)

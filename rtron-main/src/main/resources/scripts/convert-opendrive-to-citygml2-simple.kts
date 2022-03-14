@@ -21,7 +21,7 @@ processAllFiles(
     // Within this block the transformations can be defined by the user. For example:
 
     // 1. Read the OpenDRIVE dataset into memory:
-    val opendriveModel = readOpendriveModel(inputFilePath)
+    val opendriveModel = readOpendriveModel(inputFilePath).fold( { logger.warn(it.message); return@processAllFiles }, { it }) // TODO
 
     // 2. Transform the OpenDRIVE model to an intermediary representation (the RoadSpaces model):
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {

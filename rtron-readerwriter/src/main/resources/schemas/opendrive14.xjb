@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright 2019-2020 Chair of Geoinformatics, Technical University of Munich
+  ~ Copyright 2019-2022 Chair of Geoinformatics, Technical University of Munich
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
         <javaType xmlType="xsd:double" name="java.lang.Double"/>
     </globalBindings>
 
-    <bindings schemaLocation="OpenDRIVE_1.4H.xsd" version="1.4">
+    <bindings schemaLocation="opendrive14/OpenDRIVE_1.4H.xsd" version="1.4">
         <schemaBindings>
             <package name="org.asam.opendrive14"/>
         </schemaBindings>

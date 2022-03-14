@@ -16,11 +16,24 @@
 
 package io.rtron.readerwriter.opendrive.configuration
 
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.io.files.Path
+
 class OpendriveReaderConfigurationBuilder(
     val projectId: String
 ) {
+
+    // Properties and Initializers
+
+    /**
+     * Directory for exporting the schema report.
+     */
+    var outputSchemaValidationReportDirectoryPath: Option<Path> = None
+
     // Methods
     fun build() = OpendriveReaderConfiguration(
-        projectId
+        projectId,
+        outputSchemaValidationReportDirectoryPath
     )
 }

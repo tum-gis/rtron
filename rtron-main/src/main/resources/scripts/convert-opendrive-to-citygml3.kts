@@ -18,7 +18,7 @@ processAllFiles(
     toOutputDirectory = "/project/output" // adjust path to output directory
 )
 {
-    val opendriveModel = readOpendriveModel(inputFilePath)
+    val opendriveModel = readOpendriveModel(inputFilePath).fold( { logger.warn(it.message); return@processAllFiles }, { it }) // TODO
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
         crsEpsg = 32632
     }

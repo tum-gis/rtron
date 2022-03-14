@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ Copyright 2019-2020 Chair of Geoinformatics, Technical University of Munich
+  ~ Copyright 2019-2022 Chair of Geoinformatics, Technical University of Munich
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -20,10 +20,17 @@
 
     <globalBindings generateIsSetMethod="true" underscoreBinding="asCharInWord"/>
 
-    <bindings schemaLocation="OpenDRIVE_1.5M.xsd" version="1.5">
+    <bindings schemaLocation="opendrive17/opendrive_17_core.xsd" version="1.7">
         <schemaBindings>
-            <package name="org.asam.opendrive15"/>
+            <package name="org.asam.opendrive17"/>
         </schemaBindings>
+
+        <bindings node="//xs:schema//xs:simpleType[@name='e_unitSlope']/xs:restriction/xs:enumeration[@value='%']">
+            <typesafeEnumMember name="PERCENT"/>
+        </bindings>
+    </bindings>
+
+    <bindings schemaLocation="opendrive17/opendrive_17_lane.xsd" version="1.7">
 
         <bindings node="//xs:complexType[@name='t_road_lanes_laneSection_lcr_lane_roadMark']">
             <bindings node=".//xs:attribute[@name='type']">
@@ -31,9 +38,6 @@
             </bindings>
         </bindings>
 
-        <bindings node="//xs:schema//xs:simpleType[@name='e_unitSlope']/xs:restriction/xs:enumeration[@value='%']">
-            <typesafeEnumMember name="PERCENT"/>
-        </bindings>
     </bindings>
 
 </jaxb:bindings>

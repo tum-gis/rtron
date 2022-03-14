@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    // documentation libraries
     orchidImplementation("io.github.javaeden.orchid:OrchidCore:${DependencyVersions.orchid}")
     orchidImplementation("io.github.javaeden.orchid:OrchidCopper:${DependencyVersions.orchid}")
     orchidRuntimeOnly("io.github.javaeden.orchid:OrchidDocs:${DependencyVersions.orchid}")

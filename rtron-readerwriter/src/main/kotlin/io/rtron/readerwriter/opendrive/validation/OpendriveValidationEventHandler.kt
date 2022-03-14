@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.configuration
+package io.rtron.readerwriter.opendrive.validation
 
-import arrow.core.Option
-import io.rtron.io.files.Path
+import jakarta.xml.bind.ValidationEvent
+import jakarta.xml.bind.ValidationEventHandler
 
-data class OpendriveReaderConfiguration(
-    val projectId: String,
-    val outputSchemaValidationReportDirectoryPath: Option<Path>
-) {
+class OpendriveValidationEventHandler : ValidationEventHandler {
+
     // Properties and Initializers
-    init {
-        require(outputSchemaValidationReportDirectoryPath.fold({ true }, { it.isDirectory() })) { "Path must represent a directory." }
+    val validationEvents: MutableList<ValidationEvent> = mutableListOf()
+
+    // Methods
+    override fun handleEvent(event: ValidationEvent): Boolean {
+        validationEvents.add(event)
+        return true
+    }
+
+    fun clear() {
+        validationEvents.clear()
     }
 }

@@ -21,6 +21,7 @@ object PluginVersions {
     const val xjc = "1.6"
     const val versionChecker = "0.42.0"
     const val orchid = "0.21.1"
+    const val serialization = "1.6.10"
 }
 
 object Plugins {
@@ -29,4 +30,5 @@ object Plugins {
     const val xjc = "com.github.edeandrea.xjc-generation"
     const val versionChecker = "com.github.ben-manes.versions"
     const val orchid = "com.eden.orchidPlugin"
+    const val serialization = "plugin.serialization"
 }

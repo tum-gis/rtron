@@ -17,6 +17,7 @@
 package io.rtron.readerwriter.citygml
 
 import arrow.core.Either
+import arrow.core.nonEmptyListOf
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.AbstractModel
@@ -75,6 +76,6 @@ class CitygmlWriter(
     }
 
     companion object {
-        val supportedFileExtensions = listOf("gml")
+        val supportedFileExtensions = nonEmptyListOf("gml")
     }
 }

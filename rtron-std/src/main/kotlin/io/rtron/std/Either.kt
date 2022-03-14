@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.configuration
+package io.rtron.std
 
-import arrow.core.Option
-import io.rtron.io.files.Path
+import arrow.core.Either
 
-data class OpendriveReaderConfiguration(
-    val projectId: String,
-    val outputSchemaValidationReportDirectoryPath: Option<Path>
-) {
-    // Properties and Initializers
-    init {
-        require(outputSchemaValidationReportDirectoryPath.fold({ true }, { it.isDirectory() })) { "Path must represent a directory." }
-    }
+/**
+ * Returns the value of map[key] as [Either.Right], if it exists, or as [Either.Left] otherwise.
+ *
+ * @receiver the map on which the [key] is requested
+ * @param key requested key to be accessed
+ * @return [Either] of the request
+ */
+fun <K : Any, V : Any?> Map<K, V>.getValueEither(key: K): Either<NoSuchElementException, V> {
+    val value = this[key] ?: return Either.Left(NoSuchElementException(key.toString()))
+    return Either.Right(value)
 }
+
+data class NoSuchElementException(val elementName: String) : BaseException("No element found with name $elementName.")

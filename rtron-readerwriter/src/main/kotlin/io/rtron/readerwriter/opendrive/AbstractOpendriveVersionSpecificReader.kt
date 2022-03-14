@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.configuration
+package io.rtron.readerwriter.opendrive
 
-import arrow.core.Option
+import arrow.core.Either
 import io.rtron.io.files.Path
+import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.readerwriter.opendrive.validation.OpendriveSchemaValidationReport
 
-data class OpendriveReaderConfiguration(
-    val projectId: String,
-    val outputSchemaValidationReportDirectoryPath: Option<Path>
-) {
-    // Properties and Initializers
-    init {
-        require(outputSchemaValidationReportDirectoryPath.fold({ true }, { it.isDirectory() })) { "Path must represent a directory." }
-    }
+/**
+ * Version specific reader for OpenDRIVE datasets.
+ */
+abstract class AbstractOpendriveVersionSpecificReader {
+
+    abstract fun createOpendriveModel(filePath: Path): Either<AbstractOpendriveVersionSpecificReaderException, Pair<OpendriveModel, OpendriveSchemaValidationReport>>
 }
+
+sealed class AbstractOpendriveVersionSpecificReaderException(message: String) : OpendriveReaderException(message)

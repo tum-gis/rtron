@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.configuration
+package io.rtron.std
 
-import arrow.core.Option
-import io.rtron.io.files.Path
-
-data class OpendriveReaderConfiguration(
-    val projectId: String,
-    val outputSchemaValidationReportDirectoryPath: Option<Path>
-) {
+open class BaseException(val message: String) {
     // Properties and Initializers
     init {
-        require(outputSchemaValidationReportDirectoryPath.fold({ true }, { it.isDirectory() })) { "Path must represent a directory." }
+        require(message.isNotBlank()) { "Message must not be blank." }
     }
 }

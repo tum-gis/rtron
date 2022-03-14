@@ -26,13 +26,13 @@ import io.rtron.readerwriter.opendrive.validation.OpendriveSchemaValidationRepor
 import io.rtron.readerwriter.opendrive.validation.OpendriveValidationEventHandler
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Unmarshaller
-import org.asam.opendrive14.OpenDRIVE
+import org.asam.opendrive17.OpenDRIVE
 import org.mapstruct.factory.Mappers
 import java.io.File
 import javax.xml.XMLConstants
 import javax.xml.validation.SchemaFactory
 
-class Opendrive14Reader(
+class Opendrive17Reader(
     val configuration: OpendriveReaderConfiguration
 ) : AbstractOpendriveVersionSpecificReader() {
 
@@ -46,20 +46,19 @@ class Opendrive14Reader(
 
         val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
 
-        val resource = javaClass.classLoader.getResource("schemas/opendrive14/OpenDRIVE_1.4H.xsd")!!
+        val resource = javaClass.classLoader.getResource("schemas/opendrive17/opendrive_17_core.xsd")!!
         val opendriveSchema = schemaFactory.newSchema(File(resource.toURI()))
         _jaxbUnmarshaller.schema = opendriveSchema
         _jaxbUnmarshaller.eventHandler = _validationEventHandler
     }
 
     // Methods
-
     override fun createOpendriveModel(filePath: Path): Either<AbstractOpendriveVersionSpecificReaderException, Pair<OpendriveModel, OpendriveSchemaValidationReport>> =
         either.eager {
-            val converter = Mappers.getMapper(Opendrive14Mapper::class.java)
+            val converter = Mappers.getMapper(Opendrive17Mapper::class.java)
             converter.reportLogger = LogManager.getReportLogger(configuration.projectId)
             val opendriveModel = _jaxbUnmarshaller.unmarshal(filePath.toFileJ()) as OpenDRIVE
-            val report = OpendriveSchemaValidationReport.of(OpendriveVersion.V_1_4, _validationEventHandler)
+            val report = OpendriveSchemaValidationReport.of(OpendriveVersion.V_1_7, _validationEventHandler)
 
             _validationEventHandler.clear()
             val model = converter.mapModel(opendriveModel)

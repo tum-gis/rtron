@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.cli.opendrive2citygml2
+package io.rtron.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
@@ -25,7 +25,6 @@ import com.github.ajalt.clikt.parameters.options.triple
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
-import io.rtron.cli.ColorFormatter
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.readerwriter.opendrive.OpendriveReader
@@ -57,8 +56,8 @@ class SubcommandOpendriveToCitygml3 : CliktCommand(name = "opendrive-to-citygml3
 
     override fun run() {
 
-        processAllFiles(inInputDirectory = inputPath.toString(), withExtension = OpendriveReader.supportedFileExtensions.first(), toOutputDirectory = outputPath.toString()) {
-            val opendriveModel = readOpendriveModel(inputFilePath)
+        processAllFiles(inInputDirectory = inputPath.toString(), withExtension = OpendriveReader.supportedFileExtensions.head, toOutputDirectory = outputPath.toString()) {
+            val opendriveModel = readOpendriveModel(inputFilePath).fold({ logger.warn(it.message); throw java.lang.IllegalStateException("") }, { it }) // TODO
             val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
                 this@SubcommandOpendriveToCitygml3.tolerance?.let { tolerance = it }
                 this@SubcommandOpendriveToCitygml3.crsEpsg?.let { crsEpsg = it }

@@ -89,4 +89,9 @@ class File(
      * @return text of the file
      */
     fun readText(): String = _file.readText()
+
+    /**
+     * Write the text of the file.
+     */
+    fun writeText(text: String): Unit = _file.writeText(text)
 }

@@ -23,27 +23,28 @@ object DependencyVersions {
     const val arrow = "1.0.1"
     const val result = "4.0.0"
 
-    // testing
+    // testing libraries
     const val junit = "5.8.2"
     const val assertj = "3.22.0"
     const val mockk = "1.12.2"
 
-    // logging
+    // logging libraries
     const val kotlinLogging = "2.1.21"
     const val slf4jSimple = "1.7.36"
 
-    // documentation
+    // documentation libraries
     const val orchid = "0.21.1"
 
-    // object creation
+    // object creation libraries
+    const val kotlinxSerializationJson = "1.3.2"
     const val jakartaActivationApi = "2.1.0"
     const val jakartaXmlBindApi = "3.0.1"
     const val jaxb = "3.0.2"
 
-    // object mapping
+    // object mapping libraries
     const val mapstruct = "1.4.2.Final"
 
-    // io
+    // io libraries
     const val clikt = "3.4.0"
     const val mordant = "1.2.1"
     const val commonsIO = "2.11.0"
@@ -51,13 +52,13 @@ object DependencyVersions {
     const val commonsLang = "3.12.0"
     const val emojiJava = "5.1.1"
 
-    // math
+    // math libraries
     const val guava = "31.0.1-jre"
     const val commonsMath = "3.6.1"
     const val joml = "1.10.4"
     const val poly2tri = "0.1.2"
 
-    // geo
+    // geo libraries
     const val proj4 = "1.1.4"
     const val citygml4j = "eacbbc4954"
 }
@@ -69,27 +70,28 @@ object Dependencies {
     const val arrowCore = "io.arrow-kt:arrow-core:${DependencyVersions.arrow}"
     const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
 
-    // testing
+    // testing libraries
     const val junit = "org.junit.jupiter:junit-jupiter:${DependencyVersions.junit}"
     const val assertj = "org.assertj:assertj-core:${DependencyVersions.assertj}"
     const val mockk = "io.mockk:mockk:${DependencyVersions.mockk}"
 
-    // logging
+    // logging libraries
     const val kotlinLogging = "io.github.microutils:kotlin-logging:${DependencyVersions.kotlinLogging}"
     const val slf4jSimple = "org.slf4j:slf4j-simple:${DependencyVersions.slf4jSimple}"
 
-    // object creation
+    // object creation libraries
+    const val kotlinxSerializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${DependencyVersions.kotlinxSerializationJson}"
     const val jakartaActivationApi = "jakarta.activation:jakarta.activation-api:${DependencyVersions.jakartaActivationApi}"
     const val jakartaXmlBindApi = "jakarta.xml.bind:jakarta.xml.bind-api:${DependencyVersions.jakartaXmlBindApi}"
     const val sunJaxbImpl = "com.sun.xml.bind:jaxb-impl:${DependencyVersions.jaxb}"
     const val jaxbRuntime = "org.glassfish.jaxb:jaxb-runtime:${DependencyVersions.jaxb}"
     const val jaxbXjc = "org.glassfish.jaxb:jaxb-xjc:${DependencyVersions.jaxb}"
 
-    // object mapping
+    // object mapping libraries
     const val mapstruct = "org.mapstruct:mapstruct:${DependencyVersions.mapstruct}"
     const val mapstructProcessor = "org.mapstruct:mapstruct-processor:${DependencyVersions.mapstruct}"
 
-    // io
+    // io libraries
     const val clikt = "com.github.ajalt.clikt:clikt:${DependencyVersions.clikt}"
     const val mordant = "com.github.ajalt:mordant:${DependencyVersions.mordant}"
     const val commonsIO = "commons-io:commons-io:${DependencyVersions.commonsIO}"
@@ -97,13 +99,13 @@ object Dependencies {
     const val commonsLang = "org.apache.commons:commons-lang3:${DependencyVersions.commonsLang}"
     const val emojiJava = "com.vdurmont:emoji-java:${DependencyVersions.emojiJava}"
 
-    // math
+    // math libraries
     const val guava = "com.google.guava:guava:${DependencyVersions.guava}"
     const val commonsMath = "org.apache.commons:commons-math3:${DependencyVersions.commonsMath}"
     const val joml = "org.joml:joml:${DependencyVersions.joml}"
     const val poly2tri = "org.orbisgis:poly2tri-core:${DependencyVersions.poly2tri}"
 
-    // geo
+    // geo libraries
     const val proj4 = "org.locationtech.proj4j:proj4j:${DependencyVersions.proj4}"
     const val citygml4j = "com.github.citygml4j:citygml4j:${DependencyVersions.citygml4j}"
 }

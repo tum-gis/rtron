@@ -16,17 +16,21 @@
 
 package io.rtron.readerwriter.opendrive
 
-import arrow.core.Either
-import io.rtron.io.files.Path
+import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguration
-import io.rtron.readerwriter.opendrive.validation.OpendriveSchemaValidationReport
+import org.asam.opendrive17.OpenDRIVE
+import org.mapstruct.Mapper
+import org.mapstruct.Mapping
+import org.mapstruct.NullValueCheckStrategy
 
-class Opendrive15Reader(
-    val configuration: OpendriveReaderConfiguration
-) : AbstractOpendriveVersionSpecificReader() {
+@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+abstract class Opendrive17Mapper {
 
-    override fun createOpendriveModel(filePath: Path): Either<AbstractOpendriveVersionSpecificReaderException, Pair<OpendriveModel, OpendriveSchemaValidationReport>> {
-        TODO("not implemented yet for $filePath")
-    }
+    var reportLogger = LogManager.getReportLogger("general")
+
+    @Mapping(target = "header", ignore = true)
+    @Mapping(target = "road", ignore = true)
+    @Mapping(target = "controller", ignore = true)
+    @Mapping(target = "junction", ignore = true)
+    abstract fun mapModel(model: OpenDRIVE): OpendriveModel
 }
