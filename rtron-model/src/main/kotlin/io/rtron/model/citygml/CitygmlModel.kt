@@ -16,6 +16,7 @@
 
 package io.rtron.model.citygml
 
+import arrow.core.Option
 import io.rtron.model.AbstractModel
 import org.citygml4j.model.core.AbstractCityObject
 import org.xmlobjects.gml.model.feature.BoundingShape
@@ -29,7 +30,7 @@ import org.xmlobjects.gml.model.feature.BoundingShape
  * @param cityObjects list of city objects
  */
 class CitygmlModel(
-    val name: String,
+    val name: Option<String>,
     val boundingShape: BoundingShape,
     val cityObjects: List<AbstractCityObject>
 ) : AbstractModel()

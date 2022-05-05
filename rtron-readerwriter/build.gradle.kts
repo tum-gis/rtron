@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     kotlin("kapt")
-    kotlin(Plugins.serialization) version PluginVersions.serialization
     id(Plugins.xjc) version PluginVersions.xjc
 }
 
@@ -19,7 +18,6 @@ dependencies {
     implementation(Dependencies.arrowCore)
 
     // object creation libraries
-    implementation(Dependencies.kotlinxSerializationJson)
     implementation(Dependencies.jakartaXmlBindApi)
     implementation(Dependencies.sunJaxbImpl)
     xjc(Dependencies.jakartaXmlBindApi)
@@ -44,6 +42,27 @@ xjcGeneration {
     defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
 
     schemas {
+        create("opendrive11") {
+            schemaDir = "opendrive11/"
+            schemaRootDir = "$projectDir/src/main/resources/schemas/"
+            bindingFile = "src/main/resources/schemas/opendrive11.xjb"
+            javaPackageName = "org.asam.opendrive11"
+        }
+
+        create("opendrive12") {
+            schemaDir = "opendrive12/"
+            schemaRootDir = "$projectDir/src/main/resources/schemas/"
+            bindingFile = "src/main/resources/schemas/opendrive12.xjb"
+            javaPackageName = "org.asam.opendrive12"
+        }
+
+        create("opendrive13") {
+            schemaDir = "opendrive13/"
+            schemaRootDir = "$projectDir/src/main/resources/schemas/"
+            bindingFile = "src/main/resources/schemas/opendrive13.xjb"
+            javaPackageName = "org.asam.opendrive13"
+        }
+
         create("opendrive14") {
             schemaDir = "opendrive14/"
             schemaRootDir = "$projectDir/src/main/resources/schemas/"
@@ -56,6 +75,13 @@ xjcGeneration {
             schemaRootDir = "$projectDir/src/main/resources/schemas/"
             bindingFile = "src/main/resources/schemas/opendrive15.xjb"
             javaPackageName = "org.asam.opendrive15"
+        }
+
+        create("opendrive16") {
+            schemaDir = "opendrive16/"
+            schemaRootDir = "$projectDir/src/main/resources/schemas/"
+            bindingFile = "src/main/resources/schemas/opendrive16.xjb"
+            javaPackageName = "org.asam.opendrive16"
         }
 
         create("opendrive17") {

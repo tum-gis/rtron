@@ -16,18 +16,55 @@
 
 package io.rtron.model.opendrive.junction
 
-import io.rtron.model.opendrive.common.EContactPoint
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Validated
+import arrow.core.invalid
+import arrow.core.valid
+import io.rtron.io.report.MessageSeverity
+import io.rtron.io.report.Report
+import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionConnection(
-    var predecessor: JunctionPredecessorSuccessor = JunctionPredecessorSuccessor(),
-    var successor: JunctionPredecessorSuccessor = JunctionPredecessorSuccessor(),
-    var laneLink: List<JunctionConnectionLaneLink> = listOf(),
-    // TODO g_additionalData
+    var predecessor: Option<JunctionPredecessorSuccessor> = None,
+    var successor: Option<JunctionPredecessorSuccessor> = None,
+    var laneLink: List<JunctionConnectionLaneLink> = emptyList(),
 
+    var connectingRoad: Option<String> = None,
+    var contactPoint: Option<EContactPoint> = None,
     var id: String = "",
-    var incomingRoad: String = "",
-    var connectingRoad: String = "",
-    var contactPoint: EContactPoint = EContactPoint.UNKNOWN,
-    var connectionMaster: String = "",
-    var type: EJunctionType = EJunctionType.DEFAULT
-)
+    var incomingRoad: Option<String> = None,
+    var linkedRoad: Option<String> = None,
+    var type: Option<EConnectionType> = None
+) : OpendriveElement() {
+
+    // Properties and Initializers
+    val idValidated: Validated<OpendriveException.MissingValue, String>
+        get() = if (id.isBlank()) OpendriveException.MissingValue("").invalid() else id.valid()
+
+    // Methods
+    fun getFatalViolations(): List<OpendriveException> =
+        idValidated.fold({ listOf(it) }, { emptyList() })
+
+    fun healMinorViolations(): Report {
+        val report = Report()
+
+        if (connectingRoad.exists { it.isBlank() }) {
+            connectingRoad = None
+            report.append("ConnectingRoad attribute is set, but only a blank string. Unsetting.", MessageSeverity.WARNING)
+        }
+
+        if (incomingRoad.exists { it.isBlank() }) {
+            incomingRoad = None
+            report.append("IncomingRoad attribute is set, but only a blank string. Unsetting.", MessageSeverity.WARNING)
+        }
+
+        if (linkedRoad.exists { it.isBlank() }) {
+            linkedRoad = None
+            report.append("LinkedRoad attribute is set, but only a blank string. Unsetting.", MessageSeverity.WARNING)
+        }
+
+        return report
+    }
+}

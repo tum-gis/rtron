@@ -18,15 +18,15 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.6.10"
-    const val coroutines = "1.6.0"
+    const val kotlin = "1.6.20"
+    const val coroutines = "1.6.1"
     const val arrow = "1.0.1"
     const val result = "4.0.0"
 
     // testing libraries
     const val junit = "5.8.2"
     const val assertj = "3.22.0"
-    const val mockk = "1.12.2"
+    const val mockk = "1.12.3"
 
     // logging libraries
     const val kotlinLogging = "2.1.21"
@@ -42,7 +42,7 @@ object DependencyVersions {
     const val jaxb = "3.0.2"
 
     // object mapping libraries
-    const val mapstruct = "1.4.2.Final"
+    const val mapstruct = "1.5.0.Beta2"
 
     // io libraries
     const val clikt = "3.4.0"
@@ -59,7 +59,7 @@ object DependencyVersions {
     const val poly2tri = "0.1.2"
 
     // geo libraries
-    const val proj4 = "1.1.4"
+    const val proj4 = "1.1.5"
     const val citygml4j = "eacbbc4954"
 }
 

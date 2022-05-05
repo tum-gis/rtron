@@ -18,7 +18,9 @@
 
 <jaxb:bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <globalBindings generateIsSetMethod="true" underscoreBinding="asCharInWord"/>
+    <globalBindings underscoreBinding="asCharInWord">
+        <javaType xmlType="xs:integer" name="java.lang.Integer"/>
+    </globalBindings>
 
     <bindings schemaLocation="opendrive17/opendrive_17_core.xsd" version="1.7">
         <schemaBindings>
@@ -31,13 +33,11 @@
     </bindings>
 
     <bindings schemaLocation="opendrive17/opendrive_17_lane.xsd" version="1.7">
-
         <bindings node="//xs:complexType[@name='t_road_lanes_laneSection_lcr_lane_roadMark']">
             <bindings node=".//xs:attribute[@name='type']">
                 <property name="typeAttribute"/>
             </bindings>
         </bindings>
-
     </bindings>
 
 </jaxb:bindings>

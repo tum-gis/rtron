@@ -17,6 +17,7 @@
 package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -153,13 +154,12 @@ class ConcatenatedFunction(
          * @param prependConstant if true, the first linear function is preceded by a constant function
          */
         fun ofPolynomialFunctions(
-            starts: List<Double>,
-            coefficients: List<DoubleArray>,
+            starts: NonEmptyList<Double>,
+            coefficients: NonEmptyList<DoubleArray>,
             prependConstant: Boolean = false,
             prependConstantValue: Double = Double.NaN
         ): UnivariateFunction {
 
-            require(starts.isNotEmpty() && coefficients.isNotEmpty()) { "List of starts and coefficients must not be empty." }
             require(starts.hasSameSizeAs(coefficients)) { "Equally sized starts and coefficients required." }
             require(starts.isStrictlySorted()) { "Polynomials must be sorted in strict ascending order." }
 

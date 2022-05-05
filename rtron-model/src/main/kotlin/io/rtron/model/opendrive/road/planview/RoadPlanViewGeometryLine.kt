@@ -16,16 +16,10 @@
 
 package io.rtron.model.opendrive.road.planview
 
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadPlanViewGeometryLine(
-    var userData: List<UserData> = listOf(),
-    var include: List<Include> = listOf(),
-    var dataQuality: DataQuality = DataQuality()
-) : RoadPlanViewGeometryInterface {
+class RoadPlanViewGeometryLine : OpendriveElement() {
 
     // not known, due to no variables in this class
-    override fun isNaN() = false
+    fun isNaN() = false
 }

@@ -19,7 +19,6 @@ package io.rtron.io.logging
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
 /**
@@ -29,7 +28,6 @@ import kotlin.time.toDuration
  * @param completion maximum steps to until the task is completed
  * @param currentStatus current progress status
  */
-@OptIn(ExperimentalTime::class)
 class ProgressBar(
     private val taskName: String,
     private val completion: Int,

@@ -17,7 +17,6 @@
 package io.rtron.math.geometry.euclidean.threed.solid
 
 import arrow.core.Either
-import com.github.kittinunf.result.map
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D

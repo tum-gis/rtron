@@ -17,6 +17,7 @@
 package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
+import arrow.core.nonEmptyListOf
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -89,8 +90,8 @@ internal class ConcatenatedFunctionTest {
 
         @Test
         fun `concatenated function with absolute start at 0`() {
-            val starts = listOf(0.0, 5.0)
-            val coefficients = listOf(
+            val starts = nonEmptyListOf(0.0, 5.0)
+            val coefficients = nonEmptyListOf(
                 doubleArrayOf(2.0, 3.0, 4.0, 1.0),
                 doubleArrayOf(1.0, 2.0, 3.0, 4.0)
             )
@@ -114,8 +115,8 @@ internal class ConcatenatedFunctionTest {
 
         @Test
         fun `concatenated function with absolute start at -2`() {
-            val starts = listOf(-2.0, 3.0)
-            val coefficients = listOf(
+            val starts = nonEmptyListOf(-2.0, 3.0)
+            val coefficients = nonEmptyListOf(
                 doubleArrayOf(2.0, 3.0, 4.0, 1.0),
                 doubleArrayOf(1.0, 2.0, 3.0, 4.0)
             )
@@ -139,8 +140,8 @@ internal class ConcatenatedFunctionTest {
 
         @Test
         fun `concatenated function with absolute start at 2`() {
-            val starts = listOf(2.0, 7.0)
-            val coefficients = listOf(
+            val starts = nonEmptyListOf(2.0, 7.0)
+            val coefficients = nonEmptyListOf(
                 doubleArrayOf(2.0, 3.0, 4.0, 1.0),
                 doubleArrayOf(1.0, 2.0, 3.0, 4.0)
             )

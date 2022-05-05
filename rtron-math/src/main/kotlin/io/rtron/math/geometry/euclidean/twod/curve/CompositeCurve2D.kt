@@ -17,14 +17,15 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
-import com.github.kittinunf.result.map
+import arrow.core.computations.ResultEffect.bind
+import arrow.core.computations.either
+import arrow.core.left
 import io.rtron.math.container.ConcatenationContainer
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Represents the sequential concatenation of the [curveMembers].
@@ -53,27 +54,21 @@ data class CompositeCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Vector2D> {
+        Either<Exception, Vector2D> = either.eager {
 
-        val localMember = container
-            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).bind()
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePointGlobalCS(localPoint)
+        localMember.member.calculatePointGlobalCS(localPoint).bind()
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Rotation2D> {
+        Either<Exception, Rotation2D> = either.eager {
 
-        val localMember = container
-            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).bind()
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }
+        localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }.bind()
     }
 
     // Conversions
@@ -81,7 +76,28 @@ data class CompositeCurve2D(
         return "CompositeCurve2D(curveMembers=$curveMembers)"
     }
 
-    /*companion object {
-        fun of(vararg curveMembers: AbstractCurve2D) = CompositeCurve2D(curveMembers.toList())
-    }*/
+    companion object {
+        fun of(curveMembers: List<AbstractCurve2D>, absoluteDomains: List<Range<Double>>, absoluteStarts: List<Double>, distanceTolerance: Double, angleTolerance: Double): Either<GeometryException, CompositeCurve2D> = either.eager {
+
+            curveMembers.zipWithNext().forEach {
+                val frontCurveMemberEndPose = it.first.calculatePoseGlobalCS(CurveRelativeVector1D(it.first.length)).bind()
+                val backCurveMemberStartPose = it.second.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).bind()
+
+                if (frontCurveMemberEndPose.point.fuzzyUnequals(backCurveMemberStartPose.point, distanceTolerance)) {
+                    val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
+                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance of $distance."
+                    GeometryException.OverlapOrGapInCurve(suffix).left().bind<GeometryException.OverlapOrGapInCurve>()
+                }
+
+                if (frontCurveMemberEndPose.rotation.fuzzyUnequals(backCurveMemberStartPose.rotation, angleTolerance)) {
+                    val angleDifference = frontCurveMemberEndPose.rotation - backCurveMemberStartPose.rotation
+                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference: ${angleDifference.toAngleRadians()} radians."
+                    GeometryException.KinkInCurve(suffix).left().bind<GeometryException.KinkInCurve>()
+                }
+            }
+
+            val compositeCurve2D = CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts)
+            compositeCurve2D
+        }
+    }
 }

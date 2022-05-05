@@ -18,12 +18,9 @@ package io.rtron.std
 
 import arrow.core.Either
 import arrow.core.Option
-
-/**
- * Returns true, if the value of this equals the [otherValue].
- * If no value [isDefined], false is returned.
- */
-infix fun <T> Option<T>.equalsValue(otherValue: T): Boolean = handleEmpty { return false } == otherValue
+import arrow.core.Validated
+import arrow.core.invalid
+import arrow.core.valid
 
 /** Returns a list of values of type [T], whereby the empty [Option] are ignored. */
 fun <T> List<Option<T>>.unwrapValues(): List<T> = filter { it.isDefined() }.map { it.orNull()!! }
@@ -37,3 +34,6 @@ inline fun <V : Any?> Option<V>.handleEmpty(block: (Option<V>) -> Nothing): V =
 
 fun <T> Option<T>.getResult(): Either<IllegalStateException, T> =
     if (isDefined()) Either.Right(orNull()!!) else Either.Left(IllegalStateException(""))
+
+fun <L, A> Option<A>.toValidated(ifEmpty: () -> L): Validated<L, A> =
+    fold({ ifEmpty().invalid() }, { it.valid() })

@@ -16,8 +16,11 @@
 
 package io.rtron.model.opendrive.junction
 
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.model.opendrive.core.OpendriveElement
+
 data class JunctionPriority(
-    // TODO g_additionalData
-    var high: String = "",
-    var low: String = ""
-)
+    var high: Option<String> = None,
+    var low: Option<String> = None
+) : OpendriveElement()

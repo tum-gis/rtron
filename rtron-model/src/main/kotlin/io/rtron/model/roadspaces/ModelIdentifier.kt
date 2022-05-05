@@ -16,6 +16,7 @@
 
 package io.rtron.model.roadspaces
 
+import arrow.core.Option
 import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.FileIdentifierInterface
 
@@ -23,9 +24,9 @@ import io.rtron.io.files.FileIdentifierInterface
  * Model identifier interface required for class delegation.
  */
 interface ModelIdentifierInterface {
-    val modelName: String
-    val modelDate: String
-    val modelVendor: String
+    val modelName: Option<String>
+    val modelDate: Option<String>
+    val modelVendor: Option<String>
 }
 
 /**
@@ -37,8 +38,8 @@ interface ModelIdentifierInterface {
  * @param sourceFileIdentifier identifier of the model's source file
  */
 data class ModelIdentifier(
-    override val modelName: String,
-    override val modelDate: String,
-    override val modelVendor: String,
+    override val modelName: Option<String>,
+    override val modelDate: Option<String>,
+    override val modelVendor: Option<String>,
     val sourceFileIdentifier: FileIdentifier
 ) : ModelIdentifierInterface, FileIdentifierInterface by sourceFileIdentifier

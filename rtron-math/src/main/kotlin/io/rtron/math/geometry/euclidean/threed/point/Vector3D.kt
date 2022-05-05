@@ -72,10 +72,10 @@ data class Vector3D(
     operator fun unaryPlus() = Vector3D(x, y, z)
     operator fun unaryMinus() = Vector3D(-x, -y, -z)
 
-    fun fuzzyEquals(o: Vector3D, epsilon: Double) = doubleFuzzyEquals(this.x, o.x, epsilon) &&
-        doubleFuzzyEquals(this.y, o.y, epsilon) &&
-        doubleFuzzyEquals(this.z, o.z, epsilon)
-    fun fuzzyUnequals(o: Vector3D, epsilon: Double) = !fuzzyEquals(o, epsilon)
+    fun fuzzyEquals(o: Vector3D, tolerance: Double) = doubleFuzzyEquals(this.x, o.x, tolerance) &&
+        doubleFuzzyEquals(this.y, o.y, tolerance) &&
+        doubleFuzzyEquals(this.z, o.z, tolerance)
+    fun fuzzyUnequals(o: Vector3D, tolerance: Double) = !fuzzyEquals(o, tolerance)
 
     // Methods
 

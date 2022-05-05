@@ -16,13 +16,15 @@
 
 package io.rtron.model.opendrive.road
 
-import io.rtron.model.opendrive.common.CountryCode
-import io.rtron.model.opendrive.common.ERoadType
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.model.opendrive.core.ECountryCode
+import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadType(
-    var roadTypeSpeed: RoadTypeSpeed = RoadTypeSpeed(),
-    // var additionalData: AdditionalData = AdditionalData(),
+    var speed: Option<RoadTypeSpeed> = None,
+
+    var country: Option<ECountryCode> = None,
     var s: Double = Double.NaN,
     var type: ERoadType = ERoadType.UNKNOWN,
-    var countryCode: CountryCode = CountryCode()
-)
+) : OpendriveElement()

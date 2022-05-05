@@ -29,10 +29,20 @@ data class Junction(
     val id: JunctionIdentifier,
     val connections: List<Connection>
 ) {
+    // Properties and Initializers
+    init {
+        // require(connections.isNotEmpty()) { "Connections must not be empty." }
+    }
 
     // Methods
 
-    fun getConnectingRoadspaceIds() = connections.map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }.distinct()
+    fun getConnectingRoadspaceIds() = connections
+        .map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }
+        .distinct()
+
+    /*fun getConnection(incomingRoadspace: RoadspaceContactPointIdentifier): Option<RoadspaceContactPointIdentifier> {
+        connections.filter { it.incomingRoadspaceContactPointId == incomingRoadspace }
+    }*/
 
     /**
      * Returns the successor lane referenced by [LaneIdentifier], which follow the [laneIdentifier].

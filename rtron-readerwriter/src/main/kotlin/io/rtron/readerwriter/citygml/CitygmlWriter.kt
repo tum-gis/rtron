@@ -20,7 +20,6 @@ import arrow.core.Either
 import arrow.core.nonEmptyListOf
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
-import io.rtron.model.AbstractModel
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
 import io.rtron.std.handleAndRemoveFailure
@@ -41,9 +40,7 @@ class CitygmlWriter(
 
     // Methods
 
-    fun write(model: AbstractModel, directoryPath: Path): Either<Exception, List<Path>> {
-        require(model is CitygmlModel) { "$this received not a CitygmlModel." }
-
+    fun write(model: CitygmlModel, directoryPath: Path): Either<Exception, List<Path>> {
         val filePaths = configuration.versions.map { write(model, it, directoryPath) }
             .map { it.toResult() }
             .handleAndRemoveFailure { _reportLogger.log(it.toEither()) }

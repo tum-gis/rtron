@@ -21,13 +21,15 @@ processAllFiles(
 )
 {
     val opendriveModel = readOpendriveModel(inputFilePath)
+        .fold( { logger.warn(it.message); return@processAllFiles }, { it })
+
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
         crsEpsg = 32631
         // offsets are determined by a PROJ4 transformation from the PROJ string of the OpenDRIVE to
         // the PROJ string of EPSG:32631
         offsetX = 376992.8779778732
         offsetY = 4564830.71808729
-    }
+    }.fold( { logger.warn(it.message); return@processAllFiles }, { it })
     val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
         discretizationStepSize = 0.5
         flattenGenericAttributeSets = true

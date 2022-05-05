@@ -48,14 +48,14 @@ data class CurveRelativeVector3D(
 
     /**
      * Returns true, if [curvePosition], [lateralOffset] and [heightOffset] are all fuzzily equal with a tolerance
-     * of [epsilon].
+     * of [tolerance].
      */
-    fun fuzzyEquals(o: CurveRelativeVector3D, epsilon: Double) =
-        doubleFuzzyEquals(this.curvePosition, o.curvePosition, epsilon) &&
-            doubleFuzzyEquals(this.lateralOffset, o.lateralOffset, epsilon) &&
-            doubleFuzzyEquals(this.heightOffset, o.heightOffset, epsilon)
+    fun fuzzyEquals(o: CurveRelativeVector3D, tolerance: Double) =
+        doubleFuzzyEquals(this.curvePosition, o.curvePosition, tolerance) &&
+            doubleFuzzyEquals(this.lateralOffset, o.lateralOffset, tolerance) &&
+            doubleFuzzyEquals(this.heightOffset, o.heightOffset, tolerance)
 
-    fun fuzzyUnequals(o: CurveRelativeVector3D, epsilon: Double) = !fuzzyEquals(o, epsilon)
+    fun fuzzyUnequals(o: CurveRelativeVector3D, tolerance: Double) = !fuzzyEquals(o, tolerance)
 
     // Methods
     fun getCartesianCurveOffset() = Vector3D(0.0, lateralOffset, heightOffset)

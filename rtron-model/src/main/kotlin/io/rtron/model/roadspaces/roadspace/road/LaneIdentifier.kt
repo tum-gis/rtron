@@ -69,6 +69,9 @@ data class LaneIdentifier(
         getAdjacentInnerLaneIdentifier() == other || getAdjacentOuterLaneIdentifier() == other
 
     // Conversions
+    fun toStringMap(): Map<String, String> =
+        mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
+
     override fun toString() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
     fun toRoadspaceIdentifier() = laneSectionIdentifier.roadspaceIdentifier
 

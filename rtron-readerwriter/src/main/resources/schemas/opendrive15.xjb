@@ -18,7 +18,9 @@
 
 <jaxb:bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <globalBindings generateIsSetMethod="true" underscoreBinding="asCharInWord"/>
+    <globalBindings underscoreBinding="asCharInWord">
+        <javaType xmlType="xs:integer" name="java.lang.Integer"/>
+    </globalBindings>
 
     <bindings schemaLocation="opendrive15/OpenDRIVE_1.5M.xsd" version="1.5">
         <schemaBindings>

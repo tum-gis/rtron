@@ -43,6 +43,9 @@ data class RoadspaceIdentifier(
     val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
 
     // Conversions
+
+    fun toStringMap(): Map<String, String> = mapOf("roadspaceId" to roadspaceId)
+
     override fun toString(): String {
         return "RoadspaceIdentifier(roadspaceId=$roadspaceId)"
     }

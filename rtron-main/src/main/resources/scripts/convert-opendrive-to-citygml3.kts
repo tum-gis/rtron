@@ -18,10 +18,13 @@ processAllFiles(
     toOutputDirectory = "/project/output" // adjust path to output directory
 )
 {
-    val opendriveModel = readOpendriveModel(inputFilePath).fold( { logger.warn(it.message); return@processAllFiles }, { it }) // TODO
+    val opendriveModel = readOpendriveModel(inputFilePath)
+        .fold( { logger.warn(it.message); return@processAllFiles }, { it })
+
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
         crsEpsg = 32632
-    }
+    }.fold( { logger.warn(it.message); return@processAllFiles }, { it })
+
     val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
         // if false, all classes according to CityGML3 are populated
         mappingBackwardsCompatibility = false

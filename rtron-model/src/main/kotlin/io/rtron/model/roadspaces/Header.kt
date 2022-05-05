@@ -16,14 +16,14 @@
 
 package io.rtron.model.roadspaces
 
-import arrow.core.Either
+import arrow.core.Option
 import io.rtron.math.projection.CoordinateReferenceSystem
 
 /**
  * Header of the [RoadspacesModel] containing the model's meta information.
  */
 data class Header(
-    val coordinateReferenceSystem: Either<Exception, CoordinateReferenceSystem>,
+    val coordinateReferenceSystem: Option<CoordinateReferenceSystem>,
 
     val north: Double = Double.NaN,
     val south: Double = Double.NaN,

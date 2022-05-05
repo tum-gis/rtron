@@ -16,9 +16,11 @@
 
 package io.rtron.model.opendrive.road
 
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.model.opendrive.core.OpendriveElement
+
 data class RoadLink(
-    var predecessor: RoadLinkPredecessorSuccessor = RoadLinkPredecessorSuccessor(),
-    var successor: RoadLinkPredecessorSuccessor = RoadLinkPredecessorSuccessor()
-    // TODO: var neighbour
-    // TODO ref additional data
-)
+    var predecessor: Option<RoadLinkPredecessorSuccessor> = None,
+    var successor: Option<RoadLinkPredecessorSuccessor> = None
+) : OpendriveElement()

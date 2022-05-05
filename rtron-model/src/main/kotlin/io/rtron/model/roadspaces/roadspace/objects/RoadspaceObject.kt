@@ -28,7 +28,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 data class RoadspaceObject(
     val id: RoadspaceObjectIdentifier,
     val type: RoadObjectType = RoadObjectType.NONE,
-    val geometry: List<AbstractGeometry3D> = listOf(),
+    val geometry: List<AbstractGeometry3D> = emptyList(),
     val attributes: AttributeList
 ) {
 

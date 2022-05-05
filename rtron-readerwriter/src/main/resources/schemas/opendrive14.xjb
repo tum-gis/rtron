@@ -18,7 +18,7 @@
 
 <jaxb:bindings xmlns="https://jakarta.ee/xml/ns/jaxb" version="3.0" xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <globalBindings generateIsSetMethod="true" underscoreBinding="asCharInWord">
+    <globalBindings underscoreBinding="asCharInWord">
         <javaType xmlType="xsd:unsignedShort" name="java.lang.Integer"/>
         <javaType xmlType="xsd:float" name="java.lang.Float"/>
         <javaType xmlType="xsd:double" name="java.lang.Double"/>
@@ -29,19 +29,17 @@
             <package name="org.asam.opendrive14"/>
         </schemaBindings>
 
-        <bindings node="//xs:schema//xs:complexType[@name='centerLane']//xs:sequence//xs:element[@name='roadMark']//xs:complexType//xs:sequence//xs:element[@name='type']">
-            <property name="typeRoadMark"/>
-        </bindings>
-
-        <bindings node="//xs:schema//xs:complexType[@name='lane']//xs:sequence//xs:element[@name='roadMark']//xs:complexType//xs:sequence//xs:element[@name='type']">
+        <bindings node="//xs:schema//xs:complexType[@name='centerLane']//xs:sequence//xs:element[@name='roadMark']//xs:complexType//xs:attribute[@name='type']">
             <property name="typeAttribute"/>
         </bindings>
 
+        <bindings node="//xs:schema//xs:complexType[@name='lane']//xs:sequence//xs:element[@name='roadMark']//xs:complexType//xs:attribute[@name='type']">
+            <property name="typeAttribute"/>
+        </bindings>
 
         <bindings node="//xs:schema//xs:simpleType[@name='unit']/xs:restriction/xs:enumeration[@value='%']">
             <typesafeEnumMember name="PERCENT"/>
         </bindings>
-
     </bindings>
 
 </jaxb:bindings>

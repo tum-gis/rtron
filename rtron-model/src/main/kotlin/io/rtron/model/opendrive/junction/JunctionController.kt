@@ -16,9 +16,12 @@
 
 package io.rtron.model.opendrive.junction
 
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.model.opendrive.core.OpendriveElement
+
 class JunctionController(
-    // TODO g_additionalData
     var id: String = "",
-    var type: String = "",
-    var sequence: Int = Int.MIN_VALUE
-)
+    var sequence: Option<Int> = None,
+    var type: Option<String> = None
+) : OpendriveElement()

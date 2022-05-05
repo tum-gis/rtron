@@ -17,6 +17,7 @@
 package io.rtron.math.container
 
 import arrow.core.Either
+import arrow.core.right
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Range
 import io.rtron.math.range.RangeSet
@@ -24,11 +25,8 @@ import io.rtron.math.range.containsConsecutivelyIntersectingRanges
 import io.rtron.math.range.fuzzyContains
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.shift
-import io.rtron.std.handleSuccess
 import io.rtron.std.hasSameSizeAs
 import io.rtron.std.isSortedBy
-import io.rtron.std.toEither
-import io.rtron.std.toResult
 
 /**
  * Concatenates a list of [members] with a locally defined domain to a container with an absolutely defined domain.
@@ -107,7 +105,7 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param tolerance applied tolerance for the fuzzy selection
      */
     fun fuzzySelectMember(parameter: Double, tolerance: Double): Either<Exception, LocalRequest<T>> {
-        strictSelectMember(parameter).toResult().handleSuccess { return it.toEither() }
+        strictSelectMember(parameter).tap { return it.right() }
 
         val selection = absoluteDomains
             .withIndex()

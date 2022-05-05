@@ -32,7 +32,7 @@ import io.rtron.std.noneWithNextEnclosing
  * @param vertices vertices of the polygon must be located in a plane
  */
 data class Polygon3D(
-    val vertices: List<Vector3D> = listOf(),
+    val vertices: List<Vector3D> = emptyList(),
     override val tolerance: Double,
     override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D() {

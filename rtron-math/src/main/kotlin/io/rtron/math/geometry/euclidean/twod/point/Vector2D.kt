@@ -18,6 +18,7 @@ package io.rtron.math.geometry.euclidean.twod.point
 
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
+import io.rtron.math.std.fuzzyEquals as doubleFuzzyEquals
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D as CMVector2D
 import org.joml.Vector2d as JOMLVector2D
 
@@ -62,6 +63,10 @@ data class Vector2D(
     operator fun div(m: Double): Vector2D = scalarDivide(m)
     operator fun unaryPlus() = Vector2D(x, y)
     operator fun unaryMinus() = Vector2D(-x, -y)
+
+    fun fuzzyEquals(o: Vector2D, tolerance: Double) = doubleFuzzyEquals(this.x, o.x, tolerance) &&
+        doubleFuzzyEquals(this.y, o.y, tolerance)
+    fun fuzzyUnequals(o: Vector2D, tolerance: Double) = !fuzzyEquals(o, tolerance)
 
     // Methods
 

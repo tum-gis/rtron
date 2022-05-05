@@ -17,7 +17,6 @@
 package io.rtron.model.roadspaces.roadspace.road
 
 import arrow.core.Either
-import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -67,7 +66,7 @@ data class LaneSection(
         lanes: List<Lane>,
         centerLane: CenterLane
     ) :
-        this(id, curvePositionDomain, lanes.map { it.id.laneId to it }.toMap(), centerLane)
+        this(id, curvePositionDomain, lanes.associateBy { it.id.laneId }, centerLane)
 
     // Methods
     fun getLane(laneId: Int): Either<IllegalArgumentException, Lane> = lanes.getValueResult(laneId).toEither()

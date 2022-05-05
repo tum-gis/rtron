@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin(Plugins.serialization) version PluginVersions.serialization
 }
 
 kotlinProject()
@@ -10,6 +11,9 @@ dependencies {
 
     // standard libraries
     implementation(Dependencies.arrowCore)
+
+    // object creation libraries
+    implementation(Dependencies.kotlinxSerializationJson)
 
     // logging libraries
     implementation(Dependencies.kotlinLogging)

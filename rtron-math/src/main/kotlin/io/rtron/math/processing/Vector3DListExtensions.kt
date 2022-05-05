@@ -104,7 +104,7 @@ fun List<Vector3D>.isPlanar(tolerance: Double, dynamicToleranceAdjustment: Boole
     require(size >= 3) { "Planarity check requires the provision of at least three points." }
 
     val adjustedTolerance = if (dynamicToleranceAdjustment) {
-        val u = Math.ulp(this.flatMap { it.toDoubleList() }.map(::abs).maxOrNull()!!)
+        val u = Math.ulp(this.flatMap { it.toDoubleList() }.maxOf(::abs))
         val dynamicFactor = u / DBL_EPSILON
         tolerance * dynamicFactor
     } else tolerance

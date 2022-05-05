@@ -17,6 +17,7 @@
 package io.rtron.model.roadspaces.roadspace.road
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.none
@@ -42,7 +43,6 @@ import io.rtron.model.roadspaces.roadspace.ContactPoint
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
-import io.rtron.std.equalsValue
 import io.rtron.std.getValueResult
 import io.rtron.std.handleFailure
 import io.rtron.std.isSortedBy
@@ -65,7 +65,7 @@ class Road(
     val surface: AbstractCurveRelativeSurface3D,
     val surfaceWithoutTorsion: AbstractCurveRelativeSurface3D,
     val laneOffset: UnivariateFunction,
-    val laneSections: List<LaneSection>,
+    val laneSections: NonEmptyList<LaneSection>,
     val linkage: RoadLinkage
 ) {
 
@@ -76,7 +76,6 @@ class Road(
         require(curvePositionDomain.hasUpperBound()) { "Domain of curve position must have a upper bound." }
         require(surface.tolerance == surfaceWithoutTorsion.tolerance) { "Surface and SurfaceWithoutTorsion must have the same tolerance." }
         require(laneOffset.domain.fuzzyEncloses(surface.domain, surface.tolerance)) { "The lane offset function must be defined everywhere where the surface is also defined." }
-        require(laneSections.isNotEmpty()) { "Road must contain laneSections." }
         require(
             laneSections.mapIndexed { index, laneSection -> index to laneSection }
                 .all { it.first == it.second.id.laneSectionId }
@@ -113,7 +112,7 @@ class Road(
     fun getAllLeftRightLaneIdentifiers(): List<LaneIdentifier> = getAllLeftRightLanes().map { it.id }
 
     /** Returns all left and right lanes as a flattened list. */
-    fun getAllLeftRightLanes(): List<Lane> = laneSections.flatMap { it.lanes.values }
+    fun getAllLeftRightLanes(): List<Lane> = laneSections.toList().flatMap { it.lanes.values }
 
     /** Returns the identifiers of all center lanes as a list. */
     fun getAllCenterLaneIdentifier(): List<LaneIdentifier> = laneSections.map { it.centerLane.id }
@@ -143,8 +142,8 @@ class Road(
     /** Returns the contact point of the roadspace which connects to the junction with the [junctionIdentifier]. */
     fun getRoadspaceContactPointToJunction(junctionIdentifier: JunctionIdentifier): Option<RoadspaceContactPointIdentifier> =
         when {
-            linkage.predecessorJunctionId equalsValue junctionIdentifier -> Some(RoadspaceContactPointIdentifier(ContactPoint.START, id))
-            linkage.successorJunctionId equalsValue junctionIdentifier -> Some(RoadspaceContactPointIdentifier(ContactPoint.END, id))
+            linkage.predecessorJunctionId.exists { it == junctionIdentifier } -> Some(RoadspaceContactPointIdentifier(ContactPoint.START, id))
+            linkage.successorJunctionId.exists { it == junctionIdentifier } -> Some(RoadspaceContactPointIdentifier(ContactPoint.END, id))
             else -> none()
         }
 

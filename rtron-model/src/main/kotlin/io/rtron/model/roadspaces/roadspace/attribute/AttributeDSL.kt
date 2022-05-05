@@ -53,7 +53,10 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, optionalValue: Option<String>) {
-        optionalValue.present { attributes += StringAttribute(namePrefix + name, it) }
+        optionalValue.present {
+            if (it.isNotBlank())
+                attributes += StringAttribute(namePrefix + name, it)
+        }
     }
 
     /**

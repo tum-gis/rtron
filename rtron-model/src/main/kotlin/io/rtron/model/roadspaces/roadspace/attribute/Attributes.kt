@@ -93,7 +93,7 @@ class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) 
  *
  * @param name name of the list
  */
-class AttributeList(val attributes: List<Attribute> = listOf(), name: String = "") : Attribute(name) {
+class AttributeList(val attributes: List<Attribute> = emptyList(), name: String = "") : Attribute(name) {
 
     // Operators
     operator fun plus(other: AttributeList): AttributeList {

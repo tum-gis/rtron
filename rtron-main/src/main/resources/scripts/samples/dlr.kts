@@ -23,6 +23,8 @@ processAllFiles(
 )
 {
     val opendriveModel = readOpendriveModel(inputFilePath)
+        .fold( { logger.warn(it.message); return@processAllFiles }, { it })
+
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
         crsEpsg = 32632
         offsetX = 604763.0
@@ -31,7 +33,7 @@ processAllFiles(
         // This is a manually estimated height offset, so that the OpenDRIVE dataset can be combined with the
         // LoD2 building models. Thus, take the value with caution.
         offsetZ = -43.28
-    }
+    }.fold( { logger.warn(it.message); return@processAllFiles }, { it })
     val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
         discretizationStepSize = 0.5
         flattenGenericAttributeSets = true

@@ -16,14 +16,24 @@
 
 package io.rtron.model.opendrive.road.planview
 
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+import arrow.core.NonEmptyList
+import arrow.core.Validated
+import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.core.OpendriveElement
+import io.rtron.std.toValidated
 
 data class RoadPlanView(
-    var geometry: List<RoadPlanViewGeometry> = listOf(),
+    var geometry: List<RoadPlanViewGeometry> = emptyList(),
+) : OpendriveElement() {
 
-    var userData: List<UserData> = listOf(),
-    var include: List<Include> = listOf(),
-    var dataQuality: DataQuality = DataQuality()
-)
+    val geometryValidated: Validated<OpendriveException.EmptyList, NonEmptyList<RoadPlanViewGeometry>>
+        get() = NonEmptyList.fromList(geometry).toValidated { OpendriveException.EmptyList("geometry") }
+
+    // Methods
+
+    fun getSevereViolations(): List<OpendriveException> = geometryValidated.fold({ listOf(it) }, { emptyList() })
+    fun healMinorViolations(): List<OpendriveException> {
+        val healedViolations = mutableListOf<OpendriveException>()
+        return healedViolations
+    }
+}

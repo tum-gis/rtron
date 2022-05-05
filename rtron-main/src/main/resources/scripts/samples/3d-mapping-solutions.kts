@@ -23,9 +23,11 @@ processAllFiles(
 )
 {
     val opendriveModel = readOpendriveModel(inputFilePath)
+        .fold( { logger.warn(it.message); return@processAllFiles }, { it })
+
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
         crsEpsg = 32632
-    }
+    }.fold( { logger.warn(it.message); return@processAllFiles }, { it })
     val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
         discretizationStepSize = 0.5
         flattenGenericAttributeSets = true

@@ -16,8 +16,8 @@
 
 package io.rtron.model.roadspaces.junction
 
+import arrow.core.None
 import arrow.core.Option
-import arrow.core.none
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.std.getValueResult
@@ -38,6 +38,11 @@ data class Connection(
     val laneLinks: Map<LaneIdentifier, LaneIdentifier>
 ) {
 
+    // Properties and Initializers
+    init {
+        require(laneLinks.isNotEmpty()) { "Lane links must not be empty." }
+    }
+
     // Methods
 
     /**
@@ -46,7 +51,7 @@ data class Connection(
      * @param laneIdentifier identifier of the lane for which the linked and succeeding lane shall be found
      */
     fun getSuccessorLane(laneIdentifier: LaneIdentifier): Option<LaneIdentifier> {
-        if (incomingRoadspaceContactPointId.roadspaceIdentifier != laneIdentifier.toRoadspaceIdentifier()) return none()
+        if (incomingRoadspaceContactPointId.roadspaceIdentifier != laneIdentifier.toRoadspaceIdentifier()) return None
 
         return laneLinks.getValueResult(laneIdentifier).toOption()
     }

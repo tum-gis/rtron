@@ -17,12 +17,10 @@
 package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
+import arrow.core.right
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.isPlanar
-import io.rtron.std.handleSuccess
-import io.rtron.std.toEither
-import io.rtron.std.toResult
 
 @RequiresOptIn(message = "The triangulation functionality is experimental.")
 @Retention(AnnotationRetention.BINARY)
@@ -51,16 +49,13 @@ object Triangulator {
             return Either.Right(listOf(Polygon3D(linearRing.vertices, tolerance)))
 
         // run triangulation algorithms until one succeeds
-        val errorStandard = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-            .toResult()
-            .handleSuccess { return it.toEither() }
+        val standardResult = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
+            .tap { return it.right() }
         fallbackTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-            .toResult()
-            .handleSuccess { return it.toEither() }
+            .tap { return it.right() }
         fanTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-            .toResult()
-            .handleSuccess { return it.toEither() }
+            .tap { return it.right() }
 
-        return Either.Left(errorStandard)
+        return standardResult
     }
 }

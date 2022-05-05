@@ -29,10 +29,11 @@ import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfigurationBui
 import io.rtron.readerwriter.opendrive.OpendriveReader
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
 import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfigurationBuilder
-import io.rtron.transformer.opendrive2roadspaces.Opendrive2RoadspacesTransformer
-import io.rtron.transformer.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfigurationBuilder
-import io.rtron.transformer.roadspaces2citygml.Roadspaces2CitygmlTransformer
-import io.rtron.transformer.roadspaces2citygml.configuration.Roadspaces2CitygmlConfigurationBuilder
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformerException
+import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfigurationBuilder
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
+import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfigurationBuilder
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -45,7 +46,7 @@ class Project(val projectId: String, val inputFilePath: Path, val outputDirector
 
     val inputFileIdentifier = FileIdentifier.of(inputFilePath)
 
-    val logger = LogManager.getReportLogger("project")
+    val logger = LogManager.getReportLogger(projectId)
 
     /** enable concurrent processing during the transformation of a model*/
     var concurrentProcessing: Boolean = false
@@ -58,7 +59,7 @@ class Project(val projectId: String, val inputFilePath: Path, val outputDirector
         return OpendriveReader(configuration).read(filePath)
     }
 
-    fun transformOpendrive2Roadspaces(opendriveModel: OpendriveModel, setup: Opendrive2RoadspacesConfigurationBuilder.() -> Unit = {}): RoadspacesModel {
+    fun transformOpendrive2Roadspaces(opendriveModel: OpendriveModel, setup: Opendrive2RoadspacesConfigurationBuilder.() -> Unit = {}): Either<Opendrive2RoadspacesTransformerException, RoadspacesModel> {
         val builder = Opendrive2RoadspacesConfigurationBuilder(projectId, inputFileIdentifier, concurrentProcessing)
         val configuration = builder.apply(setup).build()
         return Opendrive2RoadspacesTransformer(configuration).transform(opendriveModel)

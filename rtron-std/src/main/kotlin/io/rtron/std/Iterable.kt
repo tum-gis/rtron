@@ -28,8 +28,7 @@ internal fun <T> Iterable<T>.collectionSizeOrDefault(default: Int): Int =
  * @receiver list of individual [Double] values on which the cumulative sum operation is performed on
  * @return list of accumulated values
  */
-@OptIn(ExperimentalStdlibApi::class)
-@kotlin.jvm.JvmName("cumulativeSumOfDouble")
+@JvmName("cumulativeSumOfDouble")
 fun Iterable<Double>.cumulativeSum(): List<Double> = scan(0.0) { acc, element -> acc + element }
 
 /**
@@ -38,8 +37,7 @@ fun Iterable<Double>.cumulativeSum(): List<Double> = scan(0.0) { acc, element ->
  * @receiver list of individual [Float] values on which the cumulative sum operation is performed on
  * @return list of accumulated values
  */
-@OptIn(ExperimentalStdlibApi::class)
-@kotlin.jvm.JvmName("cumulativeSumOfFloat")
+@JvmName("cumulativeSumOfFloat")
 fun Iterable<Float>.cumulativeSum(): List<Float> = scan(0.0f) { acc, element -> acc + element }
 
 /**
@@ -48,8 +46,7 @@ fun Iterable<Float>.cumulativeSum(): List<Float> = scan(0.0f) { acc, element -> 
  * @receiver list of individual [Int] values on which the cumulative sum operation is performed on
  * @return list of accumulated values
  */
-@OptIn(ExperimentalStdlibApi::class)
-@kotlin.jvm.JvmName("cumulativeSumOfInt")
+@JvmName("cumulativeSumOfInt")
 fun Iterable<Int>.cumulativeSum(): List<Int> = scan(0) { acc, element -> acc + element }
 
 /**
@@ -104,6 +101,15 @@ fun <T> Iterable<T>.zipWithNextToTriples(): List<Triple<T, T, T>> =
  */
 inline fun <T, R : Comparable<R>> Iterable<T>.isSortedBy(crossinline selector: (T) -> R): Boolean =
     this.asSequence().zipWithNext { a, b -> selector(a) <= selector(b) }.all { it }
+
+/**
+ * Returns true, if the list is strictly sorted ascending according to the [selector].
+ *
+ * @param selector the return of the [selector] is used for evaluating whether the list is sorted
+ * @return true, if the list is sorted in ascending order
+ */
+inline fun <T, R : Comparable<R>> Iterable<T>.isStrictlySortedBy(crossinline selector: (T) -> R): Boolean =
+    this.asSequence().zipWithNext { a, b -> selector(a) < selector(b) }.all { it }
 
 /**
  * Returns true, if list is sorted in weak ascending order.

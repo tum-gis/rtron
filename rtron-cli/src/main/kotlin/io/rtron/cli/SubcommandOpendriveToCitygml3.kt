@@ -57,16 +57,18 @@ class SubcommandOpendriveToCitygml3 : CliktCommand(name = "opendrive-to-citygml3
     override fun run() {
 
         processAllFiles(inInputDirectory = inputPath.toString(), withExtension = OpendriveReader.supportedFileExtensions.head, toOutputDirectory = outputPath.toString()) {
-            val opendriveModel = readOpendriveModel(inputFilePath).fold({ logger.warn(it.message); throw java.lang.IllegalStateException("") }, { it }) // TODO
+            val opendriveModel = readOpendriveModel(inputFilePath)
+                .fold({ logger.warn(it.message); return@processAllFiles }, { it })
+
             val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
-                this@SubcommandOpendriveToCitygml3.tolerance?.let { tolerance = it }
+                this@SubcommandOpendriveToCitygml3.tolerance?.let { numberTolerance = it }
                 this@SubcommandOpendriveToCitygml3.crsEpsg?.let { crsEpsg = it }
                 offset?.let {
                     offsetX = it.first
                     offsetY = it.second
                     offsetZ = it.third
                 }
-            }
+            }.fold({ logger.warn(it.message); return@processAllFiles }, { it })
 
             val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
                 flattenGenericAttributeSets = true

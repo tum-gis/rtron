@@ -16,6 +16,7 @@
 
 package io.rtron.model.roadspaces.roadspace.objects
 
+import arrow.core.Option
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifierInterface
 import java.util.UUID
@@ -29,7 +30,7 @@ import java.util.UUID
  */
 data class RoadspaceObjectIdentifier(
     val roadspaceObjectId: String,
-    val roadspaceObjectName: String,
+    val roadspaceObjectName: Option<String>,
     val roadspaceIdentifier: RoadspaceIdentifier
 ) : RoadspaceIdentifierInterface by roadspaceIdentifier {
 

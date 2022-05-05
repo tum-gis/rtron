@@ -17,7 +17,7 @@
 package io.rtron.io.csv
 
 import io.rtron.io.files.Path
-import org.apache.commons.csv.CSVFormat
+import org.apache.commons.csv.CSVFormat.Builder
 import java.io.Flushable
 import java.nio.file.Files
 import org.apache.commons.csv.CSVPrinter as CMCSVPrinter
@@ -36,7 +36,11 @@ class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
     }
 
     private val _writer = Files.newBufferedWriter(filePath.toPathN())
-    private val _csvPrinter = CMCSVPrinter(_writer, CSVFormat.DEFAULT.withHeader(*header.toTypedArray()))
+    private val _csvPrinter: CMCSVPrinter
+    init {
+        val csvFormat = Builder.create().setHeader(*header.toTypedArray()).build()
+        _csvPrinter = CMCSVPrinter(_writer, csvFormat)
+    }
 
     // Methods
     /**

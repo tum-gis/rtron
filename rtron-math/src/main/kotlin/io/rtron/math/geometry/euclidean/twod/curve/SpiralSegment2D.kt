@@ -17,7 +17,6 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
-import com.github.kittinunf.result.map
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D

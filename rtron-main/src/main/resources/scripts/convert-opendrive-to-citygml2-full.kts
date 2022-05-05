@@ -18,10 +18,12 @@ processAllFiles(
 )
 {
 
-    val opendriveModel = readOpendriveModel(inputFilePath).fold( { logger.warn(it.message); return@processAllFiles }, { it }) // TODO
+    val opendriveModel = readOpendriveModel(inputFilePath)
+        .fold( { logger.warn(it.message); return@processAllFiles }, { it })
+
     val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
         // allowed tolerance when comparing double values
-        tolerance = 1E-7
+        numberTolerance = 1E-7
 
         // prefix of attribute names
         attributesPrefix = "opendrive_"
@@ -33,7 +35,9 @@ processAllFiles(
         offsetX = 0.0
         offsetY = 0.0
         offsetZ = 0.0
-    }
+    }.fold( { logger.warn(it.message); return@processAllFiles }, { it })
+
+
     val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
         // prefix for generated gml ids
         gmlIdPrefix = "UUID_"

@@ -16,19 +16,13 @@
 
 package io.rtron.model.opendrive.road.planview
 
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+import io.rtron.model.opendrive.core.OpendriveElement
 
 class RoadPlanViewGeometrySpiral(
-    var userData: List<UserData> = listOf(),
-    var include: List<Include> = listOf(),
-    var dataQuality: DataQuality = DataQuality(),
-
+    var curvEnd: Double = Double.NaN,
     var curvStart: Double = Double.NaN,
-    var curvEnd: Double = Double.NaN
-) : RoadPlanViewGeometryInterface {
+) : OpendriveElement() {
 
     // both values are required to construct the spiral
-    override fun isNaN() = curvStart.isNaN() || curvEnd.isNaN()
+    fun isNaN() = curvStart.isNaN() || curvEnd.isNaN()
 }
