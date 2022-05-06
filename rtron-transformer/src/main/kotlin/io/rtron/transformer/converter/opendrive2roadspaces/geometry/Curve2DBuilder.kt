@@ -80,8 +80,8 @@ class Curve2DBuilder(
         val lengths: List<Double> = absoluteDomains.map { it.length }
 
         val curveMembers = planViewGeometryList.zip(lengths).dropLast(1)
-            .map { buildPlanViewGeometry(id, it.first, it.second, BoundType.OPEN, offset) } +
-            buildPlanViewGeometry(id, planViewGeometryList.last(), lengths.last(), BoundType.CLOSED, offset)
+            .map { buildPlanViewGeometry(it.first, it.second, BoundType.OPEN, offset) } +
+            buildPlanViewGeometry(planViewGeometryList.last(), lengths.last(), BoundType.CLOSED, offset)
 
         return CompositeCurve2D.of(curveMembers, absoluteDomains, absoluteStarts, configuration.distanceTolerance, configuration.angleTolerance)
     }
@@ -94,20 +94,8 @@ class Curve2DBuilder(
      * @param endBoundType applied end bound type for the curve element
      * @param offset applied translational offset
      */
-    private fun buildPlanViewGeometry(
-        id: RoadspaceIdentifier,
-        geometry: RoadPlanViewGeometry,
-        length: Double,
-        endBoundType: BoundType = BoundType.OPEN,
-        offset: Vector2D = Vector2D.ZERO
-    ): AbstractCurve2D {
-
-        if (!fuzzyEquals(geometry.length, length, configuration.numberTolerance))
-            reportLogger.warn(
-                "Plan view geometry element (s=${geometry.s}) contains a length value " +
-                    "that does not match the start value of the next geometry element.",
-                id.toString()
-            )
+    private fun buildPlanViewGeometry(geometry: RoadPlanViewGeometry, length: Double, endBoundType: BoundType = BoundType.OPEN, offset: Vector2D = Vector2D.ZERO): AbstractCurve2D {
+        require(fuzzyEquals(geometry.length, length, configuration.numberTolerance)) { "Plan view geometry element (s=${geometry.s}) contains a length value that does not match the start value of the next geometry element." }
 
         val startPose = Pose2D(Vector2D(geometry.x, geometry.y), Rotation2D(geometry.hdg))
         val affineSequence = AffineSequence2D.of(Affine2D.of(offset), Affine2D.of(startPose))
