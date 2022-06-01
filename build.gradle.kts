@@ -55,7 +55,9 @@ allprojects {
     dependencies {
         implementation(kotlin(Dependencies.kotlinStandardLibrary))
         implementation(Dependencies.kotlinCoroutines)
-        implementation(Dependencies.result)
+
+        implementation(Dependencies.arrowCore)
+        implementation(Dependencies.arrowOptics)
 
         testImplementation(Dependencies.junit)
         testImplementation(Dependencies.assertj)
@@ -81,6 +83,15 @@ allprojects {
     java {
         withSourcesJar()
         withJavadocJar()
+    }
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        version.set("0.45.2")
+
+        filter {
+            exclude("**/generated/**")
+            include("**/kotlin/**")
+        }
     }
 
     publishing {
@@ -160,9 +171,9 @@ repositories {
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }

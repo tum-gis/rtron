@@ -25,12 +25,18 @@ sealed class OpendriveException(val message: String, val exceptionIdentifier: St
 
     data class NonStrictlySortedList(val attributeName: String, val suffix: String = "") :
         OpendriveException("List of attribute '$attributeName' is not strictly sorted.${if (suffix.isNotEmpty()) " $suffix" else ""}", "NonStrictlySortedList")
-    data class MissingValue(val attributeName: String) : OpendriveException("Missing value for attribute '$attributeName'.", "MissingValue")
+    data class MissingValue(val attributeName: String, val suffix: String = "") : OpendriveException("Missing value for attribute '$attributeName'.${if (suffix.isNotEmpty()) " $suffix" else ""}", "MissingValue")
     data class UnexpectedValue(val attributeName: String, val attributeValue: String, val suffix: String = "") :
         OpendriveException(
-            "Unexpected value ${if (attributeValue.isNotEmpty()) "($attributeValue)" else ""} " +
+            "Unexpected value ${if (attributeValue.isNotEmpty()) "($attributeValue)" else ""}" +
                 "for attribute '$attributeName'.${if (suffix.isNotEmpty()) " $suffix" else ""}",
             "UnexpectedValue"
+        )
+
+    data class UnexpectedValues(val attributeNames: String, val suffix: String = "") :
+        OpendriveException(
+            "Unexpected value for at least one of the attributes '$attributeNames'.${if (suffix.isNotEmpty()) " $suffix" else ""}",
+            "UnexpectedValues"
         )
 
     data class EmptyValueForOptionalAttribute(val attributeName: String) : OpendriveException("Attribute '$attributeName' is set with an empty value even though the attribute itself is optional.", "EmptyValueForOptionalAttribute")

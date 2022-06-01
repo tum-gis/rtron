@@ -16,8 +16,10 @@
 
 package io.rtron.model.opendrive.lane
 
+import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
 
+@optics
 data class RoadLanesLaneSectionLeft(
     var lane: List<RoadLanesLaneSectionLeftLane> = emptyList(),
 ) : OpendriveElement() {
@@ -29,4 +31,6 @@ data class RoadLanesLaneSectionLeft(
 
     fun getLanes() = lane.associateBy { it.id }
     fun getLanesAscending() = lane.sortedBy { it.id }
+
+    companion object
 }

@@ -17,19 +17,23 @@
 package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
 import arrow.core.Either
-import arrow.core.computations.either
-import io.rtron.io.logging.LogManager
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
+import io.rtron.io.report.ContextReport
+import io.rtron.io.report.Report
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.analysis.function.bivariate.pure.ShapeFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
-import io.rtron.math.geometry.toIllegalStateException
+import io.rtron.model.opendrive.additions.exceptions.toIllegalStateException
 import io.rtron.model.opendrive.road.lateral.RoadLateralProfileShape
-import io.rtron.model.roadspaces.ModelIdentifier
+import io.rtron.model.roadspaces.identifier.ModelIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.Roadspace
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformationException
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve3DBuilder
@@ -42,10 +46,8 @@ class RoadspaceBuilder(
     private val configuration: Opendrive2RoadspacesConfiguration
 ) {
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
-
-    private val _curve3DBuilder = Curve3DBuilder(_reportLogger, configuration)
-    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration)
+    private val _curve3DBuilder = Curve3DBuilder(configuration)
+    private val _functionBuilder = FunctionBuilder(configuration)
 
     private val _roadBuilder = RoadBuilder(configuration)
     private val _roadObjectBuilder = RoadspaceObjectBuilder(configuration)
@@ -59,25 +61,29 @@ class RoadspaceBuilder(
      * @param road source OpenDRIVE model
      * @return transformed [Roadspace]
      */
-    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Exception, Roadspace> = either.eager {
+    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Opendrive2RoadspacesTransformationException, ContextReport<Roadspace>> = either.eager {
+        val report = Report()
 
+        val opendriveRoadId = road.additionalId.toEither { IllegalStateException("Additional road ID must be available.") }.getOrHandle { throw it }
         val roadspaceId = RoadspaceIdentifier(road.id, modelId)
-        val planViewGeometries = road.planView.geometryValidated.toEither().mapLeft { IllegalStateException(it.message) }.bind()
 
         // build up road reference line
-        val roadReferenceLine = _curve3DBuilder.buildCurve3D(roadspaceId, planViewGeometries, road.getElevationEntries())
-            .mapLeft { it.toIllegalStateException() }
+        val planViewGeometries = road.planView.geometryValidated.toEither().getOrHandle { throw it.toIllegalStateException() }
+        val roadReferenceLine = _curve3DBuilder.buildCurve3D(planViewGeometries, road.getElevationEntries())
+            .mapLeft { Opendrive2RoadspacesTransformationException.PlanViewGeometryException(it.message, opendriveRoadId) }
             .bind()
         val torsionFunction = road.getSuperelevationEntries().fold(
             { LinearFunction.X_AXIS },
-            { _functionBuilder.buildCurveTorsion(roadspaceId, it) }
+            { _functionBuilder.buildCurveTorsion(it) }
         )
 
         // build attributes for the road
         val attributes = buildAttributes(road)
 
         // build up road's surface geometries
-        val lateralProfileRoadShape = buildLateralRoadShape(roadspaceId, road.getShapeEntries())
+        val lateralProfileRoadShape = road.getShapeEntries()
+            .fold({ PlaneFunction.ZERO }, { buildLateralRoadShape(roadspaceId, it) })
+
         val roadSurface = CurveRelativeParametricSurface3D(
             roadReferenceLine.copy(torsionFunction = torsionFunction),
             lateralProfileRoadShape
@@ -87,13 +93,16 @@ class RoadspaceBuilder(
         // build up the road containing only lane sections, lanes (no road side objects)
         val roadspaceRoad = _roadBuilder
             .buildRoad(roadspaceId, road, roadSurface, roadSurfaceWithoutTorsion, attributes)
-            .bind()
+            .handleReport { report += it }
 
         // build up the road space objects (OpenDRIVE: road objects & signals)
-        val roadspaceObjectsFromRoadObjects = road.objects
-            .fold({ emptyList() }, { _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, it, roadReferenceLine, attributes) })
-        val roadspaceObjectsFromRoadSignals = road.signals
-            .fold({ emptyList() }, { _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, it, roadReferenceLine, attributes) })
+        val roadspaceObjectsFromRoadObjects = road.objects.fold({ emptyList() }, { roadObjects ->
+            _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, attributes)
+                .handleReport { report += it }
+        })
+        val roadspaceObjectsFromRoadSignals = road.signals.fold({ emptyList() }, { roadSignals ->
+            _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, attributes)
+        })
 
         // combine the models into a road space object
         val roadspace = Roadspace(
@@ -104,17 +113,16 @@ class RoadspaceBuilder(
             roadspaceObjects = roadspaceObjectsFromRoadObjects + roadspaceObjectsFromRoadSignals,
             attributes = attributes
         )
-        roadspace
+        ContextReport(roadspace, report)
     }
 
-    private fun buildLateralRoadShape(id: RoadspaceIdentifier, lateralProfileShapeList: List<RoadLateralProfileShape>):
+    private fun buildLateralRoadShape(id: RoadspaceIdentifier, lateralProfileShapeList: NonEmptyList<RoadLateralProfileShape>):
         BivariateFunction {
-
-        if (lateralProfileShapeList.isEmpty()) return PlaneFunction.ZERO
 
         val lateralFunctions = lateralProfileShapeList
             .groupBy { it.s }
-            .mapValues { _functionBuilder.buildLateralShape(id, it.value) }
+            .mapValues { NonEmptyList.fromListUnsafe(it.value) }
+            .mapValues { _functionBuilder.buildLateralShape(it.value) }
             .toSortedMap()
 
         return ShapeFunction(

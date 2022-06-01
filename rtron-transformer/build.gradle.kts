@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin(Plugins.serialization) version PluginVersions.serialization
 }
 
 kotlinProject()
@@ -13,8 +14,8 @@ dependencies {
     // single model processing layer components
     implementation(project(ProjectComponents.model))
 
-    // standard libraries
-    implementation(Dependencies.arrowCore)
+    // object creation libraries
+    implementation(Dependencies.kotlinxSerializationJson)
 
     // geo libraries
     implementation(Dependencies.citygml4j)

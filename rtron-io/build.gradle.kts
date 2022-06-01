@@ -9,9 +9,6 @@ dependencies {
     // user interface layer components
     implementation(project(ProjectComponents.standard))
 
-    // standard libraries
-    implementation(Dependencies.arrowCore)
-
     // object creation libraries
     implementation(Dependencies.kotlinxSerializationJson)
 

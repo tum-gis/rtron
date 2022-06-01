@@ -20,7 +20,6 @@ import arrow.core.Either
 import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
-import io.rtron.main.system.JavaVersion
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.roadspaces.RoadspacesModel
@@ -29,8 +28,8 @@ import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfigurationBui
 import io.rtron.readerwriter.opendrive.OpendriveReader
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
 import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfigurationBuilder
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformationException
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
-import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformerException
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfigurationBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfigurationBuilder
@@ -59,7 +58,7 @@ class Project(val projectId: String, val inputFilePath: Path, val outputDirector
         return OpendriveReader(configuration).read(filePath)
     }
 
-    fun transformOpendrive2Roadspaces(opendriveModel: OpendriveModel, setup: Opendrive2RoadspacesConfigurationBuilder.() -> Unit = {}): Either<Opendrive2RoadspacesTransformerException, RoadspacesModel> {
+    fun transformOpendrive2Roadspaces(opendriveModel: OpendriveModel, setup: Opendrive2RoadspacesConfigurationBuilder.() -> Unit = {}): Either<Opendrive2RoadspacesTransformationException, RoadspacesModel> {
         val builder = Opendrive2RoadspacesConfigurationBuilder(projectId, inputFileIdentifier, concurrentProcessing)
         val configuration = builder.apply(setup).build()
         return Opendrive2RoadspacesTransformer(configuration).transform(opendriveModel)
@@ -99,10 +98,6 @@ fun processAllFiles(inInputDirectory: String, withExtension: String, toOutputDir
 @OptIn(ExperimentalTime::class)
 fun processAllFiles(inInputDirectory: String, withExtensions: Set<String>, toOutputDirectory: String = inInputDirectory + "_output", recursive: Boolean = true, process: Project.() -> Unit) {
     val generalLogger = LogManager.getReportLogger("general")
-    if (!JavaVersion.CURRENT.isAtLeast(11, 0)) {
-        generalLogger.error("Requiring a Java version of at least 11 (current Java version is ${JavaVersion.CURRENT}).")
-        return
-    }
 
     val inputDirectoryPath = Path(inInputDirectory)
     val outputDirectoryPath = Path(toOutputDirectory)

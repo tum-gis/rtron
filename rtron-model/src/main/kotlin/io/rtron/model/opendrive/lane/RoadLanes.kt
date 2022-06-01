@@ -17,16 +17,18 @@
 package io.rtron.model.opendrive.lane
 
 import arrow.core.NonEmptyList
+import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.computations.ResultEffect.bind
+import arrow.optics.optics
 import io.rtron.math.range.Range
 import io.rtron.math.range.length
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.exceptions.toIllegalStateException
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.isSortedBy
 import io.rtron.std.toValidated
 
+@optics
 data class RoadLanes(
     var laneOffset: List<RoadLanesLaneOffset> = emptyList(),
     var laneSection: List<RoadLanesLaneSection> = emptyList(),
@@ -36,21 +38,9 @@ data class RoadLanes(
     val laneSectionValidated: Validated<OpendriveException.EmptyList, NonEmptyList<RoadLanesLaneSection>>
         get() = NonEmptyList.fromList(laneSection).toValidated { OpendriveException.EmptyList("laneSection") }
 
-    // Validation Methods
-    fun getSevereViolations(): List<OpendriveException> = laneSectionValidated.fold({ listOf(it) }, { emptyList() })
-
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        if (!laneSection.isSortedBy { it.s }) {
-            healedViolations += OpendriveException.NonSortedList("laneSection")
-            laneSection = laneSection.sortedBy { it.s }
-        }
-
-        return healedViolations
-    }
-
     // Methods
+    fun getLaneOffsetEntries(): Option<NonEmptyList<RoadLanesLaneOffset>> = NonEmptyList.fromList(laneOffset)
+
     fun containsLaneOffset() = laneOffset.isNotEmpty()
 
     fun getLaneSectionRanges(lastLaneSectionEnd: Double): NonEmptyList<Range<Double>> {
@@ -71,4 +61,6 @@ data class RoadLanes(
 
     fun getLaneSectionsWithRanges(lastLaneSectionEnd: Double): NonEmptyList<Pair<Range<Double>, RoadLanesLaneSection>> =
         NonEmptyList.fromListUnsafe(getLaneSectionRanges(lastLaneSectionEnd).zip(laneSection))
+
+    companion object
 }

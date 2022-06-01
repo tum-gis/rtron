@@ -16,15 +16,17 @@
 
 package io.rtron.model.opendrive.lane
 
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.getOrElse
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.additions.identifier.AdditionalLaneIdentifier
+import io.rtron.model.opendrive.additions.identifier.LaneIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.filterToStrictSortingBy
 
 /**
- *
+ *  [RoadLanesLaneSectionLRLane] is an abstract class, to that the data classes [RoadLanesLaneSectionLeftLane],
+ *  [RoadLanesLaneSectionRightLane] and [RoadLanesLaneSectionCenterLane] can inherit from it.
  */
 abstract class RoadLanesLaneSectionLRLane(
     open var link: Option<RoadLanesLaneSectionLCRLaneLink> = None,
@@ -38,28 +40,13 @@ abstract class RoadLanesLaneSectionLRLane(
     open var rule: List<RoadLanesLaneSectionLRLaneRule> = emptyList(),
 
     open var level: Option<Boolean> = None,
-    open var type: ELaneType = ELaneType.NONE
-) : OpendriveElement() {
+    open var type: ELaneType = ELaneType.NONE,
 
-    // Validated Properties
-
-    // Validation Methods
-    fun getSevereViolations(): List<OpendriveException> = emptyList()
-
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        val widthEntriesFiltered = width.filterToStrictSortingBy { it.sOffset }
-        if (widthEntriesFiltered.size < width.size) {
-            healedViolations += OpendriveException.NonStrictlySortedList("width", "Ignoring ${width.size - widthEntriesFiltered.size} width entries which are not placed in strict order according to sOffset.")
-            width = widthEntriesFiltered
-        }
-
-        return healedViolations
-    }
+    override var additionalId: Option<LaneIdentifier> = None
+) : OpendriveElement(), AdditionalLaneIdentifier {
 
     // Properties
+    fun getLaneWidthEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneWidth>> = NonEmptyList.fromList(width)
+    fun getLaneHeightEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneHeight>> = NonEmptyList.fromList(height)
     fun getLevelWithDefault() = level.getOrElse { false }
-
-    // Methods
 }

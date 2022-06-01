@@ -50,6 +50,13 @@ inline fun <T, K> Iterable<T>.distinctConsecutiveEnclosingBy(crossinline selecto
  * Returns a list sorted according to natural sort order of the value returned by specified [selector] function by
  * filtering all unsorted elements.
  */
+inline fun <T, K : Comparable<K>> Iterable<T>.filterToSortingBy(crossinline selector: (T) -> K): List<T> =
+    this.filterToSorting { first, second -> selector(first) <= selector(second) }
+
+/**
+ * Returns a list strictly sorted according to natural sort order of the value returned by specified [selector] function by
+ * filtering all unsorted elements.
+ */
 inline fun <T, K : Comparable<K>> Iterable<T>.filterToStrictSortingBy(crossinline selector: (T) -> K): List<T> =
     this.filterToSorting { first, second -> selector(first) < selector(second) }
 

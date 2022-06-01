@@ -47,7 +47,7 @@ data class Opendrive2RoadspacesConfiguration(
      */
     val offsetXY: Vector2D = Vector2D(offsetX, offsetY)
 
-    val outputReportFilePath: Path = outputReportDirectoryPath.resolve(Path("reports/converter/opendrive2Roadspaces/conversion.json"))
+    val outputReportFilePath: Path = outputReportDirectoryPath.resolve(Path("reports/converter/opendrive2roadspaces/conversion.json"))
 
     override fun toString() =
         "Opendrive2RoadspacesConfiguration(numberTolerance=$numberTolerance, distanceTolerance=$distanceTolerance, " +

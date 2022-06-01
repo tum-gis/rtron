@@ -16,15 +16,14 @@
 
 package io.rtron.readerwriter.opendrive.configuration
 
-import arrow.core.Option
 import io.rtron.io.files.Path
 
 data class OpendriveReaderConfiguration(
     val projectId: String,
-    val outputSchemaValidationReportDirectoryPath: Option<Path>
+    val outputSchemaValidationReportDirectoryPath: Path
 ) {
     // Properties and Initializers
     init {
-        require(outputSchemaValidationReportDirectoryPath.fold({ true }, { it.isDirectory() })) { "Path must represent a directory." }
+        require(outputSchemaValidationReportDirectoryPath.isDirectory()) { "Path must represent a directory." }
     }
 }

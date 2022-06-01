@@ -35,7 +35,6 @@ class Rotation2D(
 ) {
 
     // Properties and Initializers
-
     init {
         require(angle.isFinite()) { "Rotation angle must be finite." }
     }

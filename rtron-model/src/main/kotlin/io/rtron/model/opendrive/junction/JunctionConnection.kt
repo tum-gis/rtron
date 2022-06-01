@@ -21,9 +21,9 @@ import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.invalid
 import arrow.core.valid
-import io.rtron.io.report.MessageSeverity
-import io.rtron.io.report.Report
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionConnectionIdentifier
+import io.rtron.model.opendrive.additions.identifier.JunctionConnectionIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionConnection(
@@ -36,35 +36,12 @@ data class JunctionConnection(
     var id: String = "",
     var incomingRoad: Option<String> = None,
     var linkedRoad: Option<String> = None,
-    var type: Option<EConnectionType> = None
-) : OpendriveElement() {
+    var type: Option<EConnectionType> = None,
+
+    override var additionalId: Option<JunctionConnectionIdentifier> = None
+) : OpendriveElement(), AdditionalJunctionConnectionIdentifier {
 
     // Properties and Initializers
     val idValidated: Validated<OpendriveException.MissingValue, String>
-        get() = if (id.isBlank()) OpendriveException.MissingValue("").invalid() else id.valid()
-
-    // Methods
-    fun getFatalViolations(): List<OpendriveException> =
-        idValidated.fold({ listOf(it) }, { emptyList() })
-
-    fun healMinorViolations(): Report {
-        val report = Report()
-
-        if (connectingRoad.exists { it.isBlank() }) {
-            connectingRoad = None
-            report.append("ConnectingRoad attribute is set, but only a blank string. Unsetting.", MessageSeverity.WARNING)
-        }
-
-        if (incomingRoad.exists { it.isBlank() }) {
-            incomingRoad = None
-            report.append("IncomingRoad attribute is set, but only a blank string. Unsetting.", MessageSeverity.WARNING)
-        }
-
-        if (linkedRoad.exists { it.isBlank() }) {
-            linkedRoad = None
-            report.append("LinkedRoad attribute is set, but only a blank string. Unsetting.", MessageSeverity.WARNING)
-        }
-
-        return report
-    }
+        get() = if (id.isBlank()) OpendriveException.MissingValue("id").invalid() else id.valid()
 }

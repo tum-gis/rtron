@@ -17,6 +17,8 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
+import arrow.core.right
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.BoundType
@@ -77,10 +79,10 @@ class LineSegment3D(
     }
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<IllegalArgumentException, Vector3D> {
+        Either<GeometryException, Vector3D> {
 
         val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
-        return Either.Right(point)
+        return point.right()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -111,15 +113,9 @@ class LineSegment3D(
          * Creates a [LineSegment3D], if [start] and [end] [Vector3D] are not fuzzily equal according to the [tolerance].
          *
          */
-        fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED):
-            Either<IllegalArgumentException, LineSegment3D> =
+        fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED): Either<IllegalArgumentException, LineSegment3D> =
             if (start.fuzzyEquals(end, tolerance))
-                Either.Left(
-                    IllegalArgumentException(
-                        "Start and end vector of a line segment must be different " +
-                            "according to the given tolerance."
-                    )
-                )
+                Either.Left(IllegalArgumentException("Start and end vector of a line segment must be different according to the given tolerance."))
             else Either.Right(LineSegment3D(start, end, tolerance, endBoundType))
     }
 }

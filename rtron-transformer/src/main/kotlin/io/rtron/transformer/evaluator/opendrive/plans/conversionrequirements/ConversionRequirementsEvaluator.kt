@@ -18,44 +18,39 @@ package io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements
 
 import io.rtron.io.report.ContextReport
 import io.rtron.io.report.Report
-import io.rtron.io.report.merge
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
 import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
-import io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements.lane.RoadLanesEvaluator
-import io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements.road.RoadEvaluator
 
-class ConversionRequirementsEvaluator(val configuration: OpendriveEvaluatorConfiguration) :
-    AbstractOpendriveEvaluator() {
+class ConversionRequirementsEvaluator(val configuration: OpendriveEvaluatorConfiguration) : AbstractOpendriveEvaluator() {
 
     // Properties amd Initializers
     private val _roadEvaluator = RoadEvaluator(configuration)
     private val _roadLanesEvaluator = RoadLanesEvaluator(configuration)
+    private val _junctionEvaluator = JunctionEvaluator(configuration)
 
     // Methods
     override fun evaluateFatalViolations(opendriveModel: OpendriveModel): Report {
         val report = Report()
 
-        report += _roadEvaluator.evaluateFatalViolations(opendriveModel.road)
-        report += opendriveModel.road.map { _roadLanesEvaluator.evaluateFatalViolations(it) }.merge()
-        // report += _junctionModelingRulesEvaluator.evaluateFatalViolations(opendriveModel.junction)
+        report += _roadEvaluator.evaluateFatalViolations(opendriveModel)
+        report += _roadLanesEvaluator.evaluateFatalViolations(opendriveModel)
+        report += _junctionEvaluator.evaluateFatalViolations(opendriveModel)
 
         return report
     }
     override fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextReport<OpendriveModel> {
-        val healedOpendriveModel = opendriveModel.copy()
+        var healedOpendriveModel = opendriveModel.copy()
         val report = Report()
 
-        _roadEvaluator.evaluateNonFatalViolations(healedOpendriveModel.road).let {
-            healedOpendriveModel.road = it.value
+        _roadEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
+            healedOpendriveModel = it.value
             report += it.report
         }
 
-        healedOpendriveModel.road.forEach { currentRoad ->
-            _roadLanesEvaluator.evaluateNonFatalViolations(currentRoad).let {
-                currentRoad.lanes = it.value
-                report += it.report
-            }
+        _roadLanesEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
+            healedOpendriveModel = it.value
+            report += it.report
         }
 
         return ContextReport(healedOpendriveModel, report)

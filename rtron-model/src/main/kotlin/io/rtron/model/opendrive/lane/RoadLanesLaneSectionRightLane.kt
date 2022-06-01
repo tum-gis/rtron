@@ -18,7 +18,11 @@ package io.rtron.model.opendrive.lane
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.optics.optics
+import io.rtron.model.opendrive.additions.identifier.AdditionalLaneIdentifier
+import io.rtron.model.opendrive.additions.identifier.LaneIdentifier
 
+@optics
 data class RoadLanesLaneSectionRightLane(
     var id: Int = Int.MIN_VALUE,
 
@@ -33,5 +37,10 @@ data class RoadLanesLaneSectionRightLane(
     override var rule: List<RoadLanesLaneSectionLRLaneRule> = emptyList(),
 
     override var level: Option<Boolean> = None,
-    override var type: ELaneType = ELaneType.NONE
-) : RoadLanesLaneSectionLRLane()
+    override var type: ELaneType = ELaneType.NONE,
+
+    override var additionalId: Option<LaneIdentifier> = None
+) : RoadLanesLaneSectionLRLane(), AdditionalLaneIdentifier {
+
+    companion object
+}

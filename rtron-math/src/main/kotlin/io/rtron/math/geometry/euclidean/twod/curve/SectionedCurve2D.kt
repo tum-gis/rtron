@@ -17,14 +17,13 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.shiftLowerEndpointTo
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Cuts out a section from the [completeCurve].
@@ -45,7 +44,7 @@ class SectionedCurve2D(
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
     override val tolerance: Double get() = completeCurve.tolerance
-    private val sectionStart = CurveRelativeVector1D(section.lowerEndpointResult().toResult().handleFailure { throw it.error })
+    private val sectionStart = CurveRelativeVector1D(section.lowerEndpointResult().getOrHandle { throw it })
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):

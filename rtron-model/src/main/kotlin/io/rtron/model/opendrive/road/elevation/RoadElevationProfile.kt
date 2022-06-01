@@ -20,7 +20,6 @@ import arrow.core.NonEmptyList
 import arrow.core.Validated
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.toValidated
 
 data class RoadElevationProfile(
@@ -29,16 +28,4 @@ data class RoadElevationProfile(
 
     val elevationValidated: Validated<OpendriveException.EmptyList, NonEmptyList<RoadElevationProfileElevation>>
         get() = NonEmptyList.fromList(elevation).toValidated { OpendriveException.EmptyList("elevation") }
-
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        val elevationEntriesFiltered = elevation.filterToStrictSortingBy { it.s }
-        if (elevationEntriesFiltered.size < elevation.size) {
-            healedViolations += OpendriveException.NonStrictlySortedList("elevation", "Ignoring ${elevation.size - elevationEntriesFiltered.size} elevation entries which are not placed in strict order according to s.")
-            elevation = elevationEntriesFiltered
-        }
-
-        return healedViolations
-    }
 }

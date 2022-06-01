@@ -18,10 +18,14 @@ package io.rtron.model.opendrive.objects
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.optics.optics
+import io.rtron.model.opendrive.additions.identifier.AdditionalRoadObjectOutlineIdentifier
+import io.rtron.model.opendrive.additions.identifier.RoadObjectOutlineIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
 import io.rtron.model.opendrive.lane.ELaneType
 
-class RoadObjectsObjectOutlinesOutline(
+@optics
+data class RoadObjectsObjectOutlinesOutline(
     var cornerRoad: List<RoadObjectsObjectOutlinesOutlineCornerRoad> = emptyList(),
     var cornerLocal: List<RoadObjectsObjectOutlinesOutlineCornerLocal> = emptyList(),
 
@@ -29,8 +33,10 @@ class RoadObjectsObjectOutlinesOutline(
     var fillType: Option<EOutlineFillType> = None,
     var id: Option<Int> = None,
     var laneType: Option<ELaneType> = None,
-    var outer: Option<Boolean> = None
-) : OpendriveElement() {
+    var outer: Option<Boolean> = None,
+
+    override var additionalId: Option<RoadObjectOutlineIdentifier> = None
+) : OpendriveElement(), AdditionalRoadObjectOutlineIdentifier {
 
     // Methods
     fun isPolyhedronUniquelyDefined() = (isPolyhedronDefinedByRoadCorners() && !isPolyhedronDefinedByLocalCorners()) ||
@@ -46,12 +52,14 @@ class RoadObjectsObjectOutlinesOutline(
     fun isLinearRing() = isLinearRingDefinedByRoadCorners() || isLinearRingDefinedByLocalCorners()
 
     fun isPolyhedronDefinedByRoadCorners() =
-        cornerRoad.isNotEmpty() && cornerRoad.any { it.isSetBasePoint() && it.hasPositiveHeight() }
+        cornerRoad.isNotEmpty() && cornerRoad.any { it.hasPositiveHeight() }
     fun isPolyhedronDefinedByLocalCorners() =
-        cornerLocal.isNotEmpty() && cornerLocal.any { it.isSetBasePoint() && it.hasPositiveHeight() }
+        cornerLocal.isNotEmpty() && cornerLocal.any { it.hasPositiveHeight() }
 
     fun isLinearRingDefinedByRoadCorners() =
-        cornerRoad.isNotEmpty() && cornerRoad.all { it.isSetBasePoint() && it.hasZeroHeight() }
+        cornerRoad.isNotEmpty() && cornerRoad.all { it.hasZeroHeight() }
     fun isLinearRingDefinedByLocalCorners() =
-        cornerLocal.isNotEmpty() && cornerLocal.all { it.isSetBasePoint() && it.hasZeroHeight() }
+        cornerLocal.isNotEmpty() && cornerLocal.all { it.hasZeroHeight() }
+
+    companion object
 }

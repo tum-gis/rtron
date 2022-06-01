@@ -17,11 +17,12 @@
 
 object PluginVersions {
     const val shadowjar = "6.1.0"
-    const val ktlint = "10.2.1"
+    const val ktlint = "10.3.0"
     const val xjc = "1.6"
     const val versionChecker = "0.42.0"
     const val orchid = "0.21.1"
-    const val serialization = "1.6.20"
+    const val serialization = "1.6.21"
+    const val ksp = "1.6.21-1.0.5"
 }
 
 object Plugins {
@@ -31,4 +32,5 @@ object Plugins {
     const val versionChecker = "com.github.ben-manes.versions"
     const val orchid = "com.eden.orchidPlugin"
     const val serialization = "plugin.serialization"
+    const val ksp = "com.google.devtools.ksp"
 }

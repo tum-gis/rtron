@@ -16,11 +16,19 @@
 
 package io.rtron.model.opendrive.additions.identifier
 
+import arrow.core.Option
+
 interface RoadObjectIdentifierInterface {
     val roadObjectId: String
 }
 
-data class RoadObjectIdentifier(override val roadObjectId: String, val roadIdentifier: RoadIdentifier) : RoadObjectIdentifierInterface, RoadIdentifierInterface by roadIdentifier {
+data class RoadObjectIdentifier(override val roadObjectId: String, val roadIdentifier: RoadIdentifier) :
+    AbstractOpendriveIdentifier(), RoadObjectIdentifierInterface, RoadIdentifierInterface by roadIdentifier {
+
     // Conversions
-    fun toStringMap() = mapOf("roadObjectId" to roadObjectId) + roadIdentifier.toStringMap()
+    override fun toStringMap() = mapOf("roadObjectId" to roadObjectId) + roadIdentifier.toStringMap()
+}
+
+interface AdditionalRoadObjectIdentifier {
+    var additionalId: Option<RoadObjectIdentifier>
 }

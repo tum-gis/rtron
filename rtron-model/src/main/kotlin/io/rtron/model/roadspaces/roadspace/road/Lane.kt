@@ -17,6 +17,7 @@
 package io.rtron.model.roadspaces.roadspace.road
 
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
 /**

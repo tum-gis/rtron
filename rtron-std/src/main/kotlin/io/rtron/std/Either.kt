@@ -30,4 +30,33 @@ fun <K : Any, V : Any?> Map<K, V>.getValueEither(key: K): Either<NoSuchElementEx
     return Either.Right(value)
 }
 
-data class NoSuchElementException(val elementName: String) : BaseException("No element found with name $elementName.")
+/**
+ * Returns the value of list[index] as [Either.Right], if it exists, or as [Either.Left] otherwise.
+ *
+ * @receiver the map on which the [index] is requested
+ * @param index requested key to be accessed
+ * @return [Either] of the request
+ */
+fun <V : Any?> List<V>.getValueEither(index: Int): Either<NoSuchElementException, V> {
+    val value = this.getOrNull(index) ?: return Either.Left(NoSuchElementException(index.toString()))
+    return Either.Right(value)
+}
+
+data class NoSuchElementException(val elementName: String) : BaseException("No element found with name $elementName.") {
+    fun toIllegalArgumentException() = IllegalArgumentException(message)
+}
+
+/**
+ * Handle all [Either.Left] with [block] and return only the values of [Either.Right].
+ *
+ * @receiver the list of [Either] to be handled
+ * @param block the handler in case of an [Either.Left]
+ * @return the list of values of the [Either.Right]
+ */
+inline fun <A, B> Iterable<Either<A, B>>.handleLeftAndFilter(block: (Either.Left<A>) -> Unit): List<B> =
+    fold(emptyList()) { acc, result ->
+        when (result) {
+            is Either.Right -> acc + result.value
+            is Either.Left -> { block(result); acc }
+        }
+    }

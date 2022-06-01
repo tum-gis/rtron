@@ -17,10 +17,9 @@
 package io.rtron.transformer.converter.roadspaces2citygml.geometry
 
 import arrow.core.Either
-import io.rtron.std.handleFailure
-import io.rtron.std.handleSuccess
-import io.rtron.std.toEither
-import io.rtron.std.toResult
+import arrow.core.continuations.either
+import arrow.core.left
+import arrow.core.right
 import org.citygml4j.model.core.AbstractOccupiedSpace
 
 /**
@@ -30,11 +29,18 @@ import org.citygml4j.model.core.AbstractOccupiedSpace
  * @param lod target level of detail
  * @return [Either.Right] is returned, if a geometry or implicit geometry has been populated; [Either.Left], if no geometry could be assigned
  */
-fun AbstractOccupiedSpace.populateGeometryOrImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<Exception, Unit> {
-    val geometryError = populateGeometry(geometryTransformer, lod).toResult().handleSuccess { return it.toEither() }
-    val implicitGeometryError = populateImplicitGeometry(geometryTransformer, lod).toResult().handleSuccess { return it.toEither() }
+fun AbstractOccupiedSpace.populateGeometryOrImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<GeometryTransformerException, Unit> = either.eager {
+    val geometryErrorMessage: String = populateGeometry(geometryTransformer, lod)
+        .tap { right().bind() }
+        .fold({ it.message }, { "" })
+    val implicitGeometryErrorMessage: String = populateImplicitGeometry(geometryTransformer, lod)
+        .tap { right().bind() }
+        .fold({ it.message }, { "" })
 
-    return Either.Left(Exception("No suitable source geometry found for populating the $lod geometry (${geometryError.message}) or implicit geometry (${implicitGeometryError.message}) of the abstract occupied space."))
+    GeometryTransformerException.NoSuiteableSourceGeometry(
+        "No suitable source geometry found for populating the $lod geometry ($geometryErrorMessage) " +
+            "or implicit geometry ($implicitGeometryErrorMessage) of the abstract occupied space."
+    ).left().bind()
 }
 
 /**
@@ -44,14 +50,23 @@ fun AbstractOccupiedSpace.populateGeometryOrImplicitGeometry(geometryTransformer
  * @param lod target level of detail
  * @return [Either.Right] is returned, if an implicit geometry has been populated; [Either.Left], if no implicit geometry could be assigned
  */
-fun AbstractOccupiedSpace.populateImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<Exception, Unit> {
-    if (geometryTransformer.isSetImplicitGeometry())
-        when (lod) {
-            LevelOfDetail.ZERO -> throw IllegalArgumentException("An implicit geometry can not be assigned to an AbstractOccupiedSpace at level 0.")
-            LevelOfDetail.ONE -> geometryTransformer.getImplicitGeometry().toResult().handleFailure { return Either.Left(it.error) }.also { lod1ImplicitRepresentation = it; return Either.Right(Unit) }
-            LevelOfDetail.TWO -> geometryTransformer.getImplicitGeometry().toResult().handleFailure { return Either.Left(it.error) }.also { lod2ImplicitRepresentation = it; return Either.Right(Unit) }
-            LevelOfDetail.THREE -> geometryTransformer.getImplicitGeometry().toResult().handleFailure { return Either.Left(it.error) }.also { lod3ImplicitRepresentation = it; return Either.Right(Unit) }
-        }
+fun AbstractOccupiedSpace.populateImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<GeometryTransformerException, Unit> = either.eager {
+    require(lod != LevelOfDetail.ZERO) { "An implicit geometry can not be assigned to an AbstractOccupiedSpace at level 0." }
 
-    return Either.Left(IllegalStateException("No suitable source geometry found for populating the LoD $lod implicit geometry of the abstract occupied space."))
+    geometryTransformer.getImplicitGeometry().tap { currentImplicitGeometryProperty ->
+        if (lod == LevelOfDetail.ONE) {
+            lod1ImplicitRepresentation = currentImplicitGeometryProperty
+            return@eager
+        }
+        if (lod == LevelOfDetail.TWO) {
+            lod2ImplicitRepresentation = currentImplicitGeometryProperty
+            return@eager
+        }
+        if (lod == LevelOfDetail.THREE) {
+            lod3ImplicitRepresentation = currentImplicitGeometryProperty
+            return@eager
+        }
+    }
+
+    GeometryTransformerException.NoSuiteableSourceGeometry("No suitable source geometry found for populating the LoD $lod implicit geometry of the abstract occupied space.").left().bind()
 }

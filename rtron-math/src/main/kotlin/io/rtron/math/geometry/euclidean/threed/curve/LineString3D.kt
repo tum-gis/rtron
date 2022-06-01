@@ -17,15 +17,16 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
 import io.rtron.math.container.ConcatenationContainer
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
 import io.rtron.std.cumulativeSum
 import io.rtron.std.filterWithNext
-import io.rtron.std.handleFailure
 import io.rtron.std.noneWithNext
-import io.rtron.std.toResult
 
 /**
  * Curve specified by a sequence of [vertices].
@@ -34,7 +35,7 @@ import io.rtron.std.toResult
  * @param tolerance allowed tolerance
  */
 class LineString3D(
-    val vertices: List<Vector3D>,
+    val vertices: NonEmptyList<Vector3D>,
     override val tolerance: Double
 ) : AbstractCurve3D() {
 
@@ -55,22 +56,25 @@ class LineString3D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector3D> {
-        val localMember = container
-            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> = either.eager {
+        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
+            .mapLeft { GeometryException.DiscretizationError("TODO") } // TODO: dedicated error
+            .bind()
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePointGlobalCS(localPoint)
+        localMember.member.calculatePointGlobalCS(localPoint).bind()
     }
 
     companion object {
 
-        fun of(vertices: List<Vector3D>, tolerance: Double): Either<IllegalArgumentException, LineString3D> {
-            val adjustedVertices = vertices.filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
-            return if (adjustedVertices.size > 1) Either.Right(LineString3D(adjustedVertices, tolerance))
-            else Either.Left(IllegalArgumentException("Not enough vertices for constructing a line segment."))
+        fun of(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryException, LineString3D> {
+            val adjustedVertices = vertices
+                .filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
+                .let { NonEmptyList.fromList(it) }
+
+            return adjustedVertices
+                .toEither { GeometryException.NotEnoughVertices("Not enough vertices for constructing a line segment") }
+                .map { LineString3D(it, tolerance) }
         }
     }
 }

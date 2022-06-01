@@ -18,11 +18,14 @@ package io.rtron.model.opendrive.signal
 
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.getOrElse
+import arrow.optics.OpticsTarget
+import arrow.optics.optics
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.model.opendrive.additions.identifier.AdditionalRoadSignalIdentifier
+import io.rtron.model.opendrive.additions.identifier.RoadSignalIdentifier
 import io.rtron.model.opendrive.core.ECountryCode
 import io.rtron.model.opendrive.core.EUnit
 import io.rtron.model.opendrive.core.OpendriveElement
@@ -30,6 +33,7 @@ import io.rtron.model.opendrive.objects.EOrientation
 import io.rtron.model.opendrive.objects.RoadObjectsObjectLaneValidity
 import io.rtron.model.opendrive.objects.toRotation2D
 
+@optics([OpticsTarget.LENS, OpticsTarget.PRISM, OpticsTarget.OPTIONAL, OpticsTarget.DSL])
 data class RoadSignalsSignal(
     var validity: List<RoadObjectsObjectLaneValidity> = emptyList(),
     var dependency: List<RoadSignalsSignalDependency> = emptyList(),
@@ -57,7 +61,9 @@ data class RoadSignalsSignal(
     var value: Option<Double> = None,
     var width: Option<Double> = None,
     var zOffset: Double = Double.NaN,
-) : OpendriveElement() {
+
+    override var additionalId: Option<RoadSignalIdentifier> = None
+) : OpendriveElement(), AdditionalRoadSignalIdentifier {
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
 
@@ -65,16 +71,17 @@ data class RoadSignalsSignal(
     val referenceLinePointRelativePosition get() = Vector3D(0.0, t, zOffset)
 
     /** rotation of the object relative to the rotation on the road reference line */
-    val referenceLinePointRelativeRotation get() = orientation.toRotation2D().toRotation3D() +
-        Rotation3D.of(hOffset.getOrElse { Double.NaN }, pitch.getOrElse { Double.NaN }, roll.getOrElse { Double.NaN }) // TODO fix option
+    val referenceLinePointRelativeRotation get() = orientation.toRotation2D().toRotation3D() + Rotation3D.of(hOffset, pitch, roll)
 
     /** pose of the object relative to the pose on the road reference line */
     val referenceLinePointRelativePose
         get() = Pose3D(referenceLinePointRelativePosition, referenceLinePointRelativeRotation)
 
     // Methods
-    fun isPolygon() = !width.getOrElse { Double.NaN }.isNaN() && width.getOrElse { Double.NaN } != 0.0 && !height.getOrElse { Double.NaN }.isNaN() && height.getOrElse { Double.NaN } != 0.0 // TODO fix option
-    fun isVerticalLine() = (width.getOrElse { Double.NaN }.isNaN() || width.getOrElse { Double.NaN } == 0.0) && !height.getOrElse { Double.NaN }.isNaN() && height.getOrElse { Double.NaN } != 0.0 // TODO fix option
-    fun isHorizontalLine() = !width.getOrElse { Double.NaN }.isNaN() && width.getOrElse { Double.NaN } != 0.0 && (height.getOrElse { Double.NaN }.isNaN() || height.getOrElse { Double.NaN } == 0.0) // TODO fix option
+    fun isPolygon() = width.isDefined() && height.isDefined()
+    fun isVerticalLine() = width.isEmpty() && height.isDefined()
+    fun isHorizontalLine() = width.isDefined() && height.isEmpty()
     fun isPoint() = !isPolygon() && !isVerticalLine() && !isHorizontalLine()
+
+    companion object
 }

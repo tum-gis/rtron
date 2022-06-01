@@ -16,11 +16,19 @@
 
 package io.rtron.model.opendrive.additions.identifier
 
+import arrow.core.Option
+
 interface LaneIdentifierInterface {
     val laneId: Int
 }
 
-data class LaneIdentifier(override val laneId: Int, val laneSectionIdentifier: LaneSectionIdentifier) : LaneIdentifierInterface, RoadLaneSectionIdentifierInterface by laneSectionIdentifier {
+data class LaneIdentifier(override val laneId: Int, val laneSectionIdentifier: LaneSectionIdentifier) :
+    AbstractOpendriveIdentifier(), LaneIdentifierInterface, RoadLaneSectionIdentifierInterface by laneSectionIdentifier {
+
     // Conversions
-    fun toStringMap() = mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
+    override fun toStringMap() = mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
+}
+
+interface AdditionalLaneIdentifier {
+    var additionalId: Option<LaneIdentifier>
 }

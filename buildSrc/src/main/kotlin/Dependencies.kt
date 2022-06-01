@@ -18,15 +18,14 @@
 object DependencyVersions {
 
     // standard libraries
-    const val kotlin = "1.6.20"
+    const val kotlin = "1.6.21"
     const val coroutines = "1.6.1"
-    const val arrow = "1.0.1"
-    const val result = "4.0.0"
+    const val arrow = "1.1.2"
 
     // testing libraries
     const val junit = "5.8.2"
     const val assertj = "3.22.0"
-    const val mockk = "1.12.3"
+    const val mockk = "1.12.4"
 
     // logging libraries
     const val kotlinLogging = "2.1.21"
@@ -36,16 +35,16 @@ object DependencyVersions {
     const val orchid = "0.21.1"
 
     // object creation libraries
-    const val kotlinxSerializationJson = "1.3.2"
+    const val kotlinxSerializationJson = "1.3.3"
     const val jakartaActivationApi = "2.1.0"
     const val jakartaXmlBindApi = "3.0.1"
     const val jaxb = "3.0.2"
 
     // object mapping libraries
-    const val mapstruct = "1.5.0.Beta2"
+    const val mapstruct = "1.5.0.RC1"
 
     // io libraries
-    const val clikt = "3.4.0"
+    const val clikt = "3.4.2"
     const val mordant = "1.2.1"
     const val commonsIO = "2.11.0"
     const val commonsCSV = "1.9.0"
@@ -53,7 +52,7 @@ object DependencyVersions {
     const val emojiJava = "5.1.1"
 
     // math libraries
-    const val guava = "31.0.1-jre"
+    const val guava = "31.1-jre"
     const val commonsMath = "3.6.1"
     const val joml = "1.10.4"
     const val poly2tri = "0.1.2"
@@ -68,7 +67,8 @@ object Dependencies {
     const val kotlinStandardLibrary = "stdlib-jdk8:${DependencyVersions.kotlin}"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${DependencyVersions.coroutines}"
     const val arrowCore = "io.arrow-kt:arrow-core:${DependencyVersions.arrow}"
-    const val result = "com.github.kittinunf.result:result:${DependencyVersions.result}"
+    const val arrowOptics = "io.arrow-kt:arrow-optics:${DependencyVersions.arrow}"
+    const val arrowOpticsKspPlugin = "io.arrow-kt:arrow-optics-ksp-plugin:${DependencyVersions.arrow}"
 
     // testing libraries
     const val junit = "org.junit.jupiter:junit-jupiter:${DependencyVersions.junit}"

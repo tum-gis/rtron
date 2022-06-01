@@ -17,7 +17,7 @@
 package io.rtron.readerwriter.opendrive.reader
 
 import arrow.core.Either
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
 import io.rtron.io.files.Path
@@ -59,7 +59,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         try {
             _jaxbUnmarshaller.unmarshal(filePath.toFileJ())
         } catch (e: Exception) {
-            OpendriveReaderException.FatalSchemaValidationError(reason = e.message.toString()).left()
+            OpendriveReaderException.FatalSchemaValidationError(reason = e.toString()).left()
                 .bind<OpendriveReaderException.FatalSchemaValidationError>()
         }
 

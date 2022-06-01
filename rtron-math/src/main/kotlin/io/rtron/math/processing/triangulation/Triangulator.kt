@@ -22,16 +22,10 @@ import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.isPlanar
 
-@RequiresOptIn(message = "The triangulation functionality is experimental.")
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-annotation class ExperimentalTriangulator
-
 /**
  * Performs triangulation operations on polygons in 3D.
  * See the wikipedia article of [polygon triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation).
  */
-@ExperimentalTriangulator
 object Triangulator {
 
     private val standardTriangulationAlgorithm = Poly2TriTriangulationAlgorithm()
@@ -43,7 +37,7 @@ object Triangulator {
      *
      * @param linearRing linear ring to be triangulated
      */
-    fun triangulate(linearRing: LinearRing3D, tolerance: Double): Either<Exception, List<Polygon3D>> {
+    fun triangulate(linearRing: LinearRing3D, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> {
 
         if (linearRing.vertices.isPlanar(tolerance))
             return Either.Right(listOf(Polygon3D(linearRing.vertices, tolerance)))

@@ -19,9 +19,6 @@ dependencies {
     // batch processing layer
     implementation(project(ProjectComponents.main))
 
-    // standard libraries
-    implementation(Dependencies.arrowCore)
-
     // io
     implementation(Dependencies.clikt)
     implementation(Dependencies.mordant)

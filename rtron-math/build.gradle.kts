@@ -9,9 +9,6 @@ dependencies {
     implementation(project(ProjectComponents.standard))
     testImplementation(project(ProjectComponents.inputOutput))
 
-    // standard libraries
-    implementation(Dependencies.arrowCore)
-
     // math libraries
     implementation(Dependencies.guava)
     implementation(Dependencies.commonsMath)

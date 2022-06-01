@@ -16,21 +16,21 @@
 
 package io.rtron.transformer.evaluator.roadspaces.plans.modelingrules
 
-import arrow.core.computations.ResultEffect.bind
+import arrow.core.getOrHandle
 import arrow.core.handleError
 import io.rtron.io.report.Message
 import io.rtron.io.report.Report
 import io.rtron.io.report.merge
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.geometry.toIllegalStateException
 import io.rtron.model.roadspaces.RoadspacesModel
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.ContactPoint
 import io.rtron.model.roadspaces.roadspace.Roadspace
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
-import io.rtron.std.handleFailure
-import io.rtron.transformer.evaluator.opendrive.report.of
 import io.rtron.transformer.evaluator.roadspaces.configuration.RoadspacesEvaluatorConfiguration
 import io.rtron.transformer.evaluator.roadspaces.plans.AbstractRoadspacesEvaluator
+import io.rtron.transformer.report.of
 
 class ModelingRulesEvaluator(val configuration: RoadspacesEvaluatorConfiguration) :
     AbstractRoadspacesEvaluator() {
@@ -52,10 +52,10 @@ class ModelingRulesEvaluator(val configuration: RoadspacesEvaluatorConfiguration
         roadspace.road.getAllLeftRightLaneIdentifiers()
             .filter { roadspace.road.isInLastLaneSection(it) }
             .forEach { laneId ->
-                val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(laneId).bind()
+                val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(laneId).getOrHandle { throw it }
 
                 report += successorLaneIds.map { successorLaneId ->
-                    evaluateLaneTransition(laneId, successorLaneId, roadspace.road, roadspacesModel.getRoadspace(successorLaneId.toRoadspaceIdentifier()).handleFailure { throw it.error }.road, roadspacesModel)
+                    evaluateLaneTransition(laneId, successorLaneId, roadspace.road, roadspacesModel.getRoadspace(successorLaneId.toRoadspaceIdentifier()).getOrHandle { throw it }.road, roadspacesModel)
                 }.merge()
             }
 
@@ -69,38 +69,29 @@ class ModelingRulesEvaluator(val configuration: RoadspacesEvaluatorConfiguration
 
         val report = Report()
 
-        val laneLeftLaneBoundaryPoint: Vector3D = road.getLeftLaneBoundary(laneId).bind()
-            .calculateEndPointGlobalCS().bind()
-        val laneRightLaneBoundaryPoint: Vector3D = road.getRightLaneBoundary(laneId).bind()
-            .calculateEndPointGlobalCS().bind()
-
-        // TODO: Town01.xodr
-        // if (laneId.laneId == -1 && laneId.roadspaceId == "21" && successorLaneId.laneId == 1)
-        //    println("ok")
+        val laneLeftLaneBoundaryPoint: Vector3D = road.getLeftLaneBoundary(laneId).getOrHandle { throw it }
+            .calculateEndPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
+        val laneRightLaneBoundaryPoint: Vector3D = road.getRightLaneBoundary(laneId).getOrHandle { throw it }
+            .calculateEndPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
 
         // false, if the successor lane is connected by its end (leads to swapping of the vertices)
         val successorContactStart = !road.linkage.successorRoadspaceContactPointId
             .map { it.roadspaceContactPoint }
             .exists { it == ContactPoint.END }
 
-        // road.linkage.successorJunctionId.present {
-        //    val junction = roadspacesModel.getJunction(it).handleFailure { throw it.error }
-        //    junction.g
-        // }
-
         val successorLeftLaneBoundary = successorRoad.getLeftLaneBoundary(successorLaneId)
-            .handleError { return report }.bind() // TODO: identify inconsistencies in the topology of the model
+            .handleError { return report }.getOrHandle { throw it } // TODO: identify inconsistencies in the topology of the model
         val successorRightLaneBoundary = successorRoad.getRightLaneBoundary(successorLaneId)
-            .handleError { return report }.bind() // TODO: identify inconsistencies in the topology of the model
+            .handleError { return report }.getOrHandle { throw it } // TODO: identify inconsistencies in the topology of the model
 
         // if contact of successor at the start, normal connecting
         // if contact of the successor at the end, the end positions have to be calculated and left and right boundary have to be swapped
         val laneLeftLaneBoundarySuccessorPoint =
-            if (successorContactStart) successorLeftLaneBoundary.calculateStartPointGlobalCS().bind()
-            else successorRightLaneBoundary.calculateEndPointGlobalCS().bind()
+            if (successorContactStart) successorLeftLaneBoundary.calculateStartPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
+            else successorRightLaneBoundary.calculateEndPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
         val laneRightLaneBoundarySuccessorPoint =
-            if (successorContactStart) successorRightLaneBoundary.calculateStartPointGlobalCS().bind()
-            else successorLeftLaneBoundary.calculateEndPointGlobalCS().bind()
+            if (successorContactStart) successorRightLaneBoundary.calculateStartPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
+            else successorLeftLaneBoundary.calculateEndPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
 
         // reporting
         val location: Map<String, String> = laneId.toStringMap().map { "from_${it.key}" to it.value }.toMap() +

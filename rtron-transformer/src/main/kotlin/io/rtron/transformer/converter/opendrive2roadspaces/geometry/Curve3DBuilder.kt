@@ -19,8 +19,7 @@ package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.computations.either
-import io.rtron.io.logging.Logger
+import arrow.core.continuations.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -29,11 +28,7 @@ import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.model.opendrive.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.elevation.RoadElevationProfileElevation
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.std.handleFailure
 import io.rtron.std.isStrictlySortedBy
-import io.rtron.std.toEither
-import io.rtron.std.toResult
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
@@ -41,27 +36,20 @@ import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendri
  * Builder for curves in 3D from the OpenDRIVE data model.
  */
 class Curve3DBuilder(
-    private val reportLogger: Logger,
     private val configuration: Opendrive2RoadspacesConfiguration
 ) {
 
     // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(reportLogger, configuration)
-    private val _curve2DBuilder = Curve2DBuilder(reportLogger, configuration)
+    private val _functionBuilder = FunctionBuilder(configuration)
+    private val _curve2DBuilder = Curve2DBuilder(configuration)
 
     // Methods
 
     /**
      * Builds a curve in 3D from OpenDRIVE's plan view entries and the elevation profile.
      */
-    fun buildCurve3D(
-        id: RoadspaceIdentifier,
-        planViewGeometries: NonEmptyList<RoadPlanViewGeometry>,
-        elevationProfiles: Option<NonEmptyList<RoadElevationProfileElevation>>
-    ): Either<GeometryException, Curve3D> = either.eager {
-
-        val planViewCurve2D = _curve2DBuilder
-            .buildCurve2DFromPlanViewGeometries(id, planViewGeometries, configuration.offsetXY).bind()
+    fun buildCurve3D(planViewGeometries: NonEmptyList<RoadPlanViewGeometry>, elevationProfiles: Option<NonEmptyList<RoadElevationProfileElevation>>): Either<GeometryException, Curve3D> = either.eager {
+        val planViewCurve2D = _curve2DBuilder.buildCurve2DFromPlanViewGeometries(planViewGeometries, configuration.offsetXY).bind()
         val heightFunction = elevationProfiles.fold({ LinearFunction.X_AXIS }, { buildHeightFunction(it) })
 
         Curve3D(planViewCurve2D, heightFunction)
@@ -70,8 +58,7 @@ class Curve3DBuilder(
     /**
      * Builds the height function of the OpenDRIVE's elevation profile.
      */
-    private fun buildHeightFunction(elevationProfiles: NonEmptyList<RoadElevationProfileElevation>):
-        UnivariateFunction {
+    private fun buildHeightFunction(elevationProfiles: NonEmptyList<RoadElevationProfileElevation>): UnivariateFunction {
         require(elevationProfiles.isStrictlySortedBy { it.s }) { "Elevation entries must be sorted in strict order according to s." }
 
         return ConcatenatedFunction.ofPolynomialFunctions(
@@ -89,10 +76,7 @@ class Curve3DBuilder(
         if (roadObject.repeat.isEmpty()) return emptyList() // TODO fix repeat list handling
         if (!roadObject.repeat.first().isCurve()) return emptyList() // TODO fix repeat list handling
 
-        val curve2D = _curve2DBuilder
-            .buildLateralTranslatedCurve(roadObject.repeat.first(), roadReferenceLine) // TODO fix repeat list handling
-            .toResult()
-            .handleFailure { reportLogger.log(it.toEither(), roadObject.id); return emptyList() }
+        val curve2D = _curve2DBuilder.buildLateralTranslatedCurve(roadObject.repeat.first(), roadReferenceLine) // TODO fix repeat list handling
         val heightFunction = _functionBuilder
             .buildStackedHeightFunctionFromRepeat(roadObject.repeat.first(), roadReferenceLine) // TODO fix repeat list handling
 

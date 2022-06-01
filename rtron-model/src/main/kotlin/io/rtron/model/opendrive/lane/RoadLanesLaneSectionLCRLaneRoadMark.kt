@@ -18,8 +18,16 @@ package io.rtron.model.opendrive.lane
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Validated
+import arrow.core.invalid
+import arrow.core.valid
+import arrow.optics.optics
+import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.additions.identifier.AdditionalLaneRoadMarkIdentifier
+import io.rtron.model.opendrive.additions.identifier.LaneRoadMarkIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
 
+@optics
 data class RoadLanesLaneSectionLCRLaneRoadMark(
     var sway: List<RoadLanesLaneSectionLCRLaneRoadMarkSway> = emptyList(),
     var type: Option<RoadLanesLaneSectionLCRLaneRoadMarkType> = None,
@@ -33,4 +41,13 @@ data class RoadLanesLaneSectionLCRLaneRoadMark(
     var typeAttribute: ERoadMarkType = ERoadMarkType.NONE,
     var weight: Option<ERoadMarkWeight> = None,
     var width: Option<Double> = None,
-) : OpendriveElement()
+
+    override var additionalId: Option<LaneRoadMarkIdentifier> = None
+) : OpendriveElement(), AdditionalLaneRoadMarkIdentifier {
+
+    // Validation Properties
+    val sOffsetValidated: Validated<OpendriveException.UnexpectedValue, Double>
+        get() = if (sOffset.isFinite()) sOffset.valid() else OpendriveException.UnexpectedValue("sOffset", sOffset.toString()).invalid()
+
+    companion object
+}

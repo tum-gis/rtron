@@ -23,11 +23,15 @@ import arrow.core.Validated
 import arrow.core.getOrElse
 import arrow.core.invalid
 import arrow.core.valid
+import arrow.optics.optics
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionIdentifier
+import io.rtron.model.opendrive.additions.identifier.JunctionIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
 import io.rtron.model.opendrive.objects.EOrientation
 import io.rtron.std.toValidated
 
+@optics
 data class Junction(
     var connection: List<JunctionConnection> = emptyList(),
     var priority: List<JunctionPriority> = emptyList(),
@@ -40,8 +44,10 @@ data class Junction(
     var orientation: Option<EOrientation> = None,
     var sEnd: Option<Double> = None,
     var sStart: Option<Double> = None,
-    var type: Option<EJunctionType> = None
-) : OpendriveElement() {
+    var type: Option<EJunctionType> = None,
+
+    override var additionalId: Option<JunctionIdentifier> = None
+) : OpendriveElement(), AdditionalJunctionIdentifier {
 
     // Properties and Initializers
     val connectionValidated: Validated<OpendriveException.EmptyList, NonEmptyList<JunctionConnection>>
@@ -58,33 +64,5 @@ data class Junction(
     fun getIncomingRoadIds(): Set<String> = connection.flatMap { it.incomingRoad.toList() }.toSet()
     fun getNumberOfIncomingRoads(): Int = getIncomingRoadIds().size
 
-    fun getSevereViolations(): List<OpendriveException> =
-        connectionValidated.fold({ listOf(it) }, { emptyList() }) +
-            idValidated.fold({ listOf(it) }, { emptyList() })
-
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        if (mainRoad.exists { it.isBlank() }) {
-            mainRoad = None
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("mainRoad")
-        }
-
-        if (name.exists { it.isBlank() }) {
-            name = None
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("name")
-        }
-
-        if (sEnd.exists { !it.isFinite() }) {
-            sEnd = None
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("sEnd")
-        }
-
-        if (sStart.exists { !it.isFinite() }) {
-            sStart = None
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("sStart")
-        }
-
-        return healedViolations
-    }
+    companion object
 }

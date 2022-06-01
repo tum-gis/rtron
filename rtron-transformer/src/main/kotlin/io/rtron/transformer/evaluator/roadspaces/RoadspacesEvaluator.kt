@@ -17,7 +17,7 @@
 package io.rtron.transformer.evaluator.roadspaces
 
 import arrow.core.Either
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.RoadspacesModel

@@ -17,12 +17,11 @@
 package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
-import com.github.kittinunf.result.getOrElse
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 import io.rtron.math.range.intersectingRange
 import io.rtron.math.range.unionRanges
-import io.rtron.std.toResult
 
 /**
  * Stacks multiple functions and outputs the value according to the defined [operation].
@@ -56,12 +55,12 @@ class StackedFunction(
 
     // Methods
     override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> {
-        val individualValues = memberFunctions.map { it.valueUnbounded(x).toResult() getOrElse { defaultValue } }
+        val individualValues = memberFunctions.map { it.valueUnbounded(x).getOrElse { defaultValue } }
         return Either.Right(operation(individualValues))
     }
 
     override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> {
-        val individualValues = memberFunctions.map { it.slopeUnbounded(x).toResult() getOrElse { 0.0 } }
+        val individualValues = memberFunctions.map { it.slopeUnbounded(x).getOrElse { 0.0 } }
         return Either.Right(operation(individualValues))
     }
 

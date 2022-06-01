@@ -28,10 +28,12 @@ class Report() {
     // Properties and Initializers
     private val messages: MutableList<Message> = mutableListOf()
 
-    // val incidents: MutableList<Incident> = mutableListOf()
-
     constructor(messages: List<Message>) : this() {
         append(messages)
+    }
+
+    constructor(message: Message) : this() {
+        append(message)
     }
 
     // Operators
@@ -56,20 +58,6 @@ class Report() {
     fun append(message: Message) { this.messages += message }
     fun append(messages: List<Message>) { this.messages += messages }
 
-    fun write(path: Path) {
-        // if (messages.isEmpty()) return
-        if (!path.parent.exists())
-            path.parent.createDirectory()
-
-        val jsonFormatter = Json {
-            prettyPrint = true
-            encodeDefaults = true
-        }
-
-        val jsonFileContent = jsonFormatter.encodeToString(this)
-        File(path).writeText(jsonFileContent)
-    }
-
     /**
      * Returns the number of entries with a certain [severity].
      */
@@ -85,6 +73,18 @@ class Report() {
 
         return "$numberOfWarnings warnings, $numberOfErrors errors, $numberOfFatalErrors fatal errors"
     }
-}
 
-fun List<Report>.merge(): Report = Report(flatMap { it.getMessages() })
+    fun write(path: Path) {
+        // if (messages.isEmpty()) return
+        if (!path.parent.exists())
+            path.parent.createDirectory()
+
+        val jsonFormatter = Json {
+            prettyPrint = true
+            encodeDefaults = true
+        }
+
+        val jsonFileContent = jsonFormatter.encodeToString(this)
+        File(path).writeText(jsonFileContent)
+    }
+}

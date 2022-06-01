@@ -16,16 +16,16 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
-import arrow.core.Either
 import arrow.core.getOrElse
-import io.rtron.io.logging.LogManager
+import io.rtron.io.report.ContextReport
+import io.rtron.io.report.Message
+import io.rtron.io.report.Report
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.report.of
 import org.citygml4j.model.cityfurniture.CityFurniture
 
 /**
@@ -36,28 +36,26 @@ class CityFurnitureModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
     private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
-    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): Either<Exception, CityFurniture> {
+    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): ContextReport<CityFurniture> {
         val cityFurnitureFeature = CityFurniture()
+        val report = Report()
 
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         cityFurnitureFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
-        if (geometryTransformer.isSetRotation())
-            geometryTransformer.getRotation()
-                .toResult()
-                .handleFailure { return Either.Left(it.error) }
-                .also { _attributesAdder.addRotationAttributes(it, cityFurnitureFeature) }
+            .tapLeft { report += Message.of(it.message, roadspaceObject.id, isFatal = false, wasHealed = true) }
+
+        geometryTransformer.rotation.tap {
+            _attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
+        }
 
         // semantics
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name.getOrElse { "" }, cityFurnitureFeature) // TODO fix option
         _attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 
-        return Either.Right(cityFurnitureFeature)
+        return ContextReport(cityFurnitureFeature, report)
     }
 }

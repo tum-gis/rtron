@@ -17,14 +17,16 @@
 package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import arrow.core.left
+import arrow.core.right
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.calculateNormal
 import io.rtron.math.processing.isColinear
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 import org.poly2tri.Poly2Tri
 import org.poly2tri.geometry.polygon.Polygon as P2TPolygon
 import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
@@ -34,15 +36,14 @@ import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
  */
 class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<Exception, List<Polygon3D>> {
+    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
 
         val polygon = P2TPolygon(vertices.map { P2TPolygonPoint(it.x, it.y, it.z) })
 
-        poly2TriTriangulation(polygon).toResult().handleFailure { return Either.Left(it.error) }
-        val triangles = polygonBackConversion(polygon, tolerance).toResult().handleFailure { return Either.Left(it.error) }
+        poly2TriTriangulation(polygon).bind()
+        val triangles = polygonBackConversion(polygon, tolerance).bind()
 
-        val adjustedTriangles = adjustOrientation(vertices, triangles)
-        return Either.Right(adjustedTriangles)
+        adjustOrientation(vertices, triangles)
     }
 
     /**
@@ -50,27 +51,30 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
      *
      * @return true, if triangulation was successful
      */
-    private fun poly2TriTriangulation(polygon: P2TPolygon): Either<Exception, Boolean> {
+    private fun poly2TriTriangulation(polygon: P2TPolygon): Either<TriangulatorException.Poly2TriException, Unit> {
         try {
             Poly2Tri.triangulate(polygon)
         } catch (e: Exception) {
-            return Either.Left(IllegalStateException("Poly2Tri-Triangulation failure: (${e.message})."))
+            return TriangulatorException.Poly2TriException(e.message ?: "").left()
         } catch (e: StackOverflowError) {
-            return Either.Left(RuntimeException("Poly2Tri-Triangulation failure: StackOverflowError."))
+            return TriangulatorException.Poly2TriException("StackOverflowError").left()
         }
-        return Either.Right(true)
+        return Unit.right()
     }
 
     /**
      * Converts the Poly2Tri triangulation results back to a list of [Polygon3D].
      */
     private fun polygonBackConversion(polygon: P2TPolygon, tolerance: Double):
-        Either<IllegalStateException, List<Polygon3D>> {
-        val triangles = polygon.triangles.map {
-            val triangulatedVertices: List<Vector3D> = it.points.map { point -> Vector3D(point.x, point.y, point.z) }
+        Either<TriangulatorException, List<Polygon3D>> {
+        val triangles = polygon.triangles.map { delaunayTriangle ->
+
+            val triangulatedVertices: NonEmptyList<Vector3D> = delaunayTriangle.points
+                .map { point -> Vector3D(point.x, point.y, point.z) }
+                .let { NonEmptyList.fromListUnsafe(it) }
 
             if (triangulatedVertices.isColinear(tolerance))
-                return Either.Left(IllegalStateException("Triangulation failure (colinear vertices)."))
+                return TriangulatorException.ColinearVertices().left()
             return@map Polygon3D(triangulatedVertices, tolerance)
         }
 

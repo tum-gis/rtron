@@ -17,12 +17,15 @@
 package io.rtron.math.geometry.euclidean.threed.surface
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
+import io.rtron.math.geometry.toIllegalStateException
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Range
 import io.rtron.math.range.Tolerable
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 data class ParametricBoundedSurface3D(
     val leftBoundary: Curve3D,
@@ -44,23 +47,30 @@ data class ParametricBoundedSurface3D(
         get() = leftBoundary.length
 
     private val leftVertices by lazy {
-        leftBoundary.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
+        val vertices = leftBoundary.calculatePointListGlobalCS(discretizationStepSize)
+            .mapLeft { it.toIllegalStateException() }
+            .getOrHandle { throw it }
+        NonEmptyList.fromListUnsafe(vertices)
     }
 
     private val rightVertices by lazy {
-        rightBoundary.calculatePointListGlobalCS(discretizationStepSize).toResult().handleFailure { throw it.error }
+        val vertices = rightBoundary.calculatePointListGlobalCS(discretizationStepSize)
+            .mapLeft { it.toIllegalStateException() }
+            .getOrHandle { throw it }
+        NonEmptyList.fromListUnsafe(vertices)
     }
 
     // Methods
 
-    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> =
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either.eager {
+
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
-            .map { it.calculatePolygonsGlobalCS().toResult() }
-            .handleFailure { return Either.Left(it.error) }
+            .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
+            .bind()
+            .map { it.calculatePolygonsGlobalCS().bind() }
             .flatten()
-            .let { Either.Right(it) }
+            .let { NonEmptyList.fromListUnsafe(it) }
+    }
 
     companion object {
         const val DEFAULT_STEP_SIZE: Double = 0.3 // used for tesselation

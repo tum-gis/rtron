@@ -19,35 +19,41 @@ package io.rtron.transformer.converter.opendrive2roadspaces.header
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.flatten
-import arrow.core.toOption
-import io.rtron.io.logging.LogManager
+import arrow.core.some
+import io.rtron.io.report.ContextReport
+import io.rtron.io.report.Message
+import io.rtron.io.report.MessageSeverity
+import io.rtron.io.report.Report
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.opendrive.core.HeaderGeoReference
 import io.rtron.model.roadspaces.Header
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.report.of
 import io.rtron.model.opendrive.core.Header as OdrHeader
 
 class HeaderBuilder(
     private val configuration: Opendrive2RoadspacesConfiguration
 ) {
-    // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
-
     // Methods
-    fun buildHeader(header: OdrHeader): Header {
-        val crs = header.geoReference.map { buildCoordinateSystem(it) }.flatten()
-        return Header(coordinateReferenceSystem = crs)
+    fun buildHeader(header: OdrHeader): ContextReport<Header> {
+        val report = Report()
+
+        val crs = header.geoReference.map { buildCoordinateSystem(it).handleReport { report += it } }.flatten()
+        val roadspacesHeader = Header(coordinateReferenceSystem = crs)
+
+        return ContextReport(roadspacesHeader, report)
     }
 
     /**
      * Builds the [CoordinateReferenceSystem] for the [Header].
      */
-    private fun buildCoordinateSystem(geoReference: HeaderGeoReference): Option<CoordinateReferenceSystem> {
+    private fun buildCoordinateSystem(geoReference: HeaderGeoReference): ContextReport<Option<CoordinateReferenceSystem>> {
+        val report = Report()
 
-        CoordinateReferenceSystem.of(configuration.crsEpsg).tap { return it.toOption() }
-        CoordinateReferenceSystem.of(geoReference.content).tap { return it.toOption() }
+        CoordinateReferenceSystem.of(configuration.crsEpsg).tap { return ContextReport(it.some(), report) }
+        CoordinateReferenceSystem.of(geoReference.content).tap { return ContextReport(it.some(), report) }
 
-        _reportLogger.warn("Unknown coordinate reference system.")
-        return None
+        val message = Message("Unknown coordinate reference system.", MessageSeverity.WARNING)
+        return ContextReport(None, Report(message))
     }
 }

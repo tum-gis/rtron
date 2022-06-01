@@ -17,7 +17,10 @@
 package io.rtron.math.geometry.euclidean.threed.surface
 
 import arrow.core.Either
-import com.github.kittinunf.result.NoException
+import arrow.core.NonEmptyList
+import arrow.core.nonEmptyListOf
+import arrow.core.right
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
 import io.rtron.math.processing.calculateNormal
@@ -32,7 +35,7 @@ import io.rtron.std.noneWithNextEnclosing
  * @param vertices vertices of the polygon must be located in a plane
  */
 data class Polygon3D(
-    val vertices: List<Vector3D> = emptyList(),
+    val vertices: NonEmptyList<Vector3D>,
     override val tolerance: Double,
     override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D() {
@@ -60,13 +63,13 @@ data class Polygon3D(
         this.vertices.calculateNormal().normalized().let { Either.Right(it) }
 
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
-    fun reversed() = Polygon3D(vertices.reversed(), tolerance, affineSequence)
+    fun reversed() = Polygon3D(NonEmptyList.fromListUnsafe(vertices.reversed()), tolerance, affineSequence)
 
-    override fun calculatePolygonsLocalCS(): Either<NoException, List<Polygon3D>> = Either.Right(listOf(this))
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = nonEmptyListOf(this).right()
 
     // Conversions
     /** Returns the coordinates of all vertices as a flattened list */
-    fun toVertexPositionElementList() = this.vertices.flatMap { it.toDoubleList() }
+    fun toVertexPositionElementList(): List<Double> = this.vertices.flatMap { it.toDoubleList() }.toList()
 
     companion object {
         val TETRAGON = of(
@@ -80,12 +83,12 @@ data class Polygon3D(
         /**
          * Constructs a polygon based on the [vectors].
          */
-        fun of(vararg vectors: Vector3D, tolerance: Double) = Polygon3D(vectors.toList(), tolerance)
+        fun of(vararg vectors: Vector3D, tolerance: Double) = Polygon3D(NonEmptyList.fromListUnsafe(vectors.toList()), tolerance)
 
         /**
          * Constructs a polygon based on a [Triple] of [vectors].
          */
         fun of(vectors: Triple<Vector3D, Vector3D, Vector3D>, tolerance: Double) =
-            Polygon3D(vectors.toList(), tolerance)
+            Polygon3D(NonEmptyList.fromListUnsafe(vectors.toList()), tolerance)
     }
 }

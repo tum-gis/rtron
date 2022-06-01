@@ -21,7 +21,10 @@ import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.invalid
 import arrow.core.valid
+import arrow.optics.optics
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+
+@optics
 data class Header(
     var geoReference: Option<HeaderGeoReference> = None,
     var offset: Option<HeaderOffset> = None,
@@ -45,34 +48,5 @@ data class Header(
     val revMinorValidated: Validated<OpendriveException.UnexpectedValue, Int>
         get() = if (revMinor > 0) revMinor.valid() else OpendriveException.UnexpectedValue("revMinor", revMinor.toString()).invalid()
 
-    // Methods
-    fun getSevereViolations(): List<OpendriveException> =
-        revMajorValidated.fold({ listOf(it) }, { emptyList() }) +
-            revMinorValidated.fold({ listOf(it) }, { emptyList() })
-
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        if (name.exists { it.isEmpty() }) {
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("name")
-            name = None
-        }
-
-        if (date.exists { it.isEmpty() }) {
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("date")
-            date = None
-        }
-
-        if (vendor.exists { it.isEmpty() }) {
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("vendor")
-            vendor = None
-        }
-
-        if (north.exists { !it.isFinite() }) {
-            healedViolations += OpendriveException.EmptyValueForOptionalAttribute("north")
-            north = None
-        }
-
-        return healedViolations
-    }
+    companion object
 }

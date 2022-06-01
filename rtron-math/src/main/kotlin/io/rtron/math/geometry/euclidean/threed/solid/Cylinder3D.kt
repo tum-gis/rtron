@@ -16,7 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.Option
+import arrow.core.nonEmptyListOf
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -53,12 +55,14 @@ data class Cylinder3D(
     val diameter = radius * 2.0
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Either<Exception, List<Polygon3D>> {
+    override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> {
 
         val circleVertices = circleVertices()
 
-        val basePolygon = Polygon3D(circleVertices.reversed().map { it.toVector3D(z = 0.0) }, tolerance)
-        val topPolygon = Polygon3D(circleVertices.map { it.toVector3D(z = height) }, tolerance)
+        val basePolygonVertices = circleVertices.reversed().map { it.toVector3D(z = 0.0) }.let { NonEmptyList.fromListUnsafe(it) }
+        val basePolygon = Polygon3D(basePolygonVertices, tolerance)
+        val topPolygonVertices = circleVertices.map { it.toVector3D(z = height) }.let { NonEmptyList.fromListUnsafe(it) }
+        val topPolygon = Polygon3D(topPolygonVertices, tolerance)
 
         val sidePolygons = circleVertices
             .zipWithNextEnclosing()
@@ -72,7 +76,7 @@ data class Cylinder3D(
                 )
             }
 
-        return Either.Right(sidePolygons + basePolygon + topPolygon)
+        return nonEmptyListOf(basePolygon, topPolygon) + sidePolygons
     }
 
     /**
@@ -92,5 +96,11 @@ data class Cylinder3D(
 
     companion object {
         const val DEFAULT_NUMBER_SLICES: Int = 16 // used for tesselation
+
+        fun of(radius: Option<Double>, height: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY, numberSlices: Int = DEFAULT_NUMBER_SLICES): Cylinder3D {
+            require(radius.isDefined()) { "Radius must be defined." }
+            require(height.isDefined()) { "Height must be defined." }
+            return Cylinder3D(radius.orNull()!!, height.orNull()!!, tolerance, affineSequence, numberSlices)
+        }
     }
 }

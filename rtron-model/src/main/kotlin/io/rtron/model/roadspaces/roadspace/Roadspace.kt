@@ -18,6 +18,7 @@ package io.rtron.model.roadspaces.roadspace
 
 import arrow.core.Option
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Road

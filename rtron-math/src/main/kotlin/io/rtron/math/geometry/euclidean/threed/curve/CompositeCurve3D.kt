@@ -17,24 +17,24 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
 import io.rtron.math.container.ConcatenationContainer
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 data class CompositeCurve3D(
-    val curveMembers: List<AbstractCurve3D>,
-    private val absoluteDomains: List<Range<Double>>,
-    private val absoluteStarts: List<Double>
+    val curveMembers: NonEmptyList<AbstractCurve3D>,
+    private val absoluteDomains: NonEmptyList<Range<Double>>,
+    private val absoluteStarts: NonEmptyList<Double>
 ) : AbstractCurve3D() {
 
     // Properties and Initializers
     init {
-        require(curveMembers.isNotEmpty()) { "Must contain at least one curve member." }
         require(curveMembers.all { it.tolerance == this.tolerance }) { "All curveMembers must have the same tolerance." }
-
         require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
@@ -44,13 +44,12 @@ data class CompositeCurve3D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector3D> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> = either.eager {
         val localMember = container
             .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+            .getOrHandle { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePointGlobalCS(localPoint)
+        localMember.member.calculatePointGlobalCS(localPoint).bind()
     }
 }

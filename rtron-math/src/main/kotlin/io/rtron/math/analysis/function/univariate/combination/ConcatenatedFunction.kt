@@ -18,17 +18,18 @@ package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import arrow.core.computations.ResultEffect.bind
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.range.Range
-import io.rtron.std.handleFailure
 import io.rtron.std.hasSameSizeAs
 import io.rtron.std.isSorted
 import io.rtron.std.isStrictlySorted
-import io.rtron.std.toResult
 
 /**
  * Represents the sequential concatenation of the provided member functions.
@@ -47,25 +48,19 @@ class ConcatenatedFunction(
     override val domain: Range<Double> get() = container.domain
 
     // Methods
-    override fun valueUnbounded(x: Double): Either<Exception, Double> {
-        val localMember = container.strictSelectMember(x)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
-        return localMember.member.valueUnbounded(localMember.localParameter)
+    override fun valueUnbounded(x: Double): Either<Exception, Double> = either.eager {
+        val localMember = container.strictSelectMember(x).bind()
+        localMember.member.valueUnbounded(localMember.localParameter).bind()
     }
 
-    override fun slopeUnbounded(x: Double): Either<Exception, Double> {
-        val localMember = container.strictSelectMember(x)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
-        return localMember.member.slopeUnbounded(localMember.localParameter)
+    override fun slopeUnbounded(x: Double): Either<Exception, Double> = either.eager {
+        val localMember = container.strictSelectMember(x).bind()
+        localMember.member.slopeUnbounded(localMember.localParameter).bind()
     }
 
-    override fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> {
-        val localMember = container.fuzzySelectMember(x, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
-        return localMember.member.valueUnbounded(localMember.localParameter)
+    override fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> = either.eager {
+        val localMember = container.fuzzySelectMember(x, tolerance).bind()
+        localMember.member.valueUnbounded(localMember.localParameter).bind()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -175,7 +170,7 @@ class ConcatenatedFunction(
                 listOf(Double.MIN_VALUE) else emptyList()
             val prependedFunction = if (prependConstant) {
                 val prependValue = if (prependConstantValue.isFinite()) prependConstantValue else
-                    polynomialFunctions.first().value(0.0).toResult().handleFailure { throw it.error }
+                    polynomialFunctions.first().value(0.0).getOrHandle { throw it }
 
                 listOf(ConstantFunction(prependValue))
             } else emptyList()

@@ -18,7 +18,7 @@ package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
 import arrow.core.computations.ResultEffect.bind
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import arrow.core.left
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.GeometryException
@@ -26,6 +26,7 @@ import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
+import io.rtron.math.std.normalizeAngle
 
 /**
  * Represents the sequential concatenation of the [curveMembers].
@@ -91,7 +92,7 @@ data class CompositeCurve2D(
 
                 if (frontCurveMemberEndPose.rotation.fuzzyUnequals(backCurveMemberStartPose.rotation, angleTolerance)) {
                     val angleDifference = frontCurveMemberEndPose.rotation - backCurveMemberStartPose.rotation
-                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference: ${angleDifference.toAngleRadians()} radians."
+                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference: ${normalizeAngle(angleDifference.toAngleRadians(), 0.0)} radians."
                     GeometryException.KinkInCurve(suffix).left().bind<GeometryException.KinkInCurve>()
                 }
             }

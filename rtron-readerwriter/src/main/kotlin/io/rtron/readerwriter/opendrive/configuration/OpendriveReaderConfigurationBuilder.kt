@@ -16,8 +16,6 @@
 
 package io.rtron.readerwriter.opendrive.configuration
 
-import arrow.core.None
-import arrow.core.Option
 import io.rtron.io.files.Path
 
 class OpendriveReaderConfigurationBuilder(
@@ -29,7 +27,7 @@ class OpendriveReaderConfigurationBuilder(
     /**
      * Directory for exporting the schema report.
      */
-    var outputSchemaValidationReportDirectoryPath: Option<Path> = None
+    lateinit var outputSchemaValidationReportDirectoryPath: Path
 
     // Methods
     fun build() = OpendriveReaderConfiguration(

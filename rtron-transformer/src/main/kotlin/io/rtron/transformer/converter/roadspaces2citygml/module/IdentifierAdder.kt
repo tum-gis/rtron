@@ -16,11 +16,12 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
+import arrow.core.Option
 import arrow.core.getOrElse
-import io.rtron.model.roadspaces.junction.JunctionIdentifier
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.JunctionIdentifier
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractCityObject
 import org.xmlobjects.gml.model.basictypes.Code
@@ -97,10 +98,12 @@ class IdentifierAdder(
 
     /** Adds a pseudo random hash id (hash based on the [id], [name], [subName], [index]) and [name]-[subName] to
      * the [dstCityObject]. */
-    fun addDetailedIdentifier(id: RoadspaceObjectIdentifier, name: String, subName: String, index: Int = 0, dstCityObject: AbstractCityObject) {
-        val hashKey = name + '_' + subName + '_' + index + '_' + id.hashedId
+    fun addDetailedIdentifier(id: RoadspaceObjectIdentifier, name: Option<String>, subName: String, index: Int = 0, dstCityObject: AbstractCityObject) {
+        val adjustedName = name.getOrElse { "" } // TODO
+
+        val hashKey = adjustedName + '_' + subName + '_' + index + '_' + id.hashedId
         dstCityObject.id = generateHashUUID(hashKey)
-        dstCityObject.names = listOf(Code("$name-$subName"))
+        dstCityObject.names = listOf(Code("$adjustedName-$subName"))
     }
 
     /** Returns a completely random id. */

@@ -16,12 +16,6 @@
 
 package io.rtron.io.report
 
-fun <V> Iterable<ContextReport<V>>.sequenceContextReport(): ContextReport<List<V>> {
-    val values = map { it.value }
-    val reports = map { it.report }.merge()
-    return ContextReport(values, reports)
-}
-
 class ContextReport<out V>(
     val value: V,
     val report: Report
@@ -29,5 +23,34 @@ class ContextReport<out V>(
     // Properties and Initializers
 
     // Methods
+    fun appendReport(other: Report): ContextReport<V> {
+        this.report += other
+        return this
+    }
+
+    fun handleReport(f: (Report) -> Unit): V {
+        f(report)
+        return value
+    }
+
     fun <R> map(transform: (V) -> R): ContextReport<R> = ContextReport(transform(value), report)
 }
+
+fun <V : Any> List<ContextReport<V>>.mergeReports(): ContextReport<List<V>> {
+    val mergedReport = Report()
+    this.forEach { mergedReport += it.report }
+    return ContextReport(this.map { it.value }, mergedReport)
+}
+
+/**
+ * Handles a list of reports with [block] and then returns only the list of [ContextReport.value].
+ *
+ * @receiver list of [ContextReport] to be handled
+ * @param block the actual handler for the report message
+ * @return remaining list of [ContextReport.value]
+ */
+inline fun <V : Any> List<ContextReport<V>>.handleReport(block: (ContextReport<V>) -> Unit): List<V> =
+    map {
+        block(it)
+        it.value
+    }

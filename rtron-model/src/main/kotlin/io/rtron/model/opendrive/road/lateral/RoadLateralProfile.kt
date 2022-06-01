@@ -18,30 +18,16 @@ package io.rtron.model.opendrive.road.lateral
 
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.filterToStrictSortingBy
 
 data class RoadLateralProfile(
     var superelevation: List<RoadLateralProfileSuperelevation> = emptyList(),
     var shape: List<RoadLateralProfileShape> = emptyList(),
 ) : OpendriveElement() {
 
-    // Validation Methods
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        val superelevationEntriesFiltered = superelevation.filterToStrictSortingBy { it.s }
-        if (superelevationEntriesFiltered.size < superelevation.size) {
-            healedViolations += OpendriveException.NonStrictlySortedList("superelevation", "Ignoring ${superelevation.size - superelevationEntriesFiltered.size} superelevation entries which are not placed in strict order according to s.")
-            superelevation = superelevationEntriesFiltered
-        }
-
-        return healedViolations
-    }
-
     // Methods
-    fun getSuperelevationAsOptionNonEmptyList(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = NonEmptyList.fromList(superelevation)
+    fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = NonEmptyList.fromList(superelevation)
+    fun getShapeEntries(): Option<NonEmptyList<RoadLateralProfileShape>> = NonEmptyList.fromList(shape)
 
     fun containsSuperelevationProfile() = superelevation.isNotEmpty()
     fun containsShapeProfile() = shape.isNotEmpty()

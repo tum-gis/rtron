@@ -17,11 +17,11 @@
 package io.rtron.model.roadspaces.roadspace.attribute
 
 import io.rtron.io.files.FileIdentifier
-import io.rtron.model.roadspaces.ModelIdentifier
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.LaneSectionIdentifier
+import io.rtron.model.roadspaces.identifier.ModelIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 
 fun FileIdentifier.toAttributes(prefix: String): AttributeList {
     val fileIdentifier = this

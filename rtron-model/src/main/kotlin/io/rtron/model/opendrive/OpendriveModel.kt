@@ -18,7 +18,7 @@ package io.rtron.model.opendrive
 
 import arrow.core.NonEmptyList
 import arrow.core.Validated
-import io.rtron.io.report.Report
+import arrow.optics.optics
 import io.rtron.model.AbstractModel
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.core.Header
@@ -31,6 +31,7 @@ import io.rtron.std.toValidated
  * Implementation of the OpenDRIVE data model according to version 1.7.
  * See the [official page](https://www.asam.net/standards/detail/opendrive/) from ASAM for more.
  */
+@optics
 data class OpendriveModel(
     var header: Header = Header(),
     var road: List<Road> = emptyList(),
@@ -42,20 +43,5 @@ data class OpendriveModel(
     val roadValidated: Validated<OpendriveException.EmptyList, NonEmptyList<Road>>
         get() = NonEmptyList.fromList(road).toValidated { OpendriveException.EmptyList("road") }
 
-    // Methods
-    /*fun heal(): Either<Nel<OpendriveAttributeException>, Report> = either.eager {
-
-        roadValidated.toValidatedNel().bind()
-
-        val report = Report()
-        report
-    }*/
-
-    fun getSevereViolations(): List<OpendriveException> =
-        roadValidated.fold({ listOf(it) }, { emptyList() })
-
-    fun healMinorViolations(): Report {
-        val report = Report()
-        return report
-    }
+    companion object
 }

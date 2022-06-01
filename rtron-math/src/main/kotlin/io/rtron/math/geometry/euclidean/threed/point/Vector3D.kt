@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.threed.point
 
 import arrow.core.Either
+import arrow.core.nonEmptyListOf
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.linear.RealVector
@@ -49,7 +50,6 @@ data class Vector3D(
 ) : AbstractPoint3D() {
 
     // Properties and Initializers
-
     init {
         require(x.isFinite()) { "X value must be finite." }
         require(y.isFinite()) { "Y value must be finite." }
@@ -115,7 +115,7 @@ data class Vector3D(
 
     // Conversions
     fun toDoubleArray() = doubleArrayOf(x, y, z)
-    fun toDoubleList() = listOf(x, y, z)
+    fun toDoubleList() = nonEmptyListOf(x, y, z)
     fun toRealVector() = RealVector(doubleArrayOf(x, y, z))
     fun toVector3DCm() = this._vector3D
     fun toVector3DJOML() = JOMLVector3D(this.x, this.y, this.z)

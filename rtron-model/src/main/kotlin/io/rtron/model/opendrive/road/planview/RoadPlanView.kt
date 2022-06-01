@@ -18,10 +18,12 @@ package io.rtron.model.opendrive.road.planview
 
 import arrow.core.NonEmptyList
 import arrow.core.Validated
+import arrow.optics.optics
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.core.OpendriveElement
 import io.rtron.std.toValidated
 
+@optics
 data class RoadPlanView(
     var geometry: List<RoadPlanViewGeometry> = emptyList(),
 ) : OpendriveElement() {
@@ -29,11 +31,5 @@ data class RoadPlanView(
     val geometryValidated: Validated<OpendriveException.EmptyList, NonEmptyList<RoadPlanViewGeometry>>
         get() = NonEmptyList.fromList(geometry).toValidated { OpendriveException.EmptyList("geometry") }
 
-    // Methods
-
-    fun getSevereViolations(): List<OpendriveException> = geometryValidated.fold({ listOf(it) }, { emptyList() })
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-        return healedViolations
-    }
+    companion object
 }

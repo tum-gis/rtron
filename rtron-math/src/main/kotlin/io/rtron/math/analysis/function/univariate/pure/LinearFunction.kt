@@ -17,6 +17,9 @@
 package io.rtron.math.analysis.function.univariate.pure
 
 import arrow.core.Either
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 import kotlin.math.abs
@@ -37,6 +40,12 @@ data class LinearFunction(
     override val domain: Range<Double> = Range.all()
 ) : UnivariateFunction() {
 
+    // Properties and Initializers
+    init {
+        require(slope.isFinite()) { "Slope must be a finite value." }
+        require(intercept.isFinite()) { "Intercept must be a finite value." }
+    }
+
     // Methods
     override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> =
         Either.Right(slope * x + intercept)
@@ -46,7 +55,7 @@ data class LinearFunction(
     companion object {
 
         /**
-         * Linear function representing the x axis.
+         * Linear function representing the x-axis.
          */
         val X_AXIS = LinearFunction(0.0, 0.0, Range.all())
 
@@ -75,7 +84,9 @@ data class LinearFunction(
          * @param pointY linear function stopping at ([pointX], [pointY])
          */
         fun ofInclusiveInterceptAndPoint(intercept: Double, pointX: Double, pointY: Double): LinearFunction {
-            require(pointX.isFinite() && pointX != 0.0) { "point must not be located on the y axis." }
+            require(intercept.isFinite()) { "Intercept must be finite." }
+            require(pointX.isFinite() && pointX != 0.0) { "Point must not be located on the y axis." }
+            require(pointY.isFinite()) { "PointY must be finite." }
 
             val slope = (pointY - intercept) / pointX
             val domain = Range.closed(min(0.0, pointX), max(0.0, pointX))
@@ -91,12 +102,18 @@ data class LinearFunction(
          * @param pointX linear function stopping at ([pointX], [pointY])
          * @param pointY linear function stopping at ([pointX], [pointY])
          */
-        fun ofInclusiveInterceptAndPointWithoutNaN(intercept: Double, pointX: Double, pointY: Double): LinearFunction {
-            require(intercept.isFinite() || pointY.isFinite()) { "Either intercept or pointY must be finite." }
-            require(pointX.isFinite()) { "X must be finite." }
+        fun ofInclusiveInterceptAndPoint(intercept: Option<Double>, pointX: Double, pointY: Option<Double>): LinearFunction {
+            require(intercept.exists { it.isFinite() }) { "Intercept must be finite, if defined." }
+            require(pointX.isFinite()) { "PointX must be finite." }
+            require(pointY.exists { it.isFinite() }) { "PointY must be finite, if defined." }
+            require(intercept.isDefined() || pointY.isDefined()) { "Either intercept or pointY must be finite." }
 
-            val adjustedIntercept = if (intercept.isFinite()) intercept else pointY
-            val adjustedPointY = if (pointY.isFinite()) pointY else intercept
+            val adjustedIntercept = intercept.getOrElse {
+                pointY.toEither { IllegalStateException("PointY must be set.") }.getOrHandle { throw it }
+            }
+            val adjustedPointY = pointY.getOrElse {
+                intercept.toEither { IllegalStateException("Intercept must be set.") }.getOrHandle { throw it }
+            }
             return ofInclusiveInterceptAndPoint(adjustedIntercept, pointX, adjustedPointY)
         }
 

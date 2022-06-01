@@ -16,15 +16,12 @@
 
 package io.rtron.model.opendrive.objects
 
-import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.none
+import arrow.core.some
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.toOption
-import io.rtron.std.toResult
 
 class RoadObjectsObjectOutlinesOutlineCornerRoad(
     var dz: Double = Double.NaN,
@@ -40,12 +37,10 @@ class RoadObjectsObjectOutlinesOutlineCornerRoad(
     fun hasZeroHeight(): Boolean = !height.isFinite() || height == 0.0
     fun hasPositiveHeight(): Boolean = !hasZeroHeight() && height > 0.0
 
-    fun getBasePoint() = CurveRelativeVector3D.of(s, t, dz)
-    fun isSetBasePoint(): Boolean = getBasePoint() is Either.Right
+    fun getBasePoint() = CurveRelativeVector3D(s, t, dz)
     fun getHeadPoint(): Option<CurveRelativeVector3D> =
-        if (hasZeroHeight()) none()
-        else CurveRelativeVector3D.of(s, t, dz + height).toResult().toOption()
+        if (hasZeroHeight()) None
+        else CurveRelativeVector3D(s, t, dz + height).some()
 
-    fun getPoints(): Either<Exception, Pair<CurveRelativeVector3D, Option<CurveRelativeVector3D>>> =
-        getBasePoint().map { Pair(it, getHeadPoint()) }
+    fun getPoints(): Pair<CurveRelativeVector3D, Option<CurveRelativeVector3D>> = Pair(getBasePoint(), getHeadPoint())
 }

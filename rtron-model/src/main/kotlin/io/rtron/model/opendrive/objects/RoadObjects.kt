@@ -16,11 +16,16 @@
 
 package io.rtron.model.opendrive.objects
 
+import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
 
+@optics
 data class RoadObjects(
     var roadObject: List<RoadObjectsObject> = emptyList(),
     var objectReference: List<RoadObjectsObjectReference> = emptyList(),
     var tunnel: List<RoadObjectsTunnel> = emptyList(),
     var bridge: List<RoadObjectsBridge> = emptyList()
-) : OpendriveElement()
+) : OpendriveElement() {
+
+    companion object
+}

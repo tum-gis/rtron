@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
+import arrow.core.nonEmptyListOf
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.DBL_EPSILON
@@ -32,7 +33,7 @@ internal class LineString3DTest {
 
         @Test
         fun `line string with two points should have a length of 1`() {
-            val lineString = LineString3D(listOf(Vector3D.ZERO, Vector3D.X_AXIS), 0.0)
+            val lineString = LineString3D(nonEmptyListOf(Vector3D.ZERO, Vector3D.X_AXIS), 0.0)
 
             val actualLength = lineString.length
 
@@ -45,7 +46,7 @@ internal class LineString3DTest {
             val pointB = Vector3D(1.0, 0.0, 0.0)
             val pointC = Vector3D(1.0, 1.0, 0.0)
             val pointD = Vector3D(0.0, 1.0, 0.0)
-            val lineString = LineString3D(listOf(pointA, pointB, pointC, pointD), 0.0)
+            val lineString = LineString3D(nonEmptyListOf(pointA, pointB, pointC, pointD), 0.0)
 
             val actualLength = lineString.length
 
@@ -60,7 +61,7 @@ internal class LineString3DTest {
         fun `line string with two points yields point in the middle`() {
             val pointA = Vector3D.ZERO
             val pointB = Vector3D(0.0, 10.0, 0.0)
-            val lineString = LineString3D(listOf(pointA, pointB), 0.0)
+            val lineString = LineString3D(nonEmptyListOf(pointA, pointB), 0.0)
 
             val actualReturn = lineString.calculatePointGlobalCS(CurveRelativeVector1D(5.0))
 
@@ -77,7 +78,7 @@ internal class LineString3DTest {
             val pointB = Vector3D(1.0, 0.0, 0.0)
             val pointC = Vector3D(1.0, 1.0, 0.0)
             val pointD = Vector3D(0.0, 1.0, 0.0)
-            val lineString = LineString3D(listOf(pointA, pointB, pointC, pointD), 0.0)
+            val lineString = LineString3D(nonEmptyListOf(pointA, pointB, pointC, pointD), 0.0)
 
             val actualReturn = lineString.calculatePointGlobalCS(CurveRelativeVector1D(2.5))
 

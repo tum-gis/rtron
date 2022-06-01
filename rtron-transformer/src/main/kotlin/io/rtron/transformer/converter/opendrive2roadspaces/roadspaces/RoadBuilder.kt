@@ -16,29 +16,24 @@
 
 package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
-import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.computations.either
-import arrow.core.getOrElse
-import arrow.core.sequenceEither
-import io.rtron.io.logging.LogManager
+import io.rtron.io.report.ContextReport
+import io.rtron.io.report.Report
+import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.shiftLowerEndpointTo
 import io.rtron.model.opendrive.junction.EContactPoint
 import io.rtron.model.opendrive.lane.RoadLanesLaneSection
-import io.rtron.model.roadspaces.junction.JunctionIdentifier
+import io.rtron.model.roadspaces.identifier.JunctionIdentifier
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.LaneSectionIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.ContactPoint
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.LaneSection
-import io.rtron.model.roadspaces.roadspace.road.LaneSectionIdentifier
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
@@ -53,9 +48,7 @@ class RoadBuilder(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
-
-    private val _functionBuilder = FunctionBuilder(_reportLogger, configuration)
+    private val _functionBuilder = FunctionBuilder(configuration)
     private val _laneBuilder = LaneBuilder(configuration)
 
     // Methods
@@ -75,12 +68,12 @@ class RoadBuilder(
         roadSurface: CurveRelativeParametricSurface3D,
         roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D,
         baseAttributes: AttributeList
-    ):
-        Either<Exception, Road> = either.eager {
+    ): ContextReport<Road> {
 
         require(road.lanes.getLaneSectionLengths(road.length).all { it >= configuration.numberTolerance }) { "All lane sections must have a length above the tolerance threshold." }
+        val report = Report()
 
-        val laneOffset = _functionBuilder.buildLaneOffset(id, road.lanes)
+        val laneOffset = road.lanes.getLaneOffsetEntries().fold({ LinearFunction.X_AXIS }, { _functionBuilder.buildLaneOffset(it) })
         val laneSections: NonEmptyList<LaneSection> = road.lanes.getLaneSectionsWithRanges(road.length)
             .mapIndexed { currentId, currentLaneSection ->
                 buildLaneSection(
@@ -88,17 +81,14 @@ class RoadBuilder(
                     currentLaneSection.first,
                     currentLaneSection.second,
                     baseAttributes
-                )
-            }.sequenceEither()
-            .bind()
-            .let { NonEmptyList.fromList(it) }
-            .toEither { IllegalArgumentException("Road element contains no valid lane sections.") }
-            .bind()
+                ).handleReport { report += it }
+            }
+            .let { NonEmptyList.fromListUnsafe(it) }
 
         val roadLinkage = buildRoadLinkage(id, road)
 
         val roadspaceRoad = Road(id, roadSurface, roadSurfaceWithoutTorsion, laneOffset, laneSections, roadLinkage)
-        roadspaceRoad
+        return ContextReport(roadspaceRoad, report)
     }
 
     /**
@@ -109,10 +99,11 @@ class RoadBuilder(
         curvePositionDomain: Range<Double>,
         laneSection: RoadLanesLaneSection,
         baseAttributes: AttributeList
-    ):
-        Either<Exception, LaneSection> = either.eager {
+    ): ContextReport<LaneSection> {
         require(laneSection.center.lane.size == 1) { "Lane section ($laneSectionIdentifier) must contain exactly one center lane." }
         require(laneSection.getNumberOfLeftLanes() + laneSection.getNumberOfRightLanes() >= 1) { "Lane section ($laneSectionIdentifier) must contain at least one left or right lane." }
+
+        val report = Report()
 
         val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
 
@@ -122,17 +113,18 @@ class RoadBuilder(
                 val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
                 val attributes = baseAttributes + laneSectionAttributes
                 _laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
+                    .handleReport { report += it }
             }
 
         val centerLane = _laneBuilder.buildCenterLane(
             laneSectionIdentifier,
             localCurvePositionDomain,
-            laneSection.center.lane.first(),
+            laneSection.center.getIndividualCenterLane(),
             baseAttributes
-        )
+        ).handleReport { report += it }
 
         val roadspaceLaneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
-        roadspaceLaneSection
+        return ContextReport(roadspaceLaneSection, report)
     }
 
     private fun buildRoadLinkage(id: RoadspaceIdentifier, road: OpendriveRoad): RoadLinkage {
@@ -140,20 +132,20 @@ class RoadBuilder(
         val belongsToJunctionId = road.getJunctionOption()
             .map { JunctionIdentifier(it, id.modelIdentifier) }
 
-        val predecessorRoadspaceContactPointId = road.link // TODO: refactor
+        val predecessorRoadspaceContactPointId = road.link
             .flatMap { it.predecessor }
             .flatMap { it.getRoadPredecessorSuccessor() }
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint().getOrElse { ContactPoint.START }, RoadspaceIdentifier(it.first, id.modelIdentifier)) }
-        val predecessorJunctionId = road.link // TODO: refactor
+            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first, id.modelIdentifier)) }
+        val predecessorJunctionId = road.link
             .flatMap { it.predecessor }
             .flatMap { it.getJunctionPredecessorSuccessor() }
             .map { JunctionIdentifier(it, id.modelIdentifier) }
 
-        val successorRoadspaceContactPointId = road.link // TODO refactor
+        val successorRoadspaceContactPointId = road.link
             .flatMap { it.successor }
             .flatMap { it.getRoadPredecessorSuccessor() }
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint().getOrElse { ContactPoint.START }, RoadspaceIdentifier(it.first, id.modelIdentifier)) }
-        val successorJunctionId = road.link // TODO refactor
+            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first, id.modelIdentifier)) }
+        val successorJunctionId = road.link
             .flatMap { it.successor }
             .flatMap { it.getJunctionPredecessorSuccessor() }
             .map { JunctionIdentifier(it, id.modelIdentifier) }
@@ -173,8 +165,8 @@ class RoadBuilder(
         }
 }
 
-fun EContactPoint.toContactPoint(default: Option<ContactPoint> = None) =
+fun EContactPoint.toContactPoint(): ContactPoint =
     when (this) {
-        EContactPoint.START -> Some(ContactPoint.START)
-        EContactPoint.END -> Some(ContactPoint.END)
+        EContactPoint.START -> ContactPoint.START
+        EContactPoint.END -> ContactPoint.END
     }

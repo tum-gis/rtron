@@ -5,7 +5,6 @@
 @file:DependsOn("io.rtron:rtron-main:1.2.2")
 */
 
-import arrow.core.Some
 import io.rtron.main.project.processAllFiles
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.citygml.CitygmlVersion
@@ -30,7 +29,7 @@ processAllFiles(
     val generalAngleTolerance = 1E-2
 
     val opendriveModel: OpendriveModel = readOpendriveModel(inputFilePath) {
-        outputSchemaValidationReportDirectoryPath = Some(outputDirectoryPath)
+        outputSchemaValidationReportDirectoryPath = outputDirectoryPath
     }.fold( { logger.warn(it.message); return@processAllFiles }, { it })
 
     val opendriveEvaluatorConfiguration = OpendriveEvaluatorConfiguration(
@@ -62,6 +61,8 @@ processAllFiles(
     roadspacesEvaluator.evaluate(roadspacesModel)
 
     val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
+        outputReportDirectoryPath = outputDirectoryPath
+
         flattenGenericAttributeSets = true
         discretizationStepSize = 0.5
         transformAdditionalRoadLines = true

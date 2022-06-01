@@ -17,12 +17,15 @@
 package io.rtron.transformer.converter.roadspaces2citygml.configuration
 
 import io.rtron.io.files.FileIdentifier
+import io.rtron.io.files.Path
 import java.util.regex.Pattern
 
 data class Roadspaces2CitygmlConfiguration(
     val projectId: String,
     val sourceFileIdentifier: FileIdentifier,
     val concurrentProcessing: Boolean,
+
+    val outputReportDirectoryPath: Path,
 
     val gmlIdPrefix: String,
     val identifierAttributesPrefix: String,
@@ -40,6 +43,8 @@ data class Roadspaces2CitygmlConfiguration(
     init {
         require(PATTERN_NCNAME.matcher(gmlIdPrefix).matches()) { "Provided gmlIdPrefix ($gmlIdPrefix) requires valid NCName pattern." }
     }
+
+    val outputReportFilePath: Path = outputReportDirectoryPath.resolve(Path("reports/converter/roadspaces2citygml/conversion.json"))
 
     // Conversions
     override fun toString(): String =

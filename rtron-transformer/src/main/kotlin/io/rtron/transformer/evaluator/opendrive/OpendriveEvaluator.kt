@@ -17,11 +17,12 @@
 package io.rtron.transformer.evaluator.opendrive
 
 import arrow.core.Either
-import arrow.core.computations.either
+import arrow.core.continuations.either
 import arrow.core.left
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
 import io.rtron.transformer.evaluator.opendrive.plans.basicdatatype.BasicDataTypeEvaluator
 import io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements.ConversionRequirementsEvaluator
@@ -40,49 +41,59 @@ class OpendriveEvaluator(
     // Methods
 
     fun evaluate(opendriveModel: OpendriveModel): Either<OpendriveEvaluatorException, OpendriveModel> = either.eager {
+        opendriveModel.updateAdditionalIdentifiers()
+        var healedOpendriveModel = opendriveModel.copy()
 
-        val basicDataTypeReportFilePath = configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/opendrive/basicDataTypeEvaluationReport.json"))
-        val basicDataTypeFatalViolationsReport = _basicDataTypeEvaluator.evaluateFatalViolations(opendriveModel)
+        val basicDataTypeReportFilePath =
+            configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/opendrive/basicDataTypeEvaluationReport.json"))
+        val basicDataTypeFatalViolationsReport = _basicDataTypeEvaluator.evaluateFatalViolations(healedOpendriveModel)
         if (basicDataTypeFatalViolationsReport.isNotEmpty()) {
             basicDataTypeFatalViolationsReport.write(basicDataTypeReportFilePath)
             _reportLogger.warn("Basic data types evaluator found ${basicDataTypeFatalViolationsReport.getTextSummary()}.")
-            OpendriveEvaluatorException.FatalError("Basic data types evaluator detected fatal errors.").left().bind<OpendriveEvaluatorException.FatalError>()
+            OpendriveEvaluatorException.FatalError("Basic data types evaluator detected fatal errors.").left()
+                .bind<OpendriveEvaluatorException.FatalError>()
         }
-        val basicDataTypeHealedOpendriveModel = _basicDataTypeEvaluator
-            .evaluateNonFatalViolations(opendriveModel)
+        healedOpendriveModel = _basicDataTypeEvaluator
+            .evaluateNonFatalViolations(healedOpendriveModel)
             .let {
                 it.report.write(basicDataTypeReportFilePath)
                 it.value
             }
 
-        val modelingRulesReportFilePath = configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/opendrive/modelingRulesEvaluationReport.json"))
-        val modelingRulesFatalViolationsReport = _modelingRulesEvaluator.evaluateFatalViolations(basicDataTypeHealedOpendriveModel)
+        val modelingRulesReportFilePath =
+            configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/opendrive/modelingRulesEvaluationReport.json"))
+        val modelingRulesFatalViolationsReport =
+            _modelingRulesEvaluator.evaluateFatalViolations(healedOpendriveModel)
         if (modelingRulesFatalViolationsReport.isNotEmpty()) {
             modelingRulesFatalViolationsReport.write(modelingRulesReportFilePath)
             _reportLogger.warn("Modeling rules evaluator found ${modelingRulesFatalViolationsReport.getTextSummary()}.")
-            OpendriveEvaluatorException.FatalError("Modeling rules evaluator detected fatal errors.").left().bind<OpendriveEvaluatorException.FatalError>()
+            OpendriveEvaluatorException.FatalError("Modeling rules evaluator detected fatal errors.").left()
+                .bind<OpendriveEvaluatorException.FatalError>()
         }
-        val modelingRulesHealedOpendriveModel = _modelingRulesEvaluator
-            .evaluateNonFatalViolations(basicDataTypeHealedOpendriveModel)
+        healedOpendriveModel = _modelingRulesEvaluator
+            .evaluateNonFatalViolations(healedOpendriveModel)
             .let {
                 it.report.write(modelingRulesReportFilePath)
                 it.value
             }
 
-        val conversionRequirementsReportFilePath = configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/opendrive/conversionRequirementsEvaluationReport.json"))
-        val conversionRequirementsFatalViolationsReport = _conversionRequirementsEvaluator.evaluateFatalViolations(basicDataTypeHealedOpendriveModel)
+        val conversionRequirementsReportFilePath =
+            configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/opendrive/conversionRequirementsEvaluationReport.json"))
+        val conversionRequirementsFatalViolationsReport =
+            _conversionRequirementsEvaluator.evaluateFatalViolations(healedOpendriveModel)
         if (conversionRequirementsFatalViolationsReport.isNotEmpty()) {
             conversionRequirementsFatalViolationsReport.write(modelingRulesReportFilePath)
             _reportLogger.warn("Conversion requirements evaluator found ${conversionRequirementsFatalViolationsReport.getTextSummary()}.")
-            OpendriveEvaluatorException.FatalError("Conversion requirements evaluator detected fatal errors.").left().bind<OpendriveEvaluatorException.FatalError>()
+            OpendriveEvaluatorException.FatalError("Conversion requirements evaluator detected fatal errors.").left()
+                .bind<OpendriveEvaluatorException.FatalError>()
         }
-        val conversionRequirementsHealedOpendriveModel = _conversionRequirementsEvaluator
-            .evaluateNonFatalViolations(modelingRulesHealedOpendriveModel)
+        healedOpendriveModel = _conversionRequirementsEvaluator
+            .evaluateNonFatalViolations(healedOpendriveModel)
             .let {
                 it.report.write(conversionRequirementsReportFilePath)
                 it.value
             }
 
-        conversionRequirementsHealedOpendriveModel
+        healedOpendriveModel
     }
 }

@@ -17,13 +17,13 @@
 package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
+import arrow.core.continuations.either
+import arrow.core.left
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.calculateBestFittingPlane
 import io.rtron.math.transform.Affine3D
 import io.rtron.math.transform.AffineSequence3D
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * This algorithm wraps a [triangulationAlgorithm]. Before triangulating the vertices a best fitting plane is estimated
@@ -36,17 +36,12 @@ class ProjectedTriangulationAlgorithm(
     private val triangulationAlgorithm: TriangulationAlgorithm
 ) : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<Exception, List<Polygon3D>> {
+    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
         val projectedVertices = projectVertices(vertices, tolerance)
         val projectedPolygonsTriangulated = triangulationAlgorithm
-            .triangulate(projectedVertices, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+            .triangulate(projectedVertices, tolerance).bind()
 
-        return projectedPolygonsTriangulated
-            .map { constructPolygon(it, projectedVertices, vertices, tolerance).toResult() }
-            .handleFailure { return Either.Left(it.error) }
-            .let { Either.Right(it) }
+        projectedPolygonsTriangulated.map { constructPolygon(it, projectedVertices, vertices, tolerance).bind() }
     }
 
     /**
@@ -78,10 +73,10 @@ class ProjectedTriangulationAlgorithm(
         allProjectedVertices: List<Vector3D>,
         allOriginalVertices: List<Vector3D>,
         tolerance: Double
-    ): Either<Exception, Polygon3D> {
+    ): Either<TriangulatorException, Polygon3D> {
 
         if (!allProjectedVertices.containsAll(projectedPolygon.vertices))
-            return Either.Left(RuntimeException("Triangulation algorithm produced deviating points."))
+            return TriangulatorException.DifferentVertices().left()
 
         val constructedPolygon = projectedPolygon.vertices
             .map { allProjectedVertices.indexOf(it) }

@@ -17,6 +17,7 @@
 package io.rtron.transformer.converter.roadspaces2citygml.configuration
 
 import io.rtron.io.files.FileIdentifier
+import io.rtron.io.files.Path
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
 
@@ -25,6 +26,13 @@ class Roadspaces2CitygmlConfigurationBuilder(
     val sourceFileIdentifier: FileIdentifier,
     val concurrentProcessing: Boolean
 ) {
+
+    // Properties and Initializers
+
+    /**
+     * path for report
+     */
+    var outputReportDirectoryPath: Path = Path("./")
 
     /**
      * prefix for generated gml ids
@@ -85,6 +93,7 @@ class Roadspaces2CitygmlConfigurationBuilder(
         projectId,
         sourceFileIdentifier,
         concurrentProcessing,
+        outputReportDirectoryPath,
         gmlIdPrefix,
         identifierAttributesPrefix,
         geometryAttributesPrefix,

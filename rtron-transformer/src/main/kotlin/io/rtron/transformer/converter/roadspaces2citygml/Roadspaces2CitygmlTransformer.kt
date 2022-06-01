@@ -17,18 +17,20 @@
 package io.rtron.transformer.converter.roadspaces2citygml
 
 import arrow.core.Option
+import arrow.core.flattenOption
+import arrow.core.getOrHandle
 import io.rtron.io.logging.LogManager
 import io.rtron.io.logging.ProgressBar
+import io.rtron.io.report.ContextReport
+import io.rtron.io.report.Report
+import io.rtron.io.report.handleReport
+import io.rtron.io.report.mergeReports
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
-import io.rtron.std.getValueResult
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
-import io.rtron.std.unwrapValues
+import io.rtron.std.getValueEither
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
-import io.rtron.transformer.converter.roadspaces2citygml.module.TransportationModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadsTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadspaceObjectTransformer
 import kotlinx.coroutines.GlobalScope
@@ -53,7 +55,6 @@ class Roadspaces2CitygmlTransformer(
     private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
 
     private val identifierAdder = IdentifierAdder(configuration)
-    private val _transportationModuleBuilder = TransportationModuleBuilder(configuration, identifierAdder)
     private val _roadObjectTransformer = RoadspaceObjectTransformer(configuration, identifierAdder)
     private val _roadLanesTransformer = RoadsTransformer(configuration, identifierAdder)
 
@@ -67,44 +68,60 @@ class Roadspaces2CitygmlTransformer(
      */
     fun transform(roadspacesModel: RoadspacesModel): CitygmlModel {
 
-        // transformation of each road space
-        _reportLogger.info("${this.javaClass.simpleName} with $configuration.")
-        val abstractCityObjects = if (configuration.concurrentProcessing)
-            transformRoadspacesConcurrently(roadspacesModel)
-        else transformRoadspacesSequentially(roadspacesModel)
+        val report = Report()
 
+        // transformation of each road space
+        _reportLogger.info("${Roadspaces2CitygmlTransformer::class.simpleName} with $configuration.")
+        val abstractCityObjects =
+            if (configuration.concurrentProcessing) transformRoadspacesConcurrently(roadspacesModel).handleReport { report += it }
+            else transformRoadspacesSequentially(roadspacesModel).handleReport { report += it }
+
+        report.write(configuration.outputReportFilePath)
         // create CityGML model
         val boundingShape = calculateBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
-        _reportLogger.info("${this.javaClass.simpleName}: Completed transformation. ✔")
+        _reportLogger.info("${Roadspaces2CitygmlTransformer::class.simpleName}: Completed transformation. ✔")
         return CitygmlModel(roadspacesModel.id.modelName, boundingShape, abstractCityObjects)
     }
 
     private fun transformRoadspacesSequentially(
         roadspacesModel: RoadspacesModel
-    ): List<AbstractCityObject> {
+    ): ContextReport<List<AbstractCityObject>> {
+
+        val report = Report()
 
         // build objects
         val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
         val roadFeatures = roadspacesModel
             .getAllRoadspaceNames()
             .map { _roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() } }
-            .unwrapValues()
+            .mergeReports()
+            .handleReport { report += it }
+            .flattenOption()
 
         val roadspaceObjectsProgressBar = ProgressBar("Transforming roadspace objects", roadspacesModel.numberOfRoadspaces)
-        val roadspaceObjects = roadspacesModel.getAllRoadspaces().flatMap { _roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects).also { roadspaceObjectsProgressBar.step() } }
+        val roadspaceObjects: List<AbstractCityObject> = roadspacesModel
+            .getAllRoadspaces()
+            .map { _roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects).also { roadspaceObjectsProgressBar.step() } }
+            .mergeReports()
+            .handleReport { report += it }
+            .flatten()
 
-        val additionalRoadLines = if (configuration.transformAdditionalRoadLines) {
+        val additionalRoadLines: List<AbstractCityObject> = if (configuration.transformAdditionalRoadLines) {
             val additionalRoadLinesProgressBar = ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
-            roadspacesModel.getAllRoadspaces().flatMap { _roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() } }
+            roadspacesModel.getAllRoadspaces().map {
+                _roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
+            }.mergeReports().handleReport { report += it }.flatten()
         } else emptyList()
 
         addLaneTopology(roadspacesModel, roadFeatures)
-        return roadFeatures + roadspaceObjects + additionalRoadLines
+        val cityObjects: List<AbstractCityObject> = roadFeatures + roadspaceObjects + additionalRoadLines
+        return ContextReport(cityObjects, report)
     }
 
     private fun transformRoadspacesConcurrently(
         roadspacesModel: RoadspacesModel
-    ): List<AbstractCityObject> {
+    ): ContextReport<List<AbstractCityObject>> {
+        val report = Report()
 
         // build objects
         val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
@@ -133,12 +150,19 @@ class Roadspaces2CitygmlTransformer(
             }
         } else emptyList()
 
-        val roadFeatures = runBlocking { roadFeaturesDeferred.map { it.await() }.unwrapValues() }
-        val roadspaceObjects = runBlocking { roadspaceObjectsDeferred.flatMap { it.await() } }
-        val additionalRoadLines = runBlocking { additionalRoadLinesDeferred.flatMap { it.await() } }
+        val roadFeatures = runBlocking {
+            roadFeaturesDeferred.map { currentRoadFeature -> currentRoadFeature.await().handleReport { report += it } }.flattenOption()
+        }
+        val roadspaceObjects = runBlocking {
+            roadspaceObjectsDeferred.map { currentRoadSpaceObject -> currentRoadSpaceObject.await().handleReport { report += it } }.flatten()
+        }
+        val additionalRoadLines = runBlocking {
+            additionalRoadLinesDeferred.flatMap { currentRoadLines -> currentRoadLines.await().handleReport { report += it } }
+        }
 
         addLaneTopology(roadspacesModel, roadFeatures)
-        return roadFeatures + roadspaceObjects + additionalRoadLines
+        val cityObjects: List<AbstractCityObject> = roadFeatures + roadspaceObjects + additionalRoadLines
+        return ContextReport(cityObjects, report)
     }
 
     private fun addLaneTopology(roadspacesModel: RoadspacesModel, dstTransportationSpaces: List<Road>) {
@@ -147,19 +171,16 @@ class Roadspaces2CitygmlTransformer(
 
         val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { configuration.gmlIdPrefix + it.id.hashedId }
         trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
-            val currentLane = lanesMap.getValueResult(currentTrafficSpace.`object`.id).handleFailure { throw it.error }
-            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).toResult().handleFailure { throw it.error }
-            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).toResult().handleFailure { throw it.error }
+            val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrHandle { throw it.toIllegalArgumentException() }
+            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
+            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
 
             currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
             currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
         }
     }
 
-    private fun calculateBoundingShape(
-        abstractCityObjects: List<AbstractCityObject>,
-        crs: Option<CoordinateReferenceSystem>
-    ): BoundingShape {
+    private fun calculateBoundingShape(abstractCityObjects: List<AbstractCityObject>, crs: Option<CoordinateReferenceSystem>): BoundingShape {
         val envelope = Envelope()
         crs.tap { envelope.srsName = it.srsName }
         abstractCityObjects.forEach { envelope.include(it.computeEnvelope()) }

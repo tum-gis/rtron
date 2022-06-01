@@ -18,6 +18,7 @@ package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.model.roadspaces.common.FillerSurface
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.Attribute
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.BooleanAttribute
@@ -30,7 +31,6 @@ import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import org.citygml4j.model.core.AbstractCityObject

@@ -16,24 +16,14 @@
 
 package io.rtron.std
 
-import arrow.core.Either
 import arrow.core.Option
 import arrow.core.Validated
 import arrow.core.invalid
 import arrow.core.valid
 
-/** Returns a list of values of type [T], whereby the empty [Option] are ignored. */
-fun <T> List<Option<T>>.unwrapValues(): List<T> = filter { it.isDefined() }.map { it.orNull()!! }
-
-/** Execute [f] on the value of type [T], if present. */
-inline fun <T : Any?> Option<T>.present(f: (T) -> Unit) { if (isDefined()) f(orNull()!!) }
-
-/** Handle the none() of [Option] with [block] and return the [V]. */
+/** Handle the None of [Option] with [block] and return the [V]. */
 inline fun <V : Any?> Option<V>.handleEmpty(block: (Option<V>) -> Nothing): V =
     if (isDefined()) orNull()!! else block(this)
-
-fun <T> Option<T>.getResult(): Either<IllegalStateException, T> =
-    if (isDefined()) Either.Right(orNull()!!) else Either.Left(IllegalStateException(""))
 
 fun <L, A> Option<A>.toValidated(ifEmpty: () -> L): Validated<L, A> =
     fold({ ifEmpty().invalid() }, { it.valid() })

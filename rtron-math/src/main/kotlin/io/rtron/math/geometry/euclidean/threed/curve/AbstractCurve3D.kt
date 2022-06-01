@@ -17,6 +17,9 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
@@ -27,8 +30,6 @@ import io.rtron.math.range.Tolerable
 import io.rtron.math.range.arrange
 import io.rtron.math.range.fuzzyContainsResult
 import io.rtron.math.range.length
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Abstract class for all geometric curve objects in 3D.
@@ -53,9 +54,10 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector3D> {
-        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).toResult().handleFailure { return Either.Left(it.error) }
-        return calculatePointLocalCSUnbounded(curveRelativePoint)
+    fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> = either.eager {
+        domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance)
+            .mapLeft { GeometryException.DiscretizationError(it.message!!) }.bind()
+        calculatePointLocalCSUnbounded(curveRelativePoint).bind()
     }
 
     /**
@@ -66,7 +68,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @return point in cartesian coordinates
      */
     protected abstract fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Vector3D>
+        Either<GeometryException, Vector3D>
 
     /**
      * Returns the point in the global cartesian coordinate system that is located on this curve and given by a
@@ -76,7 +78,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector3D> =
+    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> =
         calculatePointLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
 
     /**
@@ -96,20 +98,23 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param includeEndPoint true, if the endpoint shall be included
      * @return list of points on this curve
      */
-    fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true): Either<Exception, List<Vector3D>> =
+    fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true): Either<GeometryException, NonEmptyList<Vector3D>> = either.eager {
+
         domain.arrange(step, includeEndPoint, tolerance)
             .map(::CurveRelativeVector1D)
-            .map { calculatePointGlobalCS(it).toResult() }
-            .handleFailure { return Either.Left(it.error) }
-            .let { Either.Right(it) }
+            .map { calculatePointGlobalCS(it).bind() }
+            .let { NonEmptyList.fromListUnsafe(it) }
+    }
 
     /**
      * Returns a discretized curve as a [LineString3D].
      *
      * @param step step size between the points
      */
-    fun calculateLineStringGlobalCS(step: Double): Either<Exception, LineString3D> =
-        calculatePointListGlobalCS(step, true).toResult().handleFailure { return Either.Left(it.error) }.let { LineString3D.of(it, tolerance) }
+    fun calculateLineStringGlobalCS(step: Double): Either<GeometryException, LineString3D> = either.eager {
+        val point = calculatePointListGlobalCS(step, true).bind()
+        LineString3D.of(point, tolerance).bind()
+    }
 
     override fun accept(visitor: Geometry3DVisitor) { visitor.visit(this) }
 }

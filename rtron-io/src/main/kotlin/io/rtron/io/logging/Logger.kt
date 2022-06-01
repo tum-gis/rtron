@@ -16,9 +16,7 @@
 
 package io.rtron.io.logging
 
-import arrow.core.Either
 import com.vdurmont.emoji.EmojiParser
-import io.rtron.std.ContextMessage
 import mu.KLogger
 import mu.KotlinLogging
 import org.apache.commons.lang3.SystemUtils
@@ -101,43 +99,6 @@ class Logger(
      */
     fun debug(message: String) {
         logger.debug(message)
-    }
-
-    /**
-     * Log out the exception of a [failure].
-     *
-     * @param failure failure message to be logged
-     */
-    fun log(failure: Either.Left<Exception>, prefix: String = "", suffix: String = "") {
-        log(failure.value, prefix, suffix)
-    }
-
-    /**
-     * Log out an [exception] message as a warning.
-     *
-     * @param exception exception message to be logged
-     */
-    fun log(exception: Exception, prefix: String = "", suffix: String = "") {
-        val warningMessage = if (exception.message.isNullOrEmpty()) exception.toString() else exception.message!!
-        warn(warningMessage, prefix, suffix)
-    }
-
-    /**
-     * Log the messages of a [ContextMessage].
-     *
-     * @param contextMessage message to be logged
-     */
-    fun log(contextMessage: ContextMessage<Any>, prefix: String = "", suffix: String = "") {
-        info(contextMessage.messages, prefix, suffix)
-    }
-
-    /**
-     * Log the messages of a [ContextMessage] within a [Result].
-     *
-     * @param result contains the message to be logged
-     */
-    fun log(result: Either<Exception, ContextMessage<Any>>, prefix: String = "", suffix: String = "") {
-        result.fold({ log(it, prefix, suffix) }, { log(it, prefix, suffix) })
     }
 
     private fun combineMessage(messages: List<String>, prefix: String, suffix: String) =

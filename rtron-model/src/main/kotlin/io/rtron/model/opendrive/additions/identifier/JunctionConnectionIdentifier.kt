@@ -16,10 +16,18 @@
 
 package io.rtron.model.opendrive.additions.identifier
 
-import io.rtron.model.roadspaces.junction.JunctionIdentifier
-import io.rtron.model.roadspaces.junction.JunctionIdentifierInterface
+import arrow.core.Option
 
-interface ConnectionIdentifierInterface {
+interface JunctionConnectionIdentifierInterface {
     val connectionId: String
 }
-data class ConnectionIdentifier(override val connectionId: String, val junctionIdentifier: JunctionIdentifier) : ConnectionIdentifierInterface, JunctionIdentifierInterface by junctionIdentifier
+data class JunctionConnectionIdentifier(override val connectionId: String, val junctionIdentifier: JunctionIdentifier) :
+    AbstractOpendriveIdentifier(), JunctionConnectionIdentifierInterface, JunctionIdentifierInterface by junctionIdentifier {
+
+    // Conversions
+    override fun toStringMap() = mapOf("connectionId" to connectionId) + junctionIdentifier.toStringMap()
+}
+
+interface AdditionalJunctionConnectionIdentifier {
+    var additionalId: Option<JunctionConnectionIdentifier>
+}

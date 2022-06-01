@@ -17,16 +17,16 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
+import arrow.core.continuations.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.surface.AbstractCurveRelativeSurface3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.intersectingRange
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Curve that lies on a parametric surface. This curve is parallel to the [baseSurface]'s curve but defined by a
@@ -39,7 +39,7 @@ import io.rtron.std.toResult
  * @param lateralOffsetFunction lateral offset to the curve of the [baseSurface]
  * @param heightOffsetFunction height offset to the curve of the [baseSurface]
  */
-class CurveOnParametricSurface3D(
+data class CurveOnParametricSurface3D(
     private val baseSurface: AbstractCurveRelativeSurface3D,
     private val lateralOffsetFunction: UnivariateFunction,
     private val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
@@ -60,17 +60,19 @@ class CurveOnParametricSurface3D(
     }
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Vector3D> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> = either.eager {
 
         val lateralOffset = lateralOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+            .mapLeft { GeometryException.DiscretizationError(it.message!!) }
+            .bind()
         val heightOffset = heightOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+            .mapLeft { GeometryException.DiscretizationError(it.message!!) }
+            .bind()
 
         val curveRelativePoint2D = curveRelativePoint.toCurveRelative2D(lateralOffset)
-        return baseSurface.calculatePointGlobalCS(curveRelativePoint2D, heightOffset)
+        baseSurface.calculatePointGlobalCS(curveRelativePoint2D, heightOffset)
+            .mapLeft { GeometryException.DiscretizationError(it.message!!) }
+            .bind()
     }
 
     companion object {
@@ -83,9 +85,7 @@ class CurveOnParametricSurface3D(
             baseSurface: AbstractCurveRelativeSurface3D,
             lateralOffsetFunction: UnivariateFunction,
             heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
-        ):
-            CurveOnParametricSurface3D {
-
+        ): CurveOnParametricSurface3D {
             require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
             require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The height offset function must be defined everywhere where the baseSurface is also defined." }
 

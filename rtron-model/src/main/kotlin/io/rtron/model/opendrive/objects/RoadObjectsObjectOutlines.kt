@@ -16,9 +16,11 @@
 
 package io.rtron.model.opendrive.objects
 
+import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadObjectsObjectOutlines(
+@optics
+data class RoadObjectsObjectOutlines(
     var outline: List<RoadObjectsObjectOutlinesOutline> = emptyList(),
 ) : OpendriveElement() {
 
@@ -36,4 +38,6 @@ class RoadObjectsObjectOutlines(
     fun containsLinearRings() = numberOfLinearRings() > 0
 
     fun containsGeometries() = containsPolyhedrons() || containsLinearRings()
+
+    companion object
 }

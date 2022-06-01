@@ -16,39 +16,9 @@
 
 package io.rtron.model.opendrive.core
 
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
-
 data class HeaderOffset(
     var hdg: Double = 0.0,
     var x: Double = 0.0,
     var y: Double = 0.0,
     var z: Double = 0.0,
-) : OpendriveElement() {
-
-    // Methods
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        if (!x.isFinite()) {
-            healedViolations += OpendriveException.UnexpectedValue("x", x.toString(), "Value should be finite.")
-            x = 0.0
-        }
-
-        if (!y.isFinite()) {
-            healedViolations += OpendriveException.UnexpectedValue("y", y.toString(), "Value should be finite.")
-            y = 0.0
-        }
-
-        if (!z.isFinite()) {
-            healedViolations += OpendriveException.UnexpectedValue("z", z.toString(), "Value should be finite.")
-            z = 0.0
-        }
-
-        if (!hdg.isFinite()) {
-            healedViolations += OpendriveException.UnexpectedValue("hdg", hdg.toString(), "Value should be finite.")
-            hdg = 0.0
-        }
-
-        return healedViolations
-    }
-}
+) : OpendriveElement()

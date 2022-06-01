@@ -17,11 +17,10 @@
 package io.rtron.math.analysis.function.univariate
 
 import arrow.core.Either
+import arrow.core.continuations.either
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.fuzzyContains
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Function with exactly one parameter of the form z = f(x).
@@ -60,9 +59,9 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * @param x parameter [x] of function
      * @return returns Result.Success(z) = f(x), if [x] is strictly contained in [domain] and evaluation was successful
      */
-    fun value(x: Double): Either<Exception, Double> {
-        domain.containsResult(x).toResult().handleFailure { return Either.Left(it.error) }
-        return valueUnbounded(x)
+    fun value(x: Double): Either<Exception, Double> = either.eager {
+        domain.containsResult(x).bind()
+        valueUnbounded(x).bind()
     }
 
     /**

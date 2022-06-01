@@ -16,6 +16,9 @@
 
 package io.rtron.model.roadspaces.roadspace
 
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifierInterface
+
 enum class ContactPoint(val relativeIndex: Int) {
     START(0),
     END(-1)

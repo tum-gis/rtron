@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.evaluator.opendrive.report
+package io.rtron.transformer.report
 
+import arrow.core.Option
 import io.rtron.io.report.Message
 import io.rtron.io.report.MessageSeverity
-import io.rtron.model.opendrive.additions.identifier.JunctionIdentifier
-import io.rtron.model.opendrive.junction.Junction
+import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
+import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 
 fun Message.Companion.of(text: String, location: Map<String, String>, isFatal: Boolean, wasHealed: Boolean): Message {
     val textPrefix: String = when (Pair(isFatal, wasHealed)) {
@@ -42,8 +43,20 @@ fun Message.Companion.of(text: String, location: Map<String, String>, isFatal: B
     return Message(messageText, severity, identifier, location)
 }
 
-fun Message.Companion.of(affectedJunction: Junction, text: String, isFatal: Boolean, wasHealed: Boolean): Message {
-    val junctionIdentifier = JunctionIdentifier(affectedJunction.id)
+@JvmName("MessageOfAbstractOpendriveIdentifier")
+fun Message.Companion.of(text: String, identifier: Option<AbstractOpendriveIdentifier>, isFatal: Boolean, wasHealed: Boolean): Message {
+    return of(text, identifier.fold({ emptyMap() }, { it.toStringMap() }), isFatal, wasHealed)
+}
 
-    return Message.of(text, junctionIdentifier.toStringMap(), isFatal, wasHealed)
+fun Message.Companion.of(text: String, identifier: AbstractOpendriveIdentifier, isFatal: Boolean, wasHealed: Boolean): Message {
+    return of(text, identifier.toStringMap(), isFatal, wasHealed)
+}
+
+@JvmName("MessageOfAbstractRoadspacesIdentifier")
+fun Message.Companion.of(text: String, identifier: Option<AbstractRoadspacesIdentifier>, isFatal: Boolean, wasHealed: Boolean): Message {
+    return of(text, identifier.fold({ emptyMap() }, { it.toStringMap() }), isFatal, wasHealed)
+}
+
+fun Message.Companion.of(text: String, identifier: AbstractRoadspacesIdentifier, isFatal: Boolean, wasHealed: Boolean): Message {
+    return of(text, identifier.toStringMap(), isFatal, wasHealed)
 }

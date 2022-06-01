@@ -16,8 +16,16 @@
 
 package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
-import arrow.core.Either
-import io.rtron.io.logging.LogManager
+import arrow.core.NonEmptyList
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.flatten
+import arrow.core.getOrHandle
+import arrow.core.nonEmptyListOf
+import arrow.core.some
+import io.rtron.io.report.ContextReport
+import io.rtron.io.report.Report
+import io.rtron.io.report.mergeReports
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
@@ -25,17 +33,12 @@ import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.model.opendrive.objects.EObjectType
 import io.rtron.model.opendrive.signal.RoadSignals
 import io.rtron.model.opendrive.signal.RoadSignalsSignal
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObjectIdentifier
-import io.rtron.std.handleAndRemoveFailureIndexed
-import io.rtron.std.handleFailure
-import io.rtron.std.mapAndHandleFailureOnOriginal
-import io.rtron.std.toEither
-import io.rtron.std.toResult
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve3DBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Solid3DBuilder
@@ -43,6 +46,7 @@ import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Surface3DBui
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Vector3DBuilder
 import io.rtron.model.opendrive.objects.RoadObjects as OpendriveRoadObjects
 import io.rtron.model.opendrive.objects.RoadObjectsObject as OpendriveRoadObject
+import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat as OpendriveRoadObjectRepeat
 
 /**
  * Builder for [RoadspaceObject] which correspond to the OpenDRIVE road object class.
@@ -52,12 +56,10 @@ class RoadspaceObjectBuilder(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
-
-    private val _solid3DBuilder = Solid3DBuilder(_reportLogger, configuration)
-    private val _surface3DBuilder = Surface3DBuilder(_reportLogger, configuration)
-    private val _curve3DBuilder = Curve3DBuilder(_reportLogger, configuration)
-    private val _vector3DBuilder = Vector3DBuilder()
+    private val _solid3DBuilder = Solid3DBuilder(configuration)
+    private val _surface3DBuilder = Surface3DBuilder(configuration)
+    private val _curve3DBuilder = Curve3DBuilder(configuration)
+    private val _vector3DBuilder = Vector3DBuilder(configuration)
 
     // Methods
     /**
@@ -71,27 +73,24 @@ class RoadspaceObjectBuilder(
         roadObjects: OpendriveRoadObjects,
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
-    ): List<RoadspaceObject> =
-        roadObjects.roadObject
-            .map { buildRoadObject(roadspaceId, it, roadReferenceLine, baseAttributes).toResult() }
-            .handleAndRemoveFailureIndexed { index, failure ->
-                _reportLogger.log(failure.toEither(), "ObjectId=${roadObjects.roadObject[index].id}")
-            }
+    ): ContextReport<List<RoadspaceObject>> {
+
+        return roadObjects.roadObject
+            .map { buildRoadObject(roadspaceId, it, roadReferenceLine, baseAttributes) }
+            .mergeReports()
+            .map { it.flatten() }
+    }
 
     private fun buildRoadObject(
         id: RoadspaceIdentifier,
         roadObject: OpendriveRoadObject,
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
-    ): Either<Exception, RoadspaceObject> {
-
-        val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, roadObject.name, id)
+    ): ContextReport<NonEmptyList<RoadspaceObject>> {
+        val report = Report()
 
         // get general object type and geometry representation
         val type = getObjectType(roadObject)
-        val geometries = buildGeometries(roadspaceObjectId, roadObject, roadReferenceLine)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
 
         // build attributes
         val attributes = baseAttributes +
@@ -99,9 +98,24 @@ class RoadspaceObjectBuilder(
             buildAttributes(roadObject.curveRelativePosition) +
             buildAttributes(roadObject.referenceLinePointRelativeRotation)
 
+        val roadObjectsFromRepeat = roadObject.repeat.map { currentRoadObjectRepeat ->
+            val repeatIdentifier = currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+
+            val roadspaceObjectId = RoadspaceObjectIdentifier("${roadObject.id}_${repeatIdentifier.repeatIndex}", roadObject.name, id)
+            val geometry = buildGeometries(roadObject, currentRoadObjectRepeat.some(), roadReferenceLine).handleReport { report += it }
+            RoadspaceObject(roadspaceObjectId, type, geometry, attributes)
+        }
+
+        val roadObjects = if (roadObjectsFromRepeat.isEmpty()) {
+            val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, roadObject.name, id)
+            val geometry = buildGeometries(roadObject, None, roadReferenceLine).handleReport { report += it }
+            nonEmptyListOf(RoadspaceObject(roadspaceObjectId, type, geometry, attributes))
+        } else {
+            NonEmptyList.fromListUnsafe(roadObjectsFromRepeat)
+        }
+
         // build roadspace object
-        val roadspaceObject = RoadspaceObject(roadspaceObjectId, type, geometries, attributes)
-        return Either.Right(roadspaceObject)
+        return ContextReport(roadObjects, report)
     }
 
     private fun getObjectType(roadObject: OpendriveRoadObject): RoadObjectType = roadObject.type.fold({ RoadObjectType.NONE }, {
@@ -128,52 +142,49 @@ class RoadspaceObjectBuilder(
     /**
      * Reads in the OpenDRIVE road object geometries and builds up the implemented geometries of [AbstractGeometry3D].
      *
-     * @param id identifier of the road space object
      * @param roadObject road object source model
+     * @param roadObjectRepeat considered repeat element for building complex geometries like parametric sweeps
      * @return list of transformed geometries
      */
     private fun buildGeometries(
-        id: RoadspaceObjectIdentifier,
         roadObject: OpendriveRoadObject,
+        roadObjectRepeat: Option<OpendriveRoadObjectRepeat>,
         roadReferenceLine: Curve3D
-    ): Either<Exception, List<AbstractGeometry3D>> {
+    ): ContextReport<AbstractGeometry3D> {
+        val report = Report()
 
         // affine transformation matrix at the curve point of the object
-        val curveAffine = roadReferenceLine
-            .calculateAffine(roadObject.curveRelativePosition.toCurveRelative1D())
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
+        val curveAffine = roadReferenceLine.calculateAffine(roadObject.curveRelativePosition.toCurveRelative1D())
 
         // build up solid geometrical representations
-        val geometry = mutableListOf<AbstractGeometry3D>()
-        geometry += _solid3DBuilder.buildCuboids(roadObject, curveAffine)
-        geometry += _solid3DBuilder.buildCylinders(roadObject, curveAffine)
-        geometry += _solid3DBuilder.buildPolyhedronsByRoadCorners(id, roadObject, roadReferenceLine)
-        geometry += _solid3DBuilder.buildPolyhedronsByLocalCorners(id, roadObject, curveAffine)
-        geometry += _solid3DBuilder.buildParametricSweeps(roadObject, roadReferenceLine)
+        val geometries = mutableListOf<AbstractGeometry3D>()
+        geometries += _solid3DBuilder.buildCuboids(roadObject, curveAffine).handleReport { report += it }
+        geometries += _solid3DBuilder.buildCylinders(roadObject, curveAffine).handleReport { report += it }
+        geometries += _solid3DBuilder.buildPolyhedronsByRoadCorners(roadObject, roadReferenceLine).handleReport { report += it }
+        geometries += _solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine).handleReport { report += it }
 
         // build up surface geometrical representations
-        geometry += _surface3DBuilder.buildRectangles(roadObject, curveAffine)
-        geometry += _surface3DBuilder.buildCircles(roadObject, curveAffine)
-        geometry += _surface3DBuilder.buildLinearRingsByRoadCorners(id, roadObject, roadReferenceLine)
-        geometry += _surface3DBuilder.buildLinearRingsByLocalCorners(id, roadObject, curveAffine)
-        if (roadObject.repeat.isNotEmpty()) {
-            // TODO fix repeat list handling
-            geometry += _surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(id, roadObject.repeat.first(), roadReferenceLine)
-            geometry += _surface3DBuilder.buildParametricBoundedSurfacesByVerticalRepeat(id, roadObject.repeat.first(), roadReferenceLine)
+        geometries += _surface3DBuilder.buildRectangles(roadObject, curveAffine).handleReport { report += it }
+        geometries += _surface3DBuilder.buildCircles(roadObject, curveAffine).handleReport { report += it }
+        geometries += _surface3DBuilder.buildLinearRingsByRoadCorners(roadObject, roadReferenceLine).handleReport { report += it }
+        geometries += _surface3DBuilder.buildLinearRingsByLocalCorners(roadObject, curveAffine).handleReport { report += it }
+
+        roadObjectRepeat.tap {
+            geometries += _solid3DBuilder.buildParametricSweeps(it, roadReferenceLine).toList()
+            geometries += _surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(it, roadReferenceLine)
+            geometries += _surface3DBuilder.buildParametricBoundedSurfacesByVerticalRepeat(it, roadReferenceLine)
         }
 
         // build up curve geometrical representations
-        geometry += _curve3DBuilder.buildCurve3D(roadObject, roadReferenceLine)
+        geometries += _curve3DBuilder.buildCurve3D(roadObject, roadReferenceLine)
 
         // if no other geometrical representation has been found, use a point instead
-        if (geometry.isEmpty())
-            geometry += _vector3DBuilder
-                .buildVector3Ds(roadObject, curveAffine, force = true)
-                .toResult()
-                .handleFailure { throw it.error }
+        if (geometries.isEmpty())
+            geometries += _vector3DBuilder.buildVector3Ds(roadObject, curveAffine, force = true)
 
-        return Either.Right(geometry)
+        check(geometries.size == 1) { "Exactly one geometry must be derived." }
+
+        return ContextReport(geometries.first(), report)
     }
 
     private fun buildAttributes(roadObject: OpendriveRoadObject) =
@@ -210,30 +221,27 @@ class RoadspaceObjectBuilder(
         roadSignals: RoadSignals,
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
-    ): List<RoadspaceObject> =
-        roadSignals.signal
-            .mapAndHandleFailureOnOriginal(
-                { buildRoadSignalsSignal(id, it, roadReferenceLine, baseAttributes).toResult() },
-                { failure, original -> _reportLogger.log(failure.toEither(), RoadspaceObjectIdentifier(original.id, original.name, id).toString(), "Ignoring signal object.") }
-            )
+    ): List<RoadspaceObject> {
+
+        return roadSignals.signal.map { buildRoadSignalsSignal(id, it, roadReferenceLine, baseAttributes) }
+    }
 
     private fun buildRoadSignalsSignal(
         id: RoadspaceIdentifier,
         roadSignal: RoadSignalsSignal,
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
-    ): Either<Exception, RoadspaceObject> {
+    ): RoadspaceObject {
 
         val objectId = RoadspaceObjectIdentifier(roadSignal.id, roadSignal.name, id)
 
-        val geometry = buildGeometries(roadSignal, roadReferenceLine).toResult().handleFailure { return Either.Left(it.error) }
+        val geometry = buildGeometries(roadSignal, roadReferenceLine)
         val attributes = baseAttributes +
             buildAttributes(roadSignal) +
             buildAttributes(roadSignal.curveRelativePosition) +
             buildAttributes(roadSignal.referenceLinePointRelativeRotation)
 
-        val roadObject = RoadspaceObject(objectId, RoadObjectType.SIGNAL, geometry, attributes)
-        return Either.Right(roadObject)
+        return RoadspaceObject(objectId, RoadObjectType.SIGNAL, geometry, attributes)
     }
 
     private fun buildAttributes(signal: RoadSignalsSignal): AttributeList =
@@ -250,21 +258,9 @@ class RoadspaceObjectBuilder(
             }
         }
 
-    private fun buildGeometries(signal: RoadSignalsSignal, roadReferenceLine: Curve3D):
-        Either<Exception, List<AbstractGeometry3D>> {
+    private fun buildGeometries(signal: RoadSignalsSignal, roadReferenceLine: Curve3D): AbstractGeometry3D {
+        val curveAffine = roadReferenceLine.calculateAffine(signal.curveRelativePosition.toCurveRelative1D())
 
-        val curveAffine = roadReferenceLine
-            .calculateAffine(signal.curveRelativePosition.toCurveRelative1D())
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
-
-        val geometry = mutableListOf<AbstractGeometry3D>()
-        if (geometry.isEmpty())
-            geometry += _vector3DBuilder
-                .buildVector3Ds(signal, curveAffine, force = true)
-                .toResult()
-                .handleFailure { throw it.error }
-
-        return Either.Right(geometry)
+        return _vector3DBuilder.buildVector3Ds(signal, curveAffine, force = true)
     }
 }

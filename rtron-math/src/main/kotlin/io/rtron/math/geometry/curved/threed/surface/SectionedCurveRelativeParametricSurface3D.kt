@@ -17,13 +17,12 @@
 package io.rtron.math.geometry.curved.threed.surface
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.shiftLowerEndpointTo
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Cuts out a section from the [completeCurveRelativeSurface].
@@ -45,7 +44,7 @@ class SectionedCurveRelativeParametricSurface3D(
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
     override val tolerance: Double get() = completeCurveRelativeSurface.tolerance
-    private val sectionStart = section.lowerEndpointResult().toResult().handleFailure { throw it.error }
+    private val sectionStart = section.lowerEndpointResult().getOrHandle { throw it }
 
     init {
         require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }

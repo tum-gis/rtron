@@ -14,9 +14,6 @@ dependencies {
     implementation(project(ProjectComponents.inputOutput))
     implementation(project(ProjectComponents.model))
 
-    // standard libraries
-    implementation(Dependencies.arrowCore)
-
     // object creation libraries
     implementation(Dependencies.jakartaXmlBindApi)
     implementation(Dependencies.sunJaxbImpl)

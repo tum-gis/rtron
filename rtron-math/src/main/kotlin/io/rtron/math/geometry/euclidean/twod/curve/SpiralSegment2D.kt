@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
@@ -26,8 +27,6 @@ import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Spiral curve segment within a defined [domain] that is given by the [curvatureFunction].
@@ -47,9 +46,9 @@ class SpiralSegment2D(
     // Properties and Initializers
 
     private val lowerDomainEndpoint =
-        curvatureFunction.domain.lowerEndpointResult().toResult().handleFailure { throw it.error }
+        curvatureFunction.domain.lowerEndpointResult().getOrHandle { throw it }
     private val upperDomainEndpoint =
-        curvatureFunction.domain.upperEndpointResult().toResult().handleFailure { throw it.error }
+        curvatureFunction.domain.upperEndpointResult().getOrHandle { throw it }
     override val domain: Range<Double> =
         Range.closedX(lowerDomainEndpoint, upperDomainEndpoint, endBoundType)
 
@@ -63,7 +62,7 @@ class SpiralSegment2D(
 
     private val _spiral = Spiral2D(curvatureFunction.slope)
     private val _lengthStart =
-        curvatureFunction.startValue.toResult().handleFailure { throw it.error } / curvatureFunction.slope
+        curvatureFunction.startValue.getOrHandle { throw it } / curvatureFunction.slope
     private val _spiralPoseStart = _spiral.calculatePose(_lengthStart)
 
     // Methods

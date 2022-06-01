@@ -17,7 +17,6 @@
 package io.rtron.model.roadspaces.roadspace.attribute
 
 import arrow.core.Option
-import io.rtron.std.present
 
 /**
  * Environment for describing and building attribute lists.
@@ -33,7 +32,7 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: String) {
-        StringAttribute.of(namePrefix + name, value).present { attributes += it }
+        StringAttribute.of(namePrefix + name, value).tap { attributes += it }
     }
 
     fun attribute(name: String, value: Int) {
@@ -41,7 +40,7 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: Double) {
-        DoubleAttribute.of(namePrefix + name, value).present { attributes += it }
+        DoubleAttribute.of(namePrefix + name, value).tap { attributes += it }
     }
 
     fun attribute(name: String, value: Boolean) {
@@ -49,11 +48,19 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: Double, unitOfMeasure: UnitOfMeasure) {
-        MeasureAttribute.of(namePrefix + name, value, unitOfMeasure).present { attributes += it }
+        MeasureAttribute.of(namePrefix + name, value, unitOfMeasure).tap { attributes += it }
     }
 
+    @JvmName("OptionalDoubleAttribute")
+    fun attribute(name: String, optionalValue: Option<Double>) {
+        optionalValue.tap {
+            attributes += DoubleAttribute(namePrefix + name, it)
+        }
+    }
+
+    @JvmName("OptionalStringAttribute")
     fun attribute(name: String, optionalValue: Option<String>) {
-        optionalValue.present {
+        optionalValue.tap {
             if (it.isNotBlank())
                 attributes += StringAttribute(namePrefix + name, it)
         }

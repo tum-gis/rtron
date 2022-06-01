@@ -16,20 +16,21 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
-import arrow.core.Either
-import io.rtron.io.logging.LogManager
+import io.rtron.io.report.ContextReport
+import io.rtron.io.report.Message
+import io.rtron.io.report.Report
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
+import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.report.of
 import org.citygml4j.model.generics.GenericOccupiedSpace
 
 /**
@@ -40,25 +41,29 @@ class GenericsModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
     private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
-    fun createGenericOccupiedSpaceFeature(roadspaceObject: RoadspaceObject): Either<Exception, GenericOccupiedSpace> {
+    fun createGenericOccupiedSpaceFeature(roadspaceObject: RoadspaceObject): ContextReport<GenericOccupiedSpace> {
+        val report = Report()
+
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
-        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(geometryTransformer).toResult().handleFailure { return Either.Left(it.error) }
+        val genericOccupiedSpace =
+            createGenericOccupiedSpaceFeature(roadspaceObject.id, geometryTransformer)
+                .handleReport { report += it }
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, genericOccupiedSpace)
         _attributesAdder.addAttributes(roadspaceObject, genericOccupiedSpace)
 
-        return Either.Right(genericOccupiedSpace)
+        return ContextReport(genericOccupiedSpace, report)
     }
 
-    fun createGenericOccupiedSpaceFeature(id: LaneIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList):
-        Either<Exception, GenericOccupiedSpace> {
+    fun createGenericOccupiedSpaceFeature(id: LaneIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList): ContextReport<GenericOccupiedSpace> {
+        val report = Report()
 
-        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).toResult().handleFailure { return Either.Left(it.error) }
+        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(id, abstractGeometry)
+            .handleReport { report += it }
 
         identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
         _attributesAdder.addAttributes(
@@ -66,12 +71,14 @@ class GenericsModuleBuilder(
                 attributes,
             genericOccupiedSpace
         )
-        return Either.Right(genericOccupiedSpace)
+
+        return ContextReport(genericOccupiedSpace, report)
     }
 
-    fun createGenericOccupiedSpaceFeature(id: RoadspaceIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList):
-        Either<Exception, GenericOccupiedSpace> {
-        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(abstractGeometry).toResult().handleFailure { return Either.Left(it.error) }
+    fun createGenericOccupiedSpaceFeature(id: RoadspaceIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList): ContextReport<GenericOccupiedSpace> {
+        val report = Report()
+        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(id, abstractGeometry)
+            .handleReport { report += it }
 
         identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
         _attributesAdder.addAttributes(
@@ -79,28 +86,29 @@ class GenericsModuleBuilder(
                 attributes,
             genericOccupiedSpace
         )
-        return Either.Right(genericOccupiedSpace)
+        return ContextReport(genericOccupiedSpace, report)
     }
 
-    private fun createGenericOccupiedSpaceFeature(abstractGeometry: AbstractGeometry3D):
-        Either<Exception, GenericOccupiedSpace> {
+    private fun createGenericOccupiedSpaceFeature(id: AbstractRoadspacesIdentifier, abstractGeometry: AbstractGeometry3D):
+        ContextReport<GenericOccupiedSpace> {
         val geometryTransformer = GeometryTransformer(configuration)
             .also { abstractGeometry.accept(it) }
-        return createGenericOccupiedSpaceFeature(geometryTransformer)
+        return createGenericOccupiedSpaceFeature(id, geometryTransformer)
     }
 
-    private fun createGenericOccupiedSpaceFeature(geometryTransformer: GeometryTransformer):
-        Either<Exception, GenericOccupiedSpace> {
+    private fun createGenericOccupiedSpaceFeature(id: AbstractRoadspacesIdentifier, geometryTransformer: GeometryTransformer): ContextReport<GenericOccupiedSpace> {
+        val report = Report()
+
         val genericOccupiedSpaceFeature = GenericOccupiedSpace()
 
         // geometry
         genericOccupiedSpaceFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-        if (geometryTransformer.isSetRotation())
-            geometryTransformer.getRotation()
-                .toResult()
-                .handleFailure { return Either.Left(it.error) }
-                .also { _attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature) }
+            .tapLeft { report += Message.of(it.message, id, isFatal = false, wasHealed = true) }
 
-        return Either.Right(genericOccupiedSpaceFeature)
+        geometryTransformer.rotation.tap {
+            _attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)
+        }
+
+        return ContextReport(genericOccupiedSpaceFeature, report)
     }
 }

@@ -16,16 +16,12 @@
 
 package io.rtron.transformer.evaluator.opendrive.report
 
+import arrow.core.Option
 import io.rtron.io.report.Message
 import io.rtron.io.report.MessageSeverity
 import io.rtron.io.report.Report
-import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
-import io.rtron.model.opendrive.additions.identifier.JunctionIdentifier
-import io.rtron.model.opendrive.additions.identifier.RoadIdentifier
-import io.rtron.model.opendrive.core.Header
-import io.rtron.model.opendrive.junction.Junction
-import io.rtron.model.opendrive.road.Road
+import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
 
 fun OpendriveException.toMessage(location: Map<String, String>, isFatal: Boolean, wasHealed: Boolean): Message {
     val textPrefix: String = when (Pair(isFatal, wasHealed)) {
@@ -46,31 +42,24 @@ fun OpendriveException.toMessage(location: Map<String, String>, isFatal: Boolean
     return Message(text, severity, mapOf("exceptionCode" to this.exceptionIdentifier), location)
 }
 
-fun List<OpendriveException>.toReport(location: Map<String, String>, isFatal: Boolean, wasHealed: Boolean): Report {
+@JvmName("toMessageWithIdentifier")
+fun OpendriveException.toMessage(location: AbstractOpendriveIdentifier, isFatal: Boolean, wasHealed: Boolean): Message {
+    return toMessage(location.toStringMap(), isFatal, wasHealed)
+}
+
+@JvmName("toMessageWithOptionalIdentifier")
+fun OpendriveException.toMessage(location: Option<AbstractOpendriveIdentifier>, isFatal: Boolean, wasHealed: Boolean): Message {
+    return toMessage(location.fold({ emptyMap() }, { it.toStringMap() }), isFatal, wasHealed)
+}
+
+@JvmName("toReportWithIdentifier")
+fun List<OpendriveException>.toReport(location: AbstractOpendriveIdentifier, isFatal: Boolean, wasHealed: Boolean): Report {
     val messages = this.map { it.toMessage(location, isFatal, wasHealed) }
     return Report(messages)
 }
 
-fun List<OpendriveException>.toReport(affectedOpendriveModel: OpendriveModel, isFatal: Boolean, wasHealed: Boolean): Report {
-    val identifier = mapOf("element" to "root")
-    val messages = this.map { it.toMessage(identifier, isFatal, wasHealed) }
-    return Report(messages)
-}
-
-fun List<OpendriveException>.toReport(affectedHeader: Header, isFatal: Boolean, wasHealed: Boolean): Report {
-    val identifier = mapOf("element" to "header")
-    val messages = this.map { it.toMessage(identifier, isFatal, wasHealed) }
-    return Report(messages)
-}
-
-fun List<OpendriveException>.toReport(affectedJunction: Junction, isFatal: Boolean, wasHealed: Boolean): Report {
-    val identifier = JunctionIdentifier(affectedJunction.id)
-    val messages = this.map { it.toMessage(identifier.toStringMap(), isFatal, wasHealed) }
-    return Report(messages)
-}
-
-fun List<OpendriveException>.toReport(affectedRoad: Road, isFatal: Boolean, wasHealed: Boolean): Report {
-    val identifier = RoadIdentifier(affectedRoad.id)
-    val messages = this.map { it.toMessage(identifier.toStringMap(), isFatal, wasHealed) }
+@JvmName("toReportWithOptionalIdentifier")
+fun List<OpendriveException>.toReport(location: Option<AbstractOpendriveIdentifier>, isFatal: Boolean, wasHealed: Boolean): Report {
+    val messages = this.map { it.toMessage(location, isFatal, wasHealed) }
     return Report(messages)
 }

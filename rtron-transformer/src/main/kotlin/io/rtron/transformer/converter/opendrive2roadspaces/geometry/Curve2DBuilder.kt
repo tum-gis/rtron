@@ -18,7 +18,6 @@ package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import io.rtron.io.logging.Logger
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -45,16 +44,12 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for curves in 2D from the OpenDRIVE data model.
  */
-class Curve2DBuilder(
-    private val reportLogger: Logger,
-    private val configuration: Opendrive2RoadspacesConfiguration
-) {
+class Curve2DBuilder(private val configuration: Opendrive2RoadspacesConfiguration) {
 
     // Methods
 
@@ -64,12 +59,7 @@ class Curve2DBuilder(
      * @param planViewGeometryList source geometry curve segments of OpenDRIVE
      * @param offset applied translational offset
      */
-    fun buildCurve2DFromPlanViewGeometries(
-        id: RoadspaceIdentifier,
-        planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>,
-        offset: Vector2D = Vector2D.ZERO
-    ): Either<GeometryException, CompositeCurve2D> {
-
+    fun buildCurve2DFromPlanViewGeometries(planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>, offset: Vector2D = Vector2D.ZERO): Either<GeometryException, CompositeCurve2D> {
         require(planViewGeometryList.all { it.length > configuration.numberTolerance }) { "All plan view geometry elements must have a length greater than zero (above the tolerance threshold)." }
 
         // construct composite curve
@@ -164,15 +154,14 @@ class Curve2DBuilder(
      * Builds the function for laterally translating the [roadReferenceLine] which is inter alia required for the
      * building of road objects.
      */
-    fun buildLateralTranslatedCurve(repeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
-        Either<IllegalArgumentException, LateralTranslatedCurve2D> {
+    fun buildLateralTranslatedCurve(
+        repeat: RoadObjectsObjectRepeat,
+        roadReferenceLine: Curve3D
+    ): LateralTranslatedCurve2D {
         val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
-
-        if (!roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, configuration.numberTolerance))
-            return Either.Left(IllegalArgumentException("Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance."))
+        require(roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, configuration.numberTolerance)) { "Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance." }
 
         val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
-        val lateralTranslatedCurve = LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), configuration.numberTolerance)
-        return Either.Right(lateralTranslatedCurve)
+        return LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), configuration.numberTolerance)
     }
 }

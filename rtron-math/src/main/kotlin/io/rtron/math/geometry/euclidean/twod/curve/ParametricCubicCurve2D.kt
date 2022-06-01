@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -24,8 +25,6 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
 import io.rtron.math.transform.AffineSequence2D
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
 
 /**
  * Represents a parametric cubic curve of the following form:
@@ -63,22 +62,17 @@ class ParametricCubicCurve2D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Either<Exception, Vector2D> {
 
-        val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition)
-            .toResult()
-            .handleFailure { throw it.error }
-        val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition)
-            .toResult()
-            .handleFailure { throw it.error }
+        val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
+        val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
         return Either.Right(Vector2D(x, y))
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
         Either<Exception, Rotation2D> {
 
-        val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition)
-            .toResult().handleFailure { throw it.error }
-        val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition)
-            .toResult().handleFailure { throw it.error }
+        val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition).getOrHandle { throw it }
+        val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition).getOrHandle { throw it }
+
         val rotation = Rotation2D.of(Vector2D(x, y))
         return Either.Right(rotation)
     }

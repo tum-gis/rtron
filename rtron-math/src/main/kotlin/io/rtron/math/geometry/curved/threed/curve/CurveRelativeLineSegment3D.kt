@@ -51,12 +51,7 @@ class CurveRelativeLineSegment3D(
          * Creates a [LineSegment3D], if [start] and [end] [Vector3D] are not fuzzily equal according to the [tolerance].
          *
          */
-        fun of(
-            start: CurveRelativeVector3D,
-            end: CurveRelativeVector3D,
-            tolerance: Double,
-            endBoundType: BoundType = BoundType.CLOSED
-        ): Either<IllegalArgumentException, CurveRelativeLineSegment3D> =
+        fun of(start: CurveRelativeVector3D, end: CurveRelativeVector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED): Either<IllegalArgumentException, CurveRelativeLineSegment3D> =
             if (start.fuzzyEquals(end, tolerance))
                 Either.Left(
                     IllegalArgumentException(

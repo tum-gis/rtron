@@ -19,13 +19,17 @@ package io.rtron.model.opendrive.objects
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
+import arrow.optics.OpticsTarget
+import arrow.optics.optics
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.additions.identifier.AdditionalRoadObjectIdentifier
+import io.rtron.model.opendrive.additions.identifier.RoadObjectIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
 
+@optics([OpticsTarget.LENS, OpticsTarget.PRISM, OpticsTarget.OPTIONAL, OpticsTarget.DSL])
 data class RoadObjectsObject(
     var repeat: List<RoadObjectsObjectRepeat> = emptyList(),
     // outline is deprecated
@@ -55,74 +59,15 @@ data class RoadObjectsObject(
     var validLength: Option<Double> = None,
     var width: Option<Double> = None,
     var zOffset: Double = 0.0,
-) : OpendriveElement() {
+
+    override var additionalId: Option<RoadObjectIdentifier> = None
+) : OpendriveElement(), AdditionalRoadObjectIdentifier {
 
     // Validation Properties
 
     /** height is None */
     val heightValidated: Option<Double>
         get() = height.flatMap { if (it == 0.0) None else it.some() }
-
-    // Validation Methods
-    fun getSevereViolations(): List<OpendriveException> = emptyList()
-
-    fun healMinorViolations(tolerance: Double): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        if (!s.isFinite() || s < 0.0) {
-            healedViolations += OpendriveException.UnexpectedValue("s", s.toString(), "Value shall be finite and greater equals zero.")
-            s = 0.0
-        }
-        if (!t.isFinite()) {
-            healedViolations += OpendriveException.UnexpectedValue("t", t.toString(), "Value shall be finite.")
-            t = 0.0
-        }
-        if (!zOffset.isFinite()) {
-            healedViolations += OpendriveException.UnexpectedValue("zOffset", zOffset.toString(), "Value shall be finite.")
-            zOffset = 0.0
-        }
-
-        if (hdg.exists { !it.isFinite() }) {
-            healedViolations += OpendriveException.UnexpectedValue("hdg", hdg.toString(), "Value shall be finite.")
-            hdg = None
-        }
-
-        if (roll.exists { !it.isFinite() }) {
-            healedViolations += OpendriveException.UnexpectedValue("roll", roll.toString(), "Value shall be finite.")
-            roll = None
-        }
-
-        if (pitch.exists { !it.isFinite() }) {
-            healedViolations += OpendriveException.UnexpectedValue("pitch", pitch.toString(), "Value shall be finite.")
-            roll = None
-        }
-
-        if (height.exists { !it.isFinite() || it < 0.0 }) {
-            healedViolations += OpendriveException.UnexpectedValue("height", height.toString(), "Value shall be finite and greater equals zero.")
-            height = None
-        }
-
-        if (height.exists { 0.0 < it && it < tolerance }) {
-            height = tolerance.some()
-        }
-
-        if (radius.exists { !it.isFinite() || it <= tolerance }) {
-            healedViolations += OpendriveException.UnexpectedValue("radius", radius.toString(), "Value shall be finite and greater zero.")
-            radius = None
-        }
-
-        if (length.exists { !it.isFinite() || it <= tolerance }) {
-            healedViolations += OpendriveException.UnexpectedValue("length", length.toString(), "Value shall be finite and greater zero.")
-            length = None
-        }
-
-        if (width.exists { !it.isFinite() || it <= tolerance }) {
-            healedViolations += OpendriveException.UnexpectedValue("width", width.toString(), "Value shall be finite and greater zero.")
-            width = None
-        }
-
-        return healedViolations
-    }
 
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
@@ -164,4 +109,6 @@ data class RoadObjectsObject(
 
     /** Returns true, if the provided geometry information correspond to a point. */
     fun isPoint() = !isCuboid() && !isRectangle() && !isCylinder() && outlines.isEmpty() && repeat.isEmpty()
+
+    companion object
 }

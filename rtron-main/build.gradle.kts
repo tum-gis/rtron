@@ -14,7 +14,4 @@ dependencies {
     implementation(project(ProjectComponents.readerWriter))
     implementation(project(ProjectComponents.transformer))
     implementation(kotlin("script-runtime"))
-
-    // standard libraries
-    implementation(Dependencies.arrowCore)
 }

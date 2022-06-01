@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import arrow.core.Either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import org.assertj.core.api.Assertions.assertThat
@@ -32,11 +31,9 @@ internal class Cuboid3DTest {
         fun `correct number of polygons`() {
             val cuboid = Cuboid3D.UNIT
 
-            val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
+            val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
-            require(actualPolygonsResult is Either.Right)
-            assertThat(actualPolygonsResult.value).hasSize(6)
+            assertThat(actualPolygons).hasSize(6)
         }
 
         @Test
@@ -50,11 +47,9 @@ internal class Cuboid3DTest {
             val vertexD = Vector3D(-length / 2.0, width / 2.0, 0.0)
             val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD, tolerance = 0.0)
 
-            val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
+            val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
-            require(actualPolygonsResult is Either.Right)
-            assertThat(actualPolygonsResult.value).contains(expectedBasePolygon)
+            assertThat(actualPolygons).contains(expectedBasePolygon)
         }
 
         @Test
@@ -69,11 +64,9 @@ internal class Cuboid3DTest {
             val vertexD = Vector3D(length / 2.0, -width / 2.0, height)
             val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD, tolerance = 0.0)
 
-            val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
+            val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
-            require(actualPolygonsResult is Either.Right)
-            assertThat(actualPolygonsResult.value).contains(expectedBasePolygon)
+            assertThat(actualPolygons).contains(expectedBasePolygon)
         }
 
         @Test
@@ -88,11 +81,9 @@ internal class Cuboid3DTest {
             val vertexD = Vector3D(length / 2.0, -width / 2.0, 0.0)
             val expectedBasePolygon = Polygon3D.of(vertexA, vertexB, vertexC, vertexD, tolerance = 0.0)
 
-            val actualPolygonsResult = cuboid.calculatePolygonsGlobalCS()
+            val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Either.Right::class.java)
-            require(actualPolygonsResult is Either.Right)
-            assertThat(actualPolygonsResult.value).contains(expectedBasePolygon)
+            assertThat(actualPolygons).contains(expectedBasePolygon)
         }
     }
 }

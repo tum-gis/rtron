@@ -18,44 +18,23 @@ package io.rtron.model.opendrive.lane
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.optics.optics
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import io.rtron.model.opendrive.additions.identifier.AdditionalLaneSectionIdentifier
+import io.rtron.model.opendrive.additions.identifier.LaneSectionIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.present
 
+@optics
 data class RoadLanesLaneSection(
     var left: Option<RoadLanesLaneSectionLeft> = None,
     var center: RoadLanesLaneSectionCenter = RoadLanesLaneSectionCenter(),
     var right: Option<RoadLanesLaneSectionRight> = None,
 
     var s: Double = Double.NaN,
-    var singleSide: Option<Boolean> = None
-) : OpendriveElement() {
+    var singleSide: Option<Boolean> = None,
 
-    // Validated Properties
-
-    // Validation Methods
-    fun getSevereViolations(): List<OpendriveException> = emptyList()
-
-    fun healMinorViolations(): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
-
-        left.present {
-            if (it.lane.isEmpty()) {
-                healedViolations += OpendriveException.EmptyValueForOptionalAttribute("left")
-                left = None
-            }
-        }
-
-        right.present {
-            if (it.lane.isEmpty()) {
-                healedViolations += OpendriveException.EmptyValueForOptionalAttribute("left")
-                right = None
-            }
-        }
-
-        return healedViolations
-    }
+    override var additionalId: Option<LaneSectionIdentifier> = None
+) : OpendriveElement(), AdditionalLaneSectionIdentifier {
 
     // Properties and Initializers
     val laneSectionStart get() = CurveRelativeVector1D(s)
@@ -71,4 +50,6 @@ data class RoadLanesLaneSection(
     fun getLeftLanes(): Map<Int, RoadLanesLaneSectionLRLane> = left.fold({ emptyMap() }, { it.getLanes() })
     fun getRightLanes(): Map<Int, RoadLanesLaneSectionLRLane> = right.fold({ emptyMap() }, { it.getLanes() })
     fun getLeftRightLanes(): Map<Int, RoadLanesLaneSectionLRLane> = getLeftLanes() + getRightLanes()
+
+    companion object
 }

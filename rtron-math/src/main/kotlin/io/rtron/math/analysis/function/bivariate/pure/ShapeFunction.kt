@@ -17,13 +17,13 @@
 package io.rtron.math.analysis.function.bivariate.pure
 
 import arrow.core.Either
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
-import io.rtron.std.getValueResult
-import io.rtron.std.handleFailure
-import io.rtron.std.toResult
+import io.rtron.std.getValueEither
 import java.util.SortedMap
 
 /**
@@ -60,10 +60,10 @@ class ShapeFunction(
         if (xAdjusted in functions)
             return calculateZ(xAdjusted, y)
 
-        val keyBefore = getKeyBefore(x).toResult().handleFailure { throw it.error }
-        val zBefore = calculateZ(keyBefore, y).toResult().handleFailure { throw it.error }
-        val keyAfter = getKeyAfter(x).toResult().handleFailure { throw it.error }
-        val zAfter = calculateZ(keyAfter, y).toResult().handleFailure { throw it.error }
+        val keyBefore = getKeyBefore(x).getOrHandle { throw it }
+        val zBefore = calculateZ(keyBefore, y).getOrHandle { throw it }
+        val keyAfter = getKeyAfter(x).getOrHandle { throw it }
+        val zAfter = calculateZ(keyAfter, y).getOrHandle { throw it }
 
         val linear = LinearFunction.ofInclusivePoints(keyBefore, zBefore, keyAfter, zAfter)
         return linear.valueUnbounded(x)
@@ -89,18 +89,12 @@ class ShapeFunction(
         .firstKey()
         .let { Either.Right(it) }
 
-    private fun calculateZ(key: Double, y: Double): Either<Exception, Double> {
-        val selectedFunction = functions
-            .getValueResult(key)
-            .handleFailure { return Either.Left(it.error) }
+    private fun calculateZ(key: Double, y: Double): Either<Exception, Double> = either.eager {
+        val selectedFunction = functions.getValueEither(key).mapLeft { it.toIllegalArgumentException() }.bind()
 
         val yAdjusted = if (!extrapolateY) y
         else y.coerceIn(selectedFunction.domain.lowerEndpointOrNull(), selectedFunction.domain.upperEndpointOrNull())
 
-        return selectedFunction
-            .valueUnbounded(yAdjusted)
-            .toResult()
-            .handleFailure { return Either.Left(it.error) }
-            .let { Either.Right(it) }
+        selectedFunction.valueUnbounded(yAdjusted).bind()
     }
 }

@@ -16,14 +16,11 @@
 
 package io.rtron.model.opendrive.objects
 
-import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.none
+import arrow.core.some
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.toOption
-import io.rtron.std.toResult
 
 class RoadObjectsObjectOutlinesOutlineCornerLocal(
     var height: Double = Double.NaN,
@@ -37,12 +34,10 @@ class RoadObjectsObjectOutlinesOutlineCornerLocal(
     fun hasZeroHeight(): Boolean = !height.isFinite() || height == 0.0
     fun hasPositiveHeight(): Boolean = !hasZeroHeight() && height > 0.0
 
-    fun getBasePoint() = Vector3D.of(u, v, z)
-    fun isSetBasePoint() = getBasePoint() is Either.Right
+    fun getBasePoint() = Vector3D(u, v, z)
     fun getHeadPoint(): Option<Vector3D> =
-        if (hasZeroHeight()) none()
-        else Vector3D.of(u, v, z + height).toResult().toOption()
+        if (hasZeroHeight()) None
+        else Vector3D(u, v, z + height).some()
 
-    fun getPoints(): Either<Exception, Pair<Vector3D, Option<Vector3D>>> =
-        getBasePoint().map { Pair(it, getHeadPoint()) }
+    fun getPoints(): Pair<Vector3D, Option<Vector3D>> = Pair(getBasePoint(), getHeadPoint())
 }
