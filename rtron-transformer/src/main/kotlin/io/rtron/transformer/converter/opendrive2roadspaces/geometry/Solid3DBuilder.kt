@@ -125,7 +125,7 @@ class Solid3DBuilder(
     private fun buildPolyhedronByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D):
         Either<GeometryBuilderException, ContextReport<Polyhedron3D>> {
         require(outline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
-        require(outline.cornerLocal.all { it.height == 0.0 || configuration.numberTolerance <= it.height  }) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
+        require(outline.cornerLocal.all { it.height == 0.0 || configuration.numberTolerance <= it.height }) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
 
         val verticalOutlineElements = outline.cornerRoad
@@ -188,7 +188,7 @@ class Solid3DBuilder(
     private fun buildPolyhedronByLocalCorners(outline: RoadObjectsObjectOutlinesOutline):
         Either<GeometryBuilderException, ContextReport<Polyhedron3D>> = either.eager {
         require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
-        require(outline.cornerLocal.all { it.height == 0.0 || configuration.numberTolerance <= it.height  }) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
+        require(outline.cornerLocal.all { it.height == 0.0 || configuration.numberTolerance <= it.height }) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
 
         val report = Report()
