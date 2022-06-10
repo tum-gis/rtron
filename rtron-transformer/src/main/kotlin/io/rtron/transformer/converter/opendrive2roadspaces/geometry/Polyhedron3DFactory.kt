@@ -84,7 +84,7 @@ object Polyhedron3DFactory {
 
     /**
      * A vertical outline element is represented by a [basePoint] and an optional [leftHeadPoint] and [rightHeadPoint].
-     * The [basePoint] defines the bound of the base surface
+     * The [basePoint] defines the bound of the base surface.
      *
      * @param basePoint base point of the outline element
      * @param leftHeadPoint left head point representing the bound point of the side surface to the left

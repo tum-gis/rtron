@@ -122,8 +122,8 @@ class RoadObjectsEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
                     currentCornerRoad.height = 0.0
                 }
 
-                if (0.0 < currentCornerRoad.height && currentCornerRoad.height < configuration.numberTolerance) {
-                    currentCornerRoad.height = configuration.numberTolerance
+                if (0.0 < currentCornerRoad.height && currentCornerRoad.height <= configuration.numberTolerance) {
+                    currentCornerRoad.height = 0.0
                 }
             }
 
@@ -139,8 +139,8 @@ class RoadObjectsEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
                     currentCornerLocal.height = 0.0
                 }
 
-                if (0.0 < currentCornerLocal.height && currentCornerLocal.height < configuration.numberTolerance) {
-                    currentCornerLocal.height = configuration.numberTolerance
+                if (0.0 < currentCornerLocal.height && currentCornerLocal.height <= configuration.numberTolerance) {
+                    currentCornerLocal.height = 0.0
                 }
             }
 
