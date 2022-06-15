@@ -41,13 +41,13 @@ import io.rtron.transformer.converter.roadspaces2citygml.module.TransportationMo
 import io.rtron.transformer.converter.roadspaces2citygml.router.LaneRouter
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter
 import io.rtron.transformer.report.of
-import org.citygml4j.model.core.AbstractCityObject
-import org.citygml4j.model.core.CityModel
-import org.citygml4j.model.transportation.AbstractTransportationSpace
-import org.citygml4j.model.transportation.IntersectionProperty
-import org.citygml4j.model.transportation.SectionProperty
+import org.citygml4j.core.model.core.AbstractCityObject
+import org.citygml4j.core.model.core.CityModel
+import org.citygml4j.core.model.transportation.AbstractTransportationSpace
+import org.citygml4j.core.model.transportation.IntersectionProperty
+import org.citygml4j.core.model.transportation.SectionProperty
 import org.xmlobjects.gml.model.basictypes.Code
-import org.citygml4j.model.transportation.Road as CitygmlRoad
+import org.citygml4j.core.model.transportation.Road as CitygmlRoad
 
 /**
  * Transforms [Road] classes (RoadSpaces model) to the [CityModel] (CityGML model).

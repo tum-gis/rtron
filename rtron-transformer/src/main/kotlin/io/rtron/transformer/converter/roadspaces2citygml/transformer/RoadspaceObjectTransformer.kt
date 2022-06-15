@@ -31,8 +31,8 @@ import io.rtron.transformer.converter.roadspaces2citygml.module.GenericsModuleBu
 import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.converter.roadspaces2citygml.module.VegetationModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter
-import org.citygml4j.model.core.AbstractCityObject
-import org.citygml4j.model.core.CityModel
+import org.citygml4j.core.model.core.AbstractCityObject
+import org.citygml4j.core.model.core.CityModel
 
 /**
  * Transforms [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).

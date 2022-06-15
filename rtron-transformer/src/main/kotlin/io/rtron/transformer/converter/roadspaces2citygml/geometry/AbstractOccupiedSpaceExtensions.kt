@@ -20,7 +20,7 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
-import org.citygml4j.model.core.AbstractOccupiedSpace
+import org.citygml4j.core.model.core.AbstractOccupiedSpace
 
 /**
  * Populates the [lod] geometry of an [AbstractOccupiedSpace], if available. Otherwise the [lod] implicit geometry of the [GeometryTransformer] is populated.

@@ -47,7 +47,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-        jcenter()
         maven(url = MavenSources.sonatypeSnapshot)
         maven(url = MavenSources.jitpack)
     }
@@ -87,11 +86,6 @@ allprojects {
 
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         version.set("0.45.2")
-
-        filter {
-            exclude("**/generated/**")
-            include("**/kotlin/**")
-        }
     }
 
     publishing {

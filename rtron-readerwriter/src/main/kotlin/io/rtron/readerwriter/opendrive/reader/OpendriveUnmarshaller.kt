@@ -30,7 +30,6 @@ import io.rtron.readerwriter.opendrive.reader.validation.OpendriveValidationEven
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Unmarshaller
 import org.mapstruct.factory.Mappers
-import java.io.File
 import javax.xml.XMLConstants
 import javax.xml.validation.SchemaFactory
 
@@ -49,7 +48,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
         val resourceName = OPENDRIVE_SCHEMA_LOCATIONS.getValue(opendriveVersion)
         val resource = javaClass.classLoader.getResource(resourceName)!!
-        val opendriveSchema = schemaFactory.newSchema(File(resource.toURI()))
+        val opendriveSchema = schemaFactory.newSchema(resource)
 
         _jaxbUnmarshaller.schema = opendriveSchema
         _jaxbUnmarshaller.eventHandler = _validationEventHandler

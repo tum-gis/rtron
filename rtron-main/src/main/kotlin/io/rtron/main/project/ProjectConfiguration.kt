@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.citygml.configuration
+package io.rtron.main.project
 
-import io.rtron.readerwriter.citygml.CitygmlVersion
+import io.rtron.io.files.FileIdentifier
+import io.rtron.io.files.Path
 
-class CitygmlWriterConfigurationBuilder(
-    val projectId: String
+data class ProjectConfiguration(
+    val projectId: String,
+    val inputFilePath: Path,
+    val outputDirectoryPath: Path,
+
+    /** enable concurrent processing during the transformation of a model */
+    val concurrentProcessing: Boolean = false
 ) {
-    // Properties and Initializers
 
-    /**
-     * citygml version for writing dateset
-     */
-    var versions: Set<CitygmlVersion> = setOf(CitygmlVersion.V2_0)
-
-    // Methods
-    fun build() = CitygmlWriterConfiguration(
-        projectId,
-        versions
-    )
+    val inputFileIdentifier = FileIdentifier.of(inputFilePath)
 }

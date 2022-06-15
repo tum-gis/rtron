@@ -18,7 +18,7 @@ package io.rtron.model.citygml
 
 import arrow.core.Option
 import io.rtron.model.AbstractModel
-import org.citygml4j.model.core.AbstractCityObject
+import org.citygml4j.core.model.core.AbstractCityObject
 import org.xmlobjects.gml.model.feature.BoundingShape
 
 /**

@@ -13,5 +13,4 @@ dependencies {
     implementation(project(ProjectComponents.model))
     implementation(project(ProjectComponents.readerWriter))
     implementation(project(ProjectComponents.transformer))
-    implementation(kotlin("script-runtime"))
 }

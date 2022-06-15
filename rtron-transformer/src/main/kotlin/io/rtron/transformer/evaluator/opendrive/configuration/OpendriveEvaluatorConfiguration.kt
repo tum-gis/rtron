@@ -16,7 +16,6 @@
 
 package io.rtron.transformer.evaluator.opendrive.configuration
 
-import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
 
 /**
@@ -24,15 +23,12 @@ import io.rtron.io.files.Path
  */
 data class OpendriveEvaluatorConfiguration(
     val projectId: String,
-    val sourceFileIdentifier: FileIdentifier,
-    val concurrentProcessing: Boolean,
 
     val outputReportDirectoryPath: Path,
     val numberTolerance: Double,
 ) {
 
-    // override fun toString() =
-    //     "Opendrive2RoadspacesConfiguration(tolerance=$tolerance, attributesPrefix=$attributesPrefix," +
-    //        " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ, " +
-    //        "extrapolateLateralRoadShapes=$extrapolateLateralRoadShapes)"
+    override fun toString() =
+        "OpendriveEvaluatorConfiguration(outputReportDirectoryPath=$outputReportDirectoryPath, " +
+            "numberTolerance=$numberTolerance)"
 }

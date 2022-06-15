@@ -16,7 +16,6 @@
 
 package io.rtron.transformer.evaluator.roadspaces.configuration
 
-import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
 
 /**
@@ -24,16 +23,13 @@ import io.rtron.io.files.Path
  */
 data class RoadspacesEvaluatorConfiguration(
     val projectId: String,
-    val sourceFileIdentifier: FileIdentifier,
-    val concurrentProcessing: Boolean,
 
     val outputReportDirectoryPath: Path,
     val numberTolerance: Double,
     val distanceTolerance: Double
 ) {
 
-    // override fun toString() =
-    //     "Opendrive2RoadspacesConfiguration(tolerance=$tolerance, attributesPrefix=$attributesPrefix," +
-    //        " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ, " +
-    //        "extrapolateLateralRoadShapes=$extrapolateLateralRoadShapes)"
+    override fun toString() =
+        "RoadspacesEvaluatorConfiguration(outputReportDirectoryPath=$outputReportDirectoryPath, " +
+            "numberTolerance=$numberTolerance, distanceTolerance=$distanceTolerance)"
 }

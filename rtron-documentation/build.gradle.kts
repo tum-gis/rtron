@@ -6,7 +6,7 @@ plugins {
 kotlinProject()
 
 repositories {
-    maven(url = MavenSources.bintray)
+    jcenter()
 }
 
 dependencies {

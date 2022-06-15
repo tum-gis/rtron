@@ -31,7 +31,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransf
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.report.of
-import org.citygml4j.model.generics.GenericOccupiedSpace
+import org.citygml4j.core.model.generics.GenericOccupiedSpace
 
 /**
  * Builder for city objects of the CityGML Generics module.

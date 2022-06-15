@@ -36,9 +36,9 @@ import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadspaceOb
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import org.citygml4j.model.core.AbstractCityObject
-import org.citygml4j.model.transportation.Road
-import org.citygml4j.model.transportation.TrafficSpaceReference
+import org.citygml4j.core.model.core.AbstractCityObject
+import org.citygml4j.core.model.transportation.Road
+import org.citygml4j.core.model.transportation.TrafficSpaceReference
 import org.xmlobjects.gml.model.feature.BoundingShape
 import org.xmlobjects.gml.model.geometry.Envelope
 

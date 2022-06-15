@@ -27,11 +27,15 @@ dependencies {
     kapt(Dependencies.mapstructProcessor)
 
     // geo libraries
-    implementation(Dependencies.citygml4j)
+    implementation(Dependencies.citygml4jXml)
 }
 
 tasks.withType<KotlinCompile> {
     dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 xjcGeneration {
@@ -91,6 +95,14 @@ xjcGeneration {
 }
 
 tasks.named<Jar>("sourcesJar") {
+    dependsOn("schemaGen_org-asam-opendrive11")
+    dependsOn("schemaGen_org-asam-opendrive12")
+    dependsOn("schemaGen_org-asam-opendrive13")
+    dependsOn("schemaGen_org-asam-opendrive14")
+    dependsOn("schemaGen_org-asam-opendrive15")
+    dependsOn("schemaGen_org-asam-opendrive16")
+    dependsOn("schemaGen_org-asam-opendrive17")
+
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 

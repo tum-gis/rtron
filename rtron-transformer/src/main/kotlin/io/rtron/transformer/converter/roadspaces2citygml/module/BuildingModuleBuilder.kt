@@ -28,11 +28,11 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransf
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.report.of
-import org.citygml4j.model.building.Building
-import org.citygml4j.model.construction.GroundSurface
-import org.citygml4j.model.construction.RoofSurface
-import org.citygml4j.model.construction.WallSurface
-import org.citygml4j.model.core.AbstractSpaceBoundaryProperty
+import org.citygml4j.core.model.building.Building
+import org.citygml4j.core.model.construction.GroundSurface
+import org.citygml4j.core.model.construction.RoofSurface
+import org.citygml4j.core.model.construction.WallSurface
+import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
 
 /**
  * Builder for city objects of the CityGML Building module.

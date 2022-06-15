@@ -21,7 +21,7 @@ import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
-import org.citygml4j.CityGMLContext
+import org.citygml4j.xml.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
 import java.nio.charset.StandardCharsets
 

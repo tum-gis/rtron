@@ -21,6 +21,8 @@ package io.rtron.cli
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.versionOption
+import io.rtron.cli.opendrive2citygml.SubcommandOpendriveToCitygml
+import io.rtron.cli.validate.SubcommandValidateOpendrive
 
 class MainCommand : CliktCommand(name = "rtron") {
     override fun run() = Unit
@@ -33,5 +35,5 @@ class MainCommand : CliktCommand(name = "rtron") {
  */
 fun main(args: Array<String>) = MainCommand()
     .versionOption("1.2.2")
-    .subcommands(SubcommandOpendriveToCitygml2(), SubcommandOpendriveToCitygml3())
+    .subcommands(SubcommandValidateOpendrive(), SubcommandOpendriveToCitygml())
     .main(args)

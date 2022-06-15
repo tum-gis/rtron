@@ -29,7 +29,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransf
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
 import io.rtron.transformer.report.of
-import org.citygml4j.model.vegetation.SolitaryVegetationObject
+import org.citygml4j.core.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 
 /**

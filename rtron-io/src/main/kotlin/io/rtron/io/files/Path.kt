@@ -160,4 +160,8 @@ class Path(uri: String = "") : Comparable<Path> {
 
     fun toFileJ(): JFile = _path.toFile()
     fun toFile() = File(this)
+
+    companion object {
+        fun of(path: NPath): Path = Path(path.toString())
+    }
 }

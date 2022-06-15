@@ -20,7 +20,7 @@ import arrow.core.Either
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
 import arrow.core.left
-import org.citygml4j.model.core.AbstractSpace
+import org.citygml4j.core.model.core.AbstractSpace
 
 /**
  * Populates the [lod] geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].

@@ -18,5 +18,5 @@ dependencies {
     implementation(Dependencies.kotlinxSerializationJson)
 
     // geo libraries
-    implementation(Dependencies.citygml4j)
+    implementation(Dependencies.citygml4jXml)
 }

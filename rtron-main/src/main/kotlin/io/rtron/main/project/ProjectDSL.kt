@@ -16,65 +16,19 @@
 
 package io.rtron.main.project
 
-import arrow.core.Either
-import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
-import io.rtron.model.citygml.CitygmlModel
-import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.model.roadspaces.RoadspacesModel
-import io.rtron.readerwriter.citygml.CitygmlWriter
-import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfigurationBuilder
-import io.rtron.readerwriter.opendrive.OpendriveReader
-import io.rtron.readerwriter.opendrive.OpendriveReaderException
-import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfigurationBuilder
-import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformationException
-import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfigurationBuilder
-import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfigurationBuilder
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-class Project(val projectId: String, val inputFilePath: Path, val outputDirectoryPath: Path) {
+class Project(val projectConfiguration: ProjectConfiguration) {
 
     // Properties and Initializers
     init {
-        outputDirectoryPath.createDirectory()
+        projectConfiguration.outputDirectoryPath.createDirectory()
     }
 
-    val inputFileIdentifier = FileIdentifier.of(inputFilePath)
-
-    val logger = LogManager.getReportLogger(projectId)
-
-    /** enable concurrent processing during the transformation of a model*/
-    var concurrentProcessing: Boolean = false
-
-    // Methods
-
-    fun readOpendriveModel(filePath: Path, setup: OpendriveReaderConfigurationBuilder.() -> Unit = {}): Either<OpendriveReaderException, OpendriveModel> {
-        val builder = OpendriveReaderConfigurationBuilder(projectId)
-        val configuration = builder.apply(setup).build()
-        return OpendriveReader(configuration).read(filePath)
-    }
-
-    fun transformOpendrive2Roadspaces(opendriveModel: OpendriveModel, setup: Opendrive2RoadspacesConfigurationBuilder.() -> Unit = {}): Either<Opendrive2RoadspacesTransformationException, RoadspacesModel> {
-        val builder = Opendrive2RoadspacesConfigurationBuilder(projectId, inputFileIdentifier, concurrentProcessing)
-        val configuration = builder.apply(setup).build()
-        return Opendrive2RoadspacesTransformer(configuration).transform(opendriveModel)
-    }
-
-    fun transformRoadspaces2Citygml(roadspacesModel: RoadspacesModel, setup: Roadspaces2CitygmlConfigurationBuilder.() -> Unit = {}): CitygmlModel {
-        val builder = Roadspaces2CitygmlConfigurationBuilder(projectId, inputFileIdentifier, concurrentProcessing)
-        val configuration = builder.apply(setup).build()
-        return Roadspaces2CitygmlTransformer(configuration).transform(roadspacesModel)
-    }
-
-    fun writeCitygmlModel(citygmlModel: CitygmlModel, setup: CitygmlWriterConfigurationBuilder.() -> Unit = {}) {
-        val builder = CitygmlWriterConfigurationBuilder(projectId)
-        val configuration = builder.apply(setup).build()
-        CitygmlWriter(configuration).write(citygmlModel, outputDirectoryPath)
-    }
+    val logger = LogManager.getReportLogger(projectConfiguration.projectId)
 }
 
 /**
@@ -82,8 +36,8 @@ class Project(val projectId: String, val inputFilePath: Path, val outputDirector
  * @param withExtension only process files with this extension
  * @param toOutputDirectory path to the directory where new models and files are written to
  */
-fun processAllFiles(inInputDirectory: String, withExtension: String, toOutputDirectory: String = inInputDirectory + "_output", recursive: Boolean = true, setup: Project.() -> Unit) =
-    processAllFiles(inInputDirectory, setOf(withExtension), toOutputDirectory, recursive, setup)
+fun processAllFiles(inputDirectoryPath: Path, withExtension: String, outputDirectoryPath: Path, recursive: Boolean = true, setup: Project.() -> Unit) =
+    processAllFiles(inputDirectoryPath, setOf(withExtension), outputDirectoryPath, recursive, setup)
 
 /**
  * Iterates over all files contained in the [inInputDirectory] and having an extension contained in [withExtensions].
@@ -96,11 +50,9 @@ fun processAllFiles(inInputDirectory: String, withExtension: String, toOutputDir
  * @param process user defined process to be executed
  */
 @OptIn(ExperimentalTime::class)
-fun processAllFiles(inInputDirectory: String, withExtensions: Set<String>, toOutputDirectory: String = inInputDirectory + "_output", recursive: Boolean = true, process: Project.() -> Unit) {
+fun processAllFiles(inputDirectoryPath: Path, withExtensions: Set<String>, outputDirectoryPath: Path, recursive: Boolean = true, process: Project.() -> Unit) {
     val generalLogger = LogManager.getReportLogger("general")
 
-    val inputDirectoryPath = Path(inInputDirectory)
-    val outputDirectoryPath = Path(toOutputDirectory)
     if (!inputDirectoryPath.isDirectory()) {
         generalLogger.error("Provided directory does not exist: $inputDirectoryPath")
         return
@@ -138,7 +90,8 @@ fun processAllFiles(inInputDirectory: String, withExtensions: Set<String>, toOut
         reportLogger.info("Starting project (${index + 1}/$totalNumber) 💪💪💪")
 
         val timeElapsed = measureTime {
-            val project = Project(projectId, currentPath, projectOutputDirectoryPath)
+            val projectConfiguration = ProjectConfiguration(projectId, currentPath, projectOutputDirectoryPath)
+            val project = Project(projectConfiguration)
             project.apply(process)
         }
 

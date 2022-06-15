@@ -28,18 +28,28 @@ data class Opendrive2RoadspacesConfiguration(
     val sourceFileIdentifier: FileIdentifier,
     val concurrentProcessing: Boolean,
 
-    val outputReportDirectoryPath: Path,
+    /** path for report */
+    val outputReportDirectoryPath: Path = Path("./"),
 
-    val numberTolerance: Double,
-    val distanceTolerance: Double,
-    val angleTolerance: Double,
+    /** allowed tolerance when comparing double values */
+    val numberTolerance: Double = DEFAULT_NUMBER_TOLERANCE,
+    /** allowed tolerance when comparing two vectors */
+    val distanceTolerance: Double = DEFAULT_DISTANCE_TOLERANCE,
+    /** allowed tolerance when comparing two angles */
+    val angleTolerance: Double = DEFAULT_ANGLE_TOLERANCE,
 
-    val attributesPrefix: String,
-    val crsEpsg: Int,
-    val offsetX: Double,
-    val offsetY: Double,
-    val offsetZ: Double,
-    val extrapolateLateralRoadShapes: Boolean
+    /** prefix of attribute names */
+    val attributesPrefix: String = DEFAULT_ATTRIBUTES_PREFIX,
+    /** [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications) */
+    val crsEpsg: Int = DEFAULT_CRS_EPSG,
+    /** offset by which the model is translated along the x axis */
+    val offsetX: Double = DEFAULT_OFFSET_X,
+    /** offset by which the model is translated along the y axis */
+    val offsetY: Double = DEFAULT_OFFSET_Y,
+    /** offset by which the model is translated along the z axis */
+    val offsetZ: Double = DEFAULT_OFFSET_Z,
+    /** linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown) */
+    val extrapolateLateralRoadShapes: Boolean = DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
 ) {
 
     /**
@@ -54,4 +64,17 @@ data class Opendrive2RoadspacesConfiguration(
             " angleTolerance=$angleTolerance, attributesPrefix=$attributesPrefix," +
             " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ, " +
             "extrapolateLateralRoadShapes=$extrapolateLateralRoadShapes)"
+
+    companion object {
+        val DEFAULT_NUMBER_TOLERANCE = 1E-7
+        val DEFAULT_DISTANCE_TOLERANCE = 1E-4
+        val DEFAULT_ANGLE_TOLERANCE = 1E-4
+
+        val DEFAULT_ATTRIBUTES_PREFIX = "opendrive_"
+        val DEFAULT_CRS_EPSG = 0
+        val DEFAULT_OFFSET_X = 0.0
+        val DEFAULT_OFFSET_Y = 0.0
+        val DEFAULT_OFFSET_Z = 0.0
+        val DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES = false
+    }
 }

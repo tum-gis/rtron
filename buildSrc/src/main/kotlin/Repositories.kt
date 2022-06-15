@@ -16,7 +16,6 @@
 
 
 object MavenSources {
-    const val bintray = "https://kotlin.bintray.com/kotlinx/"
     const val jitpack = "https://jitpack.io"
     const val sonatypeSnapshot = "https://oss.sonatype.org/content/repositories/snapshots/"
 }

@@ -16,7 +16,6 @@
 
 
 object DependencyVersions {
-
     // standard libraries
     const val kotlin = "1.6.21"
     const val coroutines = "1.6.1"
@@ -36,6 +35,7 @@ object DependencyVersions {
 
     // object creation libraries
     const val kotlinxSerializationJson = "1.3.3"
+    const val kaml = "0.45.0"
     const val jakartaActivationApi = "2.1.0"
     const val jakartaXmlBindApi = "3.0.1"
     const val jaxb = "3.0.2"
@@ -59,7 +59,7 @@ object DependencyVersions {
 
     // geo libraries
     const val proj4 = "1.1.5"
-    const val citygml4j = "eacbbc4954"
+    const val citygml4j = "3.0.0-SNAPSHOT"
 }
 
 object Dependencies {
@@ -81,6 +81,7 @@ object Dependencies {
 
     // object creation libraries
     const val kotlinxSerializationJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${DependencyVersions.kotlinxSerializationJson}"
+    const val kaml = "com.charleskorn.kaml:kaml:${DependencyVersions.kaml}"
     const val jakartaActivationApi = "jakarta.activation:jakarta.activation-api:${DependencyVersions.jakartaActivationApi}"
     const val jakartaXmlBindApi = "jakarta.xml.bind:jakarta.xml.bind-api:${DependencyVersions.jakartaXmlBindApi}"
     const val sunJaxbImpl = "com.sun.xml.bind:jaxb-impl:${DependencyVersions.jaxb}"
@@ -107,5 +108,5 @@ object Dependencies {
 
     // geo libraries
     const val proj4 = "org.locationtech.proj4j:proj4j:${DependencyVersions.proj4}"
-    const val citygml4j = "com.github.citygml4j:citygml4j:${DependencyVersions.citygml4j}"
+    const val citygml4jXml = "org.citygml4j:citygml4j-xml:${DependencyVersions.citygml4j}"
 }

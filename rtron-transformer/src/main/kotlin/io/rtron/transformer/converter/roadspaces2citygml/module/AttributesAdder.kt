@@ -33,15 +33,15 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
-import org.citygml4j.model.core.AbstractCityObject
-import org.citygml4j.model.core.AbstractGenericAttribute
-import org.citygml4j.model.core.AbstractGenericAttributeProperty
+import org.citygml4j.core.model.core.AbstractCityObject
+import org.citygml4j.core.model.core.AbstractGenericAttribute
+import org.citygml4j.core.model.core.AbstractGenericAttributeProperty
 import org.xmlobjects.gml.model.basictypes.Measure
-import org.citygml4j.model.generics.DoubleAttribute as GmlDoubleAttribute
-import org.citygml4j.model.generics.GenericAttributeSet as GmlGenericAttributeSet
-import org.citygml4j.model.generics.IntAttribute as GmlIntAttribute
-import org.citygml4j.model.generics.MeasureAttribute as GmlMeasureAttribute
-import org.citygml4j.model.generics.StringAttribute as GmlStringAttribute
+import org.citygml4j.core.model.generics.DoubleAttribute as GmlDoubleAttribute
+import org.citygml4j.core.model.generics.GenericAttributeSet as GmlGenericAttributeSet
+import org.citygml4j.core.model.generics.IntAttribute as GmlIntAttribute
+import org.citygml4j.core.model.generics.MeasureAttribute as GmlMeasureAttribute
+import org.citygml4j.core.model.generics.StringAttribute as GmlStringAttribute
 
 /**
  * Adds [Attribute] and [AttributeList] classes (RoadSpaces model) to an [AbstractCityObject] (CityGML model).

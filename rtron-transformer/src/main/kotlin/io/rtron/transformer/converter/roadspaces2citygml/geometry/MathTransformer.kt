@@ -17,7 +17,7 @@
 package io.rtron.transformer.converter.roadspaces2citygml.geometry
 
 import io.rtron.math.transform.Affine3D
-import org.citygml4j.model.core.TransformationMatrix4x4 as GmlTransformationMatrix4x4
+import org.citygml4j.core.model.core.TransformationMatrix4x4 as GmlTransformationMatrix4x4
 
 /**
  * Converts a [GmlTransformationMatrix4x4] object from an affine matrix.

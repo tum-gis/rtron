@@ -10,6 +10,9 @@ jobs:
         os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
         java: [ '11' ]
         distribution: [ 'temurin', 'zulu' ]
+        exclude:
+          - os: macos-latest
+            distribution: 'zulu'
       fail-fast: false
 
     steps:

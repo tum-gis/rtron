@@ -23,7 +23,7 @@ import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
-import org.citygml4j.model.core.AbstractCityObject
+import org.citygml4j.core.model.core.AbstractCityObject
 import org.xmlobjects.gml.model.basictypes.Code
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap

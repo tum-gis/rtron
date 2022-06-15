@@ -16,28 +16,40 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.configuration
 
-import io.rtron.io.files.FileIdentifier
 import io.rtron.io.files.Path
+import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
+import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
 import java.util.regex.Pattern
 
 data class Roadspaces2CitygmlConfiguration(
     val projectId: String,
-    val sourceFileIdentifier: FileIdentifier,
     val concurrentProcessing: Boolean,
 
-    val outputReportDirectoryPath: Path,
+    /** path for report */
+    val outputReportDirectoryPath: Path = Path("./"),
 
-    val gmlIdPrefix: String,
-    val identifierAttributesPrefix: String,
-    val geometryAttributesPrefix: String,
-    val flattenGenericAttributeSets: Boolean,
-    val discretizationStepSize: Double,
-    val sweepDiscretizationStepSize: Double,
-    val circleSlices: Int,
-    val generateRandomGeometryIds: Boolean,
-    val transformAdditionalRoadLines: Boolean,
-    val generateLongitudinalFillerSurfaces: Boolean,
-    val mappingBackwardsCompatibility: Boolean
+    /** prefix for generated gml ids */
+    val gmlIdPrefix: String = DEFAULT_GML_ID_PREFIX,
+    /** prefix for identifier attribute names */
+    val identifierAttributesPrefix: String = DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
+    /** prefix for geometry attribute names */
+    val geometryAttributesPrefix: String = DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
+    /** true, if nested attribute lists shall be flattened out */
+    val flattenGenericAttributeSets: Boolean = DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
+    /** distance between each discretization step for curves and surfaces */
+    val discretizationStepSize: Double = DEFAULT_DISCRETIZATION_STEP_SIZE,
+    /** distance between each discretization step for solid geometries of [ParametricSweep3D] */
+    val sweepDiscretizationStepSize: Double = DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
+    /** number of discretization points for a circle or cylinder */
+    val circleSlices: Int = DEFAULT_CIRCLE_SLICES,
+    /** true, if random ids shall be generated for the gml geometries */
+    val generateRandomGeometryIds: Boolean = DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
+    /** if true, additional road lines, such as the reference line, lane boundaries, etc. are also transformed */
+    val transformAdditionalRoadLines: Boolean = DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES,
+    /** if true, filler surfaces are generated to close gaps at lane transitions */
+    val generateLongitudinalFillerSurfaces: Boolean = DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
+    /** if true, only classes are populated that are also available in CityGML2 */
+    val mappingBackwardsCompatibility: Boolean = DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY
 ) {
 
     init {
@@ -56,5 +68,17 @@ data class Roadspaces2CitygmlConfiguration(
 
     companion object {
         val PATTERN_NCNAME: Pattern = Pattern.compile("[_\\p{L}][-_.\\p{L}0-9]*")!!
+
+        val DEFAULT_GML_ID_PREFIX = "UUID_"
+        val DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX = "identifier_"
+        val DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX = "geometry_"
+        val DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS = true
+        val DEFAULT_DISCRETIZATION_STEP_SIZE = 0.7
+        val DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE = ParametricSweep3D.DEFAULT_STEP_SIZE
+        val DEFAULT_CIRCLE_SLICES = Cylinder3D.DEFAULT_NUMBER_SLICES
+        val DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS = true
+        val DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES = false
+        val DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES = true
+        val DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY = true
     }
 }

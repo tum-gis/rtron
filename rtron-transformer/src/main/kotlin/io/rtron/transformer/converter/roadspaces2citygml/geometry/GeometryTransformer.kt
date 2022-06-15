@@ -45,9 +45,9 @@ import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleEmpty
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
-import org.citygml4j.model.core.ImplicitGeometry
-import org.citygml4j.model.core.ImplicitGeometryProperty
-import org.citygml4j.util.geometry.GeometryFactory
+import org.citygml4j.core.model.core.ImplicitGeometry
+import org.citygml4j.core.model.core.ImplicitGeometryProperty
+import org.citygml4j.core.util.geometry.GeometryFactory
 import org.xmlobjects.gml.model.geometry.DirectPosition
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurve
 import org.xmlobjects.gml.model.geometry.aggregates.MultiCurveProperty

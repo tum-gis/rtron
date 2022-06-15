@@ -20,7 +20,7 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
-import org.citygml4j.model.core.AbstractThematicSurface
+import org.citygml4j.core.model.core.AbstractThematicSurface
 
 fun AbstractThematicSurface.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> {
     val lod2MultiSurfaceError = populateLod2MultiSurface(geometryTransformer).fold({ it }, { return it.right() })

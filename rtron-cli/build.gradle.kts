@@ -1,7 +1,10 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
-    // application
+    application
     kotlin("jvm")
-    // id(Plugins.shadowjar) version PluginVersions.shadowjar
+    id(Plugins.shadowjar) version PluginVersions.shadowjar
+    kotlin(Plugins.serialization) version PluginVersions.serialization
 }
 
 kotlinProject()
@@ -19,8 +22,22 @@ dependencies {
     // batch processing layer
     implementation(project(ProjectComponents.main))
 
+    // object creation libraries
+    implementation(Dependencies.kotlinxSerializationJson)
+    implementation(Dependencies.kaml)
+
     // io
     implementation(Dependencies.clikt)
     implementation(Dependencies.mordant)
     implementation(Dependencies.commonsLang)
+}
+
+application {
+    mainClass.set("io.rtron.cli.Main")
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        mergeServiceFiles()
+    }
 }

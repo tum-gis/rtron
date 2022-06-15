@@ -37,20 +37,20 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Ge
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceFromSolidCutoutOrSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
 import io.rtron.transformer.report.of
-import org.citygml4j.model.core.AbstractSpaceBoundaryProperty
-import org.citygml4j.model.transportation.AbstractTransportationSpace
-import org.citygml4j.model.transportation.AuxiliaryTrafficArea
-import org.citygml4j.model.transportation.AuxiliaryTrafficSpace
-import org.citygml4j.model.transportation.AuxiliaryTrafficSpaceProperty
-import org.citygml4j.model.transportation.GranularityValue
-import org.citygml4j.model.transportation.Intersection
-import org.citygml4j.model.transportation.Marking
-import org.citygml4j.model.transportation.MarkingProperty
-import org.citygml4j.model.transportation.Road
-import org.citygml4j.model.transportation.Section
-import org.citygml4j.model.transportation.TrafficArea
-import org.citygml4j.model.transportation.TrafficSpace
-import org.citygml4j.model.transportation.TrafficSpaceProperty
+import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
+import org.citygml4j.core.model.transportation.AbstractTransportationSpace
+import org.citygml4j.core.model.transportation.AuxiliaryTrafficArea
+import org.citygml4j.core.model.transportation.AuxiliaryTrafficSpace
+import org.citygml4j.core.model.transportation.AuxiliaryTrafficSpaceProperty
+import org.citygml4j.core.model.transportation.GranularityValue
+import org.citygml4j.core.model.transportation.Intersection
+import org.citygml4j.core.model.transportation.Marking
+import org.citygml4j.core.model.transportation.MarkingProperty
+import org.citygml4j.core.model.transportation.Road
+import org.citygml4j.core.model.transportation.Section
+import org.citygml4j.core.model.transportation.TrafficArea
+import org.citygml4j.core.model.transportation.TrafficSpace
+import org.citygml4j.core.model.transportation.TrafficSpaceProperty
 
 enum class TransportationGranularityValue { LANE, WAY }
 
