@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin(Plugins.serialization) version PluginVersions.serialization
 }
 
 kotlinProject()
@@ -13,4 +14,7 @@ dependencies {
     implementation(project(ProjectComponents.model))
     implementation(project(ProjectComponents.readerWriter))
     implementation(project(ProjectComponents.transformer))
+
+    // object creation libraries
+    implementation(Dependencies.kotlinxSerializationJson)
 }

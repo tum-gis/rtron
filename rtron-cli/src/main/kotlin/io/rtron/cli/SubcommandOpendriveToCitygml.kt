@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package io.rtron.cli.opendrive2citygml
+package io.rtron.cli
 
 import arrow.core.toOption
 import com.charleskorn.kaml.Yaml
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
+import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -27,20 +28,15 @@ import com.github.ajalt.clikt.parameters.options.triple
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
-import io.rtron.cli.ColorFormatter
 import io.rtron.io.files.File
 import io.rtron.io.files.Path
-import io.rtron.main.project.processAllFiles
-import io.rtron.readerwriter.citygml.CitygmlWriter
-import io.rtron.readerwriter.opendrive.OpendriveReader
-import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
+import io.rtron.io.files.toPath
+import io.rtron.main.processor.OpendriveToCitygmlConfiguration
+import io.rtron.main.processor.OpendriveToCitygmlProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
-import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
-import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluator
-import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluator
 
-class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml", help = "Transform OpenDRIVE to CityGML.", printHelpOnEmptyArgs = true) {
+class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml", help = "Transform OpenDRIVE datasets to CityGML.", printHelpOnEmptyArgs = true) {
 
     // Properties and Initializers
     init {
@@ -48,13 +44,13 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     }
 
     private val configurationPath by option(
-        help = "Path to the yaml configuration."
+        help = "Path to a YAML configuration of the process."
     ).path(mustExist = true)
 
-    private val inputPath by option(
+    private val inputPath by argument(
         help = "Path to the directory containing OpenDRIVE datasets"
     ).path(mustExist = true)
-    private val outputPath by option(
+    private val outputPath by argument(
         help = "Path to the output directory into which the transformed CityGML models are written"
     ).path()
 
@@ -79,54 +75,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
 
     override fun run() {
 
-        val validateOpendriveConfiguration = deriveConfiguration()
-
-        processAllFiles(
-            inputDirectoryPath = validateOpendriveConfiguration.getInputPath(),
-            withExtension = OpendriveReader.supportedFileExtensions.head,
-            outputDirectoryPath = validateOpendriveConfiguration.getOutputPath()
-        ) {
-
-            // read opendrive model
-            val opendriveReaderConfiguration = validateOpendriveConfiguration.toOpendriveReaderConfiguration(projectConfiguration)
-            val opendriveReader = OpendriveReader(opendriveReaderConfiguration)
-            val opendriveModel = opendriveReader.read(projectConfiguration.inputFilePath)
-                .fold({ logger.warn(it.message); return@processAllFiles }, { it })
-
-            // evaluate opendrive model
-            val opendriveEvaluatorConfiguration = validateOpendriveConfiguration.toOpendriveEvaluatorConfiguration(projectConfiguration)
-            val opendriveEvaluator = OpendriveEvaluator(opendriveEvaluatorConfiguration)
-            val healedOpendriveModel = opendriveEvaluator.evaluate(opendriveModel)
-                .fold({ logger.warn(it.message); return@processAllFiles }, { it })
-
-            // transform opendrive model to roadspace model
-            val opendrive2RoadspacesConfiguration = validateOpendriveConfiguration.toOpendrive2RoadspacesConfiguration(projectConfiguration)
-            val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(opendrive2RoadspacesConfiguration)
-            val roadspacesModel = opendrive2RoadspacesTransformer.transform(healedOpendriveModel).fold({ logger.warn(it.message); return@processAllFiles }, { it })
-
-            // evaluate roadspaces model
-            val roadspacesEvaluatorConfiguration = validateOpendriveConfiguration.toRoadspacesEvaluatorConfiguration(projectConfiguration)
-            val roadspacesEvaluator = RoadspacesEvaluator(roadspacesEvaluatorConfiguration)
-            roadspacesEvaluator.evaluate(roadspacesModel)
-
-            // transform roadspace model to citygml model
-            val roadspaces2CitygmlConfiguration = validateOpendriveConfiguration.toRoadspaces2CitygmlConfiguration(projectConfiguration)
-            val roadpaces2CitygmlTransformer = Roadspaces2CitygmlTransformer(roadspaces2CitygmlConfiguration)
-            val citygmlModel = roadpaces2CitygmlTransformer.transform(roadspacesModel)
-
-            // write citygml model
-            val citygmlWriterConfiguration = validateOpendriveConfiguration.toCitygmlWriterConfiguration(projectConfiguration)
-            val citygmlWriter = CitygmlWriter(citygmlWriterConfiguration)
-            citygmlWriter.write(citygmlModel, projectConfiguration.outputDirectoryPath)
-        }
-    }
-
-    private fun deriveConfiguration(): OpendriveToCitygmlConfiguration {
         val configuration = configurationPath.toOption().fold({
             OpendriveToCitygmlConfiguration(
-                inputPath = inputPath?.toString() ?: "",
-                outputPath = outputPath?.toString() ?: "",
-
                 convertToCitygml2 = convertToCitygml2,
 
                 tolerance = tolerance,
@@ -141,12 +91,13 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 transformAdditionalRoadLines = transformAdditionalRoadLines,
             )
         }, {
-            val file = File(Path.of(it))
-            val text = file.readText()
+            val configurationFilePath = Path.of(it)
+            val configurationText = File(configurationFilePath).readText()
 
-            Yaml.default.decodeFromString(OpendriveToCitygmlConfiguration.serializer(), text)
+            Yaml.default.decodeFromString(OpendriveToCitygmlConfiguration.serializer(), configurationText)
         })
 
-        return configuration
+        val processor = OpendriveToCitygmlProcessor(configuration)
+        processor.run(inputPath.toPath(), outputPath.toPath())
     }
 }

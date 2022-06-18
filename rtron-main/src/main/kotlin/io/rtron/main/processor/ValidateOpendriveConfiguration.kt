@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package io.rtron.cli.opendrive2citygml
+package io.rtron.main.processor
 
-import io.rtron.io.files.Path
-import io.rtron.io.report.Report
 import io.rtron.main.project.ProjectConfiguration
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
 import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguration
+import io.rtron.readerwriter.opendrive.configuration.OpendriveWriterConfiguration
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
@@ -29,62 +28,41 @@ import io.rtron.transformer.evaluator.roadspaces.configuration.RoadspacesEvaluat
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OpendriveToCitygmlConfiguration(
-    val inputPath: String = "",
-    val outputPath: String = "",
-
-    val convertToCitygml2: Boolean = false,
-
+data class ValidateOpendriveConfiguration(
     val tolerance: Double = Opendrive2RoadspacesConfiguration.DEFAULT_NUMBER_TOLERANCE,
-    val crsEpsg: Int = Opendrive2RoadspacesConfiguration.DEFAULT_CRS_EPSG,
-    val offsetX: Double = Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_X,
-    val offsetY: Double = Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_Y,
-    val offsetZ: Double = Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_Z,
-
-    val discretizationStepSize: Double = Roadspaces2CitygmlConfiguration.DEFAULT_DISCRETIZATION_STEP_SIZE,
-    val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlConfiguration.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
-    val circleSlices: Int = Roadspaces2CitygmlConfiguration.DEFAULT_CIRCLE_SLICES,
-    val transformAdditionalRoadLines: Boolean = Roadspaces2CitygmlConfiguration.DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES,
+    val discretizationStepSize: Double = Roadspaces2CitygmlConfiguration.DEFAULT_DISCRETIZATION_STEP_SIZE
 ) {
 
     // Methods
-    fun getInputPath(): Path = Path(inputPath)
-    fun getOutputPath(): Path = Path(outputPath)
 
-    fun isValid(): Report {
-        // TODO
-        val report = Report()
-
-        return report
-    }
-
-    // Methods
-
-    fun toOpendriveReaderConfiguration(projectConfiguration: ProjectConfiguration) = OpendriveReaderConfiguration(
+    fun deriveOpendriveReaderConfiguration(projectConfiguration: ProjectConfiguration) = OpendriveReaderConfiguration(
         projectId = projectConfiguration.projectId,
         outputSchemaValidationReportDirectoryPath = projectConfiguration.outputDirectoryPath
     )
 
-    fun toOpendriveEvaluatorConfiguration(projectConfiguration: ProjectConfiguration) = OpendriveEvaluatorConfiguration(
+    fun deriveOpendriveEvaluatorConfiguration(projectConfiguration: ProjectConfiguration) = OpendriveEvaluatorConfiguration(
         projectId = projectConfiguration.projectId,
         outputReportDirectoryPath = projectConfiguration.outputDirectoryPath,
 
         numberTolerance = tolerance,
     )
 
-    fun toOpendrive2RoadspacesConfiguration(projectConfiguration: ProjectConfiguration) = Opendrive2RoadspacesConfiguration(
+    fun deriveOpendriveWriterConfiguration(projectConfiguration: ProjectConfiguration) = OpendriveWriterConfiguration(
+        projectId = projectConfiguration.projectId,
+    )
+
+    fun deriveOpendrive2RoadspacesConfiguration(projectConfiguration: ProjectConfiguration) = Opendrive2RoadspacesConfiguration(
         projectId = projectConfiguration.projectId,
         sourceFileIdentifier = projectConfiguration.inputFileIdentifier,
         concurrentProcessing = projectConfiguration.concurrentProcessing,
+        outputReportDirectoryPath = projectConfiguration.outputDirectoryPath,
 
         numberTolerance = tolerance,
-        crsEpsg = crsEpsg,
-        offsetX = offsetX,
-        offsetY = offsetY,
-        offsetZ = offsetZ,
+        distanceTolerance = Opendrive2RoadspacesConfiguration.DEFAULT_DISTANCE_TOLERANCE,
+        angleTolerance = Opendrive2RoadspacesConfiguration.DEFAULT_ANGLE_TOLERANCE,
     )
 
-    fun toRoadspacesEvaluatorConfiguration(projectConfiguration: ProjectConfiguration) = RoadspacesEvaluatorConfiguration(
+    fun deriveRoadspacesEvaluatorConfiguration(projectConfiguration: ProjectConfiguration) = RoadspacesEvaluatorConfiguration(
         projectId = projectConfiguration.projectId,
         outputReportDirectoryPath = projectConfiguration.outputDirectoryPath,
 
@@ -92,21 +70,22 @@ data class OpendriveToCitygmlConfiguration(
         distanceTolerance = Opendrive2RoadspacesConfiguration.DEFAULT_DISTANCE_TOLERANCE,
     )
 
-    fun toRoadspaces2CitygmlConfiguration(projectConfiguration: ProjectConfiguration) = Roadspaces2CitygmlConfiguration(
+    fun deriveRoadspaces2CitygmlConfiguration(projectConfiguration: ProjectConfiguration) = Roadspaces2CitygmlConfiguration(
         projectId = projectConfiguration.projectId,
         concurrentProcessing = projectConfiguration.concurrentProcessing,
 
-        discretizationStepSize = discretizationStepSize,
-        sweepDiscretizationStepSize = sweepDiscretizationStepSize,
-        circleSlices = circleSlices,
-        transformAdditionalRoadLines = transformAdditionalRoadLines,
+        outputReportDirectoryPath = projectConfiguration.outputDirectoryPath,
 
-        mappingBackwardsCompatibility = convertToCitygml2,
+        discretizationStepSize = discretizationStepSize,
+
+        transformAdditionalRoadLines = true,
+        generateLongitudinalFillerSurfaces = false,
+        mappingBackwardsCompatibility = true,
     )
 
-    fun toCitygmlWriterConfiguration(projectConfiguration: ProjectConfiguration) = CitygmlWriterConfiguration(
+    fun deriveCitygmlWriterConfiguration(projectConfiguration: ProjectConfiguration) = CitygmlWriterConfiguration(
         projectId = projectConfiguration.projectId,
 
-        versions = if (convertToCitygml2) setOf(CitygmlVersion.V2_0) else setOf(CitygmlVersion.V3_0)
+        versions = setOf(CitygmlVersion.V2_0)
     )
 }
