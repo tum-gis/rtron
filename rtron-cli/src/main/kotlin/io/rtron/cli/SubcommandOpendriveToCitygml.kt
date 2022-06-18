@@ -98,6 +98,6 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         })
 
         val processor = OpendriveToCitygmlProcessor(configuration)
-        processor.run(inputPath.toPath(), outputPath.toPath())
+        processor.process(inputPath.toPath(), outputPath.toPath())
     }
 }

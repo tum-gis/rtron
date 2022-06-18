@@ -29,7 +29,7 @@ class OpendriveToCitygmlProcessor(
     private val configuration: OpendriveToCitygmlConfiguration
 ) {
 
-    fun run(inputPath: Path, outputPath: Path) {
+    fun process(inputPath: Path, outputPath: Path) {
 
         processAllFiles(
             inputDirectoryPath = inputPath,

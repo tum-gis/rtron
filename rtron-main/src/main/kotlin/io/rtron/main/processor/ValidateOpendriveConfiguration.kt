@@ -78,7 +78,6 @@ data class ValidateOpendriveConfiguration(
 
         discretizationStepSize = discretizationStepSize,
 
-        transformAdditionalRoadLines = true,
         generateLongitudinalFillerSurfaces = false,
         mappingBackwardsCompatibility = true,
     )

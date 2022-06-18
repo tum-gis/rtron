@@ -30,7 +30,7 @@ class ValidateOpendriveProcessor(
     private val configuration: ValidateOpendriveConfiguration
 ) {
 
-    fun run(inputPath: Path, outputPath: Path) {
+    fun process(inputPath: Path, outputPath: Path) {
 
         processAllFiles(
             inputDirectoryPath = inputPath,

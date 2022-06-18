@@ -73,6 +73,6 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
         })
 
         val processor = ValidateOpendriveProcessor(configuration)
-        processor.run(inputPath.toPath(), outputPath.toPath())
+        processor.process(inputPath.toPath(), outputPath.toPath())
     }
 }
