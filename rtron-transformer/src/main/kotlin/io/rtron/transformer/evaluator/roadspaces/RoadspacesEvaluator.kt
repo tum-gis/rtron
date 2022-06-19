@@ -18,11 +18,11 @@ package io.rtron.transformer.evaluator.roadspaces
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.transformer.evaluator.roadspaces.configuration.RoadspacesEvaluatorConfiguration
 import io.rtron.transformer.evaluator.roadspaces.plans.modelingrules.ModelingRulesEvaluator
+import kotlin.io.path.Path
 
 class RoadspacesEvaluator(
     val configuration: RoadspacesEvaluatorConfiguration
@@ -39,8 +39,7 @@ class RoadspacesEvaluator(
     fun evaluate(roadspacesModel: RoadspacesModel): Either<RoadspacesEvaluatorException, RoadspacesModel> = either.eager {
 
         val modelingRulesReportFilePath = configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/roadspaces/modelingRulesEvaluationReport.json"))
-        _modelingRulesEvaluator.evaluateNonFatalViolations(roadspacesModel)
-            .write(modelingRulesReportFilePath)
+        _modelingRulesEvaluator.evaluateNonFatalViolations(roadspacesModel).write(modelingRulesReportFilePath)
 
         roadspacesModel
     }

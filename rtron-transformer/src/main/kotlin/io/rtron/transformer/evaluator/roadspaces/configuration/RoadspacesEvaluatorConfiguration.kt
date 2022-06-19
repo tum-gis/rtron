@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.evaluator.roadspaces.configuration
 
-import io.rtron.io.files.Path
+import java.nio.file.Path
 
 /**
  * Configuration for the OpenDRIVE validator.

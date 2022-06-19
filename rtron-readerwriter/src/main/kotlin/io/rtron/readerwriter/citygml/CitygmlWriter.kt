@@ -17,13 +17,15 @@
 package io.rtron.readerwriter.citygml
 
 import arrow.core.nonEmptyListOf
-import io.rtron.io.files.Path
+import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.io.logging.LogManager
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
 import org.citygml4j.xml.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
+import kotlin.io.path.Path
 
 class CitygmlWriter(
     val configuration: CitygmlWriterConfiguration
@@ -48,7 +50,7 @@ class CitygmlWriter(
         val fileName = directoryPath.fileName.toString() + (if (versionSuffix) "_$version" else "") + ".gml"
         val filePath = directoryPath.resolve(Path(fileName))
 
-        val writer = out.createCityGMLChunkWriter(filePath.toFileJ(), StandardCharsets.UTF_8.name())
+        val writer = out.createCityGMLChunkWriter(filePath.toFile(), StandardCharsets.UTF_8.name())
         writer.apply {
             withIndent("  ")
             withDefaultSchemaLocations()

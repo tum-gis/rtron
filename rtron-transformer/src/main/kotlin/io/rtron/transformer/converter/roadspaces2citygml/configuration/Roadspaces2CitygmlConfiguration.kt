@@ -16,10 +16,11 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.configuration
 
-import io.rtron.io.files.Path
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
+import java.nio.file.Path
 import java.util.regex.Pattern
+import kotlin.io.path.Path
 
 data class Roadspaces2CitygmlConfiguration(
     val projectId: String,

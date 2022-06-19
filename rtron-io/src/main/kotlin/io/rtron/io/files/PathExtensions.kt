@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.evaluator.opendrive.configuration
+package io.rtron.io.files
 
+import org.apache.commons.io.FileUtils
+import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.fileSize
+import kotlin.streams.asSequence
 
 /**
- * Configuration for the OpenDRIVE validator.
+ * Returns a human-readable file size like 1MB or 1GB.
+ *
+ * @return human-readable size of a file
  */
-data class OpendriveEvaluatorConfiguration(
-    val projectId: String,
+fun Path.getFileSizeToDisplay(): String = FileUtils.byteCountToDisplaySize(this.fileSize())
 
-    val outputReportDirectoryPath: Path,
-    val numberTolerance: Double,
-) {
-
-    override fun toString() =
-        "OpendriveEvaluatorConfiguration(outputReportDirectoryPath=$outputReportDirectoryPath, " +
-            "numberTolerance=$numberTolerance)"
-}
+/**
+ * Returns a sequence of subpaths with [maxDepth] by walking the file tree.
+ *
+ * @param maxDepth maximal depth to be traversed
+ * @return sequence of [Path]
+ */
+fun Path.walk(maxDepth: Int = Int.MAX_VALUE): Sequence<Path> =
+    Files.walk(this, maxDepth).asSequence().map { it }

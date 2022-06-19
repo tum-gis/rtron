@@ -16,11 +16,12 @@
 
 package io.rtron.io.report
 
-import io.rtron.io.files.File
-import io.rtron.io.files.Path
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
 
 @Serializable
 class Report() {
@@ -77,7 +78,7 @@ class Report() {
     fun write(path: Path) {
         // if (messages.isEmpty()) return
         if (!path.parent.exists())
-            path.parent.createDirectory()
+            path.parent.createDirectories()
 
         val jsonFormatter = Json {
             prettyPrint = true
@@ -85,6 +86,6 @@ class Report() {
         }
 
         val jsonFileContent = jsonFormatter.encodeToString(this)
-        File(path).writeText(jsonFileContent)
+        path.toFile().writeText(jsonFileContent)
     }
 }

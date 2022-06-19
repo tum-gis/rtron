@@ -21,7 +21,7 @@ import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.nonEmptyListOf
-import io.rtron.io.files.Path
+import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.io.logging.LogManager
 import io.rtron.io.report.Message
 import io.rtron.io.report.MessageSeverity
@@ -33,7 +33,10 @@ import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguratio
 import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
 import io.rtron.std.BaseException
 import org.w3c.dom.Document
+import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.io.path.Path
+import kotlin.io.path.exists
 
 class OpendriveReader(
     val configuration: OpendriveReaderConfiguration
@@ -77,7 +80,7 @@ class OpendriveReader(
 
     private fun getOpendriveVersion(file: Path): Either<OpendriveReaderException, OpendriveVersion> = either.eager {
 
-        val xmlDoc: Document = Either.catch { DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.toFileJ()) }
+        val xmlDoc: Document = Either.catch { DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.toFile()) }
             .mapLeft { OpendriveReaderException.MalformedXmlDocument(it.message ?: "") }
             .bind()
 

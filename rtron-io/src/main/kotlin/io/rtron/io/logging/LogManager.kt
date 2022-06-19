@@ -16,8 +16,8 @@
 
 package io.rtron.io.logging
 
-import io.rtron.io.files.Path
 import mu.KotlinLogging
+import java.nio.file.Path
 
 /**
  * LogManager creates and parametrizes the [Logger] instances.

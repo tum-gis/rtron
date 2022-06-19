@@ -19,7 +19,6 @@ package io.rtron.transformer.evaluator.opendrive
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
-import io.rtron.io.files.Path
 import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
@@ -27,6 +26,7 @@ import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluator
 import io.rtron.transformer.evaluator.opendrive.plans.basicdatatype.BasicDataTypeEvaluator
 import io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements.ConversionRequirementsEvaluator
 import io.rtron.transformer.evaluator.opendrive.plans.modelingrules.ModelingRulesEvaluator
+import kotlin.io.path.Path
 
 class OpendriveEvaluator(
     val configuration: OpendriveEvaluatorConfiguration

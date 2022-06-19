@@ -28,9 +28,6 @@ import com.github.ajalt.clikt.parameters.options.triple
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
-import io.rtron.io.files.File
-import io.rtron.io.files.Path
-import io.rtron.io.files.toPath
 import io.rtron.main.processor.OpendriveToCitygmlConfiguration
 import io.rtron.main.processor.OpendriveToCitygmlProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
@@ -90,14 +87,13 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 circleSlices = circleSlices,
                 transformAdditionalRoadLines = transformAdditionalRoadLines,
             )
-        }, {
-            val configurationFilePath = Path.of(it)
-            val configurationText = File(configurationFilePath).readText()
+        }, { configurationFilePath ->
+            val configurationText = configurationFilePath.toFile().readText()
 
             Yaml.default.decodeFromString(OpendriveToCitygmlConfiguration.serializer(), configurationText)
         })
 
         val processor = OpendriveToCitygmlProcessor(configuration)
-        processor.process(inputPath.toPath(), outputPath.toPath())
+        processor.process(inputPath, outputPath)
     }
 }

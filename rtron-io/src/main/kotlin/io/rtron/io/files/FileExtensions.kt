@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.evaluator.opendrive.configuration
+package io.rtron.io.files
 
-import java.nio.file.Path
+import java.io.File
+import com.google.common.hash.Hashing as GHashing
+import com.google.common.io.Files as GFiles
 
 /**
- * Configuration for the OpenDRIVE validator.
+ * SHA256 hash of the file or directory.
  */
-data class OpendriveEvaluatorConfiguration(
-    val projectId: String,
-
-    val outputReportDirectoryPath: Path,
-    val numberTolerance: Double,
-) {
-
-    override fun toString() =
-        "OpendriveEvaluatorConfiguration(outputReportDirectoryPath=$outputReportDirectoryPath, " +
-            "numberTolerance=$numberTolerance)"
-}
+fun File.getHashSha256() =
+    try {
+        GFiles.asByteSource(this).hash(GHashing.sha256()).toString()
+    } catch (e: Exception) {
+        ""
+    }

@@ -17,7 +17,7 @@
 package io.rtron.main.project
 
 import io.rtron.io.files.FileIdentifier
-import io.rtron.io.files.Path
+import java.nio.file.Path
 
 data class ProjectConfiguration(
     val projectId: String,

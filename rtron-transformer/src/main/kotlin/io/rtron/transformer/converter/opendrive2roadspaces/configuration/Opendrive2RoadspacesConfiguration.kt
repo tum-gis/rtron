@@ -17,8 +17,9 @@
 package io.rtron.transformer.converter.opendrive2roadspaces.configuration
 
 import io.rtron.io.files.FileIdentifier
-import io.rtron.io.files.Path
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import java.nio.file.Path
+import kotlin.io.path.Path
 
 /**
  * Transformation configuration for the OpenDRIVE to RoadSpace transformer.

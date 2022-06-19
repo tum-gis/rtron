@@ -16,6 +16,9 @@
 
 package io.rtron.io.files
 
+import java.io.File
+import java.nio.file.Path
+
 interface FileIdentifierInterface {
     val fileName: String
     val fileExtension: String
@@ -39,7 +42,7 @@ data class FileIdentifier(
 ) : FileIdentifierInterface {
 
     companion object {
-        fun of(path: Path) = of(File(path))
-        fun of(file: File) = FileIdentifier(file.nameWithoutExtension, file.extension, file.path, file.hashSha256)
+        fun of(path: Path): FileIdentifier = of(path.toFile())
+        fun of(file: File) = FileIdentifier(file.nameWithoutExtension, file.extension, file.toPath(), file.getHashSha256())
     }
 }

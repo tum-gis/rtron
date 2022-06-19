@@ -16,7 +16,8 @@
 
 package io.rtron.readerwriter.opendrive.configuration
 
-import io.rtron.io.files.Path
+import java.nio.file.Path
+import kotlin.io.path.isDirectory
 
 data class OpendriveReaderConfiguration(
     val projectId: String,

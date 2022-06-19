@@ -20,7 +20,6 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
-import io.rtron.io.files.Path
 import io.rtron.io.report.Report
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
@@ -30,6 +29,7 @@ import io.rtron.readerwriter.opendrive.reader.validation.OpendriveValidationEven
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Unmarshaller
 import org.mapstruct.factory.Mappers
+import java.nio.file.Path
 import javax.xml.XMLConstants
 import javax.xml.validation.SchemaFactory
 
@@ -56,7 +56,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
 
     fun validate(filePath: Path): Either<OpendriveReaderException.FatalSchemaValidationError, Report> = either.eager {
         try {
-            _jaxbUnmarshaller.unmarshal(filePath.toFileJ())
+            _jaxbUnmarshaller.unmarshal(filePath.toFile())
         } catch (e: Exception) {
             OpendriveReaderException.FatalSchemaValidationError(reason = e.toString()).left()
                 .bind<OpendriveReaderException.FatalSchemaValidationError>()
@@ -69,7 +69,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
     fun readFromFile(filePath: Path): Either<OpendriveReaderException.NoDedicatedReaderAvailable, OpendriveModel> =
         either.eager {
 
-            val opendriveVersionSpecificModel = _jaxbUnmarshaller.unmarshal(filePath.toFileJ())
+            val opendriveVersionSpecificModel = _jaxbUnmarshaller.unmarshal(filePath.toFile())
 
             val opendriveModel = when (opendriveVersion) {
                 OpendriveVersion.V_1_4 -> {

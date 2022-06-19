@@ -18,7 +18,6 @@ package io.rtron.math
 
 import arrow.core.Either
 import io.rtron.io.csv.CSVPrinter
-import io.rtron.io.files.Path
 import io.rtron.math.analysis.Fresnel
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -29,6 +28,7 @@ import io.rtron.math.range.arrange
 import io.rtron.math.std.PI
 import io.rtron.math.transform.AffineSequence2D
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 object SpiralSegment2DWriterTest {
 

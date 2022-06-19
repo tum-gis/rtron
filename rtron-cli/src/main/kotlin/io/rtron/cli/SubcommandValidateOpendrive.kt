@@ -25,9 +25,6 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.path
-import io.rtron.io.files.File
-import io.rtron.io.files.Path
-import io.rtron.io.files.toPath
 import io.rtron.main.processor.ValidateOpendriveConfiguration
 import io.rtron.main.processor.ValidateOpendriveProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
@@ -65,14 +62,13 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
                 tolerance = tolerance,
                 discretizationStepSize = discretizationStepSize
             )
-        }, {
-            val configurationFilePath = Path.of(it)
-            val configurationText = File(configurationFilePath).readText()
+        }, { configurationFilePath ->
+            val configurationText = configurationFilePath.toFile().readText()
 
             Yaml.default.decodeFromString(ValidateOpendriveConfiguration.serializer(), configurationText)
         })
 
         val processor = ValidateOpendriveProcessor(configuration)
-        processor.process(inputPath.toPath(), outputPath.toPath())
+        processor.process(inputPath, outputPath)
     }
 }

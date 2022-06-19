@@ -16,8 +16,13 @@
 
 package io.rtron.main.project
 
-import io.rtron.io.files.Path
+import io.rtron.io.files.walk
 import io.rtron.io.logging.LogManager
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -25,7 +30,7 @@ class Project(val projectConfiguration: ProjectConfiguration) {
 
     // Properties and Initializers
     init {
-        projectConfiguration.outputDirectoryPath.createDirectory()
+        projectConfiguration.outputDirectoryPath.createDirectories()
     }
 
     val logger = LogManager.getReportLogger(projectConfiguration.projectId)

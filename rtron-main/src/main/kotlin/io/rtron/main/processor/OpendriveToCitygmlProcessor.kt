@@ -16,7 +16,6 @@
 
 package io.rtron.main.processor
 
-import io.rtron.io.files.Path
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlWriter
 import io.rtron.readerwriter.opendrive.OpendriveReader
@@ -24,6 +23,7 @@ import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesT
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluator
 import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluator
+import java.nio.file.Path
 
 class OpendriveToCitygmlProcessor(
     private val configuration: OpendriveToCitygmlConfiguration

@@ -16,10 +16,11 @@
 
 package io.rtron.io.csv
 
-import io.rtron.io.files.Path
 import org.apache.commons.csv.CSVFormat.Builder
 import java.io.Flushable
 import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
 import org.apache.commons.csv.CSVPrinter as CMCSVPrinter
 
 /**
@@ -32,10 +33,10 @@ class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
 
     // Properties and Initializers
     init {
-        filePath.parent.createDirectory()
+        filePath.parent.createDirectories()
     }
 
-    private val _writer = Files.newBufferedWriter(filePath.toPathN())
+    private val _writer = Files.newBufferedWriter(filePath)
     private val _csvPrinter: CMCSVPrinter
     init {
         val csvFormat = Builder.create().setHeader(*header.toTypedArray()).build()
