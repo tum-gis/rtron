@@ -16,8 +16,8 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements
 
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.MessageList
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
 import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
@@ -30,29 +30,29 @@ class ConversionRequirementsEvaluator(val configuration: OpendriveEvaluatorConfi
     private val _junctionEvaluator = JunctionEvaluator(configuration)
 
     // Methods
-    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): Report {
-        val report = Report()
+    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
+        val messageList = MessageList()
 
-        report += _roadEvaluator.evaluateFatalViolations(opendriveModel)
-        report += _roadLanesEvaluator.evaluateFatalViolations(opendriveModel)
-        report += _junctionEvaluator.evaluateFatalViolations(opendriveModel)
+        messageList += _roadEvaluator.evaluateFatalViolations(opendriveModel)
+        messageList += _roadLanesEvaluator.evaluateFatalViolations(opendriveModel)
+        messageList += _junctionEvaluator.evaluateFatalViolations(opendriveModel)
 
-        return report
+        return messageList
     }
-    override fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextReport<OpendriveModel> {
+    override fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
         var healedOpendriveModel = opendriveModel.copy()
-        val report = Report()
+        val messageList = MessageList()
 
         _roadEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
             healedOpendriveModel = it.value
-            report += it.report
+            messageList += it.messageList
         }
 
         _roadLanesEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
             healedOpendriveModel = it.value
-            report += it.report
+            messageList += it.messageList
         }
 
-        return ContextReport(healedOpendriveModel, report)
+        return ContextMessageList(healedOpendriveModel, messageList)
     }
 }

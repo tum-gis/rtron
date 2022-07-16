@@ -14,31 +14,16 @@
  * limitations under the License.
  */
 
-package io.rtron.io.report
+package io.rtron.io.messages
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.exists
 
 @Serializable
-class Report() {
-
-    // Properties and Initializers
-    private val messages: MutableList<Message> = mutableListOf()
-
-    constructor(messages: List<Message>) : this() {
-        append(messages)
-    }
-
-    constructor(message: Message) : this() {
-        append(message)
-    }
+@JvmInline
+value class MessageList(private val messages: MutableList<Message> = mutableListOf()) {
 
     // Operators
-    operator fun plusAssign(other: Report) {
+    operator fun plusAssign(other: MessageList) {
         append(other.messages)
     }
 
@@ -75,17 +60,9 @@ class Report() {
         return "$numberOfWarnings warnings, $numberOfErrors errors, $numberOfFatalErrors fatal errors"
     }
 
-    fun write(path: Path) {
-        // if (messages.isEmpty()) return
-        if (!path.parent.exists())
-            path.parent.createDirectories()
+    companion object {
 
-        val jsonFormatter = Json {
-            prettyPrint = true
-            encodeDefaults = true
-        }
-
-        val jsonFileContent = jsonFormatter.encodeToString(this)
-        path.toFile().writeText(jsonFileContent)
+        fun of(messages: List<Message>): MessageList = MessageList(messages as MutableList<Message>)
+        fun of(message: Message): MessageList = MessageList(mutableListOf(message))
     }
 }

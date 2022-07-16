@@ -19,7 +19,6 @@ package io.rtron.readerwriter.opendrive.reader.mapper.opendrive14
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
-import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.junction.EContactPoint
 import io.rtron.model.opendrive.railroad.RoadRailroad
 import io.rtron.model.opendrive.road.ERoadLinkElementType
@@ -35,6 +34,7 @@ import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometryParamPoly3
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometryPoly3
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometrySpiral
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
+import mu.KotlinLogging
 import org.asam.opendrive14.ContactPoint
 import org.asam.opendrive14.ElementType
 import org.asam.opendrive14.OpenDRIVE
@@ -46,7 +46,7 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14LaneMapper::class, Opendrive14ObjectMapper::class, Opendrive14SignalMapper::class], imports = [Option::class], injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 abstract class Opendrive14RoadMapper {
 
-    var reportLogger = LogManager.getReportLogger("general")
+    private val logger = KotlinLogging.logger {}
 
     //
     // Road Link
@@ -75,8 +75,9 @@ abstract class Opendrive14RoadMapper {
     fun mapLateralProfileLogging(source: OpenDRIVE.Road.LateralProfile?) {
         if (source == null) return
 
+        // TODO: reporting
         if (source.crossfall != null && source.crossfall.isNotEmpty())
-            reportLogger.infoOnce("Since crossfall is not in the OpenDRIVE standard from version 1.6, it is not supported.")
+            logger.info("Since crossfall is not in the OpenDRIVE standard from version 1.6, it is not supported.")
     }
 
     //

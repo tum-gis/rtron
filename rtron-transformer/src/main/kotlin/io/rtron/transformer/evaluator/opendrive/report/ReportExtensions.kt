@@ -17,9 +17,9 @@
 package io.rtron.transformer.evaluator.opendrive.report
 
 import arrow.core.Option
-import io.rtron.io.report.Message
-import io.rtron.io.report.MessageSeverity
-import io.rtron.io.report.Report
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.MessageSeverity
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
 
@@ -53,13 +53,13 @@ fun OpendriveException.toMessage(location: Option<AbstractOpendriveIdentifier>, 
 }
 
 @JvmName("toReportWithIdentifier")
-fun List<OpendriveException>.toReport(location: AbstractOpendriveIdentifier, isFatal: Boolean, wasHealed: Boolean): Report {
+fun List<OpendriveException>.toReport(location: AbstractOpendriveIdentifier, isFatal: Boolean, wasHealed: Boolean): MessageList {
     val messages = this.map { it.toMessage(location, isFatal, wasHealed) }
-    return Report(messages)
+    return MessageList.of(messages)
 }
 
 @JvmName("toReportWithOptionalIdentifier")
-fun List<OpendriveException>.toReport(location: Option<AbstractOpendriveIdentifier>, isFatal: Boolean, wasHealed: Boolean): Report {
+fun List<OpendriveException>.toReport(location: Option<AbstractOpendriveIdentifier>, isFatal: Boolean, wasHealed: Boolean): MessageList {
     val messages = this.map { it.toMessage(location, isFatal, wasHealed) }
-    return Report(messages)
+    return MessageList.of(messages)
 }

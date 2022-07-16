@@ -16,11 +16,10 @@
 
 package io.rtron.readerwriter.citygml
 
-import arrow.core.nonEmptyListOf
 import io.rtron.io.files.getFileSizeToDisplay
-import io.rtron.io.logging.LogManager
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
+import mu.KotlinLogging
 import org.citygml4j.xml.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
 import java.nio.charset.StandardCharsets
@@ -32,13 +31,13 @@ class CitygmlWriter(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val logger = KotlinLogging.logger {}
 
     private val _citygmlContext = CityGMLContext.newInstance()
 
     // Methods
 
-    fun write(model: CitygmlModel, directoryPath: Path): List<Path> {
+    fun writeModel(model: CitygmlModel, directoryPath: Path): List<Path> {
         val filePaths = configuration.versions.map { write(model, it, directoryPath) }
         return filePaths
     }
@@ -63,11 +62,11 @@ class CitygmlWriter(
         }
 
         writer.close()
-        _reportLogger.info("Completed writing of file $fileName (around ${filePath.getFileSizeToDisplay()}). ✔")
+        logger.info("Completed writing of file $fileName (around ${filePath.getFileSizeToDisplay()}). ✔")
         return filePath
     }
 
     companion object {
-        val supportedFileExtensions = nonEmptyListOf("gml")
+        val supportedFileExtensions: Set<String> = setOf("gml")
     }
 }

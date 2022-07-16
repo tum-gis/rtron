@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     kotlin("kapt")
+    kotlin(Plugins.serialization) version PluginVersions.serialization
     id(Plugins.xjc) version PluginVersions.xjc
 }
 
@@ -15,6 +16,7 @@ dependencies {
     implementation(project(ProjectComponents.model))
 
     // object creation libraries
+    implementation(Dependencies.kotlinxSerializationJson)
     implementation(Dependencies.jakartaXmlBindApi)
     implementation(Dependencies.sunJaxbImpl)
     xjc(Dependencies.jakartaXmlBindApi)
@@ -25,6 +27,10 @@ dependencies {
     // object mapping libraries
     implementation(Dependencies.mapstruct)
     kapt(Dependencies.mapstructProcessor)
+
+    // logging libraries
+    implementation(Dependencies.kotlinLogging)
+    implementation(Dependencies.slf4jSimple)
 
     // geo libraries
     implementation(Dependencies.citygml4jXml)

@@ -16,31 +16,25 @@
 
 package io.rtron.transformer.evaluator.roadspaces
 
-import arrow.core.Either
-import arrow.core.continuations.either
-import io.rtron.io.logging.LogManager
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.transformer.evaluator.roadspaces.configuration.RoadspacesEvaluatorConfiguration
 import io.rtron.transformer.evaluator.roadspaces.plans.modelingrules.ModelingRulesEvaluator
-import kotlin.io.path.Path
+import io.rtron.transformer.evaluator.roadspaces.report.RoadspacesEvaluationReport
 
 class RoadspacesEvaluator(
     val configuration: RoadspacesEvaluatorConfiguration
 ) {
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
-
-    // private val _basicDataTypeEvaluator = BasicDataTypeEvaluator(configuration)
     private val _modelingRulesEvaluator = ModelingRulesEvaluator(configuration)
-    // private val _conversionRequirementsEvaluator = ConversionRequirementsEvaluator(configuration)
 
     // Methods
 
-    fun evaluate(roadspacesModel: RoadspacesModel): Either<RoadspacesEvaluatorException, RoadspacesModel> = either.eager {
+    fun evaluate(roadspacesModel: RoadspacesModel): Pair<RoadspacesModel, RoadspacesEvaluationReport> {
 
-        val modelingRulesReportFilePath = configuration.outputReportDirectoryPath.resolve(Path("reports/evaluator/roadspaces/modelingRulesEvaluationReport.json"))
-        _modelingRulesEvaluator.evaluateNonFatalViolations(roadspacesModel).write(modelingRulesReportFilePath)
+        val report = RoadspacesEvaluationReport()
 
-        roadspacesModel
+        report.modelingRulesEvaluation = _modelingRulesEvaluator.evaluateNonFatalViolations(roadspacesModel)
+
+        return roadspacesModel to report
     }
 }

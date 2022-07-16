@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package io.rtron.io.report
+package io.rtron.transformer.evaluator.roadspaces.report
 
+import io.rtron.io.messages.MessageList
 import kotlinx.serialization.Serializable
 
-/**
- * Single entry for the schema validation report.
- */
 @Serializable
-data class Message(val text: String, val severity: MessageSeverity, val identifier: Map<String, String> = emptyMap(), val location: Map<String, String> = emptyMap())
+data class RoadspacesEvaluationReport(
+
+    var modelingRulesEvaluation: MessageList = MessageList()
+
+)

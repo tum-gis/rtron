@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.evaluator.roadspaces
+package io.rtron.io.messages
 
-import io.rtron.std.BaseException
-
-sealed class RoadspacesEvaluatorException(message: String) : BaseException(message) {
-    data class FatalError(val reason: String) : RoadspacesEvaluatorException("OpenDRIVE model has fatal errors: $reason")
-}
+fun List<Message>.mergeToReport(): MessageList = MessageList.of(this)
+fun List<MessageList>.merge(): MessageList = MessageList.of(flatMap { it.getMessages() })

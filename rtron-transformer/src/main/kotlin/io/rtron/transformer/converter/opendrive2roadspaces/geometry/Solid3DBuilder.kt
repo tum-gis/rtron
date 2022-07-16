@@ -24,11 +24,11 @@ import arrow.core.continuations.either
 import arrow.core.getOrHandle
 import arrow.core.separateEither
 import arrow.core.some
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Message
-import io.rtron.io.report.Report
-import io.rtron.io.report.handleReport
-import io.rtron.io.report.mergeToReport
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.handleMessageList
+import io.rtron.io.messages.mergeToReport
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.threed.solid.Cuboid3D
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
@@ -61,9 +61,9 @@ class Solid3DBuilder(
      * Builds a list of cuboids from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCuboids(roadObject: RoadObjectsObject, curveAffine: Affine3D): ContextReport<List<Cuboid3D>> {
+    fun buildCuboids(roadObject: RoadObjectsObject, curveAffine: Affine3D): ContextMessageList<List<Cuboid3D>> {
         val cuboidList = mutableListOf<Cuboid3D>()
-        val report = Report()
+        val messageList = MessageList()
 
         if (roadObject.isCuboid()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
@@ -72,18 +72,18 @@ class Solid3DBuilder(
         }
 
         if (roadObject.repeat.any { it.isRepeatedCuboid() })
-            report += Message.of("Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, isFatal = false, wasHealed = false)
+            messageList += Message.of("Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, isFatal = false, wasHealed = false)
 
-        return ContextReport(cuboidList, report)
+        return ContextMessageList(cuboidList, messageList)
     }
 
     /**
      * Builds a list of cylinders from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCylinders(roadObject: RoadObjectsObject, curveAffine: Affine3D): ContextReport<List<Cylinder3D>> {
+    fun buildCylinders(roadObject: RoadObjectsObject, curveAffine: Affine3D): ContextMessageList<List<Cylinder3D>> {
         val cylinderList = mutableListOf<Cylinder3D>()
-        val report = Report()
+        val messageList = MessageList()
 
         if (roadObject.isCylinder()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
@@ -92,9 +92,9 @@ class Solid3DBuilder(
         }
 
         if (roadObject.repeat.any { it.isRepeatCylinder() })
-            report += Message.of("Cylinder geometries in the repeat elements are currently not supported.", roadObject.additionalId, isFatal = false, wasHealed = false)
+            messageList += Message.of("Cylinder geometries in the repeat elements are currently not supported.", roadObject.additionalId, isFatal = false, wasHealed = false)
 
-        return ContextReport(cylinderList, report)
+        return ContextMessageList(cylinderList, messageList)
     }
 
     /**
@@ -105,25 +105,25 @@ class Solid3DBuilder(
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      * @return list of polyhedrons
      */
-    fun buildPolyhedronsByRoadCorners(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D): ContextReport<List<Polyhedron3D>> {
-        val report = Report()
+    fun buildPolyhedronsByRoadCorners(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D): ContextMessageList<List<Polyhedron3D>> {
+        val messageList = MessageList()
 
         val (builderExceptions, polyhedronsWithContext) = roadObject
             .getPolyhedronsDefinedByRoadCorners()
             .map { buildPolyhedronByRoadCorners(it, roadReferenceLine) }
             .separateEither()
 
-        report += builderExceptions.map { Message.of(it.message, it.location, isFatal = false, wasHealed = true) }.mergeToReport()
-        val polyhedrons = polyhedronsWithContext.handleReport { report += it.report }
+        messageList += builderExceptions.map { Message.of(it.message, it.location, isFatal = false, wasHealed = true) }.mergeToReport()
+        val polyhedrons = polyhedronsWithContext.handleMessageList { messageList += it.messageList }
 
-        return ContextReport(polyhedrons, report)
+        return ContextMessageList(polyhedrons, messageList)
     }
 
     /**
      * Builds a single polyhedron from an OpenDRIVE road object defined by road corner outlines.
      */
     private fun buildPolyhedronByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D):
-        Either<GeometryBuilderException, ContextReport<Polyhedron3D>> {
+        Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> {
         require(outline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
         require(outline.cornerLocal.all { it.height == 0.0 || configuration.numberTolerance <= it.height }) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
@@ -162,8 +162,8 @@ class Solid3DBuilder(
      * @return list of polyhedrons
      */
     fun buildPolyhedronsByLocalCorners(roadObject: RoadObjectsObject, curveAffine: Affine3D):
-        ContextReport<List<Polyhedron3D>> {
-        val report = Report()
+        ContextMessageList<List<Polyhedron3D>> {
+        val messageList = MessageList()
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
@@ -172,34 +172,34 @@ class Solid3DBuilder(
             .map { buildPolyhedronByLocalCorners(it) }
             .separateEither()
 
-        report += builderExceptions
+        messageList += builderExceptions
             .map { Message.of(it.message, it.location, isFatal = false, wasHealed = true) }
             .mergeToReport()
         val polyhedrons = polyhedronsWithContext
-            .handleReport { report += it.report }
+            .handleMessageList { messageList += it.messageList }
             .map { it.copy(affineSequence = affineSequence) }
 
-        return ContextReport(polyhedrons, report)
+        return ContextMessageList(polyhedrons, messageList)
     }
 
     /**
      * Builds a single polyhedron from an OpenDRIVE road object defined by local corner outlines.
      */
     private fun buildPolyhedronByLocalCorners(outline: RoadObjectsObjectOutlinesOutline):
-        Either<GeometryBuilderException, ContextReport<Polyhedron3D>> = either.eager {
+        Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> = either.eager {
         require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
         require(outline.cornerLocal.all { it.height == 0.0 || configuration.numberTolerance <= it.height }) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
 
-        val report = Report()
+        val messageList = MessageList()
 
         val verticalOutlineElements = outline.cornerLocal
             .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.getBasePoint(), it.getHeadPoint(), None, configuration.numberTolerance) }
-            .handleReport { report += it.report }
+            .handleMessageList { messageList += it.messageList }
             .let { NonEmptyList.fromListUnsafe(it) }
 
-        val polyhedronWithContextReport = Polyhedron3DFactory.buildFromVerticalOutlineElements(outlineId, verticalOutlineElements, configuration.numberTolerance).bind()
-        polyhedronWithContextReport
+        val polyhedronWithContextMessageList = Polyhedron3DFactory.buildFromVerticalOutlineElements(outlineId, verticalOutlineElements, configuration.numberTolerance).bind()
+        polyhedronWithContextMessageList
     }
 
     /**

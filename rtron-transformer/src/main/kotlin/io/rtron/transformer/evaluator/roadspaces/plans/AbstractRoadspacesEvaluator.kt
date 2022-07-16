@@ -16,7 +16,7 @@
 
 package io.rtron.transformer.evaluator.roadspaces.plans
 
-import io.rtron.io.report.Report
+import io.rtron.io.messages.MessageList
 import io.rtron.model.roadspaces.RoadspacesModel
 
 abstract class AbstractRoadspacesEvaluator {
@@ -24,5 +24,5 @@ abstract class AbstractRoadspacesEvaluator {
     // Methods
     // abstract fun evaluateFatalViolations(roadspacesModel: RoadspacesModel): Report
 
-    abstract fun evaluateNonFatalViolations(roadspacesModel: RoadspacesModel): Report
+    abstract fun evaluateNonFatalViolations(roadspacesModel: RoadspacesModel): MessageList
 }

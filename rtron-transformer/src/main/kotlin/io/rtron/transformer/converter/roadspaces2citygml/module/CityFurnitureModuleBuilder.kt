@@ -17,9 +17,9 @@
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import arrow.core.getOrElse
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Message
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageList
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
@@ -39,14 +39,14 @@ class CityFurnitureModuleBuilder(
     private val _attributesAdder = AttributesAdder(configuration)
 
     // Methods
-    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): ContextReport<CityFurniture> {
+    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): ContextMessageList<CityFurniture> {
         val cityFurnitureFeature = CityFurniture()
-        val report = Report()
+        val messageList = MessageList()
 
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         cityFurnitureFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .tapLeft { report += Message.of(it.message, roadspaceObject.id, isFatal = false, wasHealed = true) }
+            .tapLeft { messageList += Message.of(it.message, roadspaceObject.id, isFatal = false, wasHealed = true) }
 
         geometryTransformer.rotation.tap {
             _attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
@@ -56,6 +56,6 @@ class CityFurnitureModuleBuilder(
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name.getOrElse { "" }, cityFurnitureFeature) // TODO fix option
         _attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 
-        return ContextReport(cityFurnitureFeature, report)
+        return ContextMessageList(cityFurnitureFeature, messageList)
     }
 }

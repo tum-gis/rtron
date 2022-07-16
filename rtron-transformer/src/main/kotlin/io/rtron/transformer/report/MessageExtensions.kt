@@ -17,8 +17,8 @@
 package io.rtron.transformer.report
 
 import arrow.core.Option
-import io.rtron.io.report.Message
-import io.rtron.io.report.MessageSeverity
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageSeverity
 import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 

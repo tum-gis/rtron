@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.evaluator.opendrive
+package io.rtron.io.messages
 
-import io.rtron.std.BaseException
+import kotlinx.serialization.Serializable
 
-sealed class OpendriveEvaluatorException(message: String) : BaseException(message) {
-    data class FatalError(val reason: String) : OpendriveEvaluatorException("OpenDRIVE model has fatal errors: $reason")
-}
+/**
+ * Single entry for the schema validation report.
+ */
+@Serializable
+data class Message(val text: String, val severity: MessageSeverity, val identifier: Map<String, String> = emptyMap(), val location: Map<String, String> = emptyMap(), val relevantValue: Double? = null)

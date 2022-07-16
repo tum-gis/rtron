@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package io.rtron.main.project
+package io.rtron.readerwriter.opendrive.report
 
-import io.rtron.io.files.FileIdentifier
-import java.nio.file.Path
+import io.rtron.io.messages.MessageList
+import io.rtron.readerwriter.opendrive.version.OpendriveVersion
+import kotlinx.serialization.Serializable
 
-data class ProjectConfiguration(
-    val projectId: String,
-    val inputFilePath: Path,
-    val outputDirectoryPath: Path,
+@Serializable
+class SchemaValidationReport(
+    private val opendriveVersion: OpendriveVersion,
+    private val completedSuccessfully: Boolean,
 
-    /** enable concurrent processing during the transformation of a model */
-    val concurrentProcessing: Boolean = false
-) {
-
-    val inputFileIdentifier = FileIdentifier.of(inputFilePath)
-}
+    val messages: MessageList
+)

@@ -16,8 +16,8 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.MessageList
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.optics.everyRoad
@@ -31,27 +31,27 @@ import io.rtron.transformer.evaluator.opendrive.report.toMessage
 class RoadEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): Report {
-        val report = Report()
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
+        val messageList = MessageList()
 
         everyRoad.modify(opendriveModel) { currentRoad ->
 
             currentRoad.planView.geometryValidated.tapInvalid {
-                report += it.toMessage(currentRoad.additionalId, isFatal = true, wasHealed = false)
+                messageList += it.toMessage(currentRoad.additionalId, isFatal = true, wasHealed = false)
             }
 
             currentRoad.lanes.laneSectionValidated.tapInvalid {
-                report += it.toMessage(currentRoad.additionalId, isFatal = true, wasHealed = false)
+                messageList += it.toMessage(currentRoad.additionalId, isFatal = true, wasHealed = false)
             }
 
             currentRoad
         }
 
-        return report
+        return messageList
     }
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextReport<OpendriveModel> {
-        val report = Report()
+    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
+        val messageList = MessageList()
         var healedOpendriveModel = opendriveModel
 
         healedOpendriveModel = everyRoad.modify(healedOpendriveModel) { currentRoad ->
@@ -59,26 +59,26 @@ class RoadEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
             currentRoad.elevationProfile.tap {
                 val elevationEntriesFiltered = it.elevation.filterToStrictSortingBy { it.s }
                 if (elevationEntriesFiltered.size < it.elevation.size) {
-                    report += OpendriveException.NonStrictlySortedList("elevation", "Ignoring ${it.elevation.size - elevationEntriesFiltered.size} elevation entries which are not placed in strict order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
+                    messageList += OpendriveException.NonStrictlySortedList("elevation", "Ignoring ${it.elevation.size - elevationEntriesFiltered.size} elevation entries which are not placed in strict order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
                     it.elevation = elevationEntriesFiltered
                 }
             }
 
             currentRoad.lateralProfile.tap {
                 if (it.containsShapeProfile() && currentRoad.lanes.containsLaneOffset()) {
-                    report += OpendriveException.UnexpectedValue("lateralProfile.shape", "", "Lane offsets shall not be used together with road shapes. Removing the shape entries.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
+                    messageList += OpendriveException.UnexpectedValue("lateralProfile.shape", "", "Lane offsets shall not be used together with road shapes. Removing the shape entries.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
                     it.shape = emptyList()
                 }
 
                 val superelevationEntriesFiltered = it.superelevation.filterToStrictSortingBy { it.s }
                 if (superelevationEntriesFiltered.size < it.superelevation.size) {
-                    report += OpendriveException.NonStrictlySortedList("superelevation", "Ignoring ${it.superelevation.size - superelevationEntriesFiltered.size} superelevation entries which are not placed in strictly ascending order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
+                    messageList += OpendriveException.NonStrictlySortedList("superelevation", "Ignoring ${it.superelevation.size - superelevationEntriesFiltered.size} superelevation entries which are not placed in strictly ascending order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
                     it.superelevation = superelevationEntriesFiltered
                 }
 
                 val shapeEntriesFilteredByS = it.shape.filterToSortingBy { it.s }
                 if (shapeEntriesFilteredByS.size < it.shape.size) {
-                    report += OpendriveException.NonSortedList("shape", "Ignoring ${it.shape.size - shapeEntriesFilteredByS.size} shape entries which are not placed in ascending order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
+                    messageList += OpendriveException.NonSortedList("shape", "Ignoring ${it.shape.size - shapeEntriesFilteredByS.size} shape entries which are not placed in ascending order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
                     it.shape = shapeEntriesFilteredByS
                 }
 
@@ -86,25 +86,25 @@ class RoadEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
                     currentShapeSubEntries.value.filterToStrictSortingBy { it.t }
                 }
                 if (shapeEntriesFilteredByT.size < it.shape.size) {
-                    report += OpendriveException.NonStrictlySortedList("shape", "Ignoring ${it.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
+                    messageList += OpendriveException.NonStrictlySortedList("shape", "Ignoring ${it.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
                     it.shape = shapeEntriesFilteredByT
                 }
             }
 
             val laneOffsetEntriesFiltered = currentRoad.lanes.laneOffset.filterToStrictSortingBy { it.s }
             if (laneOffsetEntriesFiltered.size < currentRoad.lanes.laneOffset.size) {
-                report += OpendriveException.NonStrictlySortedList("shape", "Ignoring ${currentRoad.lanes.laneOffset.size - laneOffsetEntriesFiltered.size} lane offset entries which are not placed in strictly ascending order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.NonStrictlySortedList("shape", "Ignoring ${currentRoad.lanes.laneOffset.size - laneOffsetEntriesFiltered.size} lane offset entries which are not placed in strictly ascending order according to s.").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
                 currentRoad.lanes.laneOffset = laneOffsetEntriesFiltered
             }
 
             if (!currentRoad.lanes.laneSection.isSortedBy { it.s }) {
-                report += OpendriveException.NonSortedList("laneSection").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.NonSortedList("laneSection").toMessage(currentRoad.additionalId, isFatal = false, wasHealed = true)
                 currentRoad.lanes.laneSection = currentRoad.lanes.laneSection.sortedBy { it.s }
             }
 
             currentRoad
         }
 
-        return ContextReport(healedOpendriveModel, report)
+        return ContextMessageList(healedOpendriveModel, messageList)
     }
 }

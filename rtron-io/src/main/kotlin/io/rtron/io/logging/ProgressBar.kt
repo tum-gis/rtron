@@ -16,6 +16,7 @@
 
 package io.rtron.io.logging
 
+import mu.KotlinLogging
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -35,7 +36,7 @@ class ProgressBar(
 ) {
 
     // Properties and Initializers
-    private val logger = LogManager.getReportLogger("Progress")
+    private val logger = KotlinLogging.logger {}
     private val startTime = System.currentTimeMillis()
     private var lastPrintUpdateTime: Long = 0
 

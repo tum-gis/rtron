@@ -17,8 +17,8 @@
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
 import arrow.core.None
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.MessageList
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.optics.everyJunction
@@ -29,17 +29,17 @@ import io.rtron.transformer.evaluator.opendrive.report.toMessage
 class JunctionEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): Report {
-        val report = Report()
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
+        val messageList = MessageList()
 
         everyJunction.modify(opendriveModel) { currentJunction ->
 
             currentJunction.connectionValidated.tapInvalid {
-                report += it.toMessage(currentJunction.additionalId, isFatal = true, wasHealed = false)
+                messageList += it.toMessage(currentJunction.additionalId, isFatal = true, wasHealed = false)
             }
 
             currentJunction.idValidated.tapInvalid {
-                report += it.toMessage(currentJunction.additionalId, isFatal = true, wasHealed = false)
+                messageList += it.toMessage(currentJunction.additionalId, isFatal = true, wasHealed = false)
             }
 
             currentJunction
@@ -48,37 +48,37 @@ class JunctionEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
         everyJunctionConnection.modify(opendriveModel) { currentJunctionConnection ->
 
             currentJunctionConnection.idValidated.tapInvalid {
-                report += it.toMessage(currentJunctionConnection.additionalId, isFatal = true, wasHealed = false)
+                messageList += it.toMessage(currentJunctionConnection.additionalId, isFatal = true, wasHealed = false)
             }
 
             currentJunctionConnection
         }
 
-        return report
+        return messageList
     }
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextReport<OpendriveModel> {
-        val report = Report()
+    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
+        val messageList = MessageList()
         var healedOpendriveModel = opendriveModel
 
         healedOpendriveModel = everyJunction.modify(healedOpendriveModel) { currentJunction ->
             if (currentJunction.mainRoad.exists { it.isBlank() }) {
-                report += OpendriveException.EmptyValueForOptionalAttribute("mainRoad").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyValueForOptionalAttribute("mainRoad").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
                 currentJunction.mainRoad = None
             }
 
             if (currentJunction.name.exists { it.isBlank() }) {
-                report += OpendriveException.EmptyValueForOptionalAttribute("name").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyValueForOptionalAttribute("name").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
                 currentJunction.name = None
             }
 
             if (currentJunction.sEnd.exists { !it.isFinite() }) {
-                report += OpendriveException.EmptyValueForOptionalAttribute("sEnd").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyValueForOptionalAttribute("sEnd").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
                 currentJunction.sEnd = None
             }
 
             if (currentJunction.sStart.exists { !it.isFinite() }) {
-                report += OpendriveException.EmptyValueForOptionalAttribute("sStart").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyValueForOptionalAttribute("sStart").toMessage(currentJunction.additionalId, isFatal = false, wasHealed = true)
                 currentJunction.sStart = None
             }
 
@@ -88,23 +88,23 @@ class JunctionEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
         healedOpendriveModel = everyJunctionConnection.modify(healedOpendriveModel) { currentJunctionConnection ->
 
             if (currentJunctionConnection.connectingRoad.exists { it.isBlank() }) {
-                report += OpendriveException.EmptyValueForOptionalAttribute("connectingRoad").toMessage(currentJunctionConnection.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyValueForOptionalAttribute("connectingRoad").toMessage(currentJunctionConnection.additionalId, isFatal = false, wasHealed = true)
                 currentJunctionConnection.connectingRoad = None
             }
 
             if (currentJunctionConnection.incomingRoad.exists { it.isBlank() }) {
-                report += OpendriveException.EmptyValueForOptionalAttribute("incomingRoad").toMessage(currentJunctionConnection.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyValueForOptionalAttribute("incomingRoad").toMessage(currentJunctionConnection.additionalId, isFatal = false, wasHealed = true)
                 currentJunctionConnection.incomingRoad = None
             }
 
             if (currentJunctionConnection.linkedRoad.exists { it.isBlank() }) {
-                report += OpendriveException.EmptyValueForOptionalAttribute("linkedRoad").toMessage(currentJunctionConnection.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyValueForOptionalAttribute("linkedRoad").toMessage(currentJunctionConnection.additionalId, isFatal = false, wasHealed = true)
                 currentJunctionConnection.linkedRoad = None
             }
 
             currentJunctionConnection
         }
 
-        return ContextReport(healedOpendriveModel, report)
+        return ContextMessageList(healedOpendriveModel, messageList)
     }
 }

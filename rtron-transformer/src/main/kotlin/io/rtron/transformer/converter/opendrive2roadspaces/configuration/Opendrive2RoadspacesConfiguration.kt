@@ -18,26 +18,20 @@ package io.rtron.transformer.converter.opendrive2roadspaces.configuration
 
 import io.rtron.io.files.FileIdentifier
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-import java.nio.file.Path
-import kotlin.io.path.Path
 
 /**
  * Transformation configuration for the OpenDRIVE to RoadSpace transformer.
  */
 data class Opendrive2RoadspacesConfiguration(
-    val projectId: String,
     val sourceFileIdentifier: FileIdentifier,
     val concurrentProcessing: Boolean,
 
-    /** path for report */
-    val outputReportDirectoryPath: Path = Path("./"),
-
     /** allowed tolerance when comparing double values */
     val numberTolerance: Double = DEFAULT_NUMBER_TOLERANCE,
-    /** allowed tolerance when comparing two vectors */
-    val distanceTolerance: Double = DEFAULT_DISTANCE_TOLERANCE,
-    /** allowed tolerance when comparing two angles */
-    val angleTolerance: Double = DEFAULT_ANGLE_TOLERANCE,
+    /** distance tolerance between two geometry elements of the plan view */
+    val planViewGeometryDistanceTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
+    /** angle tolerance between two geometry elements of the plan view */
+    val planViewGeometryAngleTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
 
     /** prefix of attribute names */
     val attributesPrefix: String = DEFAULT_ATTRIBUTES_PREFIX,
@@ -58,24 +52,16 @@ data class Opendrive2RoadspacesConfiguration(
      */
     val offsetXY: Vector2D = Vector2D(offsetX, offsetY)
 
-    val outputReportFilePath: Path = outputReportDirectoryPath.resolve(Path("reports/converter/opendrive2roadspaces/conversion.json"))
-
-    override fun toString() =
-        "Opendrive2RoadspacesConfiguration(numberTolerance=$numberTolerance, distanceTolerance=$distanceTolerance, " +
-            " angleTolerance=$angleTolerance, attributesPrefix=$attributesPrefix," +
-            " crsEpsg=$crsEpsg, offsetX=$offsetX, offsetY=$offsetY, offsetZ=$offsetZ, " +
-            "extrapolateLateralRoadShapes=$extrapolateLateralRoadShapes)"
-
     companion object {
-        val DEFAULT_NUMBER_TOLERANCE = 1E-7
-        val DEFAULT_DISTANCE_TOLERANCE = 1E-4
-        val DEFAULT_ANGLE_TOLERANCE = 1E-4
+        const val DEFAULT_NUMBER_TOLERANCE = 1E-7
+        const val DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE = 1E0
+        const val DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE = 1E0
 
-        val DEFAULT_ATTRIBUTES_PREFIX = "opendrive_"
-        val DEFAULT_CRS_EPSG = 0
-        val DEFAULT_OFFSET_X = 0.0
-        val DEFAULT_OFFSET_Y = 0.0
-        val DEFAULT_OFFSET_Z = 0.0
-        val DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES = false
+        const val DEFAULT_ATTRIBUTES_PREFIX = "opendrive_"
+        const val DEFAULT_CRS_EPSG = 0
+        const val DEFAULT_OFFSET_X = 0.0
+        const val DEFAULT_OFFSET_Y = 0.0
+        const val DEFAULT_OFFSET_Z = 0.0
+        const val DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES = false
     }
 }

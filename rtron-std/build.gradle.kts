@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm")
-    kotlin(Plugins.serialization) version PluginVersions.serialization
 }
 
 kotlinProject()

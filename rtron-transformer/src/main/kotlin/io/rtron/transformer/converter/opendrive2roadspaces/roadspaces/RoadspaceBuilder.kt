@@ -20,8 +20,8 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.getOrHandle
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.MessageList
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.analysis.function.bivariate.pure.ShapeFunction
@@ -61,8 +61,8 @@ class RoadspaceBuilder(
      * @param road source OpenDRIVE model
      * @return transformed [Roadspace]
      */
-    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Opendrive2RoadspacesTransformationException, ContextReport<Roadspace>> = either.eager {
-        val report = Report()
+    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>> = either.eager {
+        val messageList = MessageList()
 
         val opendriveRoadId = road.additionalId.toEither { IllegalStateException("Additional road ID must be available.") }.getOrHandle { throw it }
         val roadspaceId = RoadspaceIdentifier(road.id, modelId)
@@ -93,12 +93,12 @@ class RoadspaceBuilder(
         // build up the road containing only lane sections, lanes (no road side objects)
         val roadspaceRoad = _roadBuilder
             .buildRoad(roadspaceId, road, roadSurface, roadSurfaceWithoutTorsion, attributes)
-            .handleReport { report += it }
+            .handleMessageList { messageList += it }
 
         // build up the road space objects (OpenDRIVE: road objects & signals)
         val roadspaceObjectsFromRoadObjects = road.objects.fold({ emptyList() }, { roadObjects ->
             _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, attributes)
-                .handleReport { report += it }
+                .handleMessageList { messageList += it }
         })
         val roadspaceObjectsFromRoadSignals = road.signals.fold({ emptyList() }, { roadSignals ->
             _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, attributes)
@@ -113,7 +113,7 @@ class RoadspaceBuilder(
             roadspaceObjects = roadspaceObjectsFromRoadObjects + roadspaceObjectsFromRoadSignals,
             attributes = attributes
         )
-        ContextReport(roadspace, report)
+        ContextMessageList(roadspace, messageList)
     }
 
     private fun buildLateralRoadShape(id: RoadspaceIdentifier, lateralProfileShapeList: NonEmptyList<RoadLateralProfileShape>):

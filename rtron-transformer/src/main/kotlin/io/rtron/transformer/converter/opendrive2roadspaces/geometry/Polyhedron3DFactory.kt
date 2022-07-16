@@ -25,11 +25,11 @@ import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.nonEmptyListOf
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Message
-import io.rtron.io.report.MessageSeverity
-import io.rtron.io.report.Report
-import io.rtron.io.report.mergeReports
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.MessageSeverity
+import io.rtron.io.messages.mergeMessageLists
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.Polyhedron3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
@@ -56,13 +56,13 @@ object Polyhedron3DFactory {
      * @param outlineElements vertical line segments or points bounding the polyhedron
      */
     fun buildFromVerticalOutlineElements(outlineId: RoadObjectOutlineIdentifier, outlineElements: NonEmptyList<VerticalOutlineElement>, tolerance: Double):
-        Either<GeometryBuilderException, ContextReport<Polyhedron3D>> = either.eager {
-        val report = Report()
+        Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> = either.eager {
+        val messageList = MessageList()
 
         // prepare vertical outline elements
         val preparedOutlineElements = prepareOutlineElements(outlineId, outlineElements, tolerance)
             .bind()
-            .handleReport { report += it }
+            .handleMessageList { messageList += it }
 
         // construct faces
         val baseFace = LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }.let { NonEmptyList.fromListUnsafe(it) }, tolerance)
@@ -79,7 +79,7 @@ object Polyhedron3DFactory {
             .let { NonEmptyList.fromListUnsafe(it) }
 
         val polyhedron = Polyhedron3D(triangulatedFaces, tolerance)
-        ContextReport(polyhedron, report)
+        ContextMessageList(polyhedron, messageList)
     }
 
     /**
@@ -144,24 +144,24 @@ object Polyhedron3DFactory {
                 leftHeadPoint: Option<Vector3D>,
                 rightHeadPoint: Option<Vector3D>,
                 tolerance: Double
-            ): ContextReport<VerticalOutlineElement> {
+            ): ContextMessageList<VerticalOutlineElement> {
 
-                val report = Report()
+                val messageList = MessageList()
                 val headPoints = leftHeadPoint.toList() + rightHeadPoint.toList()
 
                 // remove head points that are fuzzily equal to base point
                 val prepHeadPoints = headPoints.filter { it.fuzzyUnequals(basePoint, tolerance) }
                 if (prepHeadPoints.size < headPoints.size)
-                    report += Message("Height of outline element must be above tolerance.", MessageSeverity.WARNING)
+                    messageList += Message("Height of outline element must be above tolerance.", MessageSeverity.WARNING)
 
                 if (prepHeadPoints.size <= 1)
-                    return ContextReport(of(basePoint, prepHeadPoints, tolerance), report)
+                    return ContextMessageList(of(basePoint, prepHeadPoints, tolerance), messageList)
 
                 // if head points are fuzzily equal, take only one
                 val verticalOutlineElement =
                     if (prepHeadPoints.first().fuzzyEquals(prepHeadPoints.last(), tolerance)) of(basePoint, prepHeadPoints.take(1), tolerance)
                     else of(basePoint, prepHeadPoints, tolerance)
-                return ContextReport(verticalOutlineElement, report)
+                return ContextMessageList(verticalOutlineElement, messageList)
             }
 
             /**
@@ -186,22 +186,22 @@ object Polyhedron3DFactory {
              * @param elements list of [VerticalOutlineElement] which must all contain the same base point
              * @param tolerance allowed tolerance
              */
-            fun of(elements: List<VerticalOutlineElement>, tolerance: Double): ContextReport<VerticalOutlineElement> {
+            fun of(elements: List<VerticalOutlineElement>, tolerance: Double): ContextMessageList<VerticalOutlineElement> {
                 require(elements.isNotEmpty()) { "List of elements must not be empty." }
                 require(elements.drop(1).all { it.basePoint == elements.first().basePoint }) { "All elements must have the same base point." }
-                val report = Report()
+                val messageList = MessageList()
 
                 if (elements.size == 1)
-                    return ContextReport(elements.first(), report)
+                    return ContextMessageList(elements.first(), messageList)
 
                 if (elements.size > 2)
-                    report += Message("Contains more than two consecutively following outline element duplicates.", MessageSeverity.WARNING)
+                    messageList += Message("Contains more than two consecutively following outline element duplicates.", MessageSeverity.WARNING)
 
                 val basePoint = elements.first().basePoint
                 val leftHeadPoint = elements.first().leftHeadPoint
                 val rightHeadPoint = elements.last().getHeadPointAdjacentToTheRight()
 
-                return of(basePoint, leftHeadPoint, rightHeadPoint, tolerance).appendReport(report)
+                return of(basePoint, leftHeadPoint, rightHeadPoint, tolerance).appendReport(messageList)
             }
         }
     }
@@ -233,35 +233,35 @@ object Polyhedron3DFactory {
      * Preparation and cleanup of [verticalOutlineElements] including the removal of duplicates and error messaging.
      */
     private fun prepareOutlineElements(outlineId: RoadObjectOutlineIdentifier, verticalOutlineElements: NonEmptyList<VerticalOutlineElement>, tolerance: Double):
-        Either<GeometryBuilderException, ContextReport<NonEmptyList<VerticalOutlineElement>>> = either.eager {
+        Either<GeometryBuilderException, ContextMessageList<NonEmptyList<VerticalOutlineElement>>> = either.eager {
 
-        val report = Report()
+        val messageList = MessageList()
 
         // remove consecutively following line segment duplicates
         val elementsWithoutDuplicates = verticalOutlineElements.filterWithNextEnclosing { a, b -> a.basePoint.fuzzyUnequals(b.basePoint, tolerance) }
         if (elementsWithoutDuplicates.size < verticalOutlineElements.size)
-            report += Message.of("Ignoring at least one consecutively following line segment duplicate.", outlineId, isFatal = false, wasHealed = true)
+            messageList += Message.of("Ignoring at least one consecutively following line segment duplicate.", outlineId, isFatal = false, wasHealed = true)
 
         // if there are not enough points to construct a polyhedron
         if (elementsWithoutDuplicates.size < 3)
-            GeometryBuilderException.NotEnoughValidOutlineElementsForPolyhedron(outlineId).left().bind<ContextReport<NonEmptyList<VerticalOutlineElement>>>()
+            GeometryBuilderException.NotEnoughValidOutlineElementsForPolyhedron(outlineId).left().bind<ContextMessageList<NonEmptyList<VerticalOutlineElement>>>()
 
         // remove consecutively following side duplicates of the form (…, A, B, A, …)
         val cleanedElements = elementsWithoutDuplicates
             .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
         if (cleanedElements.size < elementsWithoutDuplicates.size)
-            report += Message.of("Ignoring consecutively following side duplicates of the form (…, A, B, A, …).", outlineId, isFatal = false, wasHealed = true)
+            messageList += Message.of("Ignoring consecutively following side duplicates of the form (…, A, B, A, …).", outlineId, isFatal = false, wasHealed = true)
 
         // if the base points of the outline element are located on a line (or point)
         val innerBaseEdges = cleanedElements.map { it.basePoint }.filterIndexed { index, _ -> index != 0 }.map { it - cleanedElements.first().basePoint }
         val dimensionOfSpan = innerBaseEdges.map { it.toRealVector() }.dimensionOfSpan()
         if (dimensionOfSpan < 2)
-            GeometryBuilderException.ColinearOutlineElementsForPolyhedron(outlineId).left().bind<ContextReport<NonEmptyList<VerticalOutlineElement>>>()
+            GeometryBuilderException.ColinearOutlineElementsForPolyhedron(outlineId).left().bind<ContextMessageList<NonEmptyList<VerticalOutlineElement>>>()
 
-        val elements: ContextReport<NonEmptyList<VerticalOutlineElement>> = cleanedElements
+        val elements: ContextMessageList<NonEmptyList<VerticalOutlineElement>> = cleanedElements
             .zipWithConsecutivesEnclosing { it.basePoint }
             .map { VerticalOutlineElement.of(it, tolerance) }
-            .mergeReports()
+            .mergeMessageLists()
             .map { NonEmptyList.fromListUnsafe(it) }
 
         elements

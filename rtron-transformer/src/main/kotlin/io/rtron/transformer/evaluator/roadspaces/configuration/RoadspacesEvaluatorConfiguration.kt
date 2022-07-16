@@ -16,20 +16,15 @@
 
 package io.rtron.transformer.evaluator.roadspaces.configuration
 
-import java.nio.file.Path
-
 /**
  * Configuration for the OpenDRIVE validator.
  */
 data class RoadspacesEvaluatorConfiguration(
-    val projectId: String,
-
-    val outputReportDirectoryPath: Path,
     val numberTolerance: Double,
-    val distanceTolerance: Double
+    val laneTransitionDistanceTolerance: Double
 ) {
 
-    override fun toString() =
-        "RoadspacesEvaluatorConfiguration(outputReportDirectoryPath=$outputReportDirectoryPath, " +
-            "numberTolerance=$numberTolerance, distanceTolerance=$distanceTolerance)"
+    companion object {
+        const val DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE = 1E-3
+    }
 }

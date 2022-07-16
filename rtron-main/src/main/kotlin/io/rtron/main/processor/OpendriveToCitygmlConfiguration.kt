@@ -16,10 +16,9 @@
 
 package io.rtron.main.processor
 
-import io.rtron.main.project.ProjectConfiguration
+import io.rtron.io.files.FileIdentifier
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
-import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguration
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
@@ -31,6 +30,9 @@ data class OpendriveToCitygmlConfiguration(
     val convertToCitygml2: Boolean = false,
 
     val tolerance: Double = Opendrive2RoadspacesConfiguration.DEFAULT_NUMBER_TOLERANCE,
+    val planViewGeometryDistanceTolerance: Double = Opendrive2RoadspacesConfiguration.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
+    val planViewGeometryAngleTolerance: Double = Opendrive2RoadspacesConfiguration.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+
     val crsEpsg: Int = Opendrive2RoadspacesConfiguration.DEFAULT_CRS_EPSG,
     val offsetX: Double = Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_X,
     val offsetY: Double = Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_Y,
@@ -43,41 +45,31 @@ data class OpendriveToCitygmlConfiguration(
 ) {
     // Methods
 
-    fun deriveOpendriveReaderConfiguration(projectConfiguration: ProjectConfiguration) = OpendriveReaderConfiguration(
-        projectId = projectConfiguration.projectId,
-        outputSchemaValidationReportDirectoryPath = projectConfiguration.outputDirectoryPath
-    )
-
-    fun deriveOpendriveEvaluatorConfiguration(projectConfiguration: ProjectConfiguration) = OpendriveEvaluatorConfiguration(
-        projectId = projectConfiguration.projectId,
-        outputReportDirectoryPath = projectConfiguration.outputDirectoryPath,
-
+    fun deriveOpendriveEvaluatorConfiguration() = OpendriveEvaluatorConfiguration(
         numberTolerance = tolerance,
     )
 
-    fun deriveOpendrive2RoadspacesConfiguration(projectConfiguration: ProjectConfiguration) = Opendrive2RoadspacesConfiguration(
-        projectId = projectConfiguration.projectId,
-        sourceFileIdentifier = projectConfiguration.inputFileIdentifier,
-        concurrentProcessing = projectConfiguration.concurrentProcessing,
+    fun deriveOpendrive2RoadspacesConfiguration(sourceFileIdentifier: FileIdentifier) = Opendrive2RoadspacesConfiguration(
+        sourceFileIdentifier = sourceFileIdentifier,
+        concurrentProcessing = false,
 
         numberTolerance = tolerance,
+        planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+        planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+
         crsEpsg = crsEpsg,
         offsetX = offsetX,
         offsetY = offsetY,
         offsetZ = offsetZ,
     )
 
-    fun deriveRoadspacesEvaluatorConfiguration(projectConfiguration: ProjectConfiguration) = RoadspacesEvaluatorConfiguration(
-        projectId = projectConfiguration.projectId,
-        outputReportDirectoryPath = projectConfiguration.outputDirectoryPath,
-
+    fun deriveRoadspacesEvaluatorConfiguration() = RoadspacesEvaluatorConfiguration(
         numberTolerance = tolerance,
-        distanceTolerance = Opendrive2RoadspacesConfiguration.DEFAULT_DISTANCE_TOLERANCE,
+        laneTransitionDistanceTolerance = RoadspacesEvaluatorConfiguration.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE,
     )
 
-    fun deriveRoadspaces2CitygmlConfiguration(projectConfiguration: ProjectConfiguration) = Roadspaces2CitygmlConfiguration(
-        projectId = projectConfiguration.projectId,
-        concurrentProcessing = projectConfiguration.concurrentProcessing,
+    fun deriveRoadspaces2CitygmlConfiguration() = Roadspaces2CitygmlConfiguration(
+        concurrentProcessing = false,
 
         discretizationStepSize = discretizationStepSize,
         sweepDiscretizationStepSize = sweepDiscretizationStepSize,
@@ -87,8 +79,7 @@ data class OpendriveToCitygmlConfiguration(
         mappingBackwardsCompatibility = convertToCitygml2,
     )
 
-    fun deriveCitygmlWriterConfiguration(projectConfiguration: ProjectConfiguration) = CitygmlWriterConfiguration(
-        projectId = projectConfiguration.projectId,
+    fun deriveCitygmlWriterConfiguration() = CitygmlWriterConfiguration(
 
         versions = if (convertToCitygml2) setOf(CitygmlVersion.V2_0) else setOf(CitygmlVersion.V3_0)
     )

@@ -17,8 +17,8 @@
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
 import arrow.core.None
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.MessageList
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.optics.everyLaneSection
@@ -34,44 +34,44 @@ import io.rtron.transformer.evaluator.opendrive.report.toReport
 class RoadLanesEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): Report {
-        val report = Report()
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
+        val messageList = MessageList()
 
         everyRoadLanesLaneSectionLeftLane.modify(opendriveModel) { currentLeftLane ->
-            report += getSevereViolations(currentLeftLane).toReport(currentLeftLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += getSevereViolations(currentLeftLane).toReport(currentLeftLane.additionalId, isFatal = true, wasHealed = false)
             currentLeftLane
         }
 
         everyRoadLanesLaneSectionRightLane.modify(opendriveModel) { currentRightLane ->
-            report += getSevereViolations(currentRightLane).toReport(currentRightLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += getSevereViolations(currentRightLane).toReport(currentRightLane.additionalId, isFatal = true, wasHealed = false)
             currentRightLane
         }
 
-        return report
+        return messageList
     }
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextReport<OpendriveModel> {
-        val report = Report()
+    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
+        val messageList = MessageList()
         var healedOpendriveModel = opendriveModel
 
         healedOpendriveModel = everyLaneSection.modify(healedOpendriveModel) { currentLaneSection ->
 
             currentLaneSection.left.tap {
                 if (it.lane.isEmpty()) {
-                    report += OpendriveException.EmptyValueForOptionalAttribute("left").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
+                    messageList += OpendriveException.EmptyValueForOptionalAttribute("left").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
                     currentLaneSection.left = None
                 }
             }
 
             currentLaneSection.right.tap {
                 if (it.lane.isEmpty()) {
-                    report += OpendriveException.EmptyValueForOptionalAttribute("left").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
+                    messageList += OpendriveException.EmptyValueForOptionalAttribute("left").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
                     currentLaneSection.right = None
                 }
             }
 
             if (currentLaneSection.center.lane.isEmpty()) {
-                report += OpendriveException.EmptyList("lane").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
+                messageList += OpendriveException.EmptyList("lane").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
                 currentLaneSection.center.lane += RoadLanesLaneSectionCenterLane()
             }
 
@@ -79,16 +79,16 @@ class RoadLanesEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
         }
 
         healedOpendriveModel = everyRoadLanesLaneSectionLeftLane.modify(healedOpendriveModel) { currentLeftLane ->
-            report += healMinorViolations(currentLeftLane).toReport(currentLeftLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += healMinorViolations(currentLeftLane).toReport(currentLeftLane.additionalId, isFatal = true, wasHealed = false)
             currentLeftLane
         }
 
         healedOpendriveModel = everyRoadLanesLaneSectionRightLane.modify(healedOpendriveModel) { currentRightLane ->
-            report += healMinorViolations(currentRightLane).toReport(currentRightLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += healMinorViolations(currentRightLane).toReport(currentRightLane.additionalId, isFatal = true, wasHealed = false)
             currentRightLane
         }
 
-        return ContextReport(healedOpendriveModel, report)
+        return ContextMessageList(healedOpendriveModel, messageList)
     }
 
     private fun getSevereViolations(lane: RoadLanesLaneSectionLRLane): List<OpendriveException> {

@@ -18,16 +18,10 @@ package io.rtron.transformer.converter.roadspaces2citygml.configuration
 
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
-import java.nio.file.Path
 import java.util.regex.Pattern
-import kotlin.io.path.Path
 
 data class Roadspaces2CitygmlConfiguration(
-    val projectId: String,
     val concurrentProcessing: Boolean,
-
-    /** path for report */
-    val outputReportDirectoryPath: Path = Path("./"),
 
     /** prefix for generated gml ids */
     val gmlIdPrefix: String = DEFAULT_GML_ID_PREFIX,
@@ -57,29 +51,19 @@ data class Roadspaces2CitygmlConfiguration(
         require(PATTERN_NCNAME.matcher(gmlIdPrefix).matches()) { "Provided gmlIdPrefix ($gmlIdPrefix) requires valid NCName pattern." }
     }
 
-    val outputReportFilePath: Path = outputReportDirectoryPath.resolve(Path("reports/converter/roadspaces2citygml/conversion.json"))
-
-    // Conversions
-    override fun toString(): String =
-        "Roadspaces2CitygmlConfiguration(gmlIdPrefix=$gmlIdPrefix, identifierAttributesPrefix=$identifierAttributesPrefix, " +
-            "flattenGenericAttributeSets=$flattenGenericAttributeSets, discretizationStepSize=$discretizationStepSize, " +
-            "sweepDiscretizationStepSize=$sweepDiscretizationStepSize, circleSlices=$circleSlices, " +
-            "generateRandomGeometryIds=$generateRandomGeometryIds, transformAdditionalRoadLines=$transformAdditionalRoadLines, " +
-            "mappingBackwardsCompatibility=$mappingBackwardsCompatibility)"
-
     companion object {
         val PATTERN_NCNAME: Pattern = Pattern.compile("[_\\p{L}][-_.\\p{L}0-9]*")!!
 
-        val DEFAULT_GML_ID_PREFIX = "UUID_"
-        val DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX = "identifier_"
-        val DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX = "geometry_"
-        val DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS = true
-        val DEFAULT_DISCRETIZATION_STEP_SIZE = 0.7
-        val DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE = ParametricSweep3D.DEFAULT_STEP_SIZE
-        val DEFAULT_CIRCLE_SLICES = Cylinder3D.DEFAULT_NUMBER_SLICES
-        val DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS = true
-        val DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES = false
-        val DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES = true
-        val DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY = true
+        const val DEFAULT_GML_ID_PREFIX = "UUID_"
+        const val DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX = "identifier_"
+        const val DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX = "geometry_"
+        const val DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS = true
+        const val DEFAULT_DISCRETIZATION_STEP_SIZE = 0.7
+        const val DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE = ParametricSweep3D.DEFAULT_STEP_SIZE
+        const val DEFAULT_CIRCLE_SLICES = Cylinder3D.DEFAULT_NUMBER_SLICES
+        const val DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS = true
+        const val DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES = false
+        const val DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES = true
+        const val DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY = true
     }
 }

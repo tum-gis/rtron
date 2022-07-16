@@ -19,26 +19,23 @@ package io.rtron.readerwriter.opendrive
 import arrow.core.Either
 import arrow.core.continuations.either
 import io.rtron.io.files.getFileSizeToDisplay
-import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.readerwriter.opendrive.configuration.OpendriveWriterConfiguration
 import io.rtron.readerwriter.opendrive.writer.OpendriveMarshaller
 import io.rtron.std.BaseException
+import mu.KotlinLogging
 import java.nio.file.Path
 
-class OpendriveWriter(
-    val configuration: OpendriveWriterConfiguration
-) {
+class OpendriveWriter {
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val logger = KotlinLogging.logger {}
 
-    private val _opendriveMarshaller by lazy { OpendriveMarshaller() }
+    private val opendriveMarshaller by lazy { OpendriveMarshaller() }
 
     // Methods
     fun write(model: OpendriveModel, directoryPath: Path): Either<OpendriveWriterException, Path> = either.eager {
 
-        val filePath = _opendriveMarshaller.writeToFile(model, directoryPath).bind()
-        _reportLogger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔")
+        val filePath = opendriveMarshaller.writeToFile(model, directoryPath).bind()
+        logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔")
 
         filePath
     }

@@ -17,9 +17,9 @@
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
 import arrow.core.None
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Message
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageList
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyJunction
 import io.rtron.model.opendrive.junction.EJunctionType
@@ -29,41 +29,41 @@ import io.rtron.transformer.report.of
 class JunctionEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): Report {
-        val report = Report()
-        return report
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
+        val messageList = MessageList()
+        return messageList
     }
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextReport<OpendriveModel> {
-        val report = Report()
+    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
+        val messageList = MessageList()
         var healedOpendriveModel = opendriveModel.copy()
 
         healedOpendriveModel = everyJunction.modify(healedOpendriveModel) { currentJunction ->
 
             // Junctions should not be used when only two roads meet.
             if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.getNumberOfIncomingRoads() <= 2) {
-                report += Message.of("Junctions of type default should only be used when at least three roads are coming in (currently incoming road ids: ${currentJunction.getIncomingRoadIds()})", currentJunction.additionalId, isFatal = false, wasHealed = false)
+                messageList += Message.of("Junctions of type default should only be used when at least three roads are coming in (currently incoming road ids: ${currentJunction.getIncomingRoadIds()})", currentJunction.additionalId, isFatal = false, wasHealed = false)
             }
 
             // The @mainRoad, @orientation, @sStart and @sEnd attributes shall only be specified for virtual junctions.
             if (currentJunction.typeValidated != EJunctionType.VIRTUAL) {
                 currentJunction.mainRoad.tap {
-                    report += Message.of("Attribute 'mainRoad' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
+                    messageList += Message.of("Attribute 'mainRoad' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
                     currentJunction.mainRoad = None
                 }
 
                 currentJunction.orientation.tap {
-                    report += Message.of("Attribute 'orientation' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
+                    messageList += Message.of("Attribute 'orientation' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
                     currentJunction.orientation = None
                 }
 
                 currentJunction.sStart.tap {
-                    report += Message.of("Attribute 'sStart' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
+                    messageList += Message.of("Attribute 'sStart' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
                     currentJunction.sStart = None
                 }
 
                 currentJunction.sEnd.tap {
-                    report += Message.of("Attribute 'sEnd' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
+                    messageList += Message.of("Attribute 'sEnd' shall only be specified for virtual junctions", currentJunction.additionalId, isFatal = true, wasHealed = true)
                     currentJunction.sEnd = None
                 }
             }
@@ -71,6 +71,6 @@ class JunctionEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
             currentJunction
         }
 
-        return ContextReport(healedOpendriveModel, report)
+        return ContextMessageList(healedOpendriveModel, messageList)
     }
 }

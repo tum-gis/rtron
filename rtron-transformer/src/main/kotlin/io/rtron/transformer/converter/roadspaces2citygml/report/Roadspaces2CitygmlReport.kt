@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.configuration
+package io.rtron.transformer.converter.roadspaces2citygml.report
 
-import java.nio.file.Path
-import kotlin.io.path.isDirectory
+import io.rtron.io.messages.MessageList
+import kotlinx.serialization.Serializable
 
-data class OpendriveReaderConfiguration(
-    val projectId: String,
-    val outputSchemaValidationReportDirectoryPath: Path
+@Serializable
+data class Roadspaces2CitygmlReport(
+
+    val conversion: MessageList = MessageList()
 ) {
-    // Properties and Initializers
-    init {
-        require(outputSchemaValidationReportDirectoryPath.isDirectory()) { "Path must represent a directory." }
-    }
+
+    // Methods
+    fun getTextSummary(): String = conversion.getTextSummary()
 }

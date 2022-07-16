@@ -16,19 +16,9 @@
 
 package io.rtron.transformer.evaluator.opendrive.configuration
 
-import java.nio.file.Path
-
 /**
  * Configuration for the OpenDRIVE validator.
  */
 data class OpendriveEvaluatorConfiguration(
-    val projectId: String,
-
-    val outputReportDirectoryPath: Path,
     val numberTolerance: Double,
-) {
-
-    override fun toString() =
-        "OpendriveEvaluatorConfiguration(outputReportDirectoryPath=$outputReportDirectoryPath, " +
-            "numberTolerance=$numberTolerance)"
-}
+)

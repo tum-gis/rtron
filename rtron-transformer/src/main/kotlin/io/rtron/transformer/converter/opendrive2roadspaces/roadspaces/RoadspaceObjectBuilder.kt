@@ -23,9 +23,9 @@ import arrow.core.flatten
 import arrow.core.getOrHandle
 import arrow.core.nonEmptyListOf
 import arrow.core.some
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Report
-import io.rtron.io.report.mergeReports
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.mergeMessageLists
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
@@ -73,11 +73,11 @@ class RoadspaceObjectBuilder(
         roadObjects: OpendriveRoadObjects,
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
-    ): ContextReport<List<RoadspaceObject>> {
+    ): ContextMessageList<List<RoadspaceObject>> {
 
         return roadObjects.roadObject
             .map { buildRoadObject(roadspaceId, it, roadReferenceLine, baseAttributes) }
-            .mergeReports()
+            .mergeMessageLists()
             .map { it.flatten() }
     }
 
@@ -86,8 +86,8 @@ class RoadspaceObjectBuilder(
         roadObject: OpendriveRoadObject,
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
-    ): ContextReport<NonEmptyList<RoadspaceObject>> {
-        val report = Report()
+    ): ContextMessageList<NonEmptyList<RoadspaceObject>> {
+        val messageList = MessageList()
 
         // get general object type and geometry representation
         val type = getObjectType(roadObject)
@@ -102,20 +102,20 @@ class RoadspaceObjectBuilder(
             val repeatIdentifier = currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
 
             val roadspaceObjectId = RoadspaceObjectIdentifier("${roadObject.id}_${repeatIdentifier.repeatIndex}", roadObject.name, id)
-            val geometry = buildGeometries(roadObject, currentRoadObjectRepeat.some(), roadReferenceLine).handleReport { report += it }
+            val geometry = buildGeometries(roadObject, currentRoadObjectRepeat.some(), roadReferenceLine).handleMessageList { messageList += it }
             RoadspaceObject(roadspaceObjectId, type, geometry, attributes)
         }
 
         val roadObjects = if (roadObjectsFromRepeat.isEmpty()) {
             val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, roadObject.name, id)
-            val geometry = buildGeometries(roadObject, None, roadReferenceLine).handleReport { report += it }
+            val geometry = buildGeometries(roadObject, None, roadReferenceLine).handleMessageList { messageList += it }
             nonEmptyListOf(RoadspaceObject(roadspaceObjectId, type, geometry, attributes))
         } else {
             NonEmptyList.fromListUnsafe(roadObjectsFromRepeat)
         }
 
         // build roadspace object
-        return ContextReport(roadObjects, report)
+        return ContextMessageList(roadObjects, messageList)
     }
 
     private fun getObjectType(roadObject: OpendriveRoadObject): RoadObjectType = roadObject.type.fold({ RoadObjectType.NONE }, {
@@ -150,24 +150,24 @@ class RoadspaceObjectBuilder(
         roadObject: OpendriveRoadObject,
         roadObjectRepeat: Option<OpendriveRoadObjectRepeat>,
         roadReferenceLine: Curve3D
-    ): ContextReport<AbstractGeometry3D> {
-        val report = Report()
+    ): ContextMessageList<AbstractGeometry3D> {
+        val messageList = MessageList()
 
         // affine transformation matrix at the curve point of the object
         val curveAffine = roadReferenceLine.calculateAffine(roadObject.curveRelativePosition.toCurveRelative1D())
 
         // build up solid geometrical representations
         val geometries = mutableListOf<AbstractGeometry3D>()
-        geometries += _solid3DBuilder.buildCuboids(roadObject, curveAffine).handleReport { report += it }
-        geometries += _solid3DBuilder.buildCylinders(roadObject, curveAffine).handleReport { report += it }
-        geometries += _solid3DBuilder.buildPolyhedronsByRoadCorners(roadObject, roadReferenceLine).handleReport { report += it }
-        geometries += _solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine).handleReport { report += it }
+        geometries += _solid3DBuilder.buildCuboids(roadObject, curveAffine).handleMessageList { messageList += it }
+        geometries += _solid3DBuilder.buildCylinders(roadObject, curveAffine).handleMessageList { messageList += it }
+        geometries += _solid3DBuilder.buildPolyhedronsByRoadCorners(roadObject, roadReferenceLine).handleMessageList { messageList += it }
+        geometries += _solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine).handleMessageList { messageList += it }
 
         // build up surface geometrical representations
-        geometries += _surface3DBuilder.buildRectangles(roadObject, curveAffine).handleReport { report += it }
-        geometries += _surface3DBuilder.buildCircles(roadObject, curveAffine).handleReport { report += it }
-        geometries += _surface3DBuilder.buildLinearRingsByRoadCorners(roadObject, roadReferenceLine).handleReport { report += it }
-        geometries += _surface3DBuilder.buildLinearRingsByLocalCorners(roadObject, curveAffine).handleReport { report += it }
+        geometries += _surface3DBuilder.buildRectangles(roadObject, curveAffine).handleMessageList { messageList += it }
+        geometries += _surface3DBuilder.buildCircles(roadObject, curveAffine).handleMessageList { messageList += it }
+        geometries += _surface3DBuilder.buildLinearRingsByRoadCorners(roadObject, roadReferenceLine).handleMessageList { messageList += it }
+        geometries += _surface3DBuilder.buildLinearRingsByLocalCorners(roadObject, curveAffine).handleMessageList { messageList += it }
 
         roadObjectRepeat.tap {
             geometries += _solid3DBuilder.buildParametricSweeps(it, roadReferenceLine).toList()
@@ -184,7 +184,7 @@ class RoadspaceObjectBuilder(
 
         check(geometries.size == 1) { "Exactly one geometry must be derived." }
 
-        return ContextReport(geometries.first(), report)
+        return ContextMessageList(geometries.first(), messageList)
     }
 
     private fun buildAttributes(roadObject: OpendriveRoadObject) =

@@ -16,7 +16,6 @@
 
 package io.rtron.readerwriter.opendrive.reader.mapper.opendrive17
 
-import io.rtron.io.logging.LogManager
 import io.rtron.model.opendrive.OpendriveModel
 import org.asam.opendrive17.OpenDRIVE
 import org.mapstruct.Mapper
@@ -25,8 +24,6 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 abstract class Opendrive17Mapper {
-
-    var reportLogger = LogManager.getReportLogger("general")
 
     @Mapping(target = "header", ignore = true)
     @Mapping(target = "road", ignore = true)

@@ -19,9 +19,9 @@ package io.rtron.transformer.converter.roadspaces2citygml.module
 import arrow.core.Either
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Message
-import io.rtron.io.report.Report
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageList
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
@@ -44,14 +44,14 @@ class VegetationModuleBuilder(
 
     // Methods
 
-    fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): ContextReport<SolitaryVegetationObject> {
-        val report = Report()
+    fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): ContextMessageList<SolitaryVegetationObject> {
+        val messageList = MessageList()
 
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
         solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .mapLeft { report += Message.of(it.message, roadspaceObject.id, isFatal = false, wasHealed = true) }
+            .mapLeft { messageList += Message.of(it.message, roadspaceObject.id, isFatal = false, wasHealed = true) }
         geometryTransformer.rotation.tap {
             _attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
         }
@@ -61,7 +61,7 @@ class VegetationModuleBuilder(
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, solitaryVegetationObjectFeature)
         _attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
 
-        return ContextReport(solitaryVegetationObjectFeature, report)
+        return ContextMessageList(solitaryVegetationObjectFeature, messageList)
     }
 
     private fun addAttributes(

@@ -19,8 +19,8 @@ package io.rtron.readerwriter.opendrive.writer
 import arrow.core.Either
 import arrow.core.right
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.readerwriter.opendrive.OpendriveVersion
 import io.rtron.readerwriter.opendrive.OpendriveWriterException
+import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import io.rtron.readerwriter.opendrive.writer.mapper.opendrive17.Opendrive17Mapper
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller
@@ -29,6 +29,7 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.div
 
 class OpendriveMarshaller {
 
@@ -52,7 +53,7 @@ class OpendriveMarshaller {
         opendrive17Model.header.revMajor = supportedVersion.rev.first
         opendrive17Model.header.revMinor = supportedVersion.rev.second
 
-        val filePath = directoryPath.resolve(Path("opendrive17.xml"))
+        val filePath = directoryPath / Path("opendrive17.xml")
         val os: OutputStream = FileOutputStream(filePath.toFile())
         _jaxbMarshaller.marshal(opendrive17Model, os)
 

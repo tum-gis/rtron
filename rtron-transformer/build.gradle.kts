@@ -17,6 +17,10 @@ dependencies {
     // object creation libraries
     implementation(Dependencies.kotlinxSerializationJson)
 
+    // logging libraries
+    implementation(Dependencies.kotlinLogging)
+    implementation(Dependencies.slf4jSimple)
+
     // geo libraries
     implementation(Dependencies.citygml4jXml)
 }

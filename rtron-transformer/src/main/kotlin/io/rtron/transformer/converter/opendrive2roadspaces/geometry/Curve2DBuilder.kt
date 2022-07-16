@@ -73,7 +73,7 @@ class Curve2DBuilder(private val configuration: Opendrive2RoadspacesConfiguratio
             .map { buildPlanViewGeometry(it.first, it.second, BoundType.OPEN, offset) } +
             buildPlanViewGeometry(planViewGeometryList.last(), lengths.last(), BoundType.CLOSED, offset)
 
-        return CompositeCurve2D.of(curveMembers, absoluteDomains, absoluteStarts, configuration.distanceTolerance, configuration.angleTolerance)
+        return CompositeCurve2D.of(curveMembers, absoluteDomains, absoluteStarts, configuration.planViewGeometryDistanceTolerance, configuration.planViewGeometryAngleTolerance)
     }
 
     /**

@@ -17,15 +17,14 @@
 package io.rtron.transformer.converter.opendrive2roadspaces
 
 import arrow.core.Either
-import arrow.core.continuations.either
-import arrow.core.left
+import arrow.core.None
+import arrow.core.Option
 import arrow.core.separateEither
-import io.rtron.io.logging.LogManager
+import arrow.core.some
 import io.rtron.io.logging.ProgressBar
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Message
-import io.rtron.io.report.Report
-import io.rtron.io.report.mergeReports
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.mergeMessageLists
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.model.opendrive.junction.EJunctionType
@@ -35,12 +34,14 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.converter.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.junction.JunctionBuilder
+import io.rtron.transformer.converter.opendrive2roadspaces.report.Opendrive2RoadspacesReport
 import io.rtron.transformer.converter.opendrive2roadspaces.roadspaces.RoadspaceBuilder
 import io.rtron.transformer.report.of
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 
 /**
  * Transformer from OpenDRIVE data model to the RoadSpaces data model.
@@ -52,7 +53,7 @@ class Opendrive2RoadspacesTransformer(
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
+    private val logger = KotlinLogging.logger {}
 
     private val _headerBuilder = HeaderBuilder(configuration)
     private val _roadspaceBuilder = RoadspaceBuilder(configuration)
@@ -66,13 +67,13 @@ class Opendrive2RoadspacesTransformer(
      * @param opendriveModel OpenDRIVE model as input
      * @return transformed RoadSpaces model as output
      */
-    fun transform(opendriveModel: OpendriveModel): Either<Opendrive2RoadspacesTransformationException, RoadspacesModel> = either.eager {
-        _reportLogger.info("${Opendrive2RoadspacesTransformer::class.simpleName} with $configuration.")
+    fun transform(opendriveModel: OpendriveModel): Pair<Option<RoadspacesModel>, Opendrive2RoadspacesReport> {
+        logger.info("Configuration: $configuration.")
         opendriveModel.updateAdditionalIdentifiers()
-        val report = Report()
+        val report = Opendrive2RoadspacesReport()
 
         // general model information
-        val header = _headerBuilder.buildHeader(opendriveModel.header).handleReport { report += it }
+        val header = _headerBuilder.buildHeader(opendriveModel.header).handleMessageList { report.conversion += it }
         val modelIdentifier = ModelIdentifier(
             modelName = opendriveModel.header.name,
             modelDate = opendriveModel.header.date,
@@ -88,12 +89,11 @@ class Opendrive2RoadspacesTransformer(
 
         if (roadspaceExceptions.isNotEmpty()) {
             roadspaceExceptions.forEach {
-                report += Message.of(it.message, it.location, isFatal = true, wasHealed = false)
+                report.conversion += Message.of(it.message, it.location, isFatal = true, wasHealed = false)
             }
-            report.write(configuration.outputReportFilePath)
-            roadspaceExceptions.first().left().bind<RoadspacesModel>()
+            return None to report
         }
-        val roadspaces = roadspacesWithContextReports.mergeReports().handleReport { report += it }
+        val roadspaces = roadspacesWithContextReports.mergeMessageLists().handleMessageList { report.conversion += it }
 
         val junctions = opendriveModel.junction
             .filter { it.typeValidated == EJunctionType.DEFAULT }
@@ -101,16 +101,15 @@ class Opendrive2RoadspacesTransformer(
 
         val roadspacesModel = RoadspacesModel(modelIdentifier, header, roadspaces, junctions)
 
-        report.write(configuration.outputReportFilePath)
-        _reportLogger.info("${Opendrive2RoadspacesTransformer::class.simpleName}: Completed transformation. ✔")
-        roadspacesModel
+        logger.info("Completed transformation with ${report.getTextSummary()}.")
+        return roadspacesModel.some() to report
     }
 
     private fun transformRoadspacesSequentially(
         modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<Either<Opendrive2RoadspacesTransformationException, ContextReport<Roadspace>>> =
+    ): List<Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>>> =
         opendriveModel.road.map {
             _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
         }
@@ -120,7 +119,7 @@ class Opendrive2RoadspacesTransformer(
         modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<Either<Opendrive2RoadspacesTransformationException, ContextReport<Roadspace>>> {
+    ): List<Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>>> {
         val roadspacesDeferred = opendriveModel.road.map {
             GlobalScope.async {
                 _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }

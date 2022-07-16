@@ -20,10 +20,10 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.getOrHandle
-import io.rtron.io.report.ContextReport
-import io.rtron.io.report.Message
-import io.rtron.io.report.Report
-import io.rtron.io.report.mergeReports
+import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.mergeMessageLists
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.common.FillerSurface
 import io.rtron.model.roadspaces.identifier.JunctionIdentifier
@@ -63,8 +63,8 @@ class RoadsTransformer(
 
     // Methods
 
-    fun transformRoad(roadspaceName: String, roadspacesModel: RoadspacesModel): ContextReport<Option<CitygmlRoad>> {
-        val report = Report()
+    fun transformRoad(roadspaceName: String, roadspacesModel: RoadspacesModel): ContextMessageList<Option<CitygmlRoad>> {
+        val messageList = MessageList()
 
         val roadFeature = _transportationModuleBuilder.createRoad()
         if (roadspaceName.isNotEmpty())
@@ -72,19 +72,19 @@ class RoadsTransformer(
 
         val junctions = roadspacesModel.getAllJunctionIdentifiersContainingRoadspaces(roadspaceName)
         junctions.forEach {
-            report += addIntersectionOrLink(it, roadspaceName, roadspacesModel, roadFeature)
+            messageList += addIntersectionOrLink(it, roadspaceName, roadspacesModel, roadFeature)
         }
 
         val roads = roadspacesModel.getAllRoadspaceIdentifiersNotLocatedInJunctions(roadspaceName)
         roads.forEach {
-            report += addSection(it, roadspacesModel, roadFeature)
+            messageList += addSection(it, roadspacesModel, roadFeature)
         }
 
-        return ContextReport(Some(roadFeature), report)
+        return ContextMessageList(Some(roadFeature), messageList)
     }
 
-    private fun addIntersectionOrLink(junctionId: JunctionIdentifier, roadspaceName: String, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): Report {
-        val report = Report()
+    private fun addIntersectionOrLink(junctionId: JunctionIdentifier, roadspaceName: String, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): MessageList {
+        val messageList = MessageList()
 
         val roadspacesInJunction = roadspacesModel.getRoadspacesWithinJunction(junctionId)
             .getOrHandle { throw it }
@@ -92,122 +92,122 @@ class RoadsTransformer(
 
         if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && configuration.mappingBackwardsCompatibility) { // TODO option
             roadspacesInJunction.forEach {
-                report += addRoadspace(it, roadspacesModel, dstRoad)
+                messageList += addRoadspace(it, roadspacesModel, dstRoad)
             }
         } else if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && !configuration.mappingBackwardsCompatibility) { // TODO option
             val intersectionFeature = _transportationModuleBuilder.createIntersection()
             roadspacesInJunction.forEach {
-                report += addRoadspace(it, roadspacesModel, intersectionFeature)
+                messageList += addRoadspace(it, roadspacesModel, intersectionFeature)
             }
             dstRoad.intersections.add(IntersectionProperty(intersectionFeature))
         } else {
             dstRoad.intersections.add(IntersectionProperty(identifierAdder.getGmlIdentifier(junctionId)))
         }
 
-        return report
+        return messageList
     }
 
-    private fun addSection(roadspaceId: RoadspaceIdentifier, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): Report {
-        val report = Report()
+    private fun addSection(roadspaceId: RoadspaceIdentifier, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): MessageList {
+        val messageList = MessageList()
 
         val roadspace = roadspacesModel.getRoadspace(roadspaceId).getOrHandle { throw it }
 
         if (configuration.mappingBackwardsCompatibility) {
-            report += addRoadspace(roadspace, roadspacesModel, dstRoad)
+            messageList += addRoadspace(roadspace, roadspacesModel, dstRoad)
         } else {
             val sectionFeature = _transportationModuleBuilder.createSection()
-            report += addRoadspace(roadspace, roadspacesModel, sectionFeature)
+            messageList += addRoadspace(roadspace, roadspacesModel, sectionFeature)
             dstRoad.sections.add(SectionProperty(sectionFeature))
         }
 
-        return report
+        return messageList
     }
 
-    fun transformAdditionalRoadLines(roadspace: Roadspace): ContextReport<List<AbstractCityObject>> {
-        val report = Report()
+    fun transformAdditionalRoadLines(roadspace: Roadspace): ContextMessageList<List<AbstractCityObject>> {
+        val messageList = MessageList()
 
         // transforms the road reference line
         val roadReferenceLine = _genericsModuleBuilder
             .createGenericOccupiedSpaceFeature(roadspace.id, "RoadReferenceLine", roadspace.referenceLine, roadspace.attributes)
-            .handleReport { report += it }
+            .handleMessageList { messageList += it }
 
         // transforms the lines of the center lane (id=0)
         val roadCenterLaneLines = roadspace.road.getAllCenterLanes()
             .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "RoadCenterLaneLine", it.second, it.third) }
-            .mergeReports()
-            .handleReport { report += it }
+            .mergeMessageLists()
+            .handleMessageList { messageList += it }
 
         // transforms lane boundaries and center lines of the lanes
         val leftLaneBoundaries = roadspace.road.getAllLeftLaneBoundaries()
             .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "LeftLaneBoundary", it.second, AttributeList.EMPTY) }
-            .mergeReports()
-            .handleReport { report += it }
+            .mergeMessageLists()
+            .handleMessageList { messageList += it }
         val rightLaneBoundaries = roadspace.road.getAllRightLaneBoundaries()
             .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "RightLaneBoundary", it.second, AttributeList.EMPTY) }
-            .mergeReports()
-            .handleReport { report += it }
+            .mergeMessageLists()
+            .handleMessageList { messageList += it }
         val laneCenterLines = roadspace.road.getAllCurvesOnLanes(0.5)
             .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "LaneCenterLine", it.second, AttributeList.EMPTY) }
-            .mergeReports()
-            .handleReport { report += it }
+            .mergeMessageLists()
+            .handleMessageList { messageList += it }
 
         val additionalRoadLines = listOf(roadReferenceLine) + roadCenterLaneLines + leftLaneBoundaries + rightLaneBoundaries + laneCenterLines
-        return ContextReport(additionalRoadLines, report)
+        return ContextMessageList(additionalRoadLines, messageList)
     }
 
-    private fun addRoadspace(roadspace: Roadspace, roadspacesModel: RoadspacesModel, dstTransportationSpace: AbstractTransportationSpace): Report {
-        val report = Report()
+    private fun addRoadspace(roadspace: Roadspace, roadspacesModel: RoadspacesModel, dstTransportationSpace: AbstractTransportationSpace): MessageList {
+        val messageList = MessageList()
 
         roadspace.road.getAllLeftRightLaneIdentifiers().forEach { laneId ->
             val fillerSurface =
                 if (configuration.generateLongitudinalFillerSurfaces) roadspacesModel.getFillerSurfaces(laneId).getOrHandle { throw it }
                 else emptyList()
-            report += addSingleLane(laneId, roadspace.road, fillerSurface, dstTransportationSpace)
+            messageList += addSingleLane(laneId, roadspace.road, fillerSurface, dstTransportationSpace)
         }
         roadspace.roadspaceObjects.forEach { addSingleRoadspaceObject(it, dstTransportationSpace) }
         roadspace.road.getAllLaneIdentifiers().forEach {
-            report += addRoadMarkings(it, roadspace.road, dstTransportationSpace)
+            messageList += addRoadMarkings(it, roadspace.road, dstTransportationSpace)
         }
 
-        return report
+        return messageList
     }
 
-    private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace): Report {
-        val report = Report()
+    private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace): MessageList {
+        val messageList = MessageList()
         val lane = road.getLane(id)
-            .getOrHandle { report += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return report }
+            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }
         val surface = road.getLaneSurface(id, configuration.discretizationStepSize)
-            .getOrHandle { report += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return report }
+            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }
         val centerLine = road.getCurveOnLane(id, 0.5)
-            .getOrHandle { report += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return report }
+            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }
         val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, configuration.discretizationStepSize)
-            .getOrHandle { report += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return report }.toList()
+            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }.toList()
         val fillerSurfaces = innerLateralFillerSurface + longitudinalFillerSurfaces
 
         when (LaneRouter.route(lane)) {
             LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
-                report += _transportationModuleBuilder.addTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
+                messageList += _transportationModuleBuilder.addTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
             }
             LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
-                report += _transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
+                messageList += _transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
             }
         }
 
-        return report
+        return messageList
     }
 
-    private fun addSingleRoadspaceObject(roadspaceObject: RoadspaceObject, dstTransportationSpace: AbstractTransportationSpace): Report {
-        val report = Report()
+    private fun addSingleRoadspaceObject(roadspaceObject: RoadspaceObject, dstTransportationSpace: AbstractTransportationSpace): MessageList {
+        val messageList = MessageList()
 
         when (RoadspaceObjectRouter.route(roadspaceObject)) {
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
-                report += _transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
+                messageList += _transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
             }
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
-                report += _transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
+                messageList += _transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
             }
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> {
-                report += _transportationModuleBuilder.addMarkingFeature(roadspaceObject, dstTransportationSpace)
+                messageList += _transportationModuleBuilder.addMarkingFeature(roadspaceObject, dstTransportationSpace)
             }
             RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> {}
             RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> {}
@@ -215,17 +215,17 @@ class RoadsTransformer(
             RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT -> {}
         }
 
-        return report
+        return messageList
     }
 
-    private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace): Report {
-        val report = Report()
+    private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace): MessageList {
+        val messageList = MessageList()
         road.getRoadMarkings(id, configuration.discretizationStepSize)
-            .handleLeftAndFilter { report += Message.of(it.value.message!!, id, isFatal = false, wasHealed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
+            .handleLeftAndFilter { messageList += Message.of(it.value.message!!, id, isFatal = false, wasHealed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
             .forEach {
-                report += _transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace)
+                messageList += _transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace)
             }
 
-        return report
+        return messageList
     }
 }

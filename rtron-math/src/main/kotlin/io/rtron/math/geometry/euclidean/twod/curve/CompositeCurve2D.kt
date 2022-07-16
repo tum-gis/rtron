@@ -26,7 +26,6 @@ import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
-import io.rtron.math.std.normalizeAngle
 
 /**
  * Represents the sequential concatenation of the [curveMembers].
@@ -84,15 +83,15 @@ data class CompositeCurve2D(
                 val frontCurveMemberEndPose = it.first.calculatePoseGlobalCS(CurveRelativeVector1D(it.first.length)).bind()
                 val backCurveMemberStartPose = it.second.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).bind()
 
-                if (frontCurveMemberEndPose.point.fuzzyUnequals(backCurveMemberStartPose.point, distanceTolerance)) {
-                    val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
+                val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
+                if (distance > distanceTolerance) {
                     val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance of $distance."
                     GeometryException.OverlapOrGapInCurve(suffix).left().bind<GeometryException.OverlapOrGapInCurve>()
                 }
 
-                if (frontCurveMemberEndPose.rotation.fuzzyUnequals(backCurveMemberStartPose.rotation, angleTolerance)) {
-                    val angleDifference = frontCurveMemberEndPose.rotation - backCurveMemberStartPose.rotation
-                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference: ${normalizeAngle(angleDifference.toAngleRadians(), 0.0)} radians."
+                val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
+                if (angleDifference > angleTolerance) {
+                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference: $angleDifference radians."
                     GeometryException.KinkInCurve(suffix).left().bind<GeometryException.KinkInCurve>()
                 }
             }

@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.citygml.configuration
+package io.rtron.main.project
 
-import io.rtron.readerwriter.citygml.CitygmlVersion
+import io.rtron.io.files.FileIdentifier
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
 
-data class CitygmlWriterConfiguration(
-    val versions: Set<CitygmlVersion>
+data class Project(
+    val inputFilePath: Path,
+    val outputDirectoryPath: Path,
 ) {
+
     // Properties and Initializers
     init {
-        require(versions.isNotEmpty()) { "At least one CitGML version must be set." }
+        outputDirectoryPath.createDirectories()
     }
+
+    val inputFileIdentifier = FileIdentifier.of(inputFilePath)
 }

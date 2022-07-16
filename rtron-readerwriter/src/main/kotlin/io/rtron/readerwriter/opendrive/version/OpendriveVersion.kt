@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive
+package io.rtron.readerwriter.opendrive.version
 
 import arrow.core.Either
 import io.rtron.std.getValueEither
@@ -74,9 +74,9 @@ enum class OpendriveVersion(val rev: Pair<Int, Int>) {
     companion object {
         private val map = OpendriveVersion.values().associateBy(OpendriveVersion::rev)
 
-        fun ofRevision(revMajor: Int, revMinor: Int): Either<UnknownVersion, OpendriveVersion> =
-            map.getValueEither(Pair(revMajor, revMinor)).mapLeft { UnknownVersion(it.message) }
+        fun ofRevision(revMajor: Int, revMinor: Int): Either<UnknownOpendriveVersion, OpendriveVersion> =
+            map.getValueEither(Pair(revMajor, revMinor)).mapLeft { UnknownOpendriveVersion(it.message) }
 
-        data class UnknownVersion(val reason: String) : OpendriveReaderException("Version of OpenDRIVE dataset not deducible: $reason")
+        data class UnknownOpendriveVersion(val message: String) // : OpendriveReaderException("Version of OpenDRIVE dataset not deducible: $reason")
     }
 }

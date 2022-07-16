@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.configuration
+package io.rtron.transformer.converter.opendrive2roadspaces.report
 
-data class OpendriveWriterConfiguration(
-    val projectId: String,
+import io.rtron.io.messages.MessageList
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Opendrive2RoadspacesReport(
+
+    val conversion: MessageList = MessageList()
 ) {
-    // Properties and Initializers
+
+    // Methods
+    fun getTextSummary(): String = conversion.getTextSummary()
 }

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.reader.validation
+package io.rtron.readerwriter.opendrive.report
 
-import io.rtron.io.report.Message
-import io.rtron.io.report.MessageSeverity
-import io.rtron.readerwriter.opendrive.OpendriveVersion
+import io.rtron.io.messages.Message
+import io.rtron.io.messages.MessageSeverity
+import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import jakarta.xml.bind.ValidationEvent
 
 fun ValidationEvent.toMessage(opendriveSchemaVersion: OpendriveVersion): Message {
