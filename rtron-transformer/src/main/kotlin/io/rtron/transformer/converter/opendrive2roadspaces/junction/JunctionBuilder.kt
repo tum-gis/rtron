@@ -29,12 +29,12 @@ import io.rtron.model.roadspaces.junction.Junction
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.std.handleEmpty
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.roadspaces.toContactPoint
 import io.rtron.model.opendrive.junction.Junction as OpendriveJunction
 
 class JunctionBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
+    private val parameters: Opendrive2RoadspacesParameters
 ) {
     // Methods
     fun buildDefaultJunction(id: ModelIdentifier, junction: OpendriveJunction, roadspaces: List<Roadspace>): Junction {

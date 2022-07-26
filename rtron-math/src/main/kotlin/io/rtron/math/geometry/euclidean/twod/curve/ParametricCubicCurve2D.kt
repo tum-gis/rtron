@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
 import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -59,22 +58,19 @@ class ParametricCubicCurve2D(
     override val domain: Range<Double> = Range.closedX(0.0, length, endBoundType)
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Vector2D> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
 
         val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
         val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
-        return Either.Right(Vector2D(x, y))
+        return Vector2D(x, y)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Rotation2D> {
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
 
         val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition).getOrHandle { throw it }
         val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition).getOrHandle { throw it }
 
-        val rotation = Rotation2D.of(Vector2D(x, y))
-        return Either.Right(rotation)
+        return Rotation2D.of(Vector2D(x, y))
     }
 
     override fun equals(other: Any?): Boolean {

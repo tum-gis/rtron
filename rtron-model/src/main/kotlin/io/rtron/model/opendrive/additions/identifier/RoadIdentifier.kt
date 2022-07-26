@@ -26,7 +26,7 @@ data class RoadIdentifier(override val roadId: String) :
     AbstractOpendriveIdentifier(), RoadIdentifierInterface {
 
     // Conversions
-    override fun toStringMap() = mapOf("roadId" to roadId)
+    override fun toString() = "Road: roadId=$roadId"
 }
 
 interface AdditionalRoadIdentifier {

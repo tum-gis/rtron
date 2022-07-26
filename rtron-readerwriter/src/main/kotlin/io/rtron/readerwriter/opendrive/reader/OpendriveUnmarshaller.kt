@@ -25,6 +25,7 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
 import io.rtron.readerwriter.opendrive.reader.mapper.opendrive14.Opendrive14Mapper
 import io.rtron.readerwriter.opendrive.reader.validation.OpendriveValidationEventHandler
+import io.rtron.readerwriter.opendrive.report.SchemaValidationReportMessage
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Unmarshaller
@@ -54,7 +55,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         _jaxbUnmarshaller.eventHandler = _validationEventHandler
     }
 
-    fun validate(filePath: Path): Either<OpendriveReaderException.FatalSchemaValidationError, MessageList> = either.eager {
+    fun validate(filePath: Path): Either<OpendriveReaderException.FatalSchemaValidationError, MessageList<SchemaValidationReportMessage>> = either.eager {
         try {
             _jaxbUnmarshaller.unmarshal(filePath.toFile())
         } catch (e: Exception) {
@@ -62,7 +63,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
                 .bind<OpendriveReaderException.FatalSchemaValidationError>()
         }
 
-        val messageList = _validationEventHandler.toMessageList(opendriveVersion)
+        val messageList = _validationEventHandler.toMessageList()
         messageList
     }
 

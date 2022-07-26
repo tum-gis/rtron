@@ -17,15 +17,16 @@
 package io.rtron.model.opendrive.road.elevation
 
 import arrow.core.NonEmptyList
-import arrow.core.Validated
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
+import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.toValidated
 
+@optics
 data class RoadElevationProfile(
     var elevation: List<RoadElevationProfileElevation> = emptyList(),
 ) : OpendriveElement() {
 
-    val elevationValidated: Validated<OpendriveException.EmptyList, NonEmptyList<RoadElevationProfileElevation>>
-        get() = NonEmptyList.fromList(elevation).toValidated { OpendriveException.EmptyList("elevation") }
+    val elevationAsNonEmptyList: NonEmptyList<RoadElevationProfileElevation>
+        get() = NonEmptyList.fromListUnsafe(elevation)
+
+    companion object
 }

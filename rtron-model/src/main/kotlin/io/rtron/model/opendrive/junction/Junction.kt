@@ -19,17 +19,12 @@ package io.rtron.model.opendrive.junction
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.Validated
 import arrow.core.getOrElse
-import arrow.core.invalid
-import arrow.core.valid
 import arrow.optics.optics
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionIdentifier
 import io.rtron.model.opendrive.additions.identifier.JunctionIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
 import io.rtron.model.opendrive.objects.EOrientation
-import io.rtron.std.toValidated
 
 @optics
 data class Junction(
@@ -50,11 +45,8 @@ data class Junction(
 ) : OpendriveElement(), AdditionalJunctionIdentifier {
 
     // Properties and Initializers
-    val connectionValidated: Validated<OpendriveException.EmptyList, NonEmptyList<JunctionConnection>>
-        get() = NonEmptyList.fromList(connection).toValidated { OpendriveException.EmptyList("connection") }
-
-    val idValidated: Validated<OpendriveException.MissingValue, String>
-        get() = if (id.isBlank()) OpendriveException.MissingValue("id").invalid() else id.valid()
+    val connectionAsNonEmptyList: NonEmptyList<JunctionConnection>
+        get() = NonEmptyList.fromListUnsafe(connection)
 
     val typeValidated: EJunctionType
         get() = type.getOrElse { EJunctionType.DEFAULT }

@@ -20,7 +20,6 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.flatten
 import arrow.optics.optics
 import io.rtron.model.opendrive.additions.identifier.AdditionalRoadIdentifier
 import io.rtron.model.opendrive.additions.identifier.RoadIdentifier
@@ -63,7 +62,7 @@ data class Road(
     fun getJunctionOption(): Option<String> =
         if (junction.isNotEmpty() && junction != "-1") Some(junction) else None
 
-    fun getElevationEntries(): Option<NonEmptyList<RoadElevationProfileElevation>> = elevationProfile.map { it.elevationValidated.toOption() }.flatten()
+    fun getElevationEntries(): Option<NonEmptyList<RoadElevationProfileElevation>> = elevationProfile.map { it.elevationAsNonEmptyList }
     fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = lateralProfile.flatMap { it.getSuperelevationEntries() }
     fun getShapeEntries(): Option<NonEmptyList<RoadLateralProfileShape>> = lateralProfile.flatMap { it.getShapeEntries() }
 

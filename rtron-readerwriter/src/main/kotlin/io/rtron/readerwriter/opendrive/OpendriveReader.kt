@@ -21,9 +21,6 @@ import arrow.core.continuations.either
 import arrow.core.getOrHandle
 import arrow.core.left
 import io.rtron.io.files.getFileSizeToDisplay
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
-import io.rtron.io.messages.MessageSeverity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
@@ -58,15 +55,13 @@ class OpendriveReader private constructor(
     fun runSchemaValidation(): SchemaValidationReport {
 
         val messageList = versionSpecificUnmarshaller.validate(filePath).getOrHandle {
-            val abortMessage = Message(it.message, MessageSeverity.FATAL_ERROR)
-            val abortMessageList = MessageList.of(abortMessage)
-
-            return SchemaValidationReport(opendriveVersion, completedSuccessfully = false, abortMessageList)
+            logger.warn("Schema validation was aborted due the following error: ${it.message}")
+            return SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
         }
-        if (!messageList.isEmpty()) logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.getTextSummary()}.")
+        if (!messageList.isEmpty()) logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.size} incidents.")
         else logger.info("Schema validation report for OpenDRIVE $opendriveVersion: Everything ok.")
 
-        return SchemaValidationReport(opendriveVersion, completedSuccessfully = true, messageList)
+        return SchemaValidationReport(opendriveVersion, messageList)
     }
 
     fun readModel(): Either<OpendriveReaderException, OpendriveModel> = either.eager {
@@ -79,7 +74,7 @@ class OpendriveReader private constructor(
         }, { it })
 
         opendriveModel.updateAdditionalIdentifiers()
-        logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔")
+        logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
         opendriveModel
     }
 

@@ -21,15 +21,16 @@ import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.left
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.processing.removeConsecutiveSideDuplicates
 import io.rtron.math.processing.removeRedundantVerticesOnLineSegmentsEnclosing
 import io.rtron.model.opendrive.additions.identifier.RoadObjectOutlineIdentifier
 import io.rtron.std.filterWithNextEnclosing
-import io.rtron.transformer.report.of
+import io.rtron.transformer.messages.opendrive.of
 
 /**
  * Factory for building [LinearRing3D] for which multiple preparation steps are required to overcome
@@ -41,7 +42,7 @@ object LinearRing3DFactory {
      * Builds a [LinearRing3D] from a list of vertices by filtering and preparing the vertices.
      */
     fun buildFromVertices(outlineId: RoadObjectOutlineIdentifier, vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> = either.eager {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // remove end element, if start and end element are equal
         val verticesWithoutClosing = if (vertices.first() == vertices.last())
@@ -50,18 +51,18 @@ object LinearRing3DFactory {
         // remove consecutively following point duplicates
         val verticesWithoutPointDuplicates = verticesWithoutClosing.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
         if (verticesWithoutPointDuplicates.size < verticesWithoutClosing.size)
-            messageList += Message.of("Ignoring at least one consecutively following point duplicate.", outlineId, isFatal = false, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following point duplicate.", outlineId, Severity.WARNING, wasHealed = true)
 
         // remove consecutively following side duplicates
         val verticesWithoutSideDuplicates = verticesWithoutPointDuplicates.removeConsecutiveSideDuplicates()
         if (verticesWithoutSideDuplicates.size != verticesWithoutPointDuplicates.size)
-            messageList += Message.of("Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…).", outlineId, isFatal = false, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…).", outlineId, Severity.WARNING, wasHealed = true)
 
         // remove vertices that are located on a line anyway
         val preparedVertices = verticesWithoutSideDuplicates
             .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
         if (preparedVertices.size < verticesWithoutSideDuplicates.size)
-            messageList += Message.of("Ignoring at least one vertex due to linear redundancy.", outlineId, isFatal = false, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring at least one vertex due to linear redundancy.", outlineId, Severity.WARNING, wasHealed = true)
 
         // if there are not enough points to construct a linear ring
         if (preparedVertices.size <= 2)

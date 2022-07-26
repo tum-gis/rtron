@@ -20,15 +20,16 @@ import arrow.core.Either
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
-import io.rtron.transformer.report.of
+import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 
@@ -36,22 +37,22 @@ import org.xmlobjects.gml.model.measures.Length
  * Builder for city objects of the CityGML Vegetation module.
  */
 class VegetationModuleBuilder(
-    private val configuration: Roadspaces2CitygmlConfiguration,
+    private val parameters: Roadspaces2CitygmlParameters,
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _attributesAdder = AttributesAdder(configuration)
+    private val _attributesAdder = AttributesAdder(parameters)
 
     // Methods
 
     fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): ContextMessageList<SolitaryVegetationObject> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
         solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .mapLeft { messageList += Message.of(it.message, roadspaceObject.id, isFatal = false, wasHealed = true) }
+            .mapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasHealed = true) }
         geometryTransformer.rotation.tap {
             _attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
         }

@@ -21,10 +21,10 @@ import arrow.core.Option
 import arrow.core.flattenOption
 import arrow.core.some
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.mergeMessageLists
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.module.BuildingModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.CityFurnitureModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.GenericsModuleBuilder
@@ -38,15 +38,15 @@ import org.citygml4j.core.model.core.CityModel
  * Transforms [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
 class RoadspaceObjectTransformer(
-    private val configuration: Roadspaces2CitygmlConfiguration,
+    private val parameters: Roadspaces2CitygmlParameters,
     private val identifierAdder: IdentifierAdder
 ) {
 
     // Properties and Initializers
-    private val _genericsModuleBuilder = GenericsModuleBuilder(configuration, identifierAdder)
-    private val _buildingModuleBuilder = BuildingModuleBuilder(configuration, identifierAdder)
-    private val _cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(configuration, identifierAdder)
-    private val _vegetationModuleBuilder = VegetationModuleBuilder(configuration, identifierAdder)
+    private val _genericsModuleBuilder = GenericsModuleBuilder(parameters, identifierAdder)
+    private val _buildingModuleBuilder = BuildingModuleBuilder(parameters, identifierAdder)
+    private val _cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(parameters, identifierAdder)
+    private val _vegetationModuleBuilder = VegetationModuleBuilder(parameters, identifierAdder)
 
     // Methods
 
@@ -68,7 +68,7 @@ class RoadspaceObjectTransformer(
      * @return city object (CityGML model)
      */
     private fun transformSingleRoadspaceObject(roadspaceObject: RoadspaceObject): ContextMessageList<Option<AbstractCityObject>> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         val cityObjects: Option<AbstractCityObject> = when (RoadspaceObjectRouter.route(roadspaceObject)) {
             RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> _buildingModuleBuilder.createBuildingFeature(roadspaceObject).handleMessageList { messageList += it }.some()

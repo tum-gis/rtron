@@ -26,7 +26,9 @@ data class RoadObjectOutlineIdentifier(override val outlineId: Int, val roadObje
     AbstractOpendriveIdentifier(), RoadObjectOutlineIdentifierInterface, RoadIdentifierInterface by roadObjectIdentifier {
 
     // Conversions
-    override fun toStringMap() = mapOf("roadObjecOutlinetId" to outlineId.toString()) + roadObjectIdentifier.toStringMap()
+    override fun toString() = "Road object outline: outlineId=$outlineId, " +
+        "roadObjectId=${roadObjectIdentifier.roadObjectId}, " +
+        "roadId=${roadObjectIdentifier.roadId}"
 }
 
 interface AdditionalRoadObjectOutlineIdentifier {

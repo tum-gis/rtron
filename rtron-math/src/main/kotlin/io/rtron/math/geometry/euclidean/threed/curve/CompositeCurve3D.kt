@@ -16,12 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
-import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.getOrHandle
 import io.rtron.math.container.ConcatenationContainer
-import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
@@ -44,12 +41,12 @@ data class CompositeCurve3D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> = either.eager {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
         val localMember = container
             .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
             .getOrHandle { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        localMember.member.calculatePointGlobalCS(localPoint).bind()
+        return localMember.member.calculatePointGlobalCSUnbounded(localPoint)
     }
 }

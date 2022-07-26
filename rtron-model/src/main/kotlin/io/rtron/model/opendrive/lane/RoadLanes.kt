@@ -18,15 +18,10 @@ package io.rtron.model.opendrive.lane
 
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.Validated
-import arrow.core.computations.ResultEffect.bind
 import arrow.optics.optics
 import io.rtron.math.range.Range
 import io.rtron.math.range.length
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
-import io.rtron.model.opendrive.additions.exceptions.toIllegalStateException
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.toValidated
 
 @optics
 data class RoadLanes(
@@ -35,8 +30,8 @@ data class RoadLanes(
 ) : OpendriveElement() {
 
     // Validation Properties
-    val laneSectionValidated: Validated<OpendriveException.EmptyList, NonEmptyList<RoadLanesLaneSection>>
-        get() = NonEmptyList.fromList(laneSection).toValidated { OpendriveException.EmptyList("laneSection") }
+    val laneSectionAsNonEmptyList: NonEmptyList<RoadLanesLaneSection>
+        get() = NonEmptyList.fromListUnsafe(laneSection)
 
     // Methods
     fun getLaneOffsetEntries(): Option<NonEmptyList<RoadLanesLaneOffset>> = NonEmptyList.fromList(laneOffset)
@@ -48,10 +43,9 @@ data class RoadLanes(
             "The curve relative starts of all lane section must be below the " +
                 "provided lastLaneSectionEnd ($lastLaneSectionEnd)."
         }
-        val adjustedLaneSections = laneSectionValidated.toEither().mapLeft { it.toIllegalStateException() }.bind()
 
-        val laneSectionRanges = adjustedLaneSections.zipWithNext().map { Range.closed(it.first.s, it.second.s) }
-        val lastLaneSectionRange = Range.closed(adjustedLaneSections.last().s, lastLaneSectionEnd)
+        val laneSectionRanges = laneSectionAsNonEmptyList.zipWithNext().map { Range.closed(it.first.s, it.second.s) }
+        val lastLaneSectionRange = Range.closed(laneSectionAsNonEmptyList.last().s, lastLaneSectionEnd)
 
         return NonEmptyList.fromListUnsafe(laneSectionRanges + lastLaneSectionRange)
     }

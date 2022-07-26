@@ -17,13 +17,22 @@
 package io.rtron.readerwriter.opendrive.report
 
 import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.Severity
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import kotlinx.serialization.Serializable
 
 @Serializable
 class SchemaValidationReport(
     private val opendriveVersion: OpendriveVersion,
-    private val completedSuccessfully: Boolean,
 
-    val messages: MessageList
-)
+    val validationMessages: MessageList<SchemaValidationReportMessage> = MessageList(),
+
+    private val completedSuccessfully: Boolean = true,
+    private val validationAbortMessage: String = "",
+) {
+
+    fun validationProcessAborted() = !completedSuccessfully
+
+    fun containsFatalErrorMessages(): Boolean =
+        validationMessages.getMessages().any { it.severity == Severity.FATAL_ERROR }
+}

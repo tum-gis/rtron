@@ -16,25 +16,9 @@
 
 package io.rtron.model.opendrive.junction
 
-import arrow.core.Validated
-import arrow.core.invalid
-import arrow.core.valid
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionConnectionLaneLink(
     var from: Int = Int.MIN_VALUE,
     var to: Int = Int.MIN_VALUE
-) : OpendriveElement() {
-
-    // Properties and Initializers
-    val fromValidated: Validated<OpendriveException.MissingValue, Int>
-        get() = if (from == Int.MIN_VALUE) OpendriveException.MissingValue("").invalid() else from.valid()
-    val toValidated: Validated<OpendriveException.MissingValue, Int>
-        get() = if (to == Int.MIN_VALUE) OpendriveException.MissingValue("").invalid() else to.valid()
-
-    // Methods
-    fun getFatalViolations(): List<OpendriveException> =
-        fromValidated.fold({ listOf(it) }, { emptyList() }) +
-            toValidated.fold({ listOf(it) }, { emptyList() })
-}
+) : OpendriveElement()

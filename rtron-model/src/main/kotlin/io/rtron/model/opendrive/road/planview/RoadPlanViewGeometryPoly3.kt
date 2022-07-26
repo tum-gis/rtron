@@ -27,7 +27,4 @@ class RoadPlanViewGeometryPoly3(
 
     // Properties and Initializers
     val coefficients get() = doubleArrayOf(a, b, c, d)
-
-    // Methods
-    fun isNaN() = a.isNaN() || b.isNaN() || c.isNaN() || d.isNaN()
 }

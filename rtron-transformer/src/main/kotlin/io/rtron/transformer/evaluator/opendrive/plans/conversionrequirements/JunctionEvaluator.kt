@@ -16,24 +16,25 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements
 
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyJunction
 import io.rtron.model.opendrive.junction.EJunctionType
-import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
-import io.rtron.transformer.report.of
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
+import io.rtron.transformer.messages.opendrive.of
 
-class JunctionEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
+class JunctionEvaluator(val parameters: OpendriveEvaluatorParameters) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
-        val messageList = MessageList()
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         everyJunction.modify(opendriveModel) { currentJunction ->
 
             if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.incomingRoad.isEmpty() || it.connectingRoad.isEmpty() })
-                messageList += Message.of("Junction and junction type is not supported, since only junctions are supported that have connections with an incomingRoad and a connectionRoad.", currentJunction.additionalId, isFatal = true, wasHealed = false)
+                messageList += DefaultMessage.of("", "Junction and junction type is not supported, since only junctions are supported that have connections with an incomingRoad and a connectionRoad.", currentJunction.additionalId, Severity.FATAL_ERROR, wasHealed = false)
 
             currentJunction
         }

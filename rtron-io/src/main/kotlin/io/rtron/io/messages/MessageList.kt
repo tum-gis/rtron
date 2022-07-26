@@ -20,49 +20,36 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-value class MessageList(private val messages: MutableList<Message> = mutableListOf()) {
+value class MessageList<T>(private val messages: MutableList<T> = mutableListOf()) {
+
+    // Properties
+    val size: Int
+        get() = messages.size
 
     // Operators
-    operator fun plusAssign(other: MessageList) {
+    operator fun plusAssign(other: MessageList<T>) {
         append(other.messages)
     }
 
-    operator fun plusAssign(other: Message) {
+    operator fun plusAssign(other: T) {
         append(other)
     }
 
     // Methods
-    fun getMessages(): List<Message> = messages
+    fun getMessages(): List<T> = messages
 
     fun isEmpty(): Boolean = messages.isEmpty()
     fun isNotEmpty(): Boolean = messages.isNotEmpty()
 
-    fun append(message: String, severity: MessageSeverity, identifier: Map<String, String> = emptyMap(), location: Map<String, String> = emptyMap()) {
-        messages += Message(message, severity, identifier, location)
-    }
-
-    fun append(message: Message) { this.messages += message }
-    fun append(messages: List<Message>) { this.messages += messages }
-
-    /**
-     * Returns the number of entries with a certain [severity].
-     */
-    fun getNumberOfMessages(severity: MessageSeverity) = messages.filter { it.severity == severity }.size
-
-    /**
-     * Returns a summary of the message numbers depending on the severity.
-     */
-    fun getTextSummary(): String {
-        val numberOfWarnings = getNumberOfMessages(severity = MessageSeverity.WARNING)
-        val numberOfErrors = getNumberOfMessages(severity = MessageSeverity.ERROR)
-        val numberOfFatalErrors = getNumberOfMessages(severity = MessageSeverity.FATAL_ERROR)
-
-        return "$numberOfWarnings warnings, $numberOfErrors errors, $numberOfFatalErrors fatal errors"
-    }
+    fun append(message: T) { this.messages += message }
+    fun append(messages: List<T>) { this.messages += messages }
 
     companion object {
 
-        fun of(messages: List<Message>): MessageList = MessageList(messages as MutableList<Message>)
-        fun of(message: Message): MessageList = MessageList(mutableListOf(message))
+        fun <T> of(messages: List<T>): MessageList<T> = MessageList(messages as MutableList<T>)
+        fun <T> of(message: T): MessageList<T> = MessageList(mutableListOf(message))
     }
 }
+
+fun <T> List<T>.mergeToReport(): MessageList<T> = MessageList.of(this)
+fun <T> List<MessageList<T>>.merge(): MessageList<T> = MessageList.of(flatMap { it.getMessages() })

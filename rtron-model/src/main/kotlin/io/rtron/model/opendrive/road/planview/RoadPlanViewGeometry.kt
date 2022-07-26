@@ -18,8 +18,10 @@ package io.rtron.model.opendrive.road.planview
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
 
+@optics
 data class RoadPlanViewGeometry(
     var line: Option<RoadPlanViewGeometryLine> = None,
     var spiral: Option<RoadPlanViewGeometrySpiral> = None,
@@ -34,10 +36,5 @@ data class RoadPlanViewGeometry(
     var y: Double = Double.NaN
 ) : OpendriveElement() {
 
-    // Methods
-    fun isLine() = line.isDefined()
-    fun isSpiral() = spiral.isDefined()
-    fun isArc() = arc.isDefined()
-    fun isPoly3() = poly3.isDefined()
-    fun isParamPoly3() = paramPoly3.isDefined()
+    companion object
 }

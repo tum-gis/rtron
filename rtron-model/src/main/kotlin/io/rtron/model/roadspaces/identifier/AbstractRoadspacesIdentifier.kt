@@ -18,4 +18,6 @@ package io.rtron.model.roadspaces.identifier
 
 abstract class AbstractRoadspacesIdentifier {
     abstract fun toStringMap(): Map<String, String>
+
+    abstract override fun toString(): String
 }

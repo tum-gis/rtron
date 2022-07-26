@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
 import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -67,19 +66,18 @@ class SpiralSegment2D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Vector2D> = calculatePoseLocalCS(curveRelativePoint).map { it.point }
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D =
+        calculatePoseLocalCS(curveRelativePoint).point
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Rotation2D> = calculatePoseLocalCS(curveRelativePoint).map { it.rotation }
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D =
+        calculatePoseLocalCS(curveRelativePoint).rotation
 
-    private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D):
-        Either<IllegalArgumentException, Pose2D> {
+    private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D): Pose2D {
 
         val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)
         val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(_spiralPoseStart).inverseTransform(poseOnUnitSpiral)
 
-        return Either.Right(poseOnUnitSpiralStartingAtOrigin)
+        return poseOnUnitSpiralStartingAtOrigin
     }
 }
 

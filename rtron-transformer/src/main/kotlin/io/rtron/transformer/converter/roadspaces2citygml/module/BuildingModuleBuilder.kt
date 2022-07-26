@@ -18,16 +18,17 @@ package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import arrow.core.getOrElse
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
-import io.rtron.transformer.report.of
+import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.building.Building
 import org.citygml4j.core.model.construction.GroundSurface
 import org.citygml4j.core.model.construction.RoofSurface
@@ -38,18 +39,18 @@ import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
  * Builder for city objects of the CityGML Building module.
  */
 class BuildingModuleBuilder(
-    private val configuration: Roadspaces2CitygmlConfiguration,
+    private val parameters: Roadspaces2CitygmlParameters,
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _attributesAdder = AttributesAdder(configuration)
+    private val _attributesAdder = AttributesAdder(parameters)
 
     // Methods
     fun createBuildingFeature(roadspaceObject: RoadspaceObject): ContextMessageList<Building> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // geometry
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, configuration)
+        val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
 
         val buildingFeature =
             if (geometryTransformer.getSolid().isDefined()) createLod2Building(roadspaceObject.id, geometryTransformer).handleMessageList { messageList += it }
@@ -68,14 +69,14 @@ class BuildingModuleBuilder(
      */
     private fun createLod2Building(id: RoadspaceObjectIdentifier, geometryTransformer: GeometryTransformer): ContextMessageList<Building> {
         require(geometryTransformer.getSolid().isDefined()) { "Solid geometry is required to create an LoD2 building." }
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
         val buildingFeature = Building()
 
         val roofSurfaceFeature = RoofSurface()
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).tap {
             roofSurfaceFeature.lod2MultiSurface = it
         }.tapNone {
-            messageList += Message.of("No LoD2 MultiSurface for roof feature available.", id, isFatal = false, wasHealed = true)
+            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for roof feature available.", id, Severity.WARNING, wasHealed = true)
         }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
         identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "RoofSurface", dstCityObject = roofSurfaceFeature)
@@ -84,7 +85,7 @@ class BuildingModuleBuilder(
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).tap {
             groundSurfaceFeature.lod2MultiSurface = it
         }.tapNone {
-            messageList += Message.of("No LoD2 MultiSurface for ground feature available.", id, isFatal = false, wasHealed = true)
+            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for ground feature available.", id, Severity.WARNING, wasHealed = true)
         }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
         identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "FloorSurface", dstCityObject = groundSurfaceFeature)
@@ -97,17 +98,17 @@ class BuildingModuleBuilder(
                 identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "WallSurface", index, wallSurfaceFeature)
             }
         }.tapNone {
-            messageList += Message.of("No LoD2 MultiSurface for wall feature available.", id, isFatal = false, wasHealed = true)
+            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for wall feature available.", id, Severity.WARNING, wasHealed = true)
         }
 
         return ContextMessageList(buildingFeature, messageList)
     }
 
     private fun createLod1Building(id: AbstractRoadspacesIdentifier, geometryTransformer: GeometryTransformer): ContextMessageList<Building> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
         val buildingFeature = Building()
         buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE)
-            .tapLeft { messageList += Message.of(it.message, id, isFatal = false, wasHealed = true) }
+            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasHealed = true) }
 
         return ContextMessageList(buildingFeature, messageList)
     }

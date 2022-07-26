@@ -24,9 +24,11 @@ import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
 import arrow.core.separateEither
+import arrow.core.some
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.io.messages.mergeToReport
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
@@ -48,21 +50,17 @@ import io.rtron.model.roadspaces.roadspace.road.CenterLane
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.isStrictlySortedBy
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformationException
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
-import io.rtron.transformer.report.of
+import io.rtron.transformer.messages.opendrive.of
 
 /**
  * Builder for [Lane] objects of the RoadSpaces data model.
  */
 class LaneBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
+    private val parameters: Opendrive2RoadspacesParameters
 ) {
-
-    // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(configuration)
-
     // Methods
 
     /**
@@ -74,11 +72,11 @@ class LaneBuilder(
      * @param baseAttributes attributes attached to the transformed [Lane] object
      */
     fun buildLane(id: LaneIdentifier, curvePositionDomain: Range<Double>, lrLane: RoadLanesLaneSectionLRLane, baseAttributes: AttributeList): ContextMessageList<Lane> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // build lane geometry
         val width = lrLane.getLaneWidthEntries()
-            .fold({ LinearFunction.X_AXIS }, { _functionBuilder.buildLaneWidth(it) })
+            .fold({ LinearFunction.X_AXIS }, { FunctionBuilder.buildLaneWidth(it, parameters.numberTolerance) })
         val laneHeightOffsets = lrLane.getLaneHeightEntries()
             .fold({ LaneHeightOffset(LinearFunction.X_AXIS, LinearFunction.X_AXIS) }, { buildLaneHeightOffset(it) })
 
@@ -120,7 +118,7 @@ class LaneBuilder(
         require(centerLane.id == 0) { "Center lane must have id 0, but has ${centerLane.id}." }
 
         val laneIdentifier = LaneIdentifier(0, id)
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         val roadMarkings =
             if (centerLane.roadMark.isEmpty()) emptyList()
@@ -176,29 +174,30 @@ class LaneBuilder(
     ): ContextMessageList<List<RoadMarking>> {
         require(curvePositionDomain.hasUpperBound()) { "curvePositionDomain must have an upper bound." }
         val roadMarkId = roadMark.head.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         val curvePositionDomainEnd = curvePositionDomain.upperEndpointOrNull()!!
         val adjustedSrcRoadMark = roadMark
             .filter { it.sOffset in curvePositionDomain }
-            .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, configuration.numberTolerance) }
+            .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, parameters.numberTolerance) }
         if (adjustedSrcRoadMark.size < roadMark.size)
-            messageList += Message.of(
+            messageList += DefaultMessage.of(
+                "",
                 "Road mark entries have been removed, as the sOffset is not located within " +
                     "the local curve position domain ($curvePositionDomain) of the lane section.",
-                roadMarkId, isFatal = false, wasHealed = true
+                roadMarkId, Severity.WARNING, wasHealed = true
             )
 
         if (adjustedSrcRoadMark.isEmpty()) return ContextMessageList(emptyList(), messageList)
 
         val roadMarkingResults = adjustedSrcRoadMark.zipWithNext()
             .filter { it.first.typeAttribute != ERoadMarkType.NONE }
-            .map { buildRoadMarking(it.first, it.second.sOffsetValidated.toOption()) } +
+            .map { buildRoadMarking(it.first, it.second.sOffset.some()) } +
             if (adjustedSrcRoadMark.last().typeAttribute != ERoadMarkType.NONE)
                 listOf(buildRoadMarking(adjustedSrcRoadMark.last())) else emptyList()
 
         val (builderExceptions, roadMarkings) = roadMarkingResults.separateEither()
-        messageList += builderExceptions.map { Message.of(it.message, it.location, isFatal = false, wasHealed = true) }.mergeToReport()
+        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }.mergeToReport()
 
         return ContextMessageList(roadMarkings, messageList)
     }
@@ -214,12 +213,12 @@ class LaneBuilder(
 
         val domain = domainEndpoint.fold({ Range.atLeast(roadMark.sOffset) }, { Range.closed(roadMark.sOffset, it) })
 
-        if (domain.length <= configuration.numberTolerance)
+        if (domain.length <= parameters.numberTolerance)
             return Opendrive2RoadspacesTransformationException.ZeroLengthRoadMarking(roadMarkId).left()
 
         val width = roadMark.width.fold({ ConstantFunction.ZERO }, { ConstantFunction(it, domain) })
 
-        val attributes = attributes("${configuration.attributesPrefix}roadMarking") {
+        val attributes = attributes("${parameters.attributesPrefix}roadMarking") {
             attribute("_curvePositionStart", roadMark.sOffset)
             attribute("_width", roadMark.width)
             attribute("_type", roadMark.typeAttribute.toString())
@@ -232,7 +231,7 @@ class LaneBuilder(
     }
 
     private fun buildAttributes(leftRightLane: RoadLanesLaneSectionLRLane) =
-        attributes("${configuration.attributesPrefix}lane_") {
+        attributes("${parameters.attributesPrefix}lane_") {
             attribute("type", leftRightLane.type.toString())
             leftRightLane.level.tap {
                 attribute("level", it)

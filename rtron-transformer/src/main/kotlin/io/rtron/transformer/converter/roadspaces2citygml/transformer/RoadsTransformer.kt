@@ -21,8 +21,9 @@ import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.getOrHandle
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.io.messages.mergeMessageLists
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.common.FillerSurface
@@ -34,13 +35,13 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.std.handleLeftAndFilter
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.module.GenericsModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.converter.roadspaces2citygml.module.TransportationModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.router.LaneRouter
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter
-import io.rtron.transformer.report.of
+import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.core.CityModel
 import org.citygml4j.core.model.transportation.AbstractTransportationSpace
@@ -53,18 +54,18 @@ import org.citygml4j.core.model.transportation.Road as CitygmlRoad
  * Transforms [Road] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
 class RoadsTransformer(
-    private val configuration: Roadspaces2CitygmlConfiguration,
+    private val parameters: Roadspaces2CitygmlParameters,
     private val identifierAdder: IdentifierAdder
 ) {
 
     // Properties and Initializers
-    private val _genericsModuleBuilder = GenericsModuleBuilder(configuration, identifierAdder)
-    private val _transportationModuleBuilder = TransportationModuleBuilder(configuration, identifierAdder)
+    private val _genericsModuleBuilder = GenericsModuleBuilder(parameters, identifierAdder)
+    private val _transportationModuleBuilder = TransportationModuleBuilder(parameters, identifierAdder)
 
     // Methods
 
     fun transformRoad(roadspaceName: String, roadspacesModel: RoadspacesModel): ContextMessageList<Option<CitygmlRoad>> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         val roadFeature = _transportationModuleBuilder.createRoad()
         if (roadspaceName.isNotEmpty())
@@ -83,18 +84,18 @@ class RoadsTransformer(
         return ContextMessageList(Some(roadFeature), messageList)
     }
 
-    private fun addIntersectionOrLink(junctionId: JunctionIdentifier, roadspaceName: String, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): MessageList {
-        val messageList = MessageList()
+    private fun addIntersectionOrLink(junctionId: JunctionIdentifier, roadspaceName: String, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         val roadspacesInJunction = roadspacesModel.getRoadspacesWithinJunction(junctionId)
             .getOrHandle { throw it }
             .sortedBy { it.name.getOrElse { "" } } // TODO option
 
-        if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && configuration.mappingBackwardsCompatibility) { // TODO option
+        if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && parameters.mappingBackwardsCompatibility) { // TODO option
             roadspacesInJunction.forEach {
                 messageList += addRoadspace(it, roadspacesModel, dstRoad)
             }
-        } else if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && !configuration.mappingBackwardsCompatibility) { // TODO option
+        } else if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && !parameters.mappingBackwardsCompatibility) { // TODO option
             val intersectionFeature = _transportationModuleBuilder.createIntersection()
             roadspacesInJunction.forEach {
                 messageList += addRoadspace(it, roadspacesModel, intersectionFeature)
@@ -107,12 +108,12 @@ class RoadsTransformer(
         return messageList
     }
 
-    private fun addSection(roadspaceId: RoadspaceIdentifier, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): MessageList {
-        val messageList = MessageList()
+    private fun addSection(roadspaceId: RoadspaceIdentifier, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         val roadspace = roadspacesModel.getRoadspace(roadspaceId).getOrHandle { throw it }
 
-        if (configuration.mappingBackwardsCompatibility) {
+        if (parameters.mappingBackwardsCompatibility) {
             messageList += addRoadspace(roadspace, roadspacesModel, dstRoad)
         } else {
             val sectionFeature = _transportationModuleBuilder.createSection()
@@ -124,7 +125,7 @@ class RoadsTransformer(
     }
 
     fun transformAdditionalRoadLines(roadspace: Roadspace): ContextMessageList<List<AbstractCityObject>> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // transforms the road reference line
         val roadReferenceLine = _genericsModuleBuilder
@@ -155,12 +156,12 @@ class RoadsTransformer(
         return ContextMessageList(additionalRoadLines, messageList)
     }
 
-    private fun addRoadspace(roadspace: Roadspace, roadspacesModel: RoadspacesModel, dstTransportationSpace: AbstractTransportationSpace): MessageList {
-        val messageList = MessageList()
+    private fun addRoadspace(roadspace: Roadspace, roadspacesModel: RoadspacesModel, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         roadspace.road.getAllLeftRightLaneIdentifiers().forEach { laneId ->
             val fillerSurface =
-                if (configuration.generateLongitudinalFillerSurfaces) roadspacesModel.getFillerSurfaces(laneId).getOrHandle { throw it }
+                if (parameters.generateLongitudinalFillerSurfaces) roadspacesModel.getFillerSurfaces(laneId).getOrHandle { throw it }
                 else emptyList()
             messageList += addSingleLane(laneId, roadspace.road, fillerSurface, dstTransportationSpace)
         }
@@ -172,16 +173,16 @@ class RoadsTransformer(
         return messageList
     }
 
-    private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace): MessageList {
-        val messageList = MessageList()
+    private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
+        val messageList = DefaultMessageList()
         val lane = road.getLane(id)
-            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }
-        val surface = road.getLaneSurface(id, configuration.discretizationStepSize)
-            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }
+        val surface = road.getLaneSurface(id, parameters.discretizationStepSize)
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }
         val centerLine = road.getCurveOnLane(id, 0.5)
-            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }
-        val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, configuration.discretizationStepSize)
-            .getOrHandle { messageList += Message.of("${it.message} Ignoring lane.", id, isFatal = false, wasHealed = true); return messageList }.toList()
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }
+        val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, parameters.discretizationStepSize)
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }.toList()
         val fillerSurfaces = innerLateralFillerSurface + longitudinalFillerSurfaces
 
         when (LaneRouter.route(lane)) {
@@ -196,8 +197,8 @@ class RoadsTransformer(
         return messageList
     }
 
-    private fun addSingleRoadspaceObject(roadspaceObject: RoadspaceObject, dstTransportationSpace: AbstractTransportationSpace): MessageList {
-        val messageList = MessageList()
+    private fun addSingleRoadspaceObject(roadspaceObject: RoadspaceObject, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         when (RoadspaceObjectRouter.route(roadspaceObject)) {
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
@@ -218,10 +219,10 @@ class RoadsTransformer(
         return messageList
     }
 
-    private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace): MessageList {
-        val messageList = MessageList()
-        road.getRoadMarkings(id, configuration.discretizationStepSize)
-            .handleLeftAndFilter { messageList += Message.of(it.value.message!!, id, isFatal = false, wasHealed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
+    private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
+        val messageList = DefaultMessageList()
+        road.getRoadMarkings(id, parameters.discretizationStepSize)
+            .handleLeftAndFilter { messageList += DefaultMessage.of("", it.value.message!!, id, Severity.WARNING, wasHealed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
             .forEach {
                 messageList += _transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace)
             }

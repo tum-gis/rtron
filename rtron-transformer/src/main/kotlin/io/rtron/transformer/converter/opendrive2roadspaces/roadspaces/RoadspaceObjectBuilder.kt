@@ -24,7 +24,7 @@ import arrow.core.getOrHandle
 import arrow.core.nonEmptyListOf
 import arrow.core.some
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.mergeMessageLists
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
@@ -39,7 +39,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve3DBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Solid3DBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Surface3DBuilder
@@ -52,14 +52,8 @@ import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat as OpendriveRoad
  * Builder for [RoadspaceObject] which correspond to the OpenDRIVE road object class.
  */
 class RoadspaceObjectBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
+    private val parameters: Opendrive2RoadspacesParameters
 ) {
-
-    // Properties and Initializers
-    private val _solid3DBuilder = Solid3DBuilder(configuration)
-    private val _surface3DBuilder = Surface3DBuilder(configuration)
-    private val _curve3DBuilder = Curve3DBuilder(configuration)
-    private val _vector3DBuilder = Vector3DBuilder(configuration)
 
     // Methods
     /**
@@ -87,7 +81,7 @@ class RoadspaceObjectBuilder(
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
     ): ContextMessageList<NonEmptyList<RoadspaceObject>> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // get general object type and geometry representation
         val type = getObjectType(roadObject)
@@ -151,36 +145,36 @@ class RoadspaceObjectBuilder(
         roadObjectRepeat: Option<OpendriveRoadObjectRepeat>,
         roadReferenceLine: Curve3D
     ): ContextMessageList<AbstractGeometry3D> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // affine transformation matrix at the curve point of the object
         val curveAffine = roadReferenceLine.calculateAffine(roadObject.curveRelativePosition.toCurveRelative1D())
 
         // build up solid geometrical representations
         val geometries = mutableListOf<AbstractGeometry3D>()
-        geometries += _solid3DBuilder.buildCuboids(roadObject, curveAffine).handleMessageList { messageList += it }
-        geometries += _solid3DBuilder.buildCylinders(roadObject, curveAffine).handleMessageList { messageList += it }
-        geometries += _solid3DBuilder.buildPolyhedronsByRoadCorners(roadObject, roadReferenceLine).handleMessageList { messageList += it }
-        geometries += _solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine).handleMessageList { messageList += it }
+        geometries += Solid3DBuilder.buildCuboids(roadObject, curveAffine, parameters.numberTolerance).handleMessageList { messageList += it }
+        geometries += Solid3DBuilder.buildCylinders(roadObject, curveAffine, parameters.numberTolerance).handleMessageList { messageList += it }
+        geometries += Solid3DBuilder.buildPolyhedronsByRoadCorners(roadObject, roadReferenceLine, parameters.numberTolerance).handleMessageList { messageList += it }
+        geometries += Solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine, parameters.numberTolerance).handleMessageList { messageList += it }
 
         // build up surface geometrical representations
-        geometries += _surface3DBuilder.buildRectangles(roadObject, curveAffine).handleMessageList { messageList += it }
-        geometries += _surface3DBuilder.buildCircles(roadObject, curveAffine).handleMessageList { messageList += it }
-        geometries += _surface3DBuilder.buildLinearRingsByRoadCorners(roadObject, roadReferenceLine).handleMessageList { messageList += it }
-        geometries += _surface3DBuilder.buildLinearRingsByLocalCorners(roadObject, curveAffine).handleMessageList { messageList += it }
+        geometries += Surface3DBuilder.buildRectangles(roadObject, curveAffine, parameters.numberTolerance).handleMessageList { messageList += it }
+        geometries += Surface3DBuilder.buildCircles(roadObject, curveAffine, parameters.numberTolerance).handleMessageList { messageList += it }
+        geometries += Surface3DBuilder.buildLinearRingsByRoadCorners(roadObject, roadReferenceLine, parameters.numberTolerance).handleMessageList { messageList += it }
+        geometries += Surface3DBuilder.buildLinearRingsByLocalCorners(roadObject, curveAffine, parameters.numberTolerance).handleMessageList { messageList += it }
 
         roadObjectRepeat.tap {
-            geometries += _solid3DBuilder.buildParametricSweeps(it, roadReferenceLine).toList()
-            geometries += _surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(it, roadReferenceLine)
-            geometries += _surface3DBuilder.buildParametricBoundedSurfacesByVerticalRepeat(it, roadReferenceLine)
+            geometries += Solid3DBuilder.buildParametricSweeps(it, roadReferenceLine, parameters.numberTolerance).toList()
+            geometries += Surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(it, roadReferenceLine, parameters.numberTolerance)
+            geometries += Surface3DBuilder.buildParametricBoundedSurfacesByVerticalRepeat(it, roadReferenceLine, parameters.numberTolerance)
         }
 
         // build up curve geometrical representations
-        geometries += _curve3DBuilder.buildCurve3D(roadObject, roadReferenceLine)
+        geometries += Curve3DBuilder.buildCurve3D(roadObject, roadReferenceLine, parameters.numberTolerance)
 
         // if no other geometrical representation has been found, use a point instead
         if (geometries.isEmpty())
-            geometries += _vector3DBuilder.buildVector3Ds(roadObject, curveAffine, force = true)
+            geometries += Vector3DBuilder.buildVector3Ds(roadObject, curveAffine, force = true)
 
         check(geometries.size == 1) { "Exactly one geometry must be derived." }
 
@@ -188,7 +182,7 @@ class RoadspaceObjectBuilder(
     }
 
     private fun buildAttributes(roadObject: OpendriveRoadObject) =
-        attributes("${configuration.attributesPrefix}roadObject_") {
+        attributes("${parameters.attributesPrefix}roadObject_") {
             attribute("type", roadObject.type.toString())
             attribute("subtype", roadObject.subtype)
             roadObject.dynamic.tap {
@@ -203,14 +197,14 @@ class RoadspaceObjectBuilder(
         }
 
     private fun buildAttributes(curveRelativePosition: CurveRelativeVector3D) =
-        attributes("${configuration.attributesPrefix}curveRelativePosition_") {
+        attributes("${parameters.attributesPrefix}curveRelativePosition_") {
             attribute("curvePosition", curveRelativePosition.curvePosition)
             attribute("lateralOffset", curveRelativePosition.lateralOffset)
             attribute("heightOffset", curveRelativePosition.heightOffset)
         }
 
     private fun buildAttributes(rotation: Rotation3D) =
-        attributes("${configuration.attributesPrefix}curveRelativeRotation_") {
+        attributes("${parameters.attributesPrefix}curveRelativeRotation_") {
             attribute("heading", rotation.heading)
             attribute("roll", rotation.roll)
             attribute("pitch", rotation.pitch)
@@ -245,7 +239,7 @@ class RoadspaceObjectBuilder(
     }
 
     private fun buildAttributes(signal: RoadSignalsSignal): AttributeList =
-        attributes("${configuration.attributesPrefix}roadSignal_") {
+        attributes("${parameters.attributesPrefix}roadSignal_") {
             attribute("dynamic", signal.dynamic)
             attribute("orientation", signal.orientation.toString())
             signal.country.tap {
@@ -261,6 +255,6 @@ class RoadspaceObjectBuilder(
     private fun buildGeometries(signal: RoadSignalsSignal, roadReferenceLine: Curve3D): AbstractGeometry3D {
         val curveAffine = roadReferenceLine.calculateAffine(signal.curveRelativePosition.toCurveRelative1D())
 
-        return _vector3DBuilder.buildVector3Ds(signal, curveAffine, force = true)
+        return Vector3DBuilder.buildVector3Ds(signal, curveAffine, force = true)
     }
 }

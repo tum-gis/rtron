@@ -18,10 +18,6 @@ package io.rtron.model.opendrive.junction
 
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.Validated
-import arrow.core.invalid
-import arrow.core.valid
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionConnectionIdentifier
 import io.rtron.model.opendrive.additions.identifier.JunctionConnectionIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
@@ -39,9 +35,4 @@ data class JunctionConnection(
     var type: Option<EConnectionType> = None,
 
     override var additionalId: Option<JunctionConnectionIdentifier> = None
-) : OpendriveElement(), AdditionalJunctionConnectionIdentifier {
-
-    // Properties and Initializers
-    val idValidated: Validated<OpendriveException.MissingValue, String>
-        get() = if (id.isBlank()) OpendriveException.MissingValue("id").invalid() else id.valid()
-}
+) : OpendriveElement(), AdditionalJunctionConnectionIdentifier

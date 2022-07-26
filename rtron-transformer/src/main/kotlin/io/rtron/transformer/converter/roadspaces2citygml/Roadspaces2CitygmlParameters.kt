@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.converter.roadspaces2citygml.configuration
+package io.rtron.transformer.converter.roadspaces2citygml
 
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
 import io.rtron.math.geometry.euclidean.threed.solid.ParametricSweep3D
+import kotlinx.serialization.Serializable
 import java.util.regex.Pattern
 
-data class Roadspaces2CitygmlConfiguration(
+@Serializable
+data class Roadspaces2CitygmlParameters(
     val concurrentProcessing: Boolean,
 
     /** prefix for generated gml ids */

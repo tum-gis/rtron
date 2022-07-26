@@ -28,10 +28,11 @@ import com.github.ajalt.clikt.parameters.options.triple
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
-import io.rtron.main.processor.OpendriveToCitygmlConfiguration
+import io.rtron.main.processor.OpendriveToCitygmlParameters
 import io.rtron.main.processor.OpendriveToCitygmlProcessor
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
+import io.rtron.transformer.modifiers.opendrive.shifter.OpendriveShifterParameters
 
 class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml", help = "Transform OpenDRIVE datasets to CityGML.", printHelpOnEmptyArgs = true) {
 
@@ -40,8 +41,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         context { helpFormatter = ColorFormatter() }
     }
 
-    private val configurationPath by option(
-        help = "Path to a YAML configuration of the process."
+    private val parametersPath by option(
+        help = "Path to a YAML file containing the parameters of the process."
     ).path(mustExist = true)
 
     private val inputPath by argument(
@@ -54,26 +55,26 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     private val convertToCitygml2 by option(help = "convert to CityGML 2.0 (otherwise CityGML 3.0)").flag()
 
     private val tolerance by option(help = "allowed tolerance when comparing double values").double()
-        .default(Opendrive2RoadspacesConfiguration.DEFAULT_NUMBER_TOLERANCE)
+        .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
-        .default(Opendrive2RoadspacesConfiguration.DEFAULT_CRS_EPSG)
+        .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
     private val offset by option(help = "offset values by which the model is translated along x, y, and z axis").double().triple()
-        .default(Triple(Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_X, Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_Y, Opendrive2RoadspacesConfiguration.DEFAULT_OFFSET_Z))
+        .default(Triple(OpendriveShifterParameters.DEFAULT_OFFSET_X, OpendriveShifterParameters.DEFAULT_OFFSET_Y, OpendriveShifterParameters.DEFAULT_OFFSET_Z))
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
-        .default(Roadspaces2CitygmlConfiguration.DEFAULT_DISCRETIZATION_STEP_SIZE)
+        .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
     private val sweepDiscretizationStepSize by option(help = "distance between each discretization step for solid geometries of ParametricSweep3D").double()
-        .default(Roadspaces2CitygmlConfiguration.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
+        .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
     private val circleSlices by option(help = "number of discretization points for a circle or cylinder").int()
-        .default(Roadspaces2CitygmlConfiguration.DEFAULT_CIRCLE_SLICES)
+        .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
     private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc. are also transformed").flag()
 
     // Methods
 
     override fun run() {
 
-        val configuration = configurationPath.toOption().fold({
-            OpendriveToCitygmlConfiguration(
+        val parameters = parametersPath.toOption().fold({
+            OpendriveToCitygmlParameters(
                 convertToCitygml2 = convertToCitygml2,
 
                 tolerance = tolerance,
@@ -87,13 +88,13 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 circleSlices = circleSlices,
                 transformAdditionalRoadLines = transformAdditionalRoadLines,
             )
-        }, { configurationFilePath ->
-            val configurationText = configurationFilePath.toFile().readText()
+        }, { parametersFilePath ->
+            val parametersText = parametersFilePath.toFile().readText()
 
-            Yaml.default.decodeFromString(OpendriveToCitygmlConfiguration.serializer(), configurationText)
+            Yaml.default.decodeFromString(OpendriveToCitygmlParameters.serializer(), parametersText)
         })
 
-        val processor = OpendriveToCitygmlProcessor(configuration)
+        val processor = OpendriveToCitygmlProcessor(parameters)
         processor.process(inputPath, outputPath)
     }
 }

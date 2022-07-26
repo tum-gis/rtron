@@ -17,23 +17,23 @@
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
 
-class ModelingRulesEvaluator(val configuration: OpendriveEvaluatorConfiguration) :
+class ModelingRulesEvaluator(val parameters: OpendriveEvaluatorParameters) :
     AbstractOpendriveEvaluator() {
 
     // Properties amd Initializers
-    private val _roadEvaluator = RoadEvaluator(configuration)
-    private val _roadLanesEvaluator = RoadLanesEvaluator(configuration)
-    private val _roadObjectsEvaluator = RoadObjectsEvaluator(configuration)
-    private val _junctionEvaluator = JunctionEvaluator(configuration)
+    private val _roadEvaluator = RoadEvaluator(parameters)
+    private val _roadLanesEvaluator = RoadLanesEvaluator(parameters)
+    private val _roadObjectsEvaluator = RoadObjectsEvaluator(parameters)
+    private val _junctionEvaluator = JunctionEvaluator(parameters)
 
     // Methods
-    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
-        val messageList = MessageList()
+    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         messageList += _roadEvaluator.evaluateFatalViolations(opendriveModel)
         messageList += _roadLanesEvaluator.evaluateFatalViolations(opendriveModel)
@@ -46,7 +46,7 @@ class ModelingRulesEvaluator(val configuration: OpendriveEvaluatorConfiguration)
 
     override fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
         var healedOpendriveModel = opendriveModel.copy()
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         _roadEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
             healedOpendriveModel = it.value

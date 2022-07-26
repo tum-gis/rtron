@@ -17,20 +17,20 @@
 package io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements
 
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 
-class RoadEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
+class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
-        val messageList = MessageList()
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+        val messageList = DefaultMessageList()
         return messageList
     }
 
     fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
         var healedOpendriveModel = opendriveModel
 
         return ContextMessageList(healedOpendriveModel, messageList)

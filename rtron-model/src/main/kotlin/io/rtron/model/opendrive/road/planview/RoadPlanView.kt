@@ -17,19 +17,16 @@
 package io.rtron.model.opendrive.road.planview
 
 import arrow.core.NonEmptyList
-import arrow.core.Validated
 import arrow.optics.optics
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.core.OpendriveElement
-import io.rtron.std.toValidated
 
 @optics
 data class RoadPlanView(
     var geometry: List<RoadPlanViewGeometry> = emptyList(),
 ) : OpendriveElement() {
 
-    val geometryValidated: Validated<OpendriveException.EmptyList, NonEmptyList<RoadPlanViewGeometry>>
-        get() = NonEmptyList.fromList(geometry).toValidated { OpendriveException.EmptyList("geometry") }
+    val geometryAsNonEmptyList: NonEmptyList<RoadPlanViewGeometry>
+        get() = NonEmptyList.fromListUnsafe(geometry)
 
     companion object
 }

@@ -28,12 +28,11 @@ import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat
 import io.rtron.model.opendrive.road.lateral.RoadLateralProfileShape
 import io.rtron.model.opendrive.road.lateral.RoadLateralProfileSuperelevation
 import io.rtron.std.isStrictlySortedBy
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for functions of the OpenDRIVE data model.
  */
-class FunctionBuilder(private val configuration: Opendrive2RoadspacesConfiguration) {
+object FunctionBuilder {
 
     // Methods
 
@@ -89,9 +88,9 @@ class FunctionBuilder(private val configuration: Opendrive2RoadspacesConfigurati
      * @param laneWidthEntries entries containing coefficients for polynomial functions
      * @return function describing the width of a lane
      */
-    fun buildLaneWidth(laneWidthEntries: NonEmptyList<RoadLanesLaneSectionLRLaneWidth>): UnivariateFunction {
+    fun buildLaneWidth(laneWidthEntries: NonEmptyList<RoadLanesLaneSectionLRLaneWidth>, numberTolerance: Double): UnivariateFunction {
         require(laneWidthEntries.isStrictlySortedBy { it.sOffset }) { "Width entries of lane must be strictly sorted according to sOffset." }
-        require(laneWidthEntries.head.sOffset < configuration.numberTolerance) { "First width entry must start with sOffset=0.0." }
+        require(laneWidthEntries.head.sOffset < numberTolerance) { "First width entry must start with sOffset=0.0." }
 
         return ConcatenatedFunction.ofPolynomialFunctions(
             laneWidthEntries.map { it.sOffset },

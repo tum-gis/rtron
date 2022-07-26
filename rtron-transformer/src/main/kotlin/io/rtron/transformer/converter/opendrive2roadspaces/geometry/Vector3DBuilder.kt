@@ -21,14 +21,11 @@ import io.rtron.math.transform.Affine3D
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.model.opendrive.objects.RoadObjectsObject
 import io.rtron.model.opendrive.signal.RoadSignalsSignal
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for vectors in 3D from the OpenDRIVE data model.
  */
-class Vector3DBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
-) {
+object Vector3DBuilder {
 
     // Methods
 

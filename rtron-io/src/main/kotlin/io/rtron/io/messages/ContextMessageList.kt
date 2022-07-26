@@ -18,17 +18,17 @@ package io.rtron.io.messages
 
 class ContextMessageList<out V>(
     val value: V,
-    val messageList: MessageList
+    val messageList: DefaultMessageList
 ) {
     // Properties and Initializers
 
     // Methods
-    fun appendReport(other: MessageList): ContextMessageList<V> {
+    fun appendReport(other: DefaultMessageList): ContextMessageList<V> {
         this.messageList += other
         return this
     }
 
-    fun handleMessageList(f: (MessageList) -> Unit): V {
+    fun handleMessageList(f: (DefaultMessageList) -> Unit): V {
         f(messageList)
         return value
     }
@@ -37,7 +37,7 @@ class ContextMessageList<out V>(
 }
 
 fun <V : Any> List<ContextMessageList<V>>.mergeMessageLists(): ContextMessageList<List<V>> {
-    val mergedMessageList = MessageList()
+    val mergedMessageList = DefaultMessageList()
     this.forEach { mergedMessageList += it.messageList }
     return ContextMessageList(this.map { it.value }, mergedMessageList)
 }

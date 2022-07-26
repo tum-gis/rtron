@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.evaluator.roadspaces.configuration
+package io.rtron.transformer.modifiers.opendrive.shifter
 
-/**
- * Configuration for the OpenDRIVE validator.
- */
-data class RoadspacesEvaluatorConfiguration(
-    val numberTolerance: Double,
-    val laneTransitionDistanceTolerance: Double
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class OpendriveShifterParameters(
+    /** offset by which the model is translated along the x axis */
+    val offsetX: Double = DEFAULT_OFFSET_X,
+    /** offset by which the model is translated along the y axis */
+    val offsetY: Double = DEFAULT_OFFSET_Y,
+    /** offset by which the model is translated along the z axis */
+    val offsetZ: Double = DEFAULT_OFFSET_Z,
 ) {
 
     companion object {
-        const val DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE = 1E-3
+        const val DEFAULT_OFFSET_X = 0.0
+        const val DEFAULT_OFFSET_Y = 0.0
+        const val DEFAULT_OFFSET_Z = 0.0
     }
 }

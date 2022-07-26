@@ -45,9 +45,14 @@ import io.rtron.model.opendrive.objects.repeat
 import io.rtron.model.opendrive.objects.roadObject
 import io.rtron.model.opendrive.road
 import io.rtron.model.opendrive.road.Road
+import io.rtron.model.opendrive.road.elevation.RoadElevationProfile
+import io.rtron.model.opendrive.road.elevation.elevation
+import io.rtron.model.opendrive.road.elevationProfile
 import io.rtron.model.opendrive.road.lanes
 import io.rtron.model.opendrive.road.objects
 import io.rtron.model.opendrive.road.planView
+import io.rtron.model.opendrive.road.planview.RoadPlanView
+import io.rtron.model.opendrive.road.planview.geometry
 import io.rtron.model.opendrive.road.signals
 import io.rtron.model.opendrive.signal.RoadSignals
 import io.rtron.model.opendrive.signal.signal
@@ -56,6 +61,9 @@ val everyHeaderOffset = OpendriveModel.header compose Header.offset compose PPri
 
 val everyRoad = OpendriveModel.road compose Traversal.list()
 val everyRoadPlanView = everyRoad compose Road.planView
+val everyRoadPlanViewGeometry = everyRoadPlanView compose RoadPlanView.geometry compose Traversal.list()
+val everyRoadElevationProfile = everyRoad compose Road.elevationProfile
+val everyRoadElevationProfileElement = everyRoadElevationProfile compose PPrism.some() compose RoadElevationProfile.elevation compose Traversal.list()
 
 val everyLaneSection = everyRoad compose Road.lanes compose RoadLanes.laneSection compose Traversal.list()
 

@@ -20,7 +20,4 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 class RoadPlanViewGeometryArc(
     var curvature: Double = Double.NaN
-) : OpendriveElement() {
-
-    fun isNaN() = curvature.isNaN()
-}
+) : OpendriveElement()

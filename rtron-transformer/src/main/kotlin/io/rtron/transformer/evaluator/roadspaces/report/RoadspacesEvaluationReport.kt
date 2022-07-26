@@ -16,12 +16,13 @@
 
 package io.rtron.transformer.evaluator.roadspaces.report
 
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluatorParameters
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class RoadspacesEvaluationReport(
+    val parameters: RoadspacesEvaluatorParameters,
 
-    var modelingRulesEvaluation: MessageList = MessageList()
-
+    var modelingRulesEvaluation: DefaultMessageList = DefaultMessageList()
 )

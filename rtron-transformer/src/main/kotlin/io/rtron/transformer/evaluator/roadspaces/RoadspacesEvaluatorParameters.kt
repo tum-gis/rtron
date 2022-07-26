@@ -14,7 +14,20 @@
  * limitations under the License.
  */
 
-package io.rtron.io.messages
+package io.rtron.transformer.evaluator.roadspaces
 
-fun List<Message>.mergeToReport(): MessageList = MessageList.of(this)
-fun List<MessageList>.merge(): MessageList = MessageList.of(flatMap { it.getMessages() })
+import kotlinx.serialization.Serializable
+
+/**
+ * Parameters for the OpenDRIVE validator.
+ */
+@Serializable
+data class RoadspacesEvaluatorParameters(
+    val numberTolerance: Double,
+    val laneTransitionDistanceTolerance: Double
+) {
+
+    companion object {
+        const val DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE = 1E-3
+    }
+}

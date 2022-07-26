@@ -16,11 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
-import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.surface.AbstractCurveRelativeSurface3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -60,19 +58,15 @@ data class CurveOnParametricSurface3D(
     }
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> = either.eager {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
 
         val lateralOffset = lateralOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .mapLeft { GeometryException.DiscretizationError(it.message!!) }
-            .bind()
+            .getOrHandle { throw it }
         val heightOffset = heightOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .mapLeft { GeometryException.DiscretizationError(it.message!!) }
-            .bind()
+            .getOrHandle { throw it }
 
         val curveRelativePoint2D = curveRelativePoint.toCurveRelative2D(lateralOffset)
-        baseSurface.calculatePointGlobalCS(curveRelativePoint2D, heightOffset)
-            .mapLeft { GeometryException.DiscretizationError(it.message!!) }
-            .bind()
+        return baseSurface.calculatePointGlobalCSUnbounded(curveRelativePoint2D, heightOffset)
     }
 
     companion object {

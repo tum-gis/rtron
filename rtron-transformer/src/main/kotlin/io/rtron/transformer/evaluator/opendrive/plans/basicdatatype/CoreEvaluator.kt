@@ -18,59 +18,56 @@ package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
 import arrow.core.None
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.optics.everyHeaderOffset
 import io.rtron.model.opendrive.header
-import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
-import io.rtron.transformer.evaluator.opendrive.report.toMessage
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 
-class CoreEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
+class CoreEvaluator(val parameters: OpendriveEvaluatorParameters) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
-        val messageList = MessageList()
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
-        opendriveModel.roadValidated.tapInvalid {
-            messageList += it.toMessage(emptyMap(), isFatal = true, wasHealed = false)
-        }
+        if (opendriveModel.road.isEmpty())
+            messageList += DefaultMessage("NoRoadsContained", "Document does not contain any roads.", "", Severity.FATAL_ERROR, wasHealed = false)
 
         OpendriveModel.header.get(opendriveModel).also { header ->
-            header.revMajorValidated.tapInvalid {
-                messageList += it.toMessage(emptyMap(), isFatal = true, wasHealed = false)
-            }
+            if (header.revMajor < 0)
+                messageList += DefaultMessage("UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasHealed = false)
 
-            header.revMinorValidated.tapInvalid {
-                messageList += it.toMessage(emptyMap(), isFatal = true, wasHealed = false)
-            }
+            if (header.revMinor < 0)
+                messageList += DefaultMessage("UnkownOpendriveMinorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasHealed = false)
         }
 
         return messageList
     }
 
     fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
         var healedOpendriveModel = opendriveModel
 
         healedOpendriveModel = OpendriveModel.header.modify(healedOpendriveModel) { header ->
             if (header.name.exists { it.isEmpty() }) {
-                messageList += OpendriveException.EmptyValueForOptionalAttribute("name").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'name' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
                 header.name = None
             }
 
             if (header.date.exists { it.isEmpty() }) {
-                messageList += OpendriveException.EmptyValueForOptionalAttribute("date").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'date' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
                 header.date = None
             }
 
             if (header.vendor.exists { it.isEmpty() }) {
-                messageList += OpendriveException.EmptyValueForOptionalAttribute("vendor").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'vendor' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
                 header.vendor = None
             }
 
             if (header.north.exists { !it.isFinite() }) {
-                messageList += OpendriveException.EmptyValueForOptionalAttribute("north").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'north' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
                 header.north = None
             }
 
@@ -80,22 +77,22 @@ class CoreEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
         healedOpendriveModel = everyHeaderOffset.modify(healedOpendriveModel) { currentHeaderOffset ->
 
             if (!currentHeaderOffset.x.isFinite()) {
-                messageList += OpendriveException.UnexpectedValue("x", currentHeaderOffset.x.toString(), "Value should be finite.").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'x'", "Header element", Severity.WARNING, wasHealed = true)
                 currentHeaderOffset.x = 0.0
             }
 
             if (!currentHeaderOffset.y.isFinite()) {
-                messageList += OpendriveException.UnexpectedValue("y", currentHeaderOffset.y.toString(), "Value should be finite.").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'y'", "Header element", Severity.WARNING, wasHealed = true)
                 currentHeaderOffset.y = 0.0
             }
 
             if (!currentHeaderOffset.z.isFinite()) {
-                messageList += OpendriveException.UnexpectedValue("z", currentHeaderOffset.z.toString(), "Value should be finite.").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'z'", "Header element", Severity.WARNING, wasHealed = true)
                 currentHeaderOffset.z = 0.0
             }
 
             if (!currentHeaderOffset.hdg.isFinite()) {
-                messageList += OpendriveException.UnexpectedValue("hdg", currentHeaderOffset.hdg.toString(), "Value should be finite.").toMessage(emptyMap(), isFatal = false, wasHealed = true)
+                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'hdg'", "Header element", Severity.WARNING, wasHealed = true)
                 currentHeaderOffset.hdg = 0.0
             }
 

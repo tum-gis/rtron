@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package io.rtron.io.messages
+package io.rtron.readerwriter.opendrive.report
 
+import io.rtron.io.messages.Severity
 import kotlinx.serialization.Serializable
 
-/**
- * Single entry for the schema validation report.
- */
 @Serializable
-data class Message(val text: String, val severity: MessageSeverity, val identifier: Map<String, String> = emptyMap(), val location: Map<String, String> = emptyMap(), val relevantValue: Double? = null)
+data class SchemaValidationReportMessage(
+    val description: String,
+    val severity: Severity,
+    val lineNumber: Int,
+    val columnNumber: Int
+)

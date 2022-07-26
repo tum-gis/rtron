@@ -25,7 +25,7 @@ interface JunctionIdentifierInterface {
 data class JunctionIdentifier(override val junctionId: String) : AbstractOpendriveIdentifier(), JunctionIdentifierInterface {
 
     // Conversions
-    override fun toStringMap() = mapOf("junctionId" to junctionId)
+    override fun toString() = "Junction: junctionId=$junctionId"
 }
 
 interface AdditionalJunctionIdentifier {

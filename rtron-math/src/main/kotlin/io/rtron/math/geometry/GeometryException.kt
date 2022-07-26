@@ -18,18 +18,12 @@ package io.rtron.math.geometry
 
 sealed class GeometryException(val message: String, val exceptionIdentifier: String) {
 
-    data class OverlapOrGapInCurve(val suffix: String = "") :
-        GeometryException("Overlap or gap in the curve due to its segments not being adjacent to each other.${if (suffix.isNotEmpty()) " $suffix" else ""}", "OverlapOrGapInCurve")
-
-    data class KinkInCurve(val suffix: String = "") :
-        GeometryException("Kink in the curve caused by segments having different angles at the transition points.${if (suffix.isNotEmpty()) " $suffix" else ""}", "KinkInCurve")
-
     data class BoundaryRepresentationGenerationError(val reason: String) : GeometryException("Cannot generate bounding representation: $reason.", "BoundaryRepresentationGenerationError")
 
     data class NotEnoughValidLinearRings(val suffix: String = "") : GeometryException("Not enough valid linear rings could be constructed$suffix.", "NotEnoughValidLinearRings")
 
-    data class DiscretizationError(val reason: String) : GeometryException("Cannot generate bounding representation: $reason.", "DiscretizationError")
     data class NotEnoughVertices(val suffix: String = "") : GeometryException("Not enough valid linear rings could be constructed$suffix.", "NotEnoughVertices")
+    data class ValueNotContainedInDomain(val value: Double) : GeometryException("Value ($value) not contained in domain of geometry.", "ValueNotContainedInDomain")
 }
 
 fun GeometryException.toIllegalStateException(): IllegalStateException = IllegalStateException(message)

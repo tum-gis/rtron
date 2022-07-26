@@ -14,15 +14,26 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.citygml.configuration
+package io.rtron.io.messages
 
-import io.rtron.readerwriter.citygml.CitygmlVersion
+import kotlinx.serialization.Serializable
 
-data class CitygmlWriterConfiguration(
-    val versions: Set<CitygmlVersion>
+/**
+ * Single message.
+ */
+@Serializable
+data class DefaultMessage(
+    val type: String,
+    val info: String,
+    val location: String,
+    val incidentSeverity: Severity,
+    val wasHealed: Boolean,
 ) {
+
     // Properties and Initializers
-    init {
-        require(versions.isNotEmpty()) { "At least one CitGML version must be set." }
+    val messageSeverity: Severity = when (Pair(incidentSeverity, wasHealed)) {
+        Pair(Severity.FATAL_ERROR, true) -> Severity.ERROR
+        Pair(Severity.ERROR, true) -> Severity.WARNING
+        else -> incidentSeverity
     }
 }

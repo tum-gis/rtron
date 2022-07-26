@@ -18,8 +18,4 @@ package io.rtron.model.opendrive.road.planview
 
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadPlanViewGeometryLine : OpendriveElement() {
-
-    // not known, due to no variables in this class
-    fun isNaN() = false
-}
+class RoadPlanViewGeometryLine : OpendriveElement()

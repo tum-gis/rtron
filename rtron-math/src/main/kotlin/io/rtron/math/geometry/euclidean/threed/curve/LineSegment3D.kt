@@ -17,8 +17,6 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
-import arrow.core.right
-import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.BoundType
@@ -78,11 +76,9 @@ class LineSegment3D(
         return point.distance(projectedPoint)
     }
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<GeometryException, Vector3D> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
 
-        val point = start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
-        return point.right()
+        return start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
     }
 
     override fun equals(other: Any?): Boolean {

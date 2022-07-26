@@ -21,21 +21,20 @@ import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.getOrHandle
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.analysis.function.bivariate.pure.ShapeFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
-import io.rtron.model.opendrive.additions.exceptions.toIllegalStateException
 import io.rtron.model.opendrive.road.lateral.RoadLateralProfileShape
 import io.rtron.model.roadspaces.identifier.ModelIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformationException
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve3DBuilder
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
 
@@ -43,14 +42,11 @@ import io.rtron.model.opendrive.road.Road as OpendriveRoad
  * Builder of [Roadspace] (RoadSpaces data model) to the Road class of the OpenDRIVE data model.
  */
 class RoadspaceBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
+    private val parameters: Opendrive2RoadspacesParameters
 ) {
     // Properties and Initializers
-    private val _curve3DBuilder = Curve3DBuilder(configuration)
-    private val _functionBuilder = FunctionBuilder(configuration)
-
-    private val _roadBuilder = RoadBuilder(configuration)
-    private val _roadObjectBuilder = RoadspaceObjectBuilder(configuration)
+    private val _roadBuilder = RoadBuilder(parameters)
+    private val _roadObjectBuilder = RoadspaceObjectBuilder(parameters)
 
     // Methods
 
@@ -62,19 +58,19 @@ class RoadspaceBuilder(
      * @return transformed [Roadspace]
      */
     fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>> = either.eager {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         val opendriveRoadId = road.additionalId.toEither { IllegalStateException("Additional road ID must be available.") }.getOrHandle { throw it }
         val roadspaceId = RoadspaceIdentifier(road.id, modelId)
 
         // build up road reference line
-        val planViewGeometries = road.planView.geometryValidated.toEither().getOrHandle { throw it.toIllegalStateException() }
-        val roadReferenceLine = _curve3DBuilder.buildCurve3D(planViewGeometries, road.getElevationEntries())
-            .mapLeft { Opendrive2RoadspacesTransformationException.PlanViewGeometryException(it.message, opendriveRoadId) }
-            .bind()
+        val roadReferenceLine = Curve3DBuilder.buildCurve3D(
+            road.planView.geometryAsNonEmptyList, road.getElevationEntries(),
+            parameters.numberTolerance, parameters.planViewGeometryDistanceTolerance, parameters.planViewGeometryAngleTolerance
+        )
         val torsionFunction = road.getSuperelevationEntries().fold(
             { LinearFunction.X_AXIS },
-            { _functionBuilder.buildCurveTorsion(it) }
+            { FunctionBuilder.buildCurveTorsion(it) }
         )
 
         // build attributes for the road
@@ -122,18 +118,18 @@ class RoadspaceBuilder(
         val lateralFunctions = lateralProfileShapeList
             .groupBy { it.s }
             .mapValues { NonEmptyList.fromListUnsafe(it.value) }
-            .mapValues { _functionBuilder.buildLateralShape(it.value) }
+            .mapValues { FunctionBuilder.buildLateralShape(it.value) }
             .toSortedMap()
 
         return ShapeFunction(
             lateralFunctions,
             extrapolateX = true,
-            extrapolateY = configuration.extrapolateLateralRoadShapes
+            extrapolateY = parameters.extrapolateLateralRoadShapes
         )
     }
 
     private fun buildAttributes(road: OpendriveRoad) =
-        attributes("${configuration.attributesPrefix}road_") {
+        attributes("${parameters.attributesPrefix}road_") {
             attribute("length", road.length)
             attribute("junction", road.getJunctionOption())
             attribute("rule", road.rule.toString())

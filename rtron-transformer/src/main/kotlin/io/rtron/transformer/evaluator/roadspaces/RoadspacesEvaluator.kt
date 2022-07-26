@@ -17,21 +17,20 @@
 package io.rtron.transformer.evaluator.roadspaces
 
 import io.rtron.model.roadspaces.RoadspacesModel
-import io.rtron.transformer.evaluator.roadspaces.configuration.RoadspacesEvaluatorConfiguration
 import io.rtron.transformer.evaluator.roadspaces.plans.modelingrules.ModelingRulesEvaluator
 import io.rtron.transformer.evaluator.roadspaces.report.RoadspacesEvaluationReport
 
 class RoadspacesEvaluator(
-    val configuration: RoadspacesEvaluatorConfiguration
+    val parameters: RoadspacesEvaluatorParameters
 ) {
     // Properties and Initializers
-    private val _modelingRulesEvaluator = ModelingRulesEvaluator(configuration)
+    private val _modelingRulesEvaluator = ModelingRulesEvaluator(parameters)
 
     // Methods
 
     fun evaluate(roadspacesModel: RoadspacesModel): Pair<RoadspacesModel, RoadspacesEvaluationReport> {
 
-        val report = RoadspacesEvaluationReport()
+        val report = RoadspacesEvaluationReport(parameters)
 
         report.modelingRulesEvaluation = _modelingRulesEvaluator.evaluateNonFatalViolations(roadspacesModel)
 

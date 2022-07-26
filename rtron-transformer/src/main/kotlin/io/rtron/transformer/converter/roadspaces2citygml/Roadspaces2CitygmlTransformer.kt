@@ -21,13 +21,12 @@ import arrow.core.flattenOption
 import arrow.core.getOrHandle
 import io.rtron.io.logging.ProgressBar
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.mergeMessageLists
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.std.getValueEither
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
 import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.converter.roadspaces2citygml.report.Roadspaces2CitygmlReport
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadsTransformer
@@ -45,18 +44,18 @@ import org.xmlobjects.gml.model.geometry.Envelope
 /**
  * Transformer from the RoadSpaces data model to CityGML.
  *
- * @param configuration configuration for the transformation
+ * @param parameters parameters for the transformation
  */
 class Roadspaces2CitygmlTransformer(
-    val configuration: Roadspaces2CitygmlConfiguration
+    val parameters: Roadspaces2CitygmlParameters
 ) {
 
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    private val identifierAdder = IdentifierAdder(configuration)
-    private val _roadObjectTransformer = RoadspaceObjectTransformer(configuration, identifierAdder)
-    private val _roadLanesTransformer = RoadsTransformer(configuration, identifierAdder)
+    private val identifierAdder = IdentifierAdder(parameters)
+    private val _roadObjectTransformer = RoadspaceObjectTransformer(parameters, identifierAdder)
+    private val _roadLanesTransformer = RoadsTransformer(parameters, identifierAdder)
 
     // Methods
 
@@ -68,12 +67,12 @@ class Roadspaces2CitygmlTransformer(
      */
     fun transform(roadspacesModel: RoadspacesModel): Pair<CitygmlModel, Roadspaces2CitygmlReport> {
 
-        val report = Roadspaces2CitygmlReport()
+        val report = Roadspaces2CitygmlReport(parameters)
 
         // transformation of each road space
-        logger.info("Configuration: $configuration.")
+        logger.info("Parameters: $parameters.")
         val abstractCityObjects =
-            if (configuration.concurrentProcessing) transformRoadspacesConcurrently(roadspacesModel).handleMessageList { report.conversion += it }
+            if (parameters.concurrentProcessing) transformRoadspacesConcurrently(roadspacesModel).handleMessageList { report.conversion += it }
             else transformRoadspacesSequentially(roadspacesModel).handleMessageList { report.conversion += it }
 
         // create CityGML model
@@ -87,7 +86,7 @@ class Roadspaces2CitygmlTransformer(
         roadspacesModel: RoadspacesModel
     ): ContextMessageList<List<AbstractCityObject>> {
 
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // build objects
         val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
@@ -106,7 +105,7 @@ class Roadspaces2CitygmlTransformer(
             .handleMessageList { messageList += it }
             .flatten()
 
-        val additionalRoadLines: List<AbstractCityObject> = if (configuration.transformAdditionalRoadLines) {
+        val additionalRoadLines: List<AbstractCityObject> = if (parameters.transformAdditionalRoadLines) {
             val additionalRoadLinesProgressBar = ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
             roadspacesModel.getAllRoadspaces().map {
                 _roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
@@ -121,7 +120,7 @@ class Roadspaces2CitygmlTransformer(
     private fun transformRoadspacesConcurrently(
         roadspacesModel: RoadspacesModel
     ): ContextMessageList<List<AbstractCityObject>> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         // build objects
         val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
@@ -141,7 +140,7 @@ class Roadspaces2CitygmlTransformer(
             }
         }
 
-        val additionalRoadLinesDeferred = if (configuration.transformAdditionalRoadLines) {
+        val additionalRoadLinesDeferred = if (parameters.transformAdditionalRoadLines) {
             val additionalRoadLinesProgressBar = ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
             roadspacesModel.getAllRoadspaces().map {
                 GlobalScope.async {
@@ -169,14 +168,14 @@ class Roadspaces2CitygmlTransformer(
         val trafficSpaceProperties = dstTransportationSpaces.flatMap { it.trafficSpaces } + dstTransportationSpaces.flatMap { it.sections }.flatMap { it.`object`.trafficSpaces }
         val trafficSpacePropertiesAdjusted = trafficSpaceProperties.filter { it.`object`.id != null }
 
-        val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { configuration.gmlIdPrefix + it.id.hashedId }
+        val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { parameters.gmlIdPrefix + it.id.hashedId }
         trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
             val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrHandle { throw it.toIllegalArgumentException() }
             val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
             val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
 
-            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
-            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(configuration.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.gmlIdPrefix + it.hashedId) }
         }
     }
 

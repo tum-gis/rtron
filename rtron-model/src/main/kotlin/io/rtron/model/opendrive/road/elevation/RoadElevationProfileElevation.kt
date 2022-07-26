@@ -16,9 +16,11 @@
 
 package io.rtron.model.opendrive.road.elevation
 
+import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadElevationProfileElevation(
+@optics
+data class RoadElevationProfileElevation(
     var a: Double = Double.NaN,
     var b: Double = Double.NaN,
     var c: Double = Double.NaN,
@@ -30,10 +32,6 @@ class RoadElevationProfileElevation(
     val coefficients get() = doubleArrayOf(a, b, c, d)
 
     // Methods
-    fun coefficientsWithOffset(
-        offsetA: Double = 0.0,
-        offsetB: Double = 0.0,
-        offsetC: Double = 0.0,
-        offsetD: Double = 0.0
-    ) = doubleArrayOf(a + offsetA, b + offsetB, c + offsetC, d + offsetD)
+
+    companion object
 }

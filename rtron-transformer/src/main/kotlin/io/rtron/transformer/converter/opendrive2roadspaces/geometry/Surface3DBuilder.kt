@@ -21,8 +21,9 @@ import arrow.core.NonEmptyList
 import arrow.core.getOrHandle
 import arrow.core.separateEither
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.Message
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.io.messages.handleMessageList
 import io.rtron.io.messages.mergeToReport
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
@@ -39,19 +40,12 @@ import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlinesOutlineCornerRoad
 import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
-import io.rtron.transformer.report.of
+import io.rtron.transformer.messages.opendrive.of
 
 /**
  * Builder for surface geometries in 3D from the OpenDRIVE data model.
  */
-class Surface3DBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
-) {
-
-    // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(configuration)
-    private val _curve2DBuilder = Curve2DBuilder(configuration)
+object Surface3DBuilder {
 
     // Methods
 
@@ -59,18 +53,18 @@ class Surface3DBuilder(
      * Builds a list of rectangles from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildRectangles(roadObject: RoadObjectsObject, curveAffine: Affine3D): ContextMessageList<List<Rectangle3D>> {
+    fun buildRectangles(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<Rectangle3D>> {
         val rectangleList = mutableListOf<Rectangle3D>()
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         if (roadObject.isRectangle()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            rectangleList += Rectangle3D.of(roadObject.length, roadObject.width, configuration.numberTolerance, affineSequence)
+            rectangleList += Rectangle3D.of(roadObject.length, roadObject.width, numberTolerance, affineSequence)
         }
 
         if (roadObject.repeat.any { it.isRepeatedCuboid() })
-            messageList += Message.of("Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, isFatal = false, wasHealed = false)
+            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasHealed = false)
 
         return ContextMessageList(rectangleList, messageList)
     }
@@ -79,18 +73,18 @@ class Surface3DBuilder(
      * Builds a list of circles from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCircles(roadObject: RoadObjectsObject, curveAffine: Affine3D): ContextMessageList<List<Circle3D>> {
+    fun buildCircles(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<Circle3D>> {
         val circleList = mutableListOf<Circle3D>()
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         if (roadObject.isCircle()) {
             val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
             val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            circleList += Circle3D.of(roadObject.radius, configuration.numberTolerance, affineSequence)
+            circleList += Circle3D.of(roadObject.radius, numberTolerance, affineSequence)
         }
 
         if (roadObject.repeat.any { it.isRepeatCylinder() })
-            messageList += Message.of("Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, isFatal = false, wasHealed = false)
+            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasHealed = false)
 
         return ContextMessageList(circleList, messageList)
     }
@@ -98,14 +92,14 @@ class Surface3DBuilder(
     /**
      * Builds a list of linear rings from an OpenDRIVE road object defined by road corner outlines.
      */
-    fun buildLinearRingsByRoadCorners(roadObject: RoadObjectsObject, referenceLine: Curve3D): ContextMessageList<List<LinearRing3D>> {
-        val messageList = MessageList()
+    fun buildLinearRingsByRoadCorners(roadObject: RoadObjectsObject, referenceLine: Curve3D, numberTolerance: Double): ContextMessageList<List<LinearRing3D>> {
+        val messageList = DefaultMessageList()
 
         val (builderExceptions, linearRingsWithContext) = roadObject.getLinearRingsDefinedByRoadCorners()
-            .map { buildLinearRingByRoadCorners(it, referenceLine) }
+            .map { buildLinearRingByRoadCorners(it, referenceLine, numberTolerance) }
             .separateEither()
 
-        messageList += builderExceptions.map { Message.of(it.message, it.location, isFatal = false, wasHealed = true) }.mergeToReport()
+        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }.mergeToReport()
         val linearRings = linearRingsWithContext.handleMessageList { messageList += it.messageList }
 
         return ContextMessageList(linearRings, messageList)
@@ -114,7 +108,7 @@ class Surface3DBuilder(
     /**
      * Builds a single linear ring from an OpenDRIVE road object defined by road corner outlines.
      */
-    private fun buildLinearRingByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D):
+    private fun buildLinearRingByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D, numberTolerance: Double):
         Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> {
         require(outline.isLinearRingDefinedByRoadCorners()) { "Outline does not contain a linear ring represented by road corners." }
         require(outline.cornerRoad.all { it.height == 0.0 }) { "All cornerRoad elements must have a zero height." }
@@ -124,7 +118,7 @@ class Surface3DBuilder(
             .map { buildVertices(it, referenceLine) }
             .let { NonEmptyList.fromListUnsafe(it) }
 
-        return LinearRing3DFactory.buildFromVertices(outlineId, vertices, configuration.numberTolerance)
+        return LinearRing3DFactory.buildFromVertices(outlineId, vertices, numberTolerance)
     }
 
     /**
@@ -140,18 +134,18 @@ class Surface3DBuilder(
     /**
      * Builds a list of linear rings from an OpenDRIVE road object defined by local corner outlines.
      */
-    fun buildLinearRingsByLocalCorners(roadObject: RoadObjectsObject, curveAffine: Affine3D): ContextMessageList<List<LinearRing3D>> {
-        val messageList = MessageList()
+    fun buildLinearRingsByLocalCorners(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<LinearRing3D>> {
+        val messageList = DefaultMessageList()
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
         val (builderExceptions, linearRingsWithContext) = roadObject
             .getLinearRingsDefinedByLocalCorners()
-            .map { buildLinearRingByLocalCorners(it) }
+            .map { buildLinearRingByLocalCorners(it, numberTolerance) }
             .separateEither()
 
         messageList += builderExceptions
-            .map { Message.of(it.message, it.location, isFatal = false, wasHealed = true) }
+            .map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }
             .mergeToReport()
         val linearRings = linearRingsWithContext
             .handleMessageList { messageList += it.messageList }
@@ -163,14 +157,14 @@ class Surface3DBuilder(
     /**
      * Builds a single linear ring from an OpenDRIVE road object defined by local corner outlines.
      */
-    private fun buildLinearRingByLocalCorners(outline: RoadObjectsObjectOutlinesOutline): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> {
+    private fun buildLinearRingByLocalCorners(outline: RoadObjectsObjectOutlinesOutline, numberTolerance: Double): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> {
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
 
         val vertices = outline.cornerLocal
             .map { it.getBasePoint() }
             .let { NonEmptyList.fromListUnsafe(it) }
 
-        return LinearRing3DFactory.buildFromVertices(outlineId, vertices, configuration.numberTolerance)
+        return LinearRing3DFactory.buildFromVertices(outlineId, vertices, numberTolerance)
     }
 
     /**
@@ -178,13 +172,14 @@ class Surface3DBuilder(
      */
     fun buildParametricBoundedSurfacesByHorizontalRepeat(
         roadObjectRepeat: RoadObjectsObjectRepeat,
-        roadReferenceLine: Curve3D
+        roadReferenceLine: Curve3D,
+        numberTolerance: Double
     ): List<ParametricBoundedSurface3D> {
         if (!roadObjectRepeat.isHorizontalParametricBoundedSurface()) return emptyList()
 
         // curve over which the object is moved
-        val objectReferenceCurve2D = _curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine)
-        val objectReferenceHeight = _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
+        val objectReferenceCurve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine, numberTolerance)
+        val objectReferenceHeight = FunctionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
 
         // dimension of the object
         val widthFunction = roadObjectRepeat.getObjectWidthFunction()
@@ -195,7 +190,7 @@ class Surface3DBuilder(
         val rightBoundaryCurve2D = objectReferenceCurve2D.addLateralTranslation(widthFunction, +0.5)
         val rightBoundary = Curve3D(rightBoundaryCurve2D, objectReferenceHeight)
 
-        val parametricBoundedSurface = ParametricBoundedSurface3D(leftBoundary, rightBoundary, configuration.numberTolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
+        val parametricBoundedSurface = ParametricBoundedSurface3D(leftBoundary, rightBoundary, numberTolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
         return listOf(parametricBoundedSurface)
     }
 
@@ -204,13 +199,14 @@ class Surface3DBuilder(
      */
     fun buildParametricBoundedSurfacesByVerticalRepeat(
         roadObjectRepeat: RoadObjectsObjectRepeat,
-        roadReferenceLine: Curve3D
+        roadReferenceLine: Curve3D,
+        numberTolerance: Double
     ): List<ParametricBoundedSurface3D> {
         if (!roadObjectRepeat.isVerticalParametricBoundedSurface()) return emptyList()
 
         // curve over which the object is moved
-        val objectReferenceCurve2D = _curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine)
-        val objectReferenceHeight = _functionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
+        val objectReferenceCurve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine, numberTolerance)
+        val objectReferenceHeight = FunctionBuilder.buildStackedHeightFunctionFromRepeat(roadObjectRepeat, roadReferenceLine)
 
         // dimension of the object
         val heightFunction = roadObjectRepeat.getObjectHeightFunction()
@@ -220,7 +216,7 @@ class Surface3DBuilder(
         val upperBoundaryHeight = StackedFunction.ofSum(objectReferenceHeight, heightFunction, defaultValue = 0.0)
         val upperBoundary = Curve3D(objectReferenceCurve2D, upperBoundaryHeight)
 
-        val parametricBoundedSurface = ParametricBoundedSurface3D(lowerBoundary, upperBoundary, configuration.numberTolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
+        val parametricBoundedSurface = ParametricBoundedSurface3D(lowerBoundary, upperBoundary, numberTolerance, ParametricBoundedSurface3D.DEFAULT_STEP_SIZE)
         return listOf(parametricBoundedSurface)
     }
 }

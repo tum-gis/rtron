@@ -32,5 +32,3 @@ sealed class GeometryBuilderException(val message: String, open val location: Ab
     data class NotEnoughValidOutlineElementsForLinearRing(override val location: AbstractOpendriveIdentifier) :
         GeometryBuilderException("A linear ring requires at least three valid vertices.", location)
 }
-
-fun GeometryBuilderException.toIllegalStateException() = IllegalStateException(this.message)

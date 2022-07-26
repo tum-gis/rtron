@@ -19,8 +19,5 @@ package io.rtron.transformer.converter.opendrive2roadspaces
 import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
 
 sealed class Opendrive2RoadspacesTransformationException(val message: String, open val location: AbstractOpendriveIdentifier) {
-
-    data class PlanViewGeometryException(val reason: String, override val location: AbstractOpendriveIdentifier) : Opendrive2RoadspacesTransformationException("Plan view geometry cloud not be built: $reason", location)
-
     data class ZeroLengthRoadMarking(override val location: AbstractOpendriveIdentifier) : Opendrive2RoadspacesTransformationException("Length of road marking is zero (or below tolerance threshold).", location)
 }

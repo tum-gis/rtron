@@ -18,5 +18,5 @@ package io.rtron.model.opendrive.additions.identifier
 
 abstract class AbstractOpendriveIdentifier {
 
-    abstract fun toStringMap(): Map<String, String>
+    abstract override fun toString(): String
 }

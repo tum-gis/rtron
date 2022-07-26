@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.curved.threed.surface
 
-import arrow.core.Either
 import arrow.core.getOrHandle
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -51,13 +50,12 @@ class SectionedCurveRelativeParametricSurface3D(
     }
 
     // Methods
-    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-        Either<Exception, Vector3D> {
+    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D {
 
         val pointOnCompleteSurface = CurveRelativeVector2D(
             sectionStart + curveRelativePoint.curvePosition,
             curveRelativePoint.lateralOffset
         )
-        return completeCurveRelativeSurface.calculatePointGlobalCS(pointOnCompleteSurface, addHeightOffset)
+        return completeCurveRelativeSurface.calculatePointGlobalCSUnbounded(pointOnCompleteSurface, addHeightOffset)
     }
 }

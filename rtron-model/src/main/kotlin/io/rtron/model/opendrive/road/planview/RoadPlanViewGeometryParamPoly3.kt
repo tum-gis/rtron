@@ -37,9 +37,5 @@ class RoadPlanViewGeometryParamPoly3(
     val coefficientsV get() = doubleArrayOf(aV, bV, cV, dV)
 
     // Methods
-
-    fun isNaN() = aU.isNaN() || bU.isNaN() || cU.isNaN() || dU.isNaN() ||
-        aV.isNaN() || bV.isNaN() || cV.isNaN() || dV.isNaN()
-
     fun isNormalized() = pRange == ParamPoly3PRange.NORMALIZED
 }

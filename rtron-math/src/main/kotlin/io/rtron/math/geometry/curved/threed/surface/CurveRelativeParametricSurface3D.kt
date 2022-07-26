@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.curved.threed.surface
 
-import arrow.core.Either
 import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
@@ -48,8 +47,7 @@ class CurveRelativeParametricSurface3D(
     }
 
     // Methods
-    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-        Either<Exception, Vector3D> {
+    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D {
 
         val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
         val surfaceHeight = heightFunction
@@ -57,6 +55,6 @@ class CurveRelativeParametricSurface3D(
             .getOrHandle { throw it }
         val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
 
-        return Either.Right(affine.transform(offset))
+        return affine.transform(offset)
     }
 }

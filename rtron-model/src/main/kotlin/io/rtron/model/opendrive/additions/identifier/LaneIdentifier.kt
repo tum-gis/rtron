@@ -26,7 +26,9 @@ data class LaneIdentifier(override val laneId: Int, val laneSectionIdentifier: L
     AbstractOpendriveIdentifier(), LaneIdentifierInterface, RoadLaneSectionIdentifierInterface by laneSectionIdentifier {
 
     // Conversions
-    override fun toStringMap() = mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
+    override fun toString() = "Lane: laneId=$laneId, " +
+        "laneSectionIndex=${laneSectionIdentifier.laneSectionIndex}, " +
+        "roadId=${laneSectionIdentifier.roadIdentifier.roadId}"
 }
 
 interface AdditionalLaneIdentifier {

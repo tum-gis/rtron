@@ -19,6 +19,8 @@ package io.rtron.math.geometry.euclidean.threed.curve
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
+import arrow.core.left
+import arrow.core.right
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
@@ -28,7 +30,7 @@ import io.rtron.math.range.BoundType
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Tolerable
 import io.rtron.math.range.arrange
-import io.rtron.math.range.fuzzyContainsResult
+import io.rtron.math.range.fuzzyContains
 import io.rtron.math.range.length
 
 /**
@@ -54,10 +56,11 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> = either.eager {
-        domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance)
-            .mapLeft { GeometryException.DiscretizationError(it.message!!) }.bind()
-        calculatePointLocalCSUnbounded(curveRelativePoint).bind()
+    fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> {
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+            return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+
+        return calculatePointLocalCSUnbounded(curveRelativePoint).right()
     }
 
     /**
@@ -67,8 +70,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    protected abstract fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<GeometryException, Vector3D>
+    protected abstract fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D
 
     /**
      * Returns the point in the global cartesian coordinate system that is located on this curve and given by a
@@ -78,8 +80,22 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> =
-        calculatePointLocalCS(curveRelativePoint).map { affineSequence.solve().transform(it) }
+    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Vector3D> {
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+            return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+
+        return calculatePointGlobalCSUnbounded(curveRelativePoint).right()
+    }
+
+    /**
+     * Returns the point in the global cartesian coordinate system that is located on this curve and given by a
+     * point in the curve relative coordinate system.
+     *
+     * @param curveRelativePoint point in curve relative coordinates
+     * @return point in cartesian coordinates
+     */
+    fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D =
+        calculatePointLocalCSUnbounded(curveRelativePoint).let { affineSequence.solve().transform(it) }
 
     /**
      * Returns the start point in the global cartesian coordinate system that is located on this curve.
@@ -98,7 +114,8 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param includeEndPoint true, if the endpoint shall be included
      * @return list of points on this curve
      */
-    fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true): Either<GeometryException, NonEmptyList<Vector3D>> = either.eager {
+    fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true):
+        Either<GeometryException.ValueNotContainedInDomain, NonEmptyList<Vector3D>> = either.eager {
 
         domain.arrange(step, includeEndPoint, tolerance)
             .map(::CurveRelativeVector1D)

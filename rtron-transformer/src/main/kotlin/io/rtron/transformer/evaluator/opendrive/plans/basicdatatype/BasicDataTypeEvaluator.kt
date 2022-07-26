@@ -17,24 +17,24 @@
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
 
-class BasicDataTypeEvaluator(val configuration: OpendriveEvaluatorConfiguration) : AbstractOpendriveEvaluator() {
+class BasicDataTypeEvaluator(val parameters: OpendriveEvaluatorParameters) : AbstractOpendriveEvaluator() {
 
     // Properties and Initializers
-    private val _coreEvaluator = CoreEvaluator(configuration)
-    private val _roadLanesEvaluator = RoadLanesEvaluator(configuration)
-    private val _roadEvaluator = RoadEvaluator(configuration)
-    private val _roadObjectsEvaluator = RoadObjectsEvaluator(configuration)
-    private val _roadSignalsEvaluator = RoadSignalsEvaluator(configuration)
-    private val _junctionEvaluator = JunctionEvaluator(configuration)
+    private val _coreEvaluator = CoreEvaluator(parameters)
+    private val _roadLanesEvaluator = RoadLanesEvaluator(parameters)
+    private val _roadEvaluator = RoadEvaluator(parameters)
+    private val _roadObjectsEvaluator = RoadObjectsEvaluator(parameters)
+    private val _roadSignalsEvaluator = RoadSignalsEvaluator(parameters)
+    private val _junctionEvaluator = JunctionEvaluator(parameters)
 
     // Methods
-    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
-        val messageList = MessageList()
+    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         messageList += _coreEvaluator.evaluateFatalViolations(opendriveModel)
         messageList += _roadEvaluator.evaluateFatalViolations(opendriveModel)
@@ -47,7 +47,7 @@ class BasicDataTypeEvaluator(val configuration: OpendriveEvaluatorConfiguration)
     }
 
     override fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
         var healedOpendriveModel = opendriveModel
 
         _coreEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {

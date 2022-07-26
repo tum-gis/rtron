@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
 import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -55,17 +54,16 @@ class CubicCurve2D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Vector2D> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
 
         val x = curveRelativePoint.curvePosition
         val y = _polynomialFunction.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
-        return Either.Right(Vector2D(x, y))
+        return Vector2D(x, y)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<Exception, Rotation2D> {
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
         val angle = _polynomialFunction.slope(curveRelativePoint.curvePosition).getOrHandle { throw it }
-        return Either.Right(Rotation2D(angle))
+        return Rotation2D(angle)
     }
 
     override fun equals(other: Any?): Boolean {

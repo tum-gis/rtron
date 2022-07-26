@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.evaluator.opendrive.configuration
+package io.rtron.transformer.modifiers.opendrive.shifter
 
-/**
- * Configuration for the OpenDRIVE validator.
- */
-data class OpendriveEvaluatorConfiguration(
-    val numberTolerance: Double,
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class OpendriveShifterReport(
+    val parameters: OpendriveShifterParameters
 )

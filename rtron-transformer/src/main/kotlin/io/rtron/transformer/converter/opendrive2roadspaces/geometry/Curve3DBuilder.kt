@@ -16,43 +16,42 @@
 
 package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 
-import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.Option
-import arrow.core.continuations.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.model.opendrive.objects.RoadObjectsObject
 import io.rtron.model.opendrive.road.elevation.RoadElevationProfileElevation
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometry
 import io.rtron.std.isStrictlySortedBy
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 
 /**
  * Builder for curves in 3D from the OpenDRIVE data model.
  */
-class Curve3DBuilder(
-    private val configuration: Opendrive2RoadspacesConfiguration
-) {
-
-    // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(configuration)
-    private val _curve2DBuilder = Curve2DBuilder(configuration)
+object Curve3DBuilder {
 
     // Methods
 
     /**
      * Builds a curve in 3D from OpenDRIVE's plan view entries and the elevation profile.
      */
-    fun buildCurve3D(planViewGeometries: NonEmptyList<RoadPlanViewGeometry>, elevationProfiles: Option<NonEmptyList<RoadElevationProfileElevation>>): Either<GeometryException, Curve3D> = either.eager {
-        val planViewCurve2D = _curve2DBuilder.buildCurve2DFromPlanViewGeometries(planViewGeometries, configuration.offsetXY).bind()
+    fun buildCurve3D(
+        planViewGeometries: NonEmptyList<RoadPlanViewGeometry>,
+        elevationProfiles: Option<NonEmptyList<RoadElevationProfileElevation>>,
+        numberTolerance: Double,
+        distanceTolerance: Double,
+        angleTolerance: Double
+    ): Curve3D {
+        val planViewCurve2D = Curve2DBuilder.buildCurve2DFromPlanViewGeometries(
+            planViewGeometries, numberTolerance,
+            distanceTolerance, angleTolerance
+        )
         val heightFunction = elevationProfiles.fold({ LinearFunction.X_AXIS }, { buildHeightFunction(it) })
 
-        Curve3D(planViewCurve2D, heightFunction)
+        return Curve3D(planViewCurve2D, heightFunction)
     }
 
     /**
@@ -63,7 +62,7 @@ class Curve3DBuilder(
 
         return ConcatenatedFunction.ofPolynomialFunctions(
             elevationProfiles.map { it.s },
-            elevationProfiles.map { it.coefficientsWithOffset(offsetA = configuration.offsetZ) },
+            elevationProfiles.map { it.coefficients },
             prependConstant = true,
             prependConstantValue = 0.0
         )
@@ -72,12 +71,12 @@ class Curve3DBuilder(
     /**
      * Builds a curve in 3D from OpenDRIVE's road object entry [roadObject].
      */
-    fun buildCurve3D(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D): List<Curve3D> {
+    fun buildCurve3D(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D, numberTolerance: Double): List<Curve3D> {
         if (roadObject.repeat.isEmpty()) return emptyList() // TODO fix repeat list handling
         if (!roadObject.repeat.first().isCurve()) return emptyList() // TODO fix repeat list handling
 
-        val curve2D = _curve2DBuilder.buildLateralTranslatedCurve(roadObject.repeat.first(), roadReferenceLine) // TODO fix repeat list handling
-        val heightFunction = _functionBuilder
+        val curve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObject.repeat.first(), roadReferenceLine, numberTolerance) // TODO fix repeat list handling
+        val heightFunction = FunctionBuilder
             .buildStackedHeightFunctionFromRepeat(roadObject.repeat.first(), roadReferenceLine) // TODO fix repeat list handling
 
         val curve3D = Curve3D(curve2D, heightFunction)

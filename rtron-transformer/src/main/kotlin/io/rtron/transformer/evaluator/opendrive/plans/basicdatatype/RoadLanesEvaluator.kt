@@ -18,32 +18,32 @@ package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
 import arrow.core.None
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessage
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.additions.optics.everyLaneSection
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLane
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLane
-import io.rtron.std.filterToStrictSortingBy
-import io.rtron.transformer.evaluator.opendrive.configuration.OpendriveEvaluatorConfiguration
-import io.rtron.transformer.evaluator.opendrive.report.toMessage
-import io.rtron.transformer.evaluator.opendrive.report.toReport
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
+import io.rtron.transformer.evaluator.opendrive.manipulators.BasicDataTypeManipulator
+import io.rtron.transformer.messages.opendrive.of
 
-class RoadLanesEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
+class RoadLanesEvaluator(val parameters: OpendriveEvaluatorParameters) {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): MessageList {
-        val messageList = MessageList()
+    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         everyRoadLanesLaneSectionLeftLane.modify(opendriveModel) { currentLeftLane ->
-            messageList += getSevereViolations(currentLeftLane).toReport(currentLeftLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += getSevereViolations(currentLeftLane)
             currentLeftLane
         }
 
         everyRoadLanesLaneSectionRightLane.modify(opendriveModel) { currentRightLane ->
-            messageList += getSevereViolations(currentRightLane).toReport(currentRightLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += getSevereViolations(currentRightLane)
             currentRightLane
         }
 
@@ -51,27 +51,27 @@ class RoadLanesEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
     }
 
     fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
         var healedOpendriveModel = opendriveModel
 
         healedOpendriveModel = everyLaneSection.modify(healedOpendriveModel) { currentLaneSection ->
 
             currentLaneSection.left.tap {
                 if (it.lane.isEmpty()) {
-                    messageList += OpendriveException.EmptyValueForOptionalAttribute("left").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
+                    messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'left' is set with an empty value even though the attribute itself is optional.", currentLaneSection.additionalId, Severity.WARNING, wasHealed = true)
                     currentLaneSection.left = None
                 }
             }
 
             currentLaneSection.right.tap {
                 if (it.lane.isEmpty()) {
-                    messageList += OpendriveException.EmptyValueForOptionalAttribute("left").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
+                    messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'right' is set with an empty value even though the attribute itself is optional.", currentLaneSection.additionalId, Severity.WARNING, wasHealed = true)
                     currentLaneSection.right = None
                 }
             }
 
             if (currentLaneSection.center.lane.isEmpty()) {
-                messageList += OpendriveException.EmptyList("lane").toMessage(currentLaneSection.additionalId, isFatal = false, wasHealed = true)
+                messageList += DefaultMessage.of("NoLanesInLaneSection", "Lane section does not contain lanes.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasHealed = false)
                 currentLaneSection.center.lane += RoadLanesLaneSectionCenterLane()
             }
 
@@ -79,62 +79,68 @@ class RoadLanesEvaluator(val configuration: OpendriveEvaluatorConfiguration) {
         }
 
         healedOpendriveModel = everyRoadLanesLaneSectionLeftLane.modify(healedOpendriveModel) { currentLeftLane ->
-            messageList += healMinorViolations(currentLeftLane).toReport(currentLeftLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += healMinorViolations(currentLeftLane)
             currentLeftLane
         }
 
         healedOpendriveModel = everyRoadLanesLaneSectionRightLane.modify(healedOpendriveModel) { currentRightLane ->
-            messageList += healMinorViolations(currentRightLane).toReport(currentRightLane.additionalId, isFatal = true, wasHealed = false)
+            messageList += healMinorViolations(currentRightLane)
             currentRightLane
         }
 
         return ContextMessageList(healedOpendriveModel, messageList)
     }
 
-    private fun getSevereViolations(lane: RoadLanesLaneSectionLRLane): List<OpendriveException> {
-        val severeViolations = mutableListOf<OpendriveException>()
+    private fun getSevereViolations(lane: RoadLanesLaneSectionLRLane): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
         lane.getLaneWidthEntries().tap {
-            if (it.head.sOffset > configuration.numberTolerance)
-                severeViolations += OpendriveException.NonStrictlySortedList("width", "The width of the lane shall be defined for the full length of the lane section. This means that there must be a <width> element for s=0.")
+            if (it.head.sOffset > parameters.numberTolerance)
+                messageList += DefaultMessage.of("NonStrictlySortedList", "The width of the lane shall be defined for the full length of the lane section. This means that there must be a <width> element for s=0.", lane.additionalId, Severity.FATAL_ERROR, wasHealed = false)
         }
 
-        return severeViolations
+        return messageList
     }
 
-    private fun healMinorViolations(lane: RoadLanesLaneSectionLRLane): List<OpendriveException> {
-        val healedViolations = mutableListOf<OpendriveException>()
+    private fun healMinorViolations(lane: RoadLanesLaneSectionLRLane): DefaultMessageList {
+        val messageList = DefaultMessageList()
 
-        val widthEntriesFiltered = lane.width.filterToStrictSortingBy { it.sOffset }
+        lane.width = BasicDataTypeManipulator.filterToStrictlySorted(lane.width, { it.sOffset }, lane.additionalId, "width", messageList)
+
+        /*val widthEntriesFiltered = lane.width.filterToStrictSortingBy { it.sOffset }
         if (widthEntriesFiltered.size < lane.width.size) {
             healedViolations += OpendriveException.NonStrictlySortedList("width", "Ignoring ${lane.width.size - widthEntriesFiltered.size} width entries which are not placed in strict order according to sOffset.")
             lane.width = widthEntriesFiltered
-        }
+        }*/
 
         val widthEntriesFilteredBySOffsetFinite = lane.width.filter { currentWidth -> currentWidth.sOffset.isFinite() && currentWidth.sOffset >= 0.0 }
         if (widthEntriesFilteredBySOffsetFinite.size < lane.width.size) {
-            healedViolations += OpendriveException.UnexpectedValues("sOffset", "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is not-finite and positive.")
+            // messageList += OpendriveException.UnexpectedValues("sOffset", "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is not-finite and positive.").toMessage(lane.additionalId, isFatal = true, wasHealed = true)
+            messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is not-finite and positive.", lane.additionalId, Severity.FATAL_ERROR, wasHealed = true)
             lane.width = widthEntriesFilteredBySOffsetFinite
         }
 
         val widthEntriesFilteredByCoefficientsFinite = lane.width.filter { currentWidth -> currentWidth.coefficients.all { it.isFinite() } }
         if (widthEntriesFilteredByCoefficientsFinite.size < lane.width.size) {
-            healedViolations += OpendriveException.UnexpectedValues("a, b, c, d", "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where coefficients are not finite.")
+            messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where coefficients \"a, b, c, d\", are not finite.", lane.additionalId, Severity.FATAL_ERROR, wasHealed = true)
+            // messageList += OpendriveException.UnexpectedValues("a, b, c, d", "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where coefficients are not finite.").toMessage(lane.additionalId, isFatal = true, wasHealed = true)
             lane.width = widthEntriesFilteredByCoefficientsFinite
         }
 
-        val heightEntriesFiltered = lane.height.filterToStrictSortingBy { it.sOffset }
+        lane.height = BasicDataTypeManipulator.filterToStrictlySorted(lane.height, { it.sOffset }, lane.additionalId, "height", messageList)
+        /*val heightEntriesFiltered = lane.height.filterToStrictSortingBy { it.sOffset }
         if (heightEntriesFiltered.size < lane.height.size) {
-            healedViolations += OpendriveException.NonStrictlySortedList("height", "Ignoring ${lane.height.size - heightEntriesFiltered.size} height entries which are not placed in strict order according to sOffset.")
+            messageList += OpendriveException.NonStrictlySortedList("height", "Ignoring ${lane.height.size - heightEntriesFiltered.size} height entries which are not placed in strict order according to sOffset.").toMessage(lane.additionalId, isFatal = true, wasHealed = true)
             lane.height = heightEntriesFiltered
-        }
+        }*/
 
         val heightEntriesFilteredByCoefficientsFinite = lane.height.filter { it.inner.isFinite() && it.outer.isFinite() }
         if (heightEntriesFilteredByCoefficientsFinite.size < lane.height.size) {
-            healedViolations += OpendriveException.UnexpectedValues("inner, outer", "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.")
+            messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.", lane.additionalId, Severity.FATAL_ERROR, wasHealed = true)
+            // messageList += OpendriveException.UnexpectedValues("inner, outer", "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.").toMessage(lane.additionalId, isFatal = true, wasHealed = true)
             lane.height = heightEntriesFilteredByCoefficientsFinite
         }
 
-        return healedViolations
+        return messageList
     }
 }

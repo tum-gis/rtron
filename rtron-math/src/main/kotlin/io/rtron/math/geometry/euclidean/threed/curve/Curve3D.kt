@@ -21,7 +21,6 @@ import arrow.core.continuations.either
 import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
-import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.curve.CurveRelativeLineSegment3D
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
@@ -29,7 +28,7 @@ import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.curve.AbstractCurve2D
-import io.rtron.math.range.fuzzyContainsResult
+import io.rtron.math.range.fuzzyContains
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.transform.Affine3D
 
@@ -61,12 +60,11 @@ data class Curve3D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
 
-        val pointXY = curveXY.calculatePointGlobalCS(curveRelativePoint).getOrHandle { throw it }
+        val pointXY = curveXY.calculatePointGlobalCSUnbounded(curveRelativePoint)
         val height = heightFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance).getOrHandle { throw it }
-        val vector = Vector3D(pointXY.x, pointXY.y, height)
-        return Either.Right(vector)
+        return Vector3D(pointXY.x, pointXY.y, height)
     }
 
     /**
@@ -76,9 +74,9 @@ data class Curve3D(
      * @return pose whereby the orientation is tangential to this curve and its torsion
      */
     fun calculatePose(curveRelativePoint: CurveRelativeVector1D): Pose3D {
-        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).getOrHandle { throw it }
+        require(this.domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
 
-        val poseXY = curveXY.calculatePoseGlobalCS(curveRelativePoint).getOrHandle { throw it }
+        val poseXY = curveXY.calculatePoseGlobalCSUnbounded(curveRelativePoint)
         val height = heightFunction.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
         val torsion = torsionFunction.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
 
@@ -105,8 +103,7 @@ data class Curve3D(
      */
     fun transform(curveRelativePoint: CurveRelativeVector3D): Vector3D {
         val affine = calculateAffine(curveRelativePoint.toCurveRelative1D())
-        val vector = affine.transform(curveRelativePoint.getCartesianCurveOffset())
-        return vector
+        return affine.transform(curveRelativePoint.getCartesianCurveOffset())
     }
 
     /**

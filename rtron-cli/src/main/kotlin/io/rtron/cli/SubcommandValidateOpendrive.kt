@@ -25,10 +25,10 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.path
-import io.rtron.main.processor.ValidateOpendriveConfiguration
+import io.rtron.main.processor.ValidateOpendriveParameters
 import io.rtron.main.processor.ValidateOpendriveProcessor
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
-import io.rtron.transformer.converter.roadspaces2citygml.configuration.Roadspaces2CitygmlConfiguration
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 
 class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", help = "Validate OpenDRIVE datasets.", printHelpOnEmptyArgs = true) {
 
@@ -37,8 +37,8 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
         context { helpFormatter = ColorFormatter() }
     }
 
-    private val configPath by option(
-        help = "Path to a YAML configuration of the process."
+    private val parametersPath by option(
+        help = "Path to a YAML file containing the parameters of the process."
     ).path(mustExist = true)
 
     private val inputPath by argument(
@@ -49,26 +49,26 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
     ).path()
 
     private val tolerance by option(help = "allowed tolerance when comparing double values").double()
-        .default(Opendrive2RoadspacesConfiguration.DEFAULT_NUMBER_TOLERANCE)
+        .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
-        .default(Roadspaces2CitygmlConfiguration.DEFAULT_DISCRETIZATION_STEP_SIZE)
+        .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
 
     // Methods
     override fun run() {
 
-        val configuration = configPath.toOption().fold({
-            ValidateOpendriveConfiguration(
+        val parameters = parametersPath.toOption().fold({
+            ValidateOpendriveParameters(
                 tolerance = tolerance,
                 discretizationStepSize = discretizationStepSize
             )
-        }, { configurationFilePath ->
-            val configurationText = configurationFilePath.toFile().readText()
+        }, { parametersFilePath ->
+            val parametersText = parametersFilePath.toFile().readText()
 
-            Yaml.default.decodeFromString(ValidateOpendriveConfiguration.serializer(), configurationText)
+            Yaml.default.decodeFromString(ValidateOpendriveParameters.serializer(), parametersText)
         })
 
-        val processor = ValidateOpendriveProcessor(configuration)
+        val processor = ValidateOpendriveProcessor(parameters)
         processor.process(inputPath, outputPath)
     }
 }

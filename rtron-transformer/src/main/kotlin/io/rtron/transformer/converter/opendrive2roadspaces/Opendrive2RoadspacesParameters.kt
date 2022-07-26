@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.converter.opendrive2roadspaces.configuration
+package io.rtron.transformer.converter.opendrive2roadspaces
 
-import io.rtron.io.files.FileIdentifier
-import io.rtron.math.geometry.euclidean.twod.point.Vector2D
+import kotlinx.serialization.Serializable
 
 /**
- * Transformation configuration for the OpenDRIVE to RoadSpace transformer.
+ * Transformation parameters for the OpenDRIVE to RoadSpace transformer.
  */
-data class Opendrive2RoadspacesConfiguration(
-    val sourceFileIdentifier: FileIdentifier,
+@Serializable
+data class Opendrive2RoadspacesParameters(
     val concurrentProcessing: Boolean,
 
     /** allowed tolerance when comparing double values */
@@ -37,20 +36,9 @@ data class Opendrive2RoadspacesConfiguration(
     val attributesPrefix: String = DEFAULT_ATTRIBUTES_PREFIX,
     /** [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications) */
     val crsEpsg: Int = DEFAULT_CRS_EPSG,
-    /** offset by which the model is translated along the x axis */
-    val offsetX: Double = DEFAULT_OFFSET_X,
-    /** offset by which the model is translated along the y axis */
-    val offsetY: Double = DEFAULT_OFFSET_Y,
-    /** offset by which the model is translated along the z axis */
-    val offsetZ: Double = DEFAULT_OFFSET_Z,
     /** linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown) */
     val extrapolateLateralRoadShapes: Boolean = DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
 ) {
-
-    /**
-     * offset in the xy plane as vector
-     */
-    val offsetXY: Vector2D = Vector2D(offsetX, offsetY)
 
     companion object {
         const val DEFAULT_NUMBER_TOLERANCE = 1E-7
@@ -59,9 +47,6 @@ data class Opendrive2RoadspacesConfiguration(
 
         const val DEFAULT_ATTRIBUTES_PREFIX = "opendrive_"
         const val DEFAULT_CRS_EPSG = 0
-        const val DEFAULT_OFFSET_X = 0.0
-        const val DEFAULT_OFFSET_Y = 0.0
-        const val DEFAULT_OFFSET_Z = 0.0
         const val DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES = false
     }
 }

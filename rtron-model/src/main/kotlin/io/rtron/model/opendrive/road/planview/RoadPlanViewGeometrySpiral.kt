@@ -21,8 +21,4 @@ import io.rtron.model.opendrive.core.OpendriveElement
 class RoadPlanViewGeometrySpiral(
     var curvEnd: Double = Double.NaN,
     var curvStart: Double = Double.NaN,
-) : OpendriveElement() {
-
-    // both values are required to construct the spiral
-    fun isNaN() = curvStart.isNaN() || curvEnd.isNaN()
-}
+) : OpendriveElement()

@@ -18,7 +18,6 @@ package io.rtron.readerwriter.citygml
 
 import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.model.citygml.CitygmlModel
-import io.rtron.readerwriter.citygml.configuration.CitygmlWriterConfiguration
 import mu.KotlinLogging
 import org.citygml4j.xml.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
@@ -27,7 +26,7 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 
 class CitygmlWriter(
-    val configuration: CitygmlWriterConfiguration
+    val parameters: CitygmlWriterParameters
 ) {
 
     // Properties and Initializers
@@ -38,8 +37,7 @@ class CitygmlWriter(
     // Methods
 
     fun writeModel(model: CitygmlModel, directoryPath: Path): List<Path> {
-        val filePaths = configuration.versions.map { write(model, it, directoryPath) }
-        return filePaths
+        return parameters.versions.map { write(model, it, directoryPath) }
     }
 
     private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean = true): Path {
@@ -62,7 +60,7 @@ class CitygmlWriter(
         }
 
         writer.close()
-        logger.info("Completed writing of file $fileName (around ${filePath.getFileSizeToDisplay()}). ✔")
+        logger.info("Completed writing of file $fileName (around ${filePath.getFileSizeToDisplay()}).")
         return filePath
     }
 

@@ -17,15 +17,12 @@
 package io.rtron.model.opendrive
 
 import arrow.core.NonEmptyList
-import arrow.core.Validated
 import arrow.optics.optics
 import io.rtron.model.AbstractModel
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 import io.rtron.model.opendrive.core.Header
 import io.rtron.model.opendrive.junction.Junction
 import io.rtron.model.opendrive.road.Road
 import io.rtron.model.opendrive.signal.Controller
-import io.rtron.std.toValidated
 
 /**
  * Implementation of the OpenDRIVE data model according to version 1.7.
@@ -40,8 +37,8 @@ data class OpendriveModel(
 ) : AbstractModel() {
 
     // Properties and Initializers
-    val roadValidated: Validated<OpendriveException.EmptyList, NonEmptyList<Road>>
-        get() = NonEmptyList.fromList(road).toValidated { OpendriveException.EmptyList("road") }
+    val roadAsNonEmptyList: NonEmptyList<Road>
+        get() = NonEmptyList.fromListUnsafe(road)
 
     companion object
 }

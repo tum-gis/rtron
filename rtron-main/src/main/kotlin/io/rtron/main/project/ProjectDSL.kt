@@ -79,13 +79,13 @@ fun processAllFiles(inputDirectoryPath: Path, withExtensions: Set<String>, outpu
         val inputFileRelativePath = inputDirectoryPath.relativize(currentPath)
         val projectOutputDirectoryPath = outputDirectoryPath.resolve(inputFileRelativePath)
 
-        logger.info("Starting project (${index + 1}/$totalNumber): $inputFileRelativePath 💪💪💪")
+        logger.info("Starting project (${index + 1}/$totalNumber): $inputFileRelativePath")
 
         val timeElapsed = measureTime {
             val project = Project(currentPath, projectOutputDirectoryPath)
             project.apply(process)
         }
 
-        logger.info("Completed project after $timeElapsed. ✔✔✔" + System.lineSeparator())
+        logger.info("Completed project after $timeElapsed." + System.lineSeparator())
     }
 }

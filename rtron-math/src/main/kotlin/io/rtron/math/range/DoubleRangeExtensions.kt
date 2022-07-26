@@ -16,7 +16,6 @@
 
 package io.rtron.math.range
 
-import arrow.core.Either
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.math.std.fuzzyLessThanOrEquals
 import kotlin.math.absoluteValue
@@ -64,19 +63,6 @@ fun Range<Double>.fuzzyContains(value: Double, tolerance: Double): Boolean = whe
         fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance) &&
             fuzzyLessThanOrEquals(value, upperEndpointOrNull()!!, tolerance)
 }
-
-/**
- * Returns [Either.Right], if the [value] is fuzzily contained within this [Range] by the [tolerance].
- *
- * @param value value to be checked
- * @param tolerance allowed tolerance fuzziness
- * @return [Either.Right], if [value] is fuzzily contained; [Either.Left], otherwise
- */
-fun Range<Double>.fuzzyContainsResult(value: Double, tolerance: Double): Either<IllegalArgumentException, Boolean> =
-    when (this.fuzzyContains(value, tolerance)) {
-        true -> Either.Right(true)
-        false -> Either.Left(IllegalArgumentException("Value ($value) is not fuzzily contained in range $this."))
-    }
 
 /**
  * Widens the lower bound of the [Range] by [lowerWideningValue] and the upper bound of the

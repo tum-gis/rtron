@@ -16,23 +16,33 @@
 
 package io.rtron.transformer.evaluator.opendrive.report
 
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.messages.Severity
+import io.rtron.io.messages.getNumberOfMessages
+import io.rtron.io.messages.getTextSummary
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class OpendriveEvaluationReport(
-    var basicDataTypeEvaluation: MessageList = MessageList(),
+    val parameters: OpendriveEvaluatorParameters,
 
-    var modelingRulesEvaluation: MessageList = MessageList(),
-
-    var conversionRequirementsEvaluation: MessageList = MessageList()
+    var basicDataTypePlan: DefaultMessageList = DefaultMessageList(),
+    var modelingRulesPlan: DefaultMessageList = DefaultMessageList(),
+    var conversionRequirementsPlan: DefaultMessageList = DefaultMessageList()
 ) {
 
     /**
      * Returns a summary of the message numbers depending on the severity.
      */
     fun getTextSummary(): String =
-        "Basic data type evaluation ${basicDataTypeEvaluation.getTextSummary()}, " +
-            "modeling rules evaluation: ${modelingRulesEvaluation.getTextSummary()}, " +
-            "conversion requirements evaluation: ${conversionRequirementsEvaluation.getTextSummary()}"
+        "Basic data type plan ${basicDataTypePlan.getTextSummary()}, " +
+            "modeling rules plan: ${modelingRulesPlan.getTextSummary()}, " +
+            "conversion requirements plan: ${conversionRequirementsPlan.getTextSummary()}"
+
+    fun containsFatalErrors(): Boolean = (
+        basicDataTypePlan.getNumberOfMessages(Severity.FATAL_ERROR) +
+            modelingRulesPlan.getNumberOfMessages(Severity.FATAL_ERROR) +
+            conversionRequirementsPlan.getNumberOfMessages(Severity.FATAL_ERROR)
+        ) > 0
 }

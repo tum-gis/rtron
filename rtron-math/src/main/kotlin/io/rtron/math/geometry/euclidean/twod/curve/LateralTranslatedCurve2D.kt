@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
 import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
@@ -51,28 +52,24 @@ data class LateralTranslatedCurve2D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Vector2D> = either.eager {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
 
-        val curveAffine = baseCurve.calculatePoseGlobalCS(curveRelativePoint).bind()
+        val curveAffine = baseCurve.calculatePoseGlobalCSUnbounded(curveRelativePoint)
             .let { Affine2D.of(it) }
 
         val translation = calculateTranslation(curveRelativePoint).bind().lateralOffset
 
-        val point = curveAffine.transform(Vector2D(0.0, translation))
-        point
+        return curveAffine.transform(Vector2D(0.0, translation))
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, Rotation2D> {
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
 
-        val curveRotation = baseCurve.calculateRotationGlobalCS(curveRelativePoint)
-            .getOrHandle { throw it }
+        val curveRotation = baseCurve.calculateRotationGlobalCSUnbounded(curveRelativePoint)
         val lateralTranslationSlope =
             lateralTranslationFunction.slopeInFuzzy(curveRelativePoint.curvePosition, tolerance)
                 .getOrHandle { throw it }
         val lateralTranslationRotation = Rotation2D(lateralTranslationSlope)
-        return Either.Right(curveRotation + lateralTranslationRotation)
+        return curveRotation + lateralTranslationRotation
     }
 
     /**

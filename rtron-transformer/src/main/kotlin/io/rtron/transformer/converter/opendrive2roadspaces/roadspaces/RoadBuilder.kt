@@ -18,7 +18,7 @@ package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
 import arrow.core.NonEmptyList
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.MessageList
+import io.rtron.io.messages.DefaultMessageList
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
 import io.rtron.math.range.Range
@@ -36,20 +36,19 @@ import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.LaneSection
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.model.roadspaces.roadspace.road.RoadLinkage
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.converter.opendrive2roadspaces.configuration.Opendrive2RoadspacesConfiguration
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
 
 /**
  * Builder for [Road] objects of the RoadSpaces data model.
  */
 class RoadBuilder(
-    val configuration: Opendrive2RoadspacesConfiguration
+    val parameters: Opendrive2RoadspacesParameters
 ) {
 
     // Properties and Initializers
-    private val _functionBuilder = FunctionBuilder(configuration)
-    private val _laneBuilder = LaneBuilder(configuration)
+    private val _laneBuilder = LaneBuilder(parameters)
 
     // Methods
 
@@ -70,10 +69,10 @@ class RoadBuilder(
         baseAttributes: AttributeList
     ): ContextMessageList<Road> {
 
-        require(road.lanes.getLaneSectionLengths(road.length).all { it >= configuration.numberTolerance }) { "All lane sections must have a length above the tolerance threshold." }
-        val messageList = MessageList()
+        require(road.lanes.getLaneSectionLengths(road.length).all { it >= parameters.numberTolerance }) { "All lane sections must have a length above the tolerance threshold." }
+        val messageList = DefaultMessageList()
 
-        val laneOffset = road.lanes.getLaneOffsetEntries().fold({ LinearFunction.X_AXIS }, { _functionBuilder.buildLaneOffset(it) })
+        val laneOffset = road.lanes.getLaneOffsetEntries().fold({ LinearFunction.X_AXIS }, { FunctionBuilder.buildLaneOffset(it) })
         val laneSections: NonEmptyList<LaneSection> = road.lanes.getLaneSectionsWithRanges(road.length)
             .mapIndexed { currentId, currentLaneSection ->
                 buildLaneSection(
@@ -103,7 +102,7 @@ class RoadBuilder(
         require(laneSection.center.lane.size == 1) { "Lane section ($laneSectionIdentifier) must contain exactly one center lane." }
         require(laneSection.getNumberOfLeftLanes() + laneSection.getNumberOfRightLanes() >= 1) { "Lane section ($laneSectionIdentifier) must contain at least one left or right lane." }
 
-        val messageList = MessageList()
+        val messageList = DefaultMessageList()
 
         val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
 
@@ -160,7 +159,7 @@ class RoadBuilder(
     }
 
     private fun buildAttributes(laneSection: RoadLanesLaneSection) =
-        attributes("${configuration.attributesPrefix}laneSection_") {
+        attributes("${parameters.attributesPrefix}laneSection_") {
             attribute("curvePositionStart", laneSection.laneSectionStart.curvePosition)
         }
 }

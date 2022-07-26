@@ -18,11 +18,7 @@ package io.rtron.model.opendrive.core
 
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.Validated
-import arrow.core.invalid
-import arrow.core.valid
 import arrow.optics.optics
-import io.rtron.model.opendrive.additions.exceptions.OpendriveException
 
 @optics
 data class Header(
@@ -40,13 +36,6 @@ data class Header(
     var version: Option<String> = None,
     var west: Option<Double> = None
 ) : OpendriveElement() {
-
-    // Properties and Initializers
-    val revMajorValidated: Validated<OpendriveException.UnexpectedValue, Int>
-        get() = if (revMajor > 0) revMajor.valid() else OpendriveException.UnexpectedValue("revMajor", revMajor.toString()).invalid()
-
-    val revMinorValidated: Validated<OpendriveException.UnexpectedValue, Int>
-        get() = if (revMinor > 0) revMinor.valid() else OpendriveException.UnexpectedValue("revMinor", revMinor.toString()).invalid()
 
     companion object
 }
