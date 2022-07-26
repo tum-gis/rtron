@@ -79,7 +79,7 @@ class Affine3D(
      *
      * @return translation vector
      */
-    fun extractTranslation() = _matrix.getTranslation(JOMLVector3d()).toVector3D()
+    fun extractTranslation(): Vector3D = _matrix.getTranslation(JOMLVector3d()).toVector3D()
 
     /**
      * Extracts the scale vector of the [Affine3D] transformation matrix.
@@ -215,9 +215,9 @@ class Affine3D(
         /**
          * Creates an [Affine3D] transformation matrix by means of a new coordinate system basis.
          *
-         * @param basisX x axis of new basis
-         * @param basisY y axis of new basis
-         * @param basisZ z axis of new basis
+         * @param basisX x-axis of new basis
+         * @param basisY y-axis of new basis
+         * @param basisZ z-axis of new basis
          */
         fun of(basisX: Vector3D, basisY: Vector3D, basisZ: Vector3D): Affine3D {
             val matrix = JOMLMatrix4d().set(
