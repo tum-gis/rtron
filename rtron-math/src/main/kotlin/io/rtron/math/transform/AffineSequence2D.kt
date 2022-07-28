@@ -44,7 +44,7 @@ data class AffineSequence2D(
     fun solve() = Affine2D.of(affineList)
 
     companion object {
-        val EMPTY = AffineSequence2D(listOf())
+        val EMPTY = AffineSequence2D(emptyList())
 
         /**
          * Creates an [AffineSequence2D] by provided [affines] list.

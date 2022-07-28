@@ -16,8 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.map
+import arrow.core.NonEmptyList
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
@@ -31,13 +30,15 @@ abstract class AbstractSolid3D : AbstractGeometry3D(), Tolerable {
     /**
      * Calculates the polygons for the respective solid geometry within the local coordinate system of the surface.
      */
-    abstract fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception>
+    abstract fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D>
 
     /**
      * Calculates the polygons for the respective solid geometry and transforms it to the global coordinate system.
      */
-    fun calculatePolygonsGlobalCS(): Result<List<Polygon3D>, Exception> =
-        calculatePolygonsLocalCS().map { affineSequence.solve().transform(it) }
+    fun calculatePolygonsGlobalCS(): NonEmptyList<Polygon3D> =
+        calculatePolygonsLocalCS().let { polygonList ->
+            affineSequence.solve().transform(polygonList).let { NonEmptyList.fromListUnsafe(it) }
+        }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 }

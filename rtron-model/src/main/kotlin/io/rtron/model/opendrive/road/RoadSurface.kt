@@ -16,7 +16,8 @@
 
 package io.rtron.model.opendrive.road
 
+import io.rtron.model.opendrive.core.OpendriveElement
+
 data class RoadSurface(
-    var crg: List<RoadSurfaceCrg> = listOf()
-    // var additionalData: AdditionalData = AdditionalData()
-)
+    var crg: List<RoadSurfaceCrg> = emptyList()
+) : OpendriveElement()

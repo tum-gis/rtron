@@ -16,7 +16,8 @@
 
 package io.rtron.math.geometry.euclidean.threed.point
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
+import arrow.core.nonEmptyListOf
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.linear.RealVector
@@ -49,7 +50,6 @@ data class Vector3D(
 ) : AbstractPoint3D() {
 
     // Properties and Initializers
-
     init {
         require(x.isFinite()) { "X value must be finite." }
         require(y.isFinite()) { "Y value must be finite." }
@@ -72,10 +72,10 @@ data class Vector3D(
     operator fun unaryPlus() = Vector3D(x, y, z)
     operator fun unaryMinus() = Vector3D(-x, -y, -z)
 
-    fun fuzzyEquals(o: Vector3D, epsilon: Double) = doubleFuzzyEquals(this.x, o.x, epsilon) &&
-        doubleFuzzyEquals(this.y, o.y, epsilon) &&
-        doubleFuzzyEquals(this.z, o.z, epsilon)
-    fun fuzzyUnequals(o: Vector3D, epsilon: Double) = !fuzzyEquals(o, epsilon)
+    fun fuzzyEquals(o: Vector3D, tolerance: Double) = doubleFuzzyEquals(this.x, o.x, tolerance) &&
+        doubleFuzzyEquals(this.y, o.y, tolerance) &&
+        doubleFuzzyEquals(this.z, o.z, tolerance)
+    fun fuzzyUnequals(o: Vector3D, tolerance: Double) = !fuzzyEquals(o, tolerance)
 
     // Methods
 
@@ -115,7 +115,7 @@ data class Vector3D(
 
     // Conversions
     fun toDoubleArray() = doubleArrayOf(x, y, z)
-    fun toDoubleList() = listOf(x, y, z)
+    fun toDoubleList() = nonEmptyListOf(x, y, z)
     fun toRealVector() = RealVector(doubleArrayOf(x, y, z))
     fun toVector3DCm() = this._vector3D
     fun toVector3DJOML() = JOMLVector3D(this.x, this.y, this.z)
@@ -144,10 +144,10 @@ data class Vector3D(
          * Creates a [Vector3D], if each component is finite. Otherwise it will return a Result.Error.
          *
          */
-        fun of(x: Double, y: Double, z: Double): Result<Vector3D, IllegalArgumentException> =
+        fun of(x: Double, y: Double, z: Double): Either<IllegalArgumentException, Vector3D> =
             if (!x.isFinite() || !y.isFinite() || !z.isFinite())
-                Result.error(IllegalArgumentException("Values for x, y, z must be finite."))
-            else Result.success(Vector3D(x, y, z))
+                Either.Left(IllegalArgumentException("Values for x, y, z must be finite."))
+            else Either.Right(Vector3D(x, y, z))
     }
 }
 

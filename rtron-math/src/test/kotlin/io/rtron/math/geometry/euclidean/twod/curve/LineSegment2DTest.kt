@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
@@ -61,8 +61,8 @@ internal class LineSegment2DTest {
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.rotation.angle).isEqualTo(HALF_PI)
         }
 
@@ -74,8 +74,8 @@ internal class LineSegment2DTest {
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.rotation.angle).isEqualTo(QUARTER_PI)
         }
     }
@@ -91,8 +91,8 @@ internal class LineSegment2DTest {
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(5.0, 0.0))
         }
 
@@ -105,8 +105,8 @@ internal class LineSegment2DTest {
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point.x).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
             assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
         }
@@ -120,8 +120,8 @@ internal class LineSegment2DTest {
 
             val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualReturn).isInstanceOf(Result.Success::class.java)
-            require(actualReturn is Result.Success)
+            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(0.0, 0.0))
         }
     }

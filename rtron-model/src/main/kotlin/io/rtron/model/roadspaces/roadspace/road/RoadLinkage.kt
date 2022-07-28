@@ -17,10 +17,9 @@
 package io.rtron.model.roadspaces.roadspace.road
 
 import arrow.core.Option
-import io.rtron.model.roadspaces.junction.JunctionIdentifier
+import io.rtron.model.roadspaces.identifier.JunctionIdentifier
+import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
-import io.rtron.model.roadspaces.roadspace.RoadspaceIdentifier
-import io.rtron.std.present
 
 /**
  * Contains the topological information about the road.
@@ -37,7 +36,7 @@ data class RoadLinkage(
         require(!(predecessorRoadspaceContactPointId.isDefined() && predecessorJunctionId.isDefined())) { "Predecessor must be either a roadspace or junction or neither." }
         require(!(successorRoadspaceContactPointId.isDefined() && successorJunctionId.isDefined())) { "Successor must be either a roadspace or junction or neither." }
 
-        belongsToJunctionId.present {
+        belongsToJunctionId.tap {
             require(predecessorJunctionId.isEmpty()) { "If a road belongs to a junction (id=$it), a predecessing junction must not exist." }
             require(successorJunctionId.isEmpty()) { "If a road belongs to a junction (id=$it), a successing junction must not exist." }
         }

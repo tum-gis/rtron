@@ -16,14 +16,17 @@
 
 package io.rtron.model.opendrive.road.planview
 
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+import arrow.core.NonEmptyList
+import arrow.optics.optics
+import io.rtron.model.opendrive.core.OpendriveElement
 
+@optics
 data class RoadPlanView(
-    var geometry: List<RoadPlanViewGeometry> = listOf(),
+    var geometry: List<RoadPlanViewGeometry> = emptyList(),
+) : OpendriveElement() {
 
-    var userData: List<UserData> = listOf(),
-    var include: List<Include> = listOf(),
-    var dataQuality: DataQuality = DataQuality()
-)
+    val geometryAsNonEmptyList: NonEmptyList<RoadPlanViewGeometry>
+        get() = NonEmptyList.fromListUnsafe(geometry)
+
+    companion object
+}

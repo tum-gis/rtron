@@ -16,8 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.map
+import arrow.core.Either
+import arrow.core.NonEmptyList
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.range.Tolerable
@@ -30,13 +31,14 @@ abstract class AbstractSurface3D : AbstractGeometry3D(), Tolerable {
     /**
      * Calculates the polygons for the respective surface geometry within the local coordinate system of the surface.
      */
-    abstract fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception>
+    abstract fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>>
 
     /**
      * Calculates the polygons for the respective surface geometry and transforms it to the global coordinate system.
      */
-    fun calculatePolygonsGlobalCS(): Result<List<Polygon3D>, Exception> =
-        calculatePolygonsLocalCS().map { affineSequence.solve().transform(it) }
+    fun calculatePolygonsGlobalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = calculatePolygonsLocalCS()
+        .map { affineSequence.solve().transform(it) }
+        .map { NonEmptyList.fromListUnsafe(it) }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 }

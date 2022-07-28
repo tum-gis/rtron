@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.NonEmptyList
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.transform.AffineSequence3D
 
@@ -26,7 +26,7 @@ import io.rtron.math.transform.AffineSequence3D
  * @param polygons faces of the polyhedron geometry
  */
 data class Polyhedron3D(
-    val polygons: List<Polygon3D>,
+    val polygons: NonEmptyList<Polygon3D>,
     override val tolerance: Double,
     override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSolid3D() {
@@ -37,5 +37,5 @@ data class Polyhedron3D(
     }
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> = Result.success(polygons)
+    override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> = polygons
 }

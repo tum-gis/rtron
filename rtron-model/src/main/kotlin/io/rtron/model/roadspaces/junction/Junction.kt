@@ -16,8 +16,9 @@
 
 package io.rtron.model.roadspaces.junction
 
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
-import io.rtron.std.unwrapValues
+import arrow.core.flattenOption
+import io.rtron.model.roadspaces.identifier.JunctionIdentifier
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
 
 /**
  * Represents a junction which connects multiple roads and contains lane linkage information.
@@ -29,10 +30,20 @@ data class Junction(
     val id: JunctionIdentifier,
     val connections: List<Connection>
 ) {
+    // Properties and Initializers
+    init {
+        // require(connections.isNotEmpty()) { "Connections must not be empty." }
+    }
 
     // Methods
 
-    fun getConnectingRoadspaceIds() = connections.map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }.distinct()
+    fun getConnectingRoadspaceIds() = connections
+        .map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }
+        .distinct()
+
+    /*fun getConnection(incomingRoadspace: RoadspaceContactPointIdentifier): Option<RoadspaceContactPointIdentifier> {
+        connections.filter { it.incomingRoadspaceContactPointId == incomingRoadspace }
+    }*/
 
     /**
      * Returns the successor lane referenced by [LaneIdentifier], which follow the [laneIdentifier].
@@ -40,5 +51,5 @@ data class Junction(
      * @param laneIdentifier identifier for which the successor
      */
     fun getSuccessorLane(laneIdentifier: LaneIdentifier): List<LaneIdentifier> =
-        connections.map { it.getSuccessorLane(laneIdentifier) }.unwrapValues()
+        connections.map { it.getSuccessorLane(laneIdentifier) }.flattenOption()
 }

@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
 import org.assertj.core.api.Assertions.assertThat
@@ -30,12 +30,12 @@ internal class LinearFunctionTest {
     inner class TestValueCalculation {
 
         @Test
-        fun `f(3)=5*x+25 should be 40`() {
+        fun `f(3)=5 times x plus 25 should be 40`() {
             val linearFunction = LinearFunction(5.0, 25.0)
 
             val actualResult = linearFunction.value(3.0)
 
-            require(actualResult is Result.Success)
+            require(actualResult is Either.Right)
             assertThat(actualResult.value).isEqualTo(40.0)
         }
 
@@ -45,8 +45,8 @@ internal class LinearFunctionTest {
 
             val actualResult = linearFunction.value(3.0)
 
-            require(actualResult is Result.Failure)
-            assertThat(actualResult.getException()).isInstanceOf(IllegalArgumentException::class.java)
+            require(actualResult is Either.Left)
+            assertThat(actualResult.value).isInstanceOf(IllegalArgumentException::class.java)
         }
     }
 

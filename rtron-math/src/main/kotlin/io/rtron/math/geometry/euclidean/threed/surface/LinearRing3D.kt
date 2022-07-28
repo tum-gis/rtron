@@ -16,13 +16,16 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import arrow.core.nonEmptyListOf
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
 import io.rtron.math.processing.isColinear
 import io.rtron.math.processing.isPlanar
-import io.rtron.math.processing.triangulation.ExperimentalTriangulator
 import io.rtron.math.processing.triangulation.Triangulator
 import io.rtron.math.range.Tolerable
 import io.rtron.math.transform.AffineSequence3D
@@ -35,7 +38,7 @@ import io.rtron.std.noneWithNextEnclosing
  * @param vertices vertices for constructing the linear ring
  */
 data class LinearRing3D(
-    val vertices: List<Vector3D>,
+    val vertices: NonEmptyList<Vector3D>,
     override val tolerance: Double,
     override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
 ) : AbstractSurface3D(), Tolerable {
@@ -60,20 +63,21 @@ data class LinearRing3D(
     /** Returns true if the vertices are placed in a plane */
     fun isPlanar() = vertices.isPlanar(tolerance)
 
-    @OptIn(ExperimentalTriangulator::class)
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> =
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
         Triangulator.triangulate(this, tolerance)
+            .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
+            .map { NonEmptyList.fromListUnsafe(it) }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 
     companion object {
-        val UNIT = LinearRing3D(listOf(-Vector3D.X_AXIS, Vector3D.X_AXIS, Vector3D.Y_AXIS), 0.0)
+        val UNIT = LinearRing3D(nonEmptyListOf(-Vector3D.X_AXIS, Vector3D.X_AXIS, Vector3D.Y_AXIS), 0.0)
 
         /**
          * Creates a linear ring based on the provided [vertices].
          */
         fun of(vararg vertices: Vector3D, tolerance: Double) =
-            LinearRing3D(vertices.toList(), tolerance)
+            LinearRing3D(NonEmptyList.fromListUnsafe(vertices.toList()), tolerance)
 
         /**
          * Creates multiple linear rings from two lists of vertices [leftVertices] and [rightVertices].
@@ -82,7 +86,7 @@ data class LinearRing3D(
          * @param leftVertices left vertices for the linear rings construction
          * @param rightVertices right vertices for the linear rings construction
          */
-        fun of(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double): List<LinearRing3D> {
+        fun of(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double): NonEmptyList<LinearRing3D> {
             require(leftVertices.size >= 2) { "At least two left vertices required." }
             require(rightVertices.size >= 2) { "At least two right vertices required." }
 
@@ -90,7 +94,8 @@ data class LinearRing3D(
             val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
             val linearRingVertices = vertexPairs.zipWithNext()
-                .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
+                .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
+                .let { NonEmptyList.fromListUnsafe(it) }
 
             return linearRingVertices.map { LinearRing3D(it, tolerance) }
         }
@@ -103,8 +108,8 @@ data class LinearRing3D(
          * @param leftVertices left vertices for the linear rings construction
          * @param rightVertices right vertices for the linear rings construction
          */
-        fun ofWithDuplicatesRemoval(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double):
-            Result<List<LinearRing3D>, Exception> {
+        fun ofWithDuplicatesRemoval(leftVertices: NonEmptyList<Vector3D>, rightVertices: NonEmptyList<Vector3D>, tolerance: Double):
+            Either<GeometryException.NotEnoughValidLinearRings, NonEmptyList<LinearRing3D>> = either.eager {
             require(leftVertices.size >= 2) { "At least two left vertices required." }
             require(rightVertices.size >= 2) { "At least two right vertices required." }
 
@@ -114,15 +119,18 @@ data class LinearRing3D(
             val linearRings: List<LinearRing3D> = vertexPairs
                 .asSequence()
                 .zipWithNext()
-                .map { listOf(it.first.right, it.second.right, it.second.left, it.first.left) }
+                .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
                 .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
                 .filter { it.distinct().count() >= 3 }
                 .filter { !it.isColinear(tolerance) }
+                .map { NonEmptyList.fromListUnsafe(it) }
                 .map { LinearRing3D(it, tolerance) }
                 .toList()
 
-            return if (linearRings.isEmpty()) Result.error(IllegalArgumentException("Not enough valid linear rings could be constructed."))
-            else Result.success(linearRings)
+            val nonEmptyLinearRingsList = NonEmptyList.fromList(linearRings)
+                .toEither { GeometryException.NotEnoughValidLinearRings("") }
+                .bind()
+            nonEmptyLinearRingsList
         }
     }
 }

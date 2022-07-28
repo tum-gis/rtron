@@ -16,14 +16,13 @@
 
 package io.rtron.math.geometry.curved.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.fuzzyEncloses
-import io.rtron.std.handleFailure
 
 /**
  * Surface which is defined along the [baseCurve]. The height of the surface id defined by means of a
@@ -48,16 +47,14 @@ class CurveRelativeParametricSurface3D(
     }
 
     // Methods
-    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-        Result<Vector3D, Exception> {
+    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D {
 
         val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
-            .handleFailure { throw it.error }
         val surfaceHeight = heightFunction
             .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)
-            .handleFailure { throw it.error }
+            .getOrHandle { throw it }
         val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
 
-        return Result.success(affine.transform(offset))
+        return affine.transform(offset)
     }
 }

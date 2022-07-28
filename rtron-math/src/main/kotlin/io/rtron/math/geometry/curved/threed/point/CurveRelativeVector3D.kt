@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.curved.threed.point
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.CurveRelativeAbstractGeometry3D
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
@@ -48,14 +48,14 @@ data class CurveRelativeVector3D(
 
     /**
      * Returns true, if [curvePosition], [lateralOffset] and [heightOffset] are all fuzzily equal with a tolerance
-     * of [epsilon].
+     * of [tolerance].
      */
-    fun fuzzyEquals(o: CurveRelativeVector3D, epsilon: Double) =
-        doubleFuzzyEquals(this.curvePosition, o.curvePosition, epsilon) &&
-            doubleFuzzyEquals(this.lateralOffset, o.lateralOffset, epsilon) &&
-            doubleFuzzyEquals(this.heightOffset, o.heightOffset, epsilon)
+    fun fuzzyEquals(o: CurveRelativeVector3D, tolerance: Double) =
+        doubleFuzzyEquals(this.curvePosition, o.curvePosition, tolerance) &&
+            doubleFuzzyEquals(this.lateralOffset, o.lateralOffset, tolerance) &&
+            doubleFuzzyEquals(this.heightOffset, o.heightOffset, tolerance)
 
-    fun fuzzyUnequals(o: CurveRelativeVector3D, epsilon: Double) = !fuzzyEquals(o, epsilon)
+    fun fuzzyUnequals(o: CurveRelativeVector3D, tolerance: Double) = !fuzzyEquals(o, tolerance)
 
     // Methods
     fun getCartesianCurveOffset() = Vector3D(0.0, lateralOffset, heightOffset)
@@ -72,9 +72,9 @@ data class CurveRelativeVector3D(
          * values is not finite, an error is returned.
          */
         fun of(curvePosition: Double, lateralOffset: Double, heightOffset: Double):
-            Result<CurveRelativeVector3D, IllegalArgumentException> =
+            Either<IllegalArgumentException, CurveRelativeVector3D> =
             if (!curvePosition.isFinite() || !lateralOffset.isFinite() || !heightOffset.isFinite())
-                Result.error(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
-            else Result.success(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
+                Either.Left(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
+            else Either.Right(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
     }
 }

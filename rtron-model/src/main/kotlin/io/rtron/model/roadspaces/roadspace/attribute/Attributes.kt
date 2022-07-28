@@ -16,9 +16,10 @@
 
 package io.rtron.model.roadspaces.roadspace.attribute
 
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.none
+import arrow.core.some
 
 /**
  * Abstract class of an attribute.
@@ -37,8 +38,8 @@ class StringAttribute(name: String, val value: String) : Attribute(name) {
 
     companion object {
         fun of(name: String, value: String): Option<StringAttribute> =
-            if (value.isEmpty()) none()
-            else Some(StringAttribute(name, value))
+            if (value.isEmpty()) None
+            else StringAttribute(name, value).some()
     }
 }
 
@@ -59,8 +60,8 @@ class DoubleAttribute(name: String, val value: Double) : Attribute(name) {
 
     companion object {
         fun of(name: String, value: Double): Option<DoubleAttribute> =
-            if (!value.isFinite()) none()
-            else Some(DoubleAttribute(name, value))
+            if (!value.isFinite()) None
+            else DoubleAttribute(name, value).some()
     }
 }
 
@@ -83,7 +84,7 @@ class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) 
 
     companion object {
         fun of(name: String, value: Double, uom: UnitOfMeasure): Option<MeasureAttribute> =
-            if (value.isNaN()) none()
+            if (value.isNaN()) None
             else Some(MeasureAttribute(name, value, uom))
     }
 }
@@ -93,7 +94,7 @@ class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) 
  *
  * @param name name of the list
  */
-class AttributeList(val attributes: List<Attribute> = listOf(), name: String = "") : Attribute(name) {
+class AttributeList(val attributes: List<Attribute> = emptyList(), name: String = "") : Attribute(name) {
 
     // Operators
     operator fun plus(other: AttributeList): AttributeList {

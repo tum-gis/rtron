@@ -16,14 +16,16 @@
 
 package io.rtron.math.geometry.curved.threed.surface
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Tolerable
-import io.rtron.math.range.fuzzyContainsResult
+import io.rtron.math.range.fuzzyContains
 import io.rtron.math.range.length
-import io.rtron.std.handleFailure
 
 /**
  * Abstract class for all geometric surface objects in an curve relative coordinate system in 3D.
@@ -47,10 +49,11 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @return point in cartesian coordinates
      */
     fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double = 0.0):
-        Result<Vector3D, Exception> {
+        Either<GeometryException.ValueNotContainedInDomain, Vector3D> {
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+            return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
 
-        this.domain.fuzzyContainsResult(curveRelativePoint.curvePosition, tolerance).handleFailure { return it }
-        return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset)
+        return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset).right()
     }
 
     /**
@@ -61,6 +64,5 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @param addHeightOffset adds an additional height offset to the surface
      * @return point in cartesian coordinates
      */
-    abstract fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double):
-        Result<Vector3D, Exception>
+    abstract fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D
 }

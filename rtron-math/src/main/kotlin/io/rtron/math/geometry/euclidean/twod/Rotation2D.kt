@@ -20,8 +20,11 @@ import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DEG_TO_RAD
 import io.rtron.math.std.RAD_TO_DEG
+import io.rtron.math.std.TWO_PI
 import io.rtron.math.std.normalizeAngle
+import kotlin.math.absoluteValue
 import kotlin.math.atan2
+import io.rtron.math.std.fuzzyEquals as doubleFuzzyEquals
 
 /**
  * Represents a rotation anticlockwise in 2D.
@@ -33,7 +36,6 @@ class Rotation2D(
 ) {
 
     // Properties and Initializers
-
     init {
         require(angle.isFinite()) { "Rotation angle must be finite." }
     }
@@ -50,6 +52,15 @@ class Rotation2D(
 
     operator fun unaryPlus() = Rotation2D(this.angle)
     operator fun unaryMinus() = Rotation2D(-this.angle)
+
+    fun difference(v: Rotation2D): Double = normalizeAngle(normalizeAngle(angle, 0.0) - normalizeAngle(v.angle, 0.0), 0.0).absoluteValue
+
+    fun fuzzyEquals(o: Rotation2D, tolerance: Double): Boolean {
+        val adjustedThisAngle = if (doubleFuzzyEquals(this.angle, TWO_PI, tolerance)) this.angle - TWO_PI else this.angle
+        val adjustedOtherAngle = if (doubleFuzzyEquals(o.angle, TWO_PI, tolerance)) o.angle - TWO_PI else o.angle
+        return doubleFuzzyEquals(adjustedThisAngle, adjustedOtherAngle, tolerance)
+    }
+    fun fuzzyUnequals(o: Rotation2D, tolerance: Double) = !fuzzyEquals(o, tolerance)
 
     // Methods
 

@@ -17,7 +17,7 @@
 package io.rtron.model.roadspaces.common
 
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
-import io.rtron.model.roadspaces.roadspace.road.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
 
 /**
  * Represents a filler surface with it's [surface] geometry and information from which [fromLaneId] to which

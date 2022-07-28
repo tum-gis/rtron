@@ -1,5 +1,8 @@
 // user interface layer
-include("rtron-main", "rtron-documentation")
+include("rtron-documentation", "rtron-cli")
+
+// batch processing layer
+include("rtron-main")
 
 // single model processing layer
 include("rtron-model", "rtron-readerwriter", "rtron-transformer")

@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -59,15 +58,11 @@ class LineSegment2D(
     private val _segment2D = CMSegment2D(Vector2D.ZERO.toVector2DCm(), _endPoint.toVector2DCm(), _line)
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception> {
-
-        val point = Vector2D(curveRelativePoint.curvePosition, 0.0)
-        return Result.success(point)
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
+        return Vector2D(curveRelativePoint.curvePosition, 0.0)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception> = Result.success(Rotation2D.ZERO)
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D) = Rotation2D.ZERO
 
     // Conversions
 

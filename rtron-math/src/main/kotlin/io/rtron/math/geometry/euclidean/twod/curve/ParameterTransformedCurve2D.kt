@@ -16,7 +16,6 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -62,15 +61,13 @@ data class ParameterTransformedCurve2D(
 
     // Methods
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
         val transformedPoint = transformationFunction(curveRelativePoint)
-        return baseCurve.calculatePointGlobalCS(transformedPoint)
+        return baseCurve.calculatePointGlobalCSUnbounded(transformedPoint)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception> {
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
         val transformedPoint = transformationFunction(curveRelativePoint)
-        return baseCurve.calculateRotationGlobalCS(transformedPoint)
+        return baseCurve.calculateRotationGlobalCSUnbounded(transformedPoint)
     }
 }

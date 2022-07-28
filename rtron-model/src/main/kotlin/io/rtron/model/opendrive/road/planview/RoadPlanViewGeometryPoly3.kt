@@ -16,24 +16,15 @@
 
 package io.rtron.model.opendrive.road.planview
 
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+import io.rtron.model.opendrive.core.OpendriveElement
 
 class RoadPlanViewGeometryPoly3(
-    var userData: List<UserData> = listOf(),
-    var include: List<Include> = listOf(),
-    var dataQuality: DataQuality = DataQuality(),
-
     var a: Double = Double.NaN,
     var b: Double = Double.NaN,
     var c: Double = Double.NaN,
     var d: Double = Double.NaN
-) : RoadPlanViewGeometryInterface {
+) : OpendriveElement() {
 
     // Properties and Initializers
     val coefficients get() = doubleArrayOf(a, b, c, d)
-
-    // Methods
-    override fun isNaN() = a.isNaN() || b.isNaN() || c.isNaN() || d.isNaN()
 }

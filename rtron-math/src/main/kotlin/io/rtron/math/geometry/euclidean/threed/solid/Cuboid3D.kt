@@ -16,7 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
+import arrow.core.NonEmptyList
+import arrow.core.Option
+import arrow.core.nonEmptyListOf
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.std.DEFAULT_TOLERANCE
@@ -111,9 +113,8 @@ data class Cuboid3D(
     )
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
-        val polygons = listOf(basePolygon, elevatedPolygon, frontPolygon, leftPolygon, backPolygon, rightPolygon)
-        return Result.success(polygons)
+    override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> {
+        return nonEmptyListOf(basePolygon, elevatedPolygon, frontPolygon, leftPolygon, backPolygon, rightPolygon)
     }
 
     // Conversions
@@ -123,5 +124,13 @@ data class Cuboid3D(
 
     companion object {
         val UNIT = Cuboid3D(1.0, 1.0, 1.0, DEFAULT_TOLERANCE)
+
+        fun of(length: Option<Double>, width: Option<Double>, height: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY): Cuboid3D {
+            require(length.isDefined()) { "Length must be defined." }
+            require(width.isDefined()) { "Width must be defined." }
+            require(height.isDefined()) { "Height must be defined." }
+
+            return Cuboid3D(length.orNull()!!, width.orNull()!!, height.orNull()!!, tolerance, affineSequence)
+        }
     }
 }

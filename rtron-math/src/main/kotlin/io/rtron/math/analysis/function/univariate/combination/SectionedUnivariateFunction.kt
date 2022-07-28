@@ -16,11 +16,11 @@
 
 package io.rtron.math.analysis.function.univariate.combination
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 import io.rtron.math.range.shiftLowerEndpointTo
-import io.rtron.std.handleFailure
 
 /**
  * Cuts out a section from the [completeFunction].
@@ -36,12 +36,12 @@ class SectionedUnivariateFunction(
 
     // Properties and Initializers
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
-    private val sectionStart = section.lowerEndpointResult().handleFailure { throw it.error }
+    private val sectionStart = section.lowerEndpointResult().getOrHandle { throw it }
 
     // Methods
-    override fun valueUnbounded(x: Double): Result<Double, Exception> =
+    override fun valueUnbounded(x: Double): Either<Exception, Double> =
         completeFunction.valueUnbounded(sectionStart + x)
 
-    override fun slopeUnbounded(x: Double): Result<Double, Exception> =
+    override fun slopeUnbounded(x: Double): Either<Exception, Double> =
         completeFunction.slopeUnbounded(sectionStart + x)
 }

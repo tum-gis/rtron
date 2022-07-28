@@ -16,7 +16,7 @@
 
 package io.rtron.math.range
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import com.google.common.collect.Range as GRange
 
 /** Conversion from Guava range class. */
@@ -41,15 +41,15 @@ class Range<T : Comparable<*>>(
     // Methods
 
     /**
-     * Returns [Result.Success], if the [value] is contained within this [Range].
+     * Returns [Either.Right], if the [value] is contained within this [Range].
      *
      * @param value value to be checked
-     * @return [Result.Success], if [value] is fuzzily contained; [Result.Failure], otherwise
+     * @return [Either.Right], if [value] is fuzzily contained; [Either.Left], otherwise
      */
-    fun containsResult(value: T): Result<Boolean, IllegalArgumentException> =
+    fun containsResult(value: T): Either<IllegalArgumentException, Boolean> =
         when (value in this) {
-            true -> Result.success(true)
-            false -> Result.error(IllegalArgumentException("Value ($value) is not contained in range $this."))
+            true -> Either.Right(true)
+            false -> Either.Left(IllegalArgumentException("Value ($value) is not contained in range $this."))
         }
 
     /** Returns true, if this range has a lower endpoint. */
@@ -65,14 +65,14 @@ class Range<T : Comparable<*>>(
     fun upperEndpointOrNull(): T? = if (hasUpperBound()) _range.upperEndpoint() else null
 
     /** Returns the lower endpoint as result. */
-    fun lowerEndpointResult(): Result<T, IllegalStateException> =
-        if (hasLowerBound()) Result.success(_range.lowerEndpoint())
-        else Result.error(IllegalStateException("No lower endpoint available."))
+    fun lowerEndpointResult(): Either<IllegalStateException, T> =
+        if (hasLowerBound()) Either.Right(_range.lowerEndpoint())
+        else Either.Left(IllegalStateException("No lower endpoint available."))
 
     /** Returns the upper endpoint as result. */
-    fun upperEndpointResult(): Result<T, IllegalStateException> =
-        if (hasUpperBound()) Result.success(_range.upperEndpoint())
-        else Result.error(IllegalStateException("No upper endpoint available."))
+    fun upperEndpointResult(): Either<IllegalStateException, T> =
+        if (hasUpperBound()) Either.Right(_range.upperEndpoint())
+        else Either.Left(IllegalStateException("No upper endpoint available."))
 
     /** Returns the lower [BoundType] of this range. */
     fun lowerBoundType(): BoundType = if (hasLowerBound()) _range.lowerBoundType().toBoundType() else BoundType.NONE

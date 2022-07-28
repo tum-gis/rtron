@@ -5,6 +5,6 @@ plugins {
 kotlinProject()
 
 dependencies {
-    implementation(Dependencies.arrowCore)
+    // math libraries
     implementation(Dependencies.guava)
 }

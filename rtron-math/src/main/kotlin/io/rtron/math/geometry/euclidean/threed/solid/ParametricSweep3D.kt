@@ -16,22 +16,26 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.getOrElse
+import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import arrow.core.getOrElse
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
+import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.geometry.euclidean.twod.curve.LateralTranslatedCurve2D
+import io.rtron.math.geometry.toIllegalStateException
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Range
 import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyEncloses
-import io.rtron.std.handleFailure
 
 /**
  * Represents a parametric sweep in 3D. This refers to a geometry solid, which is defined by a [referenceCurveXY].
@@ -56,7 +60,7 @@ data class ParametricSweep3D(
         require(absoluteHeight.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The absolute height function must be defined everywhere where the referenceCurveXY is also defined." }
         require(objectHeightFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The object height function must be defined everywhere where the referenceCurveXY is also defined." }
         require(objectWidthFunction.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) { "The object width function must be defined everywhere where the referenceCurveXY is also defined." }
-        require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
+        require(length >= tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     override val domain: Range<Double>
@@ -96,22 +100,34 @@ data class ParametricSweep3D(
 
     /** lower left curve of the sweep as a list of points */
     private val lowerLeftVertices by lazy {
-        lowerLeftCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        val vertices = lowerLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
+            .mapLeft { it.toIllegalStateException() }
+            .getOrHandle { throw it }
+        NonEmptyList.fromListUnsafe(vertices)
     }
 
     /** lower right curve of the sweep as a list of points */
     private val lowerRightVertices by lazy {
-        lowerRightCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        val vertices = lowerRightCurve.calculatePointListGlobalCS(discretizationStepSize)
+            .mapLeft { it.toIllegalStateException() }
+            .getOrHandle { throw it }
+        NonEmptyList.fromListUnsafe(vertices)
     }
 
     /** upper left curve of the sweep as a list of points */
     private val upperLeftVertices by lazy {
-        upperLeftCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        val vertices = upperLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
+            .mapLeft { it.toIllegalStateException() }
+            .getOrHandle { throw it }
+        NonEmptyList.fromListUnsafe(vertices)
     }
 
     /** upper right curve of the sweep as a list of points */
     private val upperRightVertices by lazy {
-        upperRightCurve.calculatePointListGlobalCS(discretizationStepSize).handleFailure { throw it.error }
+        val vertices = upperRightCurve.calculatePointListGlobalCS(discretizationStepSize)
+            .mapLeft { it.toIllegalStateException() }
+            .getOrHandle { throw it }
+        NonEmptyList.fromListUnsafe(vertices)
     }
 
     init {
@@ -122,13 +138,13 @@ data class ParametricSweep3D(
     }
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
+    override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> {
 
         // calculate the side faces
-        val basePolygons = createPolygons(lowerLeftVertices, lowerRightVertices) getOrElse { emptyList() }
-        val topPolygons = createPolygons(upperRightVertices, upperLeftVertices) getOrElse { emptyList() }
-        val leftPolygons = createPolygons(upperLeftVertices, lowerLeftVertices) getOrElse { emptyList() }
-        val rightPolygons = createPolygons(lowerRightVertices, upperRightVertices) getOrElse { emptyList() }
+        val basePolygons = createPolygons(lowerLeftVertices, lowerRightVertices).getOrElse { emptyList() }
+        val topPolygons = createPolygons(upperRightVertices, upperLeftVertices).getOrElse { emptyList() }
+        val leftPolygons = createPolygons(upperLeftVertices, lowerLeftVertices).getOrElse { emptyList() }
+        val rightPolygons = createPolygons(lowerRightVertices, upperRightVertices).getOrElse { emptyList() }
 
         // calculate the start and end faces
         val startPolygons = run {
@@ -139,7 +155,7 @@ data class ParametricSweep3D(
                 lowerLeftVertices.first(),
                 tolerance = tolerance
             )
-            linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
+            linearRing.calculatePolygonsGlobalCS().getOrElse { emptyList() }
         }
         val endPolygons = run {
             val linearRing = LinearRing3D.of(
@@ -149,23 +165,23 @@ data class ParametricSweep3D(
                 upperRightVertices.last(),
                 tolerance = tolerance
             )
-            linearRing.calculatePolygonsGlobalCS() getOrElse { emptyList() }
+            linearRing.calculatePolygonsGlobalCS().getOrElse { emptyList() }
         }
 
         // combine all polygons
         val allPolygons = basePolygons + topPolygons + leftPolygons + rightPolygons +
             startPolygons + endPolygons
-        return Result.success(allPolygons)
+        return NonEmptyList.fromListUnsafe(allPolygons)
     }
 
-    private fun createPolygons(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>):
-        Result<List<Polygon3D>, Exception> =
+    private fun createPolygons(leftVertices: NonEmptyList<Vector3D>, rightVertices: NonEmptyList<Vector3D>):
+        Either<GeometryException, List<Polygon3D>> = either.eager {
+
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
-            .handleFailure { return it }
-            .map { it.calculatePolygonsGlobalCS() }
-            .handleFailure { return it }
+            .bind()
+            .map { it.calculatePolygonsGlobalCS().bind() }
             .flatten()
-            .let { Result.success(it) }
+    }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 

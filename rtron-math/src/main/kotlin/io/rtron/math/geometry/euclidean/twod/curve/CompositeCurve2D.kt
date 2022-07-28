@@ -16,14 +16,12 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.map
+import arrow.core.computations.ResultEffect.bind
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
-import io.rtron.std.handleFailure
 
 /**
  * Represents the sequential concatenation of the [curveMembers].
@@ -51,26 +49,18 @@ data class CompositeCurve2D(
     }
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception> {
-
-        val localMember = container
-            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .handleFailure { return it }
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
+        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).bind()
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePointGlobalCS(localPoint)
+        return localMember.member.calculatePointGlobalCSUnbounded(localPoint)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception> {
-
-        val localMember = container
-            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .handleFailure { return it }
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
+        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).bind()
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
-        return localMember.member.calculatePoseGlobalCS(localPoint).map { it.rotation }
+        return localMember.member.calculatePoseGlobalCSUnbounded(localPoint).rotation
     }
 
     // Conversions
@@ -78,7 +68,44 @@ data class CompositeCurve2D(
         return "CompositeCurve2D(curveMembers=$curveMembers)"
     }
 
-    /*companion object {
-        fun of(vararg curveMembers: AbstractCurve2D) = CompositeCurve2D(curveMembers.toList())
-    }*/
+    companion object {
+        fun of(
+            curveMembers: List<AbstractCurve2D>,
+            absoluteDomains: List<Range<Double>>,
+            absoluteStarts: List<Double>,
+            distanceTolerance: Double,
+            angleTolerance: Double
+        ): CompositeCurve2D {
+
+            curveMembers.zipWithNext().forEach {
+                val frontCurveMemberEndPose = it.first.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D(it.first.length))
+                val backCurveMemberStartPose = it.second.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D.ZERO)
+
+                val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
+                check(distance <= distanceTolerance) {
+                    "Cannot construct CompositeCurve2D due to gap between elements from ${frontCurveMemberEndPose.point} " +
+                        "to ${backCurveMemberStartPose.point} with an euclidean distance of $distance " +
+                        "above tolerance of $distanceTolerance."
+                }
+
+                val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
+                check(angleDifference <= distanceTolerance) {
+                    "Cannot construct CompositeCurve2D due to an angle difference between elements from " +
+                        "${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
+                        "of $angleDifference radians above tolerance of $angleTolerance."
+                }
+
+                /*if (distance <= angleTolerance) {
+                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance of $distance."
+                    GeometryException.OverlapOrGapInCurve(suffix).left().bind<GeometryException.OverlapOrGapInCurve>()
+                }
+                if (angleDifference > angleTolerance) {
+                    val suffix = "Transition location: From ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference: $angleDifference radians."
+                    GeometryException.KinkInCurve(suffix).left().bind<GeometryException.KinkInCurve>()
+                }*/
+            }
+
+            return CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts)
+        }
+    }
 }

@@ -24,7 +24,6 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
-import io.rtron.std.handleFailure
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Nested
@@ -42,7 +41,6 @@ internal class Curve3DTest {
             val heightFunction = LinearFunction.X_AXIS
             val curve3D = Curve3D(curveXY, heightFunction)
             val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
-                .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, 1.0, 0.0)
 
             val actualPointGlobal = affine.transform(pointLocal)
@@ -57,7 +55,6 @@ internal class Curve3DTest {
             val torsionFunction = LinearFunction(0.0, QUARTER_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)
             val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
-                .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, sqrt(2.0), 0.0)
 
             val actualPointGlobal = affine.transform(pointLocal)
@@ -73,7 +70,6 @@ internal class Curve3DTest {
             val torsionFunction = LinearFunction(0.0, HALF_PI)
             val curve3D = Curve3D(curveXY, heightFunction, torsionFunction)
             val affine = curve3D.calculateAffine(CurveRelativeVector1D(0.5))
-                .handleFailure { throw it.error }
             val pointLocal = Vector3D(0.0, 1.0, 0.0)
 
             val actualPointGlobal = affine.transform(pointLocal)

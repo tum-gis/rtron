@@ -41,7 +41,7 @@ data class AffineSequence3D(
     fun solve() = if (isNotEmpty()) Affine3D.of(affineList) else Affine3D.UNIT
 
     companion object {
-        val EMPTY = AffineSequence3D(listOf())
+        val EMPTY = AffineSequence3D(emptyList())
 
         /**
          * Creates an [AffineSequence2D] by provided [affines] list.

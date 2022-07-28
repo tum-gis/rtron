@@ -16,16 +16,17 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.map
+import arrow.core.Either
+import arrow.core.continuations.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.range.Range
 import io.rtron.math.std.sign
-import io.rtron.std.getValueResult
-import io.rtron.std.handleFailure
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.LaneSectionIdentifier
+import io.rtron.std.getValueEither
 import kotlin.math.abs
 
 /**
@@ -65,12 +66,12 @@ data class LaneSection(
         lanes: List<Lane>,
         centerLane: CenterLane
     ) :
-        this(id, curvePositionDomain, lanes.map { it.id.laneId to it }.toMap(), centerLane)
+        this(id, curvePositionDomain, lanes.associateBy { it.id.laneId }, centerLane)
 
     // Methods
-    fun getLane(laneId: Int): Result<Lane, IllegalArgumentException> = lanes.getValueResult(laneId)
-    fun getLane(laneIdentifier: LaneIdentifier): Result<Lane, IllegalArgumentException> =
-        lanes.getValueResult(laneIdentifier.laneId)
+    fun getLane(laneId: Int): Either<IllegalArgumentException, Lane> = lanes.getValueEither(laneId).mapLeft { it.toIllegalArgumentException() }
+    fun getLane(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, Lane> =
+        lanes.getValueEither(laneIdentifier.laneId).mapLeft { it.toIllegalArgumentException() }
 
     /**
      * Returns the lateral offset function located on a lane with [laneId].
@@ -79,22 +80,20 @@ data class LaneSection(
      * @param factor if the [factor] is 0.0 the inner lane boundary is returned. If the [factor] is 1.0 the outer lane
      * boundary is returned. An offset function within the middle of the lane is achieved by a [factor] of 0.5.
      */
-    fun getLateralLaneOffset(laneId: Int, factor: Double): Result<UnivariateFunction, Exception> {
+    fun getLateralLaneOffset(laneId: Int, factor: Double): Either<Exception, UnivariateFunction> = either.eager {
         val selectedLanes = (1..abs(laneId)).toList()
             .map { sign(laneId) * it }
-            .map { getLane(it) }
-            .handleFailure { return it }
+            .map { getLane(it).bind() }
 
         val currentLane = selectedLanes.last()
         val innerLaneBoundaryOffset = selectedLanes.dropLast(1)
             .map { it.width }
             .let { if (it.isEmpty()) LinearFunction.X_AXIS else StackedFunction.ofSum(it) }
 
-        return StackedFunction(
+        StackedFunction(
             listOf(innerLaneBoundaryOffset, currentLane.width),
             { sign(laneId) * (it[0] + factor * it[1]) }
         )
-            .let { Result.success(it) }
     }
 
     /**
@@ -106,19 +105,19 @@ data class LaneSection(
      * of the lane is achieved by a [factor] of 0.5.
      */
     fun getLaneHeightOffset(laneIdentifier: LaneIdentifier, factor: Double):
-        Result<UnivariateFunction, IllegalArgumentException> {
+        Either<IllegalArgumentException, UnivariateFunction> = either.eager {
 
-        val inner = getInnerLaneHeightOffset(laneIdentifier).handleFailure { return it }
-        val outer = getOuterLaneHeightOffset(laneIdentifier).handleFailure { return it }
+        val inner = getInnerLaneHeightOffset(laneIdentifier).bind()
+        val outer = getOuterLaneHeightOffset(laneIdentifier).bind()
         val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
-        return Result.success(laneHeightOffset)
+        laneHeightOffset
     }
 
     private fun getOuterLaneHeightOffset(laneIdentifier: LaneIdentifier):
-        Result<UnivariateFunction, IllegalArgumentException> =
+        Either<IllegalArgumentException, UnivariateFunction> =
         getLane(laneIdentifier).map { it.outerHeightOffset }
 
     private fun getInnerLaneHeightOffset(laneIdentifier: LaneIdentifier):
-        Result<UnivariateFunction, IllegalArgumentException> =
+        Either<IllegalArgumentException, UnivariateFunction> =
         getLane(laneIdentifier).map { it.innerHeightOffset }
 }

@@ -16,14 +16,45 @@
 
 package io.rtron.model.opendrive.junction
 
-data class Junction(
-    var connection: List<JunctionConnection> = listOf(),
-    var priority: List<JunctionPriority> = listOf(),
-    // TODO var controller: List<JunctionController> = listOf(),
-    // TODO surface
-    // TODO g_additionalData
+import arrow.core.NonEmptyList
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.optics.optics
+import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionIdentifier
+import io.rtron.model.opendrive.additions.identifier.JunctionIdentifier
+import io.rtron.model.opendrive.core.OpendriveElement
+import io.rtron.model.opendrive.objects.EOrientation
 
-    var name: String = "",
+@optics
+data class Junction(
+    var connection: List<JunctionConnection> = emptyList(),
+    var priority: List<JunctionPriority> = emptyList(),
+    var controller: List<JunctionController> = emptyList(),
+    var surface: Option<JunctionSurface> = None,
+
     var id: String = "",
-    var type: EJunctionType = EJunctionType.DEFAULT
-)
+    var mainRoad: Option<String> = None,
+    var name: Option<String> = None,
+    var orientation: Option<EOrientation> = None,
+    var sEnd: Option<Double> = None,
+    var sStart: Option<Double> = None,
+    var type: Option<EJunctionType> = None,
+
+    override var additionalId: Option<JunctionIdentifier> = None
+) : OpendriveElement(), AdditionalJunctionIdentifier {
+
+    // Properties and Initializers
+    val connectionAsNonEmptyList: NonEmptyList<JunctionConnection>
+        get() = NonEmptyList.fromListUnsafe(connection)
+
+    val typeValidated: EJunctionType
+        get() = type.getOrElse { EJunctionType.DEFAULT }
+
+    // Methods
+    fun getConnectingRoadIds(): Set<String> = connection.flatMap { it.incomingRoad.toList() }.toSet()
+    fun getIncomingRoadIds(): Set<String> = connection.flatMap { it.incomingRoad.toList() }.toSet()
+    fun getNumberOfIncomingRoads(): Int = getIncomingRoadIds().size
+
+    companion object
+}

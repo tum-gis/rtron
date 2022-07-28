@@ -16,14 +16,17 @@
 
 package io.rtron.math.analysis.function.univariate.combination
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.computations.ResultEffect.bind
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.range.Range
-import io.rtron.std.handleFailure
 import io.rtron.std.hasSameSizeAs
 import io.rtron.std.isSorted
 import io.rtron.std.isStrictlySorted
@@ -45,22 +48,19 @@ class ConcatenatedFunction(
     override val domain: Range<Double> get() = container.domain
 
     // Methods
-    override fun valueUnbounded(x: Double): Result<Double, Exception> {
-        val localMember = container.strictSelectMember(x)
-            .handleFailure { return it }
-        return localMember.member.valueUnbounded(localMember.localParameter)
+    override fun valueUnbounded(x: Double): Either<Exception, Double> = either.eager {
+        val localMember = container.strictSelectMember(x).bind()
+        localMember.member.valueUnbounded(localMember.localParameter).bind()
     }
 
-    override fun slopeUnbounded(x: Double): Result<Double, Exception> {
-        val localMember = container.strictSelectMember(x)
-            .handleFailure { return it }
-        return localMember.member.slopeUnbounded(localMember.localParameter)
+    override fun slopeUnbounded(x: Double): Either<Exception, Double> = either.eager {
+        val localMember = container.strictSelectMember(x).bind()
+        localMember.member.slopeUnbounded(localMember.localParameter).bind()
     }
 
-    override fun valueInFuzzy(x: Double, tolerance: Double): Result<Double, Exception> {
-        val localMember = container.fuzzySelectMember(x, tolerance)
-            .handleFailure { return it }
-        return localMember.member.valueUnbounded(localMember.localParameter)
+    override fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> = either.eager {
+        val localMember = container.fuzzySelectMember(x, tolerance).bind()
+        localMember.member.valueUnbounded(localMember.localParameter).bind()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -149,13 +149,12 @@ class ConcatenatedFunction(
          * @param prependConstant if true, the first linear function is preceded by a constant function
          */
         fun ofPolynomialFunctions(
-            starts: List<Double>,
-            coefficients: List<DoubleArray>,
+            starts: NonEmptyList<Double>,
+            coefficients: NonEmptyList<DoubleArray>,
             prependConstant: Boolean = false,
             prependConstantValue: Double = Double.NaN
         ): UnivariateFunction {
 
-            require(starts.isNotEmpty() && coefficients.isNotEmpty()) { "List of starts and coefficients must not be empty." }
             require(starts.hasSameSizeAs(coefficients)) { "Equally sized starts and coefficients required." }
             require(starts.isStrictlySorted()) { "Polynomials must be sorted in strict ascending order." }
 
@@ -171,7 +170,7 @@ class ConcatenatedFunction(
                 listOf(Double.MIN_VALUE) else emptyList()
             val prependedFunction = if (prependConstant) {
                 val prependValue = if (prependConstantValue.isFinite()) prependConstantValue else
-                    polynomialFunctions.first().value(0.0).handleFailure { throw it.error }
+                    polynomialFunctions.first().value(0.0).getOrHandle { throw it }
 
                 listOf(ConstantFunction(prependValue))
             } else emptyList()

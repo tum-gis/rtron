@@ -16,8 +16,11 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import com.github.kittinunf.result.Result
-import io.rtron.std.handleFailure
+import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.continuations.either
+import arrow.core.nonEmptyListOf
+import io.rtron.math.geometry.GeometryException
 
 /**
  * Represents a composition of multiple surface members.
@@ -25,7 +28,7 @@ import io.rtron.std.handleFailure
  * @param surfaceMembers surface members to be composited
  */
 class CompositeSurface3D(
-    private val surfaceMembers: List<AbstractSurface3D>
+    private val surfaceMembers: NonEmptyList<AbstractSurface3D>
 ) : AbstractSurface3D() {
 
     // Properties and Initializers
@@ -37,11 +40,11 @@ class CompositeSurface3D(
     override val tolerance: Double get() = surfaceMembers.first().tolerance
 
     // Secondary Constructors
-    constructor(surfaceMember: AbstractSurface3D) : this(listOf(surfaceMember))
+    constructor(surfaceMember: AbstractSurface3D) : this(nonEmptyListOf(surfaceMember))
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Result<List<Polygon3D>, Exception> {
-        val polygons = surfaceMembers.map { it.calculatePolygonsGlobalCS() }.handleFailure { return it }.flatten()
-        return Result.success(polygons)
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either.eager {
+        val polygons: List<Polygon3D> = surfaceMembers.map { it.calculatePolygonsGlobalCS().bind() }.flatten()
+        polygons.let { NonEmptyList.fromListUnsafe(it) }
     }
 }

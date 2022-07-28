@@ -16,13 +16,14 @@
 
 package io.rtron.math.analysis.function.bivariate.pure
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
-import io.rtron.std.getValueResult
-import io.rtron.std.handleFailure
+import io.rtron.std.getValueEither
 import java.util.SortedMap
 
 /**
@@ -53,16 +54,16 @@ class ShapeFunction(
 
     // Methods
 
-    override fun valueUnbounded(x: Double, y: Double): Result<Double, Exception> {
+    override fun valueUnbounded(x: Double, y: Double): Either<Exception, Double> {
 
         val xAdjusted = if (extrapolateX) x.coerceIn(minimumX, maximumX) else x
         if (xAdjusted in functions)
             return calculateZ(xAdjusted, y)
 
-        val keyBefore = getKeyBefore(x).handleFailure { throw it.error }
-        val zBefore = calculateZ(keyBefore, y).handleFailure { throw it.error }
-        val keyAfter = getKeyAfter(x).handleFailure { throw it.error }
-        val zAfter = calculateZ(keyAfter, y).handleFailure { throw it.error }
+        val keyBefore = getKeyBefore(x).getOrHandle { throw it }
+        val zBefore = calculateZ(keyBefore, y).getOrHandle { throw it }
+        val keyAfter = getKeyAfter(x).getOrHandle { throw it }
+        val zAfter = calculateZ(keyAfter, y).getOrHandle { throw it }
 
         val linear = LinearFunction.ofInclusivePoints(keyBefore, zBefore, keyAfter, zAfter)
         return linear.valueUnbounded(x)
@@ -71,34 +72,29 @@ class ShapeFunction(
     /**
      * Returns the key of a function, which is located before [x].
      */
-    private fun getKeyBefore(x: Double): Result<Double, Exception> = functions
+    private fun getKeyBefore(x: Double): Either<Exception, Double> = functions
         .filter { it.key < x }
-        .ifEmpty { return Result.error(IllegalArgumentException("No relevant entry available.")) }
+        .ifEmpty { return Either.Left(IllegalArgumentException("No relevant entry available.")) }
         .toSortedMap()
         .lastKey()
-        .let { Result.Success(it) }
+        .let { Either.Right(it) }
 
     /**
      * Returns the key of a function, which is located after [x].
      */
-    private fun getKeyAfter(x: Double): Result<Double, Exception> = functions
+    private fun getKeyAfter(x: Double): Either<Exception, Double> = functions
         .filter { x < it.key }
-        .ifEmpty { return Result.error(IllegalArgumentException("No relevant entry available.")) }
+        .ifEmpty { return Either.Left(IllegalArgumentException("No relevant entry available.")) }
         .toSortedMap()
         .firstKey()
-        .let { Result.Success(it) }
+        .let { Either.Right(it) }
 
-    private fun calculateZ(key: Double, y: Double): Result<Double, Exception> {
-        val selectedFunction = functions
-            .getValueResult(key)
-            .handleFailure { return it }
+    private fun calculateZ(key: Double, y: Double): Either<Exception, Double> = either.eager {
+        val selectedFunction = functions.getValueEither(key).mapLeft { it.toIllegalArgumentException() }.bind()
 
         val yAdjusted = if (!extrapolateY) y
         else y.coerceIn(selectedFunction.domain.lowerEndpointOrNull(), selectedFunction.domain.upperEndpointOrNull())
 
-        return selectedFunction
-            .valueUnbounded(yAdjusted)
-            .handleFailure { return it }
-            .let { Result.success(it) }
+        selectedFunction.valueUnbounded(yAdjusted).bind()
     }
 }

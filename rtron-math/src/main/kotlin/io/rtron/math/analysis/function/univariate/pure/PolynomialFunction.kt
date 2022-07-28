@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function.univariate.pure
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
@@ -54,10 +54,10 @@ data class PolynomialFunction(
     constructor(coefficients: List<Double>) : this(coefficients.toDoubleArray())
 
     // Methods
-    override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> =
-        Result.success(_polynomialFunction.value(x))
+    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> =
+        Either.Right(_polynomialFunction.value(x))
 
-    override fun slopeUnbounded(x: Double): Result<Double, IllegalArgumentException> =
+    override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> =
         polynomialDerivative.valueUnbounded(x)
 
     /**

@@ -16,7 +16,7 @@
 
 package io.rtron.readerwriter.citygml
 
-import org.citygml4j.model.CityGMLVersion as GmlCitygmlVersion
+import org.citygml4j.core.model.CityGMLVersion as GmlCitygmlVersion
 
 enum class CitygmlVersion {
     V1_0,

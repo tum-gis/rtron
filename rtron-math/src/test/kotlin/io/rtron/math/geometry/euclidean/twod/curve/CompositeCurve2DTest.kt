@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -99,8 +99,8 @@ internal class CompositeCurve2DTest {
 
             val actualPoint = compositeCurve.calculatePoseGlobalCS(curveRelativePoint)
 
-            assertThat(actualPoint).isInstanceOf(Result.Success::class.java)
-            require(actualPoint is Result.Success)
+            assertThat(actualPoint).isInstanceOf(Either.Right::class.java)
+            require(actualPoint is Either.Right)
             assertThat(actualPoint.value.point).isNotEqualTo(Vector2D.ZERO)
         }
     }

@@ -16,10 +16,8 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
-import com.github.kittinunf.result.Result
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.transform.AffineSequence3D
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -32,11 +30,9 @@ internal class Cylinder3DTest {
         fun `polygons start at level zero`() {
             val cylinder = Cylinder3D(0.5, 1.0, DBL_EPSILON_1, AffineSequence3D.EMPTY)
 
-            val actualPolygonsResult = cylinder.calculatePolygonsGlobalCS()
+            val actualPolygons = cylinder.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygonsResult).isInstanceOf(Result.Success::class.java)
-            require(actualPolygonsResult is Result.Success)
-            assertTrue(actualPolygonsResult.value.any { polygon -> polygon.vertices.any { it.z == 0.0 } })
+            assertTrue(actualPolygons.any { polygon -> polygon.vertices.any { it.z == 0.0 } })
         }
     }
 }

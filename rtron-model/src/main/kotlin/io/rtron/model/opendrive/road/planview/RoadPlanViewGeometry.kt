@@ -16,32 +16,25 @@
 
 package io.rtron.model.opendrive.road.planview
 
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
+import arrow.core.None
+import arrow.core.Option
+import arrow.optics.optics
+import io.rtron.model.opendrive.core.OpendriveElement
 
+@optics
 data class RoadPlanViewGeometry(
-    var line: RoadPlanViewGeometryLine = RoadPlanViewGeometryLine(),
-    var spiral: RoadPlanViewGeometrySpiral = RoadPlanViewGeometrySpiral(),
-    var arc: RoadPlanViewGeometryArc = RoadPlanViewGeometryArc(),
-    var poly3: RoadPlanViewGeometryPoly3 = RoadPlanViewGeometryPoly3(),
-    var paramPoly3: RoadPlanViewGeometryParamPoly3 = RoadPlanViewGeometryParamPoly3(),
+    var line: Option<RoadPlanViewGeometryLine> = None,
+    var spiral: Option<RoadPlanViewGeometrySpiral> = None,
+    var arc: Option<RoadPlanViewGeometryArc> = None,
+    var poly3: Option<RoadPlanViewGeometryPoly3> = None,
+    var paramPoly3: Option<RoadPlanViewGeometryParamPoly3> = None,
 
-    var userData: List<UserData> = listOf(),
-    var include: List<Include> = listOf(),
-    var dataQuality: DataQuality = DataQuality(),
-
+    var hdg: Double = Double.NaN,
+    var length: Double = Double.NaN,
     var s: Double = Double.NaN,
     var x: Double = Double.NaN,
-    var y: Double = Double.NaN,
-    var hdg: Double = Double.NaN,
-    var length: Double = Double.NaN
-) {
+    var y: Double = Double.NaN
+) : OpendriveElement() {
 
-    // Methods
-    fun isLine() = !line.isNaN()
-    fun isSpiral() = !spiral.isNaN()
-    fun isArc() = !arc.isNaN()
-    fun isPoly3() = !poly3.isNaN()
-    fun isParamPoly3() = !paramPoly3.isNaN()
+    companion object
 }

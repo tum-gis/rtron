@@ -10,6 +10,9 @@ jobs:
         os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
         java: [ '11' ]
         distribution: [ 'temurin', 'zulu' ]
+        exclude:
+          - os: macos-latest
+            distribution: 'zulu'
       fail-fast: false
 
     steps:
@@ -22,7 +25,5 @@ jobs:
         with:
           distribution: ${{ matrix.distribution }}
           java-version: ${{ matrix.java }}
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build

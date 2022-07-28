@@ -41,17 +41,22 @@ allprojects {
     apply(plugin = "java")
     apply(plugin = Plugins.ktlint)
     apply(plugin = "maven-publish")
-    apply(plugin = "signing")
+    if (!project.hasProperty(BuildPropertyNames.skipSigning)) {
+        apply(plugin = "signing")
+    }
 
     repositories {
         mavenCentral()
-        jcenter()
+        maven(url = MavenSources.sonatypeSnapshot)
+        maven(url = MavenSources.jitpack)
     }
 
     dependencies {
         implementation(kotlin(Dependencies.kotlinStandardLibrary))
         implementation(Dependencies.kotlinCoroutines)
-        implementation(Dependencies.result)
+
+        implementation(Dependencies.arrowCore)
+        implementation(Dependencies.arrowOptics)
 
         testImplementation(Dependencies.junit)
         testImplementation(Dependencies.assertj)
@@ -62,6 +67,14 @@ allprojects {
         useJUnitPlatform()
     }
 
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType<Javadoc> {
+        options.encoding = "UTF-8"
+    }
+
     tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
     }
@@ -69,6 +82,10 @@ allprojects {
     java {
         withSourcesJar()
         withJavadocJar()
+    }
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        version.set("0.45.2")
     }
 
     publishing {
@@ -122,8 +139,10 @@ allprojects {
         }
     }
 
-    signing {
-        sign(publishing.publications["mavenJava"])
+    if (!project.hasProperty(BuildPropertyNames.skipSigning)) {
+        signing {
+            sign(publishing.publications["mavenJava"])
+        }
     }
 }
 
@@ -146,9 +165,9 @@ repositories {
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }

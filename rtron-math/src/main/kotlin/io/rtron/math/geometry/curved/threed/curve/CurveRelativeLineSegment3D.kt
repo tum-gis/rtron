@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.curved.threed.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.geometry.curved.threed.CurveRelativeAbstractGeometry3D
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.curve.LineSegment3D
@@ -51,19 +51,14 @@ class CurveRelativeLineSegment3D(
          * Creates a [LineSegment3D], if [start] and [end] [Vector3D] are not fuzzily equal according to the [tolerance].
          *
          */
-        fun of(
-            start: CurveRelativeVector3D,
-            end: CurveRelativeVector3D,
-            tolerance: Double,
-            endBoundType: BoundType = BoundType.CLOSED
-        ): Result<CurveRelativeLineSegment3D, IllegalArgumentException> =
+        fun of(start: CurveRelativeVector3D, end: CurveRelativeVector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED): Either<IllegalArgumentException, CurveRelativeLineSegment3D> =
             if (start.fuzzyEquals(end, tolerance))
-                Result.error(
+                Either.Left(
                     IllegalArgumentException(
                         "Start and end vector of a line segment must be different " +
                             "according to the given tolerance."
                     )
                 )
-            else Result.success(CurveRelativeLineSegment3D(start, end, tolerance, endBoundType))
+            else Either.Right(CurveRelativeLineSegment3D(start, end, tolerance, endBoundType))
     }
 }

@@ -16,8 +16,10 @@
 
 package io.rtron.math.projection
 
-import com.github.kittinunf.result.Result
-import io.rtron.std.handleFailure
+import arrow.core.Either
+import arrow.core.continuations.either
+import arrow.core.left
+import arrow.core.right
 import org.locationtech.proj4j.CRSFactory as ProjCRSFactory
 import org.locationtech.proj4j.CoordinateReferenceSystem as ProjCoordinateReferenceSystem
 
@@ -54,20 +56,20 @@ class CoordinateReferenceSystem(
         /**
          * Creates a [CoordinateReferenceSystem] based on the provided [epsgCode].
          */
-        fun of(epsgCode: Int): Result<CoordinateReferenceSystem, Exception> = of("EPSG:$epsgCode")
+        fun of(epsgCode: Int): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> = of("EPSG:$epsgCode")
 
         /**
          * Creates a [CoordinateReferenceSystem] based on the provided [crsName].
          */
-        fun of(crsName: String): Result<CoordinateReferenceSystem, Exception> {
+        fun of(crsName: String): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> {
             val crs = try {
                 projCRSFactory.createFromName(crsName)
             } catch (e: Exception) {
-                return Result.error(e)
+                return CoordinateReferenceSystemException.UnkownEpsgCode(e.toString()).left()
             }
             return when (crs) {
-                null -> Result.error(IllegalArgumentException("Unknown EPSG code."))
-                else -> Result.success(CoordinateReferenceSystem(crs))
+                null -> CoordinateReferenceSystemException.UnkownEpsgCode("Unknown EPSG code.").left()
+                else -> CoordinateReferenceSystem(crs).right()
             }
         }
 
@@ -76,16 +78,16 @@ class CoordinateReferenceSystem(
          *
          * @param parameters PROJ.4 projection parameter string
          */
-        fun ofParameters(parameters: String): Result<CoordinateReferenceSystem, Exception> {
-            val epsgCode = parametersToEpsgCode(parameters).handleFailure { return it }
-            return of(epsgCode)
+        fun ofParameters(parameters: String): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> = either.eager {
+            val epsgCode = parametersToEpsgCode(parameters).bind()
+            of(epsgCode).bind()
         }
 
-        private fun parametersToEpsgCode(parameters: String): Result<Int, IllegalArgumentException> {
+        private fun parametersToEpsgCode(parameters: String): Either<CoordinateReferenceSystemException.UnkownEpsgCode, Int> {
             val result = projCRSFactory.readEpsgFromParameters(parameters)
-                ?: return Result.error(IllegalArgumentException("Cannot derive EPSG code from parameters."))
+                ?: return CoordinateReferenceSystemException.UnkownEpsgCode("Cannot derive EPSG code from parameters.").left()
 
-            return Result.success(result.toInt())
+            return result.toInt().right()
         }
     }
 }

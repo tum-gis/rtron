@@ -16,32 +16,28 @@
 
 package io.rtron.model.opendrive.road
 
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.none
-import io.rtron.model.opendrive.common.AdditionalData
-import io.rtron.model.opendrive.common.EContactPoint
+import io.rtron.model.opendrive.core.OpendriveElement
+import io.rtron.model.opendrive.junction.EContactPoint
+import io.rtron.model.opendrive.junction.EElementDir
 
 data class RoadLinkPredecessorSuccessor(
-    var additionalData: AdditionalData = AdditionalData(),
-    var elementType: ERoadLinkElementType = ERoadLinkElementType.ROAD,
+    var contactPoint: Option<EContactPoint> = None,
+    var elementDir: Option<EElementDir> = None,
     var elementId: String = "",
-
-    // variant 1
-    var contactPoint: EContactPoint = EContactPoint.UNKNOWN,
-
-    // variant 2
-    var elementS: Double = Double.NaN
-    // TODO: var elementDir:
-) {
+    var elementS: Option<Double> = None,
+    var elementType: Option<ERoadLinkElementType> = None,
+) : OpendriveElement() {
 
     // Methods
 
     fun getRoadPredecessorSuccessor(): Option<Pair<String, EContactPoint>> =
-        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.ROAD) Some(elementId to contactPoint)
-        else none()
+        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.ROAD }) contactPoint.map { elementId to it }
+        else None
 
     fun getJunctionPredecessorSuccessor(): Option<String> =
-        if (elementId.isNotEmpty() && elementType == ERoadLinkElementType.JUNCTION) Some(elementId)
-        else none()
+        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.JUNCTION }) Some(elementId)
+        else None
 }

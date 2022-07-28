@@ -172,7 +172,7 @@ class RealMatrix(
          *
          * @param columnVectors list of column vectors that must have the same dimension
          */
-        @kotlin.jvm.JvmName("ofListRealVector")
+        @JvmName("ofListRealVector")
         fun of(columnVectors: List<RealVector>): RealMatrix {
             val rowDimension = columnVectors.first().dimension
             require(columnVectors.isNotEmpty()) { "No column vectors provided for building a matrix." }
@@ -188,7 +188,7 @@ class RealMatrix(
          *
          * @param vectors list of 3D vectors whereby each vector will be represented as a row
          */
-        @kotlin.jvm.JvmName("ofListVector3D")
+        @JvmName("ofListVector3D")
         fun of(vectors: List<Vector3D>): RealMatrix =
             RealMatrix(vectors.map { it.toRealVector() })
 

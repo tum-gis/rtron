@@ -17,6 +17,7 @@
 package io.rtron.io.files
 
 import java.nio.file.Files
+import java.nio.file.Path
 import java.io.BufferedReader as JBufferedReader
 
 /**
@@ -29,7 +30,7 @@ class BufferedReader(
 ) {
 
     // Properties and Initializers
-    private val _bufferedReader: JBufferedReader = Files.newBufferedReader(filePath.toPathN())!!
+    private val _bufferedReader: JBufferedReader = Files.newBufferedReader(filePath)!!
 
     // Conversions
     /**

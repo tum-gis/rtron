@@ -16,12 +16,11 @@
 
 package io.rtron.model.opendrive.junction
 
-import io.rtron.model.opendrive.common.EElementDir
+import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionPredecessorSuccessor(
-    // TODO g_additionalData
-    var elementType: String = "",
+    var elementDir: EElementDir = EElementDir.PLUS,
     var elementId: String = "",
     var elementS: Double = Double.NaN,
-    var elementDir: EElementDir = EElementDir.UNKNOWN
-)
+    var elementType: String = ""
+) : OpendriveElement()

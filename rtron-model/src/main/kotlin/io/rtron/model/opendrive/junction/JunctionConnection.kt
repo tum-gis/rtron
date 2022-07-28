@@ -16,18 +16,23 @@
 
 package io.rtron.model.opendrive.junction
 
-import io.rtron.model.opendrive.common.EContactPoint
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionConnectionIdentifier
+import io.rtron.model.opendrive.additions.identifier.JunctionConnectionIdentifier
+import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionConnection(
-    var predecessor: JunctionPredecessorSuccessor = JunctionPredecessorSuccessor(),
-    var successor: JunctionPredecessorSuccessor = JunctionPredecessorSuccessor(),
-    var laneLink: List<JunctionConnectionLaneLink> = listOf(),
-    // TODO g_additionalData
+    var predecessor: Option<JunctionPredecessorSuccessor> = None,
+    var successor: Option<JunctionPredecessorSuccessor> = None,
+    var laneLink: List<JunctionConnectionLaneLink> = emptyList(),
 
+    var connectingRoad: Option<String> = None,
+    var contactPoint: Option<EContactPoint> = None,
     var id: String = "",
-    var incomingRoad: String = "",
-    var connectingRoad: String = "",
-    var contactPoint: EContactPoint = EContactPoint.UNKNOWN,
-    var connectionMaster: String = "",
-    var type: EJunctionType = EJunctionType.DEFAULT
-)
+    var incomingRoad: Option<String> = None,
+    var linkedRoad: Option<String> = None,
+    var type: Option<EConnectionType> = None,
+
+    override var additionalId: Option<JunctionConnectionIdentifier> = None
+) : OpendriveElement(), AdditionalJunctionConnectionIdentifier

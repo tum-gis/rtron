@@ -16,11 +16,22 @@
 
 package io.rtron.model.opendrive.road
 
-import io.rtron.model.opendrive.common.AdditionalData
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.model.opendrive.core.OpendriveElement
+import io.rtron.model.opendrive.junction.ERoadSurfaceCrgMode
+import io.rtron.model.opendrive.junction.ERoadSurfaceCrgPurpose
 
 data class RoadSurfaceCrg(
-    var additionalData: AdditionalData = AdditionalData(),
     var file: String = "",
-    var sStart: Double = Double.NaN
-    // TODO
-)
+    var hOffset: Option<Double> = None,
+    var mode: ERoadSurfaceCrgMode = ERoadSurfaceCrgMode.ATTACHED,
+    var orientation: EDirection = EDirection.SAME,
+    var purpose: Option<ERoadSurfaceCrgPurpose> = None,
+    var sEnd: Double = Double.NaN,
+    var sOffset: Option<Double> = None,
+    var sStart: Double = Double.NaN,
+    var tOffset: Option<Double> = None,
+    var zOffset: Option<Double> = None,
+    var zScale: Option<Double> = None
+) : OpendriveElement()

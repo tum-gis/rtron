@@ -16,19 +16,29 @@
 
 package io.rtron.model.opendrive
 
+import arrow.core.NonEmptyList
+import arrow.optics.optics
 import io.rtron.model.AbstractModel
-import io.rtron.model.opendrive.controller.Controller
-import io.rtron.model.opendrive.header.Header
+import io.rtron.model.opendrive.core.Header
 import io.rtron.model.opendrive.junction.Junction
 import io.rtron.model.opendrive.road.Road
+import io.rtron.model.opendrive.signal.Controller
 
 /**
- * Implementation of the OpenDRIVE data model according to version 1.6.
+ * Implementation of the OpenDRIVE data model according to version 1.7.
  * See the [official page](https://www.asam.net/standards/detail/opendrive/) from ASAM for more.
  */
+@optics
 data class OpendriveModel(
     var header: Header = Header(),
-    var road: List<Road> = listOf(),
-    var controller: List<Controller> = listOf(),
-    var junction: List<Junction> = listOf()
-) : AbstractModel()
+    var road: List<Road> = emptyList(),
+    var controller: List<Controller> = emptyList(),
+    var junction: List<Junction> = emptyList()
+) : AbstractModel() {
+
+    // Properties and Initializers
+    val roadAsNonEmptyList: NonEmptyList<Road>
+        get() = NonEmptyList.fromListUnsafe(road)
+
+    companion object
+}

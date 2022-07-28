@@ -16,7 +16,6 @@
 
 package io.rtron.math.range
 
-import com.github.kittinunf.result.Result
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.math.std.fuzzyLessThanOrEquals
 import kotlin.math.absoluteValue
@@ -64,19 +63,6 @@ fun Range<Double>.fuzzyContains(value: Double, tolerance: Double): Boolean = whe
         fuzzyLessThanOrEquals(lowerEndpointOrNull()!!, value, tolerance) &&
             fuzzyLessThanOrEquals(value, upperEndpointOrNull()!!, tolerance)
 }
-
-/**
- * Returns [Result.Success], if the [value] is fuzzily contained within this [Range] by the [tolerance].
- *
- * @param value value to be checked
- * @param tolerance allowed tolerance fuzziness
- * @return [Result.Success], if [value] is fuzzily contained; [Result.Failure], otherwise
- */
-fun Range<Double>.fuzzyContainsResult(value: Double, tolerance: Double): Result<Boolean, IllegalArgumentException> =
-    when (this.fuzzyContains(value, tolerance)) {
-        true -> Result.success(true)
-        false -> Result.error(IllegalArgumentException("Value ($value) is not fuzzily contained in range $this."))
-    }
 
 /**
  * Widens the lower bound of the [Range] by [lowerWideningValue] and the upper bound of the

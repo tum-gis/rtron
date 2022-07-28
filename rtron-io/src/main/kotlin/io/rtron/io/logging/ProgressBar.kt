@@ -16,10 +16,10 @@
 
 package io.rtron.io.logging
 
+import mu.KotlinLogging
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
 /**
@@ -29,7 +29,6 @@ import kotlin.time.toDuration
  * @param completion maximum steps to until the task is completed
  * @param currentStatus current progress status
  */
-@OptIn(ExperimentalTime::class)
 class ProgressBar(
     private val taskName: String,
     private val completion: Int,
@@ -37,7 +36,7 @@ class ProgressBar(
 ) {
 
     // Properties and Initializers
-    private val logger = LogManager.getReportLogger("Progress")
+    private val logger = KotlinLogging.logger {}
     private val startTime = System.currentTimeMillis()
     private var lastPrintUpdateTime: Long = 0
 

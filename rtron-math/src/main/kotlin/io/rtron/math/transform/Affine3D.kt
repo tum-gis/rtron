@@ -55,10 +55,10 @@ class Affine3D(
     fun transform(point: Vector3D) = _matrix.transformPosition(point.toVector3DJOML()).toVector3D()
     fun inverseTransform(point: Vector3D) = _matrixInverse.transformPosition(point.toVector3DJOML()).toVector3D()
 
-    @kotlin.jvm.JvmName("transformOfListVector3D")
+    @JvmName("transformOfListVector3D")
     fun transform(points: List<Vector3D>): List<Vector3D> = points.map { transform(it) }
 
-    @kotlin.jvm.JvmName("inverseTransformOfListVector3D")
+    @JvmName("inverseTransformOfListVector3D")
     fun inverseTransform(points: List<Vector3D>) = points.map { inverseTransform(it) }
 
     fun transform(polygon: Polygon3D) =
@@ -66,10 +66,10 @@ class Affine3D(
     fun inverseTransform(polygon: Polygon3D) =
         Polygon3D(polygon.vertices.map { inverseTransform(it) }, polygon.tolerance)
 
-    @kotlin.jvm.JvmName("transformOfListPolygon3D")
+    @JvmName("transformOfListPolygon3D")
     fun transform(polygons: List<Polygon3D>) = polygons.map { transform(it) }
 
-    @kotlin.jvm.JvmName("inverseTransformOfListPolygon3D")
+    @JvmName("inverseTransformOfListPolygon3D")
     fun inverseTransform(polygons: List<Polygon3D>) = polygons.map { inverseTransform(it) }
 
     // Methods: Extraction
@@ -79,7 +79,7 @@ class Affine3D(
      *
      * @return translation vector
      */
-    fun extractTranslation() = _matrix.getTranslation(JOMLVector3d()).toVector3D()
+    fun extractTranslation(): Vector3D = _matrix.getTranslation(JOMLVector3d()).toVector3D()
 
     /**
      * Extracts the scale vector of the [Affine3D] transformation matrix.
@@ -215,9 +215,9 @@ class Affine3D(
         /**
          * Creates an [Affine3D] transformation matrix by means of a new coordinate system basis.
          *
-         * @param basisX x axis of new basis
-         * @param basisY y axis of new basis
-         * @param basisZ z axis of new basis
+         * @param basisX x-axis of new basis
+         * @param basisY y-axis of new basis
+         * @param basisZ z-axis of new basis
          */
         fun of(basisX: Vector3D, basisY: Vector3D, basisZ: Vector3D): Affine3D {
             val matrix = JOMLMatrix4d().set(

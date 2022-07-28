@@ -16,8 +16,8 @@
 
 package io.rtron.math.analysis.function.univariate.combination
 
-import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.getOrElse
+import arrow.core.Either
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 import io.rtron.math.range.intersectingRange
@@ -54,14 +54,14 @@ class StackedFunction(
         this(listOf(memberFunction), operation, defaultValue)
 
     // Methods
-    override fun valueUnbounded(x: Double): Result<Double, IllegalArgumentException> {
-        val individualValues = memberFunctions.map { it.valueUnbounded(x) getOrElse { defaultValue } }
-        return Result.success(operation(individualValues))
+    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> {
+        val individualValues = memberFunctions.map { it.valueUnbounded(x).getOrElse { defaultValue } }
+        return Either.Right(operation(individualValues))
     }
 
-    override fun slopeUnbounded(x: Double): Result<Double, IllegalArgumentException> {
-        val individualValues = memberFunctions.map { it.slopeUnbounded(x) getOrElse { 0.0 } }
-        return Result.success(operation(individualValues))
+    override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> {
+        val individualValues = memberFunctions.map { it.slopeUnbounded(x).getOrElse { 0.0 } }
+        return Either.Right(operation(individualValues))
     }
 
     override fun equals(other: Any?): Boolean {

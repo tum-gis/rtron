@@ -16,7 +16,12 @@
 
 package io.rtron.model.opendrive.road
 
-data class RoadTypeSpeed(
-    // TODO
-    var todo: String = "todo"
-)
+import arrow.core.None
+import arrow.core.Option
+import io.rtron.model.opendrive.core.EUnitSpeed
+import io.rtron.model.opendrive.core.OpendriveElement
+
+class RoadTypeSpeed(
+    var max: Double = Double.NaN,
+    var unit: Option<EUnitSpeed> = None
+) : OpendriveElement()

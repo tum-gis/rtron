@@ -16,59 +16,90 @@
 
 package io.rtron.readerwriter.opendrive
 
-import com.github.kittinunf.result.Result
-import io.rtron.io.files.Path
-import io.rtron.io.logging.LogManager
+import arrow.core.Either
+import arrow.core.continuations.either
+import arrow.core.getOrHandle
+import arrow.core.left
+import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.model.opendrive.OpendriveModel
-import io.rtron.readerwriter.opendrive.configuration.OpendriveReaderConfiguration
-import io.rtron.std.handleFailure
-import org.w3c.dom.Document
-import javax.xml.parsers.DocumentBuilderFactory
+import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
+import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
+import io.rtron.readerwriter.opendrive.report.SchemaValidationReport
+import io.rtron.readerwriter.opendrive.version.OpendriveVersion
+import io.rtron.readerwriter.opendrive.version.OpendriveVersionUtils
+import io.rtron.std.BaseException
+import mu.KotlinLogging
+import java.nio.file.Path
+import kotlin.io.path.extension
+import kotlin.io.path.isRegularFile
 
-class OpendriveReader(
-    val configuration: OpendriveReaderConfiguration
+class OpendriveReader private constructor(
+    val filePath: Path,
+    private val opendriveVersion: OpendriveVersion,
+    private val versionSpecificUnmarshaller: OpendriveUnmarshaller
 ) {
 
     // Properties and Initializers
-    private val _reportLogger = LogManager.getReportLogger(configuration.projectId)
-
-    private val _opendrive14Reader by lazy { Opendrive14Reader(configuration) }
-    private val _opendrive15Reader by lazy { Opendrive15Reader(configuration) }
-
-    // Methods
-
-    fun read(filePath: Path): OpendriveModel {
-
-        val opendriveVersion = getOpendriveVersion(filePath).handleFailure { throw it.error }
-
-        val model = when (opendriveVersion) {
-            OpendriveVersion(1, 4) -> _opendrive14Reader.createOpendriveModel(filePath)
-            else -> {
-                _reportLogger.warn("Detected OpenDRIVE version ($opendriveVersion) for which no dedicated reader is implemented (yet). Experimentally continuing.")
-                _opendrive14Reader.createOpendriveModel(filePath)
-            }
-        }
-        _reportLogger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}). ✔")
-        return model
+    init {
+        require(filePath.isRegularFile()) { "Path must point to a regular file." }
+        require(filePath.extension in supportedFileExtensions) { "Path must point to a regular file." }
     }
 
-    private data class OpendriveVersion(val revMajor: Int = 0, val revMinor: Int = 0)
-    private fun getOpendriveVersion(file: Path): Result<OpendriveVersion, IllegalStateException> {
+    private val fallbackUnmarshaller by lazy {
+        OpendriveUnmarshaller.FALLBACK
+    }
 
-        val xmlDoc: Document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.toFileJ())
-        val header = xmlDoc.getElementsByTagName("header").item(0)
+    private val logger = KotlinLogging.logger {}
 
-        val revMajor = header.attributes.getNamedItem("revMajor") ?: return Result.error(IllegalStateException("Major version of OpenDRIVE dataset is not identifiable."))
-        val revMinor = header.attributes.getNamedItem("revMinor") ?: return Result.error(IllegalStateException("Minor version of OpenDRIVE dataset is not identifiable."))
+    // Methods
+    fun runSchemaValidation(): SchemaValidationReport {
 
-        val opendriveVersion = OpendriveVersion(
-            revMajor = revMajor.nodeValue.toInt(),
-            revMinor = revMinor.nodeValue.toInt()
-        )
-        return Result.success(opendriveVersion)
+        val messageList = versionSpecificUnmarshaller.validate(filePath).getOrHandle {
+            logger.warn("Schema validation was aborted due the following error: ${it.message}")
+            return SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
+        }
+        if (!messageList.isEmpty()) logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.size} incidents.")
+        else logger.info("Schema validation report for OpenDRIVE $opendriveVersion: Everything ok.")
+
+        return SchemaValidationReport(opendriveVersion, messageList)
+    }
+
+    fun readModel(): Either<OpendriveReaderException, OpendriveModel> = either.eager {
+
+        // read model
+        val opendriveModel: OpendriveModel = versionSpecificUnmarshaller.readFromFile(filePath).fold({
+            logger.warn("No dedicated reader available for OpenDRIVE $opendriveVersion. Using reader for OpenDRIVE ${fallbackUnmarshaller.opendriveVersion} as fallback.")
+            val model = fallbackUnmarshaller.readFromFile(filePath).bind()
+            model
+        }, { it })
+
+        opendriveModel.updateAdditionalIdentifiers()
+        logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+        opendriveModel
     }
 
     companion object {
-        val supportedFileExtensions = listOf("xodr", "xodrz")
+        val supportedFileExtensions: Set<String> = setOf("xodr", "xodrz")
+
+        fun of(filePath: Path): Either<OpendriveReaderException, OpendriveReader> = either.eager {
+            if (!filePath.isRegularFile())
+                OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
+
+            val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(filePath).bind()
+            val versionSpecificUnmarshaller = OpendriveUnmarshaller.of(opendriveVersion).getOrHandle { throw IllegalArgumentException(it.message) }
+
+            OpendriveReader(filePath, opendriveVersion, versionSpecificUnmarshaller)
+        }
     }
+}
+
+sealed class OpendriveReaderException(message: String) : BaseException(message) {
+    data class FileNotFound(val path: Path) : OpendriveReaderException("File not found at $path")
+    data class MalformedXmlDocument(val reason: String) : OpendriveReaderException("OpenDRIVE file cannot be parsed: $reason")
+    data class HeaderElementNotFound(val reason: String) : OpendriveReaderException("Header element of OpenDRIVE dataset not found: $reason")
+    data class VersionNotIdentifiable(val reason: String) : OpendriveReaderException("Version of OpenDRIVE dataset not deducible: $reason")
+
+    data class NoDedicatedSchemaAvailable(val version: OpendriveVersion) : OpendriveReaderException("No dedicated schema available for $version")
+    data class FatalSchemaValidationError(val reason: String) : OpendriveReaderException("Fatal error during schema validation: $reason")
+    data class NoDedicatedReaderAvailable(val version: OpendriveVersion) : OpendriveReaderException("No dedicated reader available for $version")
 }

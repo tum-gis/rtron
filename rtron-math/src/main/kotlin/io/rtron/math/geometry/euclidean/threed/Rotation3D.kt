@@ -16,6 +16,8 @@
 
 package io.rtron.math.geometry.euclidean.threed
 
+import arrow.core.Option
+import arrow.core.getOrElse
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.linear.RealMatrix
@@ -100,5 +102,11 @@ class Rotation3D(
             val adjustedPitch = if (pitch.isFinite()) pitch else 0.0
             return Rotation3D(adjustedHeading, adjustedRoll, adjustedPitch)
         }
+
+        /**
+         * Returns a [Rotation3D] while replacing non-finite values for [heading], [roll] and [pitch] with 0.0.
+         */
+        fun of(heading: Option<Double>, roll: Option<Double>, pitch: Option<Double>): Rotation3D =
+            Rotation3D(heading.getOrElse { 0.0 }, roll.getOrElse { 0.0 }, pitch.getOrElse { 0.0 })
     }
 }

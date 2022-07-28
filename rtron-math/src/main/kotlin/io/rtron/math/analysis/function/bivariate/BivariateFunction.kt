@@ -16,7 +16,7 @@
 
 package io.rtron.math.analysis.function.bivariate
 
-import com.github.kittinunf.result.Result
+import arrow.core.Either
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyContains
 
@@ -34,7 +34,7 @@ abstract class BivariateFunction {
     abstract val domainY: Range<Double>
 
     // Methods
-    internal abstract fun valueUnbounded(x: Double, y: Double): Result<Double, Exception>
+    internal abstract fun valueUnbounded(x: Double, y: Double): Either<Exception, Double>
 
     /**
      * Returns the value z = f(x, y). If [x] is not in [domainX] or [y] is not in [domainY] an error is returned.
@@ -42,9 +42,9 @@ abstract class BivariateFunction {
      * @param x parameter x for the function evaluation
      * @param y parameter y for the function evaluation
      */
-    fun value(x: Double, y: Double): Result<Double, Exception> {
+    fun value(x: Double, y: Double): Either<Exception, Double> {
         return if (x in domainX && y in domainY) valueUnbounded(x, y)
-        else Result.error(
+        else Either.Left(
             IllegalArgumentException(
                 "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
             )
@@ -59,9 +59,9 @@ abstract class BivariateFunction {
      * @param y parameter y for the function evaluation
      * @param tolerance allowed tolerance for fuzzy contains evaluation
      */
-    fun valueInFuzzy(x: Double, y: Double, tolerance: Double): Result<Double, Exception> {
+    fun valueInFuzzy(x: Double, y: Double, tolerance: Double): Either<Exception, Double> {
         return if (!domainX.fuzzyContains(x, tolerance) || !domainY.fuzzyContains(y, tolerance))
-            Result.error(
+            Either.Left(
                 IllegalArgumentException(
                     "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
                 )

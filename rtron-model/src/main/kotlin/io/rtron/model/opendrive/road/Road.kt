@@ -16,66 +16,55 @@
 
 package io.rtron.model.opendrive.road
 
+import arrow.core.NonEmptyList
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.none
-import com.github.kittinunf.result.Result
-import io.rtron.math.std.fuzzyEquals
-import io.rtron.model.opendrive.common.DataQuality
-import io.rtron.model.opendrive.common.ETrafficRule
-import io.rtron.model.opendrive.common.Include
-import io.rtron.model.opendrive.common.UserData
-import io.rtron.model.opendrive.road.lanes.RoadLanes
-import io.rtron.model.opendrive.road.lateralprofile.RoadLateralProfile
-import io.rtron.model.opendrive.road.objects.RoadObjects
+import arrow.optics.optics
+import io.rtron.model.opendrive.additions.identifier.AdditionalRoadIdentifier
+import io.rtron.model.opendrive.additions.identifier.RoadIdentifier
+import io.rtron.model.opendrive.core.OpendriveElement
+import io.rtron.model.opendrive.lane.RoadLanes
+import io.rtron.model.opendrive.objects.RoadObjects
+import io.rtron.model.opendrive.railroad.RoadRailroad
+import io.rtron.model.opendrive.road.elevation.RoadElevationProfile
+import io.rtron.model.opendrive.road.elevation.RoadElevationProfileElevation
+import io.rtron.model.opendrive.road.lateral.RoadLateralProfile
+import io.rtron.model.opendrive.road.lateral.RoadLateralProfileShape
+import io.rtron.model.opendrive.road.lateral.RoadLateralProfileSuperelevation
 import io.rtron.model.opendrive.road.planview.RoadPlanView
-import io.rtron.model.opendrive.road.signals.RoadSignals
-import io.rtron.std.ContextMessage
+import io.rtron.model.opendrive.signal.RoadSignals
 
+@optics
 data class Road(
-    var link: RoadLink = RoadLink(),
-    var type: List<RoadType> = listOf(),
+    var link: Option<RoadLink> = None,
+    var type: List<RoadType> = emptyList(),
     var planView: RoadPlanView = RoadPlanView(),
-    var elevationProfile: RoadElevationProfile = RoadElevationProfile(),
-    var lateralProfile: RoadLateralProfile = RoadLateralProfile(),
+    var elevationProfile: Option<RoadElevationProfile> = None,
+    var lateralProfile: Option<RoadLateralProfile> = None,
     var lanes: RoadLanes = RoadLanes(),
-    var objects: RoadObjects = RoadObjects(),
-    var signals: RoadSignals = RoadSignals(),
-    var surface: RoadSurface = RoadSurface(),
-    var railroad: RoadRailroad = RoadRailroad(),
+    var objects: Option<RoadObjects> = None,
+    var signals: Option<RoadSignals> = None,
+    var surface: Option<RoadSurface> = None,
+    var railroad: Option<RoadRailroad> = None,
 
-    var userData: List<UserData> = listOf(),
-    var include: List<Include> = listOf(),
-    var dataQuality: DataQuality = DataQuality(),
-
-    var name: String = "",
-    var length: Double = Double.NaN,
     var id: String = "",
     var junction: String = "",
-    var rule: ETrafficRule = ETrafficRule.RIGHTHANDTRAFFIC
-) {
+    var length: Double = Double.NaN,
+    var name: Option<String> = None,
+    var rule: Option<ETrafficRule> = None,
+
+    override var additionalId: Option<RoadIdentifier> = None
+) : OpendriveElement(), AdditionalRoadIdentifier {
 
     // Methods
 
-    fun getJunction(): Option<String> =
-        if (junction.isNotEmpty() && junction != "-1") Some(junction) else none()
+    fun getJunctionOption(): Option<String> =
+        if (junction.isNotEmpty() && junction != "-1") Some(junction) else None
 
-    fun isProcessable(tolerance: Double): Result<ContextMessage<Unit>, IllegalStateException> {
-        val infos = mutableListOf<String>()
+    fun getElevationEntries(): Option<NonEmptyList<RoadElevationProfileElevation>> = elevationProfile.map { it.elevationAsNonEmptyList }
+    fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = lateralProfile.flatMap { it.getSuperelevationEntries() }
+    fun getShapeEntries(): Option<NonEmptyList<RoadLateralProfileShape>> = lateralProfile.flatMap { it.getShapeEntries() }
 
-        val planViewGeometryLengthsSum = planView.geometry.sumOf { it.length }
-        if (!fuzzyEquals(planViewGeometryLengthsSum, length, tolerance))
-            return Result.error(
-                IllegalStateException(
-                    "Given length of road (${this.length}) is different than " +
-                        "the sum of the individual plan view elements ($planViewGeometryLengthsSum)."
-                )
-            )
-
-        if (lateralProfile.containsShapeProfile() && lanes.containsLaneOffset())
-            infos += "Road contains both a lateral road shape and a lane offset, whereby the combination of shapes " +
-                "and non-linear offsets should be avoided according to the standard."
-
-        return Result.success(ContextMessage(Unit, infos))
-    }
+    companion object
 }

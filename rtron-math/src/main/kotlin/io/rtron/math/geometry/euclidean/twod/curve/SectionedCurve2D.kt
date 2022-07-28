@@ -16,14 +16,13 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import com.github.kittinunf.result.Result
+import arrow.core.getOrHandle
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.shiftLowerEndpointTo
-import io.rtron.std.handleFailure
 
 /**
  * Cuts out a section from the [completeCurve].
@@ -44,20 +43,18 @@ class SectionedCurve2D(
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
     override val tolerance: Double get() = completeCurve.tolerance
-    private val sectionStart = CurveRelativeVector1D(section.lowerEndpointResult().handleFailure { throw it.error })
+    private val sectionStart = CurveRelativeVector1D(section.lowerEndpointResult().getOrHandle { throw it })
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Vector2D, Exception> {
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
 
         val pointOnCompleteCurve = sectionStart + curveRelativePoint
-        return completeCurve.calculatePointGlobalCS(pointOnCompleteCurve)
+        return completeCurve.calculatePointGlobalCSUnbounded(pointOnCompleteCurve)
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D):
-        Result<Rotation2D, Exception> {
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
 
         val pointOnCompleteCurve = sectionStart + curveRelativePoint
-        return completeCurve.calculateRotationGlobalCS(pointOnCompleteCurve)
+        return completeCurve.calculateRotationGlobalCSUnbounded(pointOnCompleteCurve)
     }
 }
