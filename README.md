@@ -38,141 +38,29 @@ Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets
 
 ## :rocket: Usage
 
-There are three main variants of usage:
+In order to use r:trån you need JDK 11 or later.
+Download the executable jar at the [releases section](https://github.com/tum-gis/rtron/releases) and let it run:
+```bash
+# for transforming OpenDRIVE datasets to CityGML
+java -jar rtron.jar opendrive-to-citygml ./input-opendrive-datasets ./output-citygml-datasets
 
-* edit the behaviour and execute the run scripts
-* deploy the resulting run scripts (via kscript directly or docker)
-* use r:trån as a library for your own project
+# for validating OpenDRIVE datasets
+java -jar rtron.jar validate-opendrive ./input-opendrive-datasets ./output-validation-reports
+```
 
-### :gear: Edit and execute the run scripts
+r:trån can [recursively](https://rtron.io/wiki/configuration) iterate over OpenDRIVE datasets contained in the input directory.
 
-Clone the repository:
+## :construction_worker: Building
+
+Clone the repo and let gradle build it:
 
 ```bash
-git clone https://github.com/tum-gis/rtron.git
+./gradlew shadowJar # build the uber-jar
+cd rtron-cli/build/libs
+java -jar rtron-*.jar
 ```
 
-Actually, you can customize the run scripts of r:trån with all editors, but an IDE provides convenient suggestions and autocompletion.
-Thus, install the community edition of [IntelliJ](https://www.jetbrains.com/idea/download) and open the cloned r:trån project.
-Navigate to the script [rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts](rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts) and execute it by hitting `Menu` ➔ `Run` ➔ `Run…` (or Alt+Shift+F10):
-
-```kotlin
-import io.rtron.main.project.processAllFiles
-import io.rtron.readerwriter.citygml.CitygmlVersion
-
-/**
- * This function iterates over all files contained in the input directory that have the
- * extension "xodr".
- */
-processAllFiles(
-    inInputDirectory = "/path/to/input-datasets", // TODO: adjust path
-    withExtension = "xodr",
-    toOutputDirectory = "/path/to/output-datasets" // TODO: adjust path
-)
-{
-    // Within this block the transformations can be defined by the user. For example:
-
-    // 1. Read the OpenDRIVE dataset into memory:
-    val opendriveModel = readOpendriveModel(inputFilePath)
-
-    // 2. Transform the OpenDRIVE model to an intermediary representation (the RoadSpaces model):
-    val roadspacesModel = transformOpendrive2Roadspaces(opendriveModel) {
-        // Within this blocks, the transformation is parametrized:
-
-        // EPSG code of the coordinate reference system (needed by GIS applications)
-        crsEpsg = 32632
-    }
-
-    // 3. Transform the RoadSpaces model to a CityGML model:
-    val citygmlModel = transformRoadspaces2Citygml(roadspacesModel) {
-        // true, if nested attribute lists shall be flattened out
-        flattenGenericAttributeSets = true
-
-        // distance between each discretization step for curves and surfaces
-        discretizationStepSize = 0.5
-    }
-
-    // 4. Write the CityGML model to the output directory:
-    writeCitygmlModel(citygmlModel) {
-
-        // set the CityGML versions for writing
-        versions = setOf(CitygmlVersion.V2_0)
-    }
-}
-```
-
-After the execution is completed, the directory ``/path/to/output-datasets`` should contain the converted CityGML2 datasets.
-For more details, visit the [website](https://rtron.io/wiki/edit-and-execute-the-run-scripts).
-
-### :package: Deploy the run scripts via kscript
-
-In order to run the r:trån scripts in deployment environments, [kscript](https://github.com/holgerbrandl/kscript) needs to be installed.
-kscript provides enhanced scripting support for Kotlin and is capable of executing the *.kts scripts contained in this [directory](rtron-main/src/main/resources/scripts).
-
-[sdkman](https://sdkman.io/install) is a tool for managing software development kits and conveniently installs [kotlin](https://kotlinlang.org/) and [kscript](https://github.com/holgerbrandl/kscript#installation):
-```bash
-curl -s "https://get.sdkman.io" | bash     # install sdkman
-source "$HOME/.sdkman/bin/sdkman-init.sh"  # add sdkman to PATH
-
-sdk install java 11.0.12-zulu # install java
-sdk install kotlin # install Kotlin
-sdk install kscript # install kscript
-```
-If you are on Windows, the deployment via docker is recommended.
-
-Once the environment is ready, the r:trån scripts can be executed:
-```bash
-# download the script ...
-curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts \ 
-    --output convert-opendrive-to-citygml2-simple.kts
-
-# and simply execute it (dependencies are resolved automatically)
-kscript ./convert-opendrive-to-citygml2-simple.kts
-```
-
-### :whale: Deploy the run scripts via docker
-
-With a [docker installation](https://docs.docker.com/get-docker/), the run scripts can be executed using the [r:trån container](https://hub.docker.com/r/rtron/rtron). First, download the example script:
-```bash
-curl https://raw.githubusercontent.com/tum-gis/rtron/main/rtron-main/src/main/resources/scripts/convert-opendrive-to-citygml2-simple.kts \
-    --output convert-opendrive-to-citygml2-simple.kts
-```
-
-Then, adapt ``/adjust/path/...`` to your host system's paths and run the execution:
-```bash
-docker run -i --name rtron --rm \
-           -v /adjust/path/to/input-datasets:/project/input \
-           -v /adjust/path/to/output-datasets:/project/output \
-           rtron/rtron - < /adjust/path/to/convert-opendrive-to-citygml2-simple.kts
-```
-Also note that the script must now reference paths in the container file system (``/project/input``, ``/project/output``).
-
-To cancel the process, run this command in another terminal:
-```bash
-docker rm -f rtron
-```
-
-
-### :recycle: Use r:trån as library (experimental)
-
-r:trån is a collection of software components for spatio-semantic road space models, as described in the [architecture](https://rtron.io/architecture/).
-To use its functionality in another [Kotlin or Java project](https://github.com/tum-gis/sample-projects-using-rtron), add the [dependency](https://mvnrepository.com/artifact/io.rtron) to the respective component using Gradle:
-
-```gradle
-dependencies {
-  implementation("io.rtron:rtron-main:1.2.2")
-  implementation("io.rtron:rtron-readerwriter:1.2.2")
-}
-```
-
-To add a dependency using Maven:
-```xml
-<dependency>
-    <groupId>io.rtron</groupId>
-    <artifactId>rtron-main</artifactId>
-    <version>1.2.2</version>
-</dependency>
-```
+You're good to go :muscle:
 
 
 ## :hammer_and_wrench: Contributing
