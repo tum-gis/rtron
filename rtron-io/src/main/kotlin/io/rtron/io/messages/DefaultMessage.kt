@@ -27,11 +27,12 @@ data class DefaultMessage(
     val info: String,
     val location: String,
     val incidentSeverity: Severity,
-    val wasHealed: Boolean,
+    val wasFixed: Boolean,
+    val infoValues: Map<String, Double> = emptyMap()
 ) {
 
     // Properties and Initializers
-    val messageSeverity: Severity = when (Pair(incidentSeverity, wasHealed)) {
+    val messageSeverity: Severity = when (Pair(incidentSeverity, wasFixed)) {
         Pair(Severity.FATAL_ERROR, true) -> Severity.ERROR
         Pair(Severity.ERROR, true) -> Severity.WARNING
         else -> incidentSeverity

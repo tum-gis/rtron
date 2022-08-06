@@ -22,5 +22,5 @@ import io.rtron.model.roadspaces.RoadspacesModel
 abstract class AbstractRoadspacesEvaluator {
 
     // Methods
-    abstract fun evaluateNonFatalViolations(roadspacesModel: RoadspacesModel): DefaultMessageList
+    abstract fun evaluate(roadspacesModel: RoadspacesModel): DefaultMessageList
 }

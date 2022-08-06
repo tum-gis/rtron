@@ -51,18 +51,18 @@ object LinearRing3DFactory {
         // remove consecutively following point duplicates
         val verticesWithoutPointDuplicates = verticesWithoutClosing.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
         if (verticesWithoutPointDuplicates.size < verticesWithoutClosing.size)
-            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following point duplicate.", outlineId, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following point duplicate.", outlineId, Severity.WARNING, wasFixed = true)
 
         // remove consecutively following side duplicates
         val verticesWithoutSideDuplicates = verticesWithoutPointDuplicates.removeConsecutiveSideDuplicates()
         if (verticesWithoutSideDuplicates.size != verticesWithoutPointDuplicates.size)
-            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…).", outlineId, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…).", outlineId, Severity.WARNING, wasFixed = true)
 
         // remove vertices that are located on a line anyway
         val preparedVertices = verticesWithoutSideDuplicates
             .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
         if (preparedVertices.size < verticesWithoutSideDuplicates.size)
-            messageList += DefaultMessage.of("", "Ignoring at least one vertex due to linear redundancy.", outlineId, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring at least one vertex due to linear redundancy.", outlineId, Severity.WARNING, wasFixed = true)
 
         // if there are not enough points to construct a linear ring
         if (preparedVertices.size <= 2)

@@ -24,6 +24,11 @@ typealias DefaultMessageList = MessageList<DefaultMessage>
 fun DefaultMessageList.getNumberOfMessages(severity: Severity) = getMessages().filter { it.messageSeverity == severity }.size
 
 /**
+ * Returns true, if list contains messages with fatal error severity.
+ */
+fun DefaultMessageList.containsFatalErrors() = getMessages().any { it.messageSeverity == Severity.FATAL_ERROR }
+
+/**
  * Returns a summary of the message numbers depending on the severity.
  */
 fun DefaultMessageList.getTextSummary(): String {

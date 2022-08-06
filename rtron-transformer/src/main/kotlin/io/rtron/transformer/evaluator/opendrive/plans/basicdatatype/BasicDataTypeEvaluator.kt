@@ -24,62 +24,18 @@ import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
 
 class BasicDataTypeEvaluator(val parameters: OpendriveEvaluatorParameters) : AbstractOpendriveEvaluator() {
 
-    // Properties and Initializers
-    private val _coreEvaluator = CoreEvaluator(parameters)
-    private val _roadLanesEvaluator = RoadLanesEvaluator(parameters)
-    private val _roadEvaluator = RoadEvaluator(parameters)
-    private val _roadObjectsEvaluator = RoadObjectsEvaluator(parameters)
-    private val _roadSignalsEvaluator = RoadSignalsEvaluator(parameters)
-    private val _junctionEvaluator = JunctionEvaluator(parameters)
-
     // Methods
-    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+    override fun evaluate(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
         val messageList = DefaultMessageList()
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-        messageList += _coreEvaluator.evaluateFatalViolations(opendriveModel)
-        messageList += _roadEvaluator.evaluateFatalViolations(opendriveModel)
-        messageList += _roadLanesEvaluator.evaluateFatalViolations(opendriveModel)
-        messageList += _roadObjectsEvaluator.evaluateFatalViolations(opendriveModel)
-        messageList += _roadSignalsEvaluator.evaluateFatalViolations(opendriveModel)
-        messageList += _junctionEvaluator.evaluateFatalViolations(opendriveModel)
+        modifiedOpendriveModel = CoreEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = RoadEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = RoadLanesEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = RoadObjectsEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = RoadSignalsEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = JunctionEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
 
-        return messageList
-    }
-
-    override fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = DefaultMessageList()
-        var healedOpendriveModel = opendriveModel
-
-        _coreEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        _roadEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        _roadLanesEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        _roadObjectsEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        _roadSignalsEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        _junctionEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        return ContextMessageList(healedOpendriveModel, messageList)
+        return ContextMessageList(modifiedOpendriveModel, messageList)
     }
 }

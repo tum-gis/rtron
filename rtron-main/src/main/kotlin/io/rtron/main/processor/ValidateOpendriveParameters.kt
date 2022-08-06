@@ -27,7 +27,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ValidateOpendriveParameters(
     val tolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE,
-    val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE
+    val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
+
+    val exportOpendriveDataset: Boolean = true,
+    val exportCitygmlDataset: Boolean = true
 ) {
 
     // Methods

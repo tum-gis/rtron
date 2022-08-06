@@ -53,7 +53,7 @@ data class LaneSectionIdentifier(
     override fun toStringMap(): Map<String, String> =
         mapOf("laneSectionId" to laneSectionId.toString()) + roadspaceIdentifier.toStringMap()
 
-    override fun toString(): String {
+    override fun toIdentifierText(): String {
         return "LaneSectionIdentifier(laneSectionId=$laneSectionId, roadSpaceId=$roadspaceId)"
     }
 }

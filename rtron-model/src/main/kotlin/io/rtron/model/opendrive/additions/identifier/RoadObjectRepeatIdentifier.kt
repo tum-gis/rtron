@@ -26,7 +26,7 @@ data class RoadObjectRepeatIdentifier(override val repeatIndex: Int, val roadObj
     AbstractOpendriveIdentifier(), RoadObjectRepeatInterface, RoadIdentifierInterface by roadObjectIdentifier {
 
     // Conversions
-    override fun toString() = "Road object repeat element: repeatIndex=$repeatIndex, " +
+    override fun toIdentifierText() = "Road object repeat element: repeatIndex=$repeatIndex, " +
         "roadObjectId=${roadObjectIdentifier.roadObjectId}, " +
         "roadId=${roadObjectIdentifier.roadId}"
 }

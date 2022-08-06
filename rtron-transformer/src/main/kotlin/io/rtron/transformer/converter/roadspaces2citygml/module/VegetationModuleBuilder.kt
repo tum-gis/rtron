@@ -52,7 +52,7 @@ class VegetationModuleBuilder(
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
         solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .mapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasHealed = true) }
+            .mapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
         geometryTransformer.rotation.tap {
             _attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
         }

@@ -66,7 +66,7 @@ object Solid3DBuilder {
         }
 
         if (roadObject.repeat.any { it.isRepeatedCuboid() })
-            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasHealed = false)
+            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
 
         return ContextMessageList(cuboidList, messageList)
     }
@@ -86,7 +86,7 @@ object Solid3DBuilder {
         }
 
         if (roadObject.repeat.any { it.isRepeatCylinder() })
-            messageList += DefaultMessage.of("", "Cylinder geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasHealed = false)
+            messageList += DefaultMessage.of("", "Cylinder geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
 
         return ContextMessageList(cylinderList, messageList)
     }
@@ -107,7 +107,7 @@ object Solid3DBuilder {
             .map { buildPolyhedronByRoadCorners(it, roadReferenceLine, numberTolerance) }
             .separateEither()
 
-        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }.mergeToReport()
+        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
         val polyhedrons = polyhedronsWithContext.handleMessageList { messageList += it.messageList }
 
         return ContextMessageList(polyhedrons, messageList)
@@ -167,7 +167,7 @@ object Solid3DBuilder {
             .separateEither()
 
         messageList += builderExceptions
-            .map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }
+            .map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }
             .mergeToReport()
         val polyhedrons = polyhedronsWithContext
             .handleMessageList { messageList += it.messageList }

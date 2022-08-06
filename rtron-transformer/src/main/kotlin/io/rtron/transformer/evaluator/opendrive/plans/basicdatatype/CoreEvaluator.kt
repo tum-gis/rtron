@@ -16,8 +16,6 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
-import arrow.core.None
-import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
@@ -25,80 +23,48 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyHeaderOffset
 import io.rtron.model.opendrive.header
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
+import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
 
-class CoreEvaluator(val parameters: OpendriveEvaluatorParameters) {
+object CoreEvaluator {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-        if (opendriveModel.road.isEmpty())
-            messageList += DefaultMessage("NoRoadsContained", "Document does not contain any roads.", "", Severity.FATAL_ERROR, wasHealed = false)
+        if (modifiedOpendriveModel.road.isEmpty())
+            messageList += DefaultMessage("NoRoadsContained", "Document does not contain any roads.", "", Severity.FATAL_ERROR, wasFixed = false)
 
-        OpendriveModel.header.get(opendriveModel).also { header ->
+        OpendriveModel.header.get(modifiedOpendriveModel).also { header ->
             if (header.revMajor < 0)
-                messageList += DefaultMessage("UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasHealed = false)
+                messageList += DefaultMessage("UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false)
 
             if (header.revMinor < 0)
-                messageList += DefaultMessage("UnkownOpendriveMinorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasHealed = false)
+                messageList += DefaultMessage("UnkownOpendriveMinorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false)
         }
 
-        return messageList
-    }
+        modifiedOpendriveModel = OpendriveModel.header.modify(modifiedOpendriveModel) { header ->
+            header.name = BasicDataTypeModifier.modifyToOptionalString(header.name, "Header element", "name", messageList)
+            header.date = BasicDataTypeModifier.modifyToOptionalString(header.date, "Header element", "date", messageList)
+            header.vendor = BasicDataTypeModifier.modifyToOptionalString(header.vendor, "Header element", "vendor", messageList)
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = DefaultMessageList()
-        var healedOpendriveModel = opendriveModel
-
-        healedOpendriveModel = OpendriveModel.header.modify(healedOpendriveModel) { header ->
-            if (header.name.exists { it.isEmpty() }) {
-                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'name' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
-                header.name = None
-            }
-
-            if (header.date.exists { it.isEmpty() }) {
-                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'date' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
-                header.date = None
-            }
-
-            if (header.vendor.exists { it.isEmpty() }) {
-                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'vendor' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
-                header.vendor = None
-            }
-
-            if (header.north.exists { !it.isFinite() }) {
-                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'north' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasHealed = true)
-                header.north = None
-            }
+            header.east = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.east, "Header element", "east", messageList)
+            header.north = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.north, "Header element", "north", messageList)
+            header.south = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.south, "Header element", "south", messageList)
+            header.west = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.south, "Header element", "west", messageList)
 
             header
         }
 
-        healedOpendriveModel = everyHeaderOffset.modify(healedOpendriveModel) { currentHeaderOffset ->
+        modifiedOpendriveModel = everyHeaderOffset.modify(modifiedOpendriveModel) { currentHeaderOffset ->
 
-            if (!currentHeaderOffset.x.isFinite()) {
-                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'x'", "Header element", Severity.WARNING, wasHealed = true)
-                currentHeaderOffset.x = 0.0
-            }
-
-            if (!currentHeaderOffset.y.isFinite()) {
-                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'y'", "Header element", Severity.WARNING, wasHealed = true)
-                currentHeaderOffset.y = 0.0
-            }
-
-            if (!currentHeaderOffset.z.isFinite()) {
-                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'z'", "Header element", Severity.WARNING, wasHealed = true)
-                currentHeaderOffset.z = 0.0
-            }
-
-            if (!currentHeaderOffset.hdg.isFinite()) {
-                messageList += DefaultMessage("UnexpectedValue", "Unexpected value for attribute 'hdg'", "Header element", Severity.WARNING, wasHealed = true)
-                currentHeaderOffset.hdg = 0.0
-            }
+            currentHeaderOffset.x = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.x, "Header element", "x", messageList)
+            currentHeaderOffset.y = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.y, "Header element", "y", messageList)
+            currentHeaderOffset.z = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.z, "Header element", "z", messageList)
+            currentHeaderOffset.hdg = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.hdg, "Header element", "hdg", messageList)
 
             currentHeaderOffset
         }
 
-        return ContextMessageList(healedOpendriveModel, messageList)
+        return modifiedOpendriveModel
     }
 }

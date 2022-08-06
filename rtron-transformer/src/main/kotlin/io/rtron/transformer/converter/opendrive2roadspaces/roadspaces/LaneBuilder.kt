@@ -185,7 +185,7 @@ class LaneBuilder(
                 "",
                 "Road mark entries have been removed, as the sOffset is not located within " +
                     "the local curve position domain ($curvePositionDomain) of the lane section.",
-                roadMarkId, Severity.WARNING, wasHealed = true
+                roadMarkId, Severity.WARNING, wasFixed = true
             )
 
         if (adjustedSrcRoadMark.isEmpty()) return ContextMessageList(emptyList(), messageList)
@@ -197,7 +197,7 @@ class LaneBuilder(
                 listOf(buildRoadMarking(adjustedSrcRoadMark.last())) else emptyList()
 
         val (builderExceptions, roadMarkings) = roadMarkingResults.separateEither()
-        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }.mergeToReport()
+        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
 
         return ContextMessageList(roadMarkings, messageList)
     }

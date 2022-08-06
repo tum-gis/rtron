@@ -16,8 +16,12 @@
 
 package io.rtron.model.roadspaces.identifier
 
+import arrow.core.Option
+
 abstract class AbstractRoadspacesIdentifier {
     abstract fun toStringMap(): Map<String, String>
 
-    abstract override fun toString(): String
+    abstract fun toIdentifierText(): String
 }
+
+fun Option<AbstractRoadspacesIdentifier>.toIdentifierText() = this.fold({ "Unknown" }, { it.toIdentifierText() })

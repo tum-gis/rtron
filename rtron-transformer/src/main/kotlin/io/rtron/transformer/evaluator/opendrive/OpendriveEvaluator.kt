@@ -19,6 +19,7 @@ package io.rtron.transformer.evaluator.opendrive
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
+import io.rtron.io.messages.containsFatalErrors
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.transformer.evaluator.opendrive.plans.basicdatatype.BasicDataTypeEvaluator
@@ -38,42 +39,34 @@ class OpendriveEvaluator(
 
     fun evaluate(opendriveModel: OpendriveModel): Pair<Option<OpendriveModel>, OpendriveEvaluationReport> {
         opendriveModel.updateAdditionalIdentifiers()
-        var healedOpendriveModel = opendriveModel.copy()
+        var modifiedOpendriveModel = opendriveModel.copy()
 
         val report = OpendriveEvaluationReport(parameters)
 
         // basic data type evaluation
-        report.basicDataTypePlan = _basicDataTypeEvaluator.evaluateFatalViolations(healedOpendriveModel)
-        if (report.basicDataTypePlan.isNotEmpty())
+        _basicDataTypeEvaluator.evaluate(modifiedOpendriveModel).let {
+            report.basicDataTypePlan = it.messageList
+            modifiedOpendriveModel = it.value
+        }
+        if (report.basicDataTypePlan.containsFatalErrors())
             return None to report
-
-        healedOpendriveModel = _basicDataTypeEvaluator.evaluateNonFatalViolations(healedOpendriveModel)
-            .let {
-                report.basicDataTypePlan = it.messageList
-                it.value
-            }
 
         // modeling rules evaluation
-        report.modelingRulesPlan = _modelingRulesEvaluator.evaluateFatalViolations(healedOpendriveModel)
-        if (report.modelingRulesPlan.isNotEmpty())
+        _modelingRulesEvaluator.evaluate(modifiedOpendriveModel).let {
+            report.modelingRulesPlan = it.messageList
+            modifiedOpendriveModel = it.value
+        }
+        if (report.modelingRulesPlan.containsFatalErrors())
             return None to report
-
-        healedOpendriveModel = _modelingRulesEvaluator.evaluateNonFatalViolations(healedOpendriveModel)
-            .let {
-                report.modelingRulesPlan = it.messageList
-                it.value
-            }
 
         // conversion requirements evaluation
-        report.conversionRequirementsPlan = _conversionRequirementsEvaluator.evaluateFatalViolations(healedOpendriveModel)
-        if (report.conversionRequirementsPlan.isNotEmpty())
+        _conversionRequirementsEvaluator.evaluate(modifiedOpendriveModel).let {
+            report.conversionRequirementsPlan = it.messageList
+            modifiedOpendriveModel = it.value
+        }
+        if (report.conversionRequirementsPlan.containsFatalErrors())
             return None to report
-        healedOpendriveModel = _conversionRequirementsEvaluator.evaluateNonFatalViolations(healedOpendriveModel)
-            .let {
-                report.conversionRequirementsPlan = it.messageList
-                it.value
-            }
 
-        return healedOpendriveModel.some() to report
+        return modifiedOpendriveModel.some() to report
     }
 }

@@ -19,6 +19,7 @@ package io.rtron.readerwriter.opendrive.version
 import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
+import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
 import org.w3c.dom.Document
 import java.nio.file.Path
@@ -26,9 +27,11 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 object OpendriveVersionUtils {
 
-    fun getOpendriveVersion(file: Path): Either<OpendriveReaderException, OpendriveVersion> = either.eager {
+    fun getOpendriveVersion(filePath: Path): Either<OpendriveReaderException, OpendriveVersion> = either.eager {
 
-        val xmlDoc: Document = Either.catch { DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.toFile()) }
+        val inputStream = filePath.inputStreamFromDirectOrCompressedFile()
+
+        val xmlDoc: Document = Either.catch { DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream) }
             .mapLeft { OpendriveReaderException.MalformedXmlDocument(it.message ?: "") }
             .bind()
 
@@ -45,6 +48,7 @@ object OpendriveVersionUtils {
             .mapLeft { OpendriveReaderException.VersionNotIdentifiable("Minor version is not identifiable") }
             .bind()
 
+        inputStream.close()
         OpendriveVersion.ofRevision(revMajor, revMinor).mapLeft { OpendriveReaderException.VersionNotIdentifiable(it.message) }.bind()
     }
 }

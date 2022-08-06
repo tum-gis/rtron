@@ -65,6 +65,6 @@ class CitygmlWriter(
     }
 
     companion object {
-        val supportedFileExtensions: Set<String> = setOf("gml")
+        val supportedFilenameEndings: Set<String> = setOf("gml")
     }
 }

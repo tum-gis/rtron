@@ -30,7 +30,6 @@ import io.rtron.readerwriter.opendrive.version.OpendriveVersionUtils
 import io.rtron.std.BaseException
 import mu.KotlinLogging
 import java.nio.file.Path
-import kotlin.io.path.extension
 import kotlin.io.path.isRegularFile
 
 class OpendriveReader private constructor(
@@ -42,7 +41,7 @@ class OpendriveReader private constructor(
     // Properties and Initializers
     init {
         require(filePath.isRegularFile()) { "Path must point to a regular file." }
-        require(filePath.extension in supportedFileExtensions) { "Path must point to a regular file." }
+        require(supportedFilenameEndings.any { filePath.fileName.toString().endsWith(it) }) { "Path must point to a regular file." }
     }
 
     private val fallbackUnmarshaller by lazy {
@@ -79,7 +78,11 @@ class OpendriveReader private constructor(
     }
 
     companion object {
-        val supportedFileExtensions: Set<String> = setOf("xodr", "xodrz")
+        enum class OpendriveFilenameEnding(val ending: String) {
+            PURE(".xodr"),
+            COMPRESSED(".xodr.zip"),
+        }
+        val supportedFilenameEndings: Set<String> = setOf(OpendriveFilenameEnding.PURE.ending, OpendriveFilenameEnding.COMPRESSED.ending)
 
         fun of(filePath: Path): Either<OpendriveReaderException, OpendriveReader> = either.eager {
             if (!filePath.isRegularFile())

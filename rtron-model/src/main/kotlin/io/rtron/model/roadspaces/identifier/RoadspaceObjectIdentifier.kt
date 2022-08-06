@@ -40,7 +40,7 @@ data class RoadspaceObjectIdentifier(
         mapOf("roadspaceObjectId" to roadspaceObjectId) + roadspaceIdentifier.toStringMap()
 
     // Conversions
-    override fun toString(): String {
+    override fun toIdentifierText(): String {
         return "RoadspaceObjectIdentifier(roadspaceObjectId=$roadspaceObjectId, roadspaceId=$roadspaceId)"
     }
 }

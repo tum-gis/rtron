@@ -17,8 +17,7 @@
 package io.rtron.transformer.evaluator.opendrive.report
 
 import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
-import io.rtron.io.messages.getNumberOfMessages
+import io.rtron.io.messages.containsFatalErrors
 import io.rtron.io.messages.getTextSummary
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import kotlinx.serialization.Serializable
@@ -40,9 +39,6 @@ data class OpendriveEvaluationReport(
             "modeling rules plan: ${modelingRulesPlan.getTextSummary()}, " +
             "conversion requirements plan: ${conversionRequirementsPlan.getTextSummary()}"
 
-    fun containsFatalErrors(): Boolean = (
-        basicDataTypePlan.getNumberOfMessages(Severity.FATAL_ERROR) +
-            modelingRulesPlan.getNumberOfMessages(Severity.FATAL_ERROR) +
-            conversionRequirementsPlan.getNumberOfMessages(Severity.FATAL_ERROR)
-        ) > 0
+    fun containsFatalErrors(): Boolean = basicDataTypePlan.containsFatalErrors() ||
+        modelingRulesPlan.containsFatalErrors() || conversionRequirementsPlan.containsFatalErrors()
 }

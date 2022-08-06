@@ -19,39 +19,30 @@ package io.rtron.main.project
 import io.rtron.io.files.walk
 import mu.KotlinLogging
 import java.nio.file.Path
-import kotlin.io.path.extension
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 /**
- * @param inputDirectoryPath path to the directory comprising the input models
- * @param withExtension only process files with this extension
- * @param outputDirectoryPath path to the directory where new models and files are written to
- */
-fun processAllFiles(inputDirectoryPath: Path, withExtension: String, outputDirectoryPath: Path, recursive: Boolean = true, setup: Project.() -> Unit) =
-    processAllFiles(inputDirectoryPath, setOf(withExtension), outputDirectoryPath, recursive, setup)
-
-/**
- * Iterates over all files contained in the [inInputDirectory] and having an extension contained in [withExtensions].
+ * Iterates over all files contained in the [inInputDirectory] and having an extension contained in [withFilenameEndings].
  * The [process] is executed on each of those input files.
  *
  * @param inputDirectoryPath path to the directory comprising the input models
- * @param withExtensions only process files with these extensions
+ * @param withFilenameEndings only process files with these extensions
  * @param outputDirectoryPath path to the directory where new models and files are written to
  * @param recursive iterates recursively over the directory
  * @param process user defined process to be executed
  */
 @OptIn(ExperimentalTime::class)
-fun processAllFiles(inputDirectoryPath: Path, withExtensions: Set<String>, outputDirectoryPath: Path, recursive: Boolean = true, process: Project.() -> Unit) {
+fun processAllFiles(inputDirectoryPath: Path, withFilenameEndings: Set<String>, outputDirectoryPath: Path, recursive: Boolean = true, process: Project.() -> Unit) {
     val logger = KotlinLogging.logger {}
 
     if (!inputDirectoryPath.isDirectory()) {
         logger.error("Provided directory does not exist: $inputDirectoryPath")
         return
     }
-    if (withExtensions.isEmpty()) {
+    if (withFilenameEndings.isEmpty()) {
         logger.error("No extensions have been provided.")
         return
     }
@@ -64,12 +55,12 @@ fun processAllFiles(inputDirectoryPath: Path, withExtensions: Set<String>, outpu
 
     val inputFilePaths = inputDirectoryPath
         .walk(recursiveDepth)
-        .filter { it.extension in withExtensions }
+        .filter { path -> withFilenameEndings.any { path.fileName.toString().endsWith(it) } }
         .toList()
         .sorted()
 
     if (inputFilePaths.isEmpty()) {
-        logger.error("No files have been found with $withExtensions as extension in input directory: $outputDirectoryPath")
+        logger.error("No files have been found with $withFilenameEndings as extension in input directory: $outputDirectoryPath")
         return
     }
 

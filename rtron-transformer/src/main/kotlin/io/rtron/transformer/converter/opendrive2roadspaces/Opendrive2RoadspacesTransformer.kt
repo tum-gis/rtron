@@ -90,7 +90,7 @@ class Opendrive2RoadspacesTransformer(
 
         if (roadspaceExceptions.isNotEmpty()) {
             roadspaceExceptions.forEach {
-                report.conversion += DefaultMessage.of("", it.message, it.location, Severity.FATAL_ERROR, wasHealed = false)
+                report.conversion += DefaultMessage.of("", it.message, it.location, Severity.FATAL_ERROR, wasFixed = false)
             }
             return None to report
         }

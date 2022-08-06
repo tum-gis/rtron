@@ -104,7 +104,7 @@ class GenericsModuleBuilder(
 
         // geometry
         genericOccupiedSpaceFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasHealed = true) }
+            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         geometryTransformer.rotation.tap {
             _attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)

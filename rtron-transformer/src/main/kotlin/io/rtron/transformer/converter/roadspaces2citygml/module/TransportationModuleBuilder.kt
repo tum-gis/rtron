@@ -98,7 +98,7 @@ class TransportationModuleBuilder(
 
         // surface representation of lane
         val trafficArea = createTrafficAreaFeature(lane.id, surface).handleMessageList { messageList += it }
-        // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasHealed = true); return report }
+        // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
 
         identifierAdder.addIdentifier(lane.id, "Lane", trafficArea)
@@ -107,7 +107,7 @@ class TransportationModuleBuilder(
         // filler surfaces
         fillerSurfaces.forEach { fillerSurface ->
             val fillerTrafficArea = createTrafficAreaFeature(lane.id, fillerSurface.surface).handleMessageList { messageList += it }
-            // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasHealed = true); return report }
+            // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
 
             identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerTrafficArea)
             _attributesAdder.addAttributes(fillerSurface, fillerTrafficArea)
@@ -143,7 +143,7 @@ class TransportationModuleBuilder(
         // surface representation
         val auxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(lane.id, surface)
             .handleMessageList { messageList += it }
-        // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasHealed = true); return report }
+        // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficArea))
 
         identifierAdder.addIdentifier(lane.id, "Lane", auxiliaryTrafficArea)
@@ -153,7 +153,7 @@ class TransportationModuleBuilder(
         fillerSurfaces.forEach { fillerSurface ->
             val fillerAuxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(lane.id, fillerSurface.surface)
                 .handleMessageList { messageList += it }
-            // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasHealed = true); return report }
+            // .getOrHandle { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
 
             identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerAuxiliaryTrafficArea)
             _attributesAdder.addAttributes(fillerSurface, fillerAuxiliaryTrafficArea)
@@ -174,7 +174,7 @@ class TransportationModuleBuilder(
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
         val trafficArea = createTrafficAreaFeature(roadspaceObject.id, geometryTransformer)
             .handleMessageList { messageList += it }
-        // .getOrHandle { report += Message.of(it.message!!, roadspaceObject.id, isFatal = false, wasHealed = true); return report }
+        // .getOrHandle { report += Message.of(it.message!!, roadspaceObject.id, isFatal = false, wasFixed = true); return report }
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
 
         // semantics
@@ -214,7 +214,7 @@ class TransportationModuleBuilder(
         // geometry
         val geometryTransformer = GeometryTransformer(parameters).also { geometry.accept(it) }
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasHealed = true) }
+            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         // semantics
         identifierAdder.addIdentifier(id, "RoadMarking", markingFeature)
@@ -233,7 +233,7 @@ class TransportationModuleBuilder(
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasHealed = true) }
+            .tapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, markingFeature)
@@ -269,7 +269,7 @@ class TransportationModuleBuilder(
 
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
         trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasHealed = true) }
+            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(trafficAreaFeature, messageList)
     }
@@ -286,7 +286,7 @@ class TransportationModuleBuilder(
 
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
         auxiliaryTrafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasHealed = true) }
+            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(auxiliaryTrafficAreaFeature, messageList)
     }

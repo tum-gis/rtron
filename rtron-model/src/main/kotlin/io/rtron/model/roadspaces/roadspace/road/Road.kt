@@ -313,7 +313,7 @@ class Road(
         if (laneSection.curvePositionDomain.length < geometricalTolerance)
             Either.Left(
                 IllegalStateException(
-                    "$laneIdentifier: The length of the lane is almost zero " +
+                    "${laneIdentifier.toIdentifierText()}: The length of the lane is almost zero " +
                         "(below tolerance) and thus no surface can be constructed."
                 )
             ).bind<AbstractSurface3D>()
@@ -332,7 +332,7 @@ class Road(
         if (leftBoundary.zip(rightBoundary).all { it.first.fuzzyEquals(it.second, geometricalTolerance) })
             Either.Left(
                 IllegalStateException(
-                    "$laneIdentifier: Lane has zero width (when discretized) and " +
+                    "${laneIdentifier.toIdentifierText()}: Lane has zero width (when discretized) and " +
                         "thus no surface can be constructed."
                 )
             ).bind<AbstractSurface3D>()
@@ -472,7 +472,7 @@ class Road(
         if (roadMarking.width.domain.length < geometricalTolerance)
             return Either.Left(
                 IllegalStateException(
-                    "$laneIdentifier: Road marking's length is zero (or below tolerance threshold) and thus no surface can be constructed."
+                    "${laneIdentifier.toIdentifierText()}: Road marking's length is zero (or below tolerance threshold) and thus no surface can be constructed."
                 )
             )
 

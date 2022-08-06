@@ -46,7 +46,7 @@ data class RoadspaceIdentifier(
     override fun toStringMap(): Map<String, String> =
         mapOf("roadspaceId" to roadspaceId) + modelIdentifier.toStringMap()
 
-    override fun toString(): String {
+    override fun toIdentifierText(): String {
         return "RoadspaceIdentifier(roadspaceId=$roadspaceId)"
     }
 

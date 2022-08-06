@@ -38,7 +38,7 @@ data class ConnectionIdentifier(
     override fun toStringMap(): Map<String, String> =
         mapOf("connectionId" to connectionId) + junctionIdentifier.toStringMap()
 
-    override fun toString(): String {
+    override fun toIdentifierText(): String {
         return "ConnectionIdentifier(connectionId=$connectionId, junctionId=$junctionId)"
     }
 }

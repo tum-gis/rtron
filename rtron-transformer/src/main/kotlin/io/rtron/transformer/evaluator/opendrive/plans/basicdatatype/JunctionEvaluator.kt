@@ -16,8 +16,6 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
-import arrow.core.None
-import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
@@ -25,84 +23,53 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyJunction
 import io.rtron.model.opendrive.additions.optics.everyJunctionConnection
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
+import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
 import io.rtron.transformer.messages.opendrive.of
 
-class JunctionEvaluator(val parameters: OpendriveEvaluatorParameters) {
+object JunctionEvaluator {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-        everyJunction.modify(opendriveModel) { currentJunction ->
+        everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
 
             if (currentJunction.connection.isEmpty())
-                messageList += DefaultMessage.of("EmptyList", "List for attribute 'connection' is empty, but it has to contain at least one element", currentJunction.additionalId, Severity.FATAL_ERROR, wasHealed = false)
+                messageList += DefaultMessage.of("EmptyList", "List for attribute 'connection' is empty, but it has to contain at least one element.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
 
             if (currentJunction.id.isBlank())
-                messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'ID'.", currentJunction.additionalId, Severity.FATAL_ERROR, wasHealed = false)
+                messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'ID'.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
 
             currentJunction
         }
 
-        everyJunctionConnection.modify(opendriveModel) { currentJunctionConnection ->
+        everyJunctionConnection.modify(modifiedOpendriveModel) { currentJunctionConnection ->
 
             if (currentJunctionConnection.id.isBlank())
-                messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'ID'.", currentJunctionConnection.additionalId, Severity.FATAL_ERROR, wasHealed = false)
+                messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'ID'.", currentJunctionConnection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
 
             currentJunctionConnection
         }
 
-        return messageList
-    }
+        modifiedOpendriveModel = everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
+            currentJunction.mainRoad = BasicDataTypeModifier.modifyToOptionalString(currentJunction.mainRoad, currentJunction.additionalId, "mainRoad", messageList)
+            currentJunction.name = BasicDataTypeModifier.modifyToOptionalString(currentJunction.name, currentJunction.additionalId, "name", messageList)
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = DefaultMessageList()
-        var healedOpendriveModel = opendriveModel
-
-        healedOpendriveModel = everyJunction.modify(healedOpendriveModel) { currentJunction ->
-            if (currentJunction.mainRoad.exists { it.isBlank() }) {
-                messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'mainRoad' is set with an empty value even though the attribute itself is optional.", currentJunction.additionalId, Severity.WARNING, wasHealed = true)
-                currentJunction.mainRoad = None
-            }
-
-            if (currentJunction.name.exists { it.isBlank() }) {
-                messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'name' is set with an empty value even though the attribute itself is optional.", currentJunction.additionalId, Severity.WARNING, wasHealed = true)
-                currentJunction.name = None
-            }
-
-            if (currentJunction.sEnd.exists { !it.isFinite() }) {
-                messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'sEnd' is set with an empty value even though the attribute itself is optional.", currentJunction.additionalId, Severity.WARNING, wasHealed = true)
-                currentJunction.sEnd = None
-            }
-
-            if (currentJunction.sStart.exists { !it.isFinite() }) {
-                messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'sStart' is set with an empty value even though the attribute itself is optional.", currentJunction.additionalId, Severity.WARNING, wasHealed = true)
-                currentJunction.sStart = None
-            }
+            currentJunction.sEnd = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentJunction.sEnd, currentJunction.additionalId, "sEnd", messageList)
+            currentJunction.sStart = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentJunction.sStart, currentJunction.additionalId, "sStart", messageList)
 
             currentJunction
         }
 
-        healedOpendriveModel = everyJunctionConnection.modify(healedOpendriveModel) { currentJunctionConnection ->
+        modifiedOpendriveModel = everyJunctionConnection.modify(modifiedOpendriveModel) { currentJunctionConnection ->
 
-            if (currentJunctionConnection.connectingRoad.exists { it.isBlank() }) {
-                messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'connectingRoad' is set with an empty value even though the attribute itself is optional.", currentJunctionConnection.additionalId, Severity.WARNING, wasHealed = true)
-                currentJunctionConnection.connectingRoad = None
-            }
-
-            if (currentJunctionConnection.incomingRoad.exists { it.isBlank() }) {
-                messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'incomingRoad' is set with an empty value even though the attribute itself is optional.", currentJunctionConnection.additionalId, Severity.WARNING, wasHealed = true)
-                currentJunctionConnection.incomingRoad = None
-            }
-
-            if (currentJunctionConnection.linkedRoad.exists { it.isBlank() }) {
-                messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'linkedRoad' is set with an empty value even though the attribute itself is optional.", currentJunctionConnection.additionalId, Severity.WARNING, wasHealed = true)
-                currentJunctionConnection.linkedRoad = None
-            }
+            currentJunctionConnection.connectingRoad = BasicDataTypeModifier.modifyToOptionalString(currentJunctionConnection.connectingRoad, currentJunctionConnection.additionalId, "connectingRoad", messageList)
+            currentJunctionConnection.incomingRoad = BasicDataTypeModifier.modifyToOptionalString(currentJunctionConnection.incomingRoad, currentJunctionConnection.additionalId, "incomingRoad", messageList)
+            currentJunctionConnection.linkedRoad = BasicDataTypeModifier.modifyToOptionalString(currentJunctionConnection.linkedRoad, currentJunctionConnection.additionalId, "linkedRoad", messageList)
 
             currentJunctionConnection
         }
 
-        return ContextMessageList(healedOpendriveModel, messageList)
+        return modifiedOpendriveModel
     }
 }

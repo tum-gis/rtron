@@ -24,35 +24,13 @@ import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
 
 class ConversionRequirementsEvaluator(val parameters: OpendriveEvaluatorParameters) : AbstractOpendriveEvaluator() {
 
-    // Properties amd Initializers
-    private val _roadEvaluator = RoadEvaluator(parameters)
-    private val _roadLanesEvaluator = RoadLanesEvaluator(parameters)
-    private val _junctionEvaluator = JunctionEvaluator(parameters)
-
     // Methods
-    override fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
+    override fun evaluate(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
         val messageList = DefaultMessageList()
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-        messageList += _roadEvaluator.evaluateFatalViolations(opendriveModel)
-        messageList += _roadLanesEvaluator.evaluateFatalViolations(opendriveModel)
-        messageList += _junctionEvaluator.evaluateFatalViolations(opendriveModel)
+        modifiedOpendriveModel = JunctionEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
 
-        return messageList
-    }
-    override fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        var healedOpendriveModel = opendriveModel.copy()
-        val messageList = DefaultMessageList()
-
-        _roadEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        _roadLanesEvaluator.evaluateNonFatalViolations(healedOpendriveModel).let {
-            healedOpendriveModel = it.value
-            messageList += it.messageList
-        }
-
-        return ContextMessageList(healedOpendriveModel, messageList)
+        return ContextMessageList(modifiedOpendriveModel, messageList)
     }
 }

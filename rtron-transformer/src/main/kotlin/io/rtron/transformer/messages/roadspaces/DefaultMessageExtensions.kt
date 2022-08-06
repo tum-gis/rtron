@@ -20,11 +20,12 @@ import arrow.core.Option
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.Severity
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
+import io.rtron.model.roadspaces.identifier.toIdentifierText
 
-fun DefaultMessage.Companion.of(type: String, info: String, location: AbstractRoadspacesIdentifier, incidentSeverity: Severity, wasHealed: Boolean): DefaultMessage {
-    return DefaultMessage(type, info, location.toString(), incidentSeverity, wasHealed)
+fun DefaultMessage.Companion.of(type: String, info: String, location: AbstractRoadspacesIdentifier, incidentSeverity: Severity, wasFixed: Boolean): DefaultMessage {
+    return DefaultMessage(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }
 
-fun DefaultMessage.Companion.of(type: String, info: String, location: Option<AbstractRoadspacesIdentifier>, incidentSeverity: Severity, wasHealed: Boolean): DefaultMessage {
-    return DefaultMessage(type, info, location.fold({ "" }, { it.toString() }), incidentSeverity, wasHealed)
+fun DefaultMessage.Companion.of(type: String, info: String, location: Option<AbstractRoadspacesIdentifier>, incidentSeverity: Severity, wasFixed: Boolean): DefaultMessage {
+    return DefaultMessage(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }

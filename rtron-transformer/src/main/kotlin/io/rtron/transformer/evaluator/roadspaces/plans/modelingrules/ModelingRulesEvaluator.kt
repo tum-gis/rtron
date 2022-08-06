@@ -32,13 +32,10 @@ import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluatorParameters
 import io.rtron.transformer.evaluator.roadspaces.plans.AbstractRoadspacesEvaluator
 
-class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) :
-    AbstractRoadspacesEvaluator() {
-
-    // Properties amd Initializers
+class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) : AbstractRoadspacesEvaluator() {
 
     // Methods
-    override fun evaluateNonFatalViolations(roadspacesModel: RoadspacesModel): DefaultMessageList {
+    override fun evaluate(roadspacesModel: RoadspacesModel): DefaultMessageList {
         val messageList = DefaultMessageList()
 
         messageList += roadspacesModel.getAllRoadspaces().map { evaluateRoadLinkages(it, roadspacesModel) }.merge()
@@ -93,19 +90,19 @@ class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) :
             if (successorContactStart) successorRightLaneBoundary.calculateStartPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
             else successorLeftLaneBoundary.calculateEndPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrHandle { throw it }
 
-        // reporting
-        // val location: Map<String, String> = laneId.toStringMap().map { "from_${it.key}" to it.value }.toMap() +
-        //    successorLaneId.toStringMap().map { "to_${it.key}" to it.value }.toMap()
+        val location = "from ${laneId.toIdentifierText()} to ${successorLaneId.toIdentifierText()}"
 
-        val location = "from $laneId to $successorLaneId"
+        val leftLaneBoundaryTransitionDistance = laneLeftLaneBoundaryPoint.distance(laneLeftLaneBoundarySuccessorPoint)
+        if (leftLaneBoundaryTransitionDistance >= parameters.laneTransitionDistanceTolerance) {
+            val infoValues = mapOf("euclidean_distance" to leftLaneBoundaryTransitionDistance)
+            messageList += DefaultMessage("LeftLaneBoundaryTransitionGap", "Left boundary of lane should be connected to its successive lane (euclidean distance: $leftLaneBoundaryTransitionDistance, successor: $successorContactStart).", location, Severity.WARNING, wasFixed = false, infoValues)
+        }
 
-        if (laneLeftLaneBoundaryPoint.distance(laneLeftLaneBoundarySuccessorPoint) >= parameters.laneTransitionDistanceTolerance)
-            messageList += DefaultMessage("", "Left boundary of lane should be connected to its successive lane (euclidean distance: ${laneLeftLaneBoundaryPoint.distance(laneLeftLaneBoundarySuccessorPoint)}, successor: $successorContactStart).", location, Severity.WARNING, wasHealed = false)
-        // TODO: .copy(relevantValue = laneLeftLaneBoundaryPoint.distance(laneLeftLaneBoundarySuccessorPoint))
-
-        if (laneRightLaneBoundaryPoint.distance(laneRightLaneBoundarySuccessorPoint) >= parameters.laneTransitionDistanceTolerance)
-            messageList += DefaultMessage("", "Right boundary of lane should be connected to its successive lane (euclidean distance: ${laneRightLaneBoundaryPoint.distance(laneRightLaneBoundarySuccessorPoint)} successor: $successorContactStart).", location, Severity.WARNING, wasHealed = false)
-        // TODO: .copy(relevantValue = laneRightLaneBoundaryPoint.distance(laneRightLaneBoundarySuccessorPoint))
+        val rightLaneBoundaryTransitionDistance = laneRightLaneBoundaryPoint.distance(laneRightLaneBoundarySuccessorPoint)
+        if (rightLaneBoundaryTransitionDistance >= parameters.laneTransitionDistanceTolerance) {
+            val infoValues = mapOf("euclidean_distance" to rightLaneBoundaryTransitionDistance)
+            messageList += DefaultMessage("RightLaneBoundaryTransitionGap", "Right boundary of lane should be connected to its successive lane (euclidean distance: $rightLaneBoundaryTransitionDistance successor: $successorContactStart).", location, Severity.WARNING, wasFixed = false, infoValues)
+        }
 
         return messageList
     }

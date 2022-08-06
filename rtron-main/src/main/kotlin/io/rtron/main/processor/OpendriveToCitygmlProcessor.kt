@@ -45,7 +45,7 @@ class OpendriveToCitygmlProcessor(
 
         processAllFiles(
             inputDirectoryPath = inputPath,
-            withExtension = OpendriveReader.supportedFileExtensions.first(),
+            withFilenameEndings = OpendriveReader.supportedFilenameEndings,
             outputDirectoryPath = outputPath
         ) {
             // read OpenDRIVE model
@@ -62,14 +62,14 @@ class OpendriveToCitygmlProcessor(
             val opendriveEvaluator = OpendriveEvaluator(parameters.deriveOpendriveEvaluatorParameters())
             val opendriveEvaluatorResult = opendriveEvaluator.evaluate(opendriveModel)
             opendriveEvaluatorResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_EVALUATOR_REPORT_PATH)
-            val healedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
+            val modifiedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
                 logger.warn(opendriveEvaluatorResult.second.getTextSummary())
                 return@processAllFiles
             }
 
             // shift OpenDRIVE model
             val opendriveShifter = OpendriveShifter(parameters.deriveOpendriveShifterParameters())
-            val opendriveShifterResult = opendriveShifter.modify(healedOpendriveModel)
+            val opendriveShifterResult = opendriveShifter.modify(modifiedOpendriveModel)
             opendriveShifterResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SHIFTER_REPORT_PATH)
 
             // transform OpenDRIVE model to Roadspaces model

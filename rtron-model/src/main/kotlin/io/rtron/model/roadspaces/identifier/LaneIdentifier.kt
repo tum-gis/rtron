@@ -71,7 +71,7 @@ data class LaneIdentifier(
     override fun toStringMap(): Map<String, String> =
         mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
 
-    override fun toString() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
+    override fun toIdentifierText() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
     fun toRoadspaceIdentifier() = laneSectionIdentifier.roadspaceIdentifier
 
     companion object {

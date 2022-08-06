@@ -176,13 +176,13 @@ class RoadsTransformer(
     private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         val lane = road.getLane(id)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val surface = road.getLaneSurface(id, parameters.discretizationStepSize)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val centerLine = road.getCurveOnLane(id, 0.5)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, parameters.discretizationStepSize)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasHealed = true); return messageList }.toList()
+            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }.toList()
         val fillerSurfaces = innerLateralFillerSurface + longitudinalFillerSurfaces
 
         when (LaneRouter.route(lane)) {
@@ -222,7 +222,7 @@ class RoadsTransformer(
     private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         road.getRoadMarkings(id, parameters.discretizationStepSize)
-            .handleLeftAndFilter { messageList += DefaultMessage.of("", it.value.message!!, id, Severity.WARNING, wasHealed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
+            .handleLeftAndFilter { messageList += DefaultMessage.of("", it.value.message!!, id, Severity.WARNING, wasFixed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
             .forEach {
                 messageList += _transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace)
             }

@@ -16,9 +16,7 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
-import arrow.core.None
 import arrow.core.some
-import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
@@ -26,76 +24,37 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyRoadSignal
 import io.rtron.model.opendrive.core.EUnit
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
+import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
 import io.rtron.transformer.messages.opendrive.of
 
-class RoadSignalsEvaluator(val parameters: OpendriveEvaluatorParameters) {
+object RoadSignalsEvaluator {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
-        return messageList
-    }
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = DefaultMessageList()
-        var healedOpendriveModel = opendriveModel
+        modifiedOpendriveModel = everyRoadSignal.modify(modifiedOpendriveModel) { currentRoadSignal ->
 
-        healedOpendriveModel = everyRoadSignal.modify(healedOpendriveModel) { currentRoadSignal ->
+            currentRoadSignal.height = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadSignal.height, currentRoadSignal.additionalId, "height", messageList, parameters.numberTolerance)
+            currentRoadSignal.hOffset = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.hOffset, currentRoadSignal.additionalId, "hOffset", messageList)
+            currentRoadSignal.pitch = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.pitch, currentRoadSignal.additionalId, "pitch", messageList)
+            currentRoadSignal.roll = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.roll, currentRoadSignal.additionalId, "roll", messageList)
+            currentRoadSignal.s = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRoadSignal.s, currentRoadSignal.additionalId, "s", messageList)
+            currentRoadSignal.subtype = BasicDataTypeModifier.modifyToNonBlankString(currentRoadSignal.subtype, currentRoadSignal.additionalId, "subtype", messageList, fallbackValue = "-1")
+            currentRoadSignal.t = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRoadSignal.t, currentRoadSignal.additionalId, "t", messageList)
+            currentRoadSignal.type = BasicDataTypeModifier.modifyToNonBlankString(currentRoadSignal.type, currentRoadSignal.additionalId, "type", messageList, fallbackValue = "-1")
+            currentRoadSignal.value = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.value, currentRoadSignal.additionalId, "value", messageList)
 
-            if (currentRoadSignal.height.exists { !it.isFinite() || it < parameters.numberTolerance }) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'height'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.height = None
-            }
-            if (currentRoadSignal.hOffset.exists { !it.isFinite() }) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'hOffset'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.hOffset = None
-            }
-            if (currentRoadSignal.pitch.exists { !it.isFinite() }) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'hOffset'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.pitch = None
-            }
-            if (currentRoadSignal.roll.exists { !it.isFinite() }) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'roll'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.roll = None
-            }
-            if (!currentRoadSignal.s.isFinite() || currentRoadSignal.s < 0.0) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 's'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.s = 0.0
-            }
-            if (currentRoadSignal.subtype.isBlank()) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'subtype'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                // messageList += OpendriveException.UnexpectedValue("subtype", currentRoadSignal.subtype, "Value shall not be empty, but -1.").toMessage(currentRoadSignal.additionalId, isFatal = true, wasHealed = true)
-                currentRoadSignal.subtype = "-1"
-            }
-            if (!currentRoadSignal.t.isFinite() || currentRoadSignal.t < 0.0) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 't'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.t = 0.0
-            }
-            if (currentRoadSignal.type.isBlank()) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'type'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.type = "-1"
-            }
-            if (currentRoadSignal.value.exists { !it.isFinite() }) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'value'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.value = None
-            }
             if (currentRoadSignal.value.isDefined() && currentRoadSignal.unit.isEmpty()) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'unit'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                // messageList += OpendriveException.UnexpectedValue("unit", currentRoadSignal.value.toString(), "Attribute 'unit' shall be defined, when attribute 'value' is defined.").toMessage(currentRoadSignal.additionalId, isFatal = true, wasHealed = true)
+                messageList += DefaultMessage.of("UnitAttributeMustBeDefinedWhenValueAttributeIsDefined", "Attribute 'unit' shall be defined, when attribute 'value' is defined.", currentRoadSignal.additionalId, Severity.WARNING, wasFixed = true)
                 currentRoadSignal.unit = EUnit.KILOMETER_PER_HOUR.some()
             }
-            if (currentRoadSignal.width.exists { !it.isFinite() || it < parameters.numberTolerance }) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'width'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.width = None
-            }
-            if (!currentRoadSignal.zOffset.isFinite()) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'zOffset'", currentRoadSignal.additionalId, Severity.WARNING, wasHealed = true)
-                currentRoadSignal.zOffset = 0.0
-            }
+            currentRoadSignal.width = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadSignal.width, currentRoadSignal.additionalId, "width", messageList, parameters.numberTolerance)
+            currentRoadSignal.zOffset = BasicDataTypeModifier.modifyToFiniteDouble(currentRoadSignal.zOffset, currentRoadSignal.additionalId, "zOffset", messageList)
 
             currentRoadSignal
         }
 
-        return ContextMessageList(healedOpendriveModel, messageList)
+        return modifiedOpendriveModel
     }
 }

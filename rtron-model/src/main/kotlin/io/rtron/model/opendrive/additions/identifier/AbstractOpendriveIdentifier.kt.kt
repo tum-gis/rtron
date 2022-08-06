@@ -16,7 +16,11 @@
 
 package io.rtron.model.opendrive.additions.identifier
 
+import arrow.core.Option
+
 abstract class AbstractOpendriveIdentifier {
 
-    abstract override fun toString(): String
+    abstract fun toIdentifierText(): String
 }
+
+fun Option<AbstractOpendriveIdentifier>.toIdentifierText() = this.fold({ "Unknown" }, { it.toIdentifierText() })

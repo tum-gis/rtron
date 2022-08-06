@@ -29,10 +29,9 @@ class RoadspacesEvaluator(
     // Methods
 
     fun evaluate(roadspacesModel: RoadspacesModel): Pair<RoadspacesModel, RoadspacesEvaluationReport> {
-
         val report = RoadspacesEvaluationReport(parameters)
 
-        report.modelingRulesEvaluation = _modelingRulesEvaluator.evaluateNonFatalViolations(roadspacesModel)
+        report.modelingRulesEvaluation = _modelingRulesEvaluator.evaluate(roadspacesModel)
 
         return roadspacesModel to report
     }

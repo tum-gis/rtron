@@ -25,20 +25,20 @@ import io.rtron.model.opendrive.junction.EJunctionType
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.messages.opendrive.of
 
-class JunctionEvaluator(val parameters: OpendriveEvaluatorParameters) {
+object JunctionEvaluator {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-        everyJunction.modify(opendriveModel) { currentJunction ->
+        everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
 
             if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.incomingRoad.isEmpty() || it.connectingRoad.isEmpty() })
-                messageList += DefaultMessage.of("", "Junction and junction type is not supported, since only junctions are supported that have connections with an incomingRoad and a connectionRoad.", currentJunction.additionalId, Severity.FATAL_ERROR, wasHealed = false)
+                messageList += DefaultMessage.of("", "Junction and junction type is not supported, since only junctions are supported that have connections with an incomingRoad and a connectionRoad.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
 
             currentJunction
         }
 
-        return messageList
+        return modifiedOpendriveModel
     }
 }

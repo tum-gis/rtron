@@ -64,7 +64,7 @@ object Surface3DBuilder {
         }
 
         if (roadObject.repeat.any { it.isRepeatedCuboid() })
-            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasHealed = false)
+            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
 
         return ContextMessageList(rectangleList, messageList)
     }
@@ -84,7 +84,7 @@ object Surface3DBuilder {
         }
 
         if (roadObject.repeat.any { it.isRepeatCylinder() })
-            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasHealed = false)
+            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
 
         return ContextMessageList(circleList, messageList)
     }
@@ -99,7 +99,7 @@ object Surface3DBuilder {
             .map { buildLinearRingByRoadCorners(it, referenceLine, numberTolerance) }
             .separateEither()
 
-        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }.mergeToReport()
+        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
         val linearRings = linearRingsWithContext.handleMessageList { messageList += it.messageList }
 
         return ContextMessageList(linearRings, messageList)
@@ -145,7 +145,7 @@ object Surface3DBuilder {
             .separateEither()
 
         messageList += builderExceptions
-            .map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasHealed = true) }
+            .map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }
             .mergeToReport()
         val linearRings = linearRingsWithContext
             .handleMessageList { messageList += it.messageList }

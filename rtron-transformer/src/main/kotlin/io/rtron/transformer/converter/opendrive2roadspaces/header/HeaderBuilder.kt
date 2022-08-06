@@ -52,7 +52,7 @@ class HeaderBuilder(
         CoordinateReferenceSystem.of(parameters.crsEpsg).tap { return ContextMessageList(it.some(), messageList) }
         CoordinateReferenceSystem.of(geoReference.content).tap { return ContextMessageList(it.some(), messageList) }
 
-        val message = DefaultMessage("UnknownCoordinateReferenceSystem", "Coordinate reference system is not known.", "Header element", Severity.WARNING, wasHealed = false)
+        val message = DefaultMessage("UnknownCoordinateReferenceSystem", "Coordinate reference system is not known.", "Header element", Severity.WARNING, wasFixed = false)
         return ContextMessageList(None, DefaultMessageList.of(message))
     }
 }

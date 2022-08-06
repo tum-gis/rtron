@@ -76,7 +76,7 @@ class BuildingModuleBuilder(
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).tap {
             roofSurfaceFeature.lod2MultiSurface = it
         }.tapNone {
-            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for roof feature available.", id, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for roof feature available.", id, Severity.WARNING, wasFixed = true)
         }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
         identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "RoofSurface", dstCityObject = roofSurfaceFeature)
@@ -85,7 +85,7 @@ class BuildingModuleBuilder(
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).tap {
             groundSurfaceFeature.lod2MultiSurface = it
         }.tapNone {
-            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for ground feature available.", id, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for ground feature available.", id, Severity.WARNING, wasFixed = true)
         }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
         identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "FloorSurface", dstCityObject = groundSurfaceFeature)
@@ -98,7 +98,7 @@ class BuildingModuleBuilder(
                 identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "WallSurface", index, wallSurfaceFeature)
             }
         }.tapNone {
-            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for wall feature available.", id, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "No LoD2 MultiSurface for wall feature available.", id, Severity.WARNING, wasFixed = true)
         }
 
         return ContextMessageList(buildingFeature, messageList)
@@ -108,7 +108,7 @@ class BuildingModuleBuilder(
         val messageList = DefaultMessageList()
         val buildingFeature = Building()
         buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasHealed = true) }
+            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(buildingFeature, messageList)
     }

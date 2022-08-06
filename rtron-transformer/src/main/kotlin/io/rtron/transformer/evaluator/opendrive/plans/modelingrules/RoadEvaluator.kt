@@ -16,7 +16,6 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
-import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
@@ -28,32 +27,25 @@ import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve2DBuild
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.messages.opendrive.of
 
-class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
+object RoadEvaluator {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-        everyRoad.modify(opendriveModel) { currentRoad ->
+        everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             if (currentRoad.planView.geometry.any { it.s > currentRoad.length + parameters.numberTolerance })
-                messageList += DefaultMessage.of("", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasHealed = false)
+                messageList += DefaultMessage.of("", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = false)
 
             currentRoad
         }
 
-        return messageList
-    }
-
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = DefaultMessageList()
-        var healedOpendriveModel = opendriveModel.copy()
-
-        healedOpendriveModel = everyRoad.modify(healedOpendriveModel) { currentRoad ->
+        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             // TODO: consolidate location handling
-            val location = currentRoad.additionalId.fold({ "" }, { it.toString() })
+            val location = currentRoad.additionalId.fold({ "" }, { it.toIdentifierText() })
 
             if (currentRoad.planView.geometry.any { it.length <= parameters.numberTolerance }) {
-                messageList += DefaultMessage.of("", "Plan view contains geometry elements with a length of zero (below tolerance threshold), which are removed.", currentRoad.additionalId, Severity.WARNING, wasHealed = true)
+                messageList += DefaultMessage.of("", "Plan view contains geometry elements with a length of zero (below tolerance threshold), which are removed.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
                 currentRoad.planView.geometry = currentRoad.planView.geometry.filter { it.length > parameters.numberTolerance }
             }
 
@@ -66,13 +58,13 @@ class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
             currentRoad.planView.geometry.zipWithNext().forEach {
                 val actualLength = it.second.s - it.first.s
                 if (!fuzzyEquals(it.first.length, actualLength, parameters.numberTolerance)) {
-                    messageList += DefaultMessage.of("", "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) does not match the start position (s=${it.second.s}) of the next geometry element.", currentRoad.additionalId, Severity.WARNING, wasHealed = true)
+                    messageList += DefaultMessage.of("", "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) does not match the start position (s=${it.second.s}) of the next geometry element.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
                     it.first.length = actualLength
                 }
             }
 
             if (!fuzzyEquals(currentRoad.planView.geometry.last().s + currentRoad.planView.geometry.last().length, currentRoad.length, parameters.numberTolerance)) {
-                messageList += DefaultMessage.of("", "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length (length=${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasHealed = true)
+                messageList += DefaultMessage.of("", "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length (length=${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
                 currentRoad.planView.geometry.last().length = currentRoad.length - currentRoad.planView.geometry.last().s
             }
 
@@ -86,12 +78,6 @@ class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
                 val frontCurveMemberEndPose = it.first.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D(it.first.length))
                 val backCurveMemberStartPose = it.second.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D.ZERO)
 
-                //    data class OverlapOrGapInCurve(val suffix: String = "") :
-                //        GeometryException("Overlap or gap in the curve due to its segments not being adjacent to each other.${if (suffix.isNotEmpty()) " $suffix" else ""}", "OverlapOrGapInCurve")
-                //
-                //    data class KinkInCurve(val suffix: String = "") :
-                //        GeometryException("Kink in the curve caused by segments having different angles at the transition points.${if (suffix.isNotEmpty()) " $suffix" else ""}", "KinkInCurve")
-
                 val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
                 if (distance > parameters.planViewGeometryDistanceTolerance)
                     messageList += DefaultMessage(
@@ -99,7 +85,7 @@ class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
                             "of $distance above the tolerance of ${parameters.planViewGeometryDistanceTolerance}.",
-                        location, Severity.FATAL_ERROR, wasHealed = false
+                        location, Severity.FATAL_ERROR, wasFixed = false
                     )
                 else if (distance > parameters.planViewGeometryDistanceWarningTolerance)
                     messageList += DefaultMessage(
@@ -107,7 +93,7 @@ class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
                             "of $distance above the warning tolerance of ${parameters.planViewGeometryDistanceWarningTolerance}.",
-                        location, Severity.WARNING, wasHealed = false
+                        location, Severity.WARNING, wasFixed = false
                     )
 
                 val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
@@ -117,7 +103,7 @@ class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
                         "Geometry elements contain a kink " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
                             "of $angleDifference above the tolerance of ${parameters.planViewGeometryAngleTolerance}.",
-                        location, Severity.FATAL_ERROR, wasHealed = false
+                        location, Severity.FATAL_ERROR, wasFixed = false
                     )
                 else if (angleDifference > parameters.planViewGeometryAngleWarningTolerance)
                     messageList += DefaultMessage(
@@ -125,13 +111,13 @@ class RoadEvaluator(val parameters: OpendriveEvaluatorParameters) {
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
                             "of $angleDifference above the warning tolerance of ${parameters.planViewGeometryAngleWarningTolerance}.",
-                        location, Severity.WARNING, wasHealed = false
+                        location, Severity.WARNING, wasFixed = false
                     )
             }
 
             currentRoad
         }
 
-        return ContextMessageList(healedOpendriveModel, messageList)
+        return modifiedOpendriveModel
     }
 }

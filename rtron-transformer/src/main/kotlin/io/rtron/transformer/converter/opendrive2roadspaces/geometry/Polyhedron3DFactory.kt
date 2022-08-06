@@ -195,7 +195,7 @@ object Polyhedron3DFactory {
                     return ContextMessageList(elements.first(), messageList)
 
                 if (elements.size > 2)
-                    messageList += DefaultMessage("OutlineContainsConsecutivelyFollowingElementDuplicates", "Contains more than two consecutively following outline element duplicates.", "", Severity.WARNING, wasHealed = false)
+                    messageList += DefaultMessage("OutlineContainsConsecutivelyFollowingElementDuplicates", "Contains more than two consecutively following outline element duplicates.", "", Severity.WARNING, wasFixed = false)
 
                 val basePoint = elements.first().basePoint
                 val leftHeadPoint = elements.first().leftHeadPoint
@@ -240,7 +240,7 @@ object Polyhedron3DFactory {
         // remove consecutively following line segment duplicates
         val elementsWithoutDuplicates = verticalOutlineElements.filterWithNextEnclosing { a, b -> a.basePoint.fuzzyUnequals(b.basePoint, tolerance) }
         if (elementsWithoutDuplicates.size < verticalOutlineElements.size)
-            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following line segment duplicate.", outlineId, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring at least one consecutively following line segment duplicate.", outlineId, Severity.WARNING, wasFixed = true)
 
         // if there are not enough points to construct a polyhedron
         if (elementsWithoutDuplicates.size < 3)
@@ -250,7 +250,7 @@ object Polyhedron3DFactory {
         val cleanedElements = elementsWithoutDuplicates
             .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
         if (cleanedElements.size < elementsWithoutDuplicates.size)
-            messageList += DefaultMessage.of("", "Ignoring consecutively following side duplicates of the form (…, A, B, A, …).", outlineId, Severity.WARNING, wasHealed = true)
+            messageList += DefaultMessage.of("", "Ignoring consecutively following side duplicates of the form (…, A, B, A, …).", outlineId, Severity.WARNING, wasFixed = true)
 
         // if the base points of the outline element are located on a line (or point)
         val innerBaseEdges = cleanedElements.map { it.basePoint }.filterIndexed { index, _ -> index != 0 }.map { it - cleanedElements.first().basePoint }

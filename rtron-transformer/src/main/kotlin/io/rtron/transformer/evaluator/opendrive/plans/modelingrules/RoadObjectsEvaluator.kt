@@ -18,7 +18,6 @@ package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
 import arrow.core.Some
 import arrow.core.flattenOption
-import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
@@ -27,19 +26,13 @@ import io.rtron.model.opendrive.additions.optics.everyRoadObject
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.messages.opendrive.of
 
-class RoadObjectsEvaluator(val parameters: OpendriveEvaluatorParameters) {
+object RoadObjectsEvaluator {
 
     // Methods
-    fun evaluateFatalViolations(opendriveModel: OpendriveModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
-        return messageList
-    }
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+        var modifiedOpendriveModel = opendriveModel.copy()
 
-    fun evaluateNonFatalViolations(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = DefaultMessageList()
-        var healedOpendriveModel = opendriveModel.copy()
-
-        healedOpendriveModel = everyRoadObject.modify(healedOpendriveModel) { currentRoadObject ->
+        modifiedOpendriveModel = everyRoadObject.modify(modifiedOpendriveModel) { currentRoadObject ->
 
             // adding ids for outline elements
             currentRoadObject.outlines.tap { currentOutlinesElement ->
@@ -47,32 +40,32 @@ class RoadObjectsEvaluator(val parameters: OpendriveEvaluatorParameters) {
 
                 if (outlineElementsWithoutId.isNotEmpty()) {
                     val startId: Int = currentOutlinesElement.outline.map { it.id }.flattenOption().maxOrNull() ?: 0
-                    messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'id'.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasHealed = true)
+                    messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'id'.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                     outlineElementsWithoutId.forEachIndexed { index, outlineElement -> outlineElement.id = Some(startId + index) }
                 }
             }
 
             currentRoadObject.outlines.tap { currentRoadObjectOutline ->
                 if (currentRoadObjectOutline.outline.any { it.isPolyhedron() && !it.isPolyhedronUniquelyDefined() }) {
-                    messageList += DefaultMessage.of("", "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more <cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasHealed = true)
+                    messageList += DefaultMessage.of("", "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more <cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                     currentRoadObjectOutline.outline.forEach { it.cornerLocal = emptyList() }
                 }
             }
 
             if (currentRoadObject.height.isEmpty() && currentRoadObject.outlines.exists { it.containsPolyhedrons() }) {
-                messageList += DefaultMessage.of("", "Road object contains a polyhedron with non-zero height, but the height of the road object element is ${currentRoadObject.height}.", currentRoadObject.additionalId, Severity.WARNING, wasHealed = false)
+                messageList += DefaultMessage.of("", "Road object contains a polyhedron with non-zero height, but the height of the road object element is ${currentRoadObject.height}.", currentRoadObject.additionalId, Severity.WARNING, wasFixed = false)
             }
 
             val repeatElementsFiltered = currentRoadObject.repeat.filter { it.length >= parameters.numberTolerance }
             if (repeatElementsFiltered.size < currentRoadObject.repeat.size) {
                 // TODO: double check handling
-                messageList += DefaultMessage.of("", "A repeat element should have a length higher than zero and threshold.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasHealed = true)
+                messageList += DefaultMessage.of("", "A repeat element should have a length higher than zero and threshold.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                 currentRoadObject.repeat = repeatElementsFiltered
             }
 
             currentRoadObject
         }
 
-        return ContextMessageList(healedOpendriveModel, messageList)
+        return modifiedOpendriveModel
     }
 }

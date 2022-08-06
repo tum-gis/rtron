@@ -44,5 +44,9 @@ data class ModelIdentifier(
     val sourceFileIdentifier: FileIdentifier
 ) : AbstractRoadspacesIdentifier(), ModelIdentifierInterface, FileIdentifierInterface by sourceFileIdentifier {
 
+    override fun toIdentifierText(): String {
+        return "ModelIdentifier(modelName=$modelName, modelDate=$modelDate, modelVendor=$modelVendor)"
+    }
+
     override fun toStringMap(): Map<String, String> = emptyMap()
 }

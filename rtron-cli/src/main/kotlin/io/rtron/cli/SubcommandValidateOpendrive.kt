@@ -22,6 +22,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.path
@@ -54,13 +55,18 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
 
+    private val skipOpendriveExport by option(help = "skip the export of the adjusted OpenDRIVE dataset").flag()
+    private val skipCitygmlExport by option(help = "skip the export of the CityGML dataset for visual inspection purposes").flag()
+
     // Methods
     override fun run() {
 
         val parameters = parametersPath.toOption().fold({
             ValidateOpendriveParameters(
                 tolerance = tolerance,
-                discretizationStepSize = discretizationStepSize
+                discretizationStepSize = discretizationStepSize,
+                exportOpendriveDataset = !skipOpendriveExport,
+                exportCitygmlDataset = !skipCitygmlExport
             )
         }, { parametersFilePath ->
             val parametersText = parametersFilePath.toFile().readText()

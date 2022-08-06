@@ -44,7 +44,7 @@ data class JunctionIdentifier(
     override fun toStringMap(): Map<String, String> =
         mapOf("junctionId" to junctionId) + modelIdentifier.toStringMap()
 
-    override fun toString(): String {
+    override fun toIdentifierText(): String {
         return "JunctionIdentifier(junctionId=$junctionId)"
     }
 }

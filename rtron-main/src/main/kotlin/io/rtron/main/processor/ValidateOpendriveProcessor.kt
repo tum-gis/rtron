@@ -45,7 +45,7 @@ class ValidateOpendriveProcessor(
 
         processAllFiles(
             inputDirectoryPath = inputPath,
-            withExtension = OpendriveReader.supportedFileExtensions.first(),
+            withFilenameEndings = OpendriveReader.supportedFilenameEndings,
             outputDirectoryPath = outputPath
         ) {
 
@@ -67,18 +67,20 @@ class ValidateOpendriveProcessor(
                 logger.warn(opendriveEvaluatorResult.second.getTextSummary())
                 return@processAllFiles
             }
-            val healedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
+            val modifiedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
                 logger.warn(opendriveEvaluatorResult.second.getTextSummary())
                 return@processAllFiles
             }
 
-            // write healed OpenDRIVE model
-            val opendriveWriter = OpendriveWriter()
-            opendriveWriter.write(healedOpendriveModel, outputDirectoryPath)
+            // write modified OpenDRIVE model
+            if (parameters.exportOpendriveDataset) {
+                val opendriveWriter = OpendriveWriter()
+                opendriveWriter.write(modifiedOpendriveModel, outputDirectoryPath)
+            }
 
             // transform OpenDRIVE model to Roadspaces model
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
-            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(healedOpendriveModel, inputFileIdentifier)
+            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel, inputFileIdentifier)
             roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
                 logger.warn(roadspacesModelResult.second.conversion.getTextSummary())
@@ -96,8 +98,10 @@ class ValidateOpendriveProcessor(
             citygmlModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML_REPORT_PATH)
 
             // write CityGML model
-            val citygmlWriter = CitygmlWriter(parameters.deriveCitygmlWriterParameters())
-            citygmlWriter.writeModel(citygmlModelResult.first, outputDirectoryPath)
+            if (parameters.exportCitygmlDataset) {
+                val citygmlWriter = CitygmlWriter(parameters.deriveCitygmlWriterParameters())
+                citygmlWriter.writeModel(citygmlModelResult.first, outputDirectoryPath)
+            }
         }
     }
 
