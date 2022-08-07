@@ -80,9 +80,10 @@ class OpendriveReader private constructor(
     companion object {
         enum class OpendriveFilenameEnding(val ending: String) {
             PURE(".xodr"),
-            COMPRESSED(".xodr.zip"),
+            ZIP_COMPRESSED(".xodr.zip"),
+            GZ_COMPRESSED(".xodr.gz"),
         }
-        val supportedFilenameEndings: Set<String> = setOf(OpendriveFilenameEnding.PURE.ending, OpendriveFilenameEnding.COMPRESSED.ending)
+        val supportedFilenameEndings: Set<String> = setOf(OpendriveFilenameEnding.PURE.ending, OpendriveFilenameEnding.ZIP_COMPRESSED.ending, OpendriveFilenameEnding.GZ_COMPRESSED.ending)
 
         fun of(filePath: Path): Either<OpendriveReaderException, OpendriveReader> = either.eager {
             if (!filePath.isRegularFile())

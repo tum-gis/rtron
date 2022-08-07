@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.zip.GZIPInputStream
 import java.util.zip.ZipFile
 import kotlin.io.path.Path
 import kotlin.io.path.extension
@@ -52,6 +53,8 @@ fun Path.inputStreamFromDirectOrCompressedFile(): InputStream =
         val zipFile = ZipFile(this.toAbsolutePath().toString())
         val zipEntry = zipFile.getEntry(this.nameWithoutExtension)
         zipFile.getInputStream(zipEntry)
+    } else if (this.extension == "gz") {
+        GZIPInputStream(this.inputStream())
     } else {
         this.inputStream()
     }
