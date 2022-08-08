@@ -66,7 +66,7 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
                 tolerance = tolerance,
                 discretizationStepSize = discretizationStepSize,
                 exportOpendriveDataset = !skipOpendriveExport,
-                exportCitygmlDataset = !skipCitygmlExport
+                exportCitygml2Dataset = !skipCitygmlExport
             )
         }, { parametersFilePath ->
             val parametersText = parametersFilePath.toFile().readText()

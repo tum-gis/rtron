@@ -92,15 +92,26 @@ class ValidateOpendriveProcessor(
             val roadspacesEvaluatorResults = roadspacesEvaluator.evaluate(roadspacesModel)
             roadspacesEvaluatorResults.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_EVALUATOR_REPORT_PATH)
 
-            // transform Roadspaces model to CityGML model
-            val roadspaces2CitygmlTransformer = Roadspaces2CitygmlTransformer(parameters.deriveRoadspaces2CitygmlParameters())
-            val citygmlModelResult = roadspaces2CitygmlTransformer.transform(roadspacesModel)
-            citygmlModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML_REPORT_PATH)
+            // transform Roadspaces model to CityGML2 model
+            val roadspaces2Citygml2Transformer = Roadspaces2CitygmlTransformer(parameters.deriveRoadspaces2Citygml2Parameters())
+            val citygml2ModelResult = roadspaces2Citygml2Transformer.transform(roadspacesModel)
+            citygml2ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML2_REPORT_PATH)
 
-            // write CityGML model
-            if (parameters.exportCitygmlDataset) {
-                val citygmlWriter = CitygmlWriter(parameters.deriveCitygmlWriterParameters())
-                citygmlWriter.writeModel(citygmlModelResult.first, outputDirectoryPath)
+            // write CityGML 2 model
+            if (parameters.exportCitygml2Dataset) {
+                val citygmlWriter = CitygmlWriter(parameters.deriveCitygml2WriterParameters())
+                citygmlWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath)
+            }
+
+            // transform Roadspaces model to CityGML3 model
+            val roadspaces2Citygml3Transformer = Roadspaces2CitygmlTransformer(parameters.deriveRoadspaces2Citygml3Parameters())
+            val citygml3ModelResult = roadspaces2Citygml3Transformer.transform(roadspacesModel)
+            citygml3ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML3_REPORT_PATH)
+
+            // write CityGML3 model
+            if (parameters.exportCitygml3Dataset) {
+                val citygmlWriter = CitygmlWriter(parameters.deriveCitygml3WriterParameters())
+                citygmlWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath)
             }
         }
     }
@@ -111,6 +122,7 @@ class ValidateOpendriveProcessor(
         val OPENDRIVE_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("02_opendrive_evaluator_report.json")
         val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("03_opendrive_to_roadspaces_report.json")
         val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("04_roadspaces_evaluator_report.json")
-        val ROADSPACES_TO_CITYGML_REPORT_PATH = REPORTS_PATH / Path("05_roadspaces_to_citygml_report.json")
+        val ROADSPACES_TO_CITYGML2_REPORT_PATH = REPORTS_PATH / Path("05_roadspaces_to_citygml2_report.json")
+        val ROADSPACES_TO_CITYGML3_REPORT_PATH = REPORTS_PATH / Path("06_roadspaces_to_citygml3_report.json")
     }
 }

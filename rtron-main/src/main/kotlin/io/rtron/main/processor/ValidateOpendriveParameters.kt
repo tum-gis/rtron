@@ -30,7 +30,8 @@ data class ValidateOpendriveParameters(
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
 
     val exportOpendriveDataset: Boolean = true,
-    val exportCitygmlDataset: Boolean = true
+    val exportCitygml2Dataset: Boolean = true,
+    val exportCitygml3Dataset: Boolean = true,
 ) {
 
     // Methods
@@ -52,7 +53,7 @@ data class ValidateOpendriveParameters(
         laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE,
     )
 
-    fun deriveRoadspaces2CitygmlParameters() = Roadspaces2CitygmlParameters(
+    fun deriveRoadspaces2Citygml2Parameters() = Roadspaces2CitygmlParameters(
         concurrentProcessing = false,
 
         discretizationStepSize = discretizationStepSize,
@@ -61,12 +62,24 @@ data class ValidateOpendriveParameters(
 
         generateLongitudinalFillerSurfaces = false,
         mappingBackwardsCompatibility = true,
-        // mappingBackwardsCompatibility = false
     )
 
-    fun deriveCitygmlWriterParameters() = CitygmlWriterParameters(
+    fun deriveRoadspaces2Citygml3Parameters() = Roadspaces2CitygmlParameters(
+        concurrentProcessing = false,
 
+        discretizationStepSize = discretizationStepSize,
+
+        transformAdditionalRoadLines = true,
+
+        generateLongitudinalFillerSurfaces = false,
+        mappingBackwardsCompatibility = false
+    )
+
+    fun deriveCitygml2WriterParameters() = CitygmlWriterParameters(
         versions = setOf(CitygmlVersion.V2_0)
-        // versions = setOf(CitygmlVersion.V3_0)
+    )
+
+    fun deriveCitygml3WriterParameters() = CitygmlWriterParameters(
+        versions = setOf(CitygmlVersion.V3_0)
     )
 }

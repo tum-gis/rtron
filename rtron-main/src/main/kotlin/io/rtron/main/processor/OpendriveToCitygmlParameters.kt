@@ -38,7 +38,7 @@ data class OpendriveToCitygmlParameters(
     val crsEpsg: Int = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
     val offsetX: Double = OpendriveShifterParameters.DEFAULT_OFFSET_X,
     val offsetY: Double = OpendriveShifterParameters.DEFAULT_OFFSET_Y,
-    val offsetZ: Double = OpendriveShifterParameters.DEFAULT_OFFSET_Z,
+    // val offsetZ: Double = OpendriveShifterParameters.DEFAULT_OFFSET_Z,
 
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
@@ -55,7 +55,7 @@ data class OpendriveToCitygmlParameters(
     fun deriveOpendriveShifterParameters() = OpendriveShifterParameters(
         offsetX = offsetX,
         offsetY = offsetY,
-        offsetZ = offsetZ,
+        // offsetZ = offsetZ,
     )
 
     fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
@@ -84,7 +84,6 @@ data class OpendriveToCitygmlParameters(
     )
 
     fun deriveCitygmlWriterParameters() = CitygmlWriterParameters(
-
         versions = if (convertToCitygml2) setOf(CitygmlVersion.V2_0) else setOf(CitygmlVersion.V3_0)
     )
 }
