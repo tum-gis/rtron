@@ -52,6 +52,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         help = "Path to the output directory into which the transformed CityGML models are written"
     ).path()
 
+    private val skipRoadShapeRemoval by option(help = "skip the removal of the road shape, if a lateral lane offset exists (not compliant to standard)").flag()
+
     private val convertToCitygml2 by option(help = "convert to CityGML 2.0 (otherwise CityGML 3.0)").flag()
 
     private val tolerance by option(help = "allowed tolerance when comparing double values").double()
@@ -76,6 +78,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         val parameters = parametersPath.toOption().fold({
             OpendriveToCitygmlParameters(
                 convertToCitygml2 = convertToCitygml2,
+
+                skipRoadShapeRemoval = skipRoadShapeRemoval,
 
                 tolerance = tolerance,
                 crsEpsg = crsEpsg,

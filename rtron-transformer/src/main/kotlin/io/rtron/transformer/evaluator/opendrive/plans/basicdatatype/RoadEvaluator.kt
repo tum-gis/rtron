@@ -60,7 +60,8 @@ object RoadEvaluator {
             currentRoad.lateralProfile.tap { currentLateralProfile ->
                 if (currentLateralProfile.containsShapeProfile() && currentRoad.lanes.containsLaneOffset()) {
                     messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'lateralProfile.shape'", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
-                    currentLateralProfile.shape = emptyList()
+                    if (!parameters.skipRoadShapeRemoval)
+                        currentLateralProfile.shape = emptyList()
                 }
 
                 currentLateralProfile.superelevation = BasicDataTypeModifier.filterToStrictlySorted(currentLateralProfile.superelevation, { it.s }, currentRoad.additionalId, "superelevation", messageList)

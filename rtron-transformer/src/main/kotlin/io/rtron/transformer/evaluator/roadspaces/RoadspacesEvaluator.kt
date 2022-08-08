@@ -19,16 +19,21 @@ package io.rtron.transformer.evaluator.roadspaces
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.transformer.evaluator.roadspaces.plans.modelingrules.ModelingRulesEvaluator
 import io.rtron.transformer.evaluator.roadspaces.report.RoadspacesEvaluationReport
+import mu.KotlinLogging
 
 class RoadspacesEvaluator(
     val parameters: RoadspacesEvaluatorParameters
 ) {
     // Properties and Initializers
+    private val logger = KotlinLogging.logger {}
+
     private val _modelingRulesEvaluator = ModelingRulesEvaluator(parameters)
 
     // Methods
 
     fun evaluate(roadspacesModel: RoadspacesModel): Pair<RoadspacesModel, RoadspacesEvaluationReport> {
+        logger.info("Parameters: $parameters.")
+
         val report = RoadspacesEvaluationReport(parameters)
 
         report.modelingRulesEvaluation = _modelingRulesEvaluator.evaluate(roadspacesModel)

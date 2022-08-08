@@ -29,6 +29,8 @@ import kotlinx.serialization.Serializable
 data class OpendriveToCitygmlParameters(
     val convertToCitygml2: Boolean = false,
 
+    val skipRoadShapeRemoval: Boolean = OpendriveEvaluatorParameters.DEFAULT_SKIP_ROAD_SHAPE_REMOVAL,
+
     val tolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE,
     val planViewGeometryDistanceTolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
     val planViewGeometryAngleTolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
@@ -46,6 +48,7 @@ data class OpendriveToCitygmlParameters(
     // Methods
 
     fun deriveOpendriveEvaluatorParameters() = OpendriveEvaluatorParameters(
+        skipRoadShapeRemoval = skipRoadShapeRemoval,
         numberTolerance = tolerance,
     )
 
