@@ -26,8 +26,10 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.triple
 import com.github.ajalt.clikt.parameters.types.double
+import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
+import io.rtron.main.processor.CompressionFormat
 import io.rtron.main.processor.OpendriveToCitygmlParameters
 import io.rtron.main.processor.OpendriveToCitygmlProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
@@ -71,6 +73,9 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
     private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed").flag()
 
+    private val compressionFormat: CompressionFormat by option(help = "compress the output files with the respective compression format").enum<CompressionFormat>()
+        .default(CompressionFormat.NONE)
+
     // Methods
 
     override fun run() {
@@ -91,6 +96,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 sweepDiscretizationStepSize = sweepDiscretizationStepSize,
                 circleSlices = circleSlices,
                 transformAdditionalRoadLines = transformAdditionalRoadLines,
+
+                compressionFormat = compressionFormat
             )
         }, { parametersFilePath ->
             val parametersText = parametersFilePath.toFile().readText()

@@ -18,6 +18,7 @@ package io.rtron.main.processor
 
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.readerwriter.citygml.CitygmlWriterParameters
+import io.rtron.readerwriter.opendrive.OpendriveWriterParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
@@ -29,15 +30,21 @@ data class ValidateOpendriveParameters(
     val tolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE,
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
 
-    val exportOpendriveDataset: Boolean = true,
-    val exportCitygml2Dataset: Boolean = true,
-    val exportCitygml3Dataset: Boolean = true,
+    val writeOpendriveFile: Boolean = true,
+    val writeCitygml2File: Boolean = true,
+    val writeCitygml3File: Boolean = true,
+
+    val compressionFormat: CompressionFormat = CompressionFormat.NONE
 ) {
 
     // Methods
 
     fun deriveOpendriveEvaluatorParameters() = OpendriveEvaluatorParameters(
         numberTolerance = tolerance,
+    )
+
+    fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
+        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 
     fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
@@ -76,10 +83,12 @@ data class ValidateOpendriveParameters(
     )
 
     fun deriveCitygml2WriterParameters() = CitygmlWriterParameters(
-        versions = setOf(CitygmlVersion.V2_0)
+        versions = setOf(CitygmlVersion.V2_0),
+        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 
     fun deriveCitygml3WriterParameters() = CitygmlWriterParameters(
-        versions = setOf(CitygmlVersion.V3_0)
+        versions = setOf(CitygmlVersion.V3_0),
+        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 }

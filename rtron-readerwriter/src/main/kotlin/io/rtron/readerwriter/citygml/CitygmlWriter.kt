@@ -17,6 +17,7 @@
 package io.rtron.readerwriter.citygml
 
 import io.rtron.io.files.getFileSizeToDisplay
+import io.rtron.io.files.outputStreamDirectOrCompressed
 import io.rtron.model.citygml.CitygmlModel
 import mu.KotlinLogging
 import org.citygml4j.xml.CityGMLContext
@@ -24,6 +25,7 @@ import org.citygml4j.xml.module.citygml.CoreModule
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.div
 
 class CitygmlWriter(
     val parameters: CitygmlWriterParameters
@@ -44,10 +46,11 @@ class CitygmlWriter(
         val citygmlVersion = version.toGmlCitygml()
         val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
-        val fileName = directoryPath.fileName.toString() + (if (versionSuffix) "_$version" else "") + ".gml"
-        val filePath = directoryPath.resolve(Path(fileName))
+        val fileName = directoryPath.fileName.toString() + (if (versionSuffix) "_$version" else "") + ".gml" + parameters.fileCompression.fold({ "" }, { it.extensionWithDot })
+        val filePath = directoryPath / Path(fileName)
+        val outputStream = filePath.outputStreamDirectOrCompressed()
 
-        val writer = out.createCityGMLChunkWriter(filePath.toFile(), StandardCharsets.UTF_8.name())
+        val writer = out.createCityGMLChunkWriter(outputStream, StandardCharsets.UTF_8.name())
         writer.apply {
             withIndent("  ")
             withDefaultSchemaLocations()
@@ -60,6 +63,7 @@ class CitygmlWriter(
         }
 
         writer.close()
+        outputStream.close()
         logger.info("Completed writing of file $fileName (around ${filePath.getFileSizeToDisplay()}).")
         return filePath
     }

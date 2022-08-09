@@ -18,6 +18,7 @@ package io.rtron.main.processor
 
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.readerwriter.citygml.CitygmlWriterParameters
+import io.rtron.readerwriter.opendrive.OpendriveWriterParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
@@ -44,6 +45,8 @@ data class OpendriveToCitygmlParameters(
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
     val circleSlices: Int = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
     val transformAdditionalRoadLines: Boolean = Roadspaces2CitygmlParameters.DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES,
+
+    val compressionFormat: CompressionFormat = CompressionFormat.NONE
 ) {
     // Methods
 
@@ -56,6 +59,10 @@ data class OpendriveToCitygmlParameters(
         offsetX = offsetX,
         offsetY = offsetY,
         offsetZ = offsetZ,
+    )
+
+    fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
+        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 
     fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
@@ -84,6 +91,7 @@ data class OpendriveToCitygmlParameters(
     )
 
     fun deriveCitygmlWriterParameters() = CitygmlWriterParameters(
-        versions = if (convertToCitygml2) setOf(CitygmlVersion.V2_0) else setOf(CitygmlVersion.V3_0)
+        versions = if (convertToCitygml2) setOf(CitygmlVersion.V2_0) else setOf(CitygmlVersion.V3_0),
+        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 }

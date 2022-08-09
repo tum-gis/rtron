@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.citygml
+package io.rtron.readerwriter.opendrive
 
 import arrow.core.None
 import arrow.core.Option
 import io.rtron.io.files.CompressedFileExtension
 
-data class CitygmlWriterParameters(
-    val versions: Set<CitygmlVersion>,
+data class OpendriveWriterParameters(
     val fileCompression: Option<CompressedFileExtension> = DEFAULT_FILE_COMPRESSION
 ) {
-    // Properties and Initializers
-    init {
-        require(versions.isNotEmpty()) { "At least one CitGML version must be set." }
-    }
 
     companion object {
         val DEFAULT_FILE_COMPRESSION = None

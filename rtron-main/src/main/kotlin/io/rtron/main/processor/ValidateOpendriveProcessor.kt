@@ -73,8 +73,8 @@ class ValidateOpendriveProcessor(
             }
 
             // write modified OpenDRIVE model
-            if (parameters.exportOpendriveDataset) {
-                val opendriveWriter = OpendriveWriter()
+            if (parameters.writeOpendriveFile) {
+                val opendriveWriter = OpendriveWriter(parameters.deriveOpendriveWriterParameters())
                 opendriveWriter.write(modifiedOpendriveModel, outputDirectoryPath)
             }
 
@@ -98,7 +98,7 @@ class ValidateOpendriveProcessor(
             citygml2ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML2_REPORT_PATH)
 
             // write CityGML 2 model
-            if (parameters.exportCitygml2Dataset) {
+            if (parameters.writeCitygml2File) {
                 val citygmlWriter = CitygmlWriter(parameters.deriveCitygml2WriterParameters())
                 citygmlWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath)
             }
@@ -109,7 +109,7 @@ class ValidateOpendriveProcessor(
             citygml3ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML3_REPORT_PATH)
 
             // write CityGML3 model
-            if (parameters.exportCitygml3Dataset) {
+            if (parameters.writeCitygml3File) {
                 val citygmlWriter = CitygmlWriter(parameters.deriveCitygml3WriterParameters())
                 citygmlWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath)
             }

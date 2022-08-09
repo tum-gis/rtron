@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.getOrHandle
 import arrow.core.left
+import io.rtron.io.files.CompressedFileExtension
 import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
@@ -78,12 +79,11 @@ class OpendriveReader private constructor(
     }
 
     companion object {
-        enum class OpendriveFilenameEnding(val ending: String) {
-            PURE(".xodr"),
-            ZIP_COMPRESSED(".xodr.zip"),
-            GZ_COMPRESSED(".xodr.gz"),
-        }
-        val supportedFilenameEndings: Set<String> = setOf(OpendriveFilenameEnding.PURE.ending, OpendriveFilenameEnding.ZIP_COMPRESSED.ending, OpendriveFilenameEnding.GZ_COMPRESSED.ending)
+        val supportedFilenameEndings: Set<String> = setOf(
+            ".xodr",
+            ".xodr.${CompressedFileExtension.ZIP.extension}",
+            ".xodr.${CompressedFileExtension.GZ.extension}"
+        )
 
         fun of(filePath: Path): Either<OpendriveReaderException, OpendriveReader> = either.eager {
             if (!filePath.isRegularFile())

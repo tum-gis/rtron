@@ -25,7 +25,9 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.double
+import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.path
+import io.rtron.main.processor.CompressionFormat
 import io.rtron.main.processor.ValidateOpendriveParameters
 import io.rtron.main.processor.ValidateOpendriveProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
@@ -58,6 +60,9 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
     private val skipOpendriveExport by option(help = "skip the export of the adjusted OpenDRIVE dataset").flag()
     private val skipCitygmlExport by option(help = "skip the export of the CityGML dataset for visual inspection purposes").flag()
 
+    private val compressionFormat: CompressionFormat by option(help = "compress the output files with the respective compression format").enum<CompressionFormat>()
+        .default(CompressionFormat.NONE)
+
     // Methods
     override fun run() {
 
@@ -65,8 +70,10 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
             ValidateOpendriveParameters(
                 tolerance = tolerance,
                 discretizationStepSize = discretizationStepSize,
-                exportOpendriveDataset = !skipOpendriveExport,
-                exportCitygml2Dataset = !skipCitygmlExport
+                writeOpendriveFile = !skipOpendriveExport,
+                writeCitygml2File = !skipCitygmlExport,
+
+                compressionFormat = compressionFormat
             )
         }, { parametersFilePath ->
             val parametersText = parametersFilePath.toFile().readText()

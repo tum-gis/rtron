@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.citygml
+package io.rtron.main.processor
 
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.some
 import io.rtron.io.files.CompressedFileExtension
 
-data class CitygmlWriterParameters(
-    val versions: Set<CitygmlVersion>,
-    val fileCompression: Option<CompressedFileExtension> = DEFAULT_FILE_COMPRESSION
-) {
-    // Properties and Initializers
-    init {
-        require(versions.isNotEmpty()) { "At least one CitGML version must be set." }
-    }
+enum class CompressionFormat {
+    NONE,
+    GZ,
+    ZIP
+}
 
-    companion object {
-        val DEFAULT_FILE_COMPRESSION = None
-    }
+fun CompressionFormat.toOptionalCompressedFileExtension(): Option<CompressedFileExtension> = when (this) {
+    CompressionFormat.NONE -> None
+    CompressionFormat.GZ -> CompressedFileExtension.GZ.some()
+    CompressionFormat.ZIP -> CompressedFileExtension.ZIP.some()
 }

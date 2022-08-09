@@ -74,7 +74,7 @@ class OpendriveToCitygmlProcessor(
             opendriveShifterResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SHIFTER_REPORT_PATH)
 
             // write shifted OpenDRIVE model
-            val opendriveWriter = OpendriveWriter()
+            val opendriveWriter = OpendriveWriter(parameters.deriveOpendriveWriterParameters())
             opendriveWriter.write(opendriveShifterResult.first, outputDirectoryPath)
 
             // transform OpenDRIVE model to Roadspaces model

@@ -25,7 +25,9 @@ import io.rtron.std.BaseException
 import mu.KotlinLogging
 import java.nio.file.Path
 
-class OpendriveWriter {
+class OpendriveWriter(
+    val parameters: OpendriveWriterParameters
+) {
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
@@ -34,7 +36,7 @@ class OpendriveWriter {
     // Methods
     fun write(model: OpendriveModel, directoryPath: Path): Either<OpendriveWriterException, Path> = either.eager {
 
-        val filePath = opendriveMarshaller.writeToFile(model, directoryPath).bind()
+        val filePath = opendriveMarshaller.writeToFile(model, directoryPath, parameters.fileCompression).bind()
         logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
 
         filePath
