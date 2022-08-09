@@ -74,7 +74,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed").flag()
 
     private val compressionFormat: CompressionFormat by option(help = "compress the output files with the respective compression format").enum<CompressionFormat>()
-        .default(CompressionFormat.NONE)
+        .default(CompressionFormat.GZ)
 
     // Methods
 

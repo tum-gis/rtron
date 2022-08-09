@@ -65,11 +65,9 @@ fun Path.inputStreamFromDirectOrCompressedFile(): InputStream =
         else -> this.inputStream()
     }
 
-enum class CompressedFileExtension(val extension: String, val extensionWithDot: String) {
-    ZIP("zip", ".zip"),
-    GZ("gz", ".gz"),
-}
-
+/**
+ * Constructs a new OutputStream of this file either directly or compressed according to the path's extension.
+ */
 fun Path.outputStreamDirectOrCompressed(): OutputStream =
     when (this.extension) {
         CompressedFileExtension.ZIP.extension -> {
