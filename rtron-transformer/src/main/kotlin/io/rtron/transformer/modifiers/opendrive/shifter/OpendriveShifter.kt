@@ -16,9 +16,14 @@
 
 package io.rtron.transformer.modifiers.opendrive.shifter
 
+import arrow.core.some
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
+import io.rtron.model.opendrive.additions.optics.everyRoad
+import io.rtron.model.opendrive.additions.optics.everyRoadElevationProfileElement
 import io.rtron.model.opendrive.additions.optics.everyRoadPlanViewGeometry
+import io.rtron.model.opendrive.road.elevation.RoadElevationProfile
+import io.rtron.model.opendrive.road.elevation.RoadElevationProfileElevation
 
 class OpendriveShifter(
     val parameters: OpendriveShifterParameters
@@ -31,30 +36,33 @@ class OpendriveShifter(
 
         // XY axes
         modifiedOpendriveModel = everyRoadPlanViewGeometry.modify(modifiedOpendriveModel) { currentPlanViewGeometry ->
-            currentPlanViewGeometry.x = currentPlanViewGeometry.x + parameters.offsetX
-            currentPlanViewGeometry.y = currentPlanViewGeometry.y + parameters.offsetY
+            val modifiedPlanViewGeometry = currentPlanViewGeometry.copy()
+            modifiedPlanViewGeometry.x = modifiedPlanViewGeometry.x + parameters.offsetX
+            modifiedPlanViewGeometry.y = modifiedPlanViewGeometry.y + parameters.offsetY
 
-            currentPlanViewGeometry
+            modifiedPlanViewGeometry
         }
 
         // Z axis
-        // TODO: check shallow copy
-//        modifiedOpendriveModel = everyRoadElevationProfileElement.modify(modifiedOpendriveModel) { currentElevationProfileElement ->
-//            currentElevationProfileElement.a = parameters.offsetZ
-//            currentElevationProfileElement
-//        }
-//
-//        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
-//            if (currentRoad.elevationProfile.isEmpty())
-//                currentRoad.elevationProfile = RoadElevationProfile(emptyList()).some()
-//
-//            currentRoad.elevationProfile.tap {
-//                if (it.elevation.isEmpty())
-//                    it.elevation += RoadElevationProfileElevation(parameters.offsetZ, 0.0, 0.0, 0.0, 0.0)
-//            }
-//
-//            currentRoad
-//        }
+        modifiedOpendriveModel = everyRoadElevationProfileElement.modify(modifiedOpendriveModel) { currentElevationProfileElement ->
+            val modifiedElevationProfileElement = currentElevationProfileElement.copy()
+            modifiedElevationProfileElement.a = modifiedElevationProfileElement.a + parameters.offsetZ
+            modifiedElevationProfileElement
+        }
+
+        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+            val modifiedRoad = currentRoad.copy()
+
+            if (modifiedRoad.elevationProfile.isEmpty())
+                modifiedRoad.elevationProfile = RoadElevationProfile(emptyList()).some()
+
+            modifiedRoad.elevationProfile.tap {
+                if (it.elevation.isEmpty())
+                    it.elevation += RoadElevationProfileElevation(parameters.offsetZ, 0.0, 0.0, 0.0, 0.0)
+            }
+
+            modifiedRoad
+        }
 
         return modifiedOpendriveModel to report
     }

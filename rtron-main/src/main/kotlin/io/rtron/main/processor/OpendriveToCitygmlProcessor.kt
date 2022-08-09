@@ -22,6 +22,7 @@ import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlWriter
 import io.rtron.readerwriter.opendrive.OpendriveReader
+import io.rtron.readerwriter.opendrive.OpendriveWriter
 import io.rtron.std.handleEmpty
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
@@ -72,9 +73,13 @@ class OpendriveToCitygmlProcessor(
             val opendriveShifterResult = opendriveShifter.modify(modifiedOpendriveModel)
             opendriveShifterResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SHIFTER_REPORT_PATH)
 
+            // write shifted OpenDRIVE model
+            val opendriveWriter = OpendriveWriter()
+            opendriveWriter.write(opendriveShifterResult.first, outputDirectoryPath)
+
             // transform OpenDRIVE model to Roadspaces model
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
-            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel, inputFileIdentifier)
+            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveShifterResult.first, inputFileIdentifier)
             roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
                 logger.warn("Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}")
@@ -91,7 +96,7 @@ class OpendriveToCitygmlProcessor(
             val citygmlModelResult = roadpaces2CitygmlTransformer.transform(roadspacesModel)
             citygmlModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML_REPORT_PATH)
 
-            // write OpenDRIVE model
+            // write CityGML model
             val citygmlWriter = CitygmlWriter(parameters.deriveCitygmlWriterParameters())
             citygmlWriter.writeModel(citygmlModelResult.first, outputDirectoryPath)
         }

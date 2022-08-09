@@ -24,7 +24,7 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.pair
+import com.github.ajalt.clikt.parameters.options.triple
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
@@ -60,8 +60,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
-    private val offset by option(help = "offset values by which the model is translated along x and y axis").double().pair()
-        .default(Pair(OpendriveShifterParameters.DEFAULT_OFFSET_X, OpendriveShifterParameters.DEFAULT_OFFSET_Y))
+    private val offset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
+        .default(Triple(OpendriveShifterParameters.DEFAULT_OFFSET_X, OpendriveShifterParameters.DEFAULT_OFFSET_Y, OpendriveShifterParameters.DEFAULT_OFFSET_Z))
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
@@ -69,7 +69,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
     private val circleSlices by option(help = "number of discretization points for a circle or cylinder").int()
         .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
-    private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc. are also transformed").flag()
+    private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed").flag()
 
     // Methods
 
@@ -85,6 +85,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 crsEpsg = crsEpsg,
                 offsetX = offset.first,
                 offsetY = offset.second,
+                offsetZ = offset.third,
 
                 discretizationStepSize = discretizationStepSize,
                 sweepDiscretizationStepSize = sweepDiscretizationStepSize,

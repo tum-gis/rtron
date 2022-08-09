@@ -23,12 +23,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 class SchemaValidationReport(
-    private val opendriveVersion: OpendriveVersion,
+    val opendriveVersion: OpendriveVersion,
 
     val validationMessages: MessageList<SchemaValidationReportMessage> = MessageList(),
 
-    private val completedSuccessfully: Boolean = true,
-    private val validationAbortMessage: String = "",
+    val completedSuccessfully: Boolean = true,
+    val validationAbortMessage: String = "",
 ) {
 
     fun validationProcessAborted() = !completedSuccessfully
