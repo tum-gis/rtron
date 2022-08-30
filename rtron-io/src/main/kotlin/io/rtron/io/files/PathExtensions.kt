@@ -16,14 +16,16 @@
 
 package io.rtron.io.files
 
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
+import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream
+import org.apache.commons.compress.compressors.zstandard.ZstdCompressorOutputStream
 import org.apache.commons.io.FileUtils
 import java.io.BufferedOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.zip.GZIPInputStream
-import java.util.zip.GZIPOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -61,24 +63,29 @@ fun Path.inputStreamFromDirectOrCompressedFile(): InputStream =
             val zipEntry = zipFile.getEntry(this.nameWithoutExtension)
             zipFile.getInputStream(zipEntry)
         }
-        CompressedFileExtension.GZ.extension -> GZIPInputStream(this.inputStream())
+        CompressedFileExtension.GZ.extension -> GzipCompressorInputStream(this.inputStream())
+        CompressedFileExtension.ZST.extension -> ZstdCompressorInputStream(this.inputStream())
         else -> this.inputStream()
     }
 
 /**
  * Constructs a new OutputStream of this file either directly or compressed according to the path's extension.
  */
-fun Path.outputStreamDirectOrCompressed(): OutputStream =
-    when (this.extension) {
+fun Path.outputStreamDirectOrCompressed(): OutputStream {
+    val bufferedOutputStream = BufferedOutputStream(this.outputStream())
+
+    return when (this.extension) {
         CompressedFileExtension.ZIP.extension -> {
-            val bufferedOutputStream = BufferedOutputStream(this.outputStream())
             val zippedOutputStream = ZipOutputStream(bufferedOutputStream)
             zippedOutputStream.putNextEntry(ZipEntry(this.nameWithoutExtension))
             zippedOutputStream
         }
         CompressedFileExtension.GZ.extension -> {
-            val bufferedOutputStream = BufferedOutputStream(this.outputStream())
-            GZIPOutputStream(bufferedOutputStream)
+            GzipCompressorOutputStream(bufferedOutputStream)
+        }
+        CompressedFileExtension.ZST.extension -> {
+            ZstdCompressorOutputStream(bufferedOutputStream)
         }
         else -> this.outputStream()
     }
+}

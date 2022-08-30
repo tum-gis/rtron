@@ -24,7 +24,7 @@ object DependencyVersions {
     // testing libraries
     const val junit = "5.9.0"
     const val assertj = "3.23.1"
-    const val mockk = "1.12.5"
+    const val mockk = "1.12.7"
 
     // logging libraries
     const val kotlinLogging = "2.1.23"
@@ -34,8 +34,8 @@ object DependencyVersions {
     const val orchid = "0.21.1"
 
     // object creation libraries
-    const val kotlinxSerializationJson = "1.3.3"
-    const val kaml = "0.46.0"
+    const val kotlinxSerializationJson = "1.4.0"
+    const val kaml = "0.47.0"
     const val jakartaActivationApi = "2.1.0"
     const val jakartaXmlBindApi = "4.0.0"
     const val jaxb = "4.0.0"
@@ -49,6 +49,8 @@ object DependencyVersions {
     const val commonsIO = "2.11.0"
     const val commonsCSV = "1.9.0"
     const val commonsLang = "3.12.0"
+    const val commonsCompress = "1.21"
+    const val zstdJni = "1.5.2-3"
     const val emojiJava = "5.1.1"
 
     // math libraries
@@ -98,6 +100,8 @@ object Dependencies {
     const val commonsIO = "commons-io:commons-io:${DependencyVersions.commonsIO}"
     const val commonsCSV = "org.apache.commons:commons-csv:${DependencyVersions.commonsCSV}"
     const val commonsLang = "org.apache.commons:commons-lang3:${DependencyVersions.commonsLang}"
+    const val commonsCompress = "org.apache.commons:commons-compress:${DependencyVersions.commonsCompress}"
+    const val zstdJni = "com.github.luben:zstd-jni:${DependencyVersions.zstdJni}"
     const val emojiJava = "com.vdurmont:emoji-java:${DependencyVersions.emojiJava}"
 
     // math libraries

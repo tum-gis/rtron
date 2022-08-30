@@ -82,7 +82,8 @@ class OpendriveReader private constructor(
         val supportedFilenameEndings: Set<String> = setOf(
             ".xodr",
             ".xodr.${CompressedFileExtension.ZIP.extension}",
-            ".xodr.${CompressedFileExtension.GZ.extension}"
+            ".xodr.${CompressedFileExtension.GZ.extension}",
+            ".xodr.${CompressedFileExtension.ZST.extension}",
         )
 
         fun of(filePath: Path): Either<OpendriveReaderException, OpendriveReader> = either.eager {

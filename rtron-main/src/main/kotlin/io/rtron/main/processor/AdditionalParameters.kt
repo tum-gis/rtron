@@ -24,11 +24,13 @@ import io.rtron.io.files.CompressedFileExtension
 enum class CompressionFormat {
     NONE,
     GZ,
-    ZIP
+    ZIP,
+    ZST
 }
 
 fun CompressionFormat.toOptionalCompressedFileExtension(): Option<CompressedFileExtension> = when (this) {
     CompressionFormat.NONE -> None
     CompressionFormat.GZ -> CompressedFileExtension.GZ.some()
     CompressionFormat.ZIP -> CompressedFileExtension.ZIP.some()
+    CompressionFormat.ZST -> CompressedFileExtension.ZST.some()
 }

@@ -20,6 +20,8 @@ dependencies {
     implementation(Dependencies.commonsIO)
     implementation(Dependencies.commonsCSV)
     implementation(Dependencies.commonsLang)
+    implementation(Dependencies.commonsCompress)
+    implementation(Dependencies.zstdJni)
     implementation(Dependencies.emojiJava)
 
     // math libraries
