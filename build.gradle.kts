@@ -26,7 +26,7 @@ if (!JavaVersion.current().isJava11Compatible)
 plugins {
     base
     java
-    kotlin("jvm") version DependencyVersions.kotlin
+    kotlin("jvm") version 1.7.20
     id(Plugins.versionChecker) version PluginVersions.versionChecker
     id(Plugins.ktlint) version PluginVersions.ktlint
     `maven-publish`
