@@ -15,6 +15,7 @@
  */
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 if (!JavaVersion.current().isJava11Compatible)
@@ -29,6 +30,7 @@ plugins {
     kotlin("jvm") version DependencyVersions.kotlin
     id(Plugins.versionChecker) version PluginVersions.versionChecker
     id(Plugins.ktlint) version PluginVersions.ktlint
+    id(Plugins.dokka) version PluginVersions.dokka
     `maven-publish`
     signing
 }
@@ -87,6 +89,22 @@ allprojects {
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         version.set("0.45.2")
     }
+
+    /*tasks.withType<DokkaTask>().configureEach {
+        dokkaSourceSets {
+            named("main") {
+                moduleName.set("Dokka Gradle Example")
+                includes.from("Module.md")
+                sourceLink {
+                    localDirectory.set(file("src/main/kotlin"))
+                    remoteUrl.set(URL("https://github.com/Kotlin/dokka/tree/master/" +
+                            "examples/gradle/dokka-gradle-example/src/main/kotlin"
+                    ))
+                    remoteLineSuffix.set("#L")
+                }
+            }
+        }
+    }*/
 
     publishing {
         apply(plugin = "maven-publish")
@@ -171,3 +189,33 @@ val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
     jvmTarget = "11"
 }
+
+fun configureDokka() {
+    // if (COMMON_JVM_ONLY) return
+
+    subprojects {
+        plugins.apply("org.jetbrains.dokka")
+
+        /*val dokkaPlugin by configurations
+        dependencies {
+            dokkaPlugin("org.jetbrains.dokka:versioning-plugin:1.7.20")
+        }*/
+    }
+    // val dokkaOutputDir = "../versions"
+
+    tasks.withType<DokkaMultiModuleTask> {
+        /*val mapOf = mapOf(
+            "org.jetbrains.dokka.versioning.VersioningPlugin" to
+                    """{ "version": "${Project.version}", "olderVersionsDir":"$dokkaOutputDir" }"""
+        )
+
+        outputDirectory.set(file(projectDir.toPath().resolve(dokkaOutputDir).resolve(Project.version)))
+        pluginsMapConfiguration.set(mapOf)*/
+    }
+
+    /*rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
+        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().ignoreScripts = false
+    }*/
+}
+
+configureDokka()

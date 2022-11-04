@@ -1,5 +1,5 @@
 // user interface layer
-include("rtron-documentation", "rtron-cli")
+include("rtron-cli")
 
 // batch processing layer
 include("rtron-main")
