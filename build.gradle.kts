@@ -191,31 +191,12 @@ compileTestKotlin.kotlinOptions {
 }
 
 fun configureDokka() {
-    // if (COMMON_JVM_ONLY) return
-
     subprojects {
         plugins.apply("org.jetbrains.dokka")
-
-        /*val dokkaPlugin by configurations
-        dependencies {
-            dokkaPlugin("org.jetbrains.dokka:versioning-plugin:1.7.20")
-        }*/
     }
-    // val dokkaOutputDir = "../versions"
 
     tasks.withType<DokkaMultiModuleTask> {
-        /*val mapOf = mapOf(
-            "org.jetbrains.dokka.versioning.VersioningPlugin" to
-                    """{ "version": "${Project.version}", "olderVersionsDir":"$dokkaOutputDir" }"""
-        )
-
-        outputDirectory.set(file(projectDir.toPath().resolve(dokkaOutputDir).resolve(Project.version)))
-        pluginsMapConfiguration.set(mapOf)*/
     }
-
-    /*rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().ignoreScripts = false
-    }*/
 }
 
 configureDokka()

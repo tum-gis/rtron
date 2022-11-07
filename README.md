@@ -39,16 +39,18 @@ Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets
 ## :rocket: Usage
 
 In order to use r:trån you need JDK 11 or later.
-Download the executable jar at the [releases section](https://github.com/tum-gis/rtron/releases) and let it run:
-```bash
-# for transforming OpenDRIVE datasets to CityGML
-java -jar rtron.jar opendrive-to-citygml ./input-opendrive-datasets ./output-citygml-datasets
+Download the prebuilt JAR executable from the [releases section](https://github.com/tum-gis/rtron/releases/latest) and make sure that you have at least a JVM 11.
+Run r:trån to ...
 
-# for validating OpenDRIVE datasets
-java -jar rtron.jar validate-opendrive ./input-opendrive-datasets ./output-validation-reports
+```bash
+# … validate OpenDRIVE datasets
+java -jar rtron.jar validate-opendrive ./input-opendrive ./output-reports
+
+# … transform OpenDRIVE datasets to CityGML
+java -jar rtron.jar opendrive-to-citygml ./input-opendrive ./output-citygml
 ```
 
-r:trån can [recursively](https://rtron.io/wiki/configuration) iterate over OpenDRIVE datasets contained in the input directory.
+R:trån recursively iterates over your OpenDRIVE input datasets and creates the same directory structure for the output folder.
 
 ## :construction_worker: Building
 
@@ -101,7 +103,7 @@ r:trån is distributed under the Apache License 2.0. See [LICENSE](LICENSE) for 
 
 ## :handshake: Thanks
 
-* [AUDI AG](https://github.com/audi) for providing an awesome work environment within [SAVe:](https://save-in.digital)
-* Prof. [Thomas H. Kolbe](https://www.lrg.tum.de/en/gis/our-team/staff/prof-thomas-h-kolbe/), [Bruno Willenborg](https://www.lrg.tum.de/en/gis/our-team/staff/bruno-willenborg/) and [Christof Beil](https://www.lrg.tum.de/en/gis/our-team/staff/christof-beil/) for support and feedback
-* [Claus Nagel](https://github.com/clausnagel) for [citygml4j](https://github.com/citygml4j/citygml4j)
-* [JetBrains](https://github.com/JetBrains) for Kotlin and their top-notch IDEs
+- [Lutz Morich](https://www.linkedin.com/in/lutz-morich-in/) and [AUDI AG](https://github.com/audi) for providing an awesome work environment within *SAVe*
+- Prof. [Thomas H. Kolbe](https://www.asg.ed.tum.de/en/gis/our-team/staff/prof-thomas-h-kolbe/), [Bruno Willenborg](https://www.asg.ed.tum.de/en/gis/our-team/staff/bruno-willenborg/) and [Christof Beil](https://www.asg.ed.tum.de/en/gis/our-team/staff/christof-beil/) for support and feedback
+- [Claus Nagel](https://github.com/clausnagel) for [citygml4j](https://github.com/citygml4j/citygml4j)
+- [JetBrains](https://github.com/JetBrains) for Kotlin and their top-notch IDEs

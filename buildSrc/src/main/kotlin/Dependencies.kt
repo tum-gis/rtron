@@ -30,9 +30,6 @@ object DependencyVersions {
     const val kotlinLogging = "3.0.3"
     const val slf4jSimple = "2.0.3"
 
-    // documentation libraries
-    //const val orchid = "0.21.1"
-
     // object creation libraries
     const val kotlinxSerializationJson = "1.4.1"
     const val kaml = "0.49.0"

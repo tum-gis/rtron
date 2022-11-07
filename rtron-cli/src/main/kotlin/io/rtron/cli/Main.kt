@@ -32,6 +32,6 @@ class MainCommand : CliktCommand(name = "rtron") {
  * @param args arguments of the cli
  */
 fun main(args: Array<String>) = MainCommand()
-    .versionOption("1.2.2")
+    .versionOption("1.3-SNAPSHOT")
     .subcommands(SubcommandValidateOpendrive(), SubcommandOpendriveToCitygml())
     .main(args)

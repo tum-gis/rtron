@@ -39,5 +39,6 @@ application {
 tasks {
     named<ShadowJar>("shadowJar") {
         mergeServiceFiles()
+        archiveFileName.set("${Project.name}-${Project.version}.${this.archiveExtension.get()}")
     }
 }
