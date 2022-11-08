@@ -1,4 +1,4 @@
-<p align="center"><a href="https://rtron.io" target="_blank" rel="noopener noreferrer"><img width="500" src="rtron-documentation/src/orchid/resources/assets/images/logo.png" alt="rtron logo"></a></p>
+<p align="center"><a href="https://rtron.io" target="_blank" rel="noopener noreferrer"><img width="500" src="https://raw.githubusercontent.com/tum-gis/rtron-site/main/public/logo.png" alt="rtron logo"></a></p>
 
 <p align="center">
     <em>a road space model transformer library for OpenDRIVE, CityGML and beyond</em>
@@ -18,7 +18,7 @@
     <a href="./LICENSE" title="License"><img src="https://img.shields.io/github/license/tum-gis/rtron.svg?style=for-the-badge&logo=Apache"></a>
 </p>
 
-![rtron preview](rtron-documentation/src/orchid/resources/assets/images/rtron-preview.png)
+![rtron preview](https://raw.githubusercontent.com/tum-gis/rtron-site/main/public/rtron/rtron-preview.png)
 
 r:trån reads road network models in [OpenDRIVE](https://www.asam.net/standards/detail/opendrive) and transforms them to the virtual 3D city model standard [CityGML](https://www.opengeospatial.org/standards/citygml).
 
