@@ -53,6 +53,9 @@ data class OpendriveToCitygmlParameters(
     fun deriveOpendriveEvaluatorParameters() = OpendriveEvaluatorParameters(
         skipRoadShapeRemoval = skipRoadShapeRemoval,
         numberTolerance = tolerance,
+
+        planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+        planViewGeometryAngleTolerance = planViewGeometryAngleTolerance
     )
 
     fun deriveOpendriveShifterParameters() = OpendriveShifterParameters(

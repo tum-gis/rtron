@@ -42,12 +42,36 @@ object RoadEvaluator {
 
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             // TODO: consolidate location handling
-            val location = currentRoad.additionalId.fold({ "" }, { it.toIdentifierText() })
 
             if (currentRoad.planView.geometry.any { it.length <= parameters.numberTolerance }) {
-                messageList += DefaultMessage.of("", "Plan view contains geometry elements with a length of zero (below tolerance threshold), which are removed.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
-                currentRoad.planView.geometry = currentRoad.planView.geometry.filter { it.length > parameters.numberTolerance }
+                messageList += DefaultMessage.of(
+                    "PlanViewGeometryElementZeroLength",
+                    "Plan view contains geometry elements with a length of zero (below tolerance threshold), which are removed.",
+                    currentRoad.additionalId,
+                    Severity.WARNING,
+                    wasFixed = true
+                )
+                currentRoad.planView.geometry =
+                    currentRoad.planView.geometry.filter { it.length > parameters.numberTolerance }
             }
+
+            currentRoad
+        }
+
+        modifiedOpendriveModel.road = modifiedOpendriveModel.road.filter { currentRoad ->
+            if (currentRoad.planView.geometry.isEmpty())
+                messageList += DefaultMessage.of(
+                    "RoadWithoutValidPlanViewGeometryElement",
+                    "Road does not contain any valid geometry element in the planView.",
+                    currentRoad.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = false
+                )
+            currentRoad.planView.geometry.isNotEmpty()
+        }
+
+        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+            val location = currentRoad.additionalId.fold({ "" }, { it.toIdentifierText() })
 
             /*val planViewGeometryLengthsSum = road.planView.geometry.sumOf { it.length }
             if (!fuzzyEquals(planViewGeometryLengthsSum, road.length, parameters.numberTolerance)) {
