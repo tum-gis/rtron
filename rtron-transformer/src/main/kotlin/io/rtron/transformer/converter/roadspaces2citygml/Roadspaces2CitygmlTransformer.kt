@@ -165,7 +165,10 @@ class Roadspaces2CitygmlTransformer(
     }
 
     private fun addLaneTopology(roadspacesModel: RoadspacesModel, dstTransportationSpaces: List<Road>) {
-        val trafficSpaceProperties = dstTransportationSpaces.flatMap { it.trafficSpaces } + dstTransportationSpaces.flatMap { it.sections }.flatMap { it.`object`.trafficSpaces }
+        val trafficSpaceProperties = dstTransportationSpaces.flatMap { it.trafficSpaces } +
+            dstTransportationSpaces.flatMap { it.sections }.flatMap { it.`object`.trafficSpaces } +
+            dstTransportationSpaces.flatMap { it.intersections }.flatMap { it.`object`.trafficSpaces }
+        // TODO: trace the traffic space created without id
         val trafficSpacePropertiesAdjusted = trafficSpaceProperties.filter { it.`object`.id != null }
 
         val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { parameters.gmlIdPrefix + it.id.hashedId }
