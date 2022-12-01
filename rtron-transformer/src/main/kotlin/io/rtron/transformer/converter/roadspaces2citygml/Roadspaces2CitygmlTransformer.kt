@@ -177,8 +177,8 @@ class Roadspaces2CitygmlTransformer(
             val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
             val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
 
-            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.gmlIdPrefix + it.hashedId) }
-            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + parameters.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + parameters.gmlIdPrefix + it.hashedId) }
         }
     }
 

@@ -27,6 +27,8 @@ data class Roadspaces2CitygmlParameters(
 
     /** prefix for generated gml ids */
     val gmlIdPrefix: String = DEFAULT_GML_ID_PREFIX,
+    /** prefix for xlinks in XML document */
+    val xlinkPrefix: String = DEFAULT_XLINK_PREFIX,
     /** prefix for identifier attribute names */
     val identifierAttributesPrefix: String = DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
     /** prefix for geometry attribute names */
@@ -57,6 +59,7 @@ data class Roadspaces2CitygmlParameters(
         val PATTERN_NCNAME: Pattern = Pattern.compile("[_\\p{L}][-_.\\p{L}0-9]*")!!
 
         const val DEFAULT_GML_ID_PREFIX = "UUID_"
+        const val DEFAULT_XLINK_PREFIX = "#"
         const val DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX = "identifier_"
         const val DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX = "geometry_"
         const val DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS = true
