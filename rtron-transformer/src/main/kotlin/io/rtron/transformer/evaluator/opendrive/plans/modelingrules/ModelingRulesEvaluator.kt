@@ -32,6 +32,7 @@ class ModelingRulesEvaluator(val parameters: OpendriveEvaluatorParameters) : Abs
         modifiedOpendriveModel = RoadEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
         modifiedOpendriveModel = RoadLanesEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
         modifiedOpendriveModel = RoadObjectsEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = RoadSignalsEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
         modifiedOpendriveModel = JunctionEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
 
         return ContextMessageList(modifiedOpendriveModel, messageList)
