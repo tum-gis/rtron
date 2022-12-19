@@ -23,7 +23,9 @@ import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.triple
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.enum
@@ -34,7 +36,7 @@ import io.rtron.main.processor.OpendriveToCitygmlParameters
 import io.rtron.main.processor.OpendriveToCitygmlProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
-import io.rtron.transformer.modifiers.opendrive.shifter.OpendriveShifterParameters
+import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
 
 class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml", help = "Transform OpenDRIVE datasets to CityGML.", printHelpOnEmptyArgs = true) {
 
@@ -62,8 +64,9 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
-    private val offset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
-        .default(Triple(OpendriveShifterParameters.DEFAULT_OFFSET_X, OpendriveShifterParameters.DEFAULT_OFFSET_Y, OpendriveShifterParameters.DEFAULT_OFFSET_Z))
+    private val addOffset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
+        .default(Triple(OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z))
+    private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset (experimental)").double().pair().multiple(default = emptyList())
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
@@ -88,9 +91,11 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
 
                 tolerance = tolerance,
                 crsEpsg = crsEpsg,
-                offsetX = offset.first,
-                offsetY = offset.second,
-                offsetZ = offset.third,
+                offsetX = addOffset.first,
+                offsetY = addOffset.second,
+                offsetZ = addOffset.third,
+                cropPolygonX = cropPolygon.map { it.first },
+                cropPolygonY = cropPolygon.map { it.second },
 
                 discretizationStepSize = discretizationStepSize,
                 sweepDiscretizationStepSize = sweepDiscretizationStepSize,

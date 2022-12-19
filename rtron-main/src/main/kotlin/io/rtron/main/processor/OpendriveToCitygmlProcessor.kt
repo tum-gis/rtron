@@ -17,6 +17,7 @@
 package io.rtron.main.processor
 
 import arrow.core.getOrHandle
+import com.charleskorn.kaml.Yaml
 import io.rtron.io.messages.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
@@ -28,10 +29,13 @@ import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesT
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluator
 import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluator
-import io.rtron.transformer.modifiers.opendrive.shifter.OpendriveShifter
+import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropper
+import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdder
+import io.rtron.transformer.modifiers.opendrive.offset.resolver.OpendriveOffsetResolver
 import mu.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.createDirectories
 import kotlin.io.path.div
 
 class OpendriveToCitygmlProcessor(
@@ -49,11 +53,22 @@ class OpendriveToCitygmlProcessor(
             withFilenameEndings = OpendriveReader.supportedFilenameEndings,
             outputDirectoryPath = outputPath
         ) {
+            val outputSubDirectoryPath = outputDirectoryPath / "citygml_${parameters.getCitygmlWriteVersion()}"
+            outputSubDirectoryPath.createDirectories()
+            // check if parameters are valid
+            parameters.isValid().tapLeft { messages ->
+                messages.forEach { logger.warn("Parameters are not valid: $it") }
+                return@processAllFiles
+            }
+            // write the parameters as yaml file
+            val parametersText = Yaml.default.encodeToString(OpendriveToCitygmlParameters.serializer(), parameters)
+            (outputSubDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
+
             // read OpenDRIVE model
             val opendriveReader = OpendriveReader.of(inputFilePath)
                 .getOrHandle { logger.warn(it.message); return@processAllFiles }
             val opendriveSchemaValidatorReport = opendriveReader.runSchemaValidation()
-            opendriveSchemaValidatorReport.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
+            opendriveSchemaValidatorReport.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted())
                 return@processAllFiles
             val opendriveModel = opendriveReader.readModel()
@@ -62,25 +77,40 @@ class OpendriveToCitygmlProcessor(
             // evaluate OpenDRIVE model
             val opendriveEvaluator = OpendriveEvaluator(parameters.deriveOpendriveEvaluatorParameters())
             val opendriveEvaluatorResult = opendriveEvaluator.evaluate(opendriveModel)
-            opendriveEvaluatorResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_EVALUATOR_REPORT_PATH)
+            opendriveEvaluatorResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_EVALUATOR_REPORT_PATH)
             val modifiedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
                 logger.warn(opendriveEvaluatorResult.second.getTextSummary())
                 return@processAllFiles
             }
 
-            // shift OpenDRIVE model
-            val opendriveShifter = OpendriveShifter(parameters.deriveOpendriveShifterParameters())
-            val opendriveShifterResult = opendriveShifter.modify(modifiedOpendriveModel)
-            opendriveShifterResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SHIFTER_REPORT_PATH)
+            // offset OpenDRIVE model
+            val opendriveOffsetAdder = OpendriveOffsetAdder(parameters.deriveOpendriveOffsetAdderParameters())
+            val opendriveOffsetAddedResult = opendriveOffsetAdder.modify(modifiedOpendriveModel)
+            opendriveOffsetAddedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_OFFSET_ADDER_REPORT_PATH)
 
-            // write shifted OpenDRIVE model
+            // resolve the offset
+            val opendriveOffsetResolver = OpendriveOffsetResolver()
+            val opendriveOffsetResolvedResult = opendriveOffsetResolver.modify(opendriveOffsetAddedResult.first)
+            opendriveOffsetResolvedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH)
+
+            // crop the OpenDRIVE model
+            val opendriveCropper = OpendriveCropper(parameters.deriveOpendriveCropperParameters())
+            val opendriveCroppedResult = opendriveCropper.modify(opendriveOffsetAddedResult.first)
+            opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH)
+            val opendriveCropped = opendriveCroppedResult.first.handleEmpty {
+                logger.warn("OpendriveCropper: ${opendriveCroppedResult.second.message}")
+                return@processAllFiles
+            }
+
+            // write offset OpenDRIVE model
             val opendriveWriter = OpendriveWriter(parameters.deriveOpendriveWriterParameters())
-            opendriveWriter.write(opendriveShifterResult.first, outputDirectoryPath)
+            opendriveWriter.write(opendriveCropped, outputSubDirectoryPath)
+            opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_CROP_REPORT_PATH)
 
             // transform OpenDRIVE model to Roadspaces model
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
-            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveShifterResult.first, inputFileIdentifier)
-            roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
+            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveCropped, inputFileIdentifier)
+            roadspacesModelResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
                 logger.warn("Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}")
                 return@processAllFiles
@@ -89,26 +119,29 @@ class OpendriveToCitygmlProcessor(
             // evaluate Roadspaces model
             val roadspacesEvaluator = RoadspacesEvaluator(parameters.deriveRoadspacesEvaluatorParameters())
             val roadspacesEvaluatorResults = roadspacesEvaluator.evaluate(roadspacesModel)
-            roadspacesEvaluatorResults.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_EVALUATOR_REPORT_PATH)
+            roadspacesEvaluatorResults.second.serializeToJsonFile(outputSubDirectoryPath / ROADSPACES_EVALUATOR_REPORT_PATH)
 
             // transform Roadspaces model to OpenDRIVE model
             val roadpaces2CitygmlTransformer = Roadspaces2CitygmlTransformer(parameters.deriveRoadspaces2CitygmlParameters())
             val citygmlModelResult = roadpaces2CitygmlTransformer.transform(roadspacesModel)
-            citygmlModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML_REPORT_PATH)
+            citygmlModelResult.second.serializeToJsonFile(outputSubDirectoryPath / ROADSPACES_TO_CITYGML_REPORT_PATH)
 
             // write CityGML model
             val citygmlWriter = CitygmlWriter(parameters.deriveCitygmlWriterParameters())
-            citygmlWriter.writeModel(citygmlModelResult.first, outputDirectoryPath)
+            citygmlWriter.writeModel(citygmlModelResult.first, outputSubDirectoryPath, "citygml_model")
         }
     }
 
     companion object {
+        val PARAMETERS_PATH = Path("parameters.yaml")
         val REPORTS_PATH = Path("reports")
         val OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH = REPORTS_PATH / Path("01_opendrive_schema_validator_report.json")
         val OPENDRIVE_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("02_opendrive_evaluator_report.json")
-        val OPENDRIVE_SHIFTER_REPORT_PATH = REPORTS_PATH / Path("03_opendrive_shifter_report.json")
-        val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("04_opendrive_to_roadspaces_report.json")
-        val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("05_roadspaces_evaluator_report.json")
-        val ROADSPACES_TO_CITYGML_REPORT_PATH = REPORTS_PATH / Path("06_roadspaces_to_citygml_report.json")
+        val OPENDRIVE_OFFSET_ADDER_REPORT_PATH = REPORTS_PATH / Path("03_opendrive_offset_adder_report.json")
+        val OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH = REPORTS_PATH / Path("04_opendrive_offset_resolver_report.json")
+        val OPENDRIVE_CROP_REPORT_PATH = REPORTS_PATH / Path("05_opendrive_crop_report.json")
+        val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("06_opendrive_to_roadspaces_report.json")
+        val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("07_roadspaces_evaluator_report.json")
+        val ROADSPACES_TO_CITYGML_REPORT_PATH = REPORTS_PATH / Path("08_roadspaces_to_citygml_report.json")
     }
 }

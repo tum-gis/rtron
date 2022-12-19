@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.modifiers.opendrive.shifter
+package io.rtron.transformer.modifiers.opendrive.offset.resolver
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OpendriveShifterReport(
-    val parameters: OpendriveShifterParameters
+data class OpendriveOffsetResolverReport(
+    var messages: List<String> = emptyList()
 )

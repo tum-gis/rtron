@@ -16,6 +16,9 @@
 
 package io.rtron.main.processor
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.readerwriter.citygml.CitygmlWriterParameters
 import io.rtron.readerwriter.opendrive.OpendriveWriterParameters
@@ -23,7 +26,8 @@ import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesP
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluatorParameters
-import io.rtron.transformer.modifiers.opendrive.shifter.OpendriveShifterParameters
+import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropperParameters
+import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -37,9 +41,11 @@ data class OpendriveToCitygmlParameters(
     val planViewGeometryAngleTolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
 
     val crsEpsg: Int = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
-    val offsetX: Double = OpendriveShifterParameters.DEFAULT_OFFSET_X,
-    val offsetY: Double = OpendriveShifterParameters.DEFAULT_OFFSET_Y,
-    val offsetZ: Double = OpendriveShifterParameters.DEFAULT_OFFSET_Z,
+    val offsetX: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X,
+    val offsetY: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y,
+    val offsetZ: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z,
+    val cropPolygonX: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_X,
+    val cropPolygonY: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_Y,
 
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
@@ -49,6 +55,22 @@ data class OpendriveToCitygmlParameters(
     val compressionFormat: CompressionFormat = CompressionFormat.NONE
 ) {
     // Methods
+    fun isValid(): Either<List<String>, Unit> {
+        val messages = mutableListOf<String>()
+        if (cropPolygonX.size != cropPolygonY.size)
+            messages += "cropPolygonX must have the same number of values as cropPolygonY"
+        if (cropPolygonX.isNotEmpty() && cropPolygonX.size < 3)
+            messages += "cropPolygonX must be empty or have at least three values for representing a triangle"
+        if (cropPolygonY.isNotEmpty() && cropPolygonY.size < 3)
+            messages += "cropPolygonX must be empty or have at least three values for representing a triangle"
+
+        return if (messages.isEmpty())
+            Unit.right()
+        else
+            messages.left()
+    }
+
+    fun getCitygmlWriteVersion(): CitygmlVersion = if (convertToCitygml2) CitygmlVersion.V2_0 else CitygmlVersion.V3_0
 
     fun deriveOpendriveEvaluatorParameters() = OpendriveEvaluatorParameters(
         skipRoadShapeRemoval = skipRoadShapeRemoval,
@@ -58,10 +80,16 @@ data class OpendriveToCitygmlParameters(
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance
     )
 
-    fun deriveOpendriveShifterParameters() = OpendriveShifterParameters(
+    fun deriveOpendriveOffsetAdderParameters() = OpendriveOffsetAdderParameters(
         offsetX = offsetX,
         offsetY = offsetY,
         offsetZ = offsetZ,
+    )
+
+    fun deriveOpendriveCropperParameters() = OpendriveCropperParameters(
+        cropPolygonX = cropPolygonX,
+        cropPolygonY = cropPolygonY,
+        numberTolerance = tolerance,
     )
 
     fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
@@ -94,7 +122,7 @@ data class OpendriveToCitygmlParameters(
     )
 
     fun deriveCitygmlWriterParameters() = CitygmlWriterParameters(
-        versions = if (convertToCitygml2) setOf(CitygmlVersion.V2_0) else setOf(CitygmlVersion.V3_0),
+        versions = setOf(this.getCitygmlWriteVersion()),
         fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 }

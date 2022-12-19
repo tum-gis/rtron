@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.modifiers.opendrive.shifter
+package io.rtron.transformer.modifiers.opendrive.offset.resolver
 
 import arrow.core.some
 import io.rtron.model.opendrive.OpendriveModel
@@ -22,23 +22,34 @@ import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.model.opendrive.additions.optics.everyRoad
 import io.rtron.model.opendrive.additions.optics.everyRoadElevationProfileElement
 import io.rtron.model.opendrive.additions.optics.everyRoadPlanViewGeometry
+import io.rtron.model.opendrive.core.HeaderOffset
 import io.rtron.model.opendrive.road.elevation.RoadElevationProfile
 import io.rtron.model.opendrive.road.elevation.RoadElevationProfileElevation
 
-class OpendriveShifter(
-    val parameters: OpendriveShifterParameters
-) {
+/**
+ * Resolves the offset of the OpenDRIVE header by applying it to the plan view geometries and elevation.
+ * This resolution is implemented as a transformer, since most software tools are not supporting this feature yet.
+ */
+class OpendriveOffsetResolver {
 
-    fun modify(opendriveModel: OpendriveModel): Pair<OpendriveModel, OpendriveShifterReport> {
-        val report = OpendriveShifterReport(parameters)
+    fun modify(opendriveModel: OpendriveModel): Pair<OpendriveModel, OpendriveOffsetResolverReport> {
+        val report = OpendriveOffsetResolverReport(emptyList())
+
         var modifiedOpendriveModel = opendriveModel.copy()
         modifiedOpendriveModel.updateAdditionalIdentifiers()
+        if (modifiedOpendriveModel.header.offset.isEmpty()) {
+            report.messages += "No offset values in header available."
+            return modifiedOpendriveModel to report
+        }
+
+        val headerOffset: HeaderOffset = modifiedOpendriveModel.header.offset.orNull()!!
+        report.messages += "Offset of x=${headerOffset.x}, y=${headerOffset.y}, z=${headerOffset.z} resolved."
 
         // XY axes
         modifiedOpendriveModel = everyRoadPlanViewGeometry.modify(modifiedOpendriveModel) { currentPlanViewGeometry ->
             val modifiedPlanViewGeometry = currentPlanViewGeometry.copy()
-            modifiedPlanViewGeometry.x = modifiedPlanViewGeometry.x + parameters.offsetX
-            modifiedPlanViewGeometry.y = modifiedPlanViewGeometry.y + parameters.offsetY
+            modifiedPlanViewGeometry.x = modifiedPlanViewGeometry.x + headerOffset.x
+            modifiedPlanViewGeometry.y = modifiedPlanViewGeometry.y + headerOffset.y
 
             modifiedPlanViewGeometry
         }
@@ -46,7 +57,7 @@ class OpendriveShifter(
         // Z axis
         modifiedOpendriveModel = everyRoadElevationProfileElement.modify(modifiedOpendriveModel) { currentElevationProfileElement ->
             val modifiedElevationProfileElement = currentElevationProfileElement.copy()
-            modifiedElevationProfileElement.a = modifiedElevationProfileElement.a + parameters.offsetZ
+            modifiedElevationProfileElement.a = modifiedElevationProfileElement.a + headerOffset.z
             modifiedElevationProfileElement
         }
 
@@ -58,7 +69,7 @@ class OpendriveShifter(
 
             modifiedRoad.elevationProfile.tap {
                 if (it.elevation.isEmpty())
-                    it.elevation += RoadElevationProfileElevation(parameters.offsetZ, 0.0, 0.0, 0.0, 0.0)
+                    it.elevation += RoadElevationProfileElevation(headerOffset.z, 0.0, 0.0, 0.0, 0.0)
             }
 
             modifiedRoad

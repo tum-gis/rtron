@@ -17,6 +17,7 @@ dependencies {
 
     // object creation libraries
     implementation(Dependencies.kotlinxSerializationJson)
+    implementation(Dependencies.kaml)
 
     // logging libraries
     implementation(Dependencies.kotlinLogging)

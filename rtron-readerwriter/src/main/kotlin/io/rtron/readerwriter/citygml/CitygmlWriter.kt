@@ -38,15 +38,15 @@ class CitygmlWriter(
 
     // Methods
 
-    fun writeModel(model: CitygmlModel, directoryPath: Path): List<Path> {
-        return parameters.versions.map { write(model, it, directoryPath) }
+    fun writeModel(model: CitygmlModel, directoryPath: Path, fileNameWithoutExtension: String): List<Path> {
+        return parameters.versions.map { write(model, it, directoryPath, fileNameWithoutExtension) }
     }
 
-    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, versionSuffix: Boolean = true): Path {
+    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, fileNameWithoutExtension: String): Path {
         val citygmlVersion = version.toGmlCitygml()
         val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
-        val fileName = directoryPath.fileName.toString() + (if (versionSuffix) "_$version" else "") + ".gml" + parameters.fileCompression.fold({ "" }, { it.extensionWithDot })
+        val fileName = fileNameWithoutExtension + ".gml" + parameters.fileCompression.fold({ "" }, { it.extensionWithDot })
         val filePath = directoryPath / Path(fileName)
         val outputStream = filePath.outputStreamDirectOrCompressed()
 

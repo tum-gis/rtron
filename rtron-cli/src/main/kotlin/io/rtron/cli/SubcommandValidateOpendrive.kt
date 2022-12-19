@@ -61,7 +61,7 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
     private val skipCitygmlExport by option(help = "skip the export of the CityGML dataset for visual inspection purposes").flag()
 
     private val compressionFormat: CompressionFormat by option(help = "compress the output files with the respective compression format").enum<CompressionFormat>()
-        .default(CompressionFormat.GZ)
+        .default(CompressionFormat.NONE)
 
     // Methods
     override fun run() {

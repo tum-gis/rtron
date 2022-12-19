@@ -17,6 +17,7 @@
 package io.rtron.main.processor
 
 import arrow.core.getOrHandle
+import com.charleskorn.kaml.Yaml
 import io.rtron.io.messages.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
@@ -48,6 +49,9 @@ class ValidateOpendriveProcessor(
             withFilenameEndings = OpendriveReader.supportedFilenameEndings,
             outputDirectoryPath = outputPath
         ) {
+            // write the parameters as yaml file
+            val parametersText = Yaml.default.encodeToString(ValidateOpendriveParameters.serializer(), parameters)
+            (outputDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // read OpenDRIVE model
             val opendriveReader = OpendriveReader.of(inputFilePath)
@@ -100,7 +104,7 @@ class ValidateOpendriveProcessor(
             // write CityGML 2 model
             if (parameters.writeCitygml2File) {
                 val citygmlWriter = CitygmlWriter(parameters.deriveCitygml2WriterParameters())
-                citygmlWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath)
+                citygmlWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath, "citygml2_model")
             }
 
             // transform Roadspaces model to CityGML3 model
@@ -111,12 +115,13 @@ class ValidateOpendriveProcessor(
             // write CityGML3 model
             if (parameters.writeCitygml3File) {
                 val citygmlWriter = CitygmlWriter(parameters.deriveCitygml3WriterParameters())
-                citygmlWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath)
+                citygmlWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath, "citygml3_model")
             }
         }
     }
 
     companion object {
+        val PARAMETERS_PATH = Path("parameters.yaml")
         val REPORTS_PATH = Path("reports")
         val OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH = REPORTS_PATH / Path("01_opendrive_schema_validator_report.json")
         val OPENDRIVE_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("02_opendrive_evaluator_report.json")
