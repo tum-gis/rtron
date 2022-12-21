@@ -96,7 +96,7 @@ class OpendriveToCitygmlProcessor(
             // crop the OpenDRIVE model
             val opendriveCropper = OpendriveCropper(parameters.deriveOpendriveCropperParameters())
             val opendriveCroppedResult = opendriveCropper.modify(opendriveOffsetAddedResult.first)
-            opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH)
+            opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_CROP_REPORT_PATH)
             val opendriveCropped = opendriveCroppedResult.first.handleEmpty {
                 logger.warn("OpendriveCropper: ${opendriveCroppedResult.second.message}")
                 return@processAllFiles
@@ -105,7 +105,6 @@ class OpendriveToCitygmlProcessor(
             // write offset OpenDRIVE model
             val opendriveWriter = OpendriveWriter(parameters.deriveOpendriveWriterParameters())
             opendriveWriter.write(opendriveCropped, outputSubDirectoryPath)
-            opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_CROP_REPORT_PATH)
 
             // transform OpenDRIVE model to Roadspaces model
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
