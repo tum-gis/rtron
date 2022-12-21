@@ -22,6 +22,7 @@ import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
 import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.model.opendrive.additions.optics.everyRoad
 import io.rtron.model.opendrive.additions.optics.everyRoadObject
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.messages.opendrive.of
@@ -31,6 +32,19 @@ object RoadObjectsEvaluator {
     // Methods
     fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
+
+        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+
+            currentRoad.objects.tap { currentRoadObjects ->
+                val roadObjectsFiltered = currentRoadObjects.roadObject.filter { it.s <= currentRoad.length + parameters.numberTolerance }
+                if (currentRoadObjects.roadObject.size > roadObjectsFiltered.size) {
+                    messageList += DefaultMessage.of("RoadObjectPositionNotInSValueRange", "Road object (number of objects affected: ${currentRoadObjects.roadObject.size - roadObjectsFiltered.size}) were removed since they were positioned outside the defined length of the road.", currentRoad.additionalId, Severity.ERROR, wasFixed = true)
+                }
+                currentRoadObjects.roadObject = roadObjectsFiltered
+            }
+
+            currentRoad
+        }
 
         modifiedOpendriveModel = everyRoadObject.modify(modifiedOpendriveModel) { currentRoadObject ->
 
