@@ -22,7 +22,7 @@ import io.rtron.io.files.CompressedFileExtension
 
 data class CitygmlWriterParameters(
     val versions: Set<CitygmlVersion>,
-    val fileCompression: Option<CompressedFileExtension> = DEFAULT_FILE_COMPRESSION
+    val fileCompression: Option<CompressedFileExtension>
 ) {
     // Properties and Initializers
     init {

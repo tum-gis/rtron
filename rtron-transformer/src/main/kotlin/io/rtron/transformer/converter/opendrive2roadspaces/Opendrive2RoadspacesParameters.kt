@@ -23,21 +23,20 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class Opendrive2RoadspacesParameters(
+    /** enable concurrency during processing */
     val concurrentProcessing: Boolean,
-
     /** allowed tolerance when comparing double values */
-    val numberTolerance: Double = DEFAULT_NUMBER_TOLERANCE,
+    val numberTolerance: Double,
     /** distance tolerance between two geometry elements of the plan view */
-    val planViewGeometryDistanceTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
+    val planViewGeometryDistanceTolerance: Double,
     /** angle tolerance between two geometry elements of the plan view */
-    val planViewGeometryAngleTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
-
+    val planViewGeometryAngleTolerance: Double,
     /** prefix of attribute names */
-    val attributesPrefix: String = DEFAULT_ATTRIBUTES_PREFIX,
+    val attributesPrefix: String,
     /** [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications) */
-    val crsEpsg: Int = DEFAULT_CRS_EPSG,
+    val crsEpsg: Int,
     /** linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown) */
-    val extrapolateLateralRoadShapes: Boolean = DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
+    val extrapolateLateralRoadShapes: Boolean
 ) {
 
     companion object {

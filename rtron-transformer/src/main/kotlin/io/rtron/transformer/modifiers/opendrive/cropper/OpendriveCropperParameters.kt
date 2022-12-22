@@ -25,11 +25,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OpendriveCropperParameters(
+    /** allowed tolerance when comparing double values */
+    val numberTolerance: Double,
     /** x values of cropping polygon */
-    val cropPolygonX: List<Double> = DEFAULT_CROP_POLYGON_X,
+    val cropPolygonX: List<Double>,
     /** y values of cropping polygon */
-    val cropPolygonY: List<Double> = DEFAULT_CROP_POLYGON_Y,
-    val numberTolerance: Double = DEFAULT_NUMBER_TOLERANCE,
+    val cropPolygonY: List<Double>,
 ) {
 
     // Properties and Initializers

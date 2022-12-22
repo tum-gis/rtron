@@ -40,7 +40,12 @@ data class ValidateOpendriveParameters(
     // Methods
 
     fun deriveOpendriveEvaluatorParameters() = OpendriveEvaluatorParameters(
+        skipRoadShapeRemoval = OpendriveEvaluatorParameters.DEFAULT_SKIP_ROAD_SHAPE_REMOVAL,
         numberTolerance = tolerance,
+        planViewGeometryDistanceTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
+        planViewGeometryDistanceWarningTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
+        planViewGeometryAngleTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+        planViewGeometryAngleWarningTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
     )
 
     fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
@@ -49,10 +54,12 @@ data class ValidateOpendriveParameters(
 
     fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
         concurrentProcessing = false,
-
         numberTolerance = tolerance,
         planViewGeometryDistanceTolerance = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
         planViewGeometryAngleTolerance = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+        attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
+        crsEpsg = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
+        extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
     )
 
     fun deriveRoadspacesEvaluatorParameters() = RoadspacesEvaluatorParameters(
@@ -62,24 +69,34 @@ data class ValidateOpendriveParameters(
 
     fun deriveRoadspaces2Citygml2Parameters() = Roadspaces2CitygmlParameters(
         concurrentProcessing = false,
-
+        gmlIdPrefix = Roadspaces2CitygmlParameters.DEFAULT_GML_ID_PREFIX,
+        xlinkPrefix = Roadspaces2CitygmlParameters.DEFAULT_XLINK_PREFIX,
+        identifierAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
+        geometryAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
+        flattenGenericAttributeSets = Roadspaces2CitygmlParameters.DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
         discretizationStepSize = discretizationStepSize,
-
+        sweepDiscretizationStepSize = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
+        circleSlices = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
+        generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
         transformAdditionalRoadLines = true,
-
         generateLongitudinalFillerSurfaces = false,
         mappingBackwardsCompatibility = true,
     )
 
     fun deriveRoadspaces2Citygml3Parameters() = Roadspaces2CitygmlParameters(
         concurrentProcessing = false,
-
+        gmlIdPrefix = Roadspaces2CitygmlParameters.DEFAULT_GML_ID_PREFIX,
+        xlinkPrefix = Roadspaces2CitygmlParameters.DEFAULT_XLINK_PREFIX,
+        identifierAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
+        geometryAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
+        flattenGenericAttributeSets = Roadspaces2CitygmlParameters.DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
         discretizationStepSize = discretizationStepSize,
-
+        sweepDiscretizationStepSize = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
+        circleSlices = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
+        generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
         transformAdditionalRoadLines = true,
-
         generateLongitudinalFillerSurfaces = false,
-        mappingBackwardsCompatibility = false
+        mappingBackwardsCompatibility = false,
     )
 
     fun deriveCitygml2WriterParameters() = CitygmlWriterParameters(

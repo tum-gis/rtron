@@ -21,13 +21,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OpendriveOffsetAdderParameters(
     /** offset by which the model is translated along the x-axis */
-    val offsetX: Double = DEFAULT_OFFSET_X,
+    val offsetX: Double,
     /** offset by which the model is translated along the y-axis */
-    val offsetY: Double = DEFAULT_OFFSET_Y,
+    val offsetY: Double,
     /** offset by which the model is translated along the z-axis */
-    val offsetZ: Double = DEFAULT_OFFSET_Z,
+    val offsetZ: Double,
     /** offset by which the model is rotated */
-    val offsetHeading: Double = DEFAULT_OFFSET_HEADING
+    val offsetHeading: Double,
 ) {
     fun isZeroOffset() = offsetX == 0.0 && offsetY == 0.0 && offsetZ == 0.0 && offsetHeading == 0.0
 

@@ -24,18 +24,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OpendriveEvaluatorParameters(
     /** skip the removal of the road shape, if a lateral lane offset exists (not compliant to standard)  */
-    val skipRoadShapeRemoval: Boolean = DEFAULT_SKIP_ROAD_SHAPE_REMOVAL,
-
-    val numberTolerance: Double = DEFAULT_NUMBER_TOLERANCE,
-
+    val skipRoadShapeRemoval: Boolean,
+    /** allowed tolerance when comparing double values */
+    val numberTolerance: Double,
     /** distance tolerance between two geometry elements of the plan view */
-    val planViewGeometryDistanceTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
+    val planViewGeometryDistanceTolerance: Double,
     /** warning tolerance for distances between two geometry elements of the plan view */
-    val planViewGeometryDistanceWarningTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
+    val planViewGeometryDistanceWarningTolerance: Double,
     /** angle tolerance between two geometry elements of the plan view */
-    val planViewGeometryAngleTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+    val planViewGeometryAngleTolerance: Double,
     /** warning tolerance for angles between two geometry elements of the plan view */
-    val planViewGeometryAngleWarningTolerance: Double = DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
+    val planViewGeometryAngleWarningTolerance: Double,
 ) {
 
     init {

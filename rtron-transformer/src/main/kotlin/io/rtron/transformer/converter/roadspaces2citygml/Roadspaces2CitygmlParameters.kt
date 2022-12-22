@@ -23,32 +23,32 @@ import java.util.regex.Pattern
 
 @Serializable
 data class Roadspaces2CitygmlParameters(
+    /** enable concurrency during processing */
     val concurrentProcessing: Boolean,
-
     /** prefix for generated gml ids */
-    val gmlIdPrefix: String = DEFAULT_GML_ID_PREFIX,
+    val gmlIdPrefix: String,
     /** prefix for xlinks in XML document */
-    val xlinkPrefix: String = DEFAULT_XLINK_PREFIX,
+    val xlinkPrefix: String,
     /** prefix for identifier attribute names */
-    val identifierAttributesPrefix: String = DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
+    val identifierAttributesPrefix: String,
     /** prefix for geometry attribute names */
-    val geometryAttributesPrefix: String = DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
+    val geometryAttributesPrefix: String,
     /** true, if nested attribute lists shall be flattened out */
-    val flattenGenericAttributeSets: Boolean = DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
+    val flattenGenericAttributeSets: Boolean,
     /** distance between each discretization step for curves and surfaces */
-    val discretizationStepSize: Double = DEFAULT_DISCRETIZATION_STEP_SIZE,
+    val discretizationStepSize: Double,
     /** distance between each discretization step for solid geometries of [ParametricSweep3D] */
-    val sweepDiscretizationStepSize: Double = DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
+    val sweepDiscretizationStepSize: Double,
     /** number of discretization points for a circle or cylinder */
-    val circleSlices: Int = DEFAULT_CIRCLE_SLICES,
+    val circleSlices: Int,
     /** true, if random ids shall be generated for the gml geometries */
-    val generateRandomGeometryIds: Boolean = DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
+    val generateRandomGeometryIds: Boolean,
     /** if true, additional road lines, such as the reference line, lane boundaries, etc. are also transformed */
-    val transformAdditionalRoadLines: Boolean = DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES,
+    val transformAdditionalRoadLines: Boolean,
     /** if true, filler surfaces are generated to close gaps at lane transitions */
-    val generateLongitudinalFillerSurfaces: Boolean = DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
+    val generateLongitudinalFillerSurfaces: Boolean,
     /** if true, only classes are populated that are also available in CityGML2 */
-    val mappingBackwardsCompatibility: Boolean = DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY
+    val mappingBackwardsCompatibility: Boolean
 ) {
 
     init {
