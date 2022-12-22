@@ -34,6 +34,13 @@ object JunctionEvaluator {
 
         modifiedOpendriveModel = everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
 
+            // It is deprecated to omit the <laneLink> element.
+            val junctionConnectionsFiltered = currentJunction.connection.filter { it.laneLink.isNotEmpty() }
+            if (currentJunction.connection.size > junctionConnectionsFiltered.size) {
+                messageList += DefaultMessage.of("JunctionConnectionWithoutLaneLinks", "Junction connections (number of connections: ${currentJunction.connection.size - junctionConnectionsFiltered.size}) were removed since they did not contain any laneLinks.", currentJunction.additionalId, Severity.ERROR, wasFixed = true)
+            }
+            currentJunction.connection = junctionConnectionsFiltered
+
             // Junctions should not be used when only two roads meet.
             if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.getNumberOfIncomingRoads() <= 2) {
                 messageList += DefaultMessage.of("", "Junctions of type default should only be used when at least three roads are coming in (currently incoming road ids: ${currentJunction.getIncomingRoadIds()})", currentJunction.additionalId, Severity.WARNING, wasFixed = false)
