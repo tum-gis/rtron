@@ -39,6 +39,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Mu
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
+import org.citygml4j.core.model.core.AbstractThematicSurface
 import org.citygml4j.core.model.transportation.AbstractTransportationSpace
 import org.citygml4j.core.model.transportation.AuxiliaryTrafficArea
 import org.citygml4j.core.model.transportation.AuxiliaryTrafficSpace
@@ -209,7 +210,7 @@ class TransportationModuleBuilder(
 
     fun addMarkingFeature(id: LaneIdentifier, roadMarking: RoadMarking, geometry: AbstractGeometry3D, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
-        val markingFeature = Marking()
+        val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
 
         // geometry
         val geometryTransformer = GeometryTransformer(parameters).also { geometry.accept(it) }
@@ -221,14 +222,13 @@ class TransportationModuleBuilder(
         _attributesAdder.addAttributes(id, roadMarking, markingFeature)
 
         // populate transportation space
-        val markingProperty = MarkingProperty(markingFeature)
-        dstTransportationSpace.markings.add(markingProperty)
+        addMarkingFeature(markingFeature, dstTransportationSpace)
         return messageList
     }
 
     fun addMarkingFeature(roadspaceObject: RoadspaceObject, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
-        val markingFeature = Marking()
+        val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
 
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
@@ -240,8 +240,7 @@ class TransportationModuleBuilder(
         _attributesAdder.addAttributes(roadspaceObject, markingFeature)
 
         // populate transportation space
-        val markingProperty = MarkingProperty(markingFeature)
-        dstTransportationSpace.markings.add(markingProperty)
+        addMarkingFeature(markingFeature, dstTransportationSpace)
         return messageList
     }
 
@@ -289,5 +288,25 @@ class TransportationModuleBuilder(
             .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(auxiliaryTrafficAreaFeature, messageList)
+    }
+
+    /**
+     * Add the [markingFeature] to the [dstTransportationSpace] depending on its type.
+     */
+    private fun addMarkingFeature(markingFeature: AbstractThematicSurface, dstTransportationSpace: AbstractTransportationSpace) {
+
+        when (markingFeature) {
+            is Marking -> {
+                val markingProperty = MarkingProperty(markingFeature)
+                dstTransportationSpace.markings.add(markingProperty)
+            }
+            is AuxiliaryTrafficArea -> {
+                // for backwards compatibility
+                val auxiliaryTrafficSpace = AuxiliaryTrafficSpace()
+                auxiliaryTrafficSpace.addBoundary(AbstractSpaceBoundaryProperty(markingFeature))
+                dstTransportationSpace.auxiliaryTrafficSpaces.add(AuxiliaryTrafficSpaceProperty(auxiliaryTrafficSpace))
+            }
+            else -> { throw IllegalStateException("MarkingFeature is of unsuitable type for adding to the transportation space.") }
+        }
     }
 }
