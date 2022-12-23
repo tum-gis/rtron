@@ -37,7 +37,6 @@ import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
 import io.rtron.math.range.length
 import io.rtron.math.std.fuzzyEquals
-import io.rtron.model.opendrive.lane.ERoadMarkType
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLane
@@ -68,7 +67,7 @@ class LaneBuilder(
      *
      * @param id identifier of the lane
      * @param curvePositionDomain curve position domain (relative to the lane section) where the lane is defined
-     * @param lane lane object of the OpenDRIVE data model
+     * @param lrLane lane object of the OpenDRIVE data model
      * @param baseAttributes attributes attached to the transformed [Lane] object
      */
     fun buildLane(id: LaneIdentifier, curvePositionDomain: Range<Double>, lrLane: RoadLanesLaneSectionLRLane, baseAttributes: AttributeList): ContextMessageList<Lane> {
@@ -164,7 +163,6 @@ class LaneBuilder(
     /**
      * Builds a list of road markings ([roadMark]).
      *
-     * @param id identifier of the lane for which the road markings are built
      * @param curvePositionDomain curve position domain (relative to the lane section) where the road markings is defined
      * @param roadMark road marking entries of the OpenDRIVE data model
      */
@@ -191,10 +189,8 @@ class LaneBuilder(
         if (adjustedSrcRoadMark.isEmpty()) return ContextMessageList(emptyList(), messageList)
 
         val roadMarkingResults = adjustedSrcRoadMark.zipWithNext()
-            .filter { it.first.typeAttribute != ERoadMarkType.NONE }
             .map { buildRoadMarking(it.first, it.second.sOffset.some()) } +
-            if (adjustedSrcRoadMark.last().typeAttribute != ERoadMarkType.NONE)
-                listOf(buildRoadMarking(adjustedSrcRoadMark.last())) else emptyList()
+            listOf(buildRoadMarking(adjustedSrcRoadMark.last()))
 
         val (builderExceptions, roadMarkings) = roadMarkingResults.separateEither()
         messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
