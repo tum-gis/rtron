@@ -57,7 +57,7 @@ object DependencyVersions {
     const val poly2tri = "0.1.2"
 
     // geo libraries
-    const val proj4 = "1.2.2"
+    const val proj4 = "1.1.5"
     const val citygml4j = "3.0.0-SNAPSHOT"
 }
 
