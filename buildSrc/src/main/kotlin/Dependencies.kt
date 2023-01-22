@@ -19,21 +19,21 @@ object DependencyVersions {
     // standard libraries
     const val kotlin = "1.7.20"
     const val coroutines = "1.6.4"
-    const val arrow = "1.1.3"
+    const val arrow = "1.1.5"
 
     // testing libraries
-    const val junit = "5.9.1"
-    const val assertj = "3.23.1"
-    const val mockk = "1.13.2"
+    const val junit = "5.9.2"
+    const val assertj = "3.24.2"
+    const val mockk = "1.13.3"
 
     // logging libraries
-    const val kotlinLogging = "3.0.3"
-    const val slf4jSimple = "2.0.3"
+    const val kotlinLogging = "3.0.4"
+    const val slf4jSimple = "2.0.6"
 
     // object creation libraries
     const val kotlinxSerializationJson = "1.4.1"
-    const val kaml = "0.49.0"
-    const val jakartaActivationApi = "2.1.0"
+    const val kaml = "0.50.0"
+    const val jakartaActivationApi = "2.1.1"
     const val jakartaXmlBindApi = "4.0.0"
     const val jaxb = "4.0.1"
 
@@ -41,12 +41,12 @@ object DependencyVersions {
     const val mapstruct = "1.5.3.Final"
 
     // io libraries
-    const val clikt = "3.5.0"
+    const val clikt = "3.5.1"
     const val mordant = "1.2.1"
     const val commonsIO = "2.11.0"
     const val commonsCSV = "1.9.0"
     const val commonsLang = "3.12.0"
-    const val commonsCompress = "1.21"
+    const val commonsCompress = "1.22"
     const val zstdJni = "1.5.2-5"
     const val emojiJava = "5.1.1"
 
@@ -57,7 +57,7 @@ object DependencyVersions {
     const val poly2tri = "0.1.2"
 
     // geo libraries
-    const val proj4 = "1.1.5"
+    const val proj4 = "1.2.2"
     const val citygml4j = "3.0.0-SNAPSHOT"
 }
 
