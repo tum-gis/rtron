@@ -58,7 +58,7 @@ object DependencyVersions {
 
     // geo libraries
     const val proj4 = "1.1.5"
-    const val citygml4j = "3.0.0-SNAPSHOT"
+    const val citygml4j = "3.0.0-rc.5"
 }
 
 object Dependencies {

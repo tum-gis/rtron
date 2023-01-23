@@ -17,7 +17,7 @@
 package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 import io.rtron.math.range.shiftLowerEndpointTo
@@ -36,7 +36,7 @@ class SectionedUnivariateFunction(
 
     // Properties and Initializers
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
-    private val sectionStart = section.lowerEndpointResult().getOrHandle { throw it }
+    private val sectionStart = section.lowerEndpointResult().getOrElse { throw it }
 
     // Methods
     override fun valueUnbounded(x: Double): Either<Exception, Double> =

@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.curved.threed.surface
 
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
@@ -52,7 +52,7 @@ class CurveRelativeParametricSurface3D(
         val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
         val surfaceHeight = heightFunction
             .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
 
         return affine.transform(offset)

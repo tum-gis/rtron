@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -61,9 +61,9 @@ data class CurveOnParametricSurface3D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
 
         val lateralOffset = lateralOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         val heightOffset = heightOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
 
         val curveRelativePoint2D = curveRelativePoint.toCurveRelative2D(lateralOffset)
         return baseSurface.calculatePointGlobalCSUnbounded(curveRelativePoint2D, heightOffset)

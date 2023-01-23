@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.pure.PolynomialFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -60,15 +60,15 @@ class ParametricCubicCurve2D(
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
 
-        val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
-        val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
+        val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition).getOrElse { throw it }
         return Vector2D(x, y)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
 
-        val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition).getOrHandle { throw it }
-        val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition).getOrHandle { throw it }
+        val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
 
         return Rotation2D.of(Vector2D(x, y))
     }

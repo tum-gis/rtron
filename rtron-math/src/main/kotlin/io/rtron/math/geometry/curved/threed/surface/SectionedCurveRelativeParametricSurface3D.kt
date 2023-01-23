@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.curved.threed.surface
 
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
@@ -43,7 +43,7 @@ class SectionedCurveRelativeParametricSurface3D(
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
     override val tolerance: Double get() = completeCurveRelativeSurface.tolerance
-    private val sectionStart = section.lowerEndpointResult().getOrHandle { throw it }
+    private val sectionStart = section.lowerEndpointResult().getOrElse { throw it }
 
     init {
         require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }

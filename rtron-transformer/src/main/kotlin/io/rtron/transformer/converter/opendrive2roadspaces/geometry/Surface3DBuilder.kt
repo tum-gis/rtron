@@ -18,7 +18,7 @@ package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import arrow.core.separateEither
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
@@ -112,7 +112,7 @@ object Surface3DBuilder {
         Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> {
         require(outline.isLinearRingDefinedByRoadCorners()) { "Outline does not contain a linear ring represented by road corners." }
         require(outline.cornerRoad.all { it.height == 0.0 }) { "All cornerRoad elements must have a zero height." }
-        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
         val vertices = outline.cornerRoad
             .map { buildVertices(it, referenceLine) }
@@ -158,7 +158,7 @@ object Surface3DBuilder {
      * Builds a single linear ring from an OpenDRIVE road object defined by local corner outlines.
      */
     private fun buildLinearRingByLocalCorners(outline: RoadObjectsObjectOutlinesOutline, numberTolerance: Double): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> {
-        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
         val vertices = outline.cornerLocal
             .map { it.getBasePoint() }

@@ -20,7 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -170,7 +170,7 @@ class ConcatenatedFunction(
                 listOf(Double.MIN_VALUE) else emptyList()
             val prependedFunction = if (prependConstant) {
                 val prependValue = if (prependConstantValue.isFinite()) prependConstantValue else
-                    polynomialFunctions.first().value(0.0).getOrHandle { throw it }
+                    polynomialFunctions.first().value(0.0).getOrElse { throw it }
 
                 listOf(ConstantFunction(prependValue))
             } else emptyList()

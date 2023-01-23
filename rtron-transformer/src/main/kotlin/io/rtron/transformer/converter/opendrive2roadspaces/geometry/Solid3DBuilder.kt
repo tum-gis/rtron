@@ -21,7 +21,7 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import arrow.core.separateEither
 import arrow.core.some
 import io.rtron.io.messages.ContextMessageList
@@ -120,7 +120,7 @@ object Solid3DBuilder {
         Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> {
         require(outline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
         require(outline.cornerLocal.all { it.height == 0.0 || numberTolerance <= it.height }) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
-        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
         val verticalOutlineElements = outline.cornerRoad
             .map { buildVerticalOutlineElement(it, referenceLine, numberTolerance) }
@@ -183,7 +183,7 @@ object Solid3DBuilder {
         Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> = either.eager {
         require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
         require(outline.cornerLocal.all { it.height == 0.0 || numberTolerance <= it.height }) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
-        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
         val messageList = DefaultMessageList()
 

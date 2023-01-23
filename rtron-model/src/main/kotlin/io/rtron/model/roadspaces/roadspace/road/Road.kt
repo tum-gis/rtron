@@ -22,7 +22,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import arrow.core.left
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.SectionedUnivariateFunction
@@ -176,7 +176,7 @@ class Road(
     /** Returns the center line of the road. */
     fun getAllCenterLanes(): List<Triple<LaneIdentifier, AbstractCurve3D, AttributeList>> =
         laneSections.map { it.centerLane }.map { element ->
-            val line = getCurveOnLaneSectionSurface(element.id.laneSectionIdentifier, element.level).getOrHandle { throw it }
+            val line = getCurveOnLaneSectionSurface(element.id.laneSectionIdentifier, element.level).getOrElse { throw it }
             Triple(element.id, line, element.attributes)
         }
 
@@ -187,7 +187,7 @@ class Road(
      */
     fun getAllLeftLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
         getAllLeftRightLaneIdentifiers().map { id ->
-            val curve = getLeftLaneBoundary(id).getOrHandle { throw it }
+            val curve = getLeftLaneBoundary(id).getOrElse { throw it }
             Pair(id, curve)
         }
 
@@ -198,7 +198,7 @@ class Road(
      */
     fun getAllRightLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
         getAllLeftRightLaneIdentifiers().map { id ->
-            val curve = getRightLaneBoundary(id).getOrHandle { throw it }
+            val curve = getRightLaneBoundary(id).getOrElse { throw it }
             Pair(id, curve)
         }
 
@@ -211,7 +211,7 @@ class Road(
      */
     fun getAllCurvesOnLanes(factor: Double): List<Pair<LaneIdentifier, AbstractCurve3D>> =
         getAllLeftRightLaneIdentifiers().map { id ->
-            val curve = getCurveOnLane(id, factor).getOrHandle { throw it }
+            val curve = getCurveOnLane(id, factor).getOrElse { throw it }
             Pair(id, curve)
         }
 
@@ -235,7 +235,7 @@ class Road(
     fun getCurveOfCenterLane(laneSectionIdentifier: LaneSectionIdentifier): Either<Exception, AbstractCurve3D> = either.eager {
         val laneSection = getLaneSection(laneSectionIdentifier).bind()
 
-        val line = getCurveOnLaneSectionSurface(laneSectionIdentifier, laneSection.centerLane.level).getOrHandle { throw it }
+        val line = getCurveOnLaneSectionSurface(laneSectionIdentifier, laneSection.centerLane.level).getOrElse { throw it }
         line
     }
 
@@ -309,7 +309,7 @@ class Road(
     fun getLaneSurface(laneIdentifier: LaneIdentifier, step: Double): Either<Exception, AbstractSurface3D> = either.eager {
 
         val laneSection = getLaneSection(laneIdentifier.laneSectionIdentifier)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         if (laneSection.curvePositionDomain.length < geometricalTolerance)
             Either.Left(
                 IllegalStateException(
@@ -319,15 +319,15 @@ class Road(
             ).bind<AbstractSurface3D>()
 
         val leftBoundary = getLeftLaneBoundary(laneIdentifier)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .calculatePointListGlobalCS(step)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         val rightBoundary = getRightLaneBoundary(laneIdentifier)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .calculatePointListGlobalCS(step)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
 
         if (leftBoundary.zip(rightBoundary).all { it.first.fuzzyEquals(it.second, geometricalTolerance) })
             Either.Left(
@@ -398,7 +398,7 @@ class Road(
         List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> {
         require(laneIdentifier.isCenter()) { "Identifier of lane must represent a center lane." }
 
-        val centerLane = getLaneSection(laneIdentifier.laneSectionIdentifier).getOrHandle { throw it }.centerLane
+        val centerLane = getLaneSection(laneIdentifier.laneSectionIdentifier).getOrElse { throw it }.centerLane
 
         return centerLane.roadMarkings.map {
             Either.Right(it to getCenterRoadMarkingGeometry(centerLane, it, step))
@@ -418,23 +418,23 @@ class Road(
 
         if (roadMarking.width.value < geometricalTolerance)
             return getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level)
-                .getOrHandle { throw it }
+                .getOrElse { throw it }
 
         val leftOffsetFunction = roadMarking.width timesValue 0.5
         val leftRoadMarkingBoundary = getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, leftOffsetFunction)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .calculatePointListGlobalCS(step)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         val rightOffsetFunction = roadMarking.width timesValue -0.5
         val rightRoadMarkingBoundary = getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, rightOffsetFunction)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .calculatePointListGlobalCS(step)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
 
         return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkingBoundary, rightRoadMarkingBoundary, geometricalTolerance)
-            .getOrHandle { throw IllegalStateException(it.message) }
+            .getOrElse { throw IllegalStateException(it.message) }
             .let { CompositeSurface3D(it) }
     }
 
@@ -449,11 +449,11 @@ class Road(
         require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
         return getLane(laneIdentifier)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .roadMarkings
             .map { currentRoadMarking ->
                 val geometry: AbstractGeometry3D = getRoadMarkingGeometry(laneIdentifier, currentRoadMarking, step)
-                    .getOrHandle { return@map it.left() }
+                    .getOrElse { return@map it.left() }
                 Either.Right(currentRoadMarking to geometry)
             }
     }
@@ -481,19 +481,19 @@ class Road(
 
         val leftOffsetFunction = roadMarking.width timesValue 0.5
         val leftRoadMarkBoundary = getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .calculatePointListGlobalCS(step)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         val rightOffsetFunction = roadMarking.width timesValue -0.5
         val rightRoadMarkBoundary = getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .calculatePointListGlobalCS(step)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
 
         return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
-            .getOrHandle { return IllegalStateException(it.message).left() }
+            .getOrElse { return IllegalStateException(it.message).left() }
             .let { CompositeSurface3D(it) }
             .let { Either.Right(it) }
     }

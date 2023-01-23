@@ -20,7 +20,6 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.getOrElse
-import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -102,7 +101,7 @@ data class ParametricSweep3D(
     private val lowerLeftVertices by lazy {
         val vertices = lowerLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         NonEmptyList.fromListUnsafe(vertices)
     }
 
@@ -110,7 +109,7 @@ data class ParametricSweep3D(
     private val lowerRightVertices by lazy {
         val vertices = lowerRightCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         NonEmptyList.fromListUnsafe(vertices)
     }
 
@@ -118,7 +117,7 @@ data class ParametricSweep3D(
     private val upperLeftVertices by lazy {
         val vertices = upperLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         NonEmptyList.fromListUnsafe(vertices)
     }
 
@@ -126,7 +125,7 @@ data class ParametricSweep3D(
     private val upperRightVertices by lazy {
         val vertices = upperRightCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         NonEmptyList.fromListUnsafe(vertices)
     }
 

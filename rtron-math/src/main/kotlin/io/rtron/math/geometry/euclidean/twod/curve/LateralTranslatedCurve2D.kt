@@ -19,7 +19,7 @@ package io.rtron.math.geometry.euclidean.twod.curve
 import arrow.core.Either
 import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -67,7 +67,7 @@ data class LateralTranslatedCurve2D(
         val curveRotation = baseCurve.calculateRotationGlobalCSUnbounded(curveRelativePoint)
         val lateralTranslationSlope =
             lateralTranslationFunction.slopeInFuzzy(curveRelativePoint.curvePosition, tolerance)
-                .getOrHandle { throw it }
+                .getOrElse { throw it }
         val lateralTranslationRotation = Rotation2D(lateralTranslationSlope)
         return curveRotation + lateralTranslationRotation
     }

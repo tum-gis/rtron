@@ -20,7 +20,7 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.flatten
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import arrow.core.nonEmptyListOf
 import arrow.core.some
 import io.rtron.io.messages.ContextMessageList
@@ -93,7 +93,7 @@ class RoadspaceObjectBuilder(
             buildAttributes(roadObject.referenceLinePointRelativeRotation)
 
         val roadObjectsFromRepeat = roadObject.repeat.map { currentRoadObjectRepeat ->
-            val repeatIdentifier = currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+            val repeatIdentifier = currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
             val roadspaceObjectId = RoadspaceObjectIdentifier("${roadObject.id}_${repeatIdentifier.repeatIndex}", roadObject.name, id)
             val geometry = buildGeometries(roadObject, currentRoadObjectRepeat.some(), roadReferenceLine).handleMessageList { messageList += it }

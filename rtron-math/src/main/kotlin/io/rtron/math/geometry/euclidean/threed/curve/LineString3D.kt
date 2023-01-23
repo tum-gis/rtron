@@ -18,7 +18,7 @@ package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -58,7 +58,7 @@ class LineString3D(
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
         val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePointGlobalCSUnbounded(localPoint)

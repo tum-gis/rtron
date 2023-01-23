@@ -18,7 +18,7 @@ package io.rtron.readerwriter.opendrive
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import arrow.core.left
 import io.rtron.io.files.CompressedFileExtension
 import io.rtron.io.files.getFileSizeToDisplay
@@ -54,7 +54,7 @@ class OpendriveReader private constructor(
     // Methods
     fun runSchemaValidation(): SchemaValidationReport {
 
-        val messageList = versionSpecificUnmarshaller.validate(filePath).getOrHandle {
+        val messageList = versionSpecificUnmarshaller.validate(filePath).getOrElse {
             logger.warn("Schema validation was aborted due the following error: ${it.message}")
             return SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
         }
@@ -91,7 +91,7 @@ class OpendriveReader private constructor(
                 OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
 
             val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(filePath).bind()
-            val versionSpecificUnmarshaller = OpendriveUnmarshaller.of(opendriveVersion).getOrHandle { throw IllegalArgumentException(it.message) }
+            val versionSpecificUnmarshaller = OpendriveUnmarshaller.of(opendriveVersion).getOrElse { throw IllegalArgumentException(it.message) }
 
             OpendriveReader(filePath, opendriveVersion, versionSpecificUnmarshaller)
         }

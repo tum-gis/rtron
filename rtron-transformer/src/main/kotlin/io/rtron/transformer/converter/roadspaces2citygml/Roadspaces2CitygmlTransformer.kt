@@ -18,7 +18,7 @@ package io.rtron.transformer.converter.roadspaces2citygml
 
 import arrow.core.Option
 import arrow.core.flattenOption
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.io.logging.ProgressBar
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessageList
@@ -173,9 +173,9 @@ class Roadspaces2CitygmlTransformer(
 
         val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { parameters.gmlIdPrefix + it.id.hashedId }
         trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
-            val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrHandle { throw it.toIllegalArgumentException() }
-            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
-            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrHandle { throw it }
+            val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrElse { throw it.toIllegalArgumentException() }
+            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
 
             currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + parameters.gmlIdPrefix + it.hashedId) }
             currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + parameters.gmlIdPrefix + it.hashedId) }

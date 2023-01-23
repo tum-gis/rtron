@@ -18,7 +18,7 @@ package io.rtron.math.analysis.function.bivariate.pure
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -60,10 +60,10 @@ class ShapeFunction(
         if (xAdjusted in functions)
             return calculateZ(xAdjusted, y)
 
-        val keyBefore = getKeyBefore(x).getOrHandle { throw it }
-        val zBefore = calculateZ(keyBefore, y).getOrHandle { throw it }
-        val keyAfter = getKeyAfter(x).getOrHandle { throw it }
-        val zAfter = calculateZ(keyAfter, y).getOrHandle { throw it }
+        val keyBefore = getKeyBefore(x).getOrElse { throw it }
+        val zBefore = calculateZ(keyBefore, y).getOrElse { throw it }
+        val keyAfter = getKeyAfter(x).getOrElse { throw it }
+        val zAfter = calculateZ(keyAfter, y).getOrElse { throw it }
 
         val linear = LinearFunction.ofInclusivePoints(keyBefore, zBefore, keyAfter, zAfter)
         return linear.valueUnbounded(x)

@@ -20,7 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import arrow.core.nonEmptyListOf
 import arrow.core.right
 import arrow.core.some
@@ -175,7 +175,7 @@ class GeometryTransformer(
      * Returns the [FaceType] according to the [Polygon3D]'s orientation.
      */
     private fun Polygon3D.getType(): FaceType {
-        val angleToZ = getNormal().getOrHandle { throw it }.angle(Vector3D.Z_AXIS)
+        val angleToZ = getNormal().getOrElse { throw it }.angle(Vector3D.Z_AXIS)
 
         return when {
             angleToZ < QUARTER_PI -> FaceType.TOP

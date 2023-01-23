@@ -16,7 +16,7 @@
 
 package io.rtron.main.processor
 
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import com.charleskorn.kaml.Yaml
 import io.rtron.io.messages.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
@@ -55,13 +55,13 @@ class ValidateOpendriveProcessor(
 
             // read OpenDRIVE model
             val opendriveReader = OpendriveReader.of(inputFilePath)
-                .getOrHandle { logger.warn(it.message); return@processAllFiles }
+                .getOrElse { logger.warn(it.message); return@processAllFiles }
             val opendriveSchemaValidatorReport = opendriveReader.runSchemaValidation()
             opendriveSchemaValidatorReport.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted())
                 return@processAllFiles
             val opendriveModel = opendriveReader.readModel()
-                .getOrHandle { logger.warn(it.message); return@processAllFiles }
+                .getOrElse { logger.warn(it.message); return@processAllFiles }
 
             // evaluate OpenDRIVE model
             val opendriveEvaluator = OpendriveEvaluator(parameters.deriveOpendriveEvaluatorParameters())

@@ -20,7 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
 import arrow.core.separateEither
@@ -171,7 +171,7 @@ class LaneBuilder(
         roadMark: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMark>
     ): ContextMessageList<List<RoadMarking>> {
         require(curvePositionDomain.hasUpperBound()) { "curvePositionDomain must have an upper bound." }
-        val roadMarkId = roadMark.head.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+        val roadMarkId = roadMark.head.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
         val messageList = DefaultMessageList()
 
         val curvePositionDomainEnd = curvePositionDomain.upperEndpointOrNull()!!
@@ -205,7 +205,7 @@ class LaneBuilder(
      * @param domainEndpoint upper domain endpoint for the domain of the road mark
      */
     private fun buildRoadMarking(roadMark: RoadLanesLaneSectionLCRLaneRoadMark, domainEndpoint: Option<Double> = None): Either<Opendrive2RoadspacesTransformationException.ZeroLengthRoadMarking, RoadMarking> {
-        val roadMarkId = roadMark.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrHandle { throw it }
+        val roadMarkId = roadMark.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
         val domain = domainEndpoint.fold({ Range.atLeast(roadMark.sOffset) }, { Range.closed(roadMark.sOffset, it) })
 

@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -43,7 +43,7 @@ class SectionedCurve2D(
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
     override val tolerance: Double get() = completeCurve.tolerance
-    private val sectionStart = CurveRelativeVector1D(section.lowerEndpointResult().getOrHandle { throw it })
+    private val sectionStart = CurveRelativeVector1D(section.lowerEndpointResult().getOrElse { throw it })
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {

@@ -18,7 +18,7 @@ package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -63,7 +63,7 @@ data class Curve3D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
 
         val pointXY = curveXY.calculatePointGlobalCSUnbounded(curveRelativePoint)
-        val height = heightFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance).getOrHandle { throw it }
+        val height = heightFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance).getOrElse { throw it }
         return Vector3D(pointXY.x, pointXY.y, height)
     }
 
@@ -77,8 +77,8 @@ data class Curve3D(
         require(this.domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
 
         val poseXY = curveXY.calculatePoseGlobalCSUnbounded(curveRelativePoint)
-        val height = heightFunction.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
-        val torsion = torsionFunction.value(curveRelativePoint.curvePosition).getOrHandle { throw it }
+        val height = heightFunction.value(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val torsion = torsionFunction.value(curveRelativePoint.curvePosition).getOrElse { throw it }
 
         val point = Vector3D(poseXY.point.x, poseXY.point.y, height)
         val rotation = Rotation3D(poseXY.rotation.angle, 0.0, torsion)

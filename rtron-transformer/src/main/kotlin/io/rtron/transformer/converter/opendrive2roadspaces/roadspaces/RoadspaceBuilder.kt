@@ -19,7 +19,7 @@ package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
@@ -60,7 +60,7 @@ class RoadspaceBuilder(
     fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>> = either.eager {
         val messageList = DefaultMessageList()
 
-        val opendriveRoadId = road.additionalId.toEither { IllegalStateException("Additional road ID must be available.") }.getOrHandle { throw it }
+        val opendriveRoadId = road.additionalId.toEither { IllegalStateException("Additional road ID must be available.") }.getOrElse { throw it }
         val roadspaceId = RoadspaceIdentifier(road.id, modelId)
 
         // build up road reference line

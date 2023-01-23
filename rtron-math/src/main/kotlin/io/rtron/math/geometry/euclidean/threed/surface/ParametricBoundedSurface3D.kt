@@ -19,7 +19,7 @@ package io.rtron.math.geometry.euclidean.threed.surface
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
-import arrow.core.getOrHandle
+import arrow.core.getOrElse
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.toIllegalStateException
@@ -49,14 +49,14 @@ data class ParametricBoundedSurface3D(
     private val leftVertices by lazy {
         val vertices = leftBoundary.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         NonEmptyList.fromListUnsafe(vertices)
     }
 
     private val rightVertices by lazy {
         val vertices = rightBoundary.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
         NonEmptyList.fromListUnsafe(vertices)
     }
 

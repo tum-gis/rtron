@@ -19,7 +19,6 @@ package io.rtron.transformer.converter.roadspaces2citygml.transformer
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
-import arrow.core.getOrHandle
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -88,7 +87,7 @@ class RoadsTransformer(
         val messageList = DefaultMessageList()
 
         val roadspacesInJunction = roadspacesModel.getRoadspacesWithinJunction(junctionId)
-            .getOrHandle { throw it }
+            .getOrElse { throw it }
             .sortedBy { it.name.getOrElse { "" } } // TODO option
 
         if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && parameters.mappingBackwardsCompatibility) { // TODO option
@@ -111,7 +110,7 @@ class RoadsTransformer(
     private fun addSection(roadspaceId: RoadspaceIdentifier, roadspacesModel: RoadspacesModel, dstRoad: CitygmlRoad): DefaultMessageList {
         val messageList = DefaultMessageList()
 
-        val roadspace = roadspacesModel.getRoadspace(roadspaceId).getOrHandle { throw it }
+        val roadspace = roadspacesModel.getRoadspace(roadspaceId).getOrElse { throw it }
 
         if (parameters.mappingBackwardsCompatibility) {
             messageList += addRoadspace(roadspace, roadspacesModel, dstRoad)
@@ -161,7 +160,7 @@ class RoadsTransformer(
 
         roadspace.road.getAllLeftRightLaneIdentifiers().forEach { laneId ->
             val fillerSurface =
-                if (parameters.generateLongitudinalFillerSurfaces) roadspacesModel.getFillerSurfaces(laneId).getOrHandle { throw it }
+                if (parameters.generateLongitudinalFillerSurfaces) roadspacesModel.getFillerSurfaces(laneId).getOrElse { throw it }
                 else emptyList()
             messageList += addSingleLane(laneId, roadspace.road, fillerSurface, dstTransportationSpace)
         }
@@ -176,13 +175,13 @@ class RoadsTransformer(
     private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         val lane = road.getLane(id)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
+            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val surface = road.getLaneSurface(id, parameters.discretizationStepSize)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
+            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val centerLine = road.getCurveOnLane(id, 0.5)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
+            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val innerLateralFillerSurface = road.getInnerLateralFillerSurface(id, parameters.discretizationStepSize)
-            .getOrHandle { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }.toList()
+            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }.toList()
         val fillerSurfaces = innerLateralFillerSurface + longitudinalFillerSurfaces
 
         when (LaneRouter.route(lane)) {

@@ -19,7 +19,6 @@ package io.rtron.math.analysis.function.univariate.pure
 import arrow.core.Either
 import arrow.core.Option
 import arrow.core.getOrElse
-import arrow.core.getOrHandle
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.range.Range
 import kotlin.math.abs
@@ -109,10 +108,10 @@ data class LinearFunction(
             require(intercept.isDefined() || pointY.isDefined()) { "Either intercept or pointY must be finite." }
 
             val adjustedIntercept = intercept.getOrElse {
-                pointY.toEither { IllegalStateException("PointY must be set.") }.getOrHandle { throw it }
+                pointY.toEither { IllegalStateException("PointY must be set.") }.getOrElse { throw it }
             }
             val adjustedPointY = pointY.getOrElse {
-                intercept.toEither { IllegalStateException("Intercept must be set.") }.getOrHandle { throw it }
+                intercept.toEither { IllegalStateException("Intercept must be set.") }.getOrElse { throw it }
             }
             return ofInclusiveInterceptAndPoint(adjustedIntercept, pointX, adjustedPointY)
         }
