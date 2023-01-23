@@ -16,8 +16,12 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.continuations.either
+import arrow.core.nonEmptyListOf
+import arrow.core.toNonEmptyListOrNone
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
