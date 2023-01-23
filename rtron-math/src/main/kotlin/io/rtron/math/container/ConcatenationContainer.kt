@@ -105,7 +105,7 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param tolerance applied tolerance for the fuzzy selection
      */
     fun fuzzySelectMember(parameter: Double, tolerance: Double): Either<Exception, LocalRequest<T>> {
-        strictSelectMember(parameter).tap { return it.right() }
+        strictSelectMember(parameter).onRight { return it.right() }
 
         val selection = absoluteDomains
             .withIndex()

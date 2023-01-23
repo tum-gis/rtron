@@ -47,7 +47,7 @@ class CityFurnitureModuleBuilder(
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
         cityFurnitureFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
         geometryTransformer.rotation.tap {
             _attributesAdder.addRotationAttributes(it, cityFurnitureFeature)

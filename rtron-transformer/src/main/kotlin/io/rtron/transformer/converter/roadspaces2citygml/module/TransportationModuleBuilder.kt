@@ -215,7 +215,7 @@ class TransportationModuleBuilder(
         // geometry
         val geometryTransformer = GeometryTransformer(parameters).also { geometry.accept(it) }
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         // semantics
         identifierAdder.addIdentifier(id, "RoadMarking", markingFeature)
@@ -233,7 +233,7 @@ class TransportationModuleBuilder(
         // geometry
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, markingFeature)
@@ -268,7 +268,7 @@ class TransportationModuleBuilder(
 
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
         trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(trafficAreaFeature, messageList)
     }
@@ -285,7 +285,7 @@ class TransportationModuleBuilder(
 
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
         auxiliaryTrafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(auxiliaryTrafficAreaFeature, messageList)
     }

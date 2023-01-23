@@ -108,7 +108,7 @@ class BuildingModuleBuilder(
         val messageList = DefaultMessageList()
         val buildingFeature = Building()
         buildingFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.ONE)
-            .tapLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(buildingFeature, messageList)
     }

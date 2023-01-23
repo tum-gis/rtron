@@ -18,6 +18,7 @@ package io.rtron.transformer.converter.roadspaces2citygml.router
 
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
+import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter.CitygmlTargetFeatureType
 
 /**
  * Feature router of [RoadspaceObject] (RoadSpace model) to the [CitygmlTargetFeatureType] (CityGML model).

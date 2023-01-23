@@ -49,8 +49,8 @@ class HeaderBuilder(
     private fun buildCoordinateSystem(geoReference: HeaderGeoReference): ContextMessageList<Option<CoordinateReferenceSystem>> {
         val messageList = DefaultMessageList()
 
-        CoordinateReferenceSystem.of(parameters.crsEpsg).tap { return ContextMessageList(it.some(), messageList) }
-        CoordinateReferenceSystem.of(geoReference.content).tap { return ContextMessageList(it.some(), messageList) }
+        CoordinateReferenceSystem.of(parameters.crsEpsg).onRight { return ContextMessageList(it.some(), messageList) }
+        CoordinateReferenceSystem.of(geoReference.content).onRight { return ContextMessageList(it.some(), messageList) }
 
         val message = DefaultMessage("UnknownCoordinateReferenceSystem", "Coordinate reference system is not known.", "Header element", Severity.WARNING, wasFixed = false)
         return ContextMessageList(None, DefaultMessageList.of(message))

@@ -56,7 +56,7 @@ class OpendriveToCitygmlProcessor(
             val outputSubDirectoryPath = outputDirectoryPath / "citygml_${parameters.getCitygmlWriteVersion()}"
             outputSubDirectoryPath.createDirectories()
             // check if parameters are valid
-            parameters.isValid().tapLeft { messages ->
+            parameters.isValid().onLeft { messages ->
                 messages.forEach { logger.warn("Parameters are not valid: $it") }
                 return@processAllFiles
             }
