@@ -24,7 +24,7 @@ class RoadLanesLaneSectionLCRLaneRoadMarkTypeLine(
     var color: Option<ERoadMarkColor> = None,
     var length: Double = Double.NaN,
     var rule: Option<ERoadMarkRule> = None,
-    var SOffset: Double = Double.NaN,
+    var sOffset: Double = Double.NaN,
     var space: Double = Double.NaN,
     var tOffset: Double = Double.NaN,
     var width: Option<Double> = None,

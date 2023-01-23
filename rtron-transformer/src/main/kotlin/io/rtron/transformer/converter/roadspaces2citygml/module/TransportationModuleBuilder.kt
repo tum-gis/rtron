@@ -103,6 +103,9 @@ class TransportationModuleBuilder(
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
 
         identifierAdder.addIdentifier(lane.id, "Lane", trafficArea)
+        trafficArea.classifier = CodeAdder.mapToTrafficAreaClassCode(lane.type)
+        trafficArea.usages = CodeAdder.mapToTrafficAreaUsageCode(lane.type)
+        trafficArea.functions = CodeAdder.mapToTrafficAreaFunctionCode(lane.type)
         _attributesAdder.addAttributes(lane, trafficArea)
 
         // filler surfaces
@@ -148,6 +151,9 @@ class TransportationModuleBuilder(
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficArea))
 
         identifierAdder.addIdentifier(lane.id, "Lane", auxiliaryTrafficArea)
+        auxiliaryTrafficArea.classifier = CodeAdder.mapToTrafficAreaClassCode(lane.type)
+        auxiliaryTrafficArea.usages = CodeAdder.mapToTrafficAreaUsageCode(lane.type)
+        auxiliaryTrafficArea.functions = CodeAdder.mapToTrafficAreaFunctionCode(lane.type)
         _attributesAdder.addAttributes(lane, auxiliaryTrafficArea)
 
         // filler surfaces
@@ -180,6 +186,7 @@ class TransportationModuleBuilder(
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, trafficArea)
+        trafficArea.classifier = CodeAdder.mapToTrafficAreaClassCode(roadspaceObject.type, roadspaceObject.name)
         _attributesAdder.addAttributes(roadspaceObject, trafficArea)
 
         // populate transportation space
