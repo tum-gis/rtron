@@ -21,7 +21,7 @@ import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
 import io.rtron.io.files.CompressedFileExtension
-import io.rtron.io.files.getFileSizeToDisplay
+import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
@@ -31,10 +31,11 @@ import io.rtron.readerwriter.opendrive.version.OpendriveVersionUtils
 import io.rtron.std.BaseException
 import mu.KotlinLogging
 import java.nio.file.Path
+import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 
 class OpendriveReader private constructor(
-    val filePath: Path,
+    private val filePath: Path,
     private val opendriveVersion: OpendriveVersion,
     private val versionSpecificUnmarshaller: OpendriveUnmarshaller
 ) {
@@ -54,10 +55,13 @@ class OpendriveReader private constructor(
     // Methods
     fun runSchemaValidation(): SchemaValidationReport {
 
-        val messageList = versionSpecificUnmarshaller.validate(filePath).getOrElse {
-            logger.warn("Schema validation was aborted due the following error: ${it.message}")
-            return SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
-        }
+        val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
+        val messageList = versionSpecificUnmarshaller.validate(fileInputStream)
+            .apply { fileInputStream.close() }
+            .getOrElse {
+                logger.warn("Schema validation was aborted due the following error: ${it.message}")
+                return SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
+            }
         if (!messageList.isEmpty()) logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.size} incidents.")
         else logger.info("Schema validation report for OpenDRIVE $opendriveVersion: Everything ok.")
 
@@ -67,14 +71,19 @@ class OpendriveReader private constructor(
     fun readModel(): Either<OpendriveReaderException, OpendriveModel> = either.eager {
 
         // read model
-        val opendriveModel: OpendriveModel = versionSpecificUnmarshaller.readFromFile(filePath).fold({
-            logger.warn("No dedicated reader available for OpenDRIVE $opendriveVersion. Using reader for OpenDRIVE ${fallbackUnmarshaller.opendriveVersion} as fallback.")
-            val model = fallbackUnmarshaller.readFromFile(filePath).bind()
-            model
-        }, { it })
+        val fileInputStream = filePath.inputStream()
+        val opendriveModel: OpendriveModel = versionSpecificUnmarshaller.readFromFile(fileInputStream)
+            .apply { fileInputStream.close() }
+            .fold({
+                logger.warn("No dedicated reader available for OpenDRIVE $opendriveVersion. Using reader for OpenDRIVE ${fallbackUnmarshaller.opendriveVersion} as fallback.")
+                val fallbackFileInputStream = filePath.inputStream()
+                val model = fallbackUnmarshaller.readFromFile(fallbackFileInputStream).bind()
+                fallbackFileInputStream.close()
+                model
+            }, { it })
 
         opendriveModel.updateAdditionalIdentifiers()
-        logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+        // logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
         opendriveModel
     }
 
@@ -90,7 +99,9 @@ class OpendriveReader private constructor(
             if (!filePath.isRegularFile())
                 OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
 
-            val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(filePath).bind()
+            val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
+            val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(fileInputStream).bind()
+            fileInputStream.close()
             val versionSpecificUnmarshaller = OpendriveUnmarshaller.of(opendriveVersion).getOrElse { throw IllegalArgumentException(it.message) }
 
             OpendriveReader(filePath, opendriveVersion, versionSpecificUnmarshaller)
@@ -106,5 +117,7 @@ sealed class OpendriveReaderException(message: String) : BaseException(message) 
 
     data class NoDedicatedSchemaAvailable(val version: OpendriveVersion) : OpendriveReaderException("No dedicated schema available for $version")
     data class FatalSchemaValidationError(val reason: String) : OpendriveReaderException("Fatal error during schema validation: $reason")
+
+    data class NumberFormatException(val reason: String) : OpendriveReaderException("Invalid formatting of a number in the dataset: $reason")
     data class NoDedicatedReaderAvailable(val version: OpendriveVersion) : OpendriveReaderException("No dedicated reader available for $version")
 }

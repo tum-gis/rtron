@@ -20,7 +20,6 @@ import arrow.core.Either
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
-import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
 import io.rtron.io.messages.MessageList
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
@@ -31,7 +30,7 @@ import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Unmarshaller
 import org.mapstruct.factory.Mappers
-import java.nio.file.Path
+import java.io.InputStream
 import javax.xml.XMLConstants
 import javax.xml.validation.SchemaFactory
 
@@ -56,11 +55,13 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         _jaxbUnmarshaller.eventHandler = _validationEventHandler
     }
 
-    fun validate(filePath: Path): Either<OpendriveReaderException.FatalSchemaValidationError, MessageList<SchemaValidationReportMessage>> = either.eager {
+    fun validate(inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> = either.eager {
         try {
-            val inputStream = filePath.inputStreamFromDirectOrCompressedFile()
             _jaxbUnmarshaller.unmarshal(inputStream)
-            inputStream.close()
+        } catch (e: NumberFormatException) {
+            val invalidFormattedNumber = e.message.toString()
+            OpendriveReaderException.NumberFormatException(reason = invalidFormattedNumber).left()
+                .bind<OpendriveReaderException.NumberFormatException>()
         } catch (e: Exception) {
             OpendriveReaderException.FatalSchemaValidationError(reason = e.toString()).left()
                 .bind<OpendriveReaderException.FatalSchemaValidationError>()
@@ -70,11 +71,9 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         messageList
     }
 
-    fun readFromFile(filePath: Path): Either<OpendriveReaderException.NoDedicatedReaderAvailable, OpendriveModel> =
+    fun readFromFile(inputStream: InputStream): Either<OpendriveReaderException.NoDedicatedReaderAvailable, OpendriveModel> =
         either.eager {
-            val inputStream = filePath.inputStreamFromDirectOrCompressedFile()
             val opendriveVersionSpecificModel = _jaxbUnmarshaller.unmarshal(inputStream)
-            inputStream.close()
 
             val opendriveModel = when (opendriveVersion) {
                 OpendriveVersion.V_1_4 -> {
