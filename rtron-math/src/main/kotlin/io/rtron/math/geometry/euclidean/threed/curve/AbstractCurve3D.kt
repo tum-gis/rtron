@@ -21,6 +21,7 @@ import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
@@ -120,7 +121,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
         domain.arrange(step, includeEndPoint, tolerance)
             .map(::CurveRelativeVector1D)
             .map { calculatePointGlobalCS(it).bind() }
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
     }
 
     /**

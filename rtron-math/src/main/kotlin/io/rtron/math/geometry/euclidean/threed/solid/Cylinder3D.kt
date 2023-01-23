@@ -19,6 +19,7 @@ package io.rtron.math.geometry.euclidean.threed.solid
 import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.nonEmptyListOf
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -59,9 +60,9 @@ data class Cylinder3D(
 
         val circleVertices = circleVertices()
 
-        val basePolygonVertices = circleVertices.reversed().map { it.toVector3D(z = 0.0) }.let { NonEmptyList.fromListUnsafe(it) }
+        val basePolygonVertices = circleVertices.reversed().map { it.toVector3D(z = 0.0) }.let { it.toNonEmptyListOrNull()!! }
         val basePolygon = Polygon3D(basePolygonVertices, tolerance)
-        val topPolygonVertices = circleVertices.map { it.toVector3D(z = height) }.let { NonEmptyList.fromListUnsafe(it) }
+        val topPolygonVertices = circleVertices.map { it.toVector3D(z = height) }.let { it.toNonEmptyListOrNull()!! }
         val topPolygon = Polygon3D(topPolygonVertices, tolerance)
 
         val sidePolygons = circleVertices

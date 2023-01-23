@@ -25,6 +25,7 @@ import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.nonEmptyListOf
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -43,6 +44,7 @@ import io.rtron.std.handleLeftAndFilter
 import io.rtron.std.zipWithConsecutivesEnclosing
 import io.rtron.std.zipWithNextEnclosing
 import io.rtron.transformer.messages.opendrive.of
+import kotlin.collections.flatten
 
 /**
  * Factory for building [Polyhedron3D] for which multiple preparation steps are required to overcome
@@ -65,7 +67,7 @@ object Polyhedron3DFactory {
             .handleMessageList { messageList += it }
 
         // construct faces
-        val baseFace = LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }.let { NonEmptyList.fromListUnsafe(it) }, tolerance)
+        val baseFace = LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }.let { it.toNonEmptyListOrNull()!! }, tolerance)
         val topFace = LinearRing3D(preparedOutlineElements.flatMap { it.getHighestPointAdjacentToTheTop() }, tolerance)
         val sideFaces: List<LinearRing3D> = preparedOutlineElements
             .zipWithNextEnclosing()
@@ -76,7 +78,7 @@ object Polyhedron3DFactory {
             .map { currentFace -> Triangulator.triangulate(currentFace, tolerance) }
             .handleLeftAndFilter { GeometryBuilderException.TriangulationException(it.value.message, outlineId).left().bind() }
             .flatten()
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
 
         val polyhedron = Polyhedron3D(triangulatedFaces, tolerance)
         ContextMessageList(polyhedron, messageList)
@@ -134,7 +136,7 @@ object Polyhedron3DFactory {
         fun getHeadPointAdjacentToTheRight() = if (rightHeadPoint.isDefined()) rightHeadPoint else leftHeadPoint
 
         fun getHighestPointAdjacentToTheTop(): NonEmptyList<Vector3D> =
-            if (containsHeadPoint()) NonEmptyList.fromListUnsafe(leftHeadPoint.toList() + rightHeadPoint.toList())
+            if (containsHeadPoint()) (leftHeadPoint.toList() + rightHeadPoint.toList()).toNonEmptyListOrNull()!!
             else nonEmptyListOf(basePoint)
 
         companion object {
@@ -225,7 +227,7 @@ object Polyhedron3DFactory {
             return None
 
         val vertices = rightElement.getVerticesAsRightBoundary() + leftElement.getVerticesAsLeftBoundary().reversed()
-        val linearRing = LinearRing3D(NonEmptyList.fromListUnsafe(vertices), tolerance)
+        val linearRing = LinearRing3D(vertices.toNonEmptyListOrNull()!!, tolerance)
         return Some(linearRing)
     }
 
@@ -262,7 +264,7 @@ object Polyhedron3DFactory {
             .zipWithConsecutivesEnclosing { it.basePoint }
             .map { VerticalOutlineElement.of(it, tolerance) }
             .mergeMessageLists()
-            .map { NonEmptyList.fromListUnsafe(it) }
+            .map { it.toNonEmptyListOrNull()!! }
 
         elements
     }

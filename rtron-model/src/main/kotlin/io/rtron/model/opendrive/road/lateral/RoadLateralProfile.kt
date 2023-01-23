@@ -18,6 +18,7 @@ package io.rtron.model.opendrive.road.lateral
 
 import arrow.core.NonEmptyList
 import arrow.core.Option
+import arrow.core.toNonEmptyListOrNone
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLateralProfile(
@@ -26,8 +27,8 @@ data class RoadLateralProfile(
 ) : OpendriveElement() {
 
     // Methods
-    fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = NonEmptyList.fromList(superelevation)
-    fun getShapeEntries(): Option<NonEmptyList<RoadLateralProfileShape>> = NonEmptyList.fromList(shape)
+    fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = superelevation.toNonEmptyListOrNone()
+    fun getShapeEntries(): Option<NonEmptyList<RoadLateralProfileShape>> = shape.toNonEmptyListOrNone()
 
     fun containsSuperelevationProfile() = superelevation.isNotEmpty()
     fun containsShapeProfile() = shape.isNotEmpty()

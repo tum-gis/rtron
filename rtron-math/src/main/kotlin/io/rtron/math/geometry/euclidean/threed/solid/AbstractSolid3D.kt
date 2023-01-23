@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.threed.solid
 
 import arrow.core.NonEmptyList
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
@@ -37,7 +38,7 @@ abstract class AbstractSolid3D : AbstractGeometry3D(), Tolerable {
      */
     fun calculatePolygonsGlobalCS(): NonEmptyList<Polygon3D> =
         calculatePolygonsLocalCS().let { polygonList ->
-            affineSequence.solve().transform(polygonList).let { NonEmptyList.fromListUnsafe(it) }
+            affineSequence.solve().transform(polygonList).let { it.toNonEmptyListOrNull()!! }
         }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)

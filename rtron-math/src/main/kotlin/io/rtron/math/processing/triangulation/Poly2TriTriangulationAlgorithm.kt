@@ -21,6 +21,7 @@ import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.calculateNormal
@@ -71,7 +72,7 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
 
             val triangulatedVertices: NonEmptyList<Vector3D> = delaunayTriangle.points
                 .map { point -> Vector3D(point.x, point.y, point.z) }
-                .let { NonEmptyList.fromListUnsafe(it) }
+                .let { it.toNonEmptyListOrNull()!! }
 
             if (triangulatedVertices.isColinear(tolerance))
                 return TriangulatorException.ColinearVertices().left()
@@ -83,7 +84,7 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
 
     /**
      * As Poly2Tri ignores the rotation of the triangles, this function reintroduces the original orientation.
-     * Therefore it calculates the reference normal based on the [originalVertices] and then reorients the triangles
+     * Therefore, it calculates the reference normal based on the [originalVertices] and then reorients the triangles
      * accordingly, if necessary.
      *
      * @param originalVertices used for calculating the reference orientation

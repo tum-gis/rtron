@@ -17,9 +17,9 @@
 package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 
 import arrow.core.Either
-import arrow.core.NonEmptyList
 import arrow.core.getOrElse
 import arrow.core.separateEither
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -116,7 +116,7 @@ object Surface3DBuilder {
 
         val vertices = outline.cornerRoad
             .map { buildVertices(it, referenceLine) }
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
 
         return LinearRing3DFactory.buildFromVertices(outlineId, vertices, numberTolerance)
     }
@@ -162,7 +162,7 @@ object Surface3DBuilder {
 
         val vertices = outline.cornerLocal
             .map { it.getBasePoint() }
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
 
         return LinearRing3DFactory.buildFromVertices(outlineId, vertices, numberTolerance)
     }

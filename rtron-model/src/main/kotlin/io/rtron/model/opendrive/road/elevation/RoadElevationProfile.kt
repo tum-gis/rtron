@@ -17,6 +17,7 @@
 package io.rtron.model.opendrive.road.elevation
 
 import arrow.core.NonEmptyList
+import arrow.core.toNonEmptyListOrNull
 import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
 
@@ -26,7 +27,7 @@ data class RoadElevationProfile(
 ) : OpendriveElement() {
 
     val elevationAsNonEmptyList: NonEmptyList<RoadElevationProfileElevation>
-        get() = NonEmptyList.fromListUnsafe(elevation)
+        get() = elevation.toNonEmptyListOrNull()!!
 
     companion object
 }

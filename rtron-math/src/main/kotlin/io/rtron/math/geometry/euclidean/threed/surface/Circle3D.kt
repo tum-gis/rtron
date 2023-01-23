@@ -21,6 +21,7 @@ import arrow.core.NonEmptyList
 import arrow.core.Option
 import arrow.core.nonEmptyListOf
 import arrow.core.right
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -54,7 +55,7 @@ data class Circle3D(
         val polygon = (0 until numberSlices)
             .map { TWO_PI * it / numberSlices }
             .map { calculatePoint(it) }
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
             .let { Polygon3D(it, tolerance) }
 
         return nonEmptyListOf(polygon).right()

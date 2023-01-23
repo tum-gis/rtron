@@ -23,6 +23,7 @@ import arrow.core.flatten
 import arrow.core.getOrElse
 import arrow.core.nonEmptyListOf
 import arrow.core.some
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.mergeMessageLists
@@ -105,7 +106,7 @@ class RoadspaceObjectBuilder(
             val geometry = buildGeometries(roadObject, None, roadReferenceLine).handleMessageList { messageList += it }
             nonEmptyListOf(RoadspaceObject(roadspaceObjectId, type, geometry, attributes))
         } else {
-            NonEmptyList.fromListUnsafe(roadObjectsFromRepeat)
+            roadObjectsFromRepeat.toNonEmptyListOrNull()!!
         }
 
         // build roadspace object

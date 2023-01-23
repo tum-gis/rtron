@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -35,6 +36,7 @@ import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.Range
 import io.rtron.math.range.Tolerable
 import io.rtron.math.range.fuzzyEncloses
+import kotlin.collections.flatten
 
 /**
  * Represents a parametric sweep in 3D. This refers to a geometry solid, which is defined by a [referenceCurveXY].
@@ -102,7 +104,7 @@ data class ParametricSweep3D(
         val vertices = lowerLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
             .getOrElse { throw it }
-        NonEmptyList.fromListUnsafe(vertices)
+        vertices.toNonEmptyListOrNull()!!
     }
 
     /** lower right curve of the sweep as a list of points */
@@ -110,7 +112,7 @@ data class ParametricSweep3D(
         val vertices = lowerRightCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
             .getOrElse { throw it }
-        NonEmptyList.fromListUnsafe(vertices)
+        vertices.toNonEmptyListOrNull()!!
     }
 
     /** upper left curve of the sweep as a list of points */
@@ -118,7 +120,7 @@ data class ParametricSweep3D(
         val vertices = upperLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
             .getOrElse { throw it }
-        NonEmptyList.fromListUnsafe(vertices)
+        vertices.toNonEmptyListOrNull()!!
     }
 
     /** upper right curve of the sweep as a list of points */
@@ -126,7 +128,7 @@ data class ParametricSweep3D(
         val vertices = upperRightCurve.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
             .getOrElse { throw it }
-        NonEmptyList.fromListUnsafe(vertices)
+        vertices.toNonEmptyListOrNull()!!
     }
 
     init {
@@ -170,7 +172,7 @@ data class ParametricSweep3D(
         // combine all polygons
         val allPolygons = basePolygons + topPolygons + leftPolygons + rightPolygons +
             startPolygons + endPolygons
-        return NonEmptyList.fromListUnsafe(allPolygons)
+        return allPolygons.toNonEmptyListOrNull()!!
     }
 
     private fun createPolygons(leftVertices: NonEmptyList<Vector3D>, rightVertices: NonEmptyList<Vector3D>):

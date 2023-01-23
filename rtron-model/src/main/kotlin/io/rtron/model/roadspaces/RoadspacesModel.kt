@@ -17,7 +17,6 @@
 package io.rtron.model.roadspaces
 
 import arrow.core.Either
-import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
@@ -26,6 +25,7 @@ import arrow.core.flattenOption
 import arrow.core.getOrElse
 import arrow.core.right
 import arrow.core.some
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.toIllegalStateException
@@ -245,7 +245,7 @@ class RoadspacesModel(
             .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
 
         return if (fillerSurfaceVertices.size < 3 || fillerSurfaceVertices.isColinear(tolerance)) None
-        else LinearRing3D(NonEmptyList.fromListUnsafe(fillerSurfaceVertices), tolerance).some()
+        else LinearRing3D(fillerSurfaceVertices.toNonEmptyListOrNull()!!, tolerance).some()
     }
 
     /**

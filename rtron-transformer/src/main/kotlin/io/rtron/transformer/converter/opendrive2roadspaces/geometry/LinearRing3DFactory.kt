@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -68,7 +69,7 @@ object LinearRing3DFactory {
         if (preparedVertices.size <= 2)
             GeometryBuilderException.NotEnoughValidOutlineElementsForLinearRing(outlineId).left().bind<ContextMessageList<LinearRing3D>>()
 
-        val linearRing = LinearRing3D(NonEmptyList.fromListUnsafe(preparedVertices), tolerance)
+        val linearRing = LinearRing3D(preparedVertices.toNonEmptyListOrNull()!!, tolerance)
         ContextMessageList(linearRing, messageList)
     }
 }

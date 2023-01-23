@@ -17,6 +17,7 @@
 package io.rtron.model.opendrive.road.planview
 
 import arrow.core.NonEmptyList
+import arrow.core.toNonEmptyListOrNull
 import arrow.optics.optics
 import io.rtron.model.opendrive.core.OpendriveElement
 
@@ -26,7 +27,7 @@ data class RoadPlanView(
 ) : OpendriveElement() {
 
     val geometryAsNonEmptyList: NonEmptyList<RoadPlanViewGeometry>
-        get() = NonEmptyList.fromListUnsafe(geometry)
+        get() = geometry.toNonEmptyListOrNull()!!
 
     companion object
 }

@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
@@ -117,7 +118,7 @@ class RoadspaceBuilder(
 
         val lateralFunctions = lateralProfileShapeList
             .groupBy { it.s }
-            .mapValues { NonEmptyList.fromListUnsafe(it.value) }
+            .mapValues { it.value.toNonEmptyListOrNull()!! }
             .mapValues { FunctionBuilder.buildLateralShape(it.value) }
             .toSortedMap()
 

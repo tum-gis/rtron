@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.nonEmptyListOf
 import arrow.core.right
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.dimensionOfSpan
@@ -63,7 +64,7 @@ data class Polygon3D(
         this.vertices.calculateNormal().normalized().let { Either.Right(it) }
 
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
-    fun reversed() = Polygon3D(NonEmptyList.fromListUnsafe(vertices.reversed()), tolerance, affineSequence)
+    fun reversed() = Polygon3D(vertices.reversed().toNonEmptyListOrNull()!!, tolerance, affineSequence)
 
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = nonEmptyListOf(this).right()
 
@@ -83,12 +84,12 @@ data class Polygon3D(
         /**
          * Constructs a polygon based on the [vectors].
          */
-        fun of(vararg vectors: Vector3D, tolerance: Double) = Polygon3D(NonEmptyList.fromListUnsafe(vectors.toList()), tolerance)
+        fun of(vararg vectors: Vector3D, tolerance: Double) = Polygon3D(vectors.toList().toNonEmptyListOrNull()!!, tolerance)
 
         /**
          * Constructs a polygon based on a [Triple] of [vectors].
          */
         fun of(vectors: Triple<Vector3D, Vector3D, Vector3D>, tolerance: Double) =
-            Polygon3D(NonEmptyList.fromListUnsafe(vectors.toList()), tolerance)
+            Polygon3D(vectors.toList().toNonEmptyListOrNull()!!, tolerance)
     }
 }

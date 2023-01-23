@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.nonEmptyListOf
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 
 /**
@@ -45,6 +46,6 @@ class CompositeSurface3D(
     // Methods
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either.eager {
         val polygons: List<Polygon3D> = surfaceMembers.map { it.calculatePolygonsGlobalCS().bind() }.flatten()
-        polygons.let { NonEmptyList.fromListUnsafe(it) }
+        polygons.let { it.toNonEmptyListOrNull()!! }
     }
 }

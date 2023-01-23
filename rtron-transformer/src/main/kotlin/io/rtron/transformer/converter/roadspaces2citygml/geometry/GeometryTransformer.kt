@@ -24,6 +24,8 @@ import arrow.core.getOrElse
 import arrow.core.nonEmptyListOf
 import arrow.core.right
 import arrow.core.some
+import arrow.core.toNonEmptyListOrNone
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
@@ -110,7 +112,7 @@ class GeometryTransformer(
      */
     fun getMultiSurface(): Option<Either<GeometryException.BoundaryRepresentationGenerationError, MultiSurfaceProperty>> {
         val polygonsOfSurface = polygonsOfSurfaceResult.handleEmpty { return None }
-        return polygonsOfSurface.map { polygonsToMultiSurfaceProperty(NonEmptyList.fromListUnsafe(it)) }.some()
+        return polygonsOfSurface.map { polygonsToMultiSurfaceProperty(it.toNonEmptyListOrNull()!!) }.some()
     }
 
     /**
@@ -232,7 +234,7 @@ class GeometryTransformer(
 
         return polygonsOfSolid
             .filter { polygon -> faceSelection.any { it == polygon.getType() } }
-            .let { NonEmptyList.fromList(it) }
+            .toNonEmptyListOrNone()
     }
 
     override fun visit(vector3D: Vector3D) {

@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.toIllegalStateException
@@ -50,14 +51,14 @@ data class ParametricBoundedSurface3D(
         val vertices = leftBoundary.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
             .getOrElse { throw it }
-        NonEmptyList.fromListUnsafe(vertices)
+        vertices.toNonEmptyListOrNull()!!
     }
 
     private val rightVertices by lazy {
         val vertices = rightBoundary.calculatePointListGlobalCS(discretizationStepSize)
             .mapLeft { it.toIllegalStateException() }
             .getOrElse { throw it }
-        NonEmptyList.fromListUnsafe(vertices)
+        vertices.toNonEmptyListOrNull()!!
     }
 
     // Methods
@@ -69,7 +70,7 @@ data class ParametricBoundedSurface3D(
             .bind()
             .map { it.calculatePolygonsGlobalCS().bind() }
             .flatten()
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
     }
 
     companion object {

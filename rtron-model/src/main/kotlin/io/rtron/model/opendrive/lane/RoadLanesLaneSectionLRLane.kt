@@ -20,6 +20,7 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.getOrElse
+import arrow.core.toNonEmptyListOrNone
 import io.rtron.model.opendrive.additions.identifier.AdditionalLaneIdentifier
 import io.rtron.model.opendrive.additions.identifier.LaneIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
@@ -46,7 +47,7 @@ abstract class RoadLanesLaneSectionLRLane(
 ) : OpendriveElement(), AdditionalLaneIdentifier {
 
     // Properties
-    fun getLaneWidthEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneWidth>> = NonEmptyList.fromList(width)
-    fun getLaneHeightEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneHeight>> = NonEmptyList.fromList(height)
+    fun getLaneWidthEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneWidth>> = width.toNonEmptyListOrNone()
+    fun getLaneHeightEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneHeight>> = height.toNonEmptyListOrNone()
     fun getLevelWithDefault() = level.getOrElse { false }
 }

@@ -16,10 +16,8 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import arrow.core.Either
-import arrow.core.NonEmptyList
+import arrow.core.*
 import arrow.core.continuations.either
-import arrow.core.nonEmptyListOf
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -66,7 +64,7 @@ data class LinearRing3D(
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
         Triangulator.triangulate(this, tolerance)
             .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
-            .map { NonEmptyList.fromListUnsafe(it) }
+            .map { it.toNonEmptyListOrNull()!! }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 
@@ -77,7 +75,7 @@ data class LinearRing3D(
          * Creates a linear ring based on the provided [vertices].
          */
         fun of(vararg vertices: Vector3D, tolerance: Double) =
-            LinearRing3D(NonEmptyList.fromListUnsafe(vertices.toList()), tolerance)
+            LinearRing3D(vertices.toList().toNonEmptyListOrNull()!!, tolerance)
 
         /**
          * Creates multiple linear rings from two lists of vertices [leftVertices] and [rightVertices].
@@ -95,7 +93,7 @@ data class LinearRing3D(
 
             val linearRingVertices = vertexPairs.zipWithNext()
                 .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
-                .let { NonEmptyList.fromListUnsafe(it) }
+                .let { it.toNonEmptyListOrNull()!! }
 
             return linearRingVertices.map { LinearRing3D(it, tolerance) }
         }
@@ -123,11 +121,11 @@ data class LinearRing3D(
                 .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
                 .filter { it.distinct().count() >= 3 }
                 .filter { !it.isColinear(tolerance) }
-                .map { NonEmptyList.fromListUnsafe(it) }
+                .map { it.toNonEmptyListOrNull()!! }
                 .map { LinearRing3D(it, tolerance) }
                 .toList()
 
-            val nonEmptyLinearRingsList = NonEmptyList.fromList(linearRings)
+            val nonEmptyLinearRingsList = linearRings.toNonEmptyListOrNone()
                 .toEither { GeometryException.NotEnoughValidLinearRings("") }
                 .bind()
             nonEmptyLinearRingsList

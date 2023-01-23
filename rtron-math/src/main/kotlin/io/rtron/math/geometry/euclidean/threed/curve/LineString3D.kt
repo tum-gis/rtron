@@ -19,6 +19,7 @@ package io.rtron.math.geometry.euclidean.threed.curve
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.getOrElse
+import arrow.core.toNonEmptyListOrNone
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -69,7 +70,7 @@ class LineString3D(
         fun of(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryException, LineString3D> {
             val adjustedVertices = vertices
                 .filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
-                .let { NonEmptyList.fromList(it) }
+                .toNonEmptyListOrNone()
 
             return adjustedVertices
                 .toEither { GeometryException.NotEnoughVertices("Not enough vertices for constructing a line segment") }

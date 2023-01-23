@@ -17,13 +17,13 @@
 package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 
 import arrow.core.Either
-import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.separateEither
 import arrow.core.some
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -124,7 +124,7 @@ object Solid3DBuilder {
 
         val verticalOutlineElements = outline.cornerRoad
             .map { buildVerticalOutlineElement(it, referenceLine, numberTolerance) }
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
 
         return Polyhedron3DFactory.buildFromVerticalOutlineElements(outlineId, verticalOutlineElements, numberTolerance)
     }
@@ -190,7 +190,7 @@ object Solid3DBuilder {
         val verticalOutlineElements = outline.cornerLocal
             .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.getBasePoint(), it.getHeadPoint(), None, numberTolerance) }
             .handleMessageList { messageList += it.messageList }
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
 
         val polyhedronWithContextMessageList = Polyhedron3DFactory.buildFromVerticalOutlineElements(outlineId, verticalOutlineElements, numberTolerance).bind()
         polyhedronWithContextMessageList

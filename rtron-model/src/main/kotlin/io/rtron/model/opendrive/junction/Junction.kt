@@ -20,6 +20,7 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.getOrElse
+import arrow.core.toNonEmptyListOrNull
 import arrow.optics.optics
 import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionIdentifier
 import io.rtron.model.opendrive.additions.identifier.JunctionIdentifier
@@ -46,7 +47,7 @@ data class Junction(
 
     // Properties and Initializers
     val connectionAsNonEmptyList: NonEmptyList<JunctionConnection>
-        get() = NonEmptyList.fromListUnsafe(connection)
+        get() = connection.toNonEmptyListOrNull()!!
 
     val typeValidated: EJunctionType
         get() = type.getOrElse { EJunctionType.DEFAULT }

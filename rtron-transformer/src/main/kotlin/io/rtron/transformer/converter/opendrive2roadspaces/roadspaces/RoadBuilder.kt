@@ -17,6 +17,7 @@
 package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
 import arrow.core.NonEmptyList
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -82,7 +83,7 @@ class RoadBuilder(
                     baseAttributes
                 ).handleMessageList { messageList += it }
             }
-            .let { NonEmptyList.fromListUnsafe(it) }
+            .let { it.toNonEmptyListOrNull()!! }
 
         val roadLinkage = buildRoadLinkage(id, road)
 

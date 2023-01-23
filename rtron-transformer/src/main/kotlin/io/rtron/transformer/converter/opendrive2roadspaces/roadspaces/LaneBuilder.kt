@@ -25,6 +25,7 @@ import arrow.core.left
 import arrow.core.right
 import arrow.core.separateEither
 import arrow.core.some
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -82,7 +83,7 @@ class LaneBuilder(
         // build road markings
         val roadMarkings: List<RoadMarking> =
             if (lrLane.roadMark.isEmpty()) emptyList()
-            else buildRoadMarkings(curvePositionDomain, NonEmptyList.fromListUnsafe(lrLane.roadMark)).handleMessageList { messageList += it }
+            else buildRoadMarkings(curvePositionDomain, lrLane.roadMark.toNonEmptyListOrNull()!!).handleMessageList { messageList += it }
 
         // lane topology
         val predecessors = lrLane.link.fold({ emptyList() }, { link -> link.predecessor.map { it.id } })
@@ -121,7 +122,7 @@ class LaneBuilder(
 
         val roadMarkings =
             if (centerLane.roadMark.isEmpty()) emptyList()
-            else buildRoadMarkings(curvePositionDomain, NonEmptyList.fromListUnsafe(centerLane.roadMark))
+            else buildRoadMarkings(curvePositionDomain, centerLane.roadMark.toNonEmptyListOrNull()!!)
                 .handleMessageList { messageList += it }
 
         val type = centerLane.type.toLaneType()

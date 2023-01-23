@@ -17,6 +17,7 @@
 package io.rtron.model.opendrive
 
 import arrow.core.NonEmptyList
+import arrow.core.toNonEmptyListOrNull
 import arrow.optics.optics
 import io.rtron.model.AbstractModel
 import io.rtron.model.opendrive.core.Header
@@ -38,7 +39,7 @@ data class OpendriveModel(
 
     // Properties and Initializers
     val roadAsNonEmptyList: NonEmptyList<Road>
-        get() = NonEmptyList.fromListUnsafe(road)
+        get() = road.toNonEmptyListOrNull()!!
 
     companion object
 }

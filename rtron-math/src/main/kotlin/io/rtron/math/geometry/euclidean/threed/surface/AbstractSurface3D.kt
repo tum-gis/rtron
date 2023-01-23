@@ -18,6 +18,7 @@ package io.rtron.math.geometry.euclidean.threed.surface
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
@@ -38,7 +39,7 @@ abstract class AbstractSurface3D : AbstractGeometry3D(), Tolerable {
      */
     fun calculatePolygonsGlobalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = calculatePolygonsLocalCS()
         .map { affineSequence.solve().transform(it) }
-        .map { NonEmptyList.fromListUnsafe(it) }
+        .map { it.toNonEmptyListOrNull()!! }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 }

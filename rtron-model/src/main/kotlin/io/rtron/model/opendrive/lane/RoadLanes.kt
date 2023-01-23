@@ -18,6 +18,8 @@ package io.rtron.model.opendrive.lane
 
 import arrow.core.NonEmptyList
 import arrow.core.Option
+import arrow.core.toNonEmptyListOrNone
+import arrow.core.toNonEmptyListOrNull
 import arrow.optics.optics
 import io.rtron.math.range.Range
 import io.rtron.math.range.length
@@ -31,10 +33,10 @@ data class RoadLanes(
 
     // Validation Properties
     val laneSectionAsNonEmptyList: NonEmptyList<RoadLanesLaneSection>
-        get() = NonEmptyList.fromListUnsafe(laneSection)
+        get() = laneSection.toNonEmptyListOrNull()!!
 
     // Methods
-    fun getLaneOffsetEntries(): Option<NonEmptyList<RoadLanesLaneOffset>> = NonEmptyList.fromList(laneOffset)
+    fun getLaneOffsetEntries(): Option<NonEmptyList<RoadLanesLaneOffset>> = laneOffset.toNonEmptyListOrNone()
 
     fun containsLaneOffset() = laneOffset.isNotEmpty()
 
@@ -47,14 +49,14 @@ data class RoadLanes(
         val laneSectionRanges = laneSectionAsNonEmptyList.zipWithNext().map { Range.closed(it.first.s, it.second.s) }
         val lastLaneSectionRange = Range.closed(laneSectionAsNonEmptyList.last().s, lastLaneSectionEnd)
 
-        return NonEmptyList.fromListUnsafe(laneSectionRanges + lastLaneSectionRange)
+        return (laneSectionRanges + lastLaneSectionRange).toNonEmptyListOrNull()!!
     }
 
     fun getLaneSectionLengths(lastLaneSectionEnd: Double): NonEmptyList<Double> =
         getLaneSectionRanges(lastLaneSectionEnd).map { it.length }
 
     fun getLaneSectionsWithRanges(lastLaneSectionEnd: Double): NonEmptyList<Pair<Range<Double>, RoadLanesLaneSection>> =
-        NonEmptyList.fromListUnsafe(getLaneSectionRanges(lastLaneSectionEnd).zip(laneSection))
+        getLaneSectionRanges(lastLaneSectionEnd).zip(laneSection).toNonEmptyListOrNull()!!
 
     companion object
 }
