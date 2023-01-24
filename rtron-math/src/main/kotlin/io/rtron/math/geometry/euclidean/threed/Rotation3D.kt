@@ -28,7 +28,7 @@ import org.apache.commons.math3.geometry.euclidean.threed.RotationOrder
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation as CMRotation
 
 /**
- * Rotation in the three dimensional space given as Tait-Bryan angles.
+ * Rotation in the three-dimensional space given as Tait-Bryan angles.
  * See the wikipedia article on [Tait–Bryan angles](https://en.wikipedia.org/wiki/Euler_angles#Tait%E2%80%93Bryan_angles).
  * Further, see the wikipedia article on [aircraft principal axes](https://en.wikipedia.org/wiki/Aircraft_principal_axes).
  *

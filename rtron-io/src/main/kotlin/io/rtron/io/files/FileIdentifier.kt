@@ -16,13 +16,15 @@
 
 package io.rtron.io.files
 
+import arrow.core.Option
+import arrow.core.some
 import java.io.File
 import java.nio.file.Path
 
 interface FileIdentifierInterface {
-    val fileName: String
-    val fileExtension: String
-    val filePath: Path
+    val fileName: Option<String>
+    val fileExtension: Option<String>
+    val filePath: Option<Path>
     val fileHashSha256: String
 }
 
@@ -35,14 +37,14 @@ interface FileIdentifierInterface {
  * @param fileHashSha256 hash of the file
  */
 data class FileIdentifier(
-    override val fileName: String,
-    override val fileExtension: String,
-    override val filePath: Path,
+    override val fileName: Option<String>,
+    override val fileExtension: Option<String>,
+    override val filePath: Option<Path>,
     override val fileHashSha256: String
 ) : FileIdentifierInterface {
 
     companion object {
         fun of(path: Path): FileIdentifier = of(path.toFile())
-        fun of(file: File) = FileIdentifier(file.nameWithoutExtension, file.extension, file.toPath(), file.getHashSha256())
+        fun of(file: File) = FileIdentifier(file.nameWithoutExtension.some(), file.extension.some(), file.toPath().some(), file.getHashSha256())
     }
 }
