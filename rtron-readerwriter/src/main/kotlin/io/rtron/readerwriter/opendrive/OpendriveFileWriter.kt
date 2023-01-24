@@ -25,7 +25,7 @@ import io.rtron.std.BaseException
 import mu.KotlinLogging
 import java.nio.file.Path
 
-class OpendriveWriter(
+class OpendriveFileWriter(
     val parameters: OpendriveWriterParameters
 ) {
     // Properties and Initializers

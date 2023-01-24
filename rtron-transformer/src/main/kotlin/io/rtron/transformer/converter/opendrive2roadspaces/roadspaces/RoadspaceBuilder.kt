@@ -46,8 +46,8 @@ class RoadspaceBuilder(
     private val parameters: Opendrive2RoadspacesParameters
 ) {
     // Properties and Initializers
-    private val _roadBuilder = RoadBuilder(parameters)
-    private val _roadObjectBuilder = RoadspaceObjectBuilder(parameters)
+    private val roadBuilder = RoadBuilder(parameters)
+    private val roadObjectBuilder = RoadspaceObjectBuilder(parameters)
 
     // Methods
 
@@ -88,17 +88,17 @@ class RoadspaceBuilder(
         val roadSurfaceWithoutTorsion = CurveRelativeParametricSurface3D(roadReferenceLine, lateralProfileRoadShape)
 
         // build up the road containing only lane sections, lanes (no road side objects)
-        val roadspaceRoad = _roadBuilder
+        val roadspaceRoad = roadBuilder
             .buildRoad(roadspaceId, road, roadSurface, roadSurfaceWithoutTorsion, attributes)
             .handleMessageList { messageList += it }
 
         // build up the road space objects (OpenDRIVE: road objects & signals)
         val roadspaceObjectsFromRoadObjects = road.objects.fold({ emptyList() }, { roadObjects ->
-            _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, attributes)
+            roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, attributes)
                 .handleMessageList { messageList += it }
         })
         val roadspaceObjectsFromRoadSignals = road.signals.fold({ emptyList() }, { roadSignals ->
-            _roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, attributes)
+            roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, attributes)
         })
 
         // combine the models into a road space object

@@ -53,7 +53,7 @@ class Rotation3D(
     val pitch = normalizeAngle(pitch)
     val roll = normalizeAngle(roll)
 
-    private val _rotation3D by lazy {
+    private val rotation3D by lazy {
         CMRotation(ROTATION_ORDER, ROTATION_CONVENTION, heading, pitch, roll)
     }
 
@@ -66,7 +66,7 @@ class Rotation3D(
     operator fun minus(v: Rotation3D) = Rotation3D(heading - v.heading, pitch - v.pitch, roll - v.roll)
 
     // Methods
-    fun getMatrix() = RealMatrix(_rotation3D.matrix)
+    fun getMatrix() = RealMatrix(rotation3D.matrix)
 
     // Conversions
 

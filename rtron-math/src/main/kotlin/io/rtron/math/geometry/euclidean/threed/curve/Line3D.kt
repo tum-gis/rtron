@@ -43,13 +43,13 @@ class Line3D(
     }
 
     /** adapted line class of Apache Commons Math */
-    private val _line3D by lazy { CMLine3D(point1.toVector3DCm(), point2.toVector3DCm(), tolerance) }
+    private val line3D by lazy { CMLine3D(point1.toVector3DCm(), point2.toVector3DCm(), tolerance) }
 
     /** line point closest to the origin */
-    val origin by lazy { _line3D.origin.toVector3D() }
+    val origin by lazy { line3D.origin.toVector3D() }
 
     /** normalized direction vector */
-    val direction by lazy { _line3D.direction.toVector3D() }
+    val direction by lazy { line3D.direction.toVector3D() }
 
     // Methods
 
@@ -59,8 +59,8 @@ class Line3D(
      * @param point point for which the distance shall be calculated
      * @return distance between this and the [point]
      */
-    fun distance(point: Vector3D): Double = _line3D.distance(point.toVector3DCm())
+    fun distance(point: Vector3D): Double = line3D.distance(point.toVector3DCm())
 
     // Conversions
-    fun toLine3DCM() = _line3D
+    fun toLine3DCM() = line3D
 }

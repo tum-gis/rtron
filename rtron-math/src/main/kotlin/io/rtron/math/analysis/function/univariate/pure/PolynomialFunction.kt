@@ -42,20 +42,20 @@ data class PolynomialFunction(
     }
 
     /** adapted polynomial of Apache Commons Math */
-    private val _polynomialFunction by lazy { CMPolynomialFunction(coefficients) }
+    private val polynomialFunction by lazy { CMPolynomialFunction(coefficients) }
 
     /** degree of the polynomial function */
-    val degree by lazy { _polynomialFunction.degree() }
+    val degree by lazy { polynomialFunction.degree() }
 
     /** derivative of this polynomial function */
-    private val polynomialDerivative by lazy { _polynomialFunction.polynomialDerivative().toPolynomialFunction() }
+    private val polynomialDerivative by lazy { polynomialFunction.polynomialDerivative().toPolynomialFunction() }
 
     // Secondary Constructors
     constructor(coefficients: List<Double>) : this(coefficients.toDoubleArray())
 
     // Methods
     override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> =
-        Either.Right(_polynomialFunction.value(x))
+        Either.Right(polynomialFunction.value(x))
 
     override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> =
         polynomialDerivative.valueUnbounded(x)
@@ -65,7 +65,7 @@ data class PolynomialFunction(
      */
     fun valueOrNull(x: Double): Double? =
         when (x) {
-            in domain -> _polynomialFunction.value(x)
+            in domain -> polynomialFunction.value(x)
             else -> null
         }
 
@@ -86,7 +86,7 @@ data class PolynomialFunction(
 
     // Conversions
     override fun toString(): String {
-        return "PolynomialFunction(polynomialFunction=$_polynomialFunction)"
+        return "PolynomialFunction(polynomialFunction=$polynomialFunction)"
     }
 
     companion object {

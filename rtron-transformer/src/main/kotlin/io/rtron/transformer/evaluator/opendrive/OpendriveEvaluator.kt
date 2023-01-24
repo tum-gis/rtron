@@ -34,9 +34,9 @@ class OpendriveEvaluator(
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    private val _basicDataTypeEvaluator = BasicDataTypeEvaluator(parameters)
-    private val _modelingRulesEvaluator = ModelingRulesEvaluator(parameters)
-    private val _conversionRequirementsEvaluator = ConversionRequirementsEvaluator(parameters)
+    private val basicDataTypeEvaluator = BasicDataTypeEvaluator(parameters)
+    private val modelingRulesEvaluator = ModelingRulesEvaluator(parameters)
+    private val conversionRequirementsEvaluator = ConversionRequirementsEvaluator(parameters)
 
     // Methods
 
@@ -49,7 +49,7 @@ class OpendriveEvaluator(
         val report = OpendriveEvaluationReport(parameters)
 
         // basic data type evaluation
-        _basicDataTypeEvaluator.evaluate(modifiedOpendriveModel).let {
+        basicDataTypeEvaluator.evaluate(modifiedOpendriveModel).let {
             report.basicDataTypePlan = it.messageList
             modifiedOpendriveModel = it.value
         }
@@ -57,7 +57,7 @@ class OpendriveEvaluator(
             return None to report
 
         // modeling rules evaluation
-        _modelingRulesEvaluator.evaluate(modifiedOpendriveModel).let {
+        modelingRulesEvaluator.evaluate(modifiedOpendriveModel).let {
             report.modelingRulesPlan = it.messageList
             modifiedOpendriveModel = it.value
         }
@@ -65,7 +65,7 @@ class OpendriveEvaluator(
             return None to report
 
         // conversion requirements evaluation
-        _conversionRequirementsEvaluator.evaluate(modifiedOpendriveModel).let {
+        conversionRequirementsEvaluator.evaluate(modifiedOpendriveModel).let {
             report.conversionRequirementsPlan = it.messageList
             modifiedOpendriveModel = it.value
         }

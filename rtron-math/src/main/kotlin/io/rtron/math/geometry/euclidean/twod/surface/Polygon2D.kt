@@ -38,7 +38,7 @@ data class Polygon2D(
         require(vertices.noneWithNextEnclosing { a, b -> a.fuzzyEquals(b, tolerance) }) { "Consecutively following point duplicates found." }
     }
 
-    private val _awtPath by lazy {
+    private val awtPath by lazy {
         val path: Path2D = Path2D.Double()
         path.moveTo(vertices.first().x, vertices.first().y)
         vertices.tail.forEach {
@@ -50,6 +50,6 @@ data class Polygon2D(
 
     // Methods
     override fun contains(point: Vector2D): Boolean {
-        return _awtPath.contains(point.x, point.y)
+        return awtPath.contains(point.x, point.y)
     }
 }

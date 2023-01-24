@@ -21,6 +21,7 @@ import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
 import io.rtron.io.files.CompressedFileExtension
+import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
@@ -34,7 +35,7 @@ import java.nio.file.Path
 import kotlin.io.path.inputStream
 import kotlin.io.path.isRegularFile
 
-class OpendriveReader private constructor(
+class OpendriveFileReader private constructor(
     private val filePath: Path,
     private val opendriveVersion: OpendriveVersion,
     private val versionSpecificUnmarshaller: OpendriveUnmarshaller
@@ -83,7 +84,7 @@ class OpendriveReader private constructor(
             }, { it })
 
         opendriveModel.updateAdditionalIdentifiers()
-        // logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+        logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
         opendriveModel
     }
 
@@ -95,7 +96,7 @@ class OpendriveReader private constructor(
             ".xodr.${CompressedFileExtension.ZST.extension}",
         )
 
-        fun of(filePath: Path): Either<OpendriveReaderException, OpendriveReader> = either.eager {
+        fun of(filePath: Path): Either<OpendriveReaderException, OpendriveFileReader> = either.eager {
             if (!filePath.isRegularFile())
                 OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
 
@@ -104,7 +105,7 @@ class OpendriveReader private constructor(
             fileInputStream.close()
             val versionSpecificUnmarshaller = OpendriveUnmarshaller.of(opendriveVersion).getOrElse { throw IllegalArgumentException(it.message) }
 
-            OpendriveReader(filePath, opendriveVersion, versionSpecificUnmarshaller)
+            OpendriveFileReader(filePath, opendriveVersion, versionSpecificUnmarshaller)
         }
     }
 }

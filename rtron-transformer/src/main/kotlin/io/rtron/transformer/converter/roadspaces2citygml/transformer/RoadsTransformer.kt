@@ -58,15 +58,15 @@ class RoadsTransformer(
 ) {
 
     // Properties and Initializers
-    private val _genericsModuleBuilder = GenericsModuleBuilder(parameters, identifierAdder)
-    private val _transportationModuleBuilder = TransportationModuleBuilder(parameters, identifierAdder)
+    private val genericsModuleBuilder = GenericsModuleBuilder(parameters, identifierAdder)
+    private val transportationModuleBuilder = TransportationModuleBuilder(parameters, identifierAdder)
 
     // Methods
 
     fun transformRoad(roadspaceName: String, roadspacesModel: RoadspacesModel): ContextMessageList<Option<CitygmlRoad>> {
         val messageList = DefaultMessageList()
 
-        val roadFeature = _transportationModuleBuilder.createRoad()
+        val roadFeature = transportationModuleBuilder.createRoad()
         if (roadspaceName.isNotEmpty())
             roadFeature.names.add(Code(roadspaceName))
 
@@ -95,7 +95,7 @@ class RoadsTransformer(
                 messageList += addRoadspace(it, roadspacesModel, dstRoad)
             }
         } else if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && !parameters.mappingBackwardsCompatibility) { // TODO option
-            val intersectionFeature = _transportationModuleBuilder.createIntersection()
+            val intersectionFeature = transportationModuleBuilder.createIntersection()
             roadspacesInJunction.forEach {
                 messageList += addRoadspace(it, roadspacesModel, intersectionFeature)
             }
@@ -115,7 +115,7 @@ class RoadsTransformer(
         if (parameters.mappingBackwardsCompatibility) {
             messageList += addRoadspace(roadspace, roadspacesModel, dstRoad)
         } else {
-            val sectionFeature = _transportationModuleBuilder.createSection()
+            val sectionFeature = transportationModuleBuilder.createSection()
             messageList += addRoadspace(roadspace, roadspacesModel, sectionFeature)
             dstRoad.sections.add(SectionProperty(sectionFeature))
         }
@@ -127,27 +127,27 @@ class RoadsTransformer(
         val messageList = DefaultMessageList()
 
         // transforms the road reference line
-        val roadReferenceLine = _genericsModuleBuilder
+        val roadReferenceLine = genericsModuleBuilder
             .createGenericOccupiedSpaceFeature(roadspace.id, "RoadReferenceLine", roadspace.referenceLine, roadspace.attributes)
             .handleMessageList { messageList += it }
 
         // transforms the lines of the center lane (id=0)
         val roadCenterLaneLines = roadspace.road.getAllCenterLanes()
-            .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "RoadCenterLaneLine", it.second, it.third) }
+            .map { genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "RoadCenterLaneLine", it.second, it.third) }
             .mergeMessageLists()
             .handleMessageList { messageList += it }
 
         // transforms lane boundaries and center lines of the lanes
         val leftLaneBoundaries = roadspace.road.getAllLeftLaneBoundaries()
-            .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "LeftLaneBoundary", it.second, AttributeList.EMPTY) }
+            .map { genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "LeftLaneBoundary", it.second, AttributeList.EMPTY) }
             .mergeMessageLists()
             .handleMessageList { messageList += it }
         val rightLaneBoundaries = roadspace.road.getAllRightLaneBoundaries()
-            .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "RightLaneBoundary", it.second, AttributeList.EMPTY) }
+            .map { genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "RightLaneBoundary", it.second, AttributeList.EMPTY) }
             .mergeMessageLists()
             .handleMessageList { messageList += it }
         val laneCenterLines = roadspace.road.getAllCurvesOnLanes(0.5)
-            .map { _genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "LaneCenterLine", it.second, AttributeList.EMPTY) }
+            .map { genericsModuleBuilder.createGenericOccupiedSpaceFeature(it.first, "LaneCenterLine", it.second, AttributeList.EMPTY) }
             .mergeMessageLists()
             .handleMessageList { messageList += it }
 
@@ -186,10 +186,10 @@ class RoadsTransformer(
 
         when (LaneRouter.route(lane)) {
             LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
-                messageList += _transportationModuleBuilder.addTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
+                messageList += transportationModuleBuilder.addTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
             }
             LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
-                messageList += _transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
+                messageList += transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(lane, surface, centerLine, fillerSurfaces, dstTransportationSpace)
             }
         }
 
@@ -201,13 +201,13 @@ class RoadsTransformer(
 
         when (RoadspaceObjectRouter.route(roadspaceObject)) {
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
-                messageList += _transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
+                messageList += transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
             }
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
-                messageList += _transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
+                messageList += transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
             }
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> {
-                messageList += _transportationModuleBuilder.addMarkingFeature(roadspaceObject, dstTransportationSpace)
+                messageList += transportationModuleBuilder.addMarkingFeature(roadspaceObject, dstTransportationSpace)
             }
             RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> {}
             RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> {}
@@ -223,7 +223,7 @@ class RoadsTransformer(
         road.getRoadMarkings(id, parameters.discretizationStepSize)
             .handleLeftAndFilter { messageList += DefaultMessage.of("", it.value.message!!, id, Severity.WARNING, wasFixed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
             .forEach {
-                messageList += _transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace)
+                messageList += transportationModuleBuilder.addMarkingFeature(id, it.first, it.second, dstTransportationSpace)
             }
 
         return messageList

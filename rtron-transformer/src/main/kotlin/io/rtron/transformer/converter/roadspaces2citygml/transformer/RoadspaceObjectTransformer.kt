@@ -43,10 +43,10 @@ class RoadspaceObjectTransformer(
 ) {
 
     // Properties and Initializers
-    private val _genericsModuleBuilder = GenericsModuleBuilder(parameters, identifierAdder)
-    private val _buildingModuleBuilder = BuildingModuleBuilder(parameters, identifierAdder)
-    private val _cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(parameters, identifierAdder)
-    private val _vegetationModuleBuilder = VegetationModuleBuilder(parameters, identifierAdder)
+    private val genericsModuleBuilder = GenericsModuleBuilder(parameters, identifierAdder)
+    private val buildingModuleBuilder = BuildingModuleBuilder(parameters, identifierAdder)
+    private val cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(parameters, identifierAdder)
+    private val vegetationModuleBuilder = VegetationModuleBuilder(parameters, identifierAdder)
 
     // Methods
 
@@ -71,13 +71,13 @@ class RoadspaceObjectTransformer(
         val messageList = DefaultMessageList()
 
         val cityObjects: Option<AbstractCityObject> = when (RoadspaceObjectRouter.route(roadspaceObject)) {
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> _buildingModuleBuilder.createBuildingFeature(roadspaceObject).handleMessageList { messageList += it }.some()
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> _cityFurnitureModuleBuilder.createCityFurnitureFeature(roadspaceObject).handleMessageList { messageList += it }.some()
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> _genericsModuleBuilder.createGenericOccupiedSpaceFeature(roadspaceObject).handleMessageList { messageList += it }.some()
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> buildingModuleBuilder.createBuildingFeature(roadspaceObject).handleMessageList { messageList += it }.some()
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> cityFurnitureModuleBuilder.createCityFurnitureFeature(roadspaceObject).handleMessageList { messageList += it }.some()
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> genericsModuleBuilder.createGenericOccupiedSpaceFeature(roadspaceObject).handleMessageList { messageList += it }.some()
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> None
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> None
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> None
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT -> _vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).handleMessageList { messageList += it }.some()
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT -> vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).handleMessageList { messageList += it }.some()
         }
 
         return ContextMessageList(cityObjects, messageList)

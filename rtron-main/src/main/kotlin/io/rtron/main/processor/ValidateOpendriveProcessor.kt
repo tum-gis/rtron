@@ -21,9 +21,9 @@ import com.charleskorn.kaml.Yaml
 import io.rtron.io.messages.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
-import io.rtron.readerwriter.citygml.CitygmlWriter
-import io.rtron.readerwriter.opendrive.OpendriveReader
-import io.rtron.readerwriter.opendrive.OpendriveWriter
+import io.rtron.readerwriter.citygml.CitygmlFileWriter
+import io.rtron.readerwriter.opendrive.OpendriveFileReader
+import io.rtron.readerwriter.opendrive.OpendriveFileWriter
 import io.rtron.std.handleEmpty
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
@@ -46,7 +46,7 @@ class ValidateOpendriveProcessor(
 
         processAllFiles(
             inputDirectoryPath = inputPath,
-            withFilenameEndings = OpendriveReader.supportedFilenameEndings,
+            withFilenameEndings = OpendriveFileReader.supportedFilenameEndings,
             outputDirectoryPath = outputPath
         ) {
             // write the parameters as yaml file
@@ -54,13 +54,13 @@ class ValidateOpendriveProcessor(
             (outputDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // read OpenDRIVE model
-            val opendriveReader = OpendriveReader.of(inputFilePath)
+            val opendriveFileReader = OpendriveFileReader.of(inputFilePath)
                 .getOrElse { logger.warn(it.message); return@processAllFiles }
-            val opendriveSchemaValidatorReport = opendriveReader.runSchemaValidation()
+            val opendriveSchemaValidatorReport = opendriveFileReader.runSchemaValidation()
             opendriveSchemaValidatorReport.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted())
                 return@processAllFiles
-            val opendriveModel = opendriveReader.readModel()
+            val opendriveModel = opendriveFileReader.readModel()
                 .getOrElse { logger.warn(it.message); return@processAllFiles }
 
             // evaluate OpenDRIVE model
@@ -78,8 +78,8 @@ class ValidateOpendriveProcessor(
 
             // write modified OpenDRIVE model
             if (parameters.writeOpendriveFile) {
-                val opendriveWriter = OpendriveWriter(parameters.deriveOpendriveWriterParameters())
-                opendriveWriter.write(modifiedOpendriveModel, outputDirectoryPath)
+                val opendriveFileWriter = OpendriveFileWriter(parameters.deriveOpendriveWriterParameters())
+                opendriveFileWriter.write(modifiedOpendriveModel, outputDirectoryPath)
             }
 
             // transform OpenDRIVE model to Roadspaces model
@@ -103,8 +103,8 @@ class ValidateOpendriveProcessor(
 
             // write CityGML 2 model
             if (parameters.writeCitygml2File) {
-                val citygmlWriter = CitygmlWriter(parameters.deriveCitygml2WriterParameters())
-                citygmlWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath, "citygml2_model")
+                val citygmlFileWriter = CitygmlFileWriter(parameters.deriveCitygml2WriterParameters())
+                citygmlFileWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath, "citygml2_model")
             }
 
             // transform Roadspaces model to CityGML3 model
@@ -114,8 +114,8 @@ class ValidateOpendriveProcessor(
 
             // write CityGML3 model
             if (parameters.writeCitygml3File) {
-                val citygmlWriter = CitygmlWriter(parameters.deriveCitygml3WriterParameters())
-                citygmlWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath, "citygml3_model")
+                val citygmlFileWriter = CitygmlFileWriter(parameters.deriveCitygml3WriterParameters())
+                citygmlFileWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath, "citygml3_model")
             }
         }
     }

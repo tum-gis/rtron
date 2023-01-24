@@ -27,14 +27,14 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.div
 
-class CitygmlWriter(
+class CitygmlFileWriter(
     val parameters: CitygmlWriterParameters
 ) {
 
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    private val _citygmlContext = CityGMLContext.newInstance()
+    private val citygmlContext = CityGMLContext.newInstance()
 
     // Methods
 
@@ -44,7 +44,7 @@ class CitygmlWriter(
 
     private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, fileNameWithoutExtension: String): Path {
         val citygmlVersion = version.toGmlCitygml()
-        val out = _citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
+        val out = citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
         val fileName = fileNameWithoutExtension + ".gml" + parameters.fileCompression.fold({ "" }, { it.extensionWithDot })
         val filePath = directoryPath / Path(fileName)

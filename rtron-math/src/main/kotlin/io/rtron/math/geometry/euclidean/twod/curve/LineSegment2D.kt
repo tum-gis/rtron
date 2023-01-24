@@ -49,13 +49,13 @@ class LineSegment2D(
     override val domain by lazy { Range.closedX(0.0, length, endBoundType) }
 
     /** end point in local coordinate system */
-    private val _endPoint = Vector2D.X_AXIS.scalarMultiply(length)
+    private val endPoint = Vector2D.X_AXIS.scalarMultiply(length)
 
     /** adapted line class of Apache Commons Math */
-    private val _line = CMLine2D(Vector2D.ZERO.toVector2DCm(), _endPoint.toVector2DCm(), tolerance)
+    private val line = CMLine2D(Vector2D.ZERO.toVector2DCm(), endPoint.toVector2DCm(), tolerance)
 
     /** adapted line segment class of Apache Commons Math */
-    private val _segment2D = CMSegment2D(Vector2D.ZERO.toVector2DCm(), _endPoint.toVector2DCm(), _line)
+    private val segment2D = CMSegment2D(Vector2D.ZERO.toVector2DCm(), endPoint.toVector2DCm(), line)
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
@@ -67,7 +67,7 @@ class LineSegment2D(
     // Conversions
 
     /** Returns adapted line segment class of Commons Math. */
-    fun toLineSegment2DCM() = _segment2D
+    fun toLineSegment2DCM() = segment2D
 
     companion object {
 

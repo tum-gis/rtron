@@ -37,7 +37,7 @@ class CityFurnitureModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _attributesAdder = AttributesAdder(parameters)
+    private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
     fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): ContextMessageList<CityFurniture> {
@@ -50,12 +50,12 @@ class CityFurnitureModuleBuilder(
             .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
         geometryTransformer.rotation.tap {
-            _attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
+            attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
         }
 
         // semantics
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name.getOrElse { "" }, cityFurnitureFeature) // TODO fix option
-        _attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
+        attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 
         return ContextMessageList(cityFurnitureFeature, messageList)
     }

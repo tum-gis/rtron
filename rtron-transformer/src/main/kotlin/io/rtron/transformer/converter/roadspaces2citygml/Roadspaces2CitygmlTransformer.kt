@@ -54,8 +54,8 @@ class Roadspaces2CitygmlTransformer(
     private val logger = KotlinLogging.logger {}
 
     private val identifierAdder = IdentifierAdder(parameters)
-    private val _roadObjectTransformer = RoadspaceObjectTransformer(parameters, identifierAdder)
-    private val _roadLanesTransformer = RoadsTransformer(parameters, identifierAdder)
+    private val roadObjectTransformer = RoadspaceObjectTransformer(parameters, identifierAdder)
+    private val roadLanesTransformer = RoadsTransformer(parameters, identifierAdder)
 
     // Methods
 
@@ -92,7 +92,7 @@ class Roadspaces2CitygmlTransformer(
         val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
         val roadFeatures = roadspacesModel
             .getAllRoadspaceNames()
-            .map { _roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() } }
+            .map { roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() } }
             .mergeMessageLists()
             .handleMessageList { messageList += it }
             .flattenOption()
@@ -100,7 +100,7 @@ class Roadspaces2CitygmlTransformer(
         val roadspaceObjectsProgressBar = ProgressBar("Transforming roadspace objects", roadspacesModel.numberOfRoadspaces)
         val roadspaceObjects: List<AbstractCityObject> = roadspacesModel
             .getAllRoadspaces()
-            .map { _roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects).also { roadspaceObjectsProgressBar.step() } }
+            .map { roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects).also { roadspaceObjectsProgressBar.step() } }
             .mergeMessageLists()
             .handleMessageList { messageList += it }
             .flatten()
@@ -108,7 +108,7 @@ class Roadspaces2CitygmlTransformer(
         val additionalRoadLines: List<AbstractCityObject> = if (parameters.transformAdditionalRoadLines) {
             val additionalRoadLinesProgressBar = ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
             roadspacesModel.getAllRoadspaces().map {
-                _roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
+                roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
             }.mergeMessageLists().handleMessageList { messageList += it }.flatten()
         } else emptyList()
 
@@ -128,14 +128,14 @@ class Roadspaces2CitygmlTransformer(
             .getAllRoadspaceNames()
             .map {
                 GlobalScope.async {
-                    _roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() }
+                    roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() }
                 }
             }
 
         val roadspaceObjectsProgressBar = ProgressBar("Transforming roadspace objects", roadspacesModel.numberOfRoadspaces)
         val roadspaceObjectsDeferred = roadspacesModel.getAllRoadspaces().map {
             GlobalScope.async {
-                _roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects)
+                roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects)
                     .also { roadspaceObjectsProgressBar.step() }
             }
         }
@@ -144,7 +144,7 @@ class Roadspaces2CitygmlTransformer(
             val additionalRoadLinesProgressBar = ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
             roadspacesModel.getAllRoadspaces().map {
                 GlobalScope.async {
-                    _roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
+                    roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
                 }
             }
         } else emptyList()

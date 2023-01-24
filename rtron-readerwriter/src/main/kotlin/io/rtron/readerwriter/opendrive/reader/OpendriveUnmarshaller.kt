@@ -37,27 +37,27 @@ import javax.xml.validation.SchemaFactory
 class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
 
     // Properties and Initializers
-    private val _jaxbUnmarshaller: Unmarshaller
-    private val _validationEventHandler = OpendriveValidationEventHandler()
+    private val jaxbUnmarshaller: Unmarshaller
+    private val validationEventHandler = OpendriveValidationEventHandler()
 
     init {
         require(opendriveVersion in SUPPORTED_SCHEMA_VERSIONS) { "The requested OpenDRIVE version is not supported." }
 
         val jaxbContext = JAXBContext.newInstance(OPENDRIVE_MODEL_CLASSES.getValue(opendriveVersion))
-        _jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+        jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
         val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
         val resourceName = OPENDRIVE_SCHEMA_LOCATIONS.getValue(opendriveVersion)
         val resource = javaClass.classLoader.getResource(resourceName)!!
         val opendriveSchema = schemaFactory.newSchema(resource)
 
-        _jaxbUnmarshaller.schema = opendriveSchema
-        _jaxbUnmarshaller.eventHandler = _validationEventHandler
+        jaxbUnmarshaller.schema = opendriveSchema
+        jaxbUnmarshaller.eventHandler = validationEventHandler
     }
 
     fun validate(inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> = either.eager {
         try {
-            _jaxbUnmarshaller.unmarshal(inputStream)
+            jaxbUnmarshaller.unmarshal(inputStream)
         } catch (e: NumberFormatException) {
             val invalidFormattedNumber = e.message.toString()
             OpendriveReaderException.NumberFormatException(reason = invalidFormattedNumber).left()
@@ -67,13 +67,13 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
                 .bind<OpendriveReaderException.FatalSchemaValidationError>()
         }
 
-        val messageList = _validationEventHandler.toMessageList()
+        val messageList = validationEventHandler.toMessageList()
         messageList
     }
 
     fun readFromFile(inputStream: InputStream): Either<OpendriveReaderException.NoDedicatedReaderAvailable, OpendriveModel> =
         either.eager {
-            val opendriveVersionSpecificModel = _jaxbUnmarshaller.unmarshal(inputStream)
+            val opendriveVersionSpecificModel = jaxbUnmarshaller.unmarshal(inputStream)
 
             val opendriveModel = when (opendriveVersion) {
                 OpendriveVersion.V_1_4 -> {

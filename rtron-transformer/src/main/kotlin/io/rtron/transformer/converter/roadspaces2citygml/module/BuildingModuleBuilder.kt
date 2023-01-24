@@ -43,7 +43,7 @@ class BuildingModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _attributesAdder = AttributesAdder(parameters)
+    private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
     fun createBuildingFeature(roadspaceObject: RoadspaceObject): ContextMessageList<Building> {
@@ -58,7 +58,7 @@ class BuildingModuleBuilder(
 
         // semantics
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name.getOrElse { "" }, buildingFeature) // TODO fix option
-        _attributesAdder.addAttributes(roadspaceObject, buildingFeature)
+        attributesAdder.addAttributes(roadspaceObject, buildingFeature)
 
         return ContextMessageList(buildingFeature, messageList)
     }

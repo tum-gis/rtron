@@ -47,7 +47,7 @@ class LineSegment3D(
     override val domain = Range.closedX(0.0, start.distance(end), endBoundType)
 
     /** adapted line segment class of Apache Commons Math */
-    private val _lineSegment3D by lazy {
+    private val lineSegment3D by lazy {
         CMLineSegment3D(start.toVector3DCm(), end.toVector3DCm(), Line3D(start, end, tolerance).toLine3DCM())
     }
 

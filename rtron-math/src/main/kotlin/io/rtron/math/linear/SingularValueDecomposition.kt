@@ -29,13 +29,13 @@ class SingularValueDecomposition(
 ) {
 
     // Properties and Initializers
-    private val _singularValueDecomposition by lazy { CMSingularValueDecomposition(matrix.toRealMatrixCM()) }
+    private val singularValueDecomposition by lazy { CMSingularValueDecomposition(matrix.toRealMatrixCM()) }
 
-    val rank by lazy { _singularValueDecomposition.rank }
-    val norm by lazy { _singularValueDecomposition.norm }
+    val rank by lazy { singularValueDecomposition.rank }
+    val norm by lazy { singularValueDecomposition.norm }
 
-    val matrixU by lazy { RealMatrix(_singularValueDecomposition.u) }
-    val matrixS by lazy { RealMatrix(_singularValueDecomposition.s) }
-    val matrixV by lazy { RealMatrix(_singularValueDecomposition.v) }
-    val matrixVT by lazy { RealMatrix(_singularValueDecomposition.vt) }
+    val matrixU by lazy { RealMatrix(singularValueDecomposition.u) }
+    val matrixS by lazy { RealMatrix(singularValueDecomposition.s) }
+    val matrixV by lazy { RealMatrix(singularValueDecomposition.v) }
+    val matrixVT by lazy { RealMatrix(singularValueDecomposition.vt) }
 }

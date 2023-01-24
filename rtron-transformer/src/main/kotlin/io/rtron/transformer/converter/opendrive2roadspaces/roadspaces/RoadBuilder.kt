@@ -49,7 +49,7 @@ class RoadBuilder(
 ) {
 
     // Properties and Initializers
-    private val _laneBuilder = LaneBuilder(parameters)
+    private val laneBuilder = LaneBuilder(parameters)
 
     // Methods
 
@@ -112,11 +112,11 @@ class RoadBuilder(
             .map { (currentLaneId, currentSrcLane) ->
                 val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
                 val attributes = baseAttributes + laneSectionAttributes
-                _laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
+                laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
                     .handleMessageList { messageList += it }
             }
 
-        val centerLane = _laneBuilder.buildCenterLane(
+        val centerLane = laneBuilder.buildCenterLane(
             laneSectionIdentifier,
             localCurvePositionDomain,
             laneSection.center.getIndividualCenterLane(),

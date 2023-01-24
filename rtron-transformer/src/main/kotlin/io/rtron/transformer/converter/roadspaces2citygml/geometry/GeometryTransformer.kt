@@ -73,7 +73,7 @@ class GeometryTransformer(
 ) : Geometry3DVisitor {
 
     // Properties and Initializers
-    private val _identifierAdder = IdentifierAdder(parameters)
+    private val identifierAdder = IdentifierAdder(parameters)
 
     private var polygonsOfSolidResult: Option<NonEmptyList<Polygon3D>> = None
     private var polygonsOfSurfaceResult: Option<Either<GeometryException.BoundaryRepresentationGenerationError, List<Polygon3D>>> = None
@@ -97,12 +97,12 @@ class GeometryTransformer(
 
         val gmlPolygons = polygonsOfSolid.map {
             val polygonGml = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) polygonGml.id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) polygonGml.id = identifierAdder.generateRandomUUID()
             SurfaceProperty(polygonGml)
         }
 
         val solid = Solid(Shell(gmlPolygons))
-        if (parameters.generateRandomGeometryIds) solid.id = _identifierAdder.generateRandomUUID()
+        if (parameters.generateRandomGeometryIds) solid.id = identifierAdder.generateRandomUUID()
 
         return SolidProperty(solid).some()
     }
@@ -139,7 +139,7 @@ class GeometryTransformer(
 
         val gmlPoint = Point().apply {
             pos = createDirectPosition(point)
-            if (parameters.generateRandomGeometryIds) id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) id = identifierAdder.generateRandomUUID()
         }
         return PointProperty(gmlPoint).some()
     }
@@ -153,7 +153,7 @@ class GeometryTransformer(
         val implicitGeometry = ImplicitGeometry()
         implicitGeometry.referencePoint = point
         if (parameters.generateRandomGeometryIds)
-            implicitGeometry.id = _identifierAdder.generateRandomUUID()
+            implicitGeometry.id = identifierAdder.generateRandomUUID()
 
         // implicitGeometry.libraryObject = ""
         rotation.tap {
@@ -286,12 +286,12 @@ class GeometryTransformer(
     private fun polygonsToMultiSurfaceProperty(polygons: NonEmptyList<Polygon3D>): MultiSurfaceProperty {
         val surfaceProperties = polygons.map {
             val gmlPolygon = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) gmlPolygon.id = _identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) gmlPolygon.id = identifierAdder.generateRandomUUID()
             SurfaceProperty(gmlPolygon)
         }
 
         val multiSurface = MultiSurface(surfaceProperties)
-        if (parameters.generateRandomGeometryIds) multiSurface.id = _identifierAdder.generateRandomUUID()
+        if (parameters.generateRandomGeometryIds) multiSurface.id = identifierAdder.generateRandomUUID()
         return MultiSurfaceProperty(multiSurface)
     }
 

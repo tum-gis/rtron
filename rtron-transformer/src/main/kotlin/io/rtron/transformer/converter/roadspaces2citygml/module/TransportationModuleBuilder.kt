@@ -75,7 +75,7 @@ class TransportationModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _attributesAdder = AttributesAdder(parameters)
+    private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
     fun createRoad() = Road()
@@ -105,7 +105,7 @@ class TransportationModuleBuilder(
         identifierAdder.addIdentifier(lane.id, "Lane", trafficArea)
         trafficArea.usages = CodeAdder.mapToTrafficAreaUsageCodes(lane.type).map { it.code }
         trafficArea.functions = CodeAdder.mapToTrafficAreaFunctionCodes(lane.type).map { it.code }
-        _attributesAdder.addAttributes(lane, trafficArea)
+        attributesAdder.addAttributes(lane, trafficArea)
 
         // filler surfaces
         fillerSurfaces.forEach { fillerSurface ->
@@ -113,7 +113,7 @@ class TransportationModuleBuilder(
             // .getOrElse { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
 
             identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerTrafficArea)
-            _attributesAdder.addAttributes(fillerSurface, fillerTrafficArea)
+            attributesAdder.addAttributes(fillerSurface, fillerTrafficArea)
             trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(fillerTrafficArea))
         }
 
@@ -151,7 +151,7 @@ class TransportationModuleBuilder(
 
         identifierAdder.addIdentifier(lane.id, "Lane", auxiliaryTrafficArea)
         auxiliaryTrafficArea.functions = CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(lane.type).map { it.code }
-        _attributesAdder.addAttributes(lane, auxiliaryTrafficArea)
+        attributesAdder.addAttributes(lane, auxiliaryTrafficArea)
 
         // filler surfaces
         fillerSurfaces.forEach { fillerSurface ->
@@ -160,7 +160,7 @@ class TransportationModuleBuilder(
             // .getOrElse { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
 
             identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerAuxiliaryTrafficArea)
-            _attributesAdder.addAttributes(fillerSurface, fillerAuxiliaryTrafficArea)
+            attributesAdder.addAttributes(fillerSurface, fillerAuxiliaryTrafficArea)
             auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(fillerAuxiliaryTrafficArea))
         }
 
@@ -183,7 +183,7 @@ class TransportationModuleBuilder(
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, trafficArea)
-        _attributesAdder.addAttributes(roadspaceObject, trafficArea)
+        attributesAdder.addAttributes(roadspaceObject, trafficArea)
 
         // populate transportation space
         val trafficSpaceProperty = TrafficSpaceProperty(trafficSpaceFeature)
@@ -203,7 +203,7 @@ class TransportationModuleBuilder(
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, auxiliaryTrafficArea)
-        _attributesAdder.addAttributes(roadspaceObject, auxiliaryTrafficArea)
+        attributesAdder.addAttributes(roadspaceObject, auxiliaryTrafficArea)
 
         // populate transportation space
         val auxiliaryTrafficSpaceProperty = AuxiliaryTrafficSpaceProperty(auxiliaryTrafficSpaceFeature)
@@ -222,7 +222,7 @@ class TransportationModuleBuilder(
 
         // semantics
         identifierAdder.addIdentifier(id, "RoadMarking", markingFeature)
-        _attributesAdder.addAttributes(id, roadMarking, markingFeature)
+        attributesAdder.addAttributes(id, roadMarking, markingFeature)
 
         // populate transportation space
         addMarkingFeature(markingFeature, dstTransportationSpace)
@@ -240,7 +240,7 @@ class TransportationModuleBuilder(
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, markingFeature)
-        _attributesAdder.addAttributes(roadspaceObject, markingFeature)
+        attributesAdder.addAttributes(roadspaceObject, markingFeature)
 
         // populate transportation space
         addMarkingFeature(markingFeature, dstTransportationSpace)

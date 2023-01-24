@@ -49,7 +49,7 @@ class CubicCurve2D(
         require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
     }
 
-    private val _polynomialFunction by lazy { PolynomialFunction(coefficients) }
+    private val polynomialFunction by lazy { PolynomialFunction(coefficients) }
     override val domain: Range<Double> = Range.closedX(0.0, length, endBoundType)
 
     // Methods
@@ -57,12 +57,12 @@ class CubicCurve2D(
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
 
         val x = curveRelativePoint.curvePosition
-        val y = _polynomialFunction.value(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val y = polynomialFunction.value(curveRelativePoint.curvePosition).getOrElse { throw it }
         return Vector2D(x, y)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
-        val angle = _polynomialFunction.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val angle = polynomialFunction.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
         return Rotation2D(angle)
     }
 

@@ -34,42 +34,42 @@ class RealVector(
     // Properties and Initializers
 
     /** adapted Apache Commons Math vector */
-    private val _vector by lazy { CMArrayRealVector(entries) }
+    private val vector by lazy { CMArrayRealVector(entries) }
 
     /** dimension of the vector */
-    val dimension by lazy { _vector.dimension }
+    val dimension by lazy { vector.dimension }
 
     /** L_2 norm of the vector */
-    val norm by lazy { _vector.norm }
+    val norm by lazy { vector.norm }
 
     // Secondary Constructors
     constructor(entries: List<Double>) : this(entries.toDoubleArray())
 
     // Operators
 
-    operator fun get(index: Int): Double = _vector.getEntry(index)
-    operator fun plus(v: RealVector) = _vector.add(v._vector).toRealVector()
-    operator fun minus(v: RealVector) = _vector.subtract(v._vector).toRealVector()
+    operator fun get(index: Int): Double = vector.getEntry(index)
+    operator fun plus(v: RealVector) = vector.add(v.vector).toRealVector()
+    operator fun minus(v: RealVector) = vector.subtract(v.vector).toRealVector()
 
     // Methods
 
     /** Returns true, if any entry of this vector is NaN. */
-    fun containsNaN(): Boolean = _vector.isNaN
+    fun containsNaN(): Boolean = vector.isNaN
 
     /** Returns true, if any entry of this vector is Infinite. */
-    fun containsInfinite(): Boolean = _vector.isInfinite
+    fun containsInfinite(): Boolean = vector.isInfinite
 
     /** Returns the dot product of this with the [other] [RealVector]. */
-    fun dotProduct(other: RealVector): Double = _vector.dotProduct(other.toVectorCM())
+    fun dotProduct(other: RealVector): Double = vector.dotProduct(other.toVectorCM())
 
     /** Multiplies each entry with [factor] and returns the [RealVector]. */
-    fun mapMultiply(factor: Double) = _vector.mapMultiply(factor).toRealVector()
+    fun mapMultiply(factor: Double) = vector.mapMultiply(factor).toRealVector()
 
     /** Returns the element-by-element product of this with the [other] [RealVector]. */
-    fun ebeMultiply(other: RealVector) = _vector.ebeMultiply(other.toVectorCM()).toRealVector()
+    fun ebeMultiply(other: RealVector) = vector.ebeMultiply(other.toVectorCM()).toRealVector()
 
     /** Returns the element-by-element division of this with the [other] [RealVector]. */
-    fun ebeDivide(other: RealVector) = _vector.ebeDivide(other.toVectorCM()).toRealVector()
+    fun ebeDivide(other: RealVector) = vector.ebeDivide(other.toVectorCM()).toRealVector()
 
     /** Returns the normalized vector. */
     fun normalize() = mapMultiply(1.0 / norm)
@@ -91,11 +91,11 @@ class RealVector(
 
     // Conversions
 
-    fun toDoubleArray(): DoubleArray = _vector.toArray()!!
+    fun toDoubleArray(): DoubleArray = vector.toArray()!!
     fun toDoubleList(): List<Double> = toDoubleArray().toList()
 
     /** Conversion to adapted Real Vector class from Apache Commons Math. */
-    fun toVectorCM(): CMArrayRealVector = _vector
+    fun toVectorCM(): CMArrayRealVector = vector
 
     companion object {
         fun of(vararg entries: Double) = RealVector(entries)

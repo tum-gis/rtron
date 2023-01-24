@@ -26,17 +26,17 @@ fun <T : Comparable<*>> GRange<T>.toRange() = Range(this)
  * Represents a mathematical range.
  * See wikipedia article of [interval](https://en.wikipedia.org/wiki/Interval_(mathematics)).
  *
- * @param _range adapted guava range class
+ * @param range adapted guava range class
  */
 class Range<T : Comparable<*>>(
-    private val _range: GRange<T>
+    private val range: GRange<T>
 ) {
     // Operators
 
     /**
      * Returns true, if the [value] is within this [Range] bounds.
      */
-    operator fun contains(value: T): Boolean = value in _range
+    operator fun contains(value: T): Boolean = value in range
 
     // Methods
 
@@ -53,37 +53,37 @@ class Range<T : Comparable<*>>(
         }
 
     /** Returns true, if this range has a lower endpoint. */
-    fun hasLowerBound() = _range.hasLowerBound()
+    fun hasLowerBound() = range.hasLowerBound()
 
     /** Returns true, if this range has an upper endpoint. */
-    fun hasUpperBound() = _range.hasUpperBound()
+    fun hasUpperBound() = range.hasUpperBound()
 
     /** Returns the lower endpoint, if this range has one; otherwise null is returned. */
-    fun lowerEndpointOrNull(): T? = if (hasLowerBound()) _range.lowerEndpoint() else null
+    fun lowerEndpointOrNull(): T? = if (hasLowerBound()) range.lowerEndpoint() else null
 
     /** Returns the upper endpoint, if this range has one; otherwise null is returned. */
-    fun upperEndpointOrNull(): T? = if (hasUpperBound()) _range.upperEndpoint() else null
+    fun upperEndpointOrNull(): T? = if (hasUpperBound()) range.upperEndpoint() else null
 
     /** Returns the lower endpoint as result. */
     fun lowerEndpointResult(): Either<IllegalStateException, T> =
-        if (hasLowerBound()) Either.Right(_range.lowerEndpoint())
+        if (hasLowerBound()) Either.Right(range.lowerEndpoint())
         else Either.Left(IllegalStateException("No lower endpoint available."))
 
     /** Returns the upper endpoint as result. */
     fun upperEndpointResult(): Either<IllegalStateException, T> =
-        if (hasUpperBound()) Either.Right(_range.upperEndpoint())
+        if (hasUpperBound()) Either.Right(range.upperEndpoint())
         else Either.Left(IllegalStateException("No upper endpoint available."))
 
     /** Returns the lower [BoundType] of this range. */
-    fun lowerBoundType(): BoundType = if (hasLowerBound()) _range.lowerBoundType().toBoundType() else BoundType.NONE
+    fun lowerBoundType(): BoundType = if (hasLowerBound()) range.lowerBoundType().toBoundType() else BoundType.NONE
 
     /** Returns the upper [BoundType] of this range. */
-    fun upperBoundType(): BoundType = if (hasUpperBound()) _range.upperBoundType().toBoundType() else BoundType.NONE
+    fun upperBoundType(): BoundType = if (hasUpperBound()) range.upperBoundType().toBoundType() else BoundType.NONE
 
     /**
      * Returns true, if this range has the form [v..v) or (v..v].
      */
-    fun isEmpty() = _range.isEmpty
+    fun isEmpty() = range.isEmpty
 
     fun isNotEmpty() = !isEmpty()
 
@@ -98,7 +98,7 @@ class Range<T : Comparable<*>>(
      * @param other other range
      * @return true, if this and [other] range is connected
      */
-    fun isConnected(other: Range<T>) = _range.isConnected(other._range)
+    fun isConnected(other: Range<T>) = range.isConnected(other.range)
 
     /**
      * Returns true, if the bounds of the [other] range do not extend the bounds of this range.
@@ -106,7 +106,7 @@ class Range<T : Comparable<*>>(
      * @param other range to be evaluated
      * @return true if, this range encloses the [other] range
      */
-    infix fun encloses(other: Range<T>) = _range.encloses(other._range)
+    infix fun encloses(other: Range<T>) = range.encloses(other.range)
 
     /**
      * Returns the intersecting range of this range with the other [connectedRange].
@@ -114,7 +114,7 @@ class Range<T : Comparable<*>>(
      * @param connectedRange range that must be connected to this range
      * @return intersecting range
      */
-    fun intersection(connectedRange: Range<T>): Range<T> = _range.intersection(connectedRange._range).toRange()
+    fun intersection(connectedRange: Range<T>): Range<T> = range.intersection(connectedRange.range).toRange()
 
     /**
      * Returns the minimal range that encloses this and the [other] range.
@@ -123,7 +123,7 @@ class Range<T : Comparable<*>>(
      * @param other other range
      * @return range that encloses this and the [other] range
      */
-    fun span(other: Range<T>) = _range.span(other._range).toRange()
+    fun span(other: Range<T>) = range.span(other.range).toRange()
 
     /**
      * Joins this and a [connectedRange] by building the span.
@@ -142,22 +142,22 @@ class Range<T : Comparable<*>>(
 
         other as Range<*>
 
-        if (_range != other._range) return false
+        if (range != other.range) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return _range.hashCode()
+        return range.hashCode()
     }
 
     // Conversions
 
     /** Conversion to Guava range. */
-    fun toRangeG() = this._range
+    fun toRangeG() = this.range
 
     /** Conversion to String. */
-    override fun toString() = "Range($_range)"
+    override fun toString() = "Range($range)"
 
     companion object {
 

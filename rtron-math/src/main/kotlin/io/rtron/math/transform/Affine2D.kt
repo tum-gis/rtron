@@ -34,27 +34,27 @@ fun JOMLMatrix3dc.isAffine() = this.m02() == 0.0 && this.m12() == 0.0 && this.m2
 /**
  * Affine transformation matrix and operations in 2D.
  *
- * @param _matrix internal matrix of adapting library
+ * @param matrix internal matrix of adapting library
  */
 class Affine2D(
-    private val _matrix: JOMLMatrix3dc
+    private val matrix: JOMLMatrix3dc
 ) : AbstractAffine() {
 
     // Properties and Initializers
     init {
-        require(_matrix.isAffine()) { "Matrix must be affine." }
-        require(_matrix.isFinite) { "Matrix must contain only finite values." }
+        require(matrix.isAffine()) { "Matrix must be affine." }
+        require(matrix.isFinite) { "Matrix must contain only finite values." }
     }
 
-    private val _matrixTransposed by lazy { JOMLMatrix3d(_matrix).transpose() }
-    private val _matrixInverse by lazy { JOMLMatrix3d(_matrix).invert() }
+    private val matrixTransposed by lazy { JOMLMatrix3d(matrix).transpose() }
+    private val matrixInverse by lazy { JOMLMatrix3d(matrix).invert() }
 
     // Methods: Transformation
     fun transform(point: Vector2D) =
-        _matrix.transform(point.x, point.y, 1.0, JOMLVector3d()).toVector2D()
+        matrix.transform(point.x, point.y, 1.0, JOMLVector3d()).toVector2D()
 
     fun inverseTransform(point: Vector2D) =
-        _matrixInverse.transform(point.x, point.y, 1.0, JOMLVector3d()).toVector2D()
+        matrixInverse.transform(point.x, point.y, 1.0, JOMLVector3d()).toVector2D()
 
     fun transform(rotation: Rotation2D) = rotation + extractRotation()
     fun inverseTransform(rotation: Rotation2D) = rotation - extractRotation()
@@ -69,7 +69,7 @@ class Affine2D(
      *
      * @return translation vector
      */
-    fun extractTranslation(): Vector2D = Vector2D(_matrix.m20(), _matrix.m21())
+    fun extractTranslation(): Vector2D = Vector2D(matrix.m20(), matrix.m21())
 
     /**
      * Extracts the scale vector of the [Affine2D] transformation matrix.
@@ -78,7 +78,7 @@ class Affine2D(
      * @return scaling vector
      */
     fun extractScaling(): RealVector {
-        val scale = _matrix.getScale(JOMLVector3d())
+        val scale = matrix.getScale(JOMLVector3d())
         return RealVector.of(scale.x, scale.y)
     }
 
@@ -87,7 +87,7 @@ class Affine2D(
      *
      * @return rotation
      */
-    fun extractRotation() = Rotation2D(atan2(_matrix.m01(), _matrix.m11()))
+    fun extractRotation() = Rotation2D(atan2(matrix.m01(), matrix.m11()))
 
     /**
      * Appends an[other] [Affine2D] transformation matrix.
@@ -106,19 +106,19 @@ class Affine2D(
 
         other as Affine2D
 
-        if (_matrix != other._matrix) return false
+        if (matrix != other.matrix) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return _matrix.hashCode()
+        return matrix.hashCode()
     }
 
     // Conversions
-    fun toMatrix3JOML() = JOMLMatrix3d(this._matrix)
+    fun toMatrix3JOML() = JOMLMatrix3d(this.matrix)
     fun toMatrix() = RealMatrix(toDoubleArray(), 3)
-    fun toDoubleArray(): DoubleArray = this._matrixTransposed.get(DoubleArray(9))
+    fun toDoubleArray(): DoubleArray = this.matrixTransposed.get(DoubleArray(9))
 
     companion object {
         /**

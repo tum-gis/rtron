@@ -56,17 +56,17 @@ data class Vector3D(
         require(z.isFinite()) { "Z value must be finite." }
     }
 
-    private val _vector3D: CMVector3D by lazy { CMVector3D(x, y, z) }
+    private val vector3D: CMVector3D by lazy { CMVector3D(x, y, z) }
 
     /** L_2 norm of the vector */
-    val norm by lazy { _vector3D.norm }
+    val norm by lazy { vector3D.norm }
 
     /** square norm of the vector */
-    val normSq by lazy { _vector3D.normSq }
+    val normSq by lazy { vector3D.normSq }
 
     // Operators
-    operator fun plus(v: Vector3D) = _vector3D.add(v._vector3D).toVector3D()
-    operator fun minus(v: Vector3D) = _vector3D.subtract(v._vector3D).toVector3D()
+    operator fun plus(v: Vector3D) = vector3D.add(v.vector3D).toVector3D()
+    operator fun minus(v: Vector3D) = vector3D.subtract(v.vector3D).toVector3D()
     operator fun times(m: Double) = scalarMultiply(m)
     operator fun div(m: Double) = scalarDivide(m)
     operator fun unaryPlus() = Vector3D(x, y, z)
@@ -80,7 +80,7 @@ data class Vector3D(
     // Methods
 
     /** Returns the scalar product of this with the [factor]. */
-    fun scalarMultiply(factor: Double): Vector3D = _vector3D.scalarMultiply(factor).toVector3D()
+    fun scalarMultiply(factor: Double): Vector3D = vector3D.scalarMultiply(factor).toVector3D()
 
     /** Returns the scalar division of this with the [divisor]. */
     fun scalarDivide(divisor: Double): Vector3D {
@@ -89,22 +89,22 @@ data class Vector3D(
     }
 
     /** Returns the dot product of this with the [other] [Vector2D]. */
-    fun dotProduct(other: Vector3D): Double = _vector3D.dotProduct(other._vector3D)
+    fun dotProduct(other: Vector3D): Double = vector3D.dotProduct(other.vector3D)
 
     /** Returns the cross product of this with the [other] [Vector2D]. */
-    fun crossProduct(other: Vector3D): Vector3D = _vector3D.crossProduct(other._vector3D).toVector3D()
+    fun crossProduct(other: Vector3D): Vector3D = vector3D.crossProduct(other.vector3D).toVector3D()
 
     /** Returns the normalized vector. */
     fun normalized(): Vector3D {
         require(norm != 0.0) { "Vector normalization requires a vector with non-zero length." }
-        return _vector3D.normalize().toVector3D()
+        return vector3D.normalize().toVector3D()
     }
 
     /** Returns the angle between the [other] vector and this vector. */
     fun angle(other: Vector3D): Double = atan2(this.crossProduct(other).norm, this.dotProduct(other))
 
     /** Returns the distance between the [other] vector and this vector. */
-    fun distance(other: Vector3D): Double = _vector3D.distance(other.toVector3DCm())
+    fun distance(other: Vector3D): Double = vector3D.distance(other.toVector3DCm())
 
     /** Returns true, if each component is zero. */
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
@@ -117,7 +117,7 @@ data class Vector3D(
     fun toDoubleArray() = doubleArrayOf(x, y, z)
     fun toDoubleList() = nonEmptyListOf(x, y, z)
     fun toRealVector() = RealVector(doubleArrayOf(x, y, z))
-    fun toVector3DCm() = this._vector3D
+    fun toVector3DCm() = this.vector3D
     fun toVector3DJOML() = JOMLVector3D(this.x, this.y, this.z)
     fun toVector4DJOML(w: Double = 0.0) = JOMLVector4D(this.x, this.y, this.z, w)
 

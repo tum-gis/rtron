@@ -27,7 +27,7 @@ class RoadspacesEvaluator(
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    private val _modelingRulesEvaluator = ModelingRulesEvaluator(parameters)
+    private val modelingRulesEvaluator = ModelingRulesEvaluator(parameters)
 
     // Methods
 
@@ -36,7 +36,7 @@ class RoadspacesEvaluator(
 
         val report = RoadspacesEvaluationReport(parameters)
 
-        report.modelingRulesEvaluation = _modelingRulesEvaluator.evaluate(roadspacesModel)
+        report.modelingRulesEvaluation = modelingRulesEvaluator.evaluate(roadspacesModel)
 
         return roadspacesModel to report
     }

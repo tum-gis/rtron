@@ -41,7 +41,7 @@ class VegetationModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _attributesAdder = AttributesAdder(parameters)
+    private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
 
@@ -54,13 +54,13 @@ class VegetationModuleBuilder(
         solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
             .mapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
         geometryTransformer.rotation.tap {
-            _attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
+            attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
         }
         addAttributes(solitaryVegetationObjectFeature, geometryTransformer).bind()
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, solitaryVegetationObjectFeature)
-        _attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
+        attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
 
         return ContextMessageList(solitaryVegetationObjectFeature, messageList)
     }

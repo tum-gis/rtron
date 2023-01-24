@@ -36,24 +36,24 @@ fun JOMLMatrix4dc.toRealMatrix(): RealMatrix {
 /**
  * Affine transformation matrix and operations in 3D.
  *
- * @param _matrix internal matrix of adapting library
+ * @param matrix internal matrix of adapting library
  */
 class Affine3D(
-    private val _matrix: JOMLMatrix4dc
+    private val matrix: JOMLMatrix4dc
 ) : AbstractAffine() {
 
     // Properties and Initializers
     init {
-        require(_matrix.isAffine) { "Matrix must be affine." }
-        require(_matrix.isFinite) { "Matrix must contain only finite values." }
+        require(matrix.isAffine) { "Matrix must be affine." }
+        require(matrix.isFinite) { "Matrix must contain only finite values." }
     }
 
-    private val _matrixTransposed by lazy { JOMLMatrix4d(_matrix).transpose() }
-    private val _matrixInverse by lazy { JOMLMatrix4d(_matrix).invertAffine() }
+    private val matrixTransposed by lazy { JOMLMatrix4d(matrix).transpose() }
+    private val matrixInverse by lazy { JOMLMatrix4d(matrix).invertAffine() }
 
     // Methods: Transformation
-    fun transform(point: Vector3D) = _matrix.transformPosition(point.toVector3DJOML()).toVector3D()
-    fun inverseTransform(point: Vector3D) = _matrixInverse.transformPosition(point.toVector3DJOML()).toVector3D()
+    fun transform(point: Vector3D) = matrix.transformPosition(point.toVector3DJOML()).toVector3D()
+    fun inverseTransform(point: Vector3D) = matrixInverse.transformPosition(point.toVector3DJOML()).toVector3D()
 
     @JvmName("transformOfListVector3D")
     fun transform(points: List<Vector3D>): List<Vector3D> = points.map { transform(it) }
@@ -79,7 +79,7 @@ class Affine3D(
      *
      * @return translation vector
      */
-    fun extractTranslation(): Vector3D = _matrix.getTranslation(JOMLVector3d()).toVector3D()
+    fun extractTranslation(): Vector3D = matrix.getTranslation(JOMLVector3d()).toVector3D()
 
     /**
      * Extracts the scale vector of the [Affine3D] transformation matrix.
@@ -87,7 +87,7 @@ class Affine3D(
      *
      * @return scaling vector
      */
-    fun extractScaling(): RealVector = _matrix.getScale(JOMLVector3d()).toRealVector()
+    fun extractScaling(): RealVector = matrix.getScale(JOMLVector3d()).toRealVector()
 
     /**
      * Extracts the rotation of the [Affine3D] transformation matrix.
@@ -95,7 +95,7 @@ class Affine3D(
      * @return rotation
      */
     fun extractRotationAffine(): Affine3D {
-        val rotation = _matrix.getUnnormalizedRotation(JOMLQuaterniond())!!
+        val rotation = matrix.getUnnormalizedRotation(JOMLQuaterniond())!!
         return Affine3D(JOMLMatrix4d().rotate(rotation))
     }
 
@@ -105,7 +105,7 @@ class Affine3D(
      * @return rotation angles
      */
     fun extractRotation(): Rotation3D {
-        val rotationQuaternion = _matrix.getUnnormalizedRotation(JOMLQuaterniond())!!
+        val rotationQuaternion = matrix.getUnnormalizedRotation(JOMLQuaterniond())!!
         val rotationEuler = rotationQuaternion.getEulerAnglesXYZ(JOMLVector3d())!!
         return Rotation3D(rotationEuler.z, rotationEuler.y, rotationEuler.x)
     }
@@ -128,23 +128,23 @@ class Affine3D(
 
         other as Affine3D
 
-        if (_matrix != other._matrix) return false
+        if (matrix != other.matrix) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return _matrix.hashCode()
+        return matrix.hashCode()
     }
 
     // Conversions
-    fun toMatrix4JOML() = JOMLMatrix4d(this._matrix)
-    fun toRealMatrix() = this._matrixTransposed.toRealMatrix()
-    fun toDoubleArray(): DoubleArray = this._matrixTransposed.get(DoubleArray(16))
+    fun toMatrix4JOML() = JOMLMatrix4d(this.matrix)
+    fun toRealMatrix() = this.matrixTransposed.toRealMatrix()
+    fun toDoubleArray(): DoubleArray = this.matrixTransposed.get(DoubleArray(16))
     fun toDoubleList(): List<Double> = toDoubleArray().toList()
 
     override fun toString(): String {
-        return "Affine3D(_matrix=$_matrix)"
+        return "Affine3D(_matrix=$matrix)"
     }
 
     companion object {

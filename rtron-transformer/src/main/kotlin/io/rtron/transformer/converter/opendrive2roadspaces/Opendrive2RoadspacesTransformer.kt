@@ -56,9 +56,9 @@ class Opendrive2RoadspacesTransformer(
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    private val _headerBuilder = HeaderBuilder(parameters)
-    private val _roadspaceBuilder = RoadspaceBuilder(parameters)
-    private val _junctionBuilder = JunctionBuilder(parameters)
+    private val headerBuilder = HeaderBuilder(parameters)
+    private val roadspaceBuilder = RoadspaceBuilder(parameters)
+    private val junctionBuilder = JunctionBuilder(parameters)
 
     // Methods
 
@@ -74,7 +74,7 @@ class Opendrive2RoadspacesTransformer(
         val report = Opendrive2RoadspacesReport(parameters)
 
         // general model information
-        val header = _headerBuilder.buildHeader(opendriveModel.header).handleMessageList { report.conversion += it }
+        val header = headerBuilder.buildHeader(opendriveModel.header).handleMessageList { report.conversion += it }
         val modelIdentifier = ModelIdentifier(
             modelName = opendriveModel.header.name,
             modelDate = opendriveModel.header.date,
@@ -98,7 +98,7 @@ class Opendrive2RoadspacesTransformer(
 
         val junctions = opendriveModel.junction
             .filter { it.typeValidated == EJunctionType.DEFAULT }
-            .map { _junctionBuilder.buildDefaultJunction(modelIdentifier, it, roadspaces) }
+            .map { junctionBuilder.buildDefaultJunction(modelIdentifier, it, roadspaces) }
 
         val roadspacesModel = RoadspacesModel(modelIdentifier, header, roadspaces, junctions)
 
@@ -112,7 +112,7 @@ class Opendrive2RoadspacesTransformer(
         progressBar: ProgressBar
     ): List<Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>>> =
         opendriveModel.roadAsNonEmptyList.map {
-            _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
+            roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
         }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -123,7 +123,7 @@ class Opendrive2RoadspacesTransformer(
     ): List<Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>>> {
         val roadspacesDeferred = opendriveModel.roadAsNonEmptyList.map {
             GlobalScope.async {
-                _roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
+                roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
             }
         }
         return runBlocking { roadspacesDeferred.map { it.await() } }

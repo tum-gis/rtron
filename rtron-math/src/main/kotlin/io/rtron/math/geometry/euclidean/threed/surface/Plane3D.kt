@@ -40,28 +40,28 @@ data class Plane3D(
         require(normal.norm > tolerance) { "Norm of normal must be greater than zero and the tolerance threshold." }
     }
 
-    private val _plane = CMPlane(point.toVector3DCm(), normal.toVector3DCm(), tolerance)
+    private val plane = CMPlane(point.toVector3DCm(), normal.toVector3DCm(), tolerance)
 
     /** first canonical vector u of the plane */
-    val vectorU by lazy { _plane.u.toVector3D() }
+    val vectorU by lazy { plane.u.toVector3D() }
 
     /** second canonical vector v of the plane */
-    val vectorV by lazy { _plane.v.toVector3D() }
+    val vectorV by lazy { plane.v.toVector3D() }
 
     // Methods
     /** Returns the oriented distance between the [point] and this plane. */
-    fun getOffset(point: Vector3D): Double = _plane.getOffset(point.toVector3DCm())
+    fun getOffset(point: Vector3D): Double = plane.getOffset(point.toVector3DCm())
 
     /** Projects the [point] onto this plane and returns the projected point. */
-    fun project(point: Vector3D): Vector3D = (_plane.project(point.toVector3DCm()) as CMVector3D).toVector3D()
+    fun project(point: Vector3D): Vector3D = (plane.project(point.toVector3DCm()) as CMVector3D).toVector3D()
 
     /** Returns true, if this plane is similar to the [other] plane. */
-    fun isSimilarTo(other: Plane3D): Boolean = _plane.isSimilarTo(other.toPlane3DCm())
+    fun isSimilarTo(other: Plane3D): Boolean = plane.isSimilarTo(other.toPlane3DCm())
 
     // Conversions
 
     /** Returns adapted line plane class of Apache Commons Math. */
-    fun toPlane3DCm() = this._plane
+    fun toPlane3DCm() = this.plane
 
     companion object {
         val XY_PLANE = Plane3D(Vector3D.ZERO, Vector3D.Z_AXIS, DEFAULT_TOLERANCE)

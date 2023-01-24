@@ -59,10 +59,10 @@ class SpiralSegment2D(
         require(curvatureFunction.slope != 0.0) { "Curvature slope must not be zero (if it's zero use a line or an arc segment)." }
     }
 
-    private val _spiral = Spiral2D(curvatureFunction.slope)
-    private val _lengthStart =
+    private val spiral = Spiral2D(curvatureFunction.slope)
+    private val lengthStart =
         curvatureFunction.startValue.getOrElse { throw it } / curvatureFunction.slope
-    private val _spiralPoseStart = _spiral.calculatePose(_lengthStart)
+    private val spiralPoseStart = spiral.calculatePose(lengthStart)
 
     // Methods
 
@@ -74,8 +74,8 @@ class SpiralSegment2D(
 
     private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D): Pose2D {
 
-        val poseOnUnitSpiral = _spiral.calculatePose(_lengthStart + curveRelativePoint.curvePosition)
-        val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(_spiralPoseStart).inverseTransform(poseOnUnitSpiral)
+        val poseOnUnitSpiral = spiral.calculatePose(lengthStart + curveRelativePoint.curvePosition)
+        val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(spiralPoseStart).inverseTransform(poseOnUnitSpiral)
 
         return poseOnUnitSpiralStartingAtOrigin
     }

@@ -53,22 +53,22 @@ class ParametricCubicCurve2D(
         require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
     }
 
-    private val _polynomialFunctionX by lazy { PolynomialFunction(coefficientsX) }
-    private val _polynomialFunctionY by lazy { PolynomialFunction(coefficientsY) }
+    private val polynomialFunctionX by lazy { PolynomialFunction(coefficientsX) }
+    private val polynomialFunctionY by lazy { PolynomialFunction(coefficientsY) }
     override val domain: Range<Double> = Range.closedX(0.0, length, endBoundType)
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
 
-        val x = _polynomialFunctionX.value(curveRelativePoint.curvePosition).getOrElse { throw it }
-        val y = _polynomialFunctionY.value(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val x = polynomialFunctionX.value(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val y = polynomialFunctionY.value(curveRelativePoint.curvePosition).getOrElse { throw it }
         return Vector2D(x, y)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
 
-        val x = _polynomialFunctionX.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
-        val y = _polynomialFunctionY.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val x = polynomialFunctionX.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
+        val y = polynomialFunctionY.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
 
         return Rotation2D.of(Vector2D(x, y))
     }

@@ -28,11 +28,11 @@ annotation class ExperimentalDateTime
 /**
  * Representation of a point in time.
  *
- * @param _localDateTime adapting class of [java.time.LocalDateTime]
+ * @param localDateTime adapting class of [java.time.LocalDateTime]
  */
 @ExperimentalDateTime
 class DateTime(
-    private val _localDateTime: LocalDateTime
+    private val localDateTime: LocalDateTime
 ) {
 
     // Properties and Initializers

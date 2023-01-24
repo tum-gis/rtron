@@ -37,13 +37,13 @@ class OpendriveMarshaller {
 
     // Properties and Initializers
     val supportedVersion: OpendriveVersion = OpendriveVersion.V_1_7
-    private val _jaxbMarshaller: Marshaller
+    private val jaxbMarshaller: Marshaller
 
     init {
         val jaxbContext = JAXBContext.newInstance(org.asam.opendrive17.OpenDRIVE::class.java)
-        _jaxbMarshaller = jaxbContext.createMarshaller()
+        jaxbMarshaller = jaxbContext.createMarshaller()
 
-        _jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
     }
 
     // Methods
@@ -58,7 +58,7 @@ class OpendriveMarshaller {
         val fileName = "opendrive17.xml" + outputFileCompression.fold({ "" }, { it.extensionWithDot })
         val filePath = directoryPath / Path(fileName)
         val outputStream: OutputStream = filePath.outputStreamDirectOrCompressed()
-        _jaxbMarshaller.marshal(opendrive17Model, outputStream)
+        jaxbMarshaller.marshal(opendrive17Model, outputStream)
         outputStream.close()
 
         return filePath.right()

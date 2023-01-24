@@ -36,11 +36,11 @@ class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
         filePath.parent.createDirectories()
     }
 
-    private val _writer = Files.newBufferedWriter(filePath)
-    private val _csvPrinter: CMCSVPrinter
+    private val writer = Files.newBufferedWriter(filePath)
+    private val csvPrinter: CMCSVPrinter
     init {
         val csvFormat = Builder.create().setHeader(*header.toTypedArray()).build()
-        _csvPrinter = CMCSVPrinter(_writer, csvFormat)
+        csvPrinter = CMCSVPrinter(writer, csvFormat)
     }
 
     // Methods
@@ -50,13 +50,13 @@ class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
      * @param values values to write
      */
     fun printRecord(vararg values: Any) {
-        _csvPrinter.printRecord(*values)
+        csvPrinter.printRecord(*values)
     }
 
     /**
      * Flushes the stream.
      */
     override fun flush() {
-        _csvPrinter.flush()
+        csvPrinter.flush()
     }
 }

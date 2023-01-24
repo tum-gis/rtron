@@ -42,7 +42,7 @@ class GenericsModuleBuilder(
     private val identifierAdder: IdentifierAdder
 ) {
     // Properties and Initializers
-    private val _attributesAdder = AttributesAdder(parameters)
+    private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
     fun createGenericOccupiedSpaceFeature(roadspaceObject: RoadspaceObject): ContextMessageList<GenericOccupiedSpace> {
@@ -55,7 +55,7 @@ class GenericsModuleBuilder(
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, genericOccupiedSpace)
-        _attributesAdder.addAttributes(roadspaceObject, genericOccupiedSpace)
+        attributesAdder.addAttributes(roadspaceObject, genericOccupiedSpace)
 
         return ContextMessageList(genericOccupiedSpace, messageList)
     }
@@ -67,7 +67,7 @@ class GenericsModuleBuilder(
             .handleMessageList { messageList += it }
 
         identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
-        _attributesAdder.addAttributes(
+        attributesAdder.addAttributes(
             id.toAttributes(parameters.identifierAttributesPrefix) +
                 attributes,
             genericOccupiedSpace
@@ -82,7 +82,7 @@ class GenericsModuleBuilder(
             .handleMessageList { messageList += it }
 
         identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
-        _attributesAdder.addAttributes(
+        attributesAdder.addAttributes(
             id.toAttributes(parameters.identifierAttributesPrefix) +
                 attributes,
             genericOccupiedSpace
@@ -107,7 +107,7 @@ class GenericsModuleBuilder(
             .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         geometryTransformer.rotation.tap {
-            _attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)
+            attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)
         }
 
         return ContextMessageList(genericOccupiedSpaceFeature, messageList)

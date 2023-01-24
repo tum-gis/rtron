@@ -46,10 +46,10 @@ data class Vector2D(
         require(y.isFinite()) { "Y value must be finite." }
     }
 
-    private val _vector2D: CMVector2D by lazy { CMVector2D(x, y) }
+    private val vector2D: CMVector2D by lazy { CMVector2D(x, y) }
 
     /** L_2 norm of the vector */
-    val norm by lazy { _vector2D.norm }
+    val norm by lazy { vector2D.norm }
 
     // Secondary Constructors
 
@@ -57,8 +57,8 @@ data class Vector2D(
 
     // Operators
 
-    operator fun plus(v: Vector2D) = _vector2D.add(v._vector2D).toVector2D()
-    operator fun minus(v: Vector2D) = _vector2D.subtract(v._vector2D).toVector2D()
+    operator fun plus(v: Vector2D) = vector2D.add(v.vector2D).toVector2D()
+    operator fun minus(v: Vector2D) = vector2D.subtract(v.vector2D).toVector2D()
     operator fun times(m: Double): Vector2D = scalarMultiply(m)
     operator fun div(m: Double): Vector2D = scalarDivide(m)
     operator fun unaryPlus() = Vector2D(x, y)
@@ -71,7 +71,7 @@ data class Vector2D(
     // Methods
 
     /** Returns the scalar product of this with the [factor]. */
-    fun scalarMultiply(factor: Double): Vector2D = _vector2D.scalarMultiply(factor).toVector2D()
+    fun scalarMultiply(factor: Double): Vector2D = vector2D.scalarMultiply(factor).toVector2D()
 
     /** Returns the scalar division of this with the [divisor]. */
     fun scalarDivide(divisor: Double): Vector2D {
@@ -80,20 +80,20 @@ data class Vector2D(
     }
 
     /** Returns the dot product of this with the [other] [Vector2D]. */
-    fun dotProduct(other: Vector2D): Double = _vector2D.dotProduct(other._vector2D)
+    fun dotProduct(other: Vector2D): Double = vector2D.dotProduct(other.vector2D)
 
     /** Returns the normalized vector. */
-    fun normalized(): Vector2D = _vector2D.normalize().toVector2D()
+    fun normalized(): Vector2D = vector2D.normalize().toVector2D()
 
     /** Returns the angle between the [other] vector and this vector. */
     fun angle(other: Vector2D) = Rotation2D.of(other) - Rotation2D.of(this)
 
     /** Returns the distance between the [other] vector and this vector. */
-    fun distance(other: Vector2D): Double = _vector2D.distance(other._vector2D)
+    fun distance(other: Vector2D): Double = vector2D.distance(other.vector2D)
 
     // Conversions
     fun toVector3D(z: Double = 0.0) = Vector3D(this.x, this.y, z)
-    fun toVector2DCm() = this._vector2D
+    fun toVector2DCm() = this.vector2D
     fun toVector2DJOML() = JOMLVector2D(this.x, this.y)
 
     companion object {
