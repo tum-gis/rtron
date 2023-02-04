@@ -31,42 +31,42 @@ enum class OpendriveVersion(val rev: Pair<Int, Int>) {
     /**
      * OpenDRIVE version 0.7 released 2005 by VIRES Simulationstechnologie GmbH.
      */
-    V_0_7(Pair(0, 7)),
+    V0_7(Pair(0, 7)),
 
     /**
      * OpenDRIVE version 1.1 Rev.D released on the 11 Apr 2008 by VIRES Simulationstechnologie GmbH.
      */
-    V_1_1(Pair(1, 1)),
+    V1_1(Pair(1, 1)),
 
     /**
      * OpenDRIVE version 1.2 Rev.A released on the 06 Jan 2008 by VIRES Simulationstechnologie GmbH.
      */
-    V_1_2(Pair(1, 2)),
+    V1_2(Pair(1, 2)),
 
     /**
      * OpenDRIVE version 1.3 Rev.C released on the 07 Aug 2010 by VIRES Simulationstechnologie GmbH.
      */
-    V_1_3(Pair(1, 3)),
+    V1_3(Pair(1, 3)),
 
     /**
      * OpenDRIVE version 1.4 Rev.H released on the 04 Nov 2015 by VIRES Simulationstechnologie GmbH.
      */
-    V_1_4(Pair(1, 4)),
+    V1_4(Pair(1, 4)),
 
     /**
      * OpenDRIVE version 1.5 released on the 17 Feb 2019 by ASAM e.V.
      */
-    V_1_5(Pair(1, 5)),
+    V1_5(Pair(1, 5)),
 
     /**
      * OpenDRIVE version 1.6.1 released on the 04 March 2021 by ASAM e.V.
      */
-    V_1_6(Pair(1, 6)),
+    V1_6(Pair(1, 6)),
 
     /**
      * OpenDRIVE version 1.7.0 released on the 03 Aug 2021 by ASAM e.V.
      */
-    V_1_7(Pair(1, 7));
+    V1_7(Pair(1, 7));
 
     // Methods
     override fun toString() = "v.${rev.first}.${rev.second}"

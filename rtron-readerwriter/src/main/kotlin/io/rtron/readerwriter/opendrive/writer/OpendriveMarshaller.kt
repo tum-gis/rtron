@@ -36,7 +36,7 @@ import kotlin.io.path.div
 class OpendriveMarshaller {
 
     // Properties and Initializers
-    val supportedVersion: OpendriveVersion = OpendriveVersion.V_1_7
+    val supportedVersion: OpendriveVersion = OpendriveVersion.V1_7
     private val jaxbMarshaller: Marshaller
 
     init {

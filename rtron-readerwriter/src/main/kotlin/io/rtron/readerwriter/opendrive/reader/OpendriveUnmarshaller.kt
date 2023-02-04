@@ -76,7 +76,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
             val opendriveVersionSpecificModel = jaxbUnmarshaller.unmarshal(inputStream)
 
             val opendriveModel = when (opendriveVersion) {
-                OpendriveVersion.V_1_4 -> {
+                OpendriveVersion.V1_4 -> {
                     val converter = Mappers.getMapper(Opendrive14Mapper::class.java)
                     converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive14.OpenDRIVE)
                 }
@@ -94,22 +94,22 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
 
     companion object {
         private val OPENDRIVE_MODEL_CLASSES: Map<OpendriveVersion, Class<out Any>> = mapOf(
-            OpendriveVersion.V_1_1 to org.asam.opendrive11.OpenDRIVE::class.java,
-            OpendriveVersion.V_1_2 to org.asam.opendrive12.OpenDRIVE::class.java,
-            OpendriveVersion.V_1_3 to org.asam.opendrive13.OpenDRIVE::class.java,
-            OpendriveVersion.V_1_4 to org.asam.opendrive14.OpenDRIVE::class.java,
-            OpendriveVersion.V_1_5 to org.asam.opendrive15.OpenDRIVE::class.java,
-            OpendriveVersion.V_1_6 to org.asam.opendrive16.OpenDRIVE::class.java,
-            OpendriveVersion.V_1_7 to org.asam.opendrive17.OpenDRIVE::class.java
+            OpendriveVersion.V1_1 to org.asam.opendrive11.OpenDRIVE::class.java,
+            OpendriveVersion.V1_2 to org.asam.opendrive12.OpenDRIVE::class.java,
+            OpendriveVersion.V1_3 to org.asam.opendrive13.OpenDRIVE::class.java,
+            OpendriveVersion.V1_4 to org.asam.opendrive14.OpenDRIVE::class.java,
+            OpendriveVersion.V1_5 to org.asam.opendrive15.OpenDRIVE::class.java,
+            OpendriveVersion.V1_6 to org.asam.opendrive16.OpenDRIVE::class.java,
+            OpendriveVersion.V1_7 to org.asam.opendrive17.OpenDRIVE::class.java
         )
         private val OPENDRIVE_SCHEMA_LOCATIONS: Map<OpendriveVersion, String> = mapOf(
-            OpendriveVersion.V_1_1 to "schemas/opendrive11/OpenDRIVE_1.1D.xsd",
-            OpendriveVersion.V_1_2 to "schemas/opendrive12/OpenDRIVE_1.2A.xsd",
-            OpendriveVersion.V_1_3 to "schemas/opendrive13/OpenDRIVE_1.3D.xsd",
-            OpendriveVersion.V_1_4 to "schemas/opendrive14/OpenDRIVE_1.4H.xsd",
-            OpendriveVersion.V_1_5 to "schemas/opendrive15/OpenDRIVE_1.5M.xsd",
-            OpendriveVersion.V_1_6 to "schemas/opendrive16/opendrive_16_core.xsd",
-            OpendriveVersion.V_1_7 to "schemas/opendrive17/opendrive_17_core.xsd"
+            OpendriveVersion.V1_1 to "schemas/opendrive11/OpenDRIVE_1.1D.xsd",
+            OpendriveVersion.V1_2 to "schemas/opendrive12/OpenDRIVE_1.2A.xsd",
+            OpendriveVersion.V1_3 to "schemas/opendrive13/OpenDRIVE_1.3D.xsd",
+            OpendriveVersion.V1_4 to "schemas/opendrive14/OpenDRIVE_1.4H.xsd",
+            OpendriveVersion.V1_5 to "schemas/opendrive15/OpenDRIVE_1.5M.xsd",
+            OpendriveVersion.V1_6 to "schemas/opendrive16/opendrive_16_core.xsd",
+            OpendriveVersion.V1_7 to "schemas/opendrive17/opendrive_17_core.xsd"
         )
         init {
             check(OPENDRIVE_MODEL_CLASSES.keys == OPENDRIVE_SCHEMA_LOCATIONS.keys) { "All model classes must have a correspondent schema location defined." }
@@ -121,6 +121,6 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
             else OpendriveReaderException.NoDedicatedSchemaAvailable(version).left()
         }
 
-        val FALLBACK = OpendriveUnmarshaller(OpendriveVersion.V_1_4)
+        val FALLBACK = OpendriveUnmarshaller(OpendriveVersion.V1_4)
     }
 }
