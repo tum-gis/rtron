@@ -95,7 +95,7 @@ class RoadspacesModel(
     fun getJunction(junctionIdentifier: JunctionIdentifier): Either<IllegalArgumentException, Junction> = junctions.getValueEither(junctionIdentifier).mapLeft { it.toIllegalArgumentException() }
 
     /** Returns a sorted list of all raodspace names. */
-    fun getAllRoadspaceNames(): List<String> = getAllRoadspaces().map { it.name.getOrElse { "" } }.distinct().sorted() // TODO option
+    fun getAllRoadspaceNames(): List<String> = getAllRoadspaces().map { it.name }.distinct().sorted()
 
     /** Returns all available [Roadspace]s. */
     fun getAllRoadspaces(): Collection<Roadspace> = roadspaces.values
@@ -110,7 +110,7 @@ class RoadspacesModel(
      *  the [roadspaceName]. */
     fun getAllRoadspaceIdentifiersNotLocatedInJunctions(roadspaceName: String): List<RoadspaceIdentifier> =
         getAllRoadspaces()
-            .filter { it.name.getOrElse { "" } == roadspaceName } // TODO option
+            .filter { it.name == roadspaceName }
             .filter { !it.road.isLocatedInJunction() }
             .map { it.id }
 
@@ -123,7 +123,7 @@ class RoadspacesModel(
     /** Returns a list of [Junction]s which contain at least one [Roadspace] with the name [roadspaceName]. */
     fun getAllJunctionIdentifiersContainingRoadspaces(roadspaceName: String): List<JunctionIdentifier> =
         getAllRoadspacesLocatedInJunction()
-            .filter { it.name == Some(roadspaceName) }
+            .filter { it.name == roadspaceName }
             .map { it.road.linkage.belongsToJunctionId }
             .flattenOption()
             .distinct()

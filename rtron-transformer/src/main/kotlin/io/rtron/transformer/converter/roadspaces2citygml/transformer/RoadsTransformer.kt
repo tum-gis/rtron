@@ -88,13 +88,13 @@ class RoadsTransformer(
 
         val roadspacesInJunction = roadspacesModel.getRoadspacesWithinJunction(junctionId)
             .getOrElse { throw it }
-            .sortedBy { it.name.getOrElse { "" } } // TODO option
+            .sortedBy { it.name }
 
-        if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && parameters.mappingBackwardsCompatibility) { // TODO option
+        if (roadspacesInJunction.first().name == roadspaceName && parameters.mappingBackwardsCompatibility) {
             roadspacesInJunction.forEach {
                 messageList += addRoadspace(it, roadspacesModel, dstRoad)
             }
-        } else if (roadspacesInJunction.first().name.getOrElse { "" } == roadspaceName && !parameters.mappingBackwardsCompatibility) { // TODO option
+        } else if (roadspacesInJunction.first().name == roadspaceName && !parameters.mappingBackwardsCompatibility) {
             val intersectionFeature = transportationModuleBuilder.createIntersection()
             roadspacesInJunction.forEach {
                 messageList += addRoadspace(it, roadspacesModel, intersectionFeature)

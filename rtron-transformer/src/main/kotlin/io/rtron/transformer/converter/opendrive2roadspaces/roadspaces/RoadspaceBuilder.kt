@@ -104,7 +104,7 @@ class RoadspaceBuilder(
         // combine the models into a road space object
         val roadspace = Roadspace(
             id = roadspaceId,
-            name = road.name,
+            name = road.name.getOrElse { "" },
             referenceLine = roadReferenceLine,
             road = roadspaceRoad,
             roadspaceObjects = roadspaceObjectsFromRoadObjects + roadspaceObjectsFromRoadSignals,

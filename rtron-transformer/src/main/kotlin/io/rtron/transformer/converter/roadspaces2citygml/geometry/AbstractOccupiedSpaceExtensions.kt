@@ -23,7 +23,7 @@ import arrow.core.right
 import org.citygml4j.core.model.core.AbstractOccupiedSpace
 
 /**
- * Populates the [lod] geometry of an [AbstractOccupiedSpace], if available. Otherwise the [lod] implicit geometry of the [GeometryTransformer] is populated.
+ * Populates the [lod] geometry of an [AbstractOccupiedSpace], if available. Otherwise, the [lod] implicit geometry of the [GeometryTransformer] is populated.
  *
  * @param geometryTransformer source geometries
  * @param lod target level of detail
@@ -31,10 +31,10 @@ import org.citygml4j.core.model.core.AbstractOccupiedSpace
  */
 fun AbstractOccupiedSpace.populateGeometryOrImplicitGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<GeometryTransformerException, Unit> = either.eager {
     val geometryErrorMessage: String = populateGeometry(geometryTransformer, lod)
-        .tap { right().bind() }
+        .onRight { right().bind() }
         .fold({ it.message }, { "" })
     val implicitGeometryErrorMessage: String = populateImplicitGeometry(geometryTransformer, lod)
-        .tap { right().bind() }
+        .onRight { right().bind() }
         .fold({ it.message }, { "" })
 
     GeometryTransformerException.NoSuiteableSourceGeometry(

@@ -16,7 +16,6 @@
 
 package io.rtron.model.roadspaces.roadspace
 
-import arrow.core.Option
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -28,7 +27,7 @@ import io.rtron.model.roadspaces.roadspace.road.Road
  */
 data class Roadspace(
     val id: RoadspaceIdentifier,
-    val name: Option<String>,
+    val name: String,
     val referenceLine: Curve3D,
     val road: Road,
     val roadspaceObjects: List<RoadspaceObject> = emptyList(),
