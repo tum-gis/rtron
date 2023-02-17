@@ -45,12 +45,14 @@ data class LaneIdentifier(
     fun isRight() = laneId < 0
 
     /** Returns the [LaneIdentifier] of the lane which is located adjacently inner (towards the reference line) to the
-     * lane of this identifier.  */
+     * lane of this identifier.
+     */
     fun getAdjacentInnerLaneIdentifier(): LaneIdentifier =
         LaneIdentifier(sign(laneId) * (abs(laneId) - 1), laneSectionIdentifier)
 
     /** Returns the [LaneIdentifier] of the lane which is located adjacently outer (in the opposite direction of the
-     * reference line) to the lane of this identifier.  */
+     * reference line) to the lane of this identifier.
+     */
     fun getAdjacentOuterLaneIdentifier(): LaneIdentifier =
         LaneIdentifier(sign(laneId) * (abs(laneId) + 1), laneSectionIdentifier)
 

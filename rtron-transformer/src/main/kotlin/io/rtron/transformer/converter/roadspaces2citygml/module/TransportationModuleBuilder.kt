@@ -51,6 +51,7 @@ import org.citygml4j.core.model.transportation.MarkingProperty
 import org.citygml4j.core.model.transportation.Road
 import org.citygml4j.core.model.transportation.Section
 import org.citygml4j.core.model.transportation.TrafficArea
+import org.citygml4j.core.model.transportation.TrafficDirectionValue
 import org.citygml4j.core.model.transportation.TrafficSpace
 import org.citygml4j.core.model.transportation.TrafficSpaceProperty
 
@@ -92,6 +93,11 @@ class TransportationModuleBuilder(
 
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
         identifierAdder.addUniqueIdentifier(lane.id, trafficSpaceFeature)
+        // TODO: consider left-hand traffic (LHT)
+        if (lane.id.isRight() || lane.id.isCenter())
+            trafficSpaceFeature.trafficDirection = TrafficDirectionValue.FORWARDS
+        else
+            trafficSpaceFeature.trafficDirection = TrafficDirectionValue.BACKWARDS
 
         // line representation of lane
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }

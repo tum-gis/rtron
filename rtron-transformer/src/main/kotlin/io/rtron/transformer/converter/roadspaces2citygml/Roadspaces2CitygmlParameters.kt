@@ -67,7 +67,7 @@ data class Roadspaces2CitygmlParameters(
         const val DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE = ParametricSweep3D.DEFAULT_STEP_SIZE
         const val DEFAULT_CIRCLE_SLICES = Cylinder3D.DEFAULT_NUMBER_SLICES
         const val DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS = false
-        const val DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES = false
+        const val DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES = true
         const val DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES = true
         const val DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY = true
     }
