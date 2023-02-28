@@ -27,7 +27,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ValidateOpendriveParameters(
-    val tolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE,
+    val tolerance: Double = OpendriveEvaluatorParameters.DEFAULT_NUMBER_TOLERANCE,
+    val planViewGeometryDistanceTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
+    val planViewGeometryDistanceWarningTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
+    val planViewGeometryAngleTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+    val planViewGeometryAngleWarningTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
+
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
 
     val writeOpendriveFile: Boolean = true,
@@ -42,10 +47,10 @@ data class ValidateOpendriveParameters(
     fun deriveOpendriveEvaluatorParameters() = OpendriveEvaluatorParameters(
         skipRoadShapeRemoval = OpendriveEvaluatorParameters.DEFAULT_SKIP_ROAD_SHAPE_REMOVAL,
         numberTolerance = tolerance,
-        planViewGeometryDistanceTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
-        planViewGeometryDistanceWarningTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
-        planViewGeometryAngleTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
-        planViewGeometryAngleWarningTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
+        planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+        planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
+        planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+        planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
     )
 
     fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
@@ -55,8 +60,8 @@ data class ValidateOpendriveParameters(
     fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
         concurrentProcessing = false,
         numberTolerance = tolerance,
-        planViewGeometryDistanceTolerance = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
-        planViewGeometryAngleTolerance = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+        planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+        planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
         attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
         crsEpsg = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
         extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES

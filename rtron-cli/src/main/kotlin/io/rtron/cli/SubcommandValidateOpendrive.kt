@@ -32,6 +32,7 @@ import io.rtron.main.processor.ValidateOpendriveParameters
 import io.rtron.main.processor.ValidateOpendriveProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 
 class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", help = "Validate OpenDRIVE datasets.", printHelpOnEmptyArgs = true) {
 
@@ -53,6 +54,14 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
 
     private val tolerance by option(help = "allowed tolerance when comparing double values").double()
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
+    private val planViewGeometryDistanceTolerance by option(help = "allowed distance tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE)
+    private val planViewGeometryDistanceWarningTolerance by option(help = "warning distance tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE)
+    private val planViewGeometryAngleTolerance by option(help = "allowed angle tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE)
+    private val planViewGeometryAngleWarningTolerance by option(help = "warning angle tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
@@ -69,6 +78,10 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
         val parameters = parametersPath.toOption().fold({
             ValidateOpendriveParameters(
                 tolerance = tolerance,
+                planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+                planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
+                planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+                planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
                 discretizationStepSize = discretizationStepSize,
                 writeOpendriveFile = !skipOpendriveExport,
                 writeCitygml2File = !skipCitygmlExport,
