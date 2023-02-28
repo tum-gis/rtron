@@ -16,7 +16,6 @@
 
 package io.rtron.model.opendrive.additions.optics
 
-import arrow.core.some
 import arrow.optics.PPrism
 import arrow.optics.Traversal
 import io.rtron.model.opendrive.OpendriveModel

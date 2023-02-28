@@ -89,7 +89,7 @@ data class CompositeCurve2D(
                 }
 
                 val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
-                check(angleDifference <= distanceTolerance) {
+                check(angleDifference <= angleTolerance) {
                     "Cannot construct CompositeCurve2D due to an angle difference between elements from " +
                         "${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
                         "of $angleDifference radians above tolerance of $angleTolerance."

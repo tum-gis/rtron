@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
+import arrow.core.None
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
@@ -137,6 +138,41 @@ object RoadEvaluator {
                             "of $angleDifference above the warning tolerance of ${parameters.planViewGeometryAngleWarningTolerance}.",
                         location, Severity.WARNING, wasFixed = false
                     )
+            }
+
+            currentRoad
+        }
+
+        val junctionIdentifiers = modifiedOpendriveModel.junction.map { it.id }
+        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+            currentRoad.getJunctionOption().tap { currentJunctionId ->
+                if (currentJunctionId !in junctionIdentifiers) {
+                    messageList += DefaultMessage(
+                        "RoadBelongsToNonExistingJunction",
+                        "Road belongs to a junction (id=${currentRoad.junction}) that does not exist.",
+                        currentRoad.id, Severity.ERROR, wasFixed = true
+                    )
+                    currentRoad.junction = ""
+                }
+            }
+
+            currentRoad.link.tap { currentLink ->
+                if (currentLink.predecessor.exists { currentPredecessor -> currentPredecessor.getJunctionPredecessorSuccessor().exists { !junctionIdentifiers.contains(it) } }) {
+                    messageList += DefaultMessage(
+                        "RoadLinkPredecessorRefersToNonExistingJunction",
+                        "Road link predecessor references a junction (id=${currentLink.predecessor.fold({ "" }, { it.elementId })}) that does not exist.",
+                        currentRoad.id, Severity.ERROR, wasFixed = true
+                    )
+                    currentLink.predecessor = None
+                }
+                if (currentLink.successor.exists { currentSuccessor -> currentSuccessor.getJunctionPredecessorSuccessor().exists { !junctionIdentifiers.contains(it) } }) {
+                    messageList += DefaultMessage(
+                        "RoadLinkSuccessorRefersToNonExistingJunction",
+                        "Road link successor references a junction (id=${currentLink.successor.fold({ "" }, { it.elementId })}) that does not exist.",
+                        currentRoad.id, Severity.ERROR, wasFixed = true
+                    )
+                    currentLink.successor = None
+                }
             }
 
             currentRoad
