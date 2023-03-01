@@ -37,8 +37,10 @@ data class OpendriveToCitygmlParameters(
     val skipRoadShapeRemoval: Boolean = OpendriveEvaluatorParameters.DEFAULT_SKIP_ROAD_SHAPE_REMOVAL,
 
     val tolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE,
-    val planViewGeometryDistanceTolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
-    val planViewGeometryAngleTolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+    val planViewGeometryDistanceTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
+    val planViewGeometryDistanceWarningTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
+    val planViewGeometryAngleTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+    val planViewGeometryAngleWarningTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
 
     val crsEpsg: Int = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
     val offsetX: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X,
@@ -76,9 +78,9 @@ data class OpendriveToCitygmlParameters(
         skipRoadShapeRemoval = skipRoadShapeRemoval,
         numberTolerance = tolerance,
         planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
-        planViewGeometryDistanceWarningTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
+        planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
-        planViewGeometryAngleWarningTolerance = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
+        planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
     )
 
     fun deriveOpendriveOffsetAdderParameters() = OpendriveOffsetAdderParameters(

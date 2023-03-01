@@ -36,6 +36,7 @@ import io.rtron.main.processor.OpendriveToCitygmlParameters
 import io.rtron.main.processor.OpendriveToCitygmlProcessor
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
 
 class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml", help = "Transform OpenDRIVE datasets to CityGML.", printHelpOnEmptyArgs = true) {
@@ -62,6 +63,14 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
 
     private val tolerance by option(help = "allowed tolerance when comparing double values").double()
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
+    private val planViewGeometryDistanceTolerance by option(help = "allowed distance tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE)
+    private val planViewGeometryDistanceWarningTolerance by option(help = "warning distance tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE)
+    private val planViewGeometryAngleTolerance by option(help = "allowed angle tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE)
+    private val planViewGeometryAngleWarningTolerance by option(help = "warning angle tolerance between two geometry elements in the plan view").double()
+        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
     private val addOffset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
@@ -90,6 +99,10 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 skipRoadShapeRemoval = skipRoadShapeRemoval,
 
                 tolerance = tolerance,
+                planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+                planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
+                planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+                planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
                 crsEpsg = crsEpsg,
                 offsetX = addOffset.first,
                 offsetY = addOffset.second,
