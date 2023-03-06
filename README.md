@@ -72,28 +72,13 @@ Therefore, bug fixes, issue reports and contributions are greatly appreciated.
 
 ## :mortar_board: Research
 
-If you are interested in the concepts and a first application of r:trån, have a look at our [paper](https://doi.org/10.3390/su12093799).
-Based on the consistent models now available in OpenDRIVE and CityGML, we generate several target formats for setting up a distributed environment simulation.
+The software r:trån can be cited using the [![DOI](https://zenodo.org/badge/258142903.svg)](https://zenodo.org/badge/latestdoi/258142903).
 
-```plain
-@article{SchwabBeilKolbe2020,
-  title = {Spatio-Semantic Road Space Modeling for Vehicle{\textendash}Pedestrian Simulation to Test Automated Driving Systems},
-  author = {Benedikt Schwab and Christof Beil and Thomas H. Kolbe},
-  journal = {Sustainability},
-  year = {2020},
-  month = may,
-  volume = {12},
-  number = {9},
-  pages = {3799},
-  publisher = {MDPI},
-  doi = {10.3390/su12093799},
-  url = {https://doi.org/10.3390/su12093799}
-}
-```
+If you use this software, please cite one of the supplemental research articles:
+- [Spatio-Semantic Road Space Modeling for Vehicle-Pedestrian Simulation to Test Automated Driving Systems](https://doi.org/10.3390/su12093799)
+- [Validation of Parametric OpenDRIVE Road Space Models](https://doi.org/10.5194/isprs-annals-X-4-W2-2022-257-2022)
 
-Moreover, these papers may also be of interest:
-
-* [Validation of Parametric OpenDRIVE Road Space Models](https://doi.org/10.5194/isprs-annals-X-4-W2-2022-257-2022)
+These papers may also be of interest:
 * [Detailed Streetspace Modelling for Multiple Applications: Discussions on the Proposed CityGML 3.0 Transportation Model](https://doi.org/https://doi.org/10.3390/ijgi9100603)
 * [Requirement Analysis of 3D Road Space Models for Automated Driving](https://doi.org/10.5194/isprs-annals-IV-4-W8-99-2019)
 * [CityGML and the streets of New York - A proposal for detailed street space modelling](https://doi.org/10.5194/isprs-annals-IV-4-W5-9-2017)
