@@ -93,6 +93,7 @@ Based on the consistent models now available in OpenDRIVE and CityGML, we genera
 
 Moreover, these papers may also be of interest:
 
+* [Validation of Parametric OpenDRIVE Road Space Models](https://doi.org/10.5194/isprs-annals-X-4-W2-2022-257-2022)
 * [Detailed Streetspace Modelling for Multiple Applications: Discussions on the Proposed CityGML 3.0 Transportation Model](https://doi.org/https://doi.org/10.3390/ijgi9100603)
 * [Requirement Analysis of 3D Road Space Models for Automated Driving](https://doi.org/10.5194/isprs-annals-IV-4-W8-99-2019)
 * [CityGML and the streets of New York - A proposal for detailed street space modelling](https://doi.org/10.5194/isprs-annals-IV-4-W5-9-2017)
