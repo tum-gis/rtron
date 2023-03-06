@@ -18,7 +18,6 @@ package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
 import arrow.core.left
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D

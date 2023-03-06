@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0] - 2023-03-06
+### Added
+- validity checks according to [article](https://doi.org/10.5194/isprs-annals-X-4-W2-2022-257-2022)
+- JSON reports
+- compressed dataset writing
+- OpenDRIVE cropping and offsetting
+- CityGML code lists #21
+- CityGML3 traffic direction #22
+
+### Removed
+- kscript due to complexity (conventional CLI is easier)
+
 ## [1.2.2] - 2021-10-14
 ### Fixed
 - stop breaking for a specific parameter combination for road objects
