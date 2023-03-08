@@ -22,6 +22,7 @@ import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyLaneSection
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLane
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
@@ -68,6 +69,11 @@ object RoadLanesEvaluator {
             }
 
             currentLaneSection
+        }
+
+        modifiedOpendriveModel = everyRoadLanesLaneSectionCenterLane.modify(modifiedOpendriveModel) { currentCenterLane ->
+            messageList += evaluateNonFatalViolations(currentCenterLane, parameters)
+            currentCenterLane
         }
 
         modifiedOpendriveModel = everyRoadLanesLaneSectionLeftLane.modify(modifiedOpendriveModel) { currentLeftLane ->
@@ -121,6 +127,16 @@ object RoadLanesEvaluator {
             // messageList += OpendriveException.UnexpectedValues("inner, outer", "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.").toMessage(lane.additionalId, isFatal = true, wasFixed = true)
             lane.height = heightEntriesFilteredByCoefficientsFinite
         }
+
+        lane.roadMark = BasicDataTypeModifier.filterToStrictlySorted(lane.roadMark, { it.sOffset }, lane.additionalId, "roadMark", messageList)
+
+        return messageList
+    }
+
+    private fun evaluateNonFatalViolations(lane: RoadLanesLaneSectionCenterLane, parameters: OpendriveEvaluatorParameters): DefaultMessageList {
+        val messageList = DefaultMessageList()
+
+        lane.roadMark = BasicDataTypeModifier.filterToStrictlySorted(lane.roadMark, { it.sOffset }, lane.additionalId, "roadMark", messageList)
 
         return messageList
     }
