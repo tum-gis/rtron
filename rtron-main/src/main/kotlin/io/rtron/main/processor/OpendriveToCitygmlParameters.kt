@@ -52,6 +52,7 @@ data class OpendriveToCitygmlParameters(
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
     val circleSlices: Int = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
+    val generateRandomGeometryIds: Boolean = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
     val transformAdditionalRoadLines: Boolean = Roadspaces2CitygmlParameters.DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES,
 
     val compressionFormat: CompressionFormat = CompressionFormat.NONE
@@ -126,7 +127,7 @@ data class OpendriveToCitygmlParameters(
         discretizationStepSize = discretizationStepSize,
         sweepDiscretizationStepSize = sweepDiscretizationStepSize,
         circleSlices = circleSlices,
-        generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
+        generateRandomGeometryIds = generateRandomGeometryIds,
         transformAdditionalRoadLines = transformAdditionalRoadLines,
         generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
         mappingBackwardsCompatibility = convertToCitygml2,
