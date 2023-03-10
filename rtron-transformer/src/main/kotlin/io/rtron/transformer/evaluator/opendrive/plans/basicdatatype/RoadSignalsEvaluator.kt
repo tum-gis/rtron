@@ -41,7 +41,7 @@ object RoadSignalsEvaluator {
             currentRoadSignal.roll = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.roll, currentRoadSignal.additionalId, "roll", messageList)
             currentRoadSignal.s = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRoadSignal.s, currentRoadSignal.additionalId, "s", messageList)
             currentRoadSignal.subtype = BasicDataTypeModifier.modifyToNonBlankString(currentRoadSignal.subtype, currentRoadSignal.additionalId, "subtype", messageList, fallbackValue = "-1")
-            currentRoadSignal.t = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRoadSignal.t, currentRoadSignal.additionalId, "t", messageList)
+            currentRoadSignal.t = BasicDataTypeModifier.modifyToFiniteDouble(currentRoadSignal.t, currentRoadSignal.additionalId, "t", messageList)
             currentRoadSignal.type = BasicDataTypeModifier.modifyToNonBlankString(currentRoadSignal.type, currentRoadSignal.additionalId, "type", messageList, fallbackValue = "-1")
             currentRoadSignal.value = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.value, currentRoadSignal.additionalId, "value", messageList)
 
