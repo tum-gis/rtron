@@ -94,8 +94,8 @@ allprojects {
 
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         filter {
-            exclude { it.file.path.contains("$buildDir/generated/") }
-            exclude { it.file.path.contains("$buildDir/generated-sources/") }
+            exclude { projectDir.toURI().relativize(it.file.toURI()).path.contains("/generated/") }
+            exclude { projectDir.toURI().relativize(it.file.toURI()).path.contains("/generated-sources/") }
         }
     }
 
