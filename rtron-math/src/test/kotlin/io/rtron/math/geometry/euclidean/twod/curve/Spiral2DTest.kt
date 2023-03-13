@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package io.rtron.math.geometry.euclidean.twod
+package io.rtron.math.geometry.euclidean.twod.curve
 
-import io.rtron.math.geometry.euclidean.twod.curve.Spiral2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.std.PI

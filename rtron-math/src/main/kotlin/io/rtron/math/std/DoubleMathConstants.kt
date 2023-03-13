@@ -30,6 +30,8 @@ val DBL_EPSILON_7 = Math.ulp(1E7)
 val DBL_EPSILON_8 = Math.ulp(1E8)
 val DBL_EPSILON_9 = Math.ulp(1E9)
 val DBL_EPSILON_10 = Math.ulp(1E10)
+val DBL_EPSILON_11 = Math.ulp(1E11)
+val DBL_EPSILON_12 = Math.ulp(1E12)
 
 val FLT_EPSILON = Math.ulp(1.0f)
 

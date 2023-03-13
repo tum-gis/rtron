@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package io.rtron.math.geometry.euclidean.twod
+package io.rtron.math.geometry.euclidean.twod.point
 
-import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.PI
 import org.assertj.core.api.Assertions.assertThat
