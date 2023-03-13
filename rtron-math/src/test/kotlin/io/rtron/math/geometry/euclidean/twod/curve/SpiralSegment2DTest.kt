@@ -25,6 +25,7 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON_11
 import io.rtron.math.std.DBL_EPSILON_2
 import io.rtron.math.std.DBL_EPSILON_4
+import io.rtron.math.std.DBL_EPSILON_6
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import org.assertj.core.api.Assertions
@@ -38,7 +39,7 @@ internal class SpiralSegment2DTest {
     inner class TestPointCalculation {
 
         @Test
-        fun `first spiral of the ASAM example dataset Ex_Line-Spiral-Arc `() {
+        fun `first spiral of the ASAM example dataset Ex_Line-Spiral-Arc`() {
             val pose = Pose2D(Vector2D(3.8003686923043311e+01, -1.8133261823256248e+00), Rotation2D(3.3186980419884304e-01))
             val affine = Affine2D.of(pose)
             val curvatureFunction = LinearFunction.ofSpiralCurvature(0.0, 1.3333327910466574e-02, 2.9999999999999996e+01)
@@ -46,7 +47,6 @@ internal class SpiralSegment2DTest {
             val curveRelativePoint = CurveRelativeVector1D(1.3000000000000000e+02 - 1.0000000000000000e+02)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
-            println(actualReturn)
 
             Assertions.assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
             require(actualReturn is Either.Right)
@@ -74,7 +74,6 @@ internal class SpiralSegment2DTest {
             val curveRelativePoint = CurveRelativeVector1D(1.7999999146329435e+02 - 1.5999999146329435e+02)
 
             val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
-            println(actualReturn)
 
             Assertions.assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
             require(actualReturn is Either.Right)
@@ -89,6 +88,60 @@ internal class SpiralSegment2DTest {
                 1.1318693921172343e+00,
                 Offset.offset(
                     DBL_EPSILON_4
+                )
+            )
+        }
+
+        @Test
+        fun `first spiral of the example dataset CrossingComplex8Course`() {
+            val pose = Pose2D(Vector2D(4.5002666984590900e+02, 5.2071081556728734e+02), Rotation2D(4.7173401120976974e+00))
+            val affine = Affine2D.of(pose)
+            val curvatureFunction = LinearFunction.ofSpiralCurvature(-0.0000000000000000e+00, -1.0126582278481013e-01, 4.9620253164556960e+00)
+            val curve = SpiralSegment2D(curvatureFunction, DBL_EPSILON_2, AffineSequence2D.of(affine))
+            val curveRelativePoint = CurveRelativeVector1D(1.0507568316454000e+01 - 5.5455429999983039e+00)
+
+            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+
+            Assertions.assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
+            Assertions.assertThat(actualReturn.value.point.x).isCloseTo(
+                4.4963740167278593e+02,
+                Offset.offset(
+                    DBL_EPSILON_6
+                )
+            )
+            Assertions.assertThat(actualReturn.value.point.y).isCloseTo(5.1577803259440122e+02, Offset.offset(DBL_EPSILON_6))
+            Assertions.assertThat(actualReturn.value.rotation.angle).isCloseTo(
+                4.4660983239227257e+00,
+                Offset.offset(
+                    DBL_EPSILON_2
+                )
+            )
+        }
+
+        @Test
+        fun `second spiral of the example dataset CrossingComplex8Course`() {
+            val pose = Pose2D(Vector2D(4.4256271579386976e+02, 5.0863294215453800e+02), Rotation2D(3.3977855734777722e+00))
+            val affine = Affine2D.of(pose)
+            val curvatureFunction = LinearFunction.ofSpiralCurvature(-1.0126582278481013e-01, -0.0000000000000000e+00, 4.9620253164556960e+00)
+            val curve = SpiralSegment2D(curvatureFunction, DBL_EPSILON_2, AffineSequence2D.of(affine))
+            val curveRelativePoint = CurveRelativeVector1D(2.6019182043553606e+01 - 2.1057156727097912e+01)
+
+            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+
+            Assertions.assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
+            require(actualReturn is Either.Right)
+            Assertions.assertThat(actualReturn.value.point.x).isCloseTo(
+                4.3763402923360974e+02,
+                Offset.offset(
+                    DBL_EPSILON_6
+                )
+            )
+            Assertions.assertThat(actualReturn.value.point.y).isCloseTo(5.0819484814787387e+02, Offset.offset(DBL_EPSILON_6))
+            Assertions.assertThat(actualReturn.value.rotation.angle).isCloseTo(
+                3.1465437853028004e+00,
+                Offset.offset(
+                    DBL_EPSILON_2
                 )
             )
         }
