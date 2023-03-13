@@ -36,12 +36,18 @@ object OpendriveValidator {
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    fun runSchemaValidation(filePath: Path): Either<OpendriveReaderException, SchemaValidationReport> = either.eager {
+    fun validateFromFile(filePath: Path): Either<OpendriveReaderException, SchemaValidationReport> = either.eager {
         val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(filePath.inputStreamFromDirectOrCompressedFile()).bind()
 
         val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
-        val messageList = validate(opendriveVersion, fileInputStream)
-            .apply { fileInputStream.close() }
+        val reportResult = validateFromStream(opendriveVersion, fileInputStream)
+        fileInputStream.close()
+
+        reportResult.bind()
+    }
+
+    fun validateFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, SchemaValidationReport> = either.eager {
+        val messageList = runValidation(opendriveVersion, inputStream)
             .getOrElse {
                 logger.warn("Schema validation was aborted due the following error: ${it.message}")
                 return@eager SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
@@ -55,7 +61,7 @@ object OpendriveValidator {
         SchemaValidationReport(opendriveVersion, messageList)
     }
 
-    fun validate(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> =
+    private fun runValidation(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> =
         either.eager {
             val unmarshaller = OpendriveUnmarshaller.of(opendriveVersion).bind()
 

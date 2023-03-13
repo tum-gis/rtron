@@ -65,7 +65,7 @@ class OpendriveToCitygmlProcessor(
             (outputSubDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // validate schema of OpenDRIVE model
-            val opendriveSchemaValidatorReport = OpendriveValidator.runSchemaValidation(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
+            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted()) {
                 return@processAllFiles

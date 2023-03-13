@@ -54,7 +54,7 @@ class ValidateOpendriveProcessor(
             (outputDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // validate schema of OpenDRIVE model
-            val opendriveSchemaValidatorReport = OpendriveValidator.runSchemaValidation(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
+            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted()) {
                 return@processAllFiles
