@@ -16,7 +16,6 @@
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 if (!JavaVersion.current().isJava11Compatible) {
     logger.warn(
@@ -46,6 +45,16 @@ allprojects {
     apply(plugin = "maven-publish")
     if (!project.hasProperty(BuildPropertyNames.skipSigning)) {
         apply(plugin = "signing")
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = "11"
+        }
     }
 
     repositories {
@@ -78,37 +87,17 @@ allprojects {
         options.encoding = "UTF-8"
     }
 
-    tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-
     java {
         withSourcesJar()
         withJavadocJar()
     }
 
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        // version.set("0.45.2")
         filter {
             exclude { it.file.path.contains("$buildDir/generated/") }
+            exclude { it.file.path.contains("$buildDir/generated-sources/") }
         }
     }
-
-    /*tasks.withType<DokkaTask>().configureEach {
-        dokkaSourceSets {
-            named("main") {
-                moduleName.set("Dokka Gradle Example")
-                includes.from("Module.md")
-                sourceLink {
-                    localDirectory.set(file("src/main/kotlin"))
-                    remoteUrl.set(URL("https://github.com/Kotlin/dokka/tree/master/" +
-                            "examples/gradle/dokka-gradle-example/src/main/kotlin"
-                    ))
-                    remoteLineSuffix.set("#L")
-                }
-            }
-        }
-    }*/
 
     publishing {
         apply(plugin = "maven-publish")
@@ -169,11 +158,10 @@ allprojects {
 }
 
 dependencies {
-    // make the root project archives configuration depend on every sub-project
+    // make the root project archives configuration depend on every subproject
     subprojects.forEach {
         implementation(it)
     }
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<DependencyUpdatesTask> {
@@ -184,14 +172,6 @@ tasks.withType<DependencyUpdatesTask> {
 }
 repositories {
     mavenCentral()
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "11"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "11"
 }
 
 fun configureDokka() {

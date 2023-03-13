@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 
 plugins {
     kotlin("jvm")
@@ -36,16 +37,7 @@ dependencies {
     implementation(Dependencies.citygml4jXml)
 }
 
-tasks.withType<KotlinCompile> {
-    dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
-
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-}
-
 xjcGeneration {
-
     defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
 
     schemas {
@@ -100,16 +92,17 @@ xjcGeneration {
     }
 }
 
-tasks.named<Jar>("sourcesJar") {
-    dependsOn("schemaGen_org-asam-opendrive11")
-    dependsOn("schemaGen_org-asam-opendrive12")
-    dependsOn("schemaGen_org-asam-opendrive13")
-    dependsOn("schemaGen_org-asam-opendrive14")
-    dependsOn("schemaGen_org-asam-opendrive15")
-    dependsOn("schemaGen_org-asam-opendrive16")
-    dependsOn("schemaGen_org-asam-opendrive17")
+tasks.withType<KotlinCompile> {
+    dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
+}
 
+tasks.named<Jar>("sourcesJar") {
+    dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+tasks.withType<KtLintCheckTask> {
+    dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
 }
 
 tasks.withType<Javadoc> {
