@@ -28,7 +28,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 @optics
 data class RoadLanes(
     var laneOffset: List<RoadLanesLaneOffset> = emptyList(),
-    var laneSection: List<RoadLanesLaneSection> = emptyList(),
+    var laneSection: List<RoadLanesLaneSection> = emptyList()
 ) : OpendriveElement() {
 
     // Validation Properties

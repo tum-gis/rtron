@@ -61,8 +61,9 @@ class AttributeListBuilder(
     @JvmName("OptionalStringAttribute")
     fun attribute(name: String, optionalValue: Option<String>) {
         optionalValue.tap {
-            if (it.isNotBlank())
+            if (it.isNotBlank()) {
                 attributes += StringAttribute(namePrefix + name, it)
+            }
         }
     }
 

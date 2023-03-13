@@ -46,8 +46,10 @@ object Curve3DBuilder {
         angleTolerance: Double
     ): Curve3D {
         val planViewCurve2D = Curve2DBuilder.buildCurve2DFromPlanViewGeometries(
-            planViewGeometries, numberTolerance,
-            distanceTolerance, angleTolerance
+            planViewGeometries,
+            numberTolerance,
+            distanceTolerance,
+            angleTolerance
         )
         val heightFunction = elevationProfiles.fold({ LinearFunction.X_AXIS }, { buildHeightFunction(it) })
 

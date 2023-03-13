@@ -39,8 +39,11 @@ class RoadObjectsObjectOutlinesOutlineCornerRoad(
 
     fun getBasePoint() = CurveRelativeVector3D(s, t, dz)
     fun getHeadPoint(): Option<CurveRelativeVector3D> =
-        if (hasZeroHeight()) None
-        else CurveRelativeVector3D(s, t, dz + height).some()
+        if (hasZeroHeight()) {
+            None
+        } else {
+            CurveRelativeVector3D(s, t, dz + height).some()
+        }
 
     fun getPoints(): Pair<CurveRelativeVector3D, Option<CurveRelativeVector3D>> = Pair(getBasePoint(), getHeadPoint())
 }

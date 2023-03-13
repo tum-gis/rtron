@@ -42,8 +42,11 @@ class StackedFunction(
     }
 
     override val domain: Range<Double> =
-        if (defaultValue.isFinite()) memberFunctions.map { it.domain }.toSet().unionRanges().span()
-        else memberFunctions.map { it.domain }.toSet().intersectingRange()
+        if (defaultValue.isFinite()) {
+            memberFunctions.map { it.domain }.toSet().unionRanges().span()
+        } else {
+            memberFunctions.map { it.domain }.toSet().intersectingRange()
+        }
 
     // Secondary Constructors
     constructor(

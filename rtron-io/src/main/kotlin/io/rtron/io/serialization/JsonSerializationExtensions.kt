@@ -26,8 +26,9 @@ import kotlin.io.path.extension
 inline fun <reified T> T.serializeToJsonFile(filePath: Path) {
     require(filePath.extension == "json") { "Extension of file path must be json." }
 
-    if (!filePath.parent.exists())
+    if (!filePath.parent.exists()) {
         filePath.parent.createDirectories()
+    }
 
     val jsonFormatter = Json {
         prettyPrint = true

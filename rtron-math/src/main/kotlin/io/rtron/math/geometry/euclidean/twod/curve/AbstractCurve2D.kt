@@ -55,8 +55,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return point in cartesian coordinates
      */
     fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Vector2D> {
-        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+        }
 
         return calculatePointLocalCSUnbounded(curveRelativePoint).right()
     }
@@ -79,8 +80,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return orientation tangential to this curve
      */
     fun calculateRotationLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Rotation2D> {
-        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+        }
 
         return calculateRotationLocalCSUnbounded(curveRelativePoint).right()
     }
@@ -124,8 +126,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return orientation tangential to this curve
      */
     fun calculateRotationGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Rotation2D> {
-        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+        }
 
         return calculateRotationGlobalCSUnbounded(curveRelativePoint).right()
     }
@@ -149,8 +152,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @return pose whereby the orientation is tangential to this curve
      */
     fun calculatePoseGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Pose2D> {
-        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+        }
 
         return calculatePoseGlobalCSUnbounded(curveRelativePoint).right()
     }

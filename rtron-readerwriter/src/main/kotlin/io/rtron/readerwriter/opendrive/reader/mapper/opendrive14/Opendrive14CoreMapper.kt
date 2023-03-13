@@ -39,8 +39,11 @@ abstract class Opendrive14CoreMapper {
     // Header
     //
     fun mapHeaderGeoreference(source: String): Option<HeaderGeoReference> {
-        return if (source.isBlank()) None
-        else HeaderGeoReference(content = source).some()
+        return if (source.isBlank()) {
+            None
+        } else {
+            HeaderGeoReference(content = source).some()
+        }
     }
 
     //

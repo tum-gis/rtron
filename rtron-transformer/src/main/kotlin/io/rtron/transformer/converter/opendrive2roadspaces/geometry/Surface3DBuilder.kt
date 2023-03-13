@@ -63,8 +63,9 @@ object Surface3DBuilder {
             rectangleList += Rectangle3D.of(roadObject.length, roadObject.width, numberTolerance, affineSequence)
         }
 
-        if (roadObject.repeat.any { it.isRepeatedCuboid() })
+        if (roadObject.repeat.any { it.isRepeatedCuboid() }) {
             messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
+        }
 
         return ContextMessageList(rectangleList, messageList)
     }
@@ -83,8 +84,9 @@ object Surface3DBuilder {
             circleList += Circle3D.of(roadObject.radius, numberTolerance, affineSequence)
         }
 
-        if (roadObject.repeat.any { it.isRepeatCylinder() })
+        if (roadObject.repeat.any { it.isRepeatCylinder() }) {
             messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
+        }
 
         return ContextMessageList(circleList, messageList)
     }

@@ -66,14 +66,16 @@ class Roadspaces2CitygmlTransformer(
      * @return generated CityGML model as output
      */
     fun transform(roadspacesModel: RoadspacesModel): Pair<CitygmlModel, Roadspaces2CitygmlReport> {
-
         val report = Roadspaces2CitygmlReport(parameters)
 
         // transformation of each road space
         logger.info("Parameters: $parameters.")
         val abstractCityObjects =
-            if (parameters.concurrentProcessing) transformRoadspacesConcurrently(roadspacesModel).handleMessageList { report.conversion += it }
-            else transformRoadspacesSequentially(roadspacesModel).handleMessageList { report.conversion += it }
+            if (parameters.concurrentProcessing) {
+                transformRoadspacesConcurrently(roadspacesModel).handleMessageList { report.conversion += it }
+            } else {
+                transformRoadspacesSequentially(roadspacesModel).handleMessageList { report.conversion += it }
+            }
 
         // create CityGML model
         val boundingShape = calculateBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
@@ -85,7 +87,6 @@ class Roadspaces2CitygmlTransformer(
     private fun transformRoadspacesSequentially(
         roadspacesModel: RoadspacesModel
     ): ContextMessageList<List<AbstractCityObject>> {
-
         val messageList = DefaultMessageList()
 
         // build objects
@@ -110,7 +111,9 @@ class Roadspaces2CitygmlTransformer(
             roadspacesModel.getAllRoadspaces().map {
                 roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
             }.mergeMessageLists().handleMessageList { messageList += it }.flatten()
-        } else emptyList()
+        } else {
+            emptyList()
+        }
 
         addLaneTopology(roadspacesModel, roadFeatures)
         val cityObjects: List<AbstractCityObject> = roadFeatures + roadspaceObjects + additionalRoadLines
@@ -147,7 +150,9 @@ class Roadspaces2CitygmlTransformer(
                     roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
                 }
             }
-        } else emptyList()
+        } else {
+            emptyList()
+        }
 
         val roadFeatures = runBlocking {
             roadFeaturesDeferred.map { currentRoadFeature -> currentRoadFeature.await().handleMessageList { messageList += it } }.flattenOption()

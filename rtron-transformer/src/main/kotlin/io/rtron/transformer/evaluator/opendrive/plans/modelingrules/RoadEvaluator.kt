@@ -35,8 +35,9 @@ object RoadEvaluator {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
-            if (currentRoad.planView.geometry.any { it.s > currentRoad.length + parameters.numberTolerance })
+            if (currentRoad.planView.geometry.any { it.s > currentRoad.length + parameters.numberTolerance }) {
                 messageList += DefaultMessage.of("", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = false)
+            }
 
             currentRoad
         }
@@ -60,7 +61,7 @@ object RoadEvaluator {
         }
 
         modifiedOpendriveModel.road = modifiedOpendriveModel.road.filter { currentRoad ->
-            if (currentRoad.planView.geometry.isEmpty())
+            if (currentRoad.planView.geometry.isEmpty()) {
                 messageList += DefaultMessage.of(
                     "RoadWithoutValidPlanViewGeometryElement",
                     "Road does not contain any valid geometry element in the planView.",
@@ -68,6 +69,7 @@ object RoadEvaluator {
                     Severity.FATAL_ERROR,
                     wasFixed = false
                 )
+            }
             currentRoad.planView.geometry.isNotEmpty()
         }
 
@@ -104,40 +106,50 @@ object RoadEvaluator {
                 val backCurveMemberStartPose = it.second.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D.ZERO)
 
                 val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
-                if (distance > parameters.planViewGeometryDistanceTolerance)
+                if (distance > parameters.planViewGeometryDistanceTolerance) {
                     messageList += DefaultMessage(
                         "GapBetweenPlanViewGeometryElements",
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
                             "of $distance above the tolerance of ${parameters.planViewGeometryDistanceTolerance}.",
-                        location, Severity.FATAL_ERROR, wasFixed = false
+                        location,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false
                     )
-                else if (distance > parameters.planViewGeometryDistanceWarningTolerance)
+                } else if (distance > parameters.planViewGeometryDistanceWarningTolerance) {
                     messageList += DefaultMessage(
                         "GapBetweenPlanViewGeometryElements",
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
                             "of $distance above the warning tolerance of ${parameters.planViewGeometryDistanceWarningTolerance}.",
-                        location, Severity.WARNING, wasFixed = false
+                        location,
+                        Severity.WARNING,
+                        wasFixed = false
                     )
+                }
 
                 val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
-                if (angleDifference > parameters.planViewGeometryAngleTolerance)
+                if (angleDifference > parameters.planViewGeometryAngleTolerance) {
                     messageList += DefaultMessage(
                         "KinkBetweenPlanViewGeometryElements",
                         "Geometry elements contain a kink " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
                             "of $angleDifference above the tolerance of ${parameters.planViewGeometryAngleTolerance}.",
-                        location, Severity.FATAL_ERROR, wasFixed = false
+                        location,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false
                     )
-                else if (angleDifference > parameters.planViewGeometryAngleWarningTolerance)
+                } else if (angleDifference > parameters.planViewGeometryAngleWarningTolerance) {
                     messageList += DefaultMessage(
                         "KinkBetweenPlanViewGeometryElements",
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
                             "of $angleDifference above the warning tolerance of ${parameters.planViewGeometryAngleWarningTolerance}.",
-                        location, Severity.WARNING, wasFixed = false
+                        location,
+                        Severity.WARNING,
+                        wasFixed = false
                     )
+                }
             }
 
             currentRoad
@@ -150,7 +162,9 @@ object RoadEvaluator {
                     messageList += DefaultMessage(
                         "RoadBelongsToNonExistingJunction",
                         "Road belongs to a junction (id=${currentRoad.junction}) that does not exist.",
-                        currentRoad.id, Severity.ERROR, wasFixed = true
+                        currentRoad.id,
+                        Severity.ERROR,
+                        wasFixed = true
                     )
                     currentRoad.junction = ""
                 }
@@ -161,7 +175,9 @@ object RoadEvaluator {
                     messageList += DefaultMessage(
                         "RoadLinkPredecessorRefersToNonExistingJunction",
                         "Road link predecessor references a junction (id=${currentLink.predecessor.fold({ "" }, { it.elementId })}) that does not exist.",
-                        currentRoad.id, Severity.ERROR, wasFixed = true
+                        currentRoad.id,
+                        Severity.ERROR,
+                        wasFixed = true
                     )
                     currentLink.predecessor = None
                 }
@@ -169,7 +185,9 @@ object RoadEvaluator {
                     messageList += DefaultMessage(
                         "RoadLinkSuccessorRefersToNonExistingJunction",
                         "Road link successor references a junction (id=${currentLink.successor.fold({ "" }, { it.elementId })}) that does not exist.",
-                        currentRoad.id, Severity.ERROR, wasFixed = true
+                        currentRoad.id,
+                        Severity.ERROR,
+                        wasFixed = true
                     )
                     currentLink.successor = None
                 }

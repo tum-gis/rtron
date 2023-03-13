@@ -39,21 +39,27 @@ val DEFAULT_TOLERANCE = DBL_EPSILON_7
 
 /** Value of PI as double. (180 degrees) */
 const val PI = CMFastMath.PI
+
 /** Value of 2PI as double. (360 degrees) */
 const val TWO_PI = 2.0 * PI
+
 /** Value of PI/2 as double. (90 degrees) */
 const val HALF_PI = 0.5 * PI
+
 /** Value of PI/4 as double. (45 degrees) */
 const val QUARTER_PI = 0.25 * PI
+
 /** Value of PI3/4 as double. (135 degrees) */
 const val THREE_QUARTER_PI = 0.75 * PI
 
 /** Value of 1/PI as double. */
 const val INV_PI = 1.0 / PI
+
 /** Value of 1/(2PI) as double. */
 const val INV_TWO_PI = 1.0 / TWO_PI
 
 /** Value to multiply a degree value by, to convert to radians. */
 const val DEG_TO_RAD = PI / 180.0
+
 /** Value to multiply a radian value by, to convert to degrees. */
 const val RAD_TO_DEG = 180.0 / PI

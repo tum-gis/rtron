@@ -56,7 +56,7 @@ enum class TrafficAreaFunctionCode(val code: Code) {
     MOTORWAY_EXIT(Code("35")),
     MOTORWAY_EMERGENCY_LANE(Code("36")),
     PRIVATE_AREA(Code("37")),
-    UNKNOWN(Code("9999")),
+    UNKNOWN(Code("9999"))
 }
 
 enum class TrafficAreaUsageCode(val code: Code) {
@@ -74,7 +74,7 @@ enum class TrafficAreaUsageCode(val code: Code) {
     HELICOPTER(Code("12")),
     TAXI(Code("13")),
     HORSE(Code("14")),
-    UNKNOWN(Code("9999")),
+    UNKNOWN(Code("9999"))
 }
 
 enum class TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(val code: Code) {
@@ -91,5 +91,5 @@ enum class TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(val code: Code)
     WOOD(Code("11")),
     STEEL(Code("12")),
     MARBLE(Code("13")),
-    UNKNOWN(Code("9999")),
+    UNKNOWN(Code("9999"))
 }

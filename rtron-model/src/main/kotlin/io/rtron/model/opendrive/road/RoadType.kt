@@ -26,5 +26,5 @@ data class RoadType(
 
     var country: Option<ECountryCode> = None,
     var s: Double = Double.NaN,
-    var type: ERoadType = ERoadType.UNKNOWN,
+    var type: ERoadType = ERoadType.UNKNOWN
 ) : OpendriveElement()

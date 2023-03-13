@@ -52,11 +52,17 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
 
         // requirement: lower and upper domain boundaries (apart from the first and last entry)
         val absoluteDomainsWithoutStart =
-            if (absoluteDomains.first().hasLowerBound()) absoluteDomains
-            else absoluteDomains.drop(1)
+            if (absoluteDomains.first().hasLowerBound()) {
+                absoluteDomains
+            } else {
+                absoluteDomains.drop(1)
+            }
         val absoluteDomainsWithoutEndings =
-            if (absoluteDomainsWithoutStart.last().hasUpperBound()) absoluteDomainsWithoutStart
-            else absoluteDomainsWithoutStart.dropLast(1)
+            if (absoluteDomainsWithoutStart.last().hasUpperBound()) {
+                absoluteDomainsWithoutStart
+            } else {
+                absoluteDomainsWithoutStart.dropLast(1)
+            }
         require(absoluteDomainsWithoutEndings.all { it.hasLowerBound() && it.hasUpperBound() }) { "All absolute domains (apart from the first and last one) must have an upper and lower bound." }
         require(absoluteDomainsWithoutEndings.isSortedBy { it.lowerEndpointOrNull()!! }) { "Provided absolute domains must be sorted." }
 
@@ -123,7 +129,6 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      */
     private fun handleSelection(parameter: Double, selection: List<Int>):
         Either<Exception, LocalRequest<T>> = when (selection.size) {
-
         0 -> Either.Left(
             IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains.")
         )

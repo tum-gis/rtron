@@ -94,10 +94,11 @@ class TransportationModuleBuilder(
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
         identifierAdder.addUniqueIdentifier(lane.id, trafficSpaceFeature)
         // TODO: consider left-hand traffic (LHT)
-        if (lane.id.isRight() || lane.id.isCenter())
+        if (lane.id.isRight() || lane.id.isCenter()) {
             trafficSpaceFeature.trafficDirection = TrafficDirectionValue.FORWARDS
-        else
+        } else {
             trafficSpaceFeature.trafficDirection = TrafficDirectionValue.BACKWARDS
+        }
 
         // line representation of lane
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
@@ -303,7 +304,6 @@ class TransportationModuleBuilder(
      * Add the [markingFeature] to the [dstTransportationSpace] depending on its type.
      */
     private fun addMarkingFeature(markingFeature: AbstractThematicSurface, dstTransportationSpace: AbstractTransportationSpace) {
-
         when (markingFeature) {
             is Marking -> {
                 val markingProperty = MarkingProperty(markingFeature)

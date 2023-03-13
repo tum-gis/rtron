@@ -64,12 +64,14 @@ class OpendriveOffsetResolver {
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             val modifiedRoad = currentRoad.copy()
 
-            if (modifiedRoad.elevationProfile.isEmpty())
+            if (modifiedRoad.elevationProfile.isEmpty()) {
                 modifiedRoad.elevationProfile = RoadElevationProfile(emptyList()).some()
+            }
 
             modifiedRoad.elevationProfile.tap {
-                if (it.elevation.isEmpty())
+                if (it.elevation.isEmpty()) {
                     it.elevation += RoadElevationProfileElevation(headerOffset.z, 0.0, 0.0, 0.0, 0.0)
+                }
             }
 
             modifiedRoad

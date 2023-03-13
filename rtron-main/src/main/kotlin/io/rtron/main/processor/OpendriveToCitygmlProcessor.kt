@@ -46,7 +46,6 @@ class OpendriveToCitygmlProcessor(
     // Methods
 
     fun process(inputPath: Path, outputPath: Path) {
-
         val logger = KotlinLogging.logger {}
 
         processAllFiles(
@@ -68,8 +67,9 @@ class OpendriveToCitygmlProcessor(
             // validate schema of OpenDRIVE model
             val opendriveSchemaValidatorReport = OpendriveValidator.runSchemaValidation(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
-            if (opendriveSchemaValidatorReport.validationProcessAborted())
+            if (opendriveSchemaValidatorReport.validationProcessAborted()) {
                 return@processAllFiles
+            }
             // read of OpenDRIVE model
             val opendriveModel = OpendriveFileReader.readFromFile(inputFilePath)
                 .getOrElse { logger.warn(it.message); return@processAllFiles }

@@ -73,7 +73,6 @@ class SpiralSegment2D(
         calculatePoseLocalCS(curveRelativePoint).rotation
 
     private fun calculatePoseLocalCS(curveRelativePoint: CurveRelativeVector1D): Pose2D {
-
         val poseOnUnitSpiral = spiral.calculatePose(lengthStart + curveRelativePoint.curvePosition)
         val poseOnUnitSpiralStartingAtOrigin = Affine2D.of(spiralPoseStart).inverseTransform(poseOnUnitSpiral)
 

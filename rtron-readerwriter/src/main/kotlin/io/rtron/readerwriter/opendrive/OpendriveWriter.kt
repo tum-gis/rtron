@@ -35,7 +35,6 @@ class OpendriveFileWriter(
 
     // Methods
     fun write(model: OpendriveModel, directoryPath: Path): Either<OpendriveWriterException, Path> = either.eager {
-
         val filePath = opendriveMarshaller.writeToFile(model, directoryPath, parameters.fileCompression).bind()
         logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
 

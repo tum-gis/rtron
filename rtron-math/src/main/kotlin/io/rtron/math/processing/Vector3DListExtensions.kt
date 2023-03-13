@@ -51,8 +51,11 @@ fun Triple<Vector3D, Vector3D, Vector3D>.isColinear(tolerance: Double): Boolean 
     val distanceFirstThird = first.distance(third)
 
     if (distanceFirstSecond < tolerance || distanceFirstThird < tolerance) return true
-    val line = if (distanceFirstSecond < distanceFirstThird)
-        Line3D(first, third, tolerance) else Line3D(first, second, tolerance)
+    val line = if (distanceFirstSecond < distanceFirstThird) {
+        Line3D(first, third, tolerance)
+    } else {
+        Line3D(first, second, tolerance)
+    }
     val point = if (distanceFirstSecond < distanceFirstThird) second else third
 
     return line.distance(point) < tolerance
@@ -107,7 +110,9 @@ fun List<Vector3D>.isPlanar(tolerance: Double, dynamicToleranceAdjustment: Boole
         val u = Math.ulp(this.flatMap { it.toDoubleList() }.maxOf(::abs))
         val dynamicFactor = u / DBL_EPSILON
         tolerance * dynamicFactor
-    } else tolerance
+    } else {
+        tolerance
+    }
 
     val bestFittingPlane = this.calculateBestFittingPlane(tolerance)
     return this.all { bestFittingPlane.getOffset(it) <= adjustedTolerance }
@@ -147,5 +152,8 @@ fun List<Vector3D>.toCoordinatesString(): String {
  * @return list of vectors without consecutively following side duplicates
  */
 fun List<Vector3D>.removeConsecutiveSideDuplicates(): List<Vector3D> =
-    if (this.size < 3) this
-    else filterWindowedEnclosing(listOf(false, true, true)) { it[0] == it[2] }
+    if (this.size < 3) {
+        this
+    } else {
+        filterWindowedEnclosing(listOf(false, true, true)) { it[0] == it[2] }
+    }

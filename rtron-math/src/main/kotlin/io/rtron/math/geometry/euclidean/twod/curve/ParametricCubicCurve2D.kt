@@ -59,14 +59,12 @@ class ParametricCubicCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-
         val x = polynomialFunctionX.value(curveRelativePoint.curvePosition).getOrElse { throw it }
         val y = polynomialFunctionY.value(curveRelativePoint.curvePosition).getOrElse { throw it }
         return Vector2D(x, y)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
-
         val x = polynomialFunctionX.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
         val y = polynomialFunctionY.slope(curveRelativePoint.curvePosition).getOrElse { throw it }
 

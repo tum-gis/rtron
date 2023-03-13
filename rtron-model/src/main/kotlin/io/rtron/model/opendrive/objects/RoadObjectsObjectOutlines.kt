@@ -21,7 +21,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
 data class RoadObjectsObjectOutlines(
-    var outline: List<RoadObjectsObjectOutlinesOutline> = emptyList(),
+    var outline: List<RoadObjectsObjectOutlinesOutline> = emptyList()
 ) : OpendriveElement() {
 
     // Methods

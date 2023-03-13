@@ -92,7 +92,6 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     // Methods
 
     override fun run() {
-
         val parameters = parametersPath.toOption().fold({
             OpendriveToCitygmlParameters(
                 convertToCitygml2 = convertToCitygml2,

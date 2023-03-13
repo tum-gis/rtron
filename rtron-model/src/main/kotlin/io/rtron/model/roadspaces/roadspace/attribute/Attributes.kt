@@ -38,8 +38,11 @@ class StringAttribute(name: String, val value: String) : Attribute(name) {
 
     companion object {
         fun of(name: String, value: String): Option<StringAttribute> =
-            if (value.isEmpty()) None
-            else StringAttribute(name, value).some()
+            if (value.isEmpty()) {
+                None
+            } else {
+                StringAttribute(name, value).some()
+            }
     }
 }
 
@@ -60,8 +63,11 @@ class DoubleAttribute(name: String, val value: Double) : Attribute(name) {
 
     companion object {
         fun of(name: String, value: Double): Option<DoubleAttribute> =
-            if (!value.isFinite()) None
-            else DoubleAttribute(name, value).some()
+            if (!value.isFinite()) {
+                None
+            } else {
+                DoubleAttribute(name, value).some()
+            }
     }
 }
 
@@ -84,8 +90,11 @@ class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) 
 
     companion object {
         fun of(name: String, value: Double, uom: UnitOfMeasure): Option<MeasureAttribute> =
-            if (value.isNaN()) None
-            else Some(MeasureAttribute(name, value, uom))
+            if (value.isNaN()) {
+                None
+            } else {
+                Some(MeasureAttribute(name, value, uom))
+            }
     }
 }
 

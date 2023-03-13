@@ -57,7 +57,6 @@ data class Cylinder3D(
 
     // Methods
     override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> {
-
         val circleVertices = circleVertices()
 
         val basePolygonVertices = circleVertices.reversed().map { it.toVector3D(z = 0.0) }.let { it.toNonEmptyListOrNull()!! }

@@ -110,7 +110,6 @@ fun AbstractThematicSurface.populateLod3MultiSurface(geometryTransformer: Geomet
 }
 
 fun AbstractThematicSurface.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer: GeometryTransformer, solidFaceSelection: List<GeometryTransformer.FaceType>): Either<GeometryTransformerException, Unit> = either.eager {
-
     geometryTransformer.getSolidCutoutOrSurface(*solidFaceSelection.toTypedArray()).tap { currentMultiSurfaceResult ->
         lod2MultiSurface = currentMultiSurfaceResult.mapLeft { it.toGeometryGenerationException() }.bind()
         return@eager

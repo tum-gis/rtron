@@ -85,8 +85,11 @@ class Opendrive2RoadspacesTransformer(
         // transformation of each road
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
         val (roadspaceExceptions, roadspacesWithContextReports) =
-            if (parameters.concurrentProcessing) transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar).separateEither()
-            else transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar).separateEither()
+            if (parameters.concurrentProcessing) {
+                transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar).separateEither()
+            } else {
+                transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar).separateEither()
+            }
 
         if (roadspaceExceptions.isNotEmpty()) {
             roadspaceExceptions.forEach {

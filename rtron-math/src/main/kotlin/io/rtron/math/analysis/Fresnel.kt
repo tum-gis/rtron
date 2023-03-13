@@ -72,10 +72,11 @@ class Fresnel {
                 }
             }
 
-            return if (l < 0.0)
+            return if (l < 0.0) {
                 Pair(-cc, -ss)
-            else
+            } else {
                 Pair(cc, ss)
+            }
         }
 
         /* S(x) for small x */

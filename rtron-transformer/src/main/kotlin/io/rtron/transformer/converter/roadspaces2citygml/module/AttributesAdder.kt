@@ -116,8 +116,11 @@ class AttributesAdder(
             is AttributeList -> {
                 val attributes = attribute.attributes.flatMap { convertAttribute(it) }
 
-                if (parameters.flattenGenericAttributeSets) attributes
-                else listOf(GmlGenericAttributeSet(attribute.name, attributes.map { AbstractGenericAttributeProperty(it) }))
+                if (parameters.flattenGenericAttributeSets) {
+                    attributes
+                } else {
+                    listOf(GmlGenericAttributeSet(attribute.name, attributes.map { AbstractGenericAttributeProperty(it) }))
+                }
             }
         }
 }

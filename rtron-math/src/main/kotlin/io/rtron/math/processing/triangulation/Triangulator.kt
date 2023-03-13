@@ -38,9 +38,9 @@ object Triangulator {
      * @param linearRing linear ring to be triangulated
      */
     fun triangulate(linearRing: LinearRing3D, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> {
-
-        if (linearRing.vertices.isPlanar(tolerance))
+        if (linearRing.vertices.isPlanar(tolerance)) {
             return Either.Right(listOf(Polygon3D(linearRing.vertices, tolerance)))
+        }
 
         // run triangulation algorithms until one succeeds
         val standardResult = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)

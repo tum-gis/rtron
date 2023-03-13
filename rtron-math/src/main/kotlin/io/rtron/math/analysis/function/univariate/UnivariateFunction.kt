@@ -72,9 +72,11 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * @return returns Result.Success(z) = f(x), if [x] is fuzzily contained in [domain] and evaluation was successful
      */
     open fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> {
-        return if (!domain.fuzzyContains(x, tolerance))
+        return if (!domain.fuzzyContains(x, tolerance)) {
             Either.Left(IllegalArgumentException("Value x=$x must be within in the defined $domain."))
-        else valueUnbounded(x)
+        } else {
+            valueUnbounded(x)
+        }
     }
 
     /**
@@ -107,8 +109,10 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * successful
      */
     fun slopeInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> {
-        return if (!domain.fuzzyContains(x, tolerance))
+        return if (!domain.fuzzyContains(x, tolerance)) {
             Either.Left(IllegalArgumentException("Value x=$x must be within in the defined $domain."))
-        else slopeUnbounded(x)
+        } else {
+            slopeUnbounded(x)
+        }
     }
 }

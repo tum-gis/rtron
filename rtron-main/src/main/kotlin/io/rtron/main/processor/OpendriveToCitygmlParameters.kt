@@ -60,17 +60,21 @@ data class OpendriveToCitygmlParameters(
     // Methods
     fun isValid(): Either<List<String>, Unit> {
         val messages = mutableListOf<String>()
-        if (cropPolygonX.size != cropPolygonY.size)
+        if (cropPolygonX.size != cropPolygonY.size) {
             messages += "cropPolygonX must have the same number of values as cropPolygonY"
-        if (cropPolygonX.isNotEmpty() && cropPolygonX.size < 3)
+        }
+        if (cropPolygonX.isNotEmpty() && cropPolygonX.size < 3) {
             messages += "cropPolygonX must be empty or have at least three values for representing a triangle"
-        if (cropPolygonY.isNotEmpty() && cropPolygonY.size < 3)
+        }
+        if (cropPolygonY.isNotEmpty() && cropPolygonY.size < 3) {
             messages += "cropPolygonX must be empty or have at least three values for representing a triangle"
+        }
 
-        return if (messages.isEmpty())
+        return if (messages.isEmpty()) {
             Unit.right()
-        else
+        } else {
             messages.left()
+        }
     }
 
     fun getCitygmlWriteVersion(): CitygmlVersion = if (convertToCitygml2) CitygmlVersion.V2_0 else CitygmlVersion.V3_0
@@ -81,20 +85,20 @@ data class OpendriveToCitygmlParameters(
         planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
         planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
-        planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
+        planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance
     )
 
     fun deriveOpendriveOffsetAdderParameters() = OpendriveOffsetAdderParameters(
         offsetX = offsetX,
         offsetY = offsetY,
         offsetZ = offsetZ,
-        offsetHeading = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_HEADING,
+        offsetHeading = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_HEADING
     )
 
     fun deriveOpendriveCropperParameters() = OpendriveCropperParameters(
         numberTolerance = tolerance,
         cropPolygonX = cropPolygonX,
-        cropPolygonY = cropPolygonY,
+        cropPolygonY = cropPolygonY
     )
 
     fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
@@ -114,7 +118,7 @@ data class OpendriveToCitygmlParameters(
 
     fun deriveRoadspacesEvaluatorParameters() = RoadspacesEvaluatorParameters(
         numberTolerance = tolerance,
-        laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE,
+        laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE
     )
 
     fun deriveRoadspaces2CitygmlParameters() = Roadspaces2CitygmlParameters(
@@ -130,7 +134,7 @@ data class OpendriveToCitygmlParameters(
         generateRandomGeometryIds = generateRandomGeometryIds,
         transformAdditionalRoadLines = transformAdditionalRoadLines,
         generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
-        mappingBackwardsCompatibility = convertToCitygml2,
+        mappingBackwardsCompatibility = convertToCitygml2
     )
 
     fun deriveCitygmlWriterParameters() = CitygmlWriterParameters(

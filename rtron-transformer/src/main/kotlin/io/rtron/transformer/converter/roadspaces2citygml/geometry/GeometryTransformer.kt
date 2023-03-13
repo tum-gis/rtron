@@ -152,8 +152,9 @@ class GeometryTransformer(
 
         val implicitGeometry = ImplicitGeometry()
         implicitGeometry.referencePoint = point
-        if (parameters.generateRandomGeometryIds)
+        if (parameters.generateRandomGeometryIds) {
             implicitGeometry.id = identifierAdder.generateRandomUUID()
+        }
 
         // implicitGeometry.libraryObject = ""
         rotation.tap {

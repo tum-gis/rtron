@@ -31,15 +31,18 @@ object CoreEvaluator {
     fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
-        if (modifiedOpendriveModel.road.isEmpty())
+        if (modifiedOpendriveModel.road.isEmpty()) {
             messageList += DefaultMessage("NoRoadsContained", "Document does not contain any roads.", "", Severity.FATAL_ERROR, wasFixed = false)
+        }
 
         OpendriveModel.header.get(modifiedOpendriveModel).also { header ->
-            if (header.revMajor < 0)
+            if (header.revMajor < 0) {
                 messageList += DefaultMessage("UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false)
+            }
 
-            if (header.revMinor < 0)
+            if (header.revMinor < 0) {
                 messageList += DefaultMessage("UnkownOpendriveMinorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false)
+            }
         }
 
         modifiedOpendriveModel = OpendriveModel.header.modify(modifiedOpendriveModel) { header ->

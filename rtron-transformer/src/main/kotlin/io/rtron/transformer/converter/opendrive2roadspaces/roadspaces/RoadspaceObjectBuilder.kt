@@ -69,7 +69,6 @@ class RoadspaceObjectBuilder(
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
     ): ContextMessageList<List<RoadspaceObject>> {
-
         return roadObjects.roadObject
             .map { buildRoadObject(roadspaceId, it, roadReferenceLine, baseAttributes) }
             .mergeMessageLists()
@@ -174,8 +173,9 @@ class RoadspaceObjectBuilder(
         geometries += Curve3DBuilder.buildCurve3D(roadObject, roadReferenceLine, parameters.numberTolerance)
 
         // if no other geometrical representation has been found, use a point instead
-        if (geometries.isEmpty())
+        if (geometries.isEmpty()) {
             geometries += Vector3DBuilder.buildVector3Ds(roadObject, curveAffine, force = true)
+        }
 
         check(geometries.size == 1) { "Exactly one geometry must be derived." }
 
@@ -217,7 +217,6 @@ class RoadspaceObjectBuilder(
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
     ): List<RoadspaceObject> {
-
         return roadSignals.signal.map { buildRoadSignalsSignal(id, it, roadReferenceLine, baseAttributes) }
     }
 
@@ -227,7 +226,6 @@ class RoadspaceObjectBuilder(
         roadReferenceLine: Curve3D,
         baseAttributes: AttributeList
     ): RoadspaceObject {
-
         val objectId = RoadspaceObjectIdentifier(roadSignal.id, roadSignal.name, id)
 
         val geometry = buildGeometries(roadSignal, roadReferenceLine)

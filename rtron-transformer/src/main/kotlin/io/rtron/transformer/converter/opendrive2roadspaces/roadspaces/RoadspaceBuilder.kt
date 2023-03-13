@@ -66,8 +66,11 @@ class RoadspaceBuilder(
 
         // build up road reference line
         val roadReferenceLine = Curve3DBuilder.buildCurve3D(
-            road.planView.geometryAsNonEmptyList, road.getElevationEntries(),
-            parameters.numberTolerance, parameters.planViewGeometryDistanceTolerance, parameters.planViewGeometryAngleTolerance
+            road.planView.geometryAsNonEmptyList,
+            road.getElevationEntries(),
+            parameters.numberTolerance,
+            parameters.planViewGeometryDistanceTolerance,
+            parameters.planViewGeometryAngleTolerance
         )
         val torsionFunction = road.getSuperelevationEntries().fold(
             { LinearFunction.X_AXIS },
@@ -115,7 +118,6 @@ class RoadspaceBuilder(
 
     private fun buildLateralRoadShape(id: RoadspaceIdentifier, lateralProfileShapeList: NonEmptyList<RoadLateralProfileShape>):
         BivariateFunction {
-
         val lateralFunctions = lateralProfileShapeList
             .groupBy { it.s }
             .mapValues { it.value.toNonEmptyListOrNull()!! }

@@ -61,7 +61,6 @@ data class Curve3D(
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
-
         val pointXY = curveXY.calculatePointGlobalCSUnbounded(curveRelativePoint)
         val height = heightFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance).getOrElse { throw it }
         return Vector3D(pointXY.x, pointXY.y, height)

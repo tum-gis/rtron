@@ -77,6 +77,7 @@ abstract class Opendrive17LaneMapper {
     //
     @Mapping(source = "width", target = "borderOrWidth")
     abstract fun mapRoadLanesLaneSectionCenterLane(source: RoadLanesLaneSectionCenterLane): T_Road_Lanes_LaneSection_Center_Lane
+
     @AfterMapping
     fun afterRoadLanesLaneSectionCenterLane(source: RoadLanesLaneSectionCenterLane, @MappingTarget target: T_Road_Lanes_LaneSection_Center_Lane) {
         target.borderOrWidth += source.border.map { mapRoadLanesLaneSectionLRLaneBorder(it) }
@@ -84,6 +85,7 @@ abstract class Opendrive17LaneMapper {
 
     @Mapping(source = "width", target = "borderOrWidth")
     abstract fun mapRoadLanesLaneSectionLeftLane(source: RoadLanesLaneSectionLeftLane): T_Road_Lanes_LaneSection_Left_Lane
+
     @AfterMapping
     fun afterRoadLanesLaneSectionLeftLane(source: RoadLanesLaneSectionLeftLane, @MappingTarget target: T_Road_Lanes_LaneSection_Left_Lane) {
         target.borderOrWidth += source.border.map { mapRoadLanesLaneSectionLRLaneBorder(it) }
@@ -91,6 +93,7 @@ abstract class Opendrive17LaneMapper {
 
     @Mapping(source = "width", target = "borderOrWidth")
     abstract fun mapRoadLanesLaneSectionLeftRight(source: RoadLanesLaneSectionRightLane): T_Road_Lanes_LaneSection_Right_Lane
+
     @AfterMapping
     fun afterRoadLanesLaneSectionRightLane(source: RoadLanesLaneSectionRightLane, @MappingTarget target: T_Road_Lanes_LaneSection_Right_Lane) {
         target.borderOrWidth += source.border.map { mapRoadLanesLaneSectionLRLaneBorder(it) }
@@ -130,6 +133,7 @@ abstract class Opendrive17LaneMapper {
     abstract fun mapRoadMarkType(source: ERoadMarkType): E_RoadMarkType
 
     fun mapOptionRoadMarkRule(source: Option<ERoadMarkRule>): E_RoadMarkRule? = source.fold({ null }, { mapRoadMarkRule(it) })
+
     @ValueMapping(source = "NO_PASSING", target = "NO___PASSING")
     abstract fun mapRoadMarkRule(source: ERoadMarkRule): E_RoadMarkRule
 

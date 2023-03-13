@@ -23,7 +23,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
 data class RoadPlanView(
-    var geometry: List<RoadPlanViewGeometry> = emptyList(),
+    var geometry: List<RoadPlanViewGeometry> = emptyList()
 ) : OpendriveElement() {
 
     val geometryAsNonEmptyList: NonEmptyList<RoadPlanViewGeometry>

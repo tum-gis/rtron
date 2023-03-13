@@ -43,12 +43,15 @@ abstract class BivariateFunction {
      * @param y parameter y for the function evaluation
      */
     fun value(x: Double, y: Double): Either<Exception, Double> {
-        return if (x in domainX && y in domainY) valueUnbounded(x, y)
-        else Either.Left(
-            IllegalArgumentException(
-                "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
+        return if (x in domainX && y in domainY) {
+            valueUnbounded(x, y)
+        } else {
+            Either.Left(
+                IllegalArgumentException(
+                    "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
+                )
             )
-        )
+        }
     }
 
     /**
@@ -60,12 +63,14 @@ abstract class BivariateFunction {
      * @param tolerance allowed tolerance for fuzzy contains evaluation
      */
     fun valueInFuzzy(x: Double, y: Double, tolerance: Double): Either<Exception, Double> {
-        return if (!domainX.fuzzyContains(x, tolerance) || !domainY.fuzzyContains(y, tolerance))
+        return if (!domainX.fuzzyContains(x, tolerance) || !domainY.fuzzyContains(y, tolerance)) {
             Either.Left(
                 IllegalArgumentException(
                     "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
                 )
             )
-        else valueUnbounded(x, y)
+        } else {
+            valueUnbounded(x, y)
+        }
     }
 }

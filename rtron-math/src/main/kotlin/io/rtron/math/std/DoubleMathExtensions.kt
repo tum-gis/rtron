@@ -29,8 +29,11 @@ import com.google.common.math.DoubleMath as GDoubleMath
  * @return true, if abs(a - b) <= tolerance
  */
 fun fuzzyEquals(a: Double, b: Double, tolerance: Double): Boolean =
-    if (tolerance == 0.0) a == b
-    else GDoubleMath.fuzzyEquals(a, b, tolerance)
+    if (tolerance == 0.0) {
+        a == b
+    } else {
+        GDoubleMath.fuzzyEquals(a, b, tolerance)
+    }
 
 /**
  * Returns the comparison of [a] and [b] with a defined [tolerance].

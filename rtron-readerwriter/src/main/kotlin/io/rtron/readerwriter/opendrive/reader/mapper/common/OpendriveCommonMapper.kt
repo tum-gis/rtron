@@ -40,6 +40,7 @@ abstract class OpendriveCommonMapper {
     fun <T> mapNullableToOption(source: T?): Option<T> = Option.fromNullable(source)
 
     fun mapCountryCodeStringToOption(source: String?): Option<ECountryCode> = source?.let { Option.fromNullable(mapCountryCodeString(it)) } ?: None
+
     @ValueMapping(source = "Austria", target = "AU")
     @ValueMapping(source = "Brazil", target = "BR")
     @ValueMapping(source = "China", target = "CN")

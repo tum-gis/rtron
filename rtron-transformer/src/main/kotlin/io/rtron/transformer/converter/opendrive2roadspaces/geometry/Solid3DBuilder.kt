@@ -65,8 +65,9 @@ object Solid3DBuilder {
             cuboidList += Cuboid3D.of(roadObject.length, roadObject.width, roadObject.heightValidated, numberTolerance, affineSequence)
         }
 
-        if (roadObject.repeat.any { it.isRepeatedCuboid() })
+        if (roadObject.repeat.any { it.isRepeatedCuboid() }) {
             messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
+        }
 
         return ContextMessageList(cuboidList, messageList)
     }
@@ -85,8 +86,9 @@ object Solid3DBuilder {
             cylinderList += Cylinder3D.of(roadObject.radius, roadObject.height, numberTolerance, affineSequence)
         }
 
-        if (roadObject.repeat.any { it.isRepeatCylinder() })
+        if (roadObject.repeat.any { it.isRepeatCylinder() }) {
             messageList += DefaultMessage.of("", "Cylinder geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
+        }
 
         return ContextMessageList(cylinderList, messageList)
     }
@@ -137,7 +139,6 @@ object Solid3DBuilder {
      */
     private fun buildVerticalOutlineElement(cornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad, roadReferenceLine: Curve3D, numberTolerance: Double):
         Polyhedron3DFactory.VerticalOutlineElement {
-
         val curveRelativeOutlineElementGeometry = cornerRoad.getPoints()
 
         val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)

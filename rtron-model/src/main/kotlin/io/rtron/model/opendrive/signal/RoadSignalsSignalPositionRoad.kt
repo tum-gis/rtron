@@ -27,5 +27,5 @@ data class RoadSignalsSignalPositionRoad(
     var roll: Option<Double> = None,
     var s: Double = Double.NaN,
     var t: Double = Double.NaN,
-    var zOffset: Double = Double.NaN,
+    var zOffset: Double = Double.NaN
 ) : OpendriveElement()

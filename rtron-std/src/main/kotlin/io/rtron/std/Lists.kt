@@ -24,6 +24,7 @@ import kotlin.math.max
 enum class MovingWindowShape {
     /** Size of the returning list is the base list size plus the size of the window. */
     FULL,
+
     /** Same size of returning list like the base list. */
     SAME
 }
@@ -66,8 +67,11 @@ fun <S, T, K> List<S>.moveWindow(
         val startValue = multipliedSubLists[indices.first().first][indices.first().second]
         val resultElement = indices.drop(0).fold(startValue) { sum, pair ->
             val curRow = multipliedSubLists.getOrNull(pair.first)
-            if (curRow.isNullOrEmpty()) sum
-            else addition(sum, curRow[pair.second])
+            if (curRow.isNullOrEmpty()) {
+                sum
+            } else {
+                addition(sum, curRow[pair.second])
+            }
         }
         acc + listOf(resultElement)
     }

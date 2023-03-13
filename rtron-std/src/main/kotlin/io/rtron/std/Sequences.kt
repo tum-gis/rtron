@@ -25,9 +25,11 @@ package io.rtron.std
  * empty if the receiver contains less than two elements
  */
 fun <T> Iterable<T>.zipWithNextEnclosing(): List<Pair<T, T>> {
-    return if (this.count() >= 2)
+    return if (this.count() >= 2) {
         zipWithNext { a, b -> a to b } + Pair(last(), first())
-    else zipWithNext { a, b -> a to b }
+    } else {
+        zipWithNext { a, b -> a to b }
+    }
 }
 
 /**
@@ -44,8 +46,9 @@ fun <T, K> Iterable<T>.zipWithConsecutives(keySelector: (T) -> K): List<List<T>>
         if (acc.isNotEmpty() && acc.last().isNotEmpty() && keySelector(acc.last().first()) == keySelector(element)) {
             acc.last().add(element)
             acc
-        } else
+        } else {
             acc + listOf(mutableListOf(element))
+        }
     }
 }
 
@@ -63,8 +66,10 @@ fun <T, K> Iterable<T>.zipWithConsecutivesEnclosing(keySelector: (T) -> K): List
     val zippedConsecutively = this.zipWithConsecutives(keySelector)
     return if (this.count() >= 2 &&
         keySelector(zippedConsecutively.first().first()) == keySelector(zippedConsecutively.last().last())
-    )
+    ) {
         listOf(zippedConsecutively.last() + zippedConsecutively.first()) +
             zippedConsecutively.subList(1, zippedConsecutively.lastIndex)
-    else zippedConsecutively
+    } else {
+        zippedConsecutively
+    }
 }

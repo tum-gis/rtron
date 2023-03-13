@@ -52,6 +52,7 @@ abstract class Opendrive17ObjectMapper {
     // Road objects
     //
     fun mapOptionRoadObjects(source: Option<RoadObjects>): T_Road_Objects? = source.fold({ null }, { mapRoadObjects(it) })
+
     @Mapping(source = "roadObject", target = "object")
     abstract fun mapRoadObjects(source: RoadObjects): T_Road_Objects
 

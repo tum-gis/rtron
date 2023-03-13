@@ -145,9 +145,11 @@ data class Vector3D(
          *
          */
         fun of(x: Double, y: Double, z: Double): Either<IllegalArgumentException, Vector3D> =
-            if (!x.isFinite() || !y.isFinite() || !z.isFinite())
+            if (!x.isFinite() || !y.isFinite() || !z.isFinite()) {
                 Either.Left(IllegalArgumentException("Values for x, y, z must be finite."))
-            else Either.Right(Vector3D(x, y, z))
+            } else {
+                Either.Right(Vector3D(x, y, z))
+            }
     }
 }
 

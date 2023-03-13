@@ -38,7 +38,6 @@ import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightL
 import io.rtron.model.opendrive.additions.optics.everyRoadObject
 
 fun OpendriveModel.updateAdditionalIdentifiers() {
-
     everyRoad.modify(this) { currentRoad ->
         val roadId = RoadIdentifier(currentRoad.id)
         currentRoad.additionalId = roadId.some()

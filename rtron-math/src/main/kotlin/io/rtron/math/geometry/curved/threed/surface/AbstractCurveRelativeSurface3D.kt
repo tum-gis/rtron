@@ -50,8 +50,9 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      */
     fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double = 0.0):
         Either<GeometryException.ValueNotContainedInDomain, Vector3D> {
-        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+        }
 
         return calculatePointGlobalCSUnbounded(curveRelativePoint, addHeightOffset).right()
     }

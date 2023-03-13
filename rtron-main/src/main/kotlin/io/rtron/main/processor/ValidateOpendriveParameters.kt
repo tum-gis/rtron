@@ -50,7 +50,7 @@ data class ValidateOpendriveParameters(
         planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
         planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
-        planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
+        planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance
     )
 
     fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
@@ -69,7 +69,7 @@ data class ValidateOpendriveParameters(
 
     fun deriveRoadspacesEvaluatorParameters() = RoadspacesEvaluatorParameters(
         numberTolerance = tolerance,
-        laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE,
+        laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE
     )
 
     fun deriveRoadspaces2Citygml2Parameters() = Roadspaces2CitygmlParameters(
@@ -85,7 +85,7 @@ data class ValidateOpendriveParameters(
         generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
         transformAdditionalRoadLines = true,
         generateLongitudinalFillerSurfaces = false,
-        mappingBackwardsCompatibility = true,
+        mappingBackwardsCompatibility = true
     )
 
     fun deriveRoadspaces2Citygml3Parameters() = Roadspaces2CitygmlParameters(
@@ -101,7 +101,7 @@ data class ValidateOpendriveParameters(
         generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
         transformAdditionalRoadLines = true,
         generateLongitudinalFillerSurfaces = false,
-        mappingBackwardsCompatibility = false,
+        mappingBackwardsCompatibility = false
     )
 
     fun deriveCitygml2WriterParameters() = CitygmlWriterParameters(

@@ -19,5 +19,5 @@ package io.rtron.model.opendrive.objects
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectBorders(
-    var marking: List<RoadObjectsObjectBordersBorder> = emptyList(),
+    var marking: List<RoadObjectsObjectBordersBorder> = emptyList()
 ) : OpendriveElement()

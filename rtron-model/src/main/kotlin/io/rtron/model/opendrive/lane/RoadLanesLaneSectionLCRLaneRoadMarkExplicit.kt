@@ -19,5 +19,5 @@ package io.rtron.model.opendrive.lane
 import io.rtron.model.opendrive.core.OpendriveElement
 
 class RoadLanesLaneSectionLCRLaneRoadMarkExplicit(
-    var line: List<RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine> = emptyList(),
+    var line: List<RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine> = emptyList()
 ) : OpendriveElement()

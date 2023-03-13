@@ -28,16 +28,22 @@ data class RoadLinkPredecessorSuccessor(
     var elementDir: Option<EElementDir> = None,
     var elementId: String = "",
     var elementS: Option<Double> = None,
-    var elementType: Option<ERoadLinkElementType> = None,
+    var elementType: Option<ERoadLinkElementType> = None
 ) : OpendriveElement() {
 
     // Methods
 
     fun getRoadPredecessorSuccessor(): Option<Pair<String, EContactPoint>> =
-        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.ROAD }) contactPoint.map { elementId to it }
-        else None
+        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.ROAD }) {
+            contactPoint.map { elementId to it }
+        } else {
+            None
+        }
 
     fun getJunctionPredecessorSuccessor(): Option<String> =
-        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.JUNCTION }) Some(elementId)
-        else None
+        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.JUNCTION }) {
+            Some(elementId)
+        } else {
+            None
+        }
 }

@@ -76,7 +76,6 @@ data class CompositeCurve2D(
             distanceTolerance: Double,
             angleTolerance: Double
         ): CompositeCurve2D {
-
             curveMembers.zipWithNext().forEach {
                 val frontCurveMemberEndPose = it.first.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D(it.first.length))
                 val backCurveMemberStartPose = it.second.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D.ZERO)

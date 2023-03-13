@@ -53,24 +53,27 @@ class OpendriveEvaluator(
             report.basicDataTypePlan = it.messageList
             modifiedOpendriveModel = it.value
         }
-        if (report.basicDataTypePlan.containsFatalErrors())
+        if (report.basicDataTypePlan.containsFatalErrors()) {
             return None to report
+        }
 
         // modeling rules evaluation
         modelingRulesEvaluator.evaluate(modifiedOpendriveModel).let {
             report.modelingRulesPlan = it.messageList
             modifiedOpendriveModel = it.value
         }
-        if (report.modelingRulesPlan.containsFatalErrors())
+        if (report.modelingRulesPlan.containsFatalErrors()) {
             return None to report
+        }
 
         // conversion requirements evaluation
         conversionRequirementsEvaluator.evaluate(modifiedOpendriveModel).let {
             report.conversionRequirementsPlan = it.messageList
             modifiedOpendriveModel = it.value
         }
-        if (report.conversionRequirementsPlan.containsFatalErrors())
+        if (report.conversionRequirementsPlan.containsFatalErrors()) {
             return None to report
+        }
 
         return modifiedOpendriveModel.some() to report
     }

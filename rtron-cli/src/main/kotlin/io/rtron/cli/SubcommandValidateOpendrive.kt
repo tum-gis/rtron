@@ -74,7 +74,6 @@ class SubcommandValidateOpendrive : CliktCommand(name = "validate-opendrive", he
 
     // Methods
     override fun run() {
-
         val parameters = parametersPath.toOption().fold({
             ValidateOpendriveParameters(
                 tolerance = tolerance,

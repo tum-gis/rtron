@@ -37,11 +37,13 @@ object RoadEvaluator {
 
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
-            if (currentRoad.planView.geometry.isEmpty())
+            if (currentRoad.planView.geometry.isEmpty()) {
                 messageList += DefaultMessage.of("NoPlanViewGeometryElements", "Plan view of road does not contain any geometry elements.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
-            if (currentRoad.lanes.laneSection.isEmpty())
+            if (currentRoad.lanes.laneSection.isEmpty()) {
                 messageList += DefaultMessage.of("NoLaneSections", "Road does not contain any lane sections.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
             currentRoad
         }
@@ -60,8 +62,9 @@ object RoadEvaluator {
             currentRoad.lateralProfile.tap { currentLateralProfile ->
                 if (currentLateralProfile.containsShapeProfile() && currentRoad.lanes.containsLaneOffset()) {
                     messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'lateralProfile.shape'", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
-                    if (!parameters.skipRoadShapeRemoval)
+                    if (!parameters.skipRoadShapeRemoval) {
                         currentLateralProfile.shape = emptyList()
+                    }
                 }
 
                 currentLateralProfile.superelevation = BasicDataTypeModifier.filterToStrictlySorted(currentLateralProfile.superelevation, { it.s }, currentRoad.additionalId, "superelevation", messageList)

@@ -82,8 +82,11 @@ class LaneBuilder(
 
         // build road markings
         val roadMarkings: List<RoadMarking> =
-            if (lrLane.roadMark.isEmpty()) emptyList()
-            else buildRoadMarkings(curvePositionDomain, lrLane.roadMark.toNonEmptyListOrNull()!!).handleMessageList { messageList += it }
+            if (lrLane.roadMark.isEmpty()) {
+                emptyList()
+            } else {
+                buildRoadMarkings(curvePositionDomain, lrLane.roadMark.toNonEmptyListOrNull()!!).handleMessageList { messageList += it }
+            }
 
         // lane topology
         val predecessors = lrLane.link.fold({ emptyList() }, { link -> link.predecessor.map { it.id } })
@@ -121,9 +124,12 @@ class LaneBuilder(
         val messageList = DefaultMessageList()
 
         val roadMarkings =
-            if (centerLane.roadMark.isEmpty()) emptyList()
-            else buildRoadMarkings(curvePositionDomain, centerLane.roadMark.toNonEmptyListOrNull()!!)
-                .handleMessageList { messageList += it }
+            if (centerLane.roadMark.isEmpty()) {
+                emptyList()
+            } else {
+                buildRoadMarkings(curvePositionDomain, centerLane.roadMark.toNonEmptyListOrNull()!!)
+                    .handleMessageList { messageList += it }
+            }
 
         val type = centerLane.type.toLaneType()
         val attributes = baseAttributes + buildAttributes(centerLane)
@@ -179,13 +185,16 @@ class LaneBuilder(
         val adjustedSrcRoadMark = roadMark
             .filter { it.sOffset in curvePositionDomain }
             .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, parameters.numberTolerance) }
-        if (adjustedSrcRoadMark.size < roadMark.size)
+        if (adjustedSrcRoadMark.size < roadMark.size) {
             messageList += DefaultMessage.of(
                 "",
                 "Road mark entries have been removed, as the sOffset is not located within " +
                     "the local curve position domain ($curvePositionDomain) of the lane section.",
-                roadMarkId, Severity.WARNING, wasFixed = true
+                roadMarkId,
+                Severity.WARNING,
+                wasFixed = true
             )
+        }
 
         if (adjustedSrcRoadMark.isEmpty()) return ContextMessageList(emptyList(), messageList)
 
@@ -210,8 +219,9 @@ class LaneBuilder(
 
         val domain = domainEndpoint.fold({ Range.atLeast(roadMark.sOffset) }, { Range.closed(roadMark.sOffset, it) })
 
-        if (domain.length <= parameters.numberTolerance)
+        if (domain.length <= parameters.numberTolerance) {
             return Opendrive2RoadspacesTransformationException.ZeroLengthRoadMarking(roadMarkId).left()
+        }
 
         val width = roadMark.width.fold({ ConstantFunction.ZERO }, { ConstantFunction(it, domain) })
 

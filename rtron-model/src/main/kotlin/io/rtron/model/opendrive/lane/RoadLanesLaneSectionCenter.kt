@@ -21,7 +21,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
 data class RoadLanesLaneSectionCenter(
-    var lane: List<RoadLanesLaneSectionCenterLane> = emptyList(),
+    var lane: List<RoadLanesLaneSectionCenterLane> = emptyList()
 ) : OpendriveElement() {
 
     // Methods

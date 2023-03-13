@@ -106,7 +106,6 @@ data class LaneSection(
      */
     fun getLaneHeightOffset(laneIdentifier: LaneIdentifier, factor: Double):
         Either<IllegalArgumentException, UnivariateFunction> = either.eager {
-
         val inner = getInnerLaneHeightOffset(laneIdentifier).bind()
         val outer = getOuterLaneHeightOffset(laneIdentifier).bind()
         val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })

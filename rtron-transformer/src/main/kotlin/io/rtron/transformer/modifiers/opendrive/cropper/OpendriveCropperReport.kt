@@ -25,5 +25,5 @@ data class OpendriveCropperReport(
     var numberOfRoadsOriginally: Int = 0,
     var numberOfRoadsRemaining: Int = 0,
     var numberOfJunctionsOriginally: Int = 0,
-    var numberOfJunctionsRemaining: Int = 0,
+    var numberOfJunctionsRemaining: Int = 0
 )

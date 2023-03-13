@@ -30,7 +30,7 @@ data class OpendriveCropperParameters(
     /** x values of cropping polygon */
     val cropPolygonX: List<Double>,
     /** y values of cropping polygon */
-    val cropPolygonY: List<Double>,
+    val cropPolygonY: List<Double>
 ) {
 
     // Properties and Initializers

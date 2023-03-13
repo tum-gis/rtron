@@ -77,7 +77,6 @@ class LineSegment3D(
     }
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
-
         return start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
     }
 
@@ -110,8 +109,10 @@ class LineSegment3D(
          *
          */
         fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED): Either<IllegalArgumentException, LineSegment3D> =
-            if (start.fuzzyEquals(end, tolerance))
+            if (start.fuzzyEquals(end, tolerance)) {
                 Either.Left(IllegalArgumentException("Start and end vector of a line segment must be different according to the given tolerance."))
-            else Either.Right(LineSegment3D(start, end, tolerance, endBoundType))
+            } else {
+                Either.Right(LineSegment3D(start, end, tolerance, endBoundType))
+            }
     }
 }

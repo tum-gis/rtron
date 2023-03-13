@@ -47,13 +47,11 @@ class SectionedCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-
         val pointOnCompleteCurve = sectionStart + curveRelativePoint
         return completeCurve.calculatePointGlobalCSUnbounded(pointOnCompleteCurve)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
-
         val pointOnCompleteCurve = sectionStart + curveRelativePoint
         return completeCurve.calculateRotationGlobalCSUnbounded(pointOnCompleteCurve)
     }

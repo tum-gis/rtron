@@ -69,7 +69,6 @@ class VegetationModuleBuilder(
         solitaryVegetationObjectFeature: SolitaryVegetationObject,
         geometryTransformer: GeometryTransformer
     ): Either<Exception, Unit> = either.eager {
-
         geometryTransformer.diameter.tap {
             solitaryVegetationObjectFeature.trunkDiameter = Length(it)
             solitaryVegetationObjectFeature.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()

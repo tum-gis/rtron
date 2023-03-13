@@ -46,15 +46,17 @@ object OpendriveValidator {
                 logger.warn("Schema validation was aborted due the following error: ${it.message}")
                 return@eager SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
             }
-        if (!messageList.isEmpty()) logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.size} incidents.")
-        else logger.info("Schema validation report for OpenDRIVE $opendriveVersion: Everything ok.")
+        if (!messageList.isEmpty()) {
+            logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.size} incidents.")
+        } else {
+            logger.info("Schema validation report for OpenDRIVE $opendriveVersion: Everything ok.")
+        }
 
         SchemaValidationReport(opendriveVersion, messageList)
     }
 
     fun validate(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> =
         either.eager {
-
             val unmarshaller = OpendriveUnmarshaller.of(opendriveVersion).bind()
 
             try {

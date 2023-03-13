@@ -36,16 +36,19 @@ fun Range<Double>.arrange(step: Double, includeClosedEndPoint: Boolean = false, 
     val upperEndpoint = upperEndpointOrNull()
     requireNotNull(upperEndpoint) { "Closed upper bound type required." }
 
-    if (includeClosedEndPoint)
+    if (includeClosedEndPoint) {
         require(upperBoundType() == BoundType.CLOSED) { "If endpoint shall be included, the BoundType must be closed." }
+    }
     require(lowerEndpoint.isFinite() && upperEndpoint.isFinite()) { "Finite endpoints required." }
 
     val numSteps = floor(length / step).toInt()
     val values = (0..numSteps).map { lowerEndpoint + sign(difference) * it * step }
 
-    return if (includeClosedEndPoint && !fuzzyEquals(values.last(), upperEndpoint, tolerance))
+    return if (includeClosedEndPoint && !fuzzyEquals(values.last(), upperEndpoint, tolerance)) {
         (values + upperEndpoint).toDoubleArray()
-    else values.toDoubleArray()
+    } else {
+        values.toDoubleArray()
+    }
 }
 
 /**

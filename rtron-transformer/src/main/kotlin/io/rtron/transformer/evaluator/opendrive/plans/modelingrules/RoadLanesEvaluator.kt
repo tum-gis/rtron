@@ -34,37 +34,44 @@ object RoadLanesEvaluator {
 
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
-            if (currentRoad.lanes.getLaneSectionLengths(currentRoad.length).any { it <= parameters.numberTolerance })
+            if (currentRoad.lanes.getLaneSectionLengths(currentRoad.length).any { it <= parameters.numberTolerance }) {
                 messageList += DefaultMessage.of("", "The length of lane sections shall be greater than zero.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
             currentRoad
         }
 
         everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
-            if (currentLaneSection.center.getNumberOfLanes() != 1)
+            if (currentLaneSection.center.getNumberOfLanes() != 1) {
                 messageList += DefaultMessage.of("", "Lane section should contain exactly one center lane.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
-            if (currentLaneSection.getNumberOfLeftRightLanes() == 0)
+            if (currentLaneSection.getNumberOfLeftRightLanes() == 0) {
                 messageList += DefaultMessage.of("", "Each lane section shall contain at least one <right> or <left> element.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
             currentLaneSection.left.tap { currentLaneSectionLeft ->
                 val leftLaneIds = currentLaneSectionLeft.lane.map { it.id }
                 val expectedIds = (currentLaneSectionLeft.getNumberOfLanes() downTo 1).toList()
 
-                if (leftLaneIds.distinct().size < leftLaneIds.size)
+                if (leftLaneIds.distinct().size < leftLaneIds.size) {
                     messageList += DefaultMessage.of("", "Lane numbering shall be unique per lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
-                if (!leftLaneIds.containsAll(expectedIds))
+                }
+                if (!leftLaneIds.containsAll(expectedIds)) {
                     messageList += DefaultMessage.of("", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                }
             }
 
             currentLaneSection.right.tap { currentLaneSectionRight ->
                 val rightLaneIds = currentLaneSectionRight.lane.map { it.id }
                 val expectedIds = (-1 downTo -currentLaneSectionRight.getNumberOfLanes()).toList()
 
-                if (rightLaneIds.distinct().size < rightLaneIds.size)
+                if (rightLaneIds.distinct().size < rightLaneIds.size) {
                     messageList += DefaultMessage.of("", "Lane numbering shall be unique per lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
-                if (!rightLaneIds.containsAll(expectedIds))
+                }
+                if (!rightLaneIds.containsAll(expectedIds)) {
                     messageList += DefaultMessage.of("", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                }
             }
 
             currentLaneSection

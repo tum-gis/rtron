@@ -23,7 +23,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLateralProfile(
     var superelevation: List<RoadLateralProfileSuperelevation> = emptyList(),
-    var shape: List<RoadLateralProfileShape> = emptyList(),
+    var shape: List<RoadLateralProfileShape> = emptyList()
 ) : OpendriveElement() {
 
     // Methods

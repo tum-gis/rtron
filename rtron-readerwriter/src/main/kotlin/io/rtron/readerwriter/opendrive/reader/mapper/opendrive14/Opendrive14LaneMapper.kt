@@ -114,6 +114,7 @@ abstract class Opendrive14LaneMapper {
     abstract fun map(source: Restriction): EAccessRestrictionType
 
     fun mapRoadMarkTypeToOption(source: RoadmarkType?): Option<ERoadMarkType> = source?.let { mapRoadMarkType(it).some() } ?: None
+
     @ValueMapping(source = "SOLID___SOLID", target = "SOLID_SOLID")
     @ValueMapping(source = "SOLID___BROKEN", target = "SOLID_BROKEN")
     @ValueMapping(source = "BROKEN___SOLID", target = "BROKEN_SOLID")
@@ -122,6 +123,7 @@ abstract class Opendrive14LaneMapper {
     abstract fun mapRoadMarkType(source: RoadmarkType): ERoadMarkType
 
     fun mapRuleToOption(source: Rule?): Option<ERoadMarkRule> = source?.let { mapRule(it).some() } ?: None
+
     @ValueMapping(source = "NO___PASSING", target = "NO_PASSING")
     abstract fun mapRule(source: Rule): ERoadMarkRule
 }

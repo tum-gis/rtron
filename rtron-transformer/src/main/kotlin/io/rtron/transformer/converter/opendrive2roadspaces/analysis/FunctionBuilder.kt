@@ -110,7 +110,6 @@ object FunctionBuilder {
      */
     fun buildStackedHeightFunctionFromRepeat(repeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
         StackedFunction {
-
         val heightFunctionSection = SectionedUnivariateFunction(
             roadReferenceLine.heightFunction,
             repeat.getRoadReferenceLineParameterSection()

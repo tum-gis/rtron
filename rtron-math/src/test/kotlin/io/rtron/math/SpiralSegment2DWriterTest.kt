@@ -34,7 +34,6 @@ object SpiralSegment2DWriterTest {
 
     @Test
     fun writeSpiralSegment2DToCsvFile() {
-
         val path = Path("out/test_files/SpiralSegment2D/SpiralSegment2D-line.csv")
         val header = listOf("curvePosition", "x", "y")
         val csvPrinter = CSVPrinter(path, header)
@@ -55,7 +54,6 @@ object SpiralSegment2DWriterTest {
     }
 
     fun writeSpiral2DToCsvFile() {
-
         val path = Path("out/test_files/SpiralSegment2D/Spiral2D-line.csv")
         val header = listOf("type", "curvePosition", "x", "y")
         val csvPrinter = CSVPrinter(path, header)

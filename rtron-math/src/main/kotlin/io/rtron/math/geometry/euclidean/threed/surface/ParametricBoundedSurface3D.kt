@@ -64,7 +64,6 @@ data class ParametricBoundedSurface3D(
     // Methods
 
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either.eager {
-
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
             .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
             .bind()

@@ -25,8 +25,10 @@ import com.google.common.collect.BoundType as GBoundType
 enum class BoundType {
     /** open bound, such as the lower bound in (3,5] */
     OPEN,
+
     /** closed bound, such as the upper bound in (3,5] */
     CLOSED,
+
     /** no bound, such as the upper bound in [3, ∞) */
     NONE
 }

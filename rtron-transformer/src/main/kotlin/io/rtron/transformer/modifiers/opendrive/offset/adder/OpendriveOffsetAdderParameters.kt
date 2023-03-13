@@ -27,7 +27,7 @@ data class OpendriveOffsetAdderParameters(
     /** offset by which the model is translated along the z-axis */
     val offsetZ: Double,
     /** offset by which the model is rotated */
-    val offsetHeading: Double,
+    val offsetHeading: Double
 ) {
     fun isZeroOffset() = offsetX == 0.0 && offsetY == 0.0 && offsetZ == 0.0 && offsetHeading == 0.0
 

@@ -67,8 +67,9 @@ class RoadsTransformer(
         val messageList = DefaultMessageList()
 
         val roadFeature = transportationModuleBuilder.createRoad()
-        if (roadspaceName.isNotEmpty())
+        if (roadspaceName.isNotEmpty()) {
             roadFeature.names.add(Code(roadspaceName))
+        }
 
         val junctions = roadspacesModel.getAllJunctionIdentifiersContainingRoadspaces(roadspaceName)
         junctions.forEach {
@@ -160,8 +161,11 @@ class RoadsTransformer(
 
         roadspace.road.getAllLeftRightLaneIdentifiers().forEach { laneId ->
             val fillerSurface =
-                if (parameters.generateLongitudinalFillerSurfaces) roadspacesModel.getFillerSurfaces(laneId).getOrElse { throw it }
-                else emptyList()
+                if (parameters.generateLongitudinalFillerSurfaces) {
+                    roadspacesModel.getFillerSurfaces(laneId).getOrElse { throw it }
+                } else {
+                    emptyList()
+                }
             messageList += addSingleLane(laneId, roadspace.road, fillerSurface, dstTransportationSpace)
         }
         roadspace.roadspaceObjects.forEach { addSingleRoadspaceObject(it, dstTransportationSpace) }

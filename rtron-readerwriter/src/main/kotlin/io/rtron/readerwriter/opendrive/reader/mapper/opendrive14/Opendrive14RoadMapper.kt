@@ -81,8 +81,9 @@ abstract class Opendrive14RoadMapper {
         if (source == null) return
 
         // TODO: reporting
-        if (source.crossfall != null && source.crossfall.isNotEmpty())
+        if (source.crossfall != null && source.crossfall.isNotEmpty()) {
             logger.info("Since crossfall is not in the OpenDRIVE standard from version 1.6, it is not supported.")
+        }
     }
 
     //

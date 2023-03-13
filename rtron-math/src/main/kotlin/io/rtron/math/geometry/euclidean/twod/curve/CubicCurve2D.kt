@@ -55,7 +55,6 @@ class CubicCurve2D(
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-
         val x = curveRelativePoint.curvePosition
         val y = polynomialFunction.value(curveRelativePoint.curvePosition).getOrElse { throw it }
         return Vector2D(x, y)

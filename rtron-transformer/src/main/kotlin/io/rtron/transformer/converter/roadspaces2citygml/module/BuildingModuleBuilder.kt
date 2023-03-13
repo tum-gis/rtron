@@ -53,8 +53,11 @@ class BuildingModuleBuilder(
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
 
         val buildingFeature =
-            if (geometryTransformer.getSolid().isDefined()) createLod2Building(roadspaceObject.id, geometryTransformer).handleMessageList { messageList += it }
-            else createLod1Building(roadspaceObject.id, geometryTransformer).handleMessageList { messageList += it }
+            if (geometryTransformer.getSolid().isDefined()) {
+                createLod2Building(roadspaceObject.id, geometryTransformer).handleMessageList { messageList += it }
+            } else {
+                createLod1Building(roadspaceObject.id, geometryTransformer).handleMessageList { messageList += it }
+            }
 
         // semantics
         identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name.getOrElse { "" }, buildingFeature) // TODO fix option

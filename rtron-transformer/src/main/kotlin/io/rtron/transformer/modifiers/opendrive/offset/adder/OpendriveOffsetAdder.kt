@@ -34,8 +34,9 @@ class OpendriveOffsetAdder(
         val modifiedOpendriveModel = opendriveModel.copy()
         modifiedOpendriveModel.updateAdditionalIdentifiers()
 
-        if (parameters.isZeroOffset())
+        if (parameters.isZeroOffset()) {
             return modifiedOpendriveModel to report
+        }
 
         val headerOffset = modifiedOpendriveModel.header.offset.getOrElse { HeaderOffset() }
         headerOffset.x = headerOffset.x + parameters.offsetX

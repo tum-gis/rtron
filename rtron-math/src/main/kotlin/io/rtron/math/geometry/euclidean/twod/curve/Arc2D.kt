@@ -79,7 +79,6 @@ class Arc2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-
         // angle in radians between start point of the arc and given curve position
         val curvePositionAngle =
             Rotation2D(TWO_PI * (curveRelativePoint.curvePosition / circumference) * curvatureSign)

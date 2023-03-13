@@ -76,20 +76,24 @@ class OpendriveCropper(
 
             currentRoad.link.tap { currentLink ->
                 // remove the predecessor link, if it is a junction, which is not contained in the remaining junctions
-                if (currentLink.predecessor.exists { currentPredecessor -> currentPredecessor.getJunctionPredecessorSuccessor().exists { it !in remainingJunctionsIds } })
+                if (currentLink.predecessor.exists { currentPredecessor -> currentPredecessor.getJunctionPredecessorSuccessor().exists { it !in remainingJunctionsIds } }) {
                     currentLink.predecessor = None
+                }
 
                 // remove the predecessor link, if it is a road, which is not contained in the remaining roads
-                if (currentLink.predecessor.exists { currentPredecessor -> currentPredecessor.getRoadPredecessorSuccessor().exists { it.first !in remainingRoadIds } })
+                if (currentLink.predecessor.exists { currentPredecessor -> currentPredecessor.getRoadPredecessorSuccessor().exists { it.first !in remainingRoadIds } }) {
                     currentLink.predecessor = None
+                }
 
                 // remove the successor link, if it is a junction, which is not contained in the remaining junctions
-                if (currentLink.successor.exists { currentPredecessor -> currentPredecessor.getJunctionPredecessorSuccessor().exists { it !in remainingJunctionsIds } })
+                if (currentLink.successor.exists { currentPredecessor -> currentPredecessor.getJunctionPredecessorSuccessor().exists { it !in remainingJunctionsIds } }) {
                     currentLink.successor = None
+                }
 
                 // remove the successor link, if it is a junction, which is not contained in the remaining junctions
-                if (currentLink.successor.exists { currentPredecessor -> currentPredecessor.getRoadPredecessorSuccessor().exists { it.first !in remainingRoadIds } })
+                if (currentLink.successor.exists { currentPredecessor -> currentPredecessor.getRoadPredecessorSuccessor().exists { it.first !in remainingRoadIds } }) {
                     currentLink.successor = None
+                }
             }
 
             currentRoad

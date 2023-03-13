@@ -27,5 +27,5 @@ class RoadLanesLaneSectionLCRLaneRoadMarkTypeLine(
     var sOffset: Double = Double.NaN,
     var space: Double = Double.NaN,
     var tOffset: Double = Double.NaN,
-    var width: Option<Double> = None,
+    var width: Option<Double> = None
 ) : OpendriveElement()

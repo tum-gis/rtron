@@ -32,8 +32,10 @@ enum class EObjectType {
 enum class EOrientation {
     /** valid in positive track direction */
     PLUS,
+
     /** valid in negative track direction */
     MINUS,
+
     /** valid in both directions */
     NONE
 }

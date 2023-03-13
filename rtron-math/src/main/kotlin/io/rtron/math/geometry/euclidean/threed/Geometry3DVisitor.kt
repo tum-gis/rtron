@@ -33,8 +33,10 @@ interface Geometry3DVisitor {
 
     // point
     fun visit(vector3D: Vector3D)
+
     // curve
     fun visit(abstractCurve3D: AbstractCurve3D)
+
     // surface
     fun visit(abstractSurface3D: AbstractSurface3D)
     fun visit(circle3D: Circle3D)

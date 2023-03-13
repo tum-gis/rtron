@@ -140,7 +140,6 @@ data class ParametricSweep3D(
 
     // Methods
     override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> {
-
         // calculate the side faces
         val basePolygons = createPolygons(lowerLeftVertices, lowerRightVertices).getOrElse { emptyList() }
         val topPolygons = createPolygons(upperRightVertices, upperLeftVertices).getOrElse { emptyList() }
@@ -177,7 +176,6 @@ data class ParametricSweep3D(
 
     private fun createPolygons(leftVertices: NonEmptyList<Vector3D>, rightVertices: NonEmptyList<Vector3D>):
         Either<GeometryException, List<Polygon3D>> = either.eager {
-
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
             .bind()
             .map { it.calculatePolygonsGlobalCS().bind() }

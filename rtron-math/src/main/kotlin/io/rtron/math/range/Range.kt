@@ -66,13 +66,19 @@ class Range<T : Comparable<*>>(
 
     /** Returns the lower endpoint as result. */
     fun lowerEndpointResult(): Either<IllegalStateException, T> =
-        if (hasLowerBound()) Either.Right(range.lowerEndpoint())
-        else Either.Left(IllegalStateException("No lower endpoint available."))
+        if (hasLowerBound()) {
+            Either.Right(range.lowerEndpoint())
+        } else {
+            Either.Left(IllegalStateException("No lower endpoint available."))
+        }
 
     /** Returns the upper endpoint as result. */
     fun upperEndpointResult(): Either<IllegalStateException, T> =
-        if (hasUpperBound()) Either.Right(range.upperEndpoint())
-        else Either.Left(IllegalStateException("No upper endpoint available."))
+        if (hasUpperBound()) {
+            Either.Right(range.upperEndpoint())
+        } else {
+            Either.Left(IllegalStateException("No upper endpoint available."))
+        }
 
     /** Returns the lower [BoundType] of this range. */
     fun lowerBoundType(): BoundType = if (hasLowerBound()) range.lowerBoundType().toBoundType() else BoundType.NONE
@@ -179,23 +185,30 @@ class Range<T : Comparable<*>>(
             upperEndpoint: T?
         ): Range<T> {
             // consistency checks
-            if (lowerBoundType == BoundType.NONE)
+            if (lowerBoundType == BoundType.NONE) {
                 require(lowerEndpoint == null) { "Inconsistent lower bound parameters." }
-            if (upperBoundType == BoundType.NONE)
+            }
+            if (upperBoundType == BoundType.NONE) {
                 require(upperEndpoint == null) { "Inconsistent upper bound parameters." }
-            if (lowerEndpoint == null)
+            }
+            if (lowerEndpoint == null) {
                 require(lowerBoundType == BoundType.NONE) { "Inconsistent lower bound parameters." }
-            if (upperEndpoint == null)
+            }
+            if (upperEndpoint == null) {
                 require(upperBoundType == BoundType.NONE) { "Inconsistent upper bound parameters." }
+            }
 
             // range function building
-            if (lowerBoundType == BoundType.NONE && upperBoundType == BoundType.NONE)
+            if (lowerBoundType == BoundType.NONE && upperBoundType == BoundType.NONE) {
                 return GRange.all<T>().toRange()
+            }
 
-            if (lowerBoundType != BoundType.NONE && upperBoundType == BoundType.NONE)
+            if (lowerBoundType != BoundType.NONE && upperBoundType == BoundType.NONE) {
                 return GRange.downTo(lowerEndpoint!!, lowerBoundType.toBoundTypeG()!!).toRange()
-            if (lowerBoundType == BoundType.NONE && upperBoundType != BoundType.NONE)
+            }
+            if (lowerBoundType == BoundType.NONE && upperBoundType != BoundType.NONE) {
                 return GRange.upTo(upperEndpoint!!, upperBoundType.toBoundTypeG()!!).toRange()
+            }
 
             return GRange.range(
                 lowerEndpoint!!,

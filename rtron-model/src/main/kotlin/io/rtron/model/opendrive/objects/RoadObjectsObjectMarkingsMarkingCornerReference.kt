@@ -19,5 +19,5 @@ package io.rtron.model.opendrive.objects
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectMarkingsMarkingCornerReference(
-    var id: Int = Int.MIN_VALUE,
+    var id: Int = Int.MIN_VALUE
 ) : OpendriveElement()

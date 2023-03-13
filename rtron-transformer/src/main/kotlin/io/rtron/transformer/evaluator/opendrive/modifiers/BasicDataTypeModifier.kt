@@ -31,8 +31,9 @@ object BasicDataTypeModifier {
     fun <T, K : Comparable<K>> filterToStrictlySorted(elementList: List<T>, selector: (T) -> K, location: String, attributeName: String, messageList: DefaultMessageList): List<T> {
         val elementListFiltered = elementList.filterToStrictSortingBy(selector)
         val numberOfIgnoredElements = elementList.size - elementListFiltered.size
-        if (numberOfIgnoredElements > 0)
+        if (numberOfIgnoredElements > 0) {
             messageList += DefaultMessage("NonStrictlyAscendingSortedList", "The list entries of the attribute '$attributeName' are not sorted in strictly ascending order. $numberOfIgnoredElements elements are removed to adhere to strictly ascending order.", location, Severity.WARNING, true)
+        }
 
         return elementListFiltered
     }
@@ -44,8 +45,9 @@ object BasicDataTypeModifier {
     fun <T, K : Comparable<K>> filterToSorted(elementList: List<T>, selector: (T) -> K, location: String, attributeName: String, messageList: DefaultMessageList): List<T> {
         val elementListFiltered = elementList.filterToSortingBy(selector)
         val numberOfIgnoredElements = elementList.size - elementListFiltered.size
-        if (numberOfIgnoredElements > 0)
+        if (numberOfIgnoredElements > 0) {
             messageList += DefaultMessage("NonAscendingSortedList", "The list entries of the attribute '$attributeName' are not sorted in ascending order. $numberOfIgnoredElements elements are removed to adhere to ascending order.", location, Severity.WARNING, true)
+        }
 
         return elementListFiltered
     }

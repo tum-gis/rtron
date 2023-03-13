@@ -43,10 +43,12 @@ object OpendriveFileReader {
 
     // Methods
     fun readFromFile(filePath: Path): Either<OpendriveReaderException, OpendriveModel> = either.eager {
-        if (!filePath.isRegularFile())
+        if (!filePath.isRegularFile()) {
             OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
-        if (!supportedFilenameEndings.any { filePath.fileName.toString().endsWith(it) })
+        }
+        if (!supportedFilenameEndings.any { filePath.fileName.toString().endsWith(it) }) {
             OpendriveReaderException.FileEndingNotSupported(filePath).left().bind<OpendriveReaderException>()
+        }
 
         val fileInputStreamForVersion = filePath.inputStreamFromDirectOrCompressedFile()
         val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(fileInputStreamForVersion).bind()
@@ -98,7 +100,7 @@ object OpendriveFileReader {
         ".xodr",
         ".xodr.${CompressedFileExtension.ZIP.extension}",
         ".xodr.${CompressedFileExtension.GZ.extension}",
-        ".xodr.${CompressedFileExtension.ZST.extension}",
+        ".xodr.${CompressedFileExtension.ZST.extension}"
     )
 }
 

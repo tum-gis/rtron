@@ -89,7 +89,6 @@ internal class Vector3DTest {
 
         @Test
         fun `scalar division by zero throws error`() {
-
             Assertions.assertThatIllegalArgumentException().isThrownBy {
                 Vector3D(2.0, 4.0, 1.0).scalarDivide(0.0)
             }

@@ -93,8 +93,9 @@ object RoadLanesEvaluator {
         val messageList = DefaultMessageList()
 
         lane.getLaneWidthEntries().tap {
-            if (it.head.sOffset > parameters.numberTolerance)
+            if (it.head.sOffset > parameters.numberTolerance) {
                 messageList += DefaultMessage.of("NonStrictlySortedList", "The width of the lane shall be defined for the full length of the lane section. This means that there must be a <width> element for s=0.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
         }
 
         return messageList

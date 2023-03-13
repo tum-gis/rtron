@@ -48,7 +48,6 @@ class ProjectedTriangulationAlgorithm(
      * Projects the [vertices] into a best fitting plane.
      */
     private fun projectVertices(vertices: List<Vector3D>, tolerance: Double): List<Vector3D> {
-
         val affine = run {
             val plane = vertices.calculateBestFittingPlane(tolerance)
             val affineTranslation = Affine3D.of(plane.point)
@@ -74,9 +73,9 @@ class ProjectedTriangulationAlgorithm(
         allOriginalVertices: List<Vector3D>,
         tolerance: Double
     ): Either<TriangulatorException, Polygon3D> {
-
-        if (!allProjectedVertices.containsAll(projectedPolygon.vertices))
+        if (!allProjectedVertices.containsAll(projectedPolygon.vertices)) {
             return TriangulatorException.DifferentVertices().left()
+        }
 
         val constructedPolygon = projectedPolygon.vertices
             .map { allProjectedVertices.indexOf(it) }

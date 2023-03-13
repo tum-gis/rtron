@@ -55,10 +55,10 @@ class ShapeFunction(
     // Methods
 
     override fun valueUnbounded(x: Double, y: Double): Either<Exception, Double> {
-
         val xAdjusted = if (extrapolateX) x.coerceIn(minimumX, maximumX) else x
-        if (xAdjusted in functions)
+        if (xAdjusted in functions) {
             return calculateZ(xAdjusted, y)
+        }
 
         val keyBefore = getKeyBefore(x).getOrElse { throw it }
         val zBefore = calculateZ(keyBefore, y).getOrElse { throw it }
@@ -92,8 +92,11 @@ class ShapeFunction(
     private fun calculateZ(key: Double, y: Double): Either<Exception, Double> = either.eager {
         val selectedFunction = functions.getValueEither(key).mapLeft { it.toIllegalArgumentException() }.bind()
 
-        val yAdjusted = if (!extrapolateY) y
-        else y.coerceIn(selectedFunction.domain.lowerEndpointOrNull(), selectedFunction.domain.upperEndpointOrNull())
+        val yAdjusted = if (!extrapolateY) {
+            y
+        } else {
+            y.coerceIn(selectedFunction.domain.lowerEndpointOrNull(), selectedFunction.domain.upperEndpointOrNull())
+        }
 
         selectedFunction.valueUnbounded(yAdjusted).bind()
     }

@@ -34,19 +34,22 @@ object JunctionEvaluator {
 
         everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
 
-            if (currentJunction.connection.isEmpty())
+            if (currentJunction.connection.isEmpty()) {
                 messageList += DefaultMessage.of("EmptyList", "List for attribute 'connection' is empty, but it has to contain at least one element.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
-            if (currentJunction.id.isBlank())
+            if (currentJunction.id.isBlank()) {
                 messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'ID'.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
             currentJunction
         }
 
         everyJunctionConnection.modify(modifiedOpendriveModel) { currentJunctionConnection ->
 
-            if (currentJunctionConnection.id.isBlank())
+            if (currentJunctionConnection.id.isBlank()) {
                 messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'ID'.", currentJunctionConnection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
 
             currentJunctionConnection
         }

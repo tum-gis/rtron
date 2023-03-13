@@ -89,6 +89,7 @@ abstract class Opendrive16LaneMapper {
     abstract fun mapRoadLanesLaneSectionRight(source: T_Road_Lanes_LaneSection_Right): RoadLanesLaneSectionRight
 
     abstract fun mapRoadLanesLaneSectionCenterLane(source: T_Road_Lanes_LaneSection_Center_Lane): RoadLanesLaneSectionCenterLane
+
     @AfterMapping
     open fun afterMappingRoadLanesLaneSectionCenterLane(source: T_Road_Lanes_LaneSection_Center_Lane, @MappingTarget target: RoadLanesLaneSectionCenterLane) {
         target.border = source.borderOrWidth.filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Border::class.java).map { mapLrLaneBorder(it) }
@@ -96,6 +97,7 @@ abstract class Opendrive16LaneMapper {
     }
 
     abstract fun mapRoadLanesLaneSectionLeftLane(source: T_Road_Lanes_LaneSection_Left_Lane): RoadLanesLaneSectionLeftLane
+
     @AfterMapping
     open fun afterMappingRoadLanesLaneSectionLeftLane(source: T_Road_Lanes_LaneSection_Left_Lane, @MappingTarget target: RoadLanesLaneSectionLeftLane) {
         target.border = source.borderOrWidth.filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Border::class.java).map { mapLrLaneBorder(it) }
@@ -103,6 +105,7 @@ abstract class Opendrive16LaneMapper {
     }
 
     abstract fun mapRoadLanesLaneSectionRightLane(source: T_Road_Lanes_LaneSection_Right_Lane): RoadLanesLaneSectionRightLane
+
     @AfterMapping
     open fun afterMappingRoadLanesLaneSectionRightLane(source: T_Road_Lanes_LaneSection_Right_Lane, @MappingTarget target: RoadLanesLaneSectionRightLane) {
         target.border = source.borderOrWidth.filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Border::class.java).map { mapLrLaneBorder(it) }

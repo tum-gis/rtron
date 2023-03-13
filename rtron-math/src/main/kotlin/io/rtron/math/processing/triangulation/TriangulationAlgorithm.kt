@@ -37,12 +37,12 @@ abstract class TriangulationAlgorithm {
      * @return list of triangulated [Polygon3D]
      */
     fun triangulateChecked(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
-
         val triangles = triangulate(vertices, tolerance).bind()
 
         val newVertices = triangles.flatMap { it.vertices }
-        if (newVertices.any { it !in vertices })
+        if (newVertices.any { it !in vertices }) {
             TriangulatorException.DifferentVertices().left().bind<List<Polygon3D>>()
+        }
 
         triangles
     }

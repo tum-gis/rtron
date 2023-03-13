@@ -38,7 +38,6 @@ import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
 class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
 
     override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
-
         val polygon = P2TPolygon(vertices.map { P2TPolygonPoint(it.x, it.y, it.z) })
 
         poly2TriTriangulation(polygon).bind()
@@ -74,8 +73,9 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
                 .map { point -> Vector3D(point.x, point.y, point.z) }
                 .let { it.toNonEmptyListOrNull()!! }
 
-            if (triangulatedVertices.isColinear(tolerance))
+            if (triangulatedVertices.isColinear(tolerance)) {
                 return TriangulatorException.ColinearVertices().left()
+            }
             return@map Polygon3D(triangulatedVertices, tolerance)
         }
 
@@ -95,8 +95,11 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
         val referenceNormal = originalVertices.calculateNormal()
         return triangles.map {
             val triangleNormal = it.vertices.calculateNormal()
-            if (referenceNormal.angle(triangleNormal) > HALF_PI + QUARTER_PI) it.reversed()
-            else it
+            if (referenceNormal.angle(triangleNormal) > HALF_PI + QUARTER_PI) {
+                it.reversed()
+            } else {
+                it
+            }
         }
     }
 }

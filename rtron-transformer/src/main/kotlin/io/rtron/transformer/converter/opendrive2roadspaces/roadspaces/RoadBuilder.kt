@@ -69,7 +69,6 @@ class RoadBuilder(
         roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D,
         baseAttributes: AttributeList
     ): ContextMessageList<Road> {
-
         require(road.lanes.getLaneSectionLengths(road.length).all { it >= parameters.numberTolerance }) { "All lane sections must have a length above the tolerance threshold." }
         val messageList = DefaultMessageList()
 
@@ -128,7 +127,6 @@ class RoadBuilder(
     }
 
     private fun buildRoadLinkage(id: RoadspaceIdentifier, road: OpendriveRoad): RoadLinkage {
-
         val belongsToJunctionId = road.getJunctionOption()
             .map { JunctionIdentifier(it, id.modelIdentifier) }
 
@@ -155,7 +153,7 @@ class RoadBuilder(
             predecessorRoadspaceContactPointId,
             predecessorJunctionId,
             successorRoadspaceContactPointId,
-            successorJunctionId,
+            successorJunctionId
         )
     }
 

@@ -96,6 +96,7 @@ abstract class Opendrive16ObjectMapper {
 
     fun mapObjectTypeToOption(source: E_ObjectType?): Option<EObjectType> =
         source?.let { mapObjectType(it).some() } ?: None
+
     @ValueMapping(source = "CAR", target = "NONE")
     @ValueMapping(source = "VAN", target = "NONE")
     @ValueMapping(source = "BUS", target = "NONE")

@@ -27,7 +27,7 @@ class RoadObjectsObjectOutlinesOutlineCornerLocal(
     var id: Option<Int> = None,
     var u: Double = Double.NaN,
     var v: Double = Double.NaN,
-    var z: Double = Double.NaN,
+    var z: Double = Double.NaN
 ) : OpendriveElement() {
 
     // Methods
@@ -36,8 +36,11 @@ class RoadObjectsObjectOutlinesOutlineCornerLocal(
 
     fun getBasePoint() = Vector3D(u, v, z)
     fun getHeadPoint(): Option<Vector3D> =
-        if (hasZeroHeight()) None
-        else Vector3D(u, v, z + height).some()
+        if (hasZeroHeight()) {
+            None
+        } else {
+            Vector3D(u, v, z + height).some()
+        }
 
     fun getPoints(): Pair<Vector3D, Option<Vector3D>> = Pair(getBasePoint(), getHeadPoint())
 }

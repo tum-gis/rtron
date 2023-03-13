@@ -26,5 +26,5 @@ data class RoadObjectsObjectBordersBorder(
     var outlineId: Int = Int.MIN_VALUE,
     var type: EBorderType = EBorderType.CONCRETE,
     var useCompleteOutline: Option<Boolean> = None,
-    var width: Double = Double.NaN,
+    var width: Double = Double.NaN
 ) : OpendriveElement()

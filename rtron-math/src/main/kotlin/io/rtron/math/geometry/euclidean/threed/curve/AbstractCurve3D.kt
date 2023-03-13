@@ -58,8 +58,9 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @return point in cartesian coordinates
      */
     fun calculatePointLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException, Vector3D> {
-        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+        }
 
         return calculatePointLocalCSUnbounded(curveRelativePoint).right()
     }
@@ -82,8 +83,9 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @return point in cartesian coordinates
      */
     fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Vector3D> {
-        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
+        }
 
         return calculatePointGlobalCSUnbounded(curveRelativePoint).right()
     }
@@ -117,7 +119,6 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      */
     fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true):
         Either<GeometryException.ValueNotContainedInDomain, NonEmptyList<Vector3D>> = either.eager {
-
         domain.arrange(step, includeEndPoint, tolerance)
             .map(::CurveRelativeVector1D)
             .map { calculatePointGlobalCS(it).bind() }

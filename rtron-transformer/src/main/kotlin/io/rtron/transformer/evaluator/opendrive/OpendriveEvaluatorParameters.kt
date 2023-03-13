@@ -34,7 +34,7 @@ data class OpendriveEvaluatorParameters(
     /** angle tolerance between two geometry elements of the plan view */
     val planViewGeometryAngleTolerance: Double,
     /** warning tolerance for angles between two geometry elements of the plan view */
-    val planViewGeometryAngleWarningTolerance: Double,
+    val planViewGeometryAngleWarningTolerance: Double
 ) {
 
     init {

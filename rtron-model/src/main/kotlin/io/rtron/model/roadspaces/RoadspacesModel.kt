@@ -71,6 +71,7 @@ class RoadspacesModel(
 
     /** Identifiers of all available roadspace. */
     val roadspaceIdentifiers get() = roadspaces.keys
+
     /** Identifiers of all available junctions. */
     val junctionIdentifiers get() = junctions.keys
 
@@ -160,7 +161,6 @@ class RoadspacesModel(
      * @param laneId lane identifier for which the successor lanes shall be found
      */
     fun getSuccessorLaneIdentifiers(laneId: LaneIdentifier): Either<IllegalArgumentException, List<LaneIdentifier>> {
-
         val road = roadspaces.getValueEither(laneId.toRoadspaceIdentifier())
             .getOrElse { throw it.toIllegalArgumentException() }.road
 
@@ -189,7 +189,6 @@ class RoadspacesModel(
      */
     private fun getLongitudinalFillerSurface(laneId: LaneIdentifier, successorLaneId: LaneIdentifier):
         Option<FillerSurface> {
-
         val road = roadspaces
             .getValueEither(laneId.laneSectionIdentifier.roadspaceIdentifier)
             .getOrElse { throw it.toIllegalArgumentException() }.road
@@ -220,15 +219,17 @@ class RoadspacesModel(
         successorRoad: Road
     ):
         Option<AbstractSurface3D> {
-
         val currentVertices = listOf(road.getLeftLaneBoundary(laneId), road.getRightLaneBoundary(laneId))
             .map { currentCurve -> currentCurve.getOrElse { throw it } }
             .map { currentCurve -> currentCurve.calculateEndPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrElse { throw it } }
 
         // false, if the successor lane is connected by its end (leads to swapping of the vertices)
         val successorContactStart =
-            if (laneId.isWithinSameRoad(successorLaneId)) true
-            else !road.linkage.successorRoadspaceContactPointId.map { it.roadspaceContactPoint }.exists { it == ContactPoint.END }
+            if (laneId.isWithinSameRoad(successorLaneId)) {
+                true
+            } else {
+                !road.linkage.successorRoadspaceContactPointId.map { it.roadspaceContactPoint }.exists { it == ContactPoint.END }
+            }
 
         val successorLaneBoundaries =
             listOf(successorRoad.getRightLaneBoundary(successorLaneId), successorRoad.getLeftLaneBoundary(successorLaneId))
@@ -244,8 +245,11 @@ class RoadspacesModel(
             .filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
             .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
 
-        return if (fillerSurfaceVertices.size < 3 || fillerSurfaceVertices.isColinear(tolerance)) None
-        else LinearRing3D(fillerSurfaceVertices.toNonEmptyListOrNull()!!, tolerance).some()
+        return if (fillerSurfaceVertices.size < 3 || fillerSurfaceVertices.isColinear(tolerance)) {
+            None
+        } else {
+            LinearRing3D(fillerSurfaceVertices.toNonEmptyListOrNull()!!, tolerance).some()
+        }
     }
 
     /**
@@ -317,7 +321,6 @@ class RoadspacesModel(
      */
     private fun getSuccessorLanesBetweenRoads(laneId: LaneIdentifier):
         Either<IllegalArgumentException, List<LaneIdentifier>> {
-
         val road = roadspaces.getValueEither(laneId.toRoadspaceIdentifier())
             .getOrElse { throw it.toIllegalArgumentException() }.road
         val roadSuccessorRoadspaceContactPoint = road.linkage

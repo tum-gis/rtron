@@ -73,8 +73,11 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         val SUPPORTED_SCHEMA_VERSIONS: Set<OpendriveVersion> = OPENDRIVE_MODEL_CLASSES.keys
 
         fun of(version: OpendriveVersion): Either<OpendriveReaderException.NoDedicatedUnmarshallerAvailable, OpendriveUnmarshaller> {
-            return if (version in SUPPORTED_SCHEMA_VERSIONS) OpendriveUnmarshaller(version).right()
-            else OpendriveReaderException.NoDedicatedUnmarshallerAvailable(version).left()
+            return if (version in SUPPORTED_SCHEMA_VERSIONS) {
+                OpendriveUnmarshaller(version).right()
+            } else {
+                OpendriveReaderException.NoDedicatedUnmarshallerAvailable(version).left()
+            }
         }
     }
 }

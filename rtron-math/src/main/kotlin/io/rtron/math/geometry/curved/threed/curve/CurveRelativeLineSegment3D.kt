@@ -52,13 +52,15 @@ class CurveRelativeLineSegment3D(
          *
          */
         fun of(start: CurveRelativeVector3D, end: CurveRelativeVector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED): Either<IllegalArgumentException, CurveRelativeLineSegment3D> =
-            if (start.fuzzyEquals(end, tolerance))
+            if (start.fuzzyEquals(end, tolerance)) {
                 Either.Left(
                     IllegalArgumentException(
                         "Start and end vector of a line segment must be different " +
                             "according to the given tolerance."
                     )
                 )
-            else Either.Right(CurveRelativeLineSegment3D(start, end, tolerance, endBoundType))
+            } else {
+                Either.Right(CurveRelativeLineSegment3D(start, end, tolerance, endBoundType))
+            }
     }
 }

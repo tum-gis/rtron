@@ -18,11 +18,12 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-if (!JavaVersion.current().isJava11Compatible)
+if (!JavaVersion.current().isJava11Compatible) {
     logger.warn(
         "This build requires Java ${JavaVersion.VERSION_11}, " +
             "but version ${JavaVersion.current()} is currently in use."
     )
+}
 
 plugins {
     base
@@ -87,7 +88,10 @@ allprojects {
     }
 
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        version.set("0.45.2")
+        // version.set("0.45.2")
+        filter {
+            exclude { it.file.path.contains("$buildDir/generated/") }
+        }
     }
 
     /*tasks.withType<DokkaTask>().configureEach {

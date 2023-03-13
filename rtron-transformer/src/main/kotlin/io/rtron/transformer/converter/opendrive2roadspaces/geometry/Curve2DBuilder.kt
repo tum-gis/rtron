@@ -71,7 +71,6 @@ object Curve2DBuilder {
      */
     fun prepareCurveMembers(planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>, numberTolerance: Double):
         Triple<List<AbstractCurve2D>, List<Range<Double>>, List<Double>> {
-
         // absolute positions for each curve member
         val absoluteStarts: List<Double> = planViewGeometryList.map { it.s }
         // domains for each curve member

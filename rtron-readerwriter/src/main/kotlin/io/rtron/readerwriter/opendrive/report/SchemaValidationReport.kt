@@ -28,7 +28,7 @@ class SchemaValidationReport(
     val validationMessages: MessageList<SchemaValidationReportMessage> = MessageList(),
 
     val completedSuccessfully: Boolean = true,
-    val validationAbortMessage: String = "",
+    val validationAbortMessage: String = ""
 ) {
 
     fun validationProcessAborted() = !completedSuccessfully

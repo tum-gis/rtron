@@ -22,7 +22,7 @@ import kotlin.io.path.createDirectories
 
 data class Project(
     val inputFilePath: Path,
-    val outputDirectoryPath: Path,
+    val outputDirectoryPath: Path
 ) {
 
     // Properties and Initializers

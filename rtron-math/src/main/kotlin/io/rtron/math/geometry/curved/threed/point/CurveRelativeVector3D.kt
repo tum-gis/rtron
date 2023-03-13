@@ -73,8 +73,10 @@ data class CurveRelativeVector3D(
          */
         fun of(curvePosition: Double, lateralOffset: Double, heightOffset: Double):
             Either<IllegalArgumentException, CurveRelativeVector3D> =
-            if (!curvePosition.isFinite() || !lateralOffset.isFinite() || !heightOffset.isFinite())
+            if (!curvePosition.isFinite() || !lateralOffset.isFinite() || !heightOffset.isFinite()) {
                 Either.Left(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
-            else Either.Right(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
+            } else {
+                Either.Right(CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset))
+            }
     }
 }

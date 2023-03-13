@@ -48,7 +48,6 @@ class CurveRelativeParametricSurface3D(
 
     // Methods
     override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D {
-
         val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
         val surfaceHeight = heightFunction
             .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)

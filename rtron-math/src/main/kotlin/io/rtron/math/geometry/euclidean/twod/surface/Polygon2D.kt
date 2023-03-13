@@ -28,7 +28,7 @@ import java.awt.geom.Path2D
  */
 data class Polygon2D(
     val vertices: NonEmptyList<Vector2D>,
-    override val tolerance: Double,
+    override val tolerance: Double
 ) : AbstractSurface2D() {
 
     // Properties and Initializers
