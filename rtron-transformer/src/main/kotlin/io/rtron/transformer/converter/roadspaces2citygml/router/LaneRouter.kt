@@ -42,6 +42,7 @@ object LaneRouter {
             LaneType.SIDEWALK -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.BORDER -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.RESTRICTED -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
+            LaneType.CURB -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.PARKING -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.BIDIRECTIONAL -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.MEDIAN -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE

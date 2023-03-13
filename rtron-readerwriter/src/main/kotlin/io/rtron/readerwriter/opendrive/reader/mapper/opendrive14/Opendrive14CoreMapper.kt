@@ -19,7 +19,6 @@ package io.rtron.readerwriter.opendrive.reader.mapper.opendrive14
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
-import io.rtron.model.opendrive.core.ECountryCode
 import io.rtron.model.opendrive.core.EUnit
 import io.rtron.model.opendrive.core.EUnitSpeed
 import io.rtron.model.opendrive.core.HeaderGeoReference
@@ -27,11 +26,13 @@ import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMappe
 import org.asam.opendrive14.Dynamic
 import org.asam.opendrive14.Unit
 import org.mapstruct.Mapper
-import org.mapstruct.MappingConstants
 import org.mapstruct.NullValueCheckStrategy
-import org.mapstruct.ValueMapping
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class], imports = [Option::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class],
+    imports = [Option::class]
+)
 abstract class Opendrive14CoreMapper {
 
     //
@@ -69,25 +70,6 @@ abstract class Opendrive14CoreMapper {
 
         Unit.PERCENT -> EUnit.PERCENT
     }
-
-    fun mapCountryCodeStringToOption(source: String?): Option<ECountryCode> = source?.let { Option.fromNullable(mapCountryCodeString(it)) } ?: None
-    @ValueMapping(source = "Austria", target = "AU")
-    @ValueMapping(source = "Brazil", target = "BR")
-    @ValueMapping(source = "China", target = "CN")
-    @ValueMapping(source = "France", target = "FR")
-    @ValueMapping(source = "Germany", target = "DE")
-    @ValueMapping(source = "Italy", target = "IT")
-    @ValueMapping(source = "Switzerland", target = "CH")
-    @ValueMapping(source = "USA", target = "US")
-    @ValueMapping(source = "AUT", target = "AU")
-    @ValueMapping(source = "BRA", target = "BR")
-    @ValueMapping(source = "CHN", target = "CN")
-    @ValueMapping(source = "FRA", target = "FR")
-    @ValueMapping(source = "DEU", target = "DE")
-    @ValueMapping(source = "ITA", target = "IT")
-    @ValueMapping(source = "CHE", target = "CH")
-    @ValueMapping(source = MappingConstants.ANY_REMAINING, target = MappingConstants.NULL)
-    abstract fun mapCountryCodeString(source: String): ECountryCode?
 
     fun mapDynamicToBoolean(source: Dynamic): Boolean = source == Dynamic.YES
 }

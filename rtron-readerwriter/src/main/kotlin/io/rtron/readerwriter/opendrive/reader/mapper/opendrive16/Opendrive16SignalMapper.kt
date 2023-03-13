@@ -14,24 +14,31 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.reader.mapper.opendrive14
+package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
 
 import arrow.core.Option
 import io.rtron.model.opendrive.signal.RoadSignals
+import io.rtron.model.opendrive.signal.RoadSignalsSignalPositionInertial
+import io.rtron.model.opendrive.signal.RoadSignalsSignalPositionRoad
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
-import org.asam.opendrive14.OpenDRIVE
+import org.asam.opendrive16.T_Road_Signals
+import org.asam.opendrive16.T_Road_Signals_Signal_PositionInertial
+import org.asam.opendrive16.T_Road_Signals_Signal_PositionRoad
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14ObjectMapper::class],
+    uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16ObjectMapper::class],
     imports = [Option::class]
 )
-abstract class Opendrive14SignalMapper {
+abstract class Opendrive16SignalMapper {
 
     //
     // Signal
     //
-    abstract fun mapSignals(source: OpenDRIVE.Road.Signals): RoadSignals
+    abstract fun mapSignals(source: T_Road_Signals): RoadSignals
+
+    abstract fun mapSignalsSignalPositionInertial(source: T_Road_Signals_Signal_PositionInertial): RoadSignalsSignalPositionInertial
+    abstract fun mapSignalsSignalPositionRoad(source: T_Road_Signals_Signal_PositionRoad): RoadSignalsSignalPositionRoad
 }

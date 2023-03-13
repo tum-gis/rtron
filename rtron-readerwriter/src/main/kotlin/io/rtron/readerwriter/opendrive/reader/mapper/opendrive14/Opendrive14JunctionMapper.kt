@@ -27,7 +27,11 @@ import org.asam.opendrive14.OpenDRIVE
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14ObjectMapper::class], imports = [Option::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14ObjectMapper::class],
+    imports = [Option::class]
+)
 abstract class Opendrive14JunctionMapper {
 
     abstract fun mapJunction(source: OpenDRIVE.Junction): Junction

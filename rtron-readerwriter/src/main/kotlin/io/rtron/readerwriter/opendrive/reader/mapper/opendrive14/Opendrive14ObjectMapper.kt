@@ -20,7 +20,6 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
 import io.rtron.model.opendrive.objects.EObjectType
-import io.rtron.model.opendrive.objects.EOrientation
 import io.rtron.model.opendrive.objects.RoadObjects
 import io.rtron.model.opendrive.objects.RoadObjectsObject
 import io.rtron.model.opendrive.objects.RoadObjectsObjectMaterial
@@ -28,19 +27,18 @@ import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlines
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.objects.RoadObjectsObjectParkingSpace
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
+import io.rtron.readerwriter.opendrive.reader.mapper.common.toUpperCaseVariations
 import org.asam.opendrive14.OpenDRIVE
 import org.asam.opendrive14.ParkingSpace
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy
 
-/**
- * Returns upper case string variations (with or without '_') of string.
- */
-fun String.toUpperCaseVariations(): List<String> =
-    listOf(uppercase(), replace("_", "").uppercase())
-
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class],
+    imports = [Option::class]
+)
 abstract class Opendrive14ObjectMapper {
 
     //
@@ -70,12 +68,6 @@ abstract class Opendrive14ObjectMapper {
     //
     // Enumerations
     //
-    fun mapOrientationStringToOption(source: String?): Option<EOrientation> = source?.let { mapOrientationString(it).some() } ?: None
-    fun mapOrientationString(source: String): EOrientation = when (source) {
-        "+" -> EOrientation.PLUS
-        "-" -> EOrientation.MINUS
-        else -> EOrientation.NONE
-    }
 
     fun mapRoadObjectTypeToOption(source: String?): Option<EObjectType> = source?.let { mapRoadObjectType(it).some() } ?: None
     fun mapRoadObjectType(source: String): EObjectType = when (source.uppercase()) {

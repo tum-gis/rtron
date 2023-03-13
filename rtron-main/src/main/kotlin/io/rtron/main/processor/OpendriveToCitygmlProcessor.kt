@@ -21,9 +21,10 @@ import com.charleskorn.kaml.Yaml
 import io.rtron.io.messages.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
-import io.rtron.readerwriter.citygml.CitygmlFileWriter
+import io.rtron.readerwriter.citygml.CitygmlWriter
 import io.rtron.readerwriter.opendrive.OpendriveFileReader
 import io.rtron.readerwriter.opendrive.OpendriveFileWriter
+import io.rtron.readerwriter.opendrive.OpendriveValidator
 import io.rtron.std.handleEmpty
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
@@ -64,14 +65,13 @@ class OpendriveToCitygmlProcessor(
             val parametersText = Yaml.default.encodeToString(OpendriveToCitygmlParameters.serializer(), parameters)
             (outputSubDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
-            // read OpenDRIVE model
-            val opendriveFileReader = OpendriveFileReader.of(inputFilePath)
-                .getOrElse { logger.warn(it.message); return@processAllFiles }
-            val opendriveSchemaValidatorReport = opendriveFileReader.runSchemaValidation()
+            // validate schema of OpenDRIVE model
+            val opendriveSchemaValidatorReport = OpendriveValidator.runSchemaValidation(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted())
                 return@processAllFiles
-            val opendriveModel = opendriveFileReader.readModel()
+            // read of OpenDRIVE model
+            val opendriveModel = OpendriveFileReader.readFromFile(inputFilePath)
                 .getOrElse { logger.warn(it.message); return@processAllFiles }
 
             // evaluate OpenDRIVE model
@@ -126,8 +126,7 @@ class OpendriveToCitygmlProcessor(
             citygmlModelResult.second.serializeToJsonFile(outputSubDirectoryPath / ROADSPACES_TO_CITYGML_REPORT_PATH)
 
             // write CityGML model
-            val citygmlFileWriter = CitygmlFileWriter(parameters.deriveCitygmlWriterParameters())
-            citygmlFileWriter.writeModel(citygmlModelResult.first, outputSubDirectoryPath, "citygml_model")
+            CitygmlWriter.writeModel(citygmlModelResult.first, outputSubDirectoryPath, "citygml_model", parameters.deriveCitygmlWriterParameters())
         }
     }
 

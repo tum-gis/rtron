@@ -34,17 +34,18 @@ fun EUnitSpeed.toUnitOfMeasure(): UnitOfMeasure = when (this) {
  * Transforms lane types of the OpenDRIVE data model to the lane types of the RoadSpaces data model.
  */
 fun ELaneType.toLaneType(): LaneType = when (this) {
-    ELaneType.NONE -> LaneType.NONE
+    ELaneType.SHOULDER -> LaneType.SHOULDER
+    ELaneType.BORDER -> LaneType.BORDER
     ELaneType.DRIVING -> LaneType.DRIVING
     ELaneType.STOP -> LaneType.STOP
-    ELaneType.SHOULDER -> LaneType.SHOULDER
-    ELaneType.BIKING -> LaneType.BIKING
-    ELaneType.SIDEWALK -> LaneType.SIDEWALK
-    ELaneType.BORDER -> LaneType.BORDER
+    ELaneType.NONE -> LaneType.NONE
     ELaneType.RESTRICTED -> LaneType.RESTRICTED
     ELaneType.PARKING -> LaneType.PARKING
-    ELaneType.BIDIRECTIONAL -> LaneType.BIDIRECTIONAL
     ELaneType.MEDIAN -> LaneType.MEDIAN
+    ELaneType.BIKING -> LaneType.BIKING
+    ELaneType.SIDEWALK -> LaneType.SIDEWALK
+    ELaneType.CURB -> LaneType.CURB
+    ELaneType.BIDIRECTIONAL -> LaneType.BIDIRECTIONAL
     ELaneType.SPECIAL_1 -> LaneType.SPECIAL_1
     ELaneType.SPECIAL_2 -> LaneType.SPECIAL_2
     ELaneType.SPECIAL_3 -> LaneType.SPECIAL_3

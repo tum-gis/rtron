@@ -27,9 +27,7 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.div
 
-class CitygmlFileWriter(
-    val parameters: CitygmlWriterParameters
-) {
+object CitygmlWriter {
 
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
@@ -38,11 +36,11 @@ class CitygmlFileWriter(
 
     // Methods
 
-    fun writeModel(model: CitygmlModel, directoryPath: Path, fileNameWithoutExtension: String): List<Path> {
-        return parameters.versions.map { write(model, it, directoryPath, fileNameWithoutExtension) }
+    fun writeModel(model: CitygmlModel, directoryPath: Path, fileNameWithoutExtension: String, parameters: CitygmlWriterParameters): List<Path> {
+        return parameters.versions.map { write(model, it, directoryPath, fileNameWithoutExtension, parameters) }
     }
 
-    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, fileNameWithoutExtension: String): Path {
+    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, fileNameWithoutExtension: String, parameters: CitygmlWriterParameters): Path {
         val citygmlVersion = version.toGmlCitygml()
         val out = citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 
@@ -68,7 +66,5 @@ class CitygmlFileWriter(
         return filePath
     }
 
-    companion object {
-        val supportedFilenameEndings: Set<String> = setOf("gml")
-    }
+    val supportedFilenameEndings: Set<String> = setOf("gml")
 }

@@ -45,7 +45,11 @@ import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 import org.mapstruct.ValueMapping
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class], imports = [Option::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class],
+    imports = [Option::class]
+)
 abstract class Opendrive14LaneMapper {
 
     //
@@ -55,12 +59,6 @@ abstract class Opendrive14LaneMapper {
 
     abstract fun mapRoadLanesLaneSectionLeft(source: OpenDRIVE.Road.Lanes.LaneSection.Left): RoadLanesLaneSectionLeft
     abstract fun mapRoadLanesLaneSectionRight(source: OpenDRIVE.Road.Lanes.LaneSection.Right): RoadLanesLaneSectionRight
-
-    fun mapSingleSideToOption(source: SingleSide?): Option<Boolean> = source?.let { mapSingleSide(it).some() } ?: None
-    fun mapSingleSide(source: SingleSide): Boolean = when (source) {
-        SingleSide.TRUE -> true
-        SingleSide.FALSE -> false
-    }
 
     //
     // Lane
@@ -106,6 +104,12 @@ abstract class Opendrive14LaneMapper {
     //
     // Enumerations
     //
+    fun mapSingleSideToOption(source: SingleSide?): Option<Boolean> = source?.let { mapSingleSide(it).some() } ?: None
+    fun mapSingleSide(source: SingleSide): Boolean = when (source) {
+        SingleSide.TRUE -> true
+        SingleSide.FALSE -> false
+    }
+
     @ValueMapping(source = "AUTONOMOUS___TRAFFIC", target = "AUTONOMOUS_TRAFFIC")
     abstract fun map(source: Restriction): EAccessRestrictionType
 

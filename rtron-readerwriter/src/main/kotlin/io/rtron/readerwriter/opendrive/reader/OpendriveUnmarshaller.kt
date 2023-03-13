@@ -17,28 +17,21 @@
 package io.rtron.readerwriter.opendrive.reader
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.right
-import io.rtron.io.messages.MessageList
-import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
-import io.rtron.readerwriter.opendrive.reader.mapper.opendrive14.Opendrive14Mapper
 import io.rtron.readerwriter.opendrive.reader.validation.OpendriveValidationEventHandler
-import io.rtron.readerwriter.opendrive.report.SchemaValidationReportMessage
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Unmarshaller
-import org.mapstruct.factory.Mappers
-import java.io.InputStream
 import javax.xml.XMLConstants
 import javax.xml.validation.SchemaFactory
 
 class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
 
     // Properties and Initializers
-    private val jaxbUnmarshaller: Unmarshaller
-    private val validationEventHandler = OpendriveValidationEventHandler()
+    val jaxbUnmarshaller: Unmarshaller
+    val validationEventHandler = OpendriveValidationEventHandler()
 
     init {
         require(opendriveVersion in SUPPORTED_SCHEMA_VERSIONS) { "The requested OpenDRIVE version is not supported." }
@@ -54,43 +47,6 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         jaxbUnmarshaller.schema = opendriveSchema
         jaxbUnmarshaller.eventHandler = validationEventHandler
     }
-
-    fun validate(inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> = either.eager {
-        try {
-            jaxbUnmarshaller.unmarshal(inputStream)
-        } catch (e: NumberFormatException) {
-            val invalidFormattedNumber = e.message.toString()
-            OpendriveReaderException.NumberFormatException(reason = invalidFormattedNumber).left()
-                .bind<OpendriveReaderException.NumberFormatException>()
-        } catch (e: Exception) {
-            OpendriveReaderException.FatalSchemaValidationError(reason = e.toString()).left()
-                .bind<OpendriveReaderException.FatalSchemaValidationError>()
-        }
-
-        val messageList = validationEventHandler.toMessageList()
-        messageList
-    }
-
-    fun readFromFile(inputStream: InputStream): Either<OpendriveReaderException.NoDedicatedReaderAvailable, OpendriveModel> =
-        either.eager {
-            val opendriveVersionSpecificModel = jaxbUnmarshaller.unmarshal(inputStream)
-
-            val opendriveModel = when (opendriveVersion) {
-                OpendriveVersion.V1_4 -> {
-                    val converter = Mappers.getMapper(Opendrive14Mapper::class.java)
-                    converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive14.OpenDRIVE)
-                }
-                // OpendriveVersion.V_1_7 -> {
-                //    val converter = Mappers.getMapper(Opendrive17Mapper::class.java)
-                // }
-                else -> {
-                    OpendriveReaderException.NoDedicatedReaderAvailable(opendriveVersion)
-                        .left().bind<OpendriveModel>()
-                }
-            }
-
-            opendriveModel
-        }
 
     companion object {
         private val OPENDRIVE_MODEL_CLASSES: Map<OpendriveVersion, Class<out Any>> = mapOf(
@@ -116,11 +72,9 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
         }
         val SUPPORTED_SCHEMA_VERSIONS: Set<OpendriveVersion> = OPENDRIVE_MODEL_CLASSES.keys
 
-        fun of(version: OpendriveVersion): Either<OpendriveReaderException.NoDedicatedSchemaAvailable, OpendriveUnmarshaller> {
+        fun of(version: OpendriveVersion): Either<OpendriveReaderException.NoDedicatedUnmarshallerAvailable, OpendriveUnmarshaller> {
             return if (version in SUPPORTED_SCHEMA_VERSIONS) OpendriveUnmarshaller(version).right()
-            else OpendriveReaderException.NoDedicatedSchemaAvailable(version).left()
+            else OpendriveReaderException.NoDedicatedUnmarshallerAvailable(version).left()
         }
-
-        val FALLBACK = OpendriveUnmarshaller(OpendriveVersion.V1_4)
     }
 }

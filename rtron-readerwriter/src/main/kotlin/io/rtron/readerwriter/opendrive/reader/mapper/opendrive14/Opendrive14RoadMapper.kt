@@ -43,7 +43,12 @@ import org.mapstruct.InjectionStrategy
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14LaneMapper::class, Opendrive14ObjectMapper::class, Opendrive14SignalMapper::class], imports = [Option::class], injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14LaneMapper::class, Opendrive14ObjectMapper::class, Opendrive14SignalMapper::class],
+    imports = [Option::class],
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR
+)
 abstract class Opendrive14RoadMapper {
 
     private val logger = KotlinLogging.logger {}

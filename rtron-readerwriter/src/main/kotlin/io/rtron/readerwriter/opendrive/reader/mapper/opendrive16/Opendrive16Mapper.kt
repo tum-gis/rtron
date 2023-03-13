@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.reader.mapper.opendrive14
+package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
 
-import arrow.core.Option
-import io.rtron.model.opendrive.signal.RoadSignals
+import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
-import org.asam.opendrive14.OpenDRIVE
+import mu.KotlinLogging
+import org.asam.opendrive16.OpenDRIVE
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14ObjectMapper::class],
-    imports = [Option::class]
+    uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16JunctionMapper::class, Opendrive16RoadMapper::class],
+    imports = [arrow.core.Option::class]
 )
-abstract class Opendrive14SignalMapper {
+abstract class Opendrive16Mapper {
 
-    //
-    // Signal
-    //
-    abstract fun mapSignals(source: OpenDRIVE.Road.Signals): RoadSignals
+    private val logger = KotlinLogging.logger {}
+
+    abstract fun mapModel(model: OpenDRIVE): OpendriveModel
 }
