@@ -38,7 +38,7 @@ internal class SpiralSegment2DTest {
     inner class TestPointCalculation {
 
         @Test
-        fun `first spiral in road 1 of ASAM spiral example `() {
+        fun `first spiral of the ASAM example dataset Ex_Line-Spiral-Arc `() {
             val pose = Pose2D(Vector2D(3.8003686923043311e+01, -1.8133261823256248e+00), Rotation2D(3.3186980419884304e-01))
             val affine = Affine2D.of(pose)
             val curvatureFunction = LinearFunction.ofSpiralCurvature(0.0, 1.3333327910466574e-02, 2.9999999999999996e+01)
@@ -66,7 +66,7 @@ internal class SpiralSegment2DTest {
         }
 
         @Test
-        fun `second spiral in road 1 of ASAM spiral example`() {
+        fun `second spiral of the ASAM example dataset Ex_Line-Spiral-Arc`() {
             val pose = Pose2D(Vector2D(8.7773023553010319e+01, 2.9721920045249909e+01), Rotation2D(9.3186944634590163e-01))
             val affine = Affine2D.of(pose)
             val curvatureFunction = LinearFunction.ofSpiralCurvature(1.3333327910466574e-02, 6.6666666666666671e-03, 2.0000000000000000e+01)
