@@ -17,7 +17,7 @@
 
 object DependencyVersions {
     // standard libraries
-    const val kotlin = "1.7.20"
+    const val kotlin = "1.8.10"
     const val coroutines = "1.6.4"
     const val arrow = "1.1.5"
 
@@ -35,7 +35,7 @@ object DependencyVersions {
     const val kaml = "0.52.0"
     const val jakartaActivationApi = "2.1.1"
     const val jakartaXmlBindApi = "4.0.0"
-    const val jaxb = "4.0.1"
+    const val jaxb = "4.0.2"
 
     // object mapping libraries
     const val mapstruct = "1.5.3.Final"
