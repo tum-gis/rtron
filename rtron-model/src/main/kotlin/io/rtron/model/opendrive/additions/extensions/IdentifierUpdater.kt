@@ -36,9 +36,6 @@ import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionCenter
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLane
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLane
 import io.rtron.model.opendrive.additions.optics.everyRoadObject
-import io.rtron.model.opendrive.junction.connection
-import io.rtron.model.opendrive.lane.laneSection
-import io.rtron.model.opendrive.road.lanes
 
 fun OpendriveModel.updateAdditionalIdentifiers() {
 

@@ -16,7 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.computations.ResultEffect.bind
+import arrow.core.getOrElse
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -50,14 +50,14 @@ data class CompositeCurve2D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).bind()
+        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).getOrElse { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePointGlobalCSUnbounded(localPoint)
     }
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
-        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).bind()
+        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance).getOrElse { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePoseGlobalCSUnbounded(localPoint).rotation

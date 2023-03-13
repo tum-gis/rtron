@@ -17,7 +17,6 @@
 package io.rtron.transformer.converter.roadspaces2citygml.geometry
 
 import arrow.core.Either
-import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
 import arrow.core.left
 import org.citygml4j.core.model.core.AbstractSpace

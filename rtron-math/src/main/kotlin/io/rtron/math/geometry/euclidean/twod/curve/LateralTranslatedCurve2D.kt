@@ -17,7 +17,6 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
-import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
 import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
@@ -57,7 +56,7 @@ data class LateralTranslatedCurve2D(
         val curveAffine = baseCurve.calculatePoseGlobalCSUnbounded(curveRelativePoint)
             .let { Affine2D.of(it) }
 
-        val translation = calculateTranslation(curveRelativePoint).bind().lateralOffset
+        val translation = calculateTranslation(curveRelativePoint).getOrElse { throw it }.lateralOffset
 
         return curveAffine.transform(Vector2D(0.0, translation))
     }

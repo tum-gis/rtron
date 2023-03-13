@@ -17,8 +17,8 @@
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import arrow.core.Either
-import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
+import arrow.core.getOrElse
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -56,7 +56,7 @@ class VegetationModuleBuilder(
         geometryTransformer.rotation.tap {
             attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
         }
-        addAttributes(solitaryVegetationObjectFeature, geometryTransformer).bind()
+        addAttributes(solitaryVegetationObjectFeature, geometryTransformer).getOrElse { throw it }
 
         // semantics
         identifierAdder.addUniqueIdentifier(roadspaceObject.id, solitaryVegetationObjectFeature)

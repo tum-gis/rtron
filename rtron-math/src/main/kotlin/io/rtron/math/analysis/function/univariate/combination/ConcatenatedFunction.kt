@@ -18,7 +18,6 @@ package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.computations.ResultEffect.bind
 import arrow.core.continuations.either
 import arrow.core.getOrElse
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
