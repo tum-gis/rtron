@@ -20,7 +20,7 @@ import io.rtron.math.std.DBL_EPSILON
 import mu.KotlinLogging
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -54,8 +54,8 @@ class FresnelTest {
 
                 val (actualX, actualY) = Fresnel.calculatePoint(l)
 
-                Assertions.assertThat(actualX).isCloseTo(x, Offset.offset(DBL_EPSILON))
-                Assertions.assertThat(actualY).isCloseTo(y, Offset.offset(DBL_EPSILON))
+                assertThat(actualX).isCloseTo(x, Offset.offset(DBL_EPSILON))
+                assertThat(actualY).isCloseTo(y, Offset.offset(DBL_EPSILON))
             }
         }
 
@@ -63,24 +63,24 @@ class FresnelTest {
         fun `test against sample value 1`() {
             val (actualX, actualY) = Fresnel.calculatePoint(-4.2284028867950161)
 
-            Assertions.assertThat(actualX).isCloseTo(-0.51547336206019945, Offset.offset(DBL_EPSILON))
-            Assertions.assertThat(actualY).isCloseTo(-0.5736113070569262, Offset.offset(DBL_EPSILON))
+            assertThat(actualX).isCloseTo(-0.51547336206019945, Offset.offset(DBL_EPSILON))
+            assertThat(actualY).isCloseTo(-0.5736113070569262, Offset.offset(DBL_EPSILON))
         }
 
         @Test
         fun `test against sample value 2`() {
             val (actualX, actualY) = Fresnel.calculatePoint(883.12677767970729)
 
-            Assertions.assertThat(actualX).isCloseTo(0.50035646758310326, Offset.offset(DBL_EPSILON))
-            Assertions.assertThat(actualY).isCloseTo(0.49994666781760994, Offset.offset(DBL_EPSILON))
+            assertThat(actualX).isCloseTo(0.50035646758310326, Offset.offset(DBL_EPSILON))
+            assertThat(actualY).isCloseTo(0.49994666781760994, Offset.offset(DBL_EPSILON))
         }
 
         @Test
         fun `test against sample value 3`() {
             val (actualX, actualY) = Fresnel.calculatePoint(-1.8154077322757265)
 
-            Assertions.assertThat(actualX).isCloseTo(-0.33992314562581244, Offset.offset(DBL_EPSILON))
-            Assertions.assertThat(actualY).isCloseTo(-0.43687889962705617, Offset.offset(DBL_EPSILON))
+            assertThat(actualX).isCloseTo(-0.33992314562581244, Offset.offset(DBL_EPSILON))
+            assertThat(actualY).isCloseTo(-0.43687889962705617, Offset.offset(DBL_EPSILON))
         }
     }
 }

@@ -18,7 +18,7 @@ package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
 import arrow.core.nonEmptyListOf
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class ConcatenatedFunctionTest {
@@ -38,11 +38,11 @@ internal class ConcatenatedFunctionTest {
 
             require(actualResult1 is Either.Left)
             require(actualResult2 is Either.Right)
-            Assertions.assertThat(actualResult2.value).isEqualTo(0.0)
+            assertThat(actualResult2.value).isEqualTo(0.0)
             require(actualResult3 is Either.Right)
-            Assertions.assertThat(actualResult3.value).isEqualTo(-5.0)
+            assertThat(actualResult3.value).isEqualTo(-5.0)
             require(actualResult4 is Either.Right)
-            Assertions.assertThat(actualResult4.value).isEqualTo(-5.0)
+            assertThat(actualResult4.value).isEqualTo(-5.0)
         }
 
         @Test
@@ -58,11 +58,11 @@ internal class ConcatenatedFunctionTest {
 
             require(actualResult1 is Either.Left)
             require(actualResult2 is Either.Right)
-            Assertions.assertThat(actualResult2.value).isEqualTo(0.0)
+            assertThat(actualResult2.value).isEqualTo(0.0)
             require(actualResult3 is Either.Right)
-            Assertions.assertThat(actualResult3.value).isEqualTo(-5.0)
+            assertThat(actualResult3.value).isEqualTo(-5.0)
             require(actualResult4 is Either.Right)
-            Assertions.assertThat(actualResult4.value).isEqualTo(-5.0)
+            assertThat(actualResult4.value).isEqualTo(-5.0)
         }
 
         @Test
@@ -78,11 +78,11 @@ internal class ConcatenatedFunctionTest {
 
             require(actualResult1 is Either.Left)
             require(actualResult2 is Either.Right)
-            Assertions.assertThat(actualResult2.value).isEqualTo(0.0)
+            assertThat(actualResult2.value).isEqualTo(0.0)
             require(actualResult3 is Either.Right)
-            Assertions.assertThat(actualResult3.value).isEqualTo(-5.0)
+            assertThat(actualResult3.value).isEqualTo(-5.0)
             require(actualResult4 is Either.Right)
-            Assertions.assertThat(actualResult4.value).isEqualTo(-5.0)
+            assertThat(actualResult4.value).isEqualTo(-5.0)
         }
     }
 
@@ -104,13 +104,13 @@ internal class ConcatenatedFunctionTest {
             val actualResult4 = concatenatedFunction.valueInFuzzy(7.0, 1E-7)
 
             require(actualResult1 is Either.Right)
-            Assertions.assertThat(actualResult1.value).isEqualTo(2.0)
+            assertThat(actualResult1.value).isEqualTo(2.0)
             require(actualResult2 is Either.Right)
-            Assertions.assertThat(actualResult2.value).isEqualTo(32.0)
+            assertThat(actualResult2.value).isEqualTo(32.0)
             require(actualResult3 is Either.Right)
-            Assertions.assertThat(actualResult3.value).isEqualTo(1.0)
+            assertThat(actualResult3.value).isEqualTo(1.0)
             require(actualResult4 is Either.Right)
-            Assertions.assertThat(actualResult4.value).isEqualTo(49.0)
+            assertThat(actualResult4.value).isEqualTo(49.0)
         }
 
         @Test
@@ -129,13 +129,13 @@ internal class ConcatenatedFunctionTest {
             val actualResult4 = concatenatedFunction.valueInFuzzy(5.0, 1E-7)
 
             require(actualResult1 is Either.Right)
-            Assertions.assertThat(actualResult1.value).isEqualTo(2.0)
+            assertThat(actualResult1.value).isEqualTo(2.0)
             require(actualResult2 is Either.Right)
-            Assertions.assertThat(actualResult2.value).isEqualTo(32.0)
+            assertThat(actualResult2.value).isEqualTo(32.0)
             require(actualResult3 is Either.Right)
-            Assertions.assertThat(actualResult3.value).isEqualTo(1.0)
+            assertThat(actualResult3.value).isEqualTo(1.0)
             require(actualResult4 is Either.Right)
-            Assertions.assertThat(actualResult4.value).isEqualTo(49.0)
+            assertThat(actualResult4.value).isEqualTo(49.0)
         }
 
         @Test
@@ -154,13 +154,13 @@ internal class ConcatenatedFunctionTest {
             val actualResult4 = concatenatedFunction.valueInFuzzy(9.0, 1E-7)
 
             require(actualResult1 is Either.Right)
-            Assertions.assertThat(actualResult1.value).isEqualTo(2.0)
+            assertThat(actualResult1.value).isEqualTo(2.0)
             require(actualResult2 is Either.Right)
-            Assertions.assertThat(actualResult2.value).isEqualTo(32.0)
+            assertThat(actualResult2.value).isEqualTo(32.0)
             require(actualResult3 is Either.Right)
-            Assertions.assertThat(actualResult3.value).isEqualTo(1.0)
+            assertThat(actualResult3.value).isEqualTo(1.0)
             require(actualResult4 is Either.Right)
-            Assertions.assertThat(actualResult4.value).isEqualTo(49.0)
+            assertThat(actualResult4.value).isEqualTo(49.0)
         }
     }
 }
