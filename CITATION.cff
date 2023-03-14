@@ -1,5 +1,4 @@
 cff-version: 1.2.2
-message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Schwab"
   given-names: "Benedikt"
@@ -10,8 +9,6 @@ authors:
 - family-names: "Kolbe"
   given-names: "Thomas H."
   orcid: "https://orcid.org/0000-0003-1456-0423"
-title: "Spatio-Semantic Road Space Modeling for Vehicle–Pedestrian Simulation to Test Automated Driving Systems"
-version: 1.1.5
-doi: 10.3390/su12093799
-date-released: 2020-05-07
+title: "r:trån"
+date-released: 2020-06-02
 url: "https://github.com/tum-gis/rtron"
