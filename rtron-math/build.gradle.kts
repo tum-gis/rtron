@@ -17,4 +17,8 @@ dependencies {
     // geo libraries
     implementation(Dependencies.proj4)
     implementation(Dependencies.poly2tri)
+
+    // testing
+    testImplementation(Dependencies.commonsCSV)
+    testImplementation(Dependencies.kotlinLogging)
 }

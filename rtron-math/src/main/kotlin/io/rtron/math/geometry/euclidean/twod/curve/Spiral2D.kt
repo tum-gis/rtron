@@ -37,8 +37,8 @@ data class Spiral2D(
 ) {
 
     // Properties and Initializers
-    private val constantA: Double = 1.0 / sqrt(abs(cDot))
-    private val constantAuxiliaryA: Double = constantA * sqrt(PI)
+    val constantA: Double = 1.0 / sqrt(abs(cDot))
+    val constantAuxiliaryA: Double = constantA * sqrt(PI)
 
     // Methods
 
