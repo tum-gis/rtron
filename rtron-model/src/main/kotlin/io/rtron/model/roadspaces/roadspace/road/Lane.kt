@@ -16,6 +16,7 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import arrow.core.Option
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -43,6 +44,7 @@ data class Lane(
     val predecessors: List<Int>,
     val successors: List<Int>,
     val type: LaneType,
+    val laneMaterial: Option<LaneMaterial>,
     val attributes: AttributeList
 ) {
 
@@ -66,6 +68,7 @@ data class CenterLane(
     val level: Boolean = false,
     val roadMarkings: List<RoadMarking> = emptyList(),
     val type: LaneType = LaneType.NONE,
+    val laneMaterial: Option<LaneMaterial>,
     val attributes: AttributeList = AttributeList.EMPTY
 ) {
     // Properties and Initializers

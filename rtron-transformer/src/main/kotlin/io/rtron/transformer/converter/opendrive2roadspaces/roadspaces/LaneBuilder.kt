@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.right
@@ -42,12 +43,14 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneHeight
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneMaterial
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.LaneSectionIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.CenterLane
 import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.isStrictlySortedBy
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
@@ -94,12 +97,13 @@ class LaneBuilder(
 
         // build lane attributes
         val type = lrLane.type.toLaneType()
+        val laneMaterial = buildLaneMaterial(lrLane.material)
         val attributes = baseAttributes + buildAttributes(lrLane)
 
         // build up lane object
         val lane = Lane(
             id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, lrLane.getLevelWithDefault(), roadMarkings,
-            predecessors, successors, type, attributes
+            predecessors, successors, type, laneMaterial, attributes
         )
         return ContextMessageList(lane, messageList)
     }
@@ -132,9 +136,10 @@ class LaneBuilder(
             }
 
         val type = centerLane.type.toLaneType()
+        val laneMaterial = buildLaneMaterial(centerLane.material)
         val attributes = baseAttributes + buildAttributes(centerLane)
 
-        val lane = CenterLane(laneIdentifier, centerLane.getLevelWithDefault(), roadMarkings, type, attributes)
+        val lane = CenterLane(laneIdentifier, centerLane.getLevelWithDefault(), roadMarkings, type, laneMaterial, attributes)
         return ContextMessageList(lane, messageList)
     }
 
@@ -235,6 +240,30 @@ class LaneBuilder(
         }
 
         return RoadMarking(width, attributes).right()
+    }
+
+    private fun buildLaneMaterial(laneMaterials: List<RoadLanesLaneSectionLRLaneMaterial>): Option<LaneMaterial> {
+        if (laneMaterials.isEmpty()) {
+            return None
+        }
+        val firstEntry = laneMaterials.first()
+        // return none, if first entry does not start at the beginning (leads to gap)
+        if (!fuzzyEquals(firstEntry.sOffset, 0.0, parameters.numberTolerance)) {
+            return None
+        }
+
+        // return none, if different entries
+        if (laneMaterials.any {
+            !fuzzyEquals(it.friction, firstEntry.friction, parameters.numberTolerance) ||
+                !fuzzyEquals(it.roughness, firstEntry.roughness, parameters.numberTolerance) ||
+                it.surface != firstEntry.surface
+        }
+        ) {
+            return None
+        }
+
+        val laneMaterial = LaneMaterial(firstEntry.friction, firstEntry.roughness, firstEntry.surface)
+        return Some(laneMaterial)
     }
 
     private fun buildAttributes(leftRightLane: RoadLanesLaneSectionLRLane) =

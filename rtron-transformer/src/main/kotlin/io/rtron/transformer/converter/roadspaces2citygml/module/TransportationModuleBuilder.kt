@@ -112,6 +112,8 @@ class TransportationModuleBuilder(
         identifierAdder.addIdentifier(lane.id, "Lane", trafficArea)
         trafficArea.usages = CodeAdder.mapToTrafficAreaUsageCodes(lane.type).map { it.code }
         trafficArea.functions = CodeAdder.mapToTrafficAreaFunctionCodes(lane.type).map { it.code }
+        lane.laneMaterial.flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
+            .tap { trafficArea.surfaceMaterial = it.code }
         attributesAdder.addAttributes(lane, trafficArea)
 
         // filler surfaces
@@ -158,6 +160,8 @@ class TransportationModuleBuilder(
 
         identifierAdder.addIdentifier(lane.id, "Lane", auxiliaryTrafficArea)
         auxiliaryTrafficArea.functions = CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(lane.type).map { it.code }
+        lane.laneMaterial.flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
+            .tap { auxiliaryTrafficArea.surfaceMaterial = it.code }
         attributesAdder.addAttributes(lane, auxiliaryTrafficArea)
 
         // filler surfaces

@@ -16,9 +16,14 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.some
 import io.rtron.model.citygml.code.AuxiliaryTrafficAreaFunctionCode
+import io.rtron.model.citygml.code.TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode
 import io.rtron.model.citygml.code.TrafficAreaFunctionCode
 import io.rtron.model.citygml.code.TrafficAreaUsageCode
+import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.LaneType
 
 object CodeAdder {
@@ -128,5 +133,13 @@ object CodeAdder {
             LaneType.HOV -> emptyList()
             LaneType.MWY_ENTRY -> listOf(TrafficAreaUsageCode.CAR)
             LaneType.MWY_EXIT -> listOf(TrafficAreaUsageCode.CAR)
+        }
+
+    fun mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(laneMaterial: LaneMaterial): Option<TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode> =
+        when (laneMaterial.surface.uppercase()) {
+            in "ASPHALT" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.ASPHALT.some()
+            in "GRASS" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.GRASS.some()
+            in "SPEC_CONCRETE_3D" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.GRASS.some()
+            else -> None
         }
 }
