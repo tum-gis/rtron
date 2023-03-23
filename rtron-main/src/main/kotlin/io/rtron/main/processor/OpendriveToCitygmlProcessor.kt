@@ -95,7 +95,7 @@ class OpendriveToCitygmlProcessor(
 
             // crop the OpenDRIVE model
             val opendriveCropper = OpendriveCropper(parameters.deriveOpendriveCropperParameters())
-            val opendriveCroppedResult = opendriveCropper.modify(opendriveOffsetAddedResult.first)
+            val opendriveCroppedResult = opendriveCropper.modify(opendriveOffsetResolvedResult.first)
             opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_CROP_REPORT_PATH)
             val opendriveCropped = opendriveCroppedResult.first.handleEmpty {
                 logger.warn("OpendriveCropper: ${opendriveCroppedResult.second.message}")

@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.modifiers.opendrive.offset.resolver
 
+import arrow.core.None
 import arrow.core.some
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
@@ -43,7 +44,7 @@ class OpendriveOffsetResolver {
         }
 
         val headerOffset: HeaderOffset = modifiedOpendriveModel.header.offset.orNull()!!
-        report.messages += "Offset of x=${headerOffset.x}, y=${headerOffset.y}, z=${headerOffset.z} resolved."
+        modifiedOpendriveModel.header.offset = None
 
         // XY axes
         modifiedOpendriveModel = everyRoadPlanViewGeometry.modify(modifiedOpendriveModel) { currentPlanViewGeometry ->
@@ -76,6 +77,8 @@ class OpendriveOffsetResolver {
 
             modifiedRoad
         }
+
+        report.messages += "Offset of x=${headerOffset.x}, y=${headerOffset.y}, z=${headerOffset.z} resolved."
 
         return modifiedOpendriveModel to report
     }
