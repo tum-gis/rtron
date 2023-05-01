@@ -16,9 +16,7 @@
 
 package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
-import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
@@ -34,7 +32,6 @@ import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
-import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformationException
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve3DBuilder
 import io.rtron.model.opendrive.road.Road as OpendriveRoad
@@ -58,10 +55,8 @@ class RoadspaceBuilder(
      * @param road source OpenDRIVE model
      * @return transformed [Roadspace]
      */
-    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>> = either.eager {
+    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): ContextMessageList<Roadspace> {
         val messageList = DefaultMessageList()
-
-        val opendriveRoadId = road.additionalId.toEither { IllegalStateException("Additional road ID must be available.") }.getOrElse { throw it }
         val roadspaceId = RoadspaceIdentifier(road.id, modelId)
 
         // build up road reference line
@@ -113,7 +108,7 @@ class RoadspaceBuilder(
             roadspaceObjects = roadspaceObjectsFromRoadObjects + roadspaceObjectsFromRoadSignals,
             attributes = attributes
         )
-        ContextMessageList(roadspace, messageList)
+        return ContextMessageList(roadspace, messageList)
     }
 
     private fun buildLateralRoadShape(id: RoadspaceIdentifier, lateralProfileShapeList: NonEmptyList<RoadLateralProfileShape>):

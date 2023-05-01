@@ -16,22 +16,17 @@
 
 package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
-import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
-import arrow.core.left
-import arrow.core.right
-import arrow.core.separateEither
 import arrow.core.some
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
-import io.rtron.io.messages.mergeToReport
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
@@ -54,7 +49,6 @@ import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.isStrictlySortedBy
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
-import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformationException
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.messages.opendrive.of
 
@@ -203,12 +197,9 @@ class LaneBuilder(
 
         if (adjustedSrcRoadMark.isEmpty()) return ContextMessageList(emptyList(), messageList)
 
-        val roadMarkingResults = adjustedSrcRoadMark.zipWithNext()
+        val roadMarkings = adjustedSrcRoadMark.zipWithNext()
             .map { buildRoadMarking(it.first, it.second.sOffset.some()) } +
             listOf(buildRoadMarking(adjustedSrcRoadMark.last()))
-
-        val (builderExceptions, roadMarkings) = roadMarkingResults.separateEither()
-        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
 
         return ContextMessageList(roadMarkings, messageList)
     }
@@ -219,14 +210,9 @@ class LaneBuilder(
      * @param roadMark road mark entry of the OpenDRIVE data model
      * @param domainEndpoint upper domain endpoint for the domain of the road mark
      */
-    private fun buildRoadMarking(roadMark: RoadLanesLaneSectionLCRLaneRoadMark, domainEndpoint: Option<Double> = None): Either<Opendrive2RoadspacesTransformationException.ZeroLengthRoadMarking, RoadMarking> {
-        val roadMarkId = roadMark.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
-
+    private fun buildRoadMarking(roadMark: RoadLanesLaneSectionLCRLaneRoadMark, domainEndpoint: Option<Double> = None): RoadMarking {
         val domain = domainEndpoint.fold({ Range.atLeast(roadMark.sOffset) }, { Range.closed(roadMark.sOffset, it) })
-
-        if (domain.length <= parameters.numberTolerance) {
-            return Opendrive2RoadspacesTransformationException.ZeroLengthRoadMarking(roadMarkId).left()
-        }
+        require(domain.length > parameters.numberTolerance) { "Length of road marking must be above zero and the tolerance threshold." }
 
         val width = roadMark.width.fold({ ConstantFunction.ZERO }, { ConstantFunction(it, domain) })
 
@@ -239,7 +225,7 @@ class LaneBuilder(
             attribute("_material", roadMark.material)
         }
 
-        return RoadMarking(width, attributes).right()
+        return RoadMarking(width, attributes)
     }
 
     private fun buildLaneMaterial(laneMaterials: List<RoadLanesLaneSectionLRLaneMaterial>): Option<LaneMaterial> {

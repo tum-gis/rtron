@@ -16,16 +16,11 @@
 
 package io.rtron.transformer.converter.opendrive2roadspaces
 
-import arrow.core.Either
-import arrow.core.None
 import arrow.core.Option
-import arrow.core.separateEither
 import arrow.core.some
 import io.rtron.io.files.FileIdentifier
 import io.rtron.io.logging.ProgressBar
 import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.Severity
 import io.rtron.io.messages.mergeMessageLists
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
@@ -37,7 +32,6 @@ import io.rtron.transformer.converter.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.junction.JunctionBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.report.Opendrive2RoadspacesReport
 import io.rtron.transformer.converter.opendrive2roadspaces.roadspaces.RoadspaceBuilder
-import io.rtron.transformer.messages.opendrive.of
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -84,19 +78,13 @@ class Opendrive2RoadspacesTransformer(
 
         // transformation of each road
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
-        val (roadspaceExceptions, roadspacesWithContextReports) =
+        val roadspacesWithContextReports =
             if (parameters.concurrentProcessing) {
-                transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar).separateEither()
+                transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar)
             } else {
-                transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar).separateEither()
+                transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar)
             }
 
-        if (roadspaceExceptions.isNotEmpty()) {
-            roadspaceExceptions.forEach {
-                report.conversion += DefaultMessage.of("", it.message, it.location, Severity.FATAL_ERROR, wasFixed = false)
-            }
-            return None to report
-        }
         val roadspaces = roadspacesWithContextReports.mergeMessageLists().handleMessageList { report.conversion += it }
 
         val junctions = opendriveModel.junction
@@ -113,7 +101,7 @@ class Opendrive2RoadspacesTransformer(
         modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>>> =
+    ): List<ContextMessageList<Roadspace>> =
         opendriveModel.roadAsNonEmptyList.map {
             roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
         }
@@ -123,7 +111,7 @@ class Opendrive2RoadspacesTransformer(
         modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<Either<Opendrive2RoadspacesTransformationException, ContextMessageList<Roadspace>>> {
+    ): List<ContextMessageList<Roadspace>> {
         val roadspacesDeferred = opendriveModel.roadAsNonEmptyList.map {
             GlobalScope.async {
                 roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }

@@ -33,8 +33,12 @@ object JunctionEvaluator {
 
         modifiedOpendriveModel = everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
 
-            if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.incomingRoad.isEmpty() || it.connectingRoad.isEmpty() }) {
-                messageList += DefaultMessage.of("", "Junction and junction type is not supported, since only junctions are supported that have connections with an incomingRoad and a connectionRoad.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.incomingRoad.isEmpty() }) {
+                messageList += DefaultMessage.of("DefaultJunctionWithoutIncomingRoad", "Junction of type default has no connection with an incoming road.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+            }
+
+            if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.connectingRoad.isEmpty() }) {
+                messageList += DefaultMessage.of("DefaultJunctionWithoutConnectingRoad", "Junction of type default has no connection with a connecting road.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
             }
 
             currentJunction
