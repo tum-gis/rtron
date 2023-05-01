@@ -61,19 +61,15 @@ object RoadObjectsEvaluator {
 
             currentRoadObject.outlines.tap { currentRoadObjectOutline ->
                 if (currentRoadObjectOutline.outline.any { it.isPolyhedron() && !it.isPolyhedronUniquelyDefined() }) {
-                    messageList += DefaultMessage.of("", "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more <cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of("SimultaneousDefinitionCornerRoadCornerLocal", "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more <cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                     currentRoadObjectOutline.outline.forEach { it.cornerLocal = emptyList() }
                 }
-            }
-
-            if (currentRoadObject.height.isEmpty() && currentRoadObject.outlines.exists { it.containsPolyhedrons() }) {
-                messageList += DefaultMessage.of("", "Road object contains a polyhedron with non-zero height, but the height of the road object element is ${currentRoadObject.height}.", currentRoadObject.additionalId, Severity.WARNING, wasFixed = false)
             }
 
             val repeatElementsFiltered = currentRoadObject.repeat.filter { it.length >= parameters.numberTolerance }
             if (repeatElementsFiltered.size < currentRoadObject.repeat.size) {
                 // TODO: double check handling
-                messageList += DefaultMessage.of("", "A repeat element should have a length higher than zero and threshold.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                messageList += DefaultMessage.of("RepeatElementHasZeroLength", "A repeat element should have a length higher than zero and tolerance.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                 currentRoadObject.repeat = repeatElementsFiltered
             }
 

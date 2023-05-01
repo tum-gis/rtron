@@ -112,6 +112,7 @@ data class OpendriveToCitygmlParameters(
         planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
         attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
+        deriveCrsEpsgAutomatically = true,
         crsEpsg = crsEpsg,
         extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
     )

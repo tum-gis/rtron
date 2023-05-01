@@ -31,7 +31,7 @@ object JunctionEvaluator {
     fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
-        everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
+        modifiedOpendriveModel = everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
 
             if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.incomingRoad.isEmpty() || it.connectingRoad.isEmpty() }) {
                 messageList += DefaultMessage.of("", "Junction and junction type is not supported, since only junctions are supported that have connections with an incomingRoad and a connectionRoad.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)

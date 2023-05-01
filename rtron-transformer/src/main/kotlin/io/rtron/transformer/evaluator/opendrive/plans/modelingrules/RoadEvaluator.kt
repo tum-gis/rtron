@@ -36,7 +36,7 @@ object RoadEvaluator {
 
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             if (currentRoad.planView.geometry.any { it.s > currentRoad.length + parameters.numberTolerance }) {
-                messageList += DefaultMessage.of("", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = false)
+                messageList += DefaultMessage.of("PlanViewGeometrySValueExceedsRoadLength", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = false)
             }
 
             currentRoad
@@ -85,13 +85,13 @@ object RoadEvaluator {
             currentRoad.planView.geometry.zipWithNext().forEach {
                 val actualLength = it.second.s - it.first.s
                 if (!fuzzyEquals(it.first.length, actualLength, parameters.numberTolerance)) {
-                    messageList += DefaultMessage.of("", "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) does not match the start position (s=${it.second.s}) of the next geometry element.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+                    messageList += DefaultMessage.of("PlanViewGeometryElementLengthNotMatchingNextElement", "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) does not match the start position (s=${it.second.s}) of the next geometry element.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
                     it.first.length = actualLength
                 }
             }
 
             if (!fuzzyEquals(currentRoad.planView.geometry.last().s + currentRoad.planView.geometry.last().length, currentRoad.length, parameters.numberTolerance)) {
-                messageList += DefaultMessage.of("", "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length (length=${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+                messageList += DefaultMessage.of("LastPlanPlanViewGeometryElementNotMatchingRoadLength", "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length (length=${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
                 currentRoad.planView.geometry.last().length = currentRoad.length - currentRoad.planView.geometry.last().s
             }
 

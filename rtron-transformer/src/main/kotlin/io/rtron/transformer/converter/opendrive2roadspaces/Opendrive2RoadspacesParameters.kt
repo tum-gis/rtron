@@ -34,6 +34,8 @@ data class Opendrive2RoadspacesParameters(
     /** prefix of attribute names */
     val attributesPrefix: String,
     /** [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications) */
+    val deriveCrsEpsgAutomatically: Boolean,
+    /** [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications) */
     val crsEpsg: Int,
     /** linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown) */
     val extrapolateLateralRoadShapes: Boolean
@@ -45,6 +47,7 @@ data class Opendrive2RoadspacesParameters(
         const val DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE = 1E0
 
         const val DEFAULT_ATTRIBUTES_PREFIX = "opendrive_"
+        const val DEFAULT_DERIVE_CRS_EPSG_AUTOMATICALLY = false
         const val DEFAULT_CRS_EPSG = 0
         const val DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES = false
     }

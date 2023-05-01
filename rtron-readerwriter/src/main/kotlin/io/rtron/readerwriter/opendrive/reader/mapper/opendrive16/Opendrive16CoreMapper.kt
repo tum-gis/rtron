@@ -55,7 +55,7 @@ abstract class Opendrive16CoreMapper {
     fun mapHeaderOffsetToOptionHeaderOffset(source: T_Header_Offset?): Option<HeaderOffset> = source?.let { mapHeaderOffset(it).some() } ?: None
     abstract fun mapHeaderOffset(source: T_Header_Offset): HeaderOffset
 
-    fun mapAdditionalData(source: List<Object>): List<AdditionalData> {
+    fun mapAdditionalData(source: List<Any>): List<AdditionalData> {
         return emptyList()
     }
 

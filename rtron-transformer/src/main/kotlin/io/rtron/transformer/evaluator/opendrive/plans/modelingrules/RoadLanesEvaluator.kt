@@ -22,7 +22,6 @@ import io.rtron.io.messages.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyLaneSection
 import io.rtron.model.opendrive.additions.optics.everyRoad
-import io.rtron.std.isSortedDescending
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.messages.opendrive.of
 
@@ -35,7 +34,7 @@ object RoadLanesEvaluator {
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
             if (currentRoad.lanes.getLaneSectionLengths(currentRoad.length).any { it <= parameters.numberTolerance }) {
-                messageList += DefaultMessage.of("", "The length of lane sections shall be greater than zero.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                messageList += DefaultMessage.of("LaneSectionLengthBelowTolerance", "Lane sections has a length of zero or below the tolerance.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
             }
 
             currentRoad
@@ -43,11 +42,11 @@ object RoadLanesEvaluator {
 
         everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
             if (currentLaneSection.center.getNumberOfLanes() != 1) {
-                messageList += DefaultMessage.of("", "Lane section should contain exactly one center lane.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                messageList += DefaultMessage.of("LaneSectionContainsNoCenterLane", "Lane section contains no center lane.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
             }
 
             if (currentLaneSection.getNumberOfLeftRightLanes() == 0) {
-                messageList += DefaultMessage.of("", "Each lane section shall contain at least one <right> or <left> element.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                messageList += DefaultMessage.of("LaneSectionContainsNoLeftOrRightLane", "Lane section contains neither a left nor a right lane.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
             }
 
             currentLaneSection.left.tap { currentLaneSectionLeft ->
@@ -55,10 +54,10 @@ object RoadLanesEvaluator {
                 val expectedIds = (currentLaneSectionLeft.getNumberOfLanes() downTo 1).toList()
 
                 if (leftLaneIds.distinct().size < leftLaneIds.size) {
-                    messageList += DefaultMessage.of("", "Lane numbering shall be unique per lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                    messageList += DefaultMessage.of("LaneIdDuplicatesWithinLeftLaneSection", "Lane ids are not unique within the left lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
                 }
                 if (!leftLaneIds.containsAll(expectedIds)) {
-                    messageList += DefaultMessage.of("", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                    messageList += DefaultMessage.of("NonConsecutiveLaneIdsWithinLeftLaneSection", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
                 }
             }
 
@@ -67,29 +66,10 @@ object RoadLanesEvaluator {
                 val expectedIds = (-1 downTo -currentLaneSectionRight.getNumberOfLanes()).toList()
 
                 if (rightLaneIds.distinct().size < rightLaneIds.size) {
-                    messageList += DefaultMessage.of("", "Lane numbering shall be unique per lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                    messageList += DefaultMessage.of("LaneIdDuplicatesWithinRightLaneSection", "Lane ids are not unique within the right lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
                 }
                 if (!rightLaneIds.containsAll(expectedIds)) {
-                    messageList += DefaultMessage.of("", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
-                }
-            }
-
-            currentLaneSection
-        }
-
-        modifiedOpendriveModel = everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
-
-            currentLaneSection.left.tap { currentLaneSectionLeft ->
-                if (!currentLaneSectionLeft.lane.map { it.id }.isSortedDescending()) {
-                    currentLaneSectionLeft.lane = currentLaneSectionLeft.lane.sortedByDescending { it.id }
-                    messageList += DefaultMessage.of("", "Lane numbering shall start with 1 next to the center lane, descend in negative t-direction and ascend in positive t-direction.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = true)
-                }
-            }
-
-            currentLaneSection.right.tap { currentLaneSectionRight ->
-                if (!currentLaneSectionRight.lane.map { it.id }.isSortedDescending()) {
-                    currentLaneSectionRight.lane = currentLaneSectionRight.lane.sortedByDescending { it.id }
-                    messageList += DefaultMessage.of("", "Lane numbering shall start with 1 next to the center lane, descend in negative t-direction and ascend in positive t-direction.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of("NonConsecutiveLaneIdsWithinRightLaneSection", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
                 }
             }
 

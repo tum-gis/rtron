@@ -50,9 +50,11 @@ class HeaderBuilder(
         val messageList = DefaultMessageList()
 
         CoordinateReferenceSystem.of(parameters.crsEpsg).onRight { return ContextMessageList(it.some(), messageList) }
-        CoordinateReferenceSystem.of(geoReference.content).onRight { return ContextMessageList(it.some(), messageList) }
+        if (parameters.deriveCrsEpsgAutomatically) {
+            CoordinateReferenceSystem.of(geoReference.content).onRight { return ContextMessageList(it.some(), messageList) }
+            messageList += DefaultMessage("AutomaticCrsEpsgCodeDerivationFailed", "EPSG code of the coordinate reference system cannot be derived automatically from the OpenDRIVE header element; add the code explicitly as a command line argument if correct georeferencing is required.", "Header element", Severity.WARNING, wasFixed = false)
+        }
 
-        val message = DefaultMessage("UnknownCoordinateReferenceSystem", "Coordinate reference system is not known.", "Header element", Severity.WARNING, wasFixed = false)
-        return ContextMessageList(None, DefaultMessageList.of(message))
+        return ContextMessageList(None, messageList)
     }
 }

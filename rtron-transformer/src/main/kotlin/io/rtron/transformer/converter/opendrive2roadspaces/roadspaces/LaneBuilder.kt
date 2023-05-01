@@ -192,7 +192,7 @@ class LaneBuilder(
             .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, parameters.numberTolerance) }
         if (adjustedSrcRoadMark.size < roadMark.size) {
             messageList += DefaultMessage.of(
-                "",
+                "RoadMarkEntriesNotLocatedWithinSRange",
                 "Road mark entries have been removed, as the sOffset is not located within " +
                     "the local curve position domain ($curvePositionDomain) of the lane section.",
                 roadMarkId,

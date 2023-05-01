@@ -49,22 +49,22 @@ object JunctionEvaluator {
             // The @mainRoad, @orientation, @sStart and @sEnd attributes shall only be specified for virtual junctions.
             if (currentJunction.typeValidated != EJunctionType.VIRTUAL) {
                 currentJunction.mainRoad.tap {
-                    messageList += DefaultMessage.of("", "Attribute 'mainRoad' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'mainRoad' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                     currentJunction.mainRoad = None
                 }
 
                 currentJunction.orientation.tap {
-                    messageList += DefaultMessage.of("", "Attribute 'orientation' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'orientation' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                     currentJunction.orientation = None
                 }
 
                 currentJunction.sStart.tap {
-                    messageList += DefaultMessage.of("", "Attribute 'sStart' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'sStart' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                     currentJunction.sStart = None
                 }
 
                 currentJunction.sEnd.tap {
-                    messageList += DefaultMessage.of("", "Attribute 'sEnd' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'sEnd' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
                     currentJunction.sEnd = None
                 }
             }

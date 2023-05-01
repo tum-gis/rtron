@@ -63,6 +63,7 @@ data class ValidateOpendriveParameters(
         planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
         attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
+        deriveCrsEpsgAutomatically = false,
         crsEpsg = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
         extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
     )
