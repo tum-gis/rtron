@@ -16,12 +16,18 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
+import arrow.core.Option
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
 import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.model.opendrive.additions.identifier.LaneIdentifier
 import io.rtron.model.opendrive.additions.optics.everyLaneSection
 import io.rtron.model.opendrive.additions.optics.everyRoad
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionCenterLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLane
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.messages.opendrive.of
 
@@ -76,6 +82,30 @@ object RoadLanesEvaluator {
             currentLaneSection
         }
 
+        modifiedOpendriveModel = everyRoadLanesLaneSectionCenterLane.modify(modifiedOpendriveModel) { currentCenterLane ->
+            currentCenterLane.roadMark = filterToNonZeroLengthRoadMarks(currentCenterLane.roadMark, currentCenterLane.additionalId, parameters, messageList)
+            currentCenterLane
+        }
+        modifiedOpendriveModel = everyRoadLanesLaneSectionLeftLane.modify(modifiedOpendriveModel) { currentLeftLane ->
+            currentLeftLane.roadMark = filterToNonZeroLengthRoadMarks(currentLeftLane.roadMark, currentLeftLane.additionalId, parameters, messageList)
+            currentLeftLane
+        }
+        modifiedOpendriveModel = everyRoadLanesLaneSectionRightLane.modify(modifiedOpendriveModel) { currentRightLane ->
+            currentRightLane.roadMark = filterToNonZeroLengthRoadMarks(currentRightLane.roadMark, currentRightLane.additionalId, parameters, messageList)
+            currentRightLane
+        }
+
         return modifiedOpendriveModel
+    }
+
+    private fun filterToNonZeroLengthRoadMarks(roadMarks: List<RoadLanesLaneSectionLCRLaneRoadMark>, location: Option<LaneIdentifier>, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): List<RoadLanesLaneSectionLCRLaneRoadMark> {
+        if (roadMarks.isEmpty()) return emptyList()
+
+        val roadMarksFiltered: List<RoadLanesLaneSectionLCRLaneRoadMark> = roadMarks.zipWithNext().map { it.first to it.second.sOffset - it.first.sOffset }.filter { it.second >= parameters.numberTolerance }.map { it.first } + roadMarks.last()
+        if (roadMarksFiltered.size < roadMarks.size) {
+            messageList += DefaultMessage.of("RoadMarkWithLengthBelowThreshold", "Center lane contains roadMarks with length zero (or below threshold).", location, Severity.ERROR, wasFixed = true)
+        }
+
+        return roadMarksFiltered
     }
 }

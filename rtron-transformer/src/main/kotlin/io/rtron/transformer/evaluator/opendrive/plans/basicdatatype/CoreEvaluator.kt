@@ -35,6 +35,11 @@ object CoreEvaluator {
             messageList += DefaultMessage("NoRoadsContained", "Document does not contain any roads.", "", Severity.FATAL_ERROR, wasFixed = false)
         }
 
+        val duplicateRoadIds = modifiedOpendriveModel.road.map { it.id }.groupingBy { it }.eachCount().filter { it.value > 1 }
+        if (duplicateRoadIds.isNotEmpty()) {
+            messageList += DefaultMessage("DuplicateRoadIds", "Multiple road elements are using the same ID (affected IDs: ${duplicateRoadIds.keys.joinToString()}).", "", Severity.FATAL_ERROR, wasFixed = false)
+        }
+
         OpendriveModel.header.get(modifiedOpendriveModel).also { header ->
             if (header.revMajor < 0) {
                 messageList += DefaultMessage("UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false)
