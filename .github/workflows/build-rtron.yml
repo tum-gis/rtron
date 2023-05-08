@@ -3,7 +3,7 @@ name: Build rtron
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -27,3 +27,25 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build with Gradle
+        run: ./gradlew shadowJar
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: rtron-build
+          path: |
+            rtron-cli/build/libs/rtron.jar
