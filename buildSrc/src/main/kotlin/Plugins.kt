@@ -16,7 +16,7 @@
 
 
 object PluginVersions {
-    const val shadowjar = "8.1.1"
+    const val shadowjar = "7.1.2"
     const val ktlint = "11.3.2"
     const val xjc = "1.6"
     const val versionChecker = "0.46.0"

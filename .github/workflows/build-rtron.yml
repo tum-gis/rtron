@@ -27,6 +27,8 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
+      - name: Test local publishing
+        run: ./gradlew build publishToMavenLocal -Pskip.signing
 
   build:
     needs: test
