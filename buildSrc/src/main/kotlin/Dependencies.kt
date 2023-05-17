@@ -18,7 +18,7 @@
 object DependencyVersions {
     // standard libraries
     const val kotlin = "1.8.21"
-    const val coroutines = "1.6.4"
+    const val coroutines = "1.7.1"
     const val arrow = "1.1.5"
 
     // testing libraries
@@ -31,7 +31,7 @@ object DependencyVersions {
     const val slf4jSimple = "2.0.7"
 
     // object creation libraries
-    const val kotlinxSerializationJson = "1.5.0"
+    const val kotlinxSerializationJson = "1.5.1"
     const val kaml = "0.53.0"
     const val jakartaActivationApi = "2.1.2"
     const val jakartaXmlBindApi = "4.0.0"
@@ -43,7 +43,7 @@ object DependencyVersions {
     // io libraries
     const val clikt = "3.5.2"
     const val mordant = "1.2.1"
-    const val commonsIO = "2.11.0"
+    const val commonsIO = "2.12.0"
     const val commonsCSV = "1.10.0"
     const val commonsLang = "3.12.0"
     const val commonsCompress = "1.23.0"
