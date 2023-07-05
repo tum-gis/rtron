@@ -50,8 +50,8 @@ class ValidateOpendriveProcessor(
             outputDirectoryPath = outputPath
         ) {
             // write the parameters as yaml file
-            val parametersText = Yaml.default.encodeToString(ValidateOpendriveParameters.serializer(), parameters)
-            (outputDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
+            // val parametersText = Yaml.default.encodeToString(ValidateOpendriveParameters.serializer(), parameters)
+            // (outputDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // read OpenDRIVE model
             val opendriveFileReader = OpendriveFileReader.of(inputFilePath)
@@ -85,7 +85,7 @@ class ValidateOpendriveProcessor(
             // transform OpenDRIVE model to Roadspaces model
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
             val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel, inputFileIdentifier)
-            roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
+            // roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
                 logger.warn(roadspacesModelResult.second.conversion.getTextSummary())
                 return@processAllFiles
@@ -94,28 +94,28 @@ class ValidateOpendriveProcessor(
             // evaluate Roadspaces model
             val roadspacesEvaluator = RoadspacesEvaluator(parameters.deriveRoadspacesEvaluatorParameters())
             val roadspacesEvaluatorResults = roadspacesEvaluator.evaluate(roadspacesModel)
-            roadspacesEvaluatorResults.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_EVALUATOR_REPORT_PATH)
+            // roadspacesEvaluatorResults.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_EVALUATOR_REPORT_PATH)
 
             // transform Roadspaces model to CityGML2 model
             val roadspaces2Citygml2Transformer = Roadspaces2CitygmlTransformer(parameters.deriveRoadspaces2Citygml2Parameters())
             val citygml2ModelResult = roadspaces2Citygml2Transformer.transform(roadspacesModel)
-            citygml2ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML2_REPORT_PATH)
+            // citygml2ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML2_REPORT_PATH)
 
             // write CityGML 2 model
             if (parameters.writeCitygml2File) {
                 val citygmlFileWriter = CitygmlFileWriter(parameters.deriveCitygml2WriterParameters())
-                citygmlFileWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath, "citygml2_model")
+                // citygmlFileWriter.writeModel(citygml2ModelResult.first, outputDirectoryPath, "citygml2_model")
             }
 
             // transform Roadspaces model to CityGML3 model
             val roadspaces2Citygml3Transformer = Roadspaces2CitygmlTransformer(parameters.deriveRoadspaces2Citygml3Parameters())
             val citygml3ModelResult = roadspaces2Citygml3Transformer.transform(roadspacesModel)
-            citygml3ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML3_REPORT_PATH)
+            // citygml3ModelResult.second.serializeToJsonFile(outputDirectoryPath / ROADSPACES_TO_CITYGML3_REPORT_PATH)
 
             // write CityGML3 model
             if (parameters.writeCitygml3File) {
                 val citygmlFileWriter = CitygmlFileWriter(parameters.deriveCitygml3WriterParameters())
-                citygmlFileWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath, "citygml3_model")
+                // citygmlFileWriter.writeModel(citygml3ModelResult.first, outputDirectoryPath, "citygml3_model")
             }
         }
     }
@@ -123,8 +123,8 @@ class ValidateOpendriveProcessor(
     companion object {
         val PARAMETERS_PATH = Path("parameters.yaml")
         val REPORTS_PATH = Path("reports")
-        val OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH = REPORTS_PATH / Path("01_opendrive_schema_validator_report.json")
-        val OPENDRIVE_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("02_opendrive_evaluator_report.json")
+        val OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH = Path("01_opendrive_schema_validator_report.json")
+        val OPENDRIVE_EVALUATOR_REPORT_PATH = Path("02_opendrive_evaluator_report.json")
         val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("03_opendrive_to_roadspaces_report.json")
         val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("04_roadspaces_evaluator_report.json")
         val ROADSPACES_TO_CITYGML2_REPORT_PATH = REPORTS_PATH / Path("05_roadspaces_to_citygml2_report.json")
