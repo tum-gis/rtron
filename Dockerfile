@@ -16,4 +16,7 @@ FROM bellsoft/liberica-openjdk-debian:17 AS runtime
 WORKDIR /app
 COPY --from=builder /home/app/rtron-cli/build/libs/rtron-1*.jar /app/app.jar
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+WORKDIR /
+COPY entrypoint.sh /entrypoint.sh
+RUN ["chmod", "+x", "entrypoint.sh"]
