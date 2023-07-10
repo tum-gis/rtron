@@ -34,7 +34,7 @@ jobs:
       - name: "Build uber JAR with Gradle"
         run: ./gradlew shadowJar
       - name: "Sanity testing: Validation test runs"
-        run: java -jar ./rtron-cli/build/libs/rtron.jar validate-opendrive ./samples/datasets ./samples/datasets-out
+        run: java -jar ./rtron-cli/build/libs/rtron.jar validate-opendrive ./samples/datasets ./samples/datasets-output
 
   build:
     needs: test

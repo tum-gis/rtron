@@ -101,6 +101,11 @@ tasks.named<Jar>("sourcesJar") {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
+tasks.named<org.gradle.jvm.tasks.Jar>("kotlinSourcesJar") {
+    dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 tasks.withType<KtLintCheckTask> {
     dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
 }
