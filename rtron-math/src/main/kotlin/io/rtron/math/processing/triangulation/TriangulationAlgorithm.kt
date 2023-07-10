@@ -53,5 +53,5 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    internal abstract fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>>
+    internal abstract fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>>
 }

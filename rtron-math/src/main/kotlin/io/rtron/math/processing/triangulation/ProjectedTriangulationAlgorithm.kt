@@ -17,6 +17,7 @@
 package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.left
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -36,7 +37,7 @@ class ProjectedTriangulationAlgorithm(
     private val triangulationAlgorithm: TriangulationAlgorithm
 ) : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
+    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
         val projectedVertices = projectVertices(vertices, tolerance)
         val projectedPolygonsTriangulated = triangulationAlgorithm
             .triangulate(projectedVertices, tolerance).bind()
@@ -47,7 +48,7 @@ class ProjectedTriangulationAlgorithm(
     /**
      * Projects the [vertices] into a best fitting plane.
      */
-    private fun projectVertices(vertices: List<Vector3D>, tolerance: Double): List<Vector3D> {
+    private fun projectVertices(vertices: NonEmptyList<Vector3D>, tolerance: Double): NonEmptyList<Vector3D> {
         val affine = run {
             val plane = vertices.calculateBestFittingPlane(tolerance)
             val affineTranslation = Affine3D.of(plane.point)

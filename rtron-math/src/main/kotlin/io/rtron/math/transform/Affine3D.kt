@@ -16,6 +16,7 @@
 
 package io.rtron.math.transform
 
+import arrow.core.NonEmptyList
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -57,6 +58,9 @@ class Affine3D(
 
     @JvmName("transformOfListVector3D")
     fun transform(points: List<Vector3D>): List<Vector3D> = points.map { transform(it) }
+
+    @JvmName("transformOfNonEmptyListVector3D")
+    fun transform(points: NonEmptyList<Vector3D>): NonEmptyList<Vector3D> = points.map { transform(it) }
 
     @JvmName("inverseTransformOfListVector3D")
     fun inverseTransform(points: List<Vector3D>) = points.map { inverseTransform(it) }

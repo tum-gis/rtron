@@ -17,6 +17,8 @@
 package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
+import arrow.core.left
 import arrow.core.nonEmptyListOf
 import arrow.core.right
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -29,10 +31,14 @@ import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
  */
 class FanTriangulationAlgorithm : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: List<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> {
-        val polygons = vertices.filterIndexed { index, _ -> index != 0 }
+    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> {
+        if (vertices.tail.any { vertices.head.fuzzyEquals(it, tolerance) }) {
+            return TriangulatorException.FirstVertexDuplicated().left()
+        }
+
+        val polygons = vertices.tail
             .zipWithNext()
-            .map { Polygon3D(nonEmptyListOf(vertices.first(), it.first, it.second), tolerance) }
+            .map { Polygon3D(nonEmptyListOf(vertices.head, it.first, it.second), tolerance) }
 
         return polygons.right()
     }
