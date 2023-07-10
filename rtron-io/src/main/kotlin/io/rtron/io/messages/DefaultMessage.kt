@@ -37,4 +37,6 @@ data class DefaultMessage(
         Pair(Severity.ERROR, true) -> Severity.WARNING
         else -> incidentSeverity
     }
+
+    companion object { }
 }

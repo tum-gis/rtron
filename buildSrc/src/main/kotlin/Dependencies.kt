@@ -17,8 +17,8 @@
 
 object DependencyVersions {
     // standard libraries
-    const val kotlin = "1.8.21"
-    const val coroutines = "1.7.1"
+    const val kotlin = "1.9.0"
+    const val coroutines = "1.7.2"
     const val arrow = "1.1.5"
 
     // testing libraries
@@ -32,10 +32,10 @@ object DependencyVersions {
 
     // object creation libraries
     const val kotlinxSerializationJson = "1.5.1"
-    const val kaml = "0.53.0"
+    const val kaml = "0.54.0"
     const val jakartaActivationApi = "2.1.2"
     const val jakartaXmlBindApi = "4.0.0"
-    const val jaxb = "4.0.2"
+    const val jaxb = "4.0.3"
 
     // object mapping libraries
     const val mapstruct = "1.5.5.Final"
@@ -43,21 +43,21 @@ object DependencyVersions {
     // io libraries
     const val clikt = "3.5.2"
     const val mordant = "1.2.1"
-    const val commonsIO = "2.12.0"
+    const val commonsIO = "2.13.0"
     const val commonsCSV = "1.10.0"
     const val commonsLang = "3.12.0"
     const val commonsCompress = "1.23.0"
-    const val zstdJni = "1.5.5-2"
+    const val zstdJni = "1.5.5-4"
     const val emojiJava = "5.1.1"
 
     // math libraries
-    const val guava = "31.1-jre"
+    const val guava = "32.1.1-jre"
     const val commonsMath = "3.6.1"
     const val joml = "1.10.5"
     const val poly2tri = "0.1.2"
 
     // geo libraries
-    const val proj4 = "1.2.3"
+    const val proj4 = "1.3.0"
     const val citygml4j = "3.0.0"
 }
 
