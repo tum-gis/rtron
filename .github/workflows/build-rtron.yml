@@ -16,37 +16,42 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up Java
+      - name: "Set up Java"
         uses: actions/setup-java@v3
         with:
           distribution: ${{ matrix.distribution }}
           java-version: ${{ matrix.java }}
-      - name: Build with Gradle
+      - name: "Build with Gradle"
         run: ./gradlew build --no-daemon
-      - name: Test local publishing
+      - name: "Test local publishing"
         run: ./gradlew build publishToMavenLocal -Pskip.signing
         if: matrix.os == 'ubuntu'
+
+      - name: "Build uber JAR with Gradle"
+        run: ./gradlew shadowJar
+      - name: "Sanity testing: Validation test runs"
+        run: java -jar ./rtron-cli/build/libs/rtron.jar validate-opendrive ./samples/datasets ./samples/datasets-out
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up Java
+      - name: "Set up Java"
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
-      - name: Build with Gradle
+      - name: "Build with Gradle"
         run: ./gradlew shadowJar
-      - name: Upload build artifacts
+      - name: "Upload build artifacts"
         uses: actions/upload-artifact@v3
         with:
           name: rtron-build

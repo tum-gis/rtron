@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OpenDRIVE>
+    <header date="2023-07-10T15:24:12" east="117.34483815599224" north="117.79483812917015" revMajor="1" revMinor="7" south="-117.95483812559387" vendor="MathWorks" version="1" west="-117.95483812559387"/>
+    <road id="0" junction="-1" length="143.31898262439302" name="Road 0" rule="RHT">
+        <link>
+            <predecessor contactPoint="end" elementDir="+" elementId="1" elementType="road"/>
+            <successor contactPoint="start" elementDir="+" elementId="3" elementType="road"/>
+        </link>
+        <type s="0.0" type="town">
+            <speed max="40.0" unit="mph"/>
+        </type>
+        <planView>
+            <geometry hdg="-2.2459994646276176" length="143.31898262439302" s="0.0" x="-71.74999475479126" y="56.95000061392784">
+                <arc curvature="0.010960124289713097"/>
+            </geometry>
+        </planView>
+        <elevationProfile>
+            <elevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </elevationProfile>
+        <lateralProfile>
+            <superelevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </lateralProfile>
+        <lanes>
+            <laneOffset a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+            <laneSection s="0.0" singleSide="false">
+                <left>
+                    <lane id="4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="4"/>
+                            <successor id="4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="3" level="false" type="curb">
+                        <link>
+                            <predecessor id="3"/>
+                            <successor id="3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="2"/>
+                            <successor id="2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="1" level="false" type="driving">
+                        <link>
+                            <predecessor id="1"/>
+                            <successor id="1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                </left>
+                <center>
+                    <lane id="0" level="false" type="none">
+                        <roadMark color="yellow" laneChange="none" material="standard" sOffset="0.0" type="solid solid" weight="standard" width="0.125"/>
+                    </lane>
+                </center>
+                <right>
+                    <lane id="-1" level="false" type="driving">
+                        <link>
+                            <predecessor id="-1"/>
+                            <successor id="-1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="-2"/>
+                            <successor id="-2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-3" level="false" type="curb">
+                        <link>
+                            <predecessor id="-3"/>
+                            <successor id="-3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="-4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="-4"/>
+                            <successor id="-4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                </right>
+            </laneSection>
+        </lanes>
+    </road>
+    <road id="1" junction="-1" length="143.31898262439324" name="Road 1" rule="RHT">
+        <link>
+            <predecessor contactPoint="end" elementDir="+" elementId="2" elementType="road"/>
+            <successor contactPoint="start" elementDir="+" elementId="0" elementType="road"/>
+        </link>
+        <type s="0.0" type="town">
+            <speed max="40.0" unit="mph"/>
+        </type>
+        <planView>
+            <geometry hdg="2.466389515757072" length="143.31898262439324" s="0.0" x="56.50000064074993" y="71.13999478518963">
+                <arc curvature="0.010960124289713097"/>
+            </geometry>
+        </planView>
+        <elevationProfile>
+            <elevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </elevationProfile>
+        <lateralProfile>
+            <superelevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </lateralProfile>
+        <lanes>
+            <laneOffset a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+            <laneSection s="0.0" singleSide="false">
+                <left>
+                    <lane id="4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="4"/>
+                            <successor id="4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="3" level="false" type="curb">
+                        <link>
+                            <predecessor id="3"/>
+                            <successor id="3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="2"/>
+                            <successor id="2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="1" level="false" type="driving">
+                        <link>
+                            <predecessor id="1"/>
+                            <successor id="1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                </left>
+                <center>
+                    <lane id="0" level="false" type="none">
+                        <roadMark color="yellow" laneChange="none" material="standard" sOffset="0.0" type="solid solid" weight="standard" width="0.125"/>
+                    </lane>
+                </center>
+                <right>
+                    <lane id="-1" level="false" type="driving">
+                        <link>
+                            <predecessor id="-1"/>
+                            <successor id="-1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="-2"/>
+                            <successor id="-2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-3" level="false" type="curb">
+                        <link>
+                            <predecessor id="-3"/>
+                            <successor id="-3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="-4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="-4"/>
+                            <successor id="-4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                </right>
+            </laneSection>
+        </lanes>
+    </road>
+    <road id="2" junction="-1" length="143.3189826243931" name="Road 2" rule="RHT">
+        <link>
+            <predecessor contactPoint="end" elementDir="+" elementId="3" elementType="road"/>
+            <successor contactPoint="start" elementDir="+" elementId="1" elementType="road"/>
+        </link>
+        <type s="0.0" type="town">
+            <speed max="40.0" unit="mph"/>
+        </type>
+        <planView>
+            <geometry hdg="0.8955931889621755" length="143.3189826243931" s="0.0" x="70.68999481201172" y="-57.11000061035156">
+                <arc curvature="0.010960124289713097"/>
+            </geometry>
+        </planView>
+        <elevationProfile>
+            <elevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </elevationProfile>
+        <lateralProfile>
+            <superelevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </lateralProfile>
+        <lanes>
+            <laneOffset a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+            <laneSection s="0.0" singleSide="false">
+                <left>
+                    <lane id="4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="4"/>
+                            <successor id="4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="3" level="false" type="curb">
+                        <link>
+                            <predecessor id="3"/>
+                            <successor id="3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="2"/>
+                            <successor id="2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="1" level="false" type="driving">
+                        <link>
+                            <predecessor id="1"/>
+                            <successor id="1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                </left>
+                <center>
+                    <lane id="0" level="false" type="none">
+                        <roadMark color="yellow" laneChange="none" material="standard" sOffset="0.0" type="solid solid" weight="standard" width="0.125"/>
+                    </lane>
+                </center>
+                <right>
+                    <lane id="-1" level="false" type="driving">
+                        <link>
+                            <predecessor id="-1"/>
+                            <successor id="-1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="-2"/>
+                            <successor id="-2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-3" level="false" type="curb">
+                        <link>
+                            <predecessor id="-3"/>
+                            <successor id="-3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="-4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="-4"/>
+                            <successor id="-4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                </right>
+            </laneSection>
+        </lanes>
+    </road>
+    <road id="3" junction="-1" length="143.3189826243929" name="Road 3" rule="RHT">
+        <link>
+            <predecessor contactPoint="end" elementDir="+" elementId="0" elementType="road"/>
+            <successor contactPoint="start" elementDir="+" elementId="2" elementType="road"/>
+        </link>
+        <type s="0.0" type="town">
+            <speed max="40.0" unit="mph"/>
+        </type>
+        <planView>
+            <geometry hdg="-0.675203137832721" length="143.3189826243929" s="0.0" x="-57.56000058352947" y="-71.29999478161335">
+                <arc curvature="0.010960124289713097"/>
+            </geometry>
+        </planView>
+        <elevationProfile>
+            <elevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </elevationProfile>
+        <lateralProfile>
+            <superelevation a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+        </lateralProfile>
+        <lanes>
+            <laneOffset a="0.0" b="0.0" c="0.0" d="0.0" s="0.0"/>
+            <laneSection s="0.0" singleSide="false">
+                <left>
+                    <lane id="4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="4"/>
+                            <successor id="4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="3" level="false" type="curb">
+                        <link>
+                            <predecessor id="3"/>
+                            <successor id="3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="2"/>
+                            <successor id="2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="1" level="false" type="driving">
+                        <link>
+                            <predecessor id="1"/>
+                            <successor id="1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                </left>
+                <center>
+                    <lane id="0" level="false" type="none">
+                        <roadMark color="yellow" laneChange="none" material="standard" sOffset="0.0" type="solid solid" weight="standard" width="0.125"/>
+                    </lane>
+                </center>
+                <right>
+                    <lane id="-1" level="false" type="driving">
+                        <link>
+                            <predecessor id="-1"/>
+                            <successor id="-1"/>
+                        </link>
+                        <width a="3.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-2" level="false" type="shoulder">
+                        <link>
+                            <predecessor id="-2"/>
+                            <successor id="-2"/>
+                        </link>
+                        <width a="0.5" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                    </lane>
+                    <lane id="-3" level="false" type="curb">
+                        <link>
+                            <predecessor id="-3"/>
+                            <successor id="-3"/>
+                        </link>
+                        <width a="0.6349999999999998" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="curb" weight="standard" width="0.15239999999999998"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                    <lane id="-4" level="false" type="sidewalk">
+                        <link>
+                            <predecessor id="-4"/>
+                            <successor id="-4"/>
+                        </link>
+                        <width a="2.0" b="0.0" c="0.0" d="0.0" sOffset="0.0"/>
+                        <roadMark color="standard" laneChange="none" material="standard" sOffset="0.0" type="none" weight="standard" width="0.0"/>
+                        <speed max="40.0" sOffset="0.0" unit="mph"/>
+                        <height inner="0.15239999999999998" outer="0.15239999999999998" sOffset="0.0"/>
+                    </lane>
+                </right>
+            </laneSection>
+        </lanes>
+    </road>
+</OpenDRIVE>
