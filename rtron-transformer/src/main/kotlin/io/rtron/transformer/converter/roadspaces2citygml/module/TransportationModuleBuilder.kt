@@ -90,6 +90,7 @@ class TransportationModuleBuilder(
 
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
         IdentifierAdder.addIdentifier(lane.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), trafficSpaceFeature)
+        attributesAdder.addAttributes(lane, trafficSpaceFeature)
         relatedObjects.forEach { relationAdder.addRelatedToRelation(it, trafficSpaceFeature) }
         // TODO: consider left-hand traffic (LHT)
         if (lane.id.isRight() || lane.id.isCenter()) {
@@ -151,6 +152,7 @@ class TransportationModuleBuilder(
         val messageList = DefaultMessageList()
         val auxiliaryTrafficSpaceFeature = createAuxiliaryTrafficSpaceFeature(TransportationGranularityValue.LANE)
         IdentifierAdder.addIdentifier(lane.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), auxiliaryTrafficSpaceFeature)
+        attributesAdder.addAttributes(lane, auxiliaryTrafficSpaceFeature)
 
         // line representation
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
