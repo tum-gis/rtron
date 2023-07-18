@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
+import arrow.core.Option
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -23,10 +24,8 @@ import io.rtron.io.messages.Severity
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
-import io.rtron.model.roadspaces.common.FillerSurface
 import io.rtron.model.roadspaces.common.LateralFillerSurface
-import io.rtron.model.roadspaces.common.LongitudinalFillerSurfaceBetweenRoads
-import io.rtron.model.roadspaces.common.LongitudinalFillerSurfaceWithinRoad
+import io.rtron.model.roadspaces.common.LongitudinalFillerSurface
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
@@ -37,6 +36,10 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransf
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceFromSolidCutoutOrSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadMarkingGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
 import org.citygml4j.core.model.core.AbstractThematicSurface
@@ -62,20 +65,14 @@ fun TransportationGranularityValue.toGmlGranularityValue(): GranularityValue = w
     TransportationGranularityValue.WAY -> GranularityValue.WAY
 }
 
-fun FillerSurface.toGmlName(): String = when (this) {
-    is LateralFillerSurface -> "LateralFillerSurface"
-    is LongitudinalFillerSurfaceBetweenRoads -> "LongitudinalFillerSurfaceBetweenRoads"
-    is LongitudinalFillerSurfaceWithinRoad -> "LongitudinalFillerSurfaceWithinRoad"
-}
-
 /**
  * Builder for city objects of the CityGML Transportation module.
  */
 class TransportationModuleBuilder(
-    val parameters: Roadspaces2CitygmlParameters,
-    private val identifierAdder: IdentifierAdder
+    val parameters: Roadspaces2CitygmlParameters
 ) {
     // Properties and Initializers
+    private val relationAdder = RelationAdder(parameters)
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
@@ -85,14 +82,15 @@ class TransportationModuleBuilder(
     fun createMarking() = Marking()
 
     /**
-     * Transforms a [lane] with a [surface] and [centerLine] representation and its [fillerSurfaces] to a
+     * Transforms a [lane] with a [surface] and [centerLine] representation and its [longitudinalFillerSurfaces] to a
      * CityGML [TrafficSpace] and adds it to the [dstTransportationSpace].
      */
-    fun addTrafficSpaceFeature(lane: Lane, surface: AbstractSurface3D, centerLine: AbstractCurve3D, fillerSurfaces: List<FillerSurface>, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
+    fun addTrafficSpaceFeature(lane: Lane, surface: AbstractSurface3D, centerLine: AbstractCurve3D, lateralFillerSurface: Option<LateralFillerSurface>, longitudinalFillerSurfaces: List<LongitudinalFillerSurface>, relatedObjects: List<RoadspaceObject>, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
 
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
-        identifierAdder.addUniqueIdentifier(lane.id, trafficSpaceFeature)
+        IdentifierAdder.addIdentifier(lane.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), trafficSpaceFeature)
+        relatedObjects.forEach { relationAdder.addRelatedToRelation(it, trafficSpaceFeature) }
         // TODO: consider left-hand traffic (LHT)
         if (lane.id.isRight() || lane.id.isCenter()) {
             trafficSpaceFeature.trafficDirection = TrafficDirectionValue.FORWARDS
@@ -106,10 +104,9 @@ class TransportationModuleBuilder(
 
         // surface representation of lane
         val trafficArea = createTrafficAreaFeature(lane.id, surface).handleMessageList { messageList += it }
-        // .getOrElse { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
 
-        identifierAdder.addIdentifier(lane.id, "Lane", trafficArea)
+        IdentifierAdder.addIdentifier(lane.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), "Lane", trafficArea)
         trafficArea.usages = CodeAdder.mapToTrafficAreaUsageCodes(lane.type).map { it.code }
         trafficArea.functions = CodeAdder.mapToTrafficAreaFunctionCodes(lane.type).map { it.code }
         lane.laneMaterial.flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
@@ -117,11 +114,17 @@ class TransportationModuleBuilder(
         attributesAdder.addAttributes(lane, trafficArea)
 
         // filler surfaces
-        fillerSurfaces.forEach { fillerSurface ->
-            val fillerTrafficArea = createTrafficAreaFeature(lane.id, fillerSurface.surface).handleMessageList { messageList += it }
-            // .getOrElse { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
+        lateralFillerSurface.tap { fillerSurface ->
+            val fillerTrafficArea = createTrafficAreaFeature(fillerSurface.id, fillerSurface.surface).handleMessageList { messageList += it }
 
-            identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerTrafficArea)
+            IdentifierAdder.addIdentifier(fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), "LateralFillerSurface", fillerTrafficArea)
+            attributesAdder.addAttributes(fillerSurface, fillerTrafficArea)
+            trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(fillerTrafficArea))
+        }
+        longitudinalFillerSurfaces.forEach { fillerSurface ->
+            val fillerTrafficArea = createTrafficAreaFeature(lane.id, fillerSurface.surface).handleMessageList { messageList += it }
+
+            IdentifierAdder.addIdentifier(fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), "LongitudinalFillerSurface", fillerTrafficArea)
             attributesAdder.addAttributes(fillerSurface, fillerTrafficArea)
             trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(fillerTrafficArea))
         }
@@ -134,19 +137,20 @@ class TransportationModuleBuilder(
     }
 
     /**
-     * Transforms a [lane] with a [surface] and [centerLine] representation and its [fillerSurfaces] to a
+     * Transforms a [lane] with a [surface] and [centerLine] representation and its [longitudinalFillerSurfaces] to a
      * CityGML [AuxiliaryTrafficSpace] and adds it to the [dstTransportationSpace].
      */
     fun addAuxiliaryTrafficSpaceFeature(
         lane: Lane,
         surface: AbstractSurface3D,
         centerLine: AbstractCurve3D,
-        fillerSurfaces: List<FillerSurface>,
+        lateralFillerSurface: Option<LateralFillerSurface>,
+        longitudinalFillerSurfaces: List<LongitudinalFillerSurface>,
         dstTransportationSpace: AbstractTransportationSpace
     ): DefaultMessageList {
         val messageList = DefaultMessageList()
         val auxiliaryTrafficSpaceFeature = createAuxiliaryTrafficSpaceFeature(TransportationGranularityValue.LANE)
-        identifierAdder.addUniqueIdentifier(lane.id, auxiliaryTrafficSpaceFeature)
+        IdentifierAdder.addIdentifier(lane.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), auxiliaryTrafficSpaceFeature)
 
         // line representation
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
@@ -155,22 +159,27 @@ class TransportationModuleBuilder(
         // surface representation
         val auxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(lane.id, surface)
             .handleMessageList { messageList += it }
-        // .getOrElse { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficArea))
 
-        identifierAdder.addIdentifier(lane.id, "Lane", auxiliaryTrafficArea)
+        IdentifierAdder.addIdentifier(lane.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), "Lane", auxiliaryTrafficArea)
         auxiliaryTrafficArea.functions = CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(lane.type).map { it.code }
         lane.laneMaterial.flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
             .tap { auxiliaryTrafficArea.surfaceMaterial = it.code }
         attributesAdder.addAttributes(lane, auxiliaryTrafficArea)
 
         // filler surfaces
-        fillerSurfaces.forEach { fillerSurface ->
+        lateralFillerSurface.tap { fillerSurface ->
+            val fillerAuxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(fillerSurface.id, fillerSurface.surface).handleMessageList { messageList += it }
+
+            IdentifierAdder.addIdentifier(fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), "LateralFillerSurface", fillerAuxiliaryTrafficArea)
+            attributesAdder.addAttributes(fillerSurface, fillerAuxiliaryTrafficArea)
+            auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(fillerAuxiliaryTrafficArea))
+        }
+        longitudinalFillerSurfaces.forEach { fillerSurface ->
             val fillerAuxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(lane.id, fillerSurface.surface)
                 .handleMessageList { messageList += it }
-            // .getOrElse { report += Message.of(it.message!!, lane.id, isFatal = false, wasFixed = true); return report }
 
-            identifierAdder.addIdentifier(lane.id, fillerSurface.toGmlName(), fillerAuxiliaryTrafficArea)
+            IdentifierAdder.addIdentifier(fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), "LongitudinalFillerSurface", fillerAuxiliaryTrafficArea)
             attributesAdder.addAttributes(fillerSurface, fillerAuxiliaryTrafficArea)
             auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(fillerAuxiliaryTrafficArea))
         }
@@ -184,16 +193,16 @@ class TransportationModuleBuilder(
     fun addTrafficSpaceFeature(roadspaceObject: RoadspaceObject, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), trafficSpaceFeature)
 
         // surface representation
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
         val trafficArea = createTrafficAreaFeature(roadspaceObject.id, geometryTransformer)
             .handleMessageList { messageList += it }
-        // .getOrElse { report += Message.of(it.message!!, roadspaceObject.id, isFatal = false, wasFixed = true); return report }
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficArea))
 
         // semantics
-        identifierAdder.addUniqueIdentifier(roadspaceObject.id, trafficArea)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), trafficArea)
         attributesAdder.addAttributes(roadspaceObject, trafficArea)
 
         // populate transportation space
@@ -205,6 +214,7 @@ class TransportationModuleBuilder(
     fun addAuxiliaryTrafficSpaceFeature(roadspaceObject: RoadspaceObject, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         val auxiliaryTrafficSpaceFeature = createAuxiliaryTrafficSpaceFeature(TransportationGranularityValue.LANE)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), auxiliaryTrafficSpaceFeature)
 
         // surface representation
         val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
@@ -213,7 +223,7 @@ class TransportationModuleBuilder(
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficArea))
 
         // semantics
-        identifierAdder.addUniqueIdentifier(roadspaceObject.id, auxiliaryTrafficArea)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), auxiliaryTrafficArea)
         attributesAdder.addAttributes(roadspaceObject, auxiliaryTrafficArea)
 
         // populate transportation space
@@ -222,7 +232,7 @@ class TransportationModuleBuilder(
         return messageList
     }
 
-    fun addMarkingFeature(id: LaneIdentifier, roadMarking: RoadMarking, geometry: AbstractGeometry3D, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
+    fun addMarkingFeature(id: LaneIdentifier, roadMarkingIndex: Int, roadMarking: RoadMarking, geometry: AbstractGeometry3D, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
 
@@ -232,7 +242,7 @@ class TransportationModuleBuilder(
             .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
 
         // semantics
-        identifierAdder.addIdentifier(id, "RoadMarking", markingFeature)
+        IdentifierAdder.addIdentifier(id.deriveRoadMarkingGmlIdentifier(parameters.gmlIdPrefix, roadMarkingIndex), "RoadMarking", markingFeature)
         attributesAdder.addAttributes(id, roadMarking, markingFeature)
 
         // populate transportation space
@@ -250,7 +260,7 @@ class TransportationModuleBuilder(
             .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
         // semantics
-        identifierAdder.addUniqueIdentifier(roadspaceObject.id, markingFeature)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), markingFeature)
         attributesAdder.addAttributes(roadspaceObject, markingFeature)
 
         // populate transportation space

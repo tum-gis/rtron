@@ -17,6 +17,8 @@
 package io.rtron.model.roadspaces.roadspace.objects
 
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
@@ -24,17 +26,24 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * Represents an object within the road space.
  *
  * @param geometry geometry of the road space object
+ * @param laneRelations object relations to road lanes
  * @param attributes attributes containing information about the road space object
  */
 data class RoadspaceObject(
     val id: RoadspaceObjectIdentifier,
     val type: RoadObjectType = RoadObjectType.NONE,
     val geometry: AbstractGeometry3D,
+    val laneRelations: List<LateralLaneRangeIdentifier>,
     val attributes: AttributeList
 ) {
 
     // Properties and Initializers
     val name get() = id.roadspaceObjectName
+
+    // Methods
+
+    /** Returns true, if the lane with [laneIdentifier] is related to this object. */
+    fun isRelatedToLane(laneIdentifier: LaneIdentifier) = laneRelations.any { it.contains(laneIdentifier) }
 
     // Conversions
     override fun toString(): String {

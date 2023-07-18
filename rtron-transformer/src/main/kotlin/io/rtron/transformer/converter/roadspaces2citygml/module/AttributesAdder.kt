@@ -17,7 +17,9 @@
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
-import io.rtron.model.roadspaces.common.FillerSurface
+import io.rtron.model.roadspaces.common.LateralFillerSurface
+import io.rtron.model.roadspaces.common.LongitudinalFillerSurface
+import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.Attribute
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -28,7 +30,6 @@ import io.rtron.model.roadspaces.roadspace.attribute.MeasureAttribute
 import io.rtron.model.roadspaces.roadspace.attribute.StringAttribute
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
-import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
@@ -36,6 +37,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.core.AbstractGenericAttribute
 import org.citygml4j.core.model.core.AbstractGenericAttributeProperty
+import org.citygml4j.core.model.core.CityObjectRelation
 import org.xmlobjects.gml.model.basictypes.Measure
 import org.citygml4j.core.model.generics.DoubleAttribute as GmlDoubleAttribute
 import org.citygml4j.core.model.generics.GenericAttributeSet as GmlGenericAttributeSet
@@ -74,9 +76,13 @@ class AttributesAdder(
         addAttributes(attributes, dstCityObject)
     }
 
-    fun addAttributes(fillerSurface: FillerSurface, dstCityObject: AbstractCityObject) {
-        val attributes = fillerSurface.fromLaneId.toAttributes(parameters.identifierAttributesPrefix + "from_") +
-            fillerSurface.toLaneId.toAttributes(parameters.identifierAttributesPrefix + "to_")
+    fun addAttributes(longitudinalFillerSurface: LongitudinalFillerSurface, dstCityObject: AbstractCityObject) {
+        val attributes = longitudinalFillerSurface.id.toAttributes(parameters.identifierAttributesPrefix)
+        addAttributes(attributes, dstCityObject)
+    }
+
+    fun addAttributes(lateralFillerSurface: LateralFillerSurface, dstCityObject: AbstractCityObject) {
+        val attributes = lateralFillerSurface.id.toAttributes(parameters.identifierAttributesPrefix)
         addAttributes(attributes, dstCityObject)
     }
 
@@ -90,6 +96,15 @@ class AttributesAdder(
      */
     fun addAttributes(attributeList: AttributeList, dstCityObject: AbstractCityObject) {
         dstCityObject.genericAttributes = dstCityObject.genericAttributes + attributeList.attributes
+            .flatMap { convertAttribute(it) }
+            .map { AbstractGenericAttributeProperty(it) }
+    }
+
+    /**
+     * Adds the attributes of an [id] to the [dstRelation].
+     */
+    fun addAttributes(id: AbstractRoadspacesIdentifier, dstRelation: CityObjectRelation) {
+        dstRelation.genericAttributes = dstRelation.genericAttributes + id.toAttributes(parameters.identifierAttributesPrefix).attributes
             .flatMap { convertAttribute(it) }
             .map { AbstractGenericAttributeProperty(it) }
     }

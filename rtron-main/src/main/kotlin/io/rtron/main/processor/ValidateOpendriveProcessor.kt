@@ -84,7 +84,7 @@ class ValidateOpendriveProcessor(
 
             // transform OpenDRIVE model to Roadspaces model
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
-            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel, inputFileIdentifier)
+            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel)
             roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
                 logger.warn(roadspacesModelResult.second.conversion.getTextSummary())

@@ -128,25 +128,25 @@ class RoadBuilder(
 
     private fun buildRoadLinkage(id: RoadspaceIdentifier, road: OpendriveRoad): RoadLinkage {
         val belongsToJunctionId = road.getJunctionOption()
-            .map { JunctionIdentifier(it, id.modelIdentifier) }
+            .map { JunctionIdentifier(it) }
 
         val predecessorRoadspaceContactPointId = road.link
             .flatMap { it.predecessor }
             .flatMap { it.getRoadPredecessorSuccessor() }
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first, id.modelIdentifier)) }
+            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first)) }
         val predecessorJunctionId = road.link
             .flatMap { it.predecessor }
             .flatMap { it.getJunctionPredecessorSuccessor() }
-            .map { JunctionIdentifier(it, id.modelIdentifier) }
+            .map { JunctionIdentifier(it) }
 
         val successorRoadspaceContactPointId = road.link
             .flatMap { it.successor }
             .flatMap { it.getRoadPredecessorSuccessor() }
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first, id.modelIdentifier)) }
+            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first)) }
         val successorJunctionId = road.link
             .flatMap { it.successor }
             .flatMap { it.getJunctionPredecessorSuccessor() }
-            .map { JunctionIdentifier(it, id.modelIdentifier) }
+            .map { JunctionIdentifier(it) }
 
         return RoadLinkage(
             belongsToJunctionId,

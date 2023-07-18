@@ -24,10 +24,12 @@ import arrow.core.Some
 import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
+import arrow.core.right
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.SectionedUnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.surface.AbstractCurveRelativeSurface3D
 import io.rtron.math.geometry.curved.threed.surface.SectionedCurveRelativeParametricSurface3D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
@@ -39,12 +41,14 @@ import io.rtron.math.geometry.euclidean.threed.surface.CompositeSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.toIllegalStateException
 import io.rtron.math.range.Range
+import io.rtron.math.range.fuzzyContains
 import io.rtron.math.range.fuzzyEncloses
 import io.rtron.math.range.length
 import io.rtron.model.roadspaces.common.LateralFillerSurface
 import io.rtron.model.roadspaces.identifier.JunctionIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.LaneSectionIdentifier
+import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.ContactPoint
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
@@ -132,6 +136,21 @@ class Road(
     /** Returns the lane section with the [laneSectionIdentifier]; if it does not exist, an [Either.Left] is returned. */
     fun getLaneSection(laneSectionIdentifier: LaneSectionIdentifier): Either<IllegalArgumentException, LaneSection> =
         laneSections.getValueEither(laneSectionIdentifier.laneSectionId).mapLeft { it.toIllegalArgumentException() }
+
+    /** Returns the lane section of the [curveRelativePoint]; if it does not exist, an [Either.Left] is returned. */
+    fun getLaneSection(curveRelativePoint: CurveRelativeVector1D): Either<IllegalArgumentException, LaneSection> {
+        val selectedLaneSections = laneSections.filter { it.curvePositionDomain.contains(curveRelativePoint.curvePosition) }
+        if (selectedLaneSections.size == 1) {
+            return selectedLaneSections.first().right()
+        }
+
+        val fuzzySelectedLaneSections = laneSections.filter { it.curvePositionDomain.fuzzyContains(curveRelativePoint.curvePosition, geometricalTolerance) }
+        return when (fuzzySelectedLaneSections.size) {
+            1 -> fuzzySelectedLaneSections.first().right()
+            0 -> IllegalArgumentException("No laneSection found").left()
+            else -> throw IllegalArgumentException("Domains of lane sections must close flush.")
+        }
+    }
 
     /** Returns an individual lane referenced by [laneIdentifier]; if it does not exist, an [Either.Left] is returned. */
     fun getLane(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, Lane> = either.eager {
@@ -356,14 +375,15 @@ class Road(
     }
 
     /**
-     * Returns the filler surface which closes the gap occurring at the lateral transition of two lane elements.
+     * Returns the filler surface which closes the gap occurring at the lateral transition of the [laneIdentifier] to
+     * the inner lane toward the road reference line.
      * These lateral transitions might contain vertical holes which are caused by e.g. lane height offsets.
      * If no lateral surface filler is needed due to adjacent lane surfaces, [Option<Nothing>] is returned.
      *
      * @param laneIdentifier lane identifier for which the lateral filler surfaces to the left shall be created
      * @param step discretization step size
      */
-    fun getInnerLateralFillerSurface(laneIdentifier: LaneIdentifier, step: Double):
+    fun getLateralFillerSurface(laneIdentifier: LaneIdentifier, step: Double):
         Either<Exception, Option<LateralFillerSurface>> = either.eager {
         require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
@@ -392,7 +412,7 @@ class Road(
             .mapLeft { IllegalStateException(it.message) }
             .bind()
             .let { CompositeSurface3D(it) }
-            .let { LateralFillerSurface(laneIdentifier, innerLaneIdentifier, it) }
+            .let { LateralFillerSurface(LateralLaneRangeIdentifier.of(laneIdentifier, innerLaneIdentifier), it) }
             .let { Some(it) }
     }
 

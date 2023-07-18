@@ -16,6 +16,9 @@
 
 package io.rtron.model.roadspaces.identifier
 
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.attributes
+
 /**
  * Lane section identifier interface required for class delegation.
  */
@@ -50,6 +53,13 @@ data class LaneSectionIdentifier(
         LaneSectionIdentifier(this.laneSectionId + 1, this.roadspaceIdentifier)
 
     // Conversions
+    override fun toAttributes(prefix: String): AttributeList {
+        val laneSectionIdentifier = this
+        return attributes(prefix) {
+            attribute("laneSectionId", laneSectionIdentifier.laneSectionId)
+        } + laneSectionIdentifier.roadspaceIdentifier.toAttributes(prefix)
+    }
+
     override fun toStringMap(): Map<String, String> =
         mapOf("laneSectionId" to laneSectionId.toString()) + roadspaceIdentifier.toStringMap()
 

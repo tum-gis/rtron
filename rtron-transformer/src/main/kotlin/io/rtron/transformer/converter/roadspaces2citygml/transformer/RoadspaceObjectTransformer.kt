@@ -28,7 +28,6 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import io.rtron.transformer.converter.roadspaces2citygml.module.BuildingModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.CityFurnitureModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.GenericsModuleBuilder
-import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.converter.roadspaces2citygml.module.VegetationModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter
 import org.citygml4j.core.model.core.AbstractCityObject
@@ -38,15 +37,14 @@ import org.citygml4j.core.model.core.CityModel
  * Transforms [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
 class RoadspaceObjectTransformer(
-    private val parameters: Roadspaces2CitygmlParameters,
-    private val identifierAdder: IdentifierAdder
+    private val parameters: Roadspaces2CitygmlParameters
 ) {
 
     // Properties and Initializers
-    private val genericsModuleBuilder = GenericsModuleBuilder(parameters, identifierAdder)
-    private val buildingModuleBuilder = BuildingModuleBuilder(parameters, identifierAdder)
-    private val cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(parameters, identifierAdder)
-    private val vegetationModuleBuilder = VegetationModuleBuilder(parameters, identifierAdder)
+    private val genericsModuleBuilder = GenericsModuleBuilder(parameters)
+    private val buildingModuleBuilder = BuildingModuleBuilder(parameters)
+    private val cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(parameters)
+    private val vegetationModuleBuilder = VegetationModuleBuilder(parameters)
 
     // Methods
 
@@ -77,7 +75,7 @@ class RoadspaceObjectTransformer(
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> None
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> None
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> None
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT -> vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).handleMessageList { messageList += it }.some()
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).handleMessageList { messageList += it }.some()
         }
 
         return ContextMessageList(cityObjects, messageList)

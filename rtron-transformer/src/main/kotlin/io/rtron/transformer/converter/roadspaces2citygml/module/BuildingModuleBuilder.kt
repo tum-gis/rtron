@@ -16,7 +16,6 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
-import arrow.core.getOrElse
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -28,6 +27,10 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLod2GroundGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLod2RoofGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLod2WallGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.building.Building
 import org.citygml4j.core.model.construction.GroundSurface
@@ -39,10 +42,10 @@ import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
  * Builder for city objects of the CityGML Building module.
  */
 class BuildingModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters,
-    private val identifierAdder: IdentifierAdder
+    private val parameters: Roadspaces2CitygmlParameters
 ) {
     // Properties and Initializers
+    private val relationAdder = RelationAdder(parameters)
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
@@ -60,7 +63,8 @@ class BuildingModuleBuilder(
             }
 
         // semantics
-        identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name.getOrElse { "" }, buildingFeature) // TODO fix option
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), buildingFeature)
+        relationAdder.addBelongToRelations(roadspaceObject, buildingFeature)
         attributesAdder.addAttributes(roadspaceObject, buildingFeature)
 
         return ContextMessageList(buildingFeature, messageList)
@@ -82,7 +86,7 @@ class BuildingModuleBuilder(
             messageList += DefaultMessage.of("", "No LoD2 MultiSurface for roof feature available.", id, Severity.WARNING, wasFixed = true)
         }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
-        identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "RoofSurface", dstCityObject = roofSurfaceFeature)
+        IdentifierAdder.addIdentifier(id.deriveLod2RoofGmlIdentifier(parameters.gmlIdPrefix), "RoofSurface", dstCityObject = roofSurfaceFeature)
 
         val groundSurfaceFeature = GroundSurface()
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).tap {
@@ -91,14 +95,14 @@ class BuildingModuleBuilder(
             messageList += DefaultMessage.of("", "No LoD2 MultiSurface for ground feature available.", id, Severity.WARNING, wasFixed = true)
         }
         buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
-        identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "FloorSurface", dstCityObject = groundSurfaceFeature)
+        IdentifierAdder.addIdentifier(id.deriveLod2GroundGmlIdentifier(parameters.gmlIdPrefix), "GroundSurface", dstCityObject = groundSurfaceFeature)
 
         geometryTransformer.getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE).tap { wallSurfaceResult ->
             wallSurfaceResult.forEachIndexed { index, multiSurfaceProperty ->
                 val wallSurfaceFeature = WallSurface()
                 wallSurfaceFeature.lod2MultiSurface = multiSurfaceProperty
                 buildingFeature.addBoundary(AbstractSpaceBoundaryProperty(wallSurfaceFeature))
-                identifierAdder.addDetailedIdentifier(id, id.roadspaceObjectName, "WallSurface", index, wallSurfaceFeature)
+                IdentifierAdder.addIdentifier(id.deriveLod2WallGmlIdentifier(parameters.gmlIdPrefix, index), "WallSurface", dstCityObject = wallSurfaceFeature)
             }
         }.tapNone {
             messageList += DefaultMessage.of("", "No LoD2 MultiSurface for wall feature available.", id, Severity.WARNING, wasFixed = true)

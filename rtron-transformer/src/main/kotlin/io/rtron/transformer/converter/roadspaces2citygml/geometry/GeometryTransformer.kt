@@ -46,7 +46,7 @@ import io.rtron.math.transform.Affine3D
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleEmpty
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
-import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.generateRandomUUID
 import org.citygml4j.core.model.core.ImplicitGeometry
 import org.citygml4j.core.model.core.ImplicitGeometryProperty
 import org.citygml4j.core.util.geometry.GeometryFactory
@@ -73,8 +73,6 @@ class GeometryTransformer(
 ) : Geometry3DVisitor {
 
     // Properties and Initializers
-    private val identifierAdder = IdentifierAdder(parameters)
-
     private var polygonsOfSolidResult: Option<NonEmptyList<Polygon3D>> = None
     private var polygonsOfSurfaceResult: Option<Either<GeometryException.BoundaryRepresentationGenerationError, List<Polygon3D>>> = None
     private var multiCurveResult: Option<Either<GeometryException, LineString3D>> = None
@@ -97,12 +95,12 @@ class GeometryTransformer(
 
         val gmlPolygons = polygonsOfSolid.map {
             val polygonGml = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) polygonGml.id = identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) polygonGml.id = generateRandomUUID(parameters.gmlIdPrefix)
             SurfaceProperty(polygonGml)
         }
 
         val solid = Solid(Shell(gmlPolygons))
-        if (parameters.generateRandomGeometryIds) solid.id = identifierAdder.generateRandomUUID()
+        if (parameters.generateRandomGeometryIds) solid.id = generateRandomUUID(parameters.gmlIdPrefix)
 
         return SolidProperty(solid).some()
     }
@@ -139,7 +137,7 @@ class GeometryTransformer(
 
         val gmlPoint = Point().apply {
             pos = createDirectPosition(point)
-            if (parameters.generateRandomGeometryIds) id = identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) id = generateRandomUUID(parameters.gmlIdPrefix)
         }
         return PointProperty(gmlPoint).some()
     }
@@ -153,7 +151,7 @@ class GeometryTransformer(
         val implicitGeometry = ImplicitGeometry()
         implicitGeometry.referencePoint = point
         if (parameters.generateRandomGeometryIds) {
-            implicitGeometry.id = identifierAdder.generateRandomUUID()
+            implicitGeometry.id = generateRandomUUID(parameters.gmlIdPrefix)
         }
 
         // implicitGeometry.libraryObject = ""
@@ -287,12 +285,12 @@ class GeometryTransformer(
     private fun polygonsToMultiSurfaceProperty(polygons: NonEmptyList<Polygon3D>): MultiSurfaceProperty {
         val surfaceProperties = polygons.map {
             val gmlPolygon = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) gmlPolygon.id = identifierAdder.generateRandomUUID()
+            if (parameters.generateRandomGeometryIds) gmlPolygon.id = generateRandomUUID(parameters.gmlIdPrefix)
             SurfaceProperty(gmlPolygon)
         }
 
         val multiSurface = MultiSurface(surfaceProperties)
-        if (parameters.generateRandomGeometryIds) multiSurface.id = identifierAdder.generateRandomUUID()
+        if (parameters.generateRandomGeometryIds) multiSurface.id = generateRandomUUID(parameters.gmlIdPrefix)
         return MultiSurfaceProperty(multiSurface)
     }
 

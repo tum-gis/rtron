@@ -38,7 +38,7 @@ class HeaderBuilder(
         val messageList = DefaultMessageList()
 
         val crs = header.geoReference.map { buildCoordinateSystem(it).handleMessageList { messageList += it } }.flatten()
-        val roadspacesHeader = Header(coordinateReferenceSystem = crs)
+        val roadspacesHeader = Header(coordinateReferenceSystem = crs, name = header.name, date = header.date, vendor = header.vendor)
 
         return ContextMessageList(roadspacesHeader, messageList)
     }

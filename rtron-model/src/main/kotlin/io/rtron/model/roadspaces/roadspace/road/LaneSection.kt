@@ -26,6 +26,7 @@ import io.rtron.math.range.Range
 import io.rtron.math.std.sign
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.LaneSectionIdentifier
+import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.std.getValueEither
 import kotlin.math.abs
 
@@ -72,6 +73,12 @@ data class LaneSection(
     fun getLane(laneId: Int): Either<IllegalArgumentException, Lane> = lanes.getValueEither(laneId).mapLeft { it.toIllegalArgumentException() }
     fun getLane(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, Lane> =
         lanes.getValueEither(laneIdentifier.laneId).mapLeft { it.toIllegalArgumentException() }
+
+    /** Returns the complete range of lane identifiers contained in this lane section. */
+    fun getCompleteLateralLaneRangeIdentifier(): LateralLaneRangeIdentifier {
+        val range = Range.closed(lanes.keys.min(), lanes.keys.max())
+        return LateralLaneRangeIdentifier(range, id)
+    }
 
     /**
      * Returns the lateral offset function located on a lane with [laneId].

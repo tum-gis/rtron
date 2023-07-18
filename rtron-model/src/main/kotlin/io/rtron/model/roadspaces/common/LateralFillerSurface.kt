@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces
+package io.rtron.model.roadspaces.common
 
-import arrow.core.Option
-import io.rtron.math.projection.CoordinateReferenceSystem
+import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
+import io.rtron.math.range.difference
+import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 
-/**
- * Header of the [RoadspacesModel] containing the model's meta information.
- */
-data class Header(
-    val coordinateReferenceSystem: Option<CoordinateReferenceSystem>,
+data class LateralFillerSurface(val id: LateralLaneRangeIdentifier, val surface: AbstractSurface3D) {
 
-    val name: Option<String>,
-    val date: Option<String>,
-    val vendor: Option<String>,
-
-    val north: Double = Double.NaN,
-    val south: Double = Double.NaN,
-    val east: Double = Double.NaN,
-    val west: Double = Double.NaN
-)
+    // Properties and Initializers
+    init {
+        require(id.laneIdRange.difference == 1) { "Lane identifiers must be laterally adjacent." }
+    }
+}

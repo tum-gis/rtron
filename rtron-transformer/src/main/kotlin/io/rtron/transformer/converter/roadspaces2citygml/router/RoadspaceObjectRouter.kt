@@ -32,7 +32,7 @@ object RoadspaceObjectRouter {
         TRANSPORTATION_TRAFFICSPACE,
         TRANSPORTATION_AUXILIARYTRAFFICSPACE,
         TRANSPORTATION_MARKING,
-        VEGETATION_SOLITARYVEGEATIONOBJECT
+        VEGETATION_SOLITARYVEGETATIONOBJECT
     }
 
     /**
@@ -52,7 +52,7 @@ object RoadspaceObjectRouter {
                 "trafficIsland" -> return CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
                 "trafficLight" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
                 "trafficSign" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "tree" -> return CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT
+                "tree" -> return CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
                 "unknown" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
                 "wall" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             }
@@ -62,8 +62,8 @@ object RoadspaceObjectRouter {
             RoadObjectType.NONE -> CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE
             RoadObjectType.OBSTACLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.POLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            RoadObjectType.TREE -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT
-            RoadObjectType.VEGETATION -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGEATIONOBJECT
+            RoadObjectType.TREE -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
+            RoadObjectType.VEGETATION -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
             RoadObjectType.BARRIER -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.BUILDING -> CitygmlTargetFeatureType.BUILDING_BUILDING
             RoadObjectType.PARKING_SPACE -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE

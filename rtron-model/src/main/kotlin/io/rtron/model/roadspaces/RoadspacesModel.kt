@@ -32,12 +32,12 @@ import io.rtron.math.geometry.toIllegalStateException
 import io.rtron.math.processing.isColinear
 import io.rtron.math.processing.removeRedundantVerticesOnLineSegmentsEnclosing
 import io.rtron.model.AbstractModel
-import io.rtron.model.roadspaces.common.FillerSurface
+import io.rtron.model.roadspaces.common.LongitudinalFillerSurface
 import io.rtron.model.roadspaces.common.LongitudinalFillerSurfaceBetweenRoads
 import io.rtron.model.roadspaces.common.LongitudinalFillerSurfaceWithinRoad
 import io.rtron.model.roadspaces.identifier.JunctionIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
-import io.rtron.model.roadspaces.identifier.ModelIdentifier
+import io.rtron.model.roadspaces.identifier.LongitudinalLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.junction.Junction
 import io.rtron.model.roadspaces.roadspace.ContactPoint
@@ -54,7 +54,6 @@ import io.rtron.std.handleEmpty
  * approach of OpenDRIVE and generate the surface based modeling approach of CityGML.
  */
 class RoadspacesModel(
-    val id: ModelIdentifier,
     val header: Header,
     roadspaces: List<Roadspace>,
     junctions: List<Junction>
@@ -174,7 +173,7 @@ class RoadspacesModel(
         }
     }
 
-    fun getFillerSurfaces(laneId: LaneIdentifier): Either<Exception, List<FillerSurface>> = either.eager {
+    fun getLongitudinalFillerSurfaces(laneId: LaneIdentifier): Either<Exception, List<LongitudinalFillerSurface>> = either.eager {
         val successorLaneIds = getSuccessorLaneIdentifiers(laneId).bind()
 
         val fillerSurfaces = successorLaneIds.map { getLongitudinalFillerSurface(laneId, it) }.flattenOption()
@@ -188,18 +187,19 @@ class RoadspacesModel(
      * @param successorLaneId identifier of the second lane
      */
     private fun getLongitudinalFillerSurface(laneId: LaneIdentifier, successorLaneId: LaneIdentifier):
-        Option<FillerSurface> {
+        Option<LongitudinalFillerSurface> {
         val road = roadspaces
             .getValueEither(laneId.laneSectionIdentifier.roadspaceIdentifier)
             .getOrElse { throw it.toIllegalArgumentException() }.road
         val successorRoad = roadspaces
             .getValueEither(successorLaneId.laneSectionIdentifier.roadspaceIdentifier)
             .getOrElse { throw it.toIllegalArgumentException() }.road
-        val surface = buildFillerSurfaceGeometry(laneId, successorLaneId, road, successorRoad).handleEmpty { return None }
+        val surface = buildLongitudinalFillerSurfaceGeometry(laneId, successorLaneId, road, successorRoad).handleEmpty { return None }
+        val longitudinalFillerSurfaceId = LongitudinalLaneRangeIdentifier(laneId, successorLaneId)
 
         val fillerSurface = when {
-            laneId.isWithinSameRoad(successorLaneId) -> LongitudinalFillerSurfaceWithinRoad(laneId, successorLaneId, surface)
-            else -> LongitudinalFillerSurfaceBetweenRoads(laneId, successorLaneId, surface)
+            laneId.isWithinSameRoad(successorLaneId) -> LongitudinalFillerSurfaceWithinRoad(longitudinalFillerSurfaceId, surface)
+            else -> LongitudinalFillerSurfaceBetweenRoads(longitudinalFillerSurfaceId, surface)
         }
         return Some(fillerSurface)
     }
@@ -212,7 +212,7 @@ class RoadspacesModel(
      * @param road road to which [laneId] belongs
      * @param successorRoad road to which the successor lane belongs
      */
-    fun buildFillerSurfaceGeometry(
+    fun buildLongitudinalFillerSurfaceGeometry(
         laneId: LaneIdentifier,
         successorLaneId: LaneIdentifier,
         road: Road,

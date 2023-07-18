@@ -29,6 +29,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
@@ -37,10 +38,10 @@ import org.xmlobjects.gml.model.measures.Length
  * Builder for city objects of the CityGML Vegetation module.
  */
 class VegetationModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters,
-    private val identifierAdder: IdentifierAdder
+    private val parameters: Roadspaces2CitygmlParameters
 ) {
     // Properties and Initializers
+    private val relationAdder = RelationAdder(parameters)
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
@@ -59,7 +60,8 @@ class VegetationModuleBuilder(
         addAttributes(solitaryVegetationObjectFeature, geometryTransformer).getOrElse { throw it }
 
         // semantics
-        identifierAdder.addUniqueIdentifier(roadspaceObject.id, solitaryVegetationObjectFeature)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), solitaryVegetationObjectFeature)
+        relationAdder.addBelongToRelations(roadspaceObject, solitaryVegetationObjectFeature)
         attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
 
         return ContextMessageList(solitaryVegetationObjectFeature, messageList)

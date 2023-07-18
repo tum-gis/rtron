@@ -16,7 +16,8 @@
 
 package io.rtron.model.roadspaces.identifier
 
-import java.util.UUID
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.attributes
 
 /**
  * Junction identifier interface required for class delegation.
@@ -32,17 +33,22 @@ interface JunctionIdentifierInterface {
  * @param modelIdentifier identifier of the model
  */
 data class JunctionIdentifier(
-    override val junctionId: String,
-    val modelIdentifier: ModelIdentifier
-) : AbstractRoadspacesIdentifier(), JunctionIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
+    override val junctionId: String
+) : AbstractRoadspacesIdentifier(), JunctionIdentifierInterface {
 
     // Properties and Initializers
-    val hashKey get() = junctionId + '_' + modelIdentifier.fileHashSha256
-    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
+    val hashKey get() = "Junction_$junctionId"
 
     // Conversions
+    override fun toAttributes(prefix: String): AttributeList {
+        val junctionIdentifier = this
+        return attributes(prefix) {
+            attribute("junctionId", junctionIdentifier.junctionId)
+        }
+    }
+
     override fun toStringMap(): Map<String, String> =
-        mapOf("junctionId" to junctionId) + modelIdentifier.toStringMap()
+        mapOf("junctionId" to junctionId)
 
     override fun toIdentifierText(): String {
         return "JunctionIdentifier(junctionId=$junctionId)"

@@ -31,9 +31,11 @@ import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
+import io.rtron.math.range.Range
 import io.rtron.model.opendrive.objects.EObjectType
 import io.rtron.model.opendrive.signal.RoadSignals
 import io.rtron.model.opendrive.signal.RoadSignalsSignal
+import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -48,6 +50,7 @@ import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Vector3DBuil
 import io.rtron.model.opendrive.objects.RoadObjects as OpendriveRoadObjects
 import io.rtron.model.opendrive.objects.RoadObjectsObject as OpendriveRoadObject
 import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat as OpendriveRoadObjectRepeat
+import io.rtron.model.roadspaces.roadspace.road.Road as RoadspaceRoad
 
 /**
  * Builder for [RoadspaceObject] which correspond to the OpenDRIVE road object class.
@@ -67,10 +70,11 @@ class RoadspaceObjectBuilder(
         roadspaceId: RoadspaceIdentifier,
         roadObjects: OpendriveRoadObjects,
         roadReferenceLine: Curve3D,
+        road: RoadspaceRoad,
         baseAttributes: AttributeList
     ): ContextMessageList<List<RoadspaceObject>> {
         return roadObjects.roadObject
-            .map { buildRoadObject(roadspaceId, it, roadReferenceLine, baseAttributes) }
+            .map { buildRoadObject(roadspaceId, it, roadReferenceLine, road, baseAttributes) }
             .mergeMessageLists()
             .map { it.flatten() }
     }
@@ -79,6 +83,7 @@ class RoadspaceObjectBuilder(
         id: RoadspaceIdentifier,
         roadObject: OpendriveRoadObject,
         roadReferenceLine: Curve3D,
+        road: RoadspaceRoad,
         baseAttributes: AttributeList
     ): ContextMessageList<NonEmptyList<RoadspaceObject>> {
         val messageList = DefaultMessageList()
@@ -91,19 +96,20 @@ class RoadspaceObjectBuilder(
             buildAttributes(roadObject) +
             buildAttributes(roadObject.curveRelativePosition) +
             buildAttributes(roadObject.referenceLinePointRelativeRotation)
+        val laneRelations = buildLaneRelations(roadObject, road)
 
         val roadObjectsFromRepeat = roadObject.repeat.map { currentRoadObjectRepeat ->
             val repeatIdentifier = currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
             val roadspaceObjectId = RoadspaceObjectIdentifier("${roadObject.id}_${repeatIdentifier.repeatIndex}", roadObject.name, id)
             val geometry = buildGeometries(roadObject, currentRoadObjectRepeat.some(), roadReferenceLine).handleMessageList { messageList += it }
-            RoadspaceObject(roadspaceObjectId, type, geometry, attributes)
+            RoadspaceObject(roadspaceObjectId, type, geometry, laneRelations, attributes)
         }
 
         val roadObjects = if (roadObjectsFromRepeat.isEmpty()) {
             val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, roadObject.name, id)
             val geometry = buildGeometries(roadObject, None, roadReferenceLine).handleMessageList { messageList += it }
-            nonEmptyListOf(RoadspaceObject(roadspaceObjectId, type, geometry, attributes))
+            nonEmptyListOf(RoadspaceObject(roadspaceObjectId, type, geometry, laneRelations, attributes))
         } else {
             roadObjectsFromRepeat.toNonEmptyListOrNull()!!
         }
@@ -215,26 +221,29 @@ class RoadspaceObjectBuilder(
         id: RoadspaceIdentifier,
         roadSignals: RoadSignals,
         roadReferenceLine: Curve3D,
+        road: RoadspaceRoad,
         baseAttributes: AttributeList
     ): List<RoadspaceObject> {
-        return roadSignals.signal.map { buildRoadSignalsSignal(id, it, roadReferenceLine, baseAttributes) }
+        return roadSignals.signal.map { buildRoadSignalsSignal(id, it, roadReferenceLine, road, baseAttributes) }
     }
 
     private fun buildRoadSignalsSignal(
         id: RoadspaceIdentifier,
         roadSignal: RoadSignalsSignal,
         roadReferenceLine: Curve3D,
+        road: RoadspaceRoad,
         baseAttributes: AttributeList
     ): RoadspaceObject {
         val objectId = RoadspaceObjectIdentifier(roadSignal.id, roadSignal.name, id)
 
         val geometry = buildGeometries(roadSignal, roadReferenceLine)
+        val laneRelations = buildLaneRelations(roadSignal, road)
         val attributes = baseAttributes +
             buildAttributes(roadSignal) +
             buildAttributes(roadSignal.curveRelativePosition) +
             buildAttributes(roadSignal.referenceLinePointRelativeRotation)
 
-        return RoadspaceObject(objectId, RoadObjectType.SIGNAL, geometry, attributes)
+        return RoadspaceObject(objectId, RoadObjectType.SIGNAL, geometry, laneRelations, attributes)
     }
 
     private fun buildAttributes(signal: RoadSignalsSignal): AttributeList =
@@ -255,5 +264,25 @@ class RoadspaceObjectBuilder(
         val curveAffine = roadReferenceLine.calculateAffine(signal.curveRelativePosition.toCurveRelative1D())
 
         return Vector3DBuilder.buildVector3Ds(signal, curveAffine, force = true)
+    }
+
+    private fun buildLaneRelations(roadObject: OpendriveRoadObject, road: RoadspaceRoad): List<LateralLaneRangeIdentifier> {
+        val laneSection = road.getLaneSection(roadObject.curveRelativePosition.toCurveRelative1D()).getOrElse { throw it }
+
+        return if (roadObject.validity.isEmpty()) {
+            listOf(laneSection.getCompleteLateralLaneRangeIdentifier())
+        } else {
+            roadObject.validity.map { LateralLaneRangeIdentifier(Range.closed(it.fromLane, it.toLane), laneSection.id) }
+        }
+    }
+
+    private fun buildLaneRelations(roadSignal: RoadSignalsSignal, road: RoadspaceRoad): List<LateralLaneRangeIdentifier> {
+        val laneSection = road.getLaneSection(roadSignal.curveRelativePosition.toCurveRelative1D()).getOrElse { throw it }
+
+        return if (roadSignal.validity.isEmpty()) {
+            listOf(laneSection.getCompleteLateralLaneRangeIdentifier())
+        } else {
+            roadSignal.validity.map { LateralLaneRangeIdentifier(Range.closed(it.fromLane, it.toLane), laneSection.id) }
+        }
     }
 }

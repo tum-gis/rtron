@@ -22,7 +22,6 @@ import io.rtron.model.opendrive.junction.JunctionConnection
 import io.rtron.model.roadspaces.identifier.ConnectionIdentifier
 import io.rtron.model.roadspaces.identifier.JunctionIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
-import io.rtron.model.roadspaces.identifier.ModelIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.junction.Connection
 import io.rtron.model.roadspaces.junction.Junction
@@ -37,16 +36,16 @@ class JunctionBuilder(
     private val parameters: Opendrive2RoadspacesParameters
 ) {
     // Methods
-    fun buildDefaultJunction(id: ModelIdentifier, junction: OpendriveJunction, roadspaces: List<Roadspace>): Junction {
-        val junctionId = JunctionIdentifier(junction.id, id)
+    fun buildDefaultJunction(junction: OpendriveJunction, roadspaces: List<Roadspace>): Junction {
+        val junctionId = JunctionIdentifier(junction.id)
         val connections = junction.connection.map { buildConnection(junctionId, it, roadspaces) }
         return Junction(junctionId, connections)
     }
 
     private fun buildConnection(id: JunctionIdentifier, connection: JunctionConnection, roadspaces: List<Roadspace>): Connection {
         val connectionId = ConnectionIdentifier(connection.id, id)
-        val incomingRoadspaceId = RoadspaceIdentifier.of(connection.incomingRoad, id.modelIdentifier)
-        val connectingRoadspaceId = RoadspaceIdentifier.of(connection.connectingRoad, id.modelIdentifier)
+        val incomingRoadspaceId = RoadspaceIdentifier.of(connection.incomingRoad)
+        val connectingRoadspaceId = RoadspaceIdentifier.of(connection.connectingRoad)
 
         check(roadspaces.count { it.id == incomingRoadspaceId } == 1) { "Incoming roadspace with $incomingRoadspaceId does not exist." }
         val incomingRoadspace = roadspaces.find { it.id == incomingRoadspaceId }!!

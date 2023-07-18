@@ -17,7 +17,8 @@
 package io.rtron.model.roadspaces.identifier
 
 import arrow.core.Option
-import java.util.UUID
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.attributes
 
 /**
  * Identifier of a lane section containing essential meta information.
@@ -33,8 +34,16 @@ data class RoadspaceObjectIdentifier(
 ) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface by roadspaceIdentifier {
 
     // Properties and Initializers
-    val hashKey get() = roadspaceObjectId + '_' + roadspaceIdentifier.roadspaceId + '_' + roadspaceIdentifier.modelIdentifier.fileHashSha256
-    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
+    val hashKey get() = "RoadspaceObject_${roadspaceObjectId}_${roadspaceIdentifier.roadspaceId}"
+
+    // Conversions
+    override fun toAttributes(prefix: String): AttributeList {
+        val roadspaceObjectIdentifier = this
+        return attributes(prefix) {
+            attribute("roadObjectId", roadspaceObjectIdentifier.roadspaceObjectId)
+            attribute("roadObjectName", roadspaceObjectIdentifier.roadspaceObjectName)
+        } + roadspaceObjectIdentifier.roadspaceIdentifier.toAttributes(prefix)
+    }
 
     override fun toStringMap(): Map<String, String> =
         mapOf("roadspaceObjectId" to roadspaceObjectId) + roadspaceIdentifier.toStringMap()

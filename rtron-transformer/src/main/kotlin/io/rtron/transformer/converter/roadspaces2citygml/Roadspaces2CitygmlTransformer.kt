@@ -27,10 +27,10 @@ import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.std.getValueEither
-import io.rtron.transformer.converter.roadspaces2citygml.module.IdentifierAdder
 import io.rtron.transformer.converter.roadspaces2citygml.report.Roadspaces2CitygmlReport
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadsTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadspaceObjectTransformer
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -53,9 +53,8 @@ class Roadspaces2CitygmlTransformer(
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    private val identifierAdder = IdentifierAdder(parameters)
-    private val roadObjectTransformer = RoadspaceObjectTransformer(parameters, identifierAdder)
-    private val roadLanesTransformer = RoadsTransformer(parameters, identifierAdder)
+    private val roadObjectTransformer = RoadspaceObjectTransformer(parameters)
+    private val roadLanesTransformer = RoadsTransformer(parameters)
 
     // Methods
 
@@ -80,7 +79,7 @@ class Roadspaces2CitygmlTransformer(
         // create CityGML model
         val boundingShape = calculateBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
         logger.info("Completed transformation with ${report.getTextSummary()}.")
-        val citygmlModel = CitygmlModel(roadspacesModel.id.modelName, boundingShape, abstractCityObjects)
+        val citygmlModel = CitygmlModel(roadspacesModel.header.name, boundingShape, abstractCityObjects)
         return citygmlModel to report
     }
 
@@ -176,14 +175,14 @@ class Roadspaces2CitygmlTransformer(
         // TODO: trace the traffic space created without id
         val trafficSpacePropertiesAdjusted = trafficSpaceProperties.filter { it.`object`.id != null }
 
-        val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { parameters.gmlIdPrefix + it.id.hashedId }
+        val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { it.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix) }
         trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
-            val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrElse { throw it.toIllegalArgumentException() }
+            val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrElse { return@forEach }
             val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
             val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
 
-            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + parameters.gmlIdPrefix + it.hashedId) }
-            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + parameters.gmlIdPrefix + it.hashedId) }
+            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }
+            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }
         }
     }
 

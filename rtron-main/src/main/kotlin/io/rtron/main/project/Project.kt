@@ -16,7 +16,6 @@
 
 package io.rtron.main.project
 
-import io.rtron.io.files.FileIdentifier
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 
@@ -29,6 +28,4 @@ data class Project(
     init {
         outputDirectoryPath.createDirectories()
     }
-
-    val inputFileIdentifier = FileIdentifier.of(inputFilePath)
 }

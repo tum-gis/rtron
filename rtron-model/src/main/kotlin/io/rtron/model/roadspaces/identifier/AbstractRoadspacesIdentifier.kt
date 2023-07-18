@@ -17,8 +17,11 @@
 package io.rtron.model.roadspaces.identifier
 
 import arrow.core.Option
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
 abstract class AbstractRoadspacesIdentifier {
+    abstract fun toAttributes(prefix: String): AttributeList
+
     abstract fun toStringMap(): Map<String, String>
 
     abstract fun toIdentifierText(): String

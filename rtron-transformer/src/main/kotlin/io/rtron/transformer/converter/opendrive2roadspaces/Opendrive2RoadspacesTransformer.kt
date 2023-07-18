@@ -18,7 +18,6 @@ package io.rtron.transformer.converter.opendrive2roadspaces
 
 import arrow.core.Option
 import arrow.core.some
-import io.rtron.io.files.FileIdentifier
 import io.rtron.io.logging.ProgressBar
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.mergeMessageLists
@@ -26,7 +25,6 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.model.opendrive.junction.EJunctionType
 import io.rtron.model.roadspaces.RoadspacesModel
-import io.rtron.model.roadspaces.identifier.ModelIdentifier
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.transformer.converter.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.junction.JunctionBuilder
@@ -62,59 +60,51 @@ class Opendrive2RoadspacesTransformer(
      * @param opendriveModel OpenDRIVE model as input
      * @return transformed RoadSpaces model as output
      */
-    fun transform(opendriveModel: OpendriveModel, sourceFileIdentifier: FileIdentifier): Pair<Option<RoadspacesModel>, Opendrive2RoadspacesReport> {
+    fun transform(opendriveModel: OpendriveModel): Pair<Option<RoadspacesModel>, Opendrive2RoadspacesReport> {
         logger.info("Parameters: $parameters.")
         opendriveModel.updateAdditionalIdentifiers()
         val report = Opendrive2RoadspacesReport(parameters)
 
         // general model information
         val header = headerBuilder.buildHeader(opendriveModel.header).handleMessageList { report.conversion += it }
-        val modelIdentifier = ModelIdentifier(
-            modelName = opendriveModel.header.name,
-            modelDate = opendriveModel.header.date,
-            modelVendor = opendriveModel.header.vendor,
-            sourceFileIdentifier = sourceFileIdentifier
-        )
 
         // transformation of each road
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
         val roadspacesWithContextReports =
             if (parameters.concurrentProcessing) {
-                transformRoadspacesConcurrently(modelIdentifier, opendriveModel, progressBar)
+                transformRoadspacesConcurrently(opendriveModel, progressBar)
             } else {
-                transformRoadspacesSequentially(modelIdentifier, opendriveModel, progressBar)
+                transformRoadspacesSequentially(opendriveModel, progressBar)
             }
 
         val roadspaces = roadspacesWithContextReports.mergeMessageLists().handleMessageList { report.conversion += it }
 
         val junctions = opendriveModel.junction
             .filter { it.typeValidated == EJunctionType.DEFAULT }
-            .map { junctionBuilder.buildDefaultJunction(modelIdentifier, it, roadspaces) }
+            .map { junctionBuilder.buildDefaultJunction(it, roadspaces) }
 
-        val roadspacesModel = RoadspacesModel(modelIdentifier, header, roadspaces, junctions)
+        val roadspacesModel = RoadspacesModel(header, roadspaces, junctions)
 
         logger.info("Completed transformation with ${report.getTextSummary()}.")
         return roadspacesModel.some() to report
     }
 
     private fun transformRoadspacesSequentially(
-        modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
     ): List<ContextMessageList<Roadspace>> =
         opendriveModel.roadAsNonEmptyList.map {
-            roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
+            roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
         }
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun transformRoadspacesConcurrently(
-        modelIdentifier: ModelIdentifier,
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
     ): List<ContextMessageList<Roadspace>> {
         val roadspacesDeferred = opendriveModel.roadAsNonEmptyList.map {
             GlobalScope.async {
-                roadspaceBuilder.buildRoadspace(modelIdentifier, it).also { progressBar.step() }
+                roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
             }
         }
         return runBlocking { roadspacesDeferred.map { it.await() } }

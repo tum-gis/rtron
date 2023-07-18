@@ -17,7 +17,8 @@
 package io.rtron.model.roadspaces.identifier
 
 import arrow.core.Option
-import java.util.UUID
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.attributes
 
 /**
  * Road space identifier interface required for class delegation.
@@ -33,27 +34,31 @@ interface RoadspaceIdentifierInterface {
  * @param modelIdentifier identifier of the model
  */
 data class RoadspaceIdentifier(
-    override val roadspaceId: String,
-    val modelIdentifier: ModelIdentifier
-) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface, ModelIdentifierInterface by modelIdentifier {
+    override val roadspaceId: String
+) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface {
 
     // Properties and Initializers
-    val hashKey get() = roadspaceId + '_' + modelIdentifier.fileHashSha256
-    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
+    val hashKey get() = "Roadspace_$roadspaceId"
 
     // Conversions
+    override fun toAttributes(prefix: String): AttributeList {
+        val roadspaceIdentifier = this
+        return attributes(prefix) {
+            attribute("roadId", roadspaceIdentifier.roadspaceId)
+        }
+    }
 
     override fun toStringMap(): Map<String, String> =
-        mapOf("roadspaceId" to roadspaceId) + modelIdentifier.toStringMap()
+        mapOf("roadspaceId" to roadspaceId)
 
     override fun toIdentifierText(): String {
         return "RoadspaceIdentifier(roadspaceId=$roadspaceId)"
     }
 
     companion object {
-        fun of(roadspaceId: Option<String>, modelIdentifier: ModelIdentifier): RoadspaceIdentifier {
+        fun of(roadspaceId: Option<String>): RoadspaceIdentifier {
             require(roadspaceId.isDefined()) { "RoadspaceId must be defined." }
-            return RoadspaceIdentifier(roadspaceId.orNull()!!, modelIdentifier)
+            return RoadspaceIdentifier(roadspaceId.orNull()!!)
         }
     }
 }

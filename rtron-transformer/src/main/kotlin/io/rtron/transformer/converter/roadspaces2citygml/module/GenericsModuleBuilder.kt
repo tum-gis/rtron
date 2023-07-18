@@ -25,23 +25,30 @@ import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
-import io.rtron.model.roadspaces.roadspace.attribute.toAttributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLaneCenterLineGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLeftLaneBoundaryGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRightLaneBoundaryGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadCenterLaneLineGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadReferenceLineGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
+import org.citygml4j.core.model.generics.GenericLogicalSpace
 import org.citygml4j.core.model.generics.GenericOccupiedSpace
 
 /**
  * Builder for city objects of the CityGML Generics module.
  */
 class GenericsModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters,
-    private val identifierAdder: IdentifierAdder
+    private val parameters: Roadspaces2CitygmlParameters
 ) {
     // Properties and Initializers
+    private val relationAdder = RelationAdder(parameters)
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
@@ -54,62 +61,112 @@ class GenericsModuleBuilder(
                 .handleMessageList { messageList += it }
 
         // semantics
-        identifierAdder.addUniqueIdentifier(roadspaceObject.id, genericOccupiedSpace)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), genericOccupiedSpace)
+        relationAdder.addBelongToRelations(roadspaceObject, genericOccupiedSpace)
         attributesAdder.addAttributes(roadspaceObject, genericOccupiedSpace)
 
         return ContextMessageList(genericOccupiedSpace, messageList)
     }
 
-    fun createGenericOccupiedSpaceFeature(id: LaneIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList): ContextMessageList<GenericOccupiedSpace> {
+    fun createRoadReferenceLine(id: RoadspaceIdentifier, abstractGeometry: AbstractGeometry3D, attributes: AttributeList): ContextMessageList<GenericLogicalSpace> {
         val messageList = DefaultMessageList()
 
-        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(id, abstractGeometry)
+        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
             .handleMessageList { messageList += it }
-
-        identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
+        IdentifierAdder.addIdentifier(id.deriveRoadReferenceLineGmlIdentifier(parameters.gmlIdPrefix), "RoadReferenceLine", genericLogicalSpace)
         attributesAdder.addAttributes(
-            id.toAttributes(parameters.identifierAttributesPrefix) +
-                attributes,
-            genericOccupiedSpace
+            id.toAttributes(parameters.identifierAttributesPrefix) + attributes,
+            genericLogicalSpace
         )
 
-        return ContextMessageList(genericOccupiedSpace, messageList)
+        return ContextMessageList(genericLogicalSpace, messageList)
     }
 
-    fun createGenericOccupiedSpaceFeature(id: RoadspaceIdentifier, name: String, abstractGeometry: AbstractGeometry3D, attributes: AttributeList): ContextMessageList<GenericOccupiedSpace> {
+    fun createRoadCenterLaneLine(id: LaneIdentifier, abstractGeometry: AbstractGeometry3D, attributes: AttributeList): ContextMessageList<GenericLogicalSpace> {
         val messageList = DefaultMessageList()
-        val genericOccupiedSpace = createGenericOccupiedSpaceFeature(id, abstractGeometry)
-            .handleMessageList { messageList += it }
 
-        identifierAdder.addIdentifier(id, name, genericOccupiedSpace)
+        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+            .handleMessageList { messageList += it }
+        IdentifierAdder.addIdentifier(id.deriveRoadCenterLaneLineGmlIdentifier(parameters.gmlIdPrefix), "RoadCenterLaneLine", genericLogicalSpace)
         attributesAdder.addAttributes(
-            id.toAttributes(parameters.identifierAttributesPrefix) +
-                attributes,
-            genericOccupiedSpace
+            id.toAttributes(parameters.identifierAttributesPrefix) + attributes,
+            genericLogicalSpace
         )
-        return ContextMessageList(genericOccupiedSpace, messageList)
+
+        return ContextMessageList(genericLogicalSpace, messageList)
     }
 
-    private fun createGenericOccupiedSpaceFeature(id: AbstractRoadspacesIdentifier, abstractGeometry: AbstractGeometry3D):
-        ContextMessageList<GenericOccupiedSpace> {
+    fun createCenterLaneLine(id: LaneIdentifier, abstractGeometry: AbstractGeometry3D): ContextMessageList<GenericLogicalSpace> {
+        val messageList = DefaultMessageList()
+
+        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+            .handleMessageList { messageList += it }
+        IdentifierAdder.addIdentifier(id.deriveLaneCenterLineGmlIdentifier(parameters.gmlIdPrefix), "LaneCenterLine", genericLogicalSpace)
+        attributesAdder.addAttributes(
+            id.toAttributes(parameters.identifierAttributesPrefix),
+            genericLogicalSpace
+        )
+
+        return ContextMessageList(genericLogicalSpace, messageList)
+    }
+
+    fun createLeftLaneBoundary(id: LaneIdentifier, abstractGeometry: AbstractGeometry3D): ContextMessageList<GenericLogicalSpace> {
+        val messageList = DefaultMessageList()
+
+        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+            .handleMessageList { messageList += it }
+        IdentifierAdder.addIdentifier(id.deriveLeftLaneBoundaryGmlIdentifier(parameters.gmlIdPrefix), "LeftLaneBoundary", genericLogicalSpace)
+        attributesAdder.addAttributes(
+            id.toAttributes(parameters.identifierAttributesPrefix),
+            genericLogicalSpace
+        )
+
+        return ContextMessageList(genericLogicalSpace, messageList)
+    }
+
+    fun createRightLaneBoundary(id: LaneIdentifier, abstractGeometry: AbstractGeometry3D): ContextMessageList<GenericLogicalSpace> {
+        val messageList = DefaultMessageList()
+
+        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+            .handleMessageList { messageList += it }
+        IdentifierAdder.addIdentifier(id.deriveRightLaneBoundaryGmlIdentifier(parameters.gmlIdPrefix), "RightLaneBoundary", genericLogicalSpace)
+        attributesAdder.addAttributes(
+            id.toAttributes(parameters.identifierAttributesPrefix),
+            genericLogicalSpace
+        )
+
+        return ContextMessageList(genericLogicalSpace, messageList)
+    }
+
+    private fun createLogicalOccupiedSpaceFeature(id: AbstractRoadspacesIdentifier, abstractGeometry: AbstractGeometry3D):
+        ContextMessageList<GenericLogicalSpace> {
         val geometryTransformer = GeometryTransformer(parameters)
             .also { abstractGeometry.accept(it) }
-        return createGenericOccupiedSpaceFeature(id, geometryTransformer)
+        return createLogicalOccupiedSpaceFeature(id, geometryTransformer)
     }
 
     private fun createGenericOccupiedSpaceFeature(id: AbstractRoadspacesIdentifier, geometryTransformer: GeometryTransformer): ContextMessageList<GenericOccupiedSpace> {
         val messageList = DefaultMessageList()
-
         val genericOccupiedSpaceFeature = GenericOccupiedSpace()
 
         // geometry
         genericOccupiedSpaceFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
             .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
-
         geometryTransformer.rotation.tap {
             attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)
         }
 
         return ContextMessageList(genericOccupiedSpaceFeature, messageList)
+    }
+
+    private fun createLogicalOccupiedSpaceFeature(id: AbstractRoadspacesIdentifier, geometryTransformer: GeometryTransformer): ContextMessageList<GenericLogicalSpace> {
+        val messageList = DefaultMessageList()
+        val genericLogicalSpaceFeature = GenericLogicalSpace()
+
+        // geometry
+        genericLogicalSpaceFeature.populateGeometry(geometryTransformer, LevelOfDetail.TWO)
+            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+
+        return ContextMessageList(genericLogicalSpaceFeature, messageList)
     }
 }

@@ -17,7 +17,8 @@
 package io.rtron.model.roadspaces.identifier
 
 import io.rtron.math.std.sign
-import java.util.UUID
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import kotlin.math.abs
 
 /**
@@ -32,14 +33,9 @@ data class LaneIdentifier(
 ) : AbstractRoadspacesIdentifier(), LaneSectionIdentifierInterface by laneSectionIdentifier {
 
     // Properties and Initializers
-    val hashKey get() = laneId.toString() + '_' +
-        laneSectionIdentifier.laneSectionId + '_' +
-        laneSectionIdentifier.roadspaceIdentifier.roadspaceId + '_' +
-        laneSectionIdentifier.roadspaceIdentifier.modelIdentifier.fileHashSha256
-    val hashedId get() = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
+    val hashKey get() = "Lane_${laneId}_${laneSectionIdentifier.laneSectionId}_${laneSectionIdentifier.roadspaceIdentifier.roadspaceId}"
 
     // Methods
-
     fun isLeft() = laneId > 0
     fun isCenter() = laneId == 0
     fun isRight() = laneId < 0
@@ -70,6 +66,13 @@ data class LaneIdentifier(
         getAdjacentInnerLaneIdentifier() == other || getAdjacentOuterLaneIdentifier() == other
 
     // Conversions
+    override fun toAttributes(prefix: String): AttributeList {
+        val laneIdentifier = this
+        return attributes(prefix) {
+            attribute("laneId", laneIdentifier.laneId)
+        } + laneIdentifier.laneSectionIdentifier.toAttributes(prefix)
+    }
+
     override fun toStringMap(): Map<String, String> =
         mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
 

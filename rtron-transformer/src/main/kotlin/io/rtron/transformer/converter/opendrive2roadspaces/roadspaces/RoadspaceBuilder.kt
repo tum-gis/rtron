@@ -27,10 +27,10 @@ import io.rtron.math.analysis.function.bivariate.pure.ShapeFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.threed.surface.CurveRelativeParametricSurface3D
 import io.rtron.model.opendrive.road.lateral.RoadLateralProfileShape
-import io.rtron.model.roadspaces.identifier.ModelIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
+import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve3DBuilder
@@ -55,9 +55,9 @@ class RoadspaceBuilder(
      * @param road source OpenDRIVE model
      * @return transformed [Roadspace]
      */
-    fun buildRoadspace(modelId: ModelIdentifier, road: OpendriveRoad): ContextMessageList<Roadspace> {
+    fun buildRoadspace(road: OpendriveRoad): ContextMessageList<Roadspace> {
         val messageList = DefaultMessageList()
-        val roadspaceId = RoadspaceIdentifier(road.id, modelId)
+        val roadspaceId = RoadspaceIdentifier(road.id)
 
         // build up road reference line
         val roadReferenceLine = Curve3DBuilder.buildCurve3D(
@@ -85,18 +85,18 @@ class RoadspaceBuilder(
         )
         val roadSurfaceWithoutTorsion = CurveRelativeParametricSurface3D(roadReferenceLine, lateralProfileRoadShape)
 
-        // build up the road containing only lane sections, lanes (no road side objects)
+        // build up the road containing only lane sections, lanes (no roadside objects)
         val roadspaceRoad = roadBuilder
             .buildRoad(roadspaceId, road, roadSurface, roadSurfaceWithoutTorsion, attributes)
             .handleMessageList { messageList += it }
 
         // build up the road space objects (OpenDRIVE: road objects & signals)
         val roadspaceObjectsFromRoadObjects = road.objects.fold({ emptyList() }, { roadObjects ->
-            roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, attributes)
+            roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, roadspaceRoad, attributes)
                 .handleMessageList { messageList += it }
         })
-        val roadspaceObjectsFromRoadSignals = road.signals.fold({ emptyList() }, { roadSignals ->
-            roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, attributes)
+        val roadspaceObjectsFromRoadSignals: List<RoadspaceObject> = road.signals.fold({ emptyList() }, { roadSignals ->
+            roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, roadspaceRoad, attributes)
         })
 
         // combine the models into a road space object

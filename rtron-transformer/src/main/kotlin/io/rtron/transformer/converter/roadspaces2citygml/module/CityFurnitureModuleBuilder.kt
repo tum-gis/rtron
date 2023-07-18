@@ -16,7 +16,6 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
-import arrow.core.getOrElse
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
 import io.rtron.io.messages.DefaultMessageList
@@ -26,6 +25,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.cityfurniture.CityFurniture
 
@@ -33,10 +33,10 @@ import org.citygml4j.core.model.cityfurniture.CityFurniture
  * Builder for city objects of the CityGML CityFurniture module.
  */
 class CityFurnitureModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters,
-    private val identifierAdder: IdentifierAdder
+    private val parameters: Roadspaces2CitygmlParameters
 ) {
     // Properties and Initializers
+    private val relationAdder = RelationAdder(parameters)
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
@@ -54,7 +54,8 @@ class CityFurnitureModuleBuilder(
         }
 
         // semantics
-        identifierAdder.addIdentifier(roadspaceObject.id, roadspaceObject.name.getOrElse { "" }, cityFurnitureFeature) // TODO fix option
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), cityFurnitureFeature)
+        relationAdder.addBelongToRelations(roadspaceObject, cityFurnitureFeature)
         attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 
         return ContextMessageList(cityFurnitureFeature, messageList)

@@ -16,6 +16,9 @@
 
 package io.rtron.model.roadspaces.identifier
 
+import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+import io.rtron.model.roadspaces.roadspace.attribute.attributes
+
 /**
  * Connection identifier interface required for class delegation.
  */
@@ -35,6 +38,15 @@ data class ConnectionIdentifier(
 ) : AbstractRoadspacesIdentifier(), ConnectionIdentifierInterface, JunctionIdentifierInterface by junctionIdentifier {
 
     // Conversions
+    val hashKey get() = "Connection_${connectionId}_${junctionIdentifier.junctionId}"
+
+    override fun toAttributes(prefix: String): AttributeList {
+        val connectionIdentifier = this
+        return attributes(prefix) {
+            attribute("connectionId", connectionIdentifier.connectionId)
+        } + connectionIdentifier.junctionIdentifier.toAttributes(prefix)
+    }
+
     override fun toStringMap(): Map<String, String> =
         mapOf("connectionId" to connectionId) + junctionIdentifier.toStringMap()
 

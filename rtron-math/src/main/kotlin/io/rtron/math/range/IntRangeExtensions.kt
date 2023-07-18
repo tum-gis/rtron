@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces
-
-import arrow.core.Option
-import io.rtron.math.projection.CoordinateReferenceSystem
+package io.rtron.math.range
 
 /**
- * Header of the [RoadspacesModel] containing the model's meta information.
+ * Difference between the upper and lower bound of the [Range].
  */
-data class Header(
-    val coordinateReferenceSystem: Option<CoordinateReferenceSystem>,
-
-    val name: Option<String>,
-    val date: Option<String>,
-    val vendor: Option<String>,
-
-    val north: Double = Double.NaN,
-    val south: Double = Double.NaN,
-    val east: Double = Double.NaN,
-    val west: Double = Double.NaN
-)
+val Range<Int>.difference: Int
+    get() {
+        val adjustedLowerEndpoint = lowerEndpointOrNull() ?: Int.MIN_VALUE
+        val adjustedUpperEndpoint = upperEndpointOrNull() ?: Int.MAX_VALUE
+        return adjustedUpperEndpoint - adjustedLowerEndpoint
+    }
