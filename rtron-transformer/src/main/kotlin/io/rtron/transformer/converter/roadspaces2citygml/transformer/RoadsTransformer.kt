@@ -227,7 +227,7 @@ class RoadsTransformer(
     private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         road.getRoadMarkings(id, parameters.discretizationStepSize)
-            .handleLeftAndFilter { messageList += DefaultMessage.of("", it.value.message!!, id, Severity.WARNING, wasFixed = true) } //    _reportLogger.log(it, id.toString(), "Ignoring road markings.")
+            .handleLeftAndFilter { messageList += DefaultMessage.of("", it.value.message!!, id, Severity.WARNING, wasFixed = true) }
             .forEachIndexed { index, (roadMarking, geometry) ->
                 messageList += transportationModuleBuilder.addMarkingFeature(id, index, roadMarking, geometry, dstTransportationSpace)
             }

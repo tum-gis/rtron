@@ -40,6 +40,12 @@ data class LaneIdentifier(
     fun isCenter() = laneId == 0
     fun isRight() = laneId < 0
 
+    /** Returns true, if lane id is in the direction of the reference line. */
+    fun isForward() = isCenter() || isRight()
+
+    /** Returns true, if lane id is in the opposite direction of the reference line. */
+    fun isBackward() = isLeft()
+
     /** Returns the [LaneIdentifier] of the lane which is located adjacently inner (towards the reference line) to the
      * lane of this identifier.
      */

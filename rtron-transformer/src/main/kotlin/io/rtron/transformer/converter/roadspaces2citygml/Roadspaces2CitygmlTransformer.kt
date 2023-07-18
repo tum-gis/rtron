@@ -178,8 +178,18 @@ class Roadspaces2CitygmlTransformer(
         val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { it.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix) }
         trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
             val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrElse { return@forEach }
-            val predecessorLaneIds = roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
-            val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+            val predecessorLaneIds =
+                if (currentLane.id.isForward()) {
+                    roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+                } else {
+                    roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+                }
+            val successorLaneIds =
+                if (currentLane.id.isForward()) {
+                    roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+                } else {
+                    roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+                }
 
             currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }
             currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }

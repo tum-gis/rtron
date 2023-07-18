@@ -93,11 +93,7 @@ class TransportationModuleBuilder(
         attributesAdder.addAttributes(lane, trafficSpaceFeature)
         relatedObjects.forEach { relationAdder.addRelatedToRelation(it, trafficSpaceFeature) }
         // TODO: consider left-hand traffic (LHT)
-        if (lane.id.isRight() || lane.id.isCenter()) {
-            trafficSpaceFeature.trafficDirection = TrafficDirectionValue.FORWARDS
-        } else {
-            trafficSpaceFeature.trafficDirection = TrafficDirectionValue.BACKWARDS
-        }
+        trafficSpaceFeature.trafficDirection = if (lane.id.isForward()) TrafficDirectionValue.FORWARDS else TrafficDirectionValue.BACKWARDS
 
         // line representation of lane
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
