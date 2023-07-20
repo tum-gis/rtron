@@ -23,7 +23,7 @@ import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadObjectsObjectOutlinesOutlineCornerRoad(
+data class RoadObjectsObjectOutlinesOutlineCornerRoad(
     var dz: Double = Double.NaN,
     var height: Double = Double.NaN,
     var id: Option<Int> = None,

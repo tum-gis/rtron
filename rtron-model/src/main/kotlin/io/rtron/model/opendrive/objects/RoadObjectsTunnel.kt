@@ -20,7 +20,7 @@ import arrow.core.None
 import arrow.core.Option
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadObjectsTunnel(
+data class RoadObjectsTunnel(
     var validity: List<RoadObjectsObjectLaneValidity> = emptyList(),
 
     var daylight: Option<Double> = None,

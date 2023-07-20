@@ -46,7 +46,7 @@ data class RoadLanes(
                 "provided lastLaneSectionEnd ($lastLaneSectionEnd)."
         }
 
-        val laneSectionRanges = laneSectionAsNonEmptyList.zipWithNext().map { Range.closed(it.first.s, it.second.s) }
+        val laneSectionRanges = laneSectionAsNonEmptyList.zipWithNext().map { Range.closedOpen(it.first.s, it.second.s) }
         val lastLaneSectionRange = Range.closed(laneSectionAsNonEmptyList.last().s, lastLaneSectionEnd)
 
         return (laneSectionRanges + lastLaneSectionRange).toNonEmptyListOrNull()!!

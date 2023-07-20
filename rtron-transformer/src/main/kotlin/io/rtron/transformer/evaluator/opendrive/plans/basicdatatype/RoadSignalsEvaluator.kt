@@ -26,6 +26,8 @@ import io.rtron.model.opendrive.core.EUnit
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
 import io.rtron.transformer.messages.opendrive.of
+import kotlin.math.max
+import kotlin.math.min
 
 object RoadSignalsEvaluator {
 
@@ -51,6 +53,12 @@ object RoadSignalsEvaluator {
             }
             currentRoadSignal.width = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadSignal.width, currentRoadSignal.additionalId, "width", messageList, parameters.numberTolerance)
             currentRoadSignal.zOffset = BasicDataTypeModifier.modifyToFiniteDouble(currentRoadSignal.zOffset, currentRoadSignal.additionalId, "zOffset", messageList)
+
+            currentRoadSignal.validity.filter { it.fromLane > it.toLane }.forEach { currentValidity ->
+                messageList += DefaultMessage.of("LaneValidityElementNotOrdered", "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.", currentRoadSignal.additionalId, Severity.ERROR, wasFixed = true)
+                currentValidity.fromLane = min(currentValidity.fromLane, currentValidity.toLane)
+                currentValidity.toLane = max(currentValidity.fromLane, currentValidity.toLane)
+            }
 
             currentRoadSignal
         }

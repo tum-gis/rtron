@@ -22,7 +22,7 @@ import arrow.core.some
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadObjectsObjectOutlinesOutlineCornerLocal(
+data class RoadObjectsObjectOutlinesOutlineCornerLocal(
     var height: Double = Double.NaN,
     var id: Option<Int> = None,
     var u: Double = Double.NaN,

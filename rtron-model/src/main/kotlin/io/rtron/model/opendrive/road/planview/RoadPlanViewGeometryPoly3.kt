@@ -18,7 +18,7 @@ package io.rtron.model.opendrive.road.planview
 
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadPlanViewGeometryPoly3(
+data class RoadPlanViewGeometryPoly3(
     var a: Double = Double.NaN,
     var b: Double = Double.NaN,
     var c: Double = Double.NaN,

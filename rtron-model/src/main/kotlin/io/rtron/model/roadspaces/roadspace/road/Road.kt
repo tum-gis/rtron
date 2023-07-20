@@ -40,6 +40,7 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.CompositeSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.toIllegalStateException
+import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyContains
 import io.rtron.math.range.fuzzyEncloses
@@ -87,6 +88,8 @@ class Road(
             laneSections.mapIndexed { index, laneSection -> index to laneSection }
                 .all { it.first == it.second.id.laneSectionId }
         ) { "LaneSection elements must be positioned according to their laneSection id on the list." }
+        require(laneSections.dropLast(1).all { it.curvePositionDomain.lowerBoundType() == BoundType.CLOSED && it.curvePositionDomain.upperBoundType() == BoundType.OPEN }) { "CurvePositionDomain of all LaneSections apart from the last must have a closed lower and open upper bound." }
+        require(laneSections.last().curvePositionDomain.lowerBoundType() == BoundType.CLOSED && laneSections.last().curvePositionDomain.upperBoundType() == BoundType.CLOSED) { "CurvePositionDomain of the last LaneSection must have a closed lower and upper bound." }
 
         val expectedLaneIds = laneSections.indices.toList()
         require(laneSections.indices.toList().containsAll(expectedLaneIds)) { "There must be no gaps within the given laneSectionIds." }
@@ -142,6 +145,8 @@ class Road(
         val selectedLaneSections = laneSections.filter { it.curvePositionDomain.contains(curveRelativePoint.curvePosition) }
         if (selectedLaneSections.size == 1) {
             return selectedLaneSections.first().right()
+        } else if (selectedLaneSections.size > 1) {
+            throw IllegalArgumentException("Domains of lane sections must close flush.")
         }
 
         val fuzzySelectedLaneSections = laneSections.filter { it.curvePositionDomain.fuzzyContains(curveRelativePoint.curvePosition, geometricalTolerance) }

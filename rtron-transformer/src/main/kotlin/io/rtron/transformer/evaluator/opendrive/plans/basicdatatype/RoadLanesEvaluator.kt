@@ -91,24 +91,24 @@ object RoadLanesEvaluator {
 
     private fun evaluateFatalViolations(lane: RoadLanesLaneSectionLRLane, parameters: OpendriveEvaluatorParameters): DefaultMessageList {
         val messageList = DefaultMessageList()
-
-        lane.getLaneWidthEntries().tap {
-            if (it.head.sOffset > parameters.numberTolerance) {
-                messageList += DefaultMessage.of("NonStrictlySortedList", "The width of the lane shall be defined for the full length of the lane section. This means that there must be a <width> element for s=0.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = false)
-            }
-        }
-
         return messageList
     }
 
     private fun evaluateNonFatalViolations(lane: RoadLanesLaneSectionLRLane, parameters: OpendriveEvaluatorParameters): DefaultMessageList {
         val messageList = DefaultMessageList()
 
+        lane.getLaneWidthEntries().tap {
+            if (it.head.sOffset > parameters.numberTolerance) {
+                messageList += DefaultMessage.of("LaneWidthEntriesNotDefinedFromStart", "The width of the lane shall be defined for the full length of the lane section starting with a <width> element for s=0. The first available element is copied and positioned at s=0.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                val firstEntry = it.head.copy().apply { sOffset = 0.0 }
+                lane.width = listOf(firstEntry) + lane.width
+            }
+        }
+
         lane.width = BasicDataTypeModifier.filterToStrictlySorted(lane.width, { it.sOffset }, lane.additionalId, "width", messageList)
 
         val widthEntriesFilteredBySOffsetFinite = lane.width.filter { currentWidth -> currentWidth.sOffset.isFinite() && currentWidth.sOffset >= 0.0 }
         if (widthEntriesFilteredBySOffsetFinite.size < lane.width.size) {
-            // messageList += OpendriveException.UnexpectedValues("sOffset", "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is not-finite and positive.").toMessage(lane.additionalId, isFatal = true, wasFixed = true)
             messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is not-finite and positive.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
             lane.width = widthEntriesFilteredBySOffsetFinite
         }
@@ -116,7 +116,6 @@ object RoadLanesEvaluator {
         val widthEntriesFilteredByCoefficientsFinite = lane.width.filter { currentWidth -> currentWidth.coefficients.all { it.isFinite() } }
         if (widthEntriesFilteredByCoefficientsFinite.size < lane.width.size) {
             messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where coefficients \"a, b, c, d\", are not finite.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
-            // messageList += OpendriveException.UnexpectedValues("a, b, c, d", "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where coefficients are not finite.").toMessage(lane.additionalId, isFatal = true, wasFixed = true)
             lane.width = widthEntriesFilteredByCoefficientsFinite
         }
 
@@ -125,7 +124,6 @@ object RoadLanesEvaluator {
         val heightEntriesFilteredByCoefficientsFinite = lane.height.filter { it.inner.isFinite() && it.outer.isFinite() }
         if (heightEntriesFilteredByCoefficientsFinite.size < lane.height.size) {
             messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
-            // messageList += OpendriveException.UnexpectedValues("inner, outer", "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.").toMessage(lane.additionalId, isFatal = true, wasFixed = true)
             lane.height = heightEntriesFilteredByCoefficientsFinite
         }
 

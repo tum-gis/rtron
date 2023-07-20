@@ -47,7 +47,8 @@ data class LaneSection(
 
     // Properties and Initializers
     init {
-        require(curvePositionDomain.hasLowerBound()) { "Curve position domain must have a lower bound" }
+        require(curvePositionDomain.hasLowerBound()) { "Curve position domain must have a lower bound." }
+        require(curvePositionDomain.hasUpperBound()) { "Curve position domain must have an upper bound." }
         require(lanes.isNotEmpty()) { "LaneSection must contain lanes." }
         require(lanes.all { it.key == it.value.id.laneId }) { "Lane elements must be positioned according to their lane id on the map." }
 

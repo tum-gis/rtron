@@ -33,8 +33,6 @@ import io.rtron.math.processing.isColinear
 import io.rtron.math.processing.removeRedundantVerticesOnLineSegmentsEnclosing
 import io.rtron.model.AbstractModel
 import io.rtron.model.roadspaces.common.LongitudinalFillerSurface
-import io.rtron.model.roadspaces.common.LongitudinalFillerSurfaceBetweenRoads
-import io.rtron.model.roadspaces.common.LongitudinalFillerSurfaceWithinRoad
 import io.rtron.model.roadspaces.identifier.JunctionIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.LongitudinalLaneRangeIdentifier
@@ -198,8 +196,8 @@ class RoadspacesModel(
         val longitudinalFillerSurfaceId = LongitudinalLaneRangeIdentifier(laneId, successorLaneId)
 
         val fillerSurface = when {
-            laneId.isWithinSameRoad(successorLaneId) -> LongitudinalFillerSurfaceWithinRoad(longitudinalFillerSurfaceId, surface)
-            else -> LongitudinalFillerSurfaceBetweenRoads(longitudinalFillerSurfaceId, surface)
+            laneId.isWithinSameRoad(successorLaneId) -> LongitudinalFillerSurface.ofWithinRoad(longitudinalFillerSurfaceId, surface)
+            else -> LongitudinalFillerSurface.ofBetweenRoad(longitudinalFillerSurfaceId, surface)
         }
         return Some(fillerSurface)
     }

@@ -18,7 +18,7 @@ package io.rtron.model.opendrive.lane
 
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadLanesLaneSectionLCRLaneRoadMarkSway(
+data class RoadLanesLaneSectionLCRLaneRoadMarkSway(
     var a: Double = Double.NaN,
     var b: Double = Double.NaN,
     var c: Double = Double.NaN,

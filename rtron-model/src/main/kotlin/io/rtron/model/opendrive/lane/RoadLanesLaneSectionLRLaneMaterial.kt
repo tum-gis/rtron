@@ -18,7 +18,7 @@ package io.rtron.model.opendrive.lane
 
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadLanesLaneSectionLRLaneMaterial(
+data class RoadLanesLaneSectionLRLaneMaterial(
     var friction: Double = Double.NaN,
     var roughness: Double = Double.NaN,
     var sOffset: Double = Double.NaN,

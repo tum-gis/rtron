@@ -20,7 +20,7 @@ import arrow.core.None
 import arrow.core.Option
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine(
+data class RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine(
     var length: Double = Double.NaN,
     var rule: Option<ERoadMarkRule> = None,
     var sOffset: Double = Double.NaN,

@@ -160,14 +160,15 @@ class RoadsTransformer(
     private fun addRoadspace(roadspace: Roadspace, roadspacesModel: RoadspacesModel, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
 
-        if (parameters.generateLongitudinalFillerSurfaces) {
-            roadspace.road.getAllLeftRightLaneIdentifiers().forEach { laneId ->
-                val longitudinalFillerSurfaces =
+        roadspace.road.getAllLeftRightLaneIdentifiers().forEach { laneId ->
+            val longitudinalFillerSurfaces =
+                if (parameters.generateLongitudinalFillerSurfaces) {
                     roadspacesModel.getLongitudinalFillerSurfaces(laneId).getOrElse { throw it }
-
-                val relatedObjects = roadspace.roadspaceObjects.filter { it.isRelatedToLane(laneId) }
-                messageList += addSingleLane(laneId, roadspace.road, longitudinalFillerSurfaces, relatedObjects, dstTransportationSpace)
-            }
+                } else {
+                    emptyList()
+                }
+            val relatedObjects = roadspace.roadspaceObjects.filter { it.isRelatedToLane(laneId) }
+            messageList += addSingleLane(laneId, roadspace.road, longitudinalFillerSurfaces, relatedObjects, dstTransportationSpace)
         }
 
         roadspace.roadspaceObjects.forEach { addSingleRoadspaceObject(it, dstTransportationSpace) }

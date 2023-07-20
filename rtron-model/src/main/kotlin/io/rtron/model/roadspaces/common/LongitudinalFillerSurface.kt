@@ -20,25 +20,22 @@ import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.model.roadspaces.identifier.LongitudinalLaneRangeIdentifier
 
 /**
- * Represents a filler surface with it's [surface] geometry for a lane range with [id].
+ * Represents a filler surface with it's [surface] geometry between two lane sections or between to road with [id].
  */
-sealed class LongitudinalFillerSurface(
+data class LongitudinalFillerSurface(
     val id: LongitudinalLaneRangeIdentifier,
     val surface: AbstractSurface3D
-)
+) {
 
-class LongitudinalFillerSurfaceWithinRoad(id: LongitudinalLaneRangeIdentifier, surface: AbstractSurface3D) : LongitudinalFillerSurface(id, surface) {
+    companion object {
+        fun ofWithinRoad(id: LongitudinalLaneRangeIdentifier, surface: AbstractSurface3D): LongitudinalFillerSurface {
+            require(id.isWithinSameRoad()) { "Lane identifiers must be located within the same road." }
+            return LongitudinalFillerSurface(id, surface)
+        }
 
-    // Properties and Initializers
-    init {
-        require(id.isWithinSameRoad()) { "Lane identifiers must be located within the same road." }
-    }
-}
-
-class LongitudinalFillerSurfaceBetweenRoads(id: LongitudinalLaneRangeIdentifier, surface: AbstractSurface3D) : LongitudinalFillerSurface(id, surface) {
-
-    // Properties and Initializers
-    init {
-        require(!id.isWithinSameRoad()) { "Lane identifiers must not be located within the same road." }
+        fun ofBetweenRoad(id: LongitudinalLaneRangeIdentifier, surface: AbstractSurface3D): LongitudinalFillerSurface {
+            require(!id.isWithinSameRoad()) { "Lane identifiers must not be located within the same road." }
+            return LongitudinalFillerSurface(id, surface)
+        }
     }
 }

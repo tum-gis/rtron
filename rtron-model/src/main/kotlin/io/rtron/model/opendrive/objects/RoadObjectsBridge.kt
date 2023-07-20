@@ -20,7 +20,7 @@ import arrow.core.None
 import arrow.core.Option
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadObjectsBridge(
+data class RoadObjectsBridge(
     var validity: List<RoadObjectsObjectLaneValidity> = emptyList(),
 
     var id: String = "",

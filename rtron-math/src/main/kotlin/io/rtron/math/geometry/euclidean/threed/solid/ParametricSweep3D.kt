@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.nonEmptyListOf
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
@@ -149,22 +150,26 @@ data class ParametricSweep3D(
         // calculate the start and end faces
         val startPolygons = run {
             val linearRing = LinearRing3D.of(
-                upperLeftVertices.first(),
-                upperRightVertices.first(),
-                lowerRightVertices.first(),
-                lowerLeftVertices.first(),
+                nonEmptyListOf(
+                    upperLeftVertices.first(),
+                    upperRightVertices.first(),
+                    lowerRightVertices.first(),
+                    lowerLeftVertices.first()
+                ),
                 tolerance = tolerance
-            )
+            ).getOrElse { return@run emptyList() }
             linearRing.calculatePolygonsGlobalCS().getOrElse { emptyList() }
         }
         val endPolygons = run {
             val linearRing = LinearRing3D.of(
-                upperLeftVertices.last(),
-                lowerLeftVertices.last(),
-                lowerRightVertices.last(),
-                upperRightVertices.last(),
+                nonEmptyListOf(
+                    upperLeftVertices.last(),
+                    lowerLeftVertices.last(),
+                    lowerRightVertices.last(),
+                    upperRightVertices.last()
+                ),
                 tolerance = tolerance
-            )
+            ).getOrElse { return@run emptyList() }
             linearRing.calculatePolygonsGlobalCS().getOrElse { emptyList() }
         }
 

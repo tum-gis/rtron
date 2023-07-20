@@ -20,7 +20,7 @@ import arrow.core.None
 import arrow.core.Option
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class JunctionController(
+data class JunctionController(
     var id: String = "",
     var sequence: Option<Int> = None,
     var type: Option<String> = None

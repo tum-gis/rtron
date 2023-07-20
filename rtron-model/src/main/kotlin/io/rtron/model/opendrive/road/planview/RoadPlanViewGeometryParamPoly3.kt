@@ -19,7 +19,7 @@ package io.rtron.model.opendrive.road.planview
 import io.rtron.model.opendrive.core.OpendriveElement
 import io.rtron.model.opendrive.road.ParamPoly3PRange
 
-class RoadPlanViewGeometryParamPoly3(
+data class RoadPlanViewGeometryParamPoly3(
     var aU: Double = Double.NaN,
     var aV: Double = Double.NaN,
     var bU: Double = Double.NaN,

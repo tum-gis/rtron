@@ -19,7 +19,9 @@ package io.rtron.math.geometry.euclidean.threed.surface
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import arrow.core.continuations.either
+import arrow.core.left
 import arrow.core.nonEmptyListOf
+import arrow.core.right
 import arrow.core.toNonEmptyListOrNone
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
@@ -78,8 +80,15 @@ data class LinearRing3D(
         /**
          * Creates a linear ring based on the provided [vertices].
          */
-        fun of(vararg vertices: Vector3D, tolerance: Double) =
-            LinearRing3D(vertices.toList().toNonEmptyListOrNull()!!, tolerance)
+        fun of(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryException.NotEnoughVertices, LinearRing3D> {
+            // val vertices = vertices.toList().toNonEmptyListOrNull()!!
+            val verticesAdjusted: List<Vector3D> = vertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
+            if (verticesAdjusted.size < 3) {
+                return GeometryException.NotEnoughVertices("").left()
+            }
+
+            return LinearRing3D(verticesAdjusted.toNonEmptyListOrNull()!!, tolerance).right()
+        }
 
         /**
          * Creates multiple linear rings from two lists of vertices [leftVertices] and [rightVertices].

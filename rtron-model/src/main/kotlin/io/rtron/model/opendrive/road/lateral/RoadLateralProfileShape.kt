@@ -18,7 +18,7 @@ package io.rtron.model.opendrive.road.lateral
 
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadLateralProfileShape(
+data class RoadLateralProfileShape(
     var a: Double = Double.NaN,
     var b: Double = Double.NaN,
     var c: Double = Double.NaN,

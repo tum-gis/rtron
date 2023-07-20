@@ -28,6 +28,8 @@ import io.rtron.model.opendrive.additions.optics.everyRoadObjectRepeatElement
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
 import io.rtron.transformer.messages.opendrive.of
+import kotlin.math.max
+import kotlin.math.min
 
 object RoadObjectsEvaluator {
 
@@ -52,6 +54,12 @@ object RoadObjectsEvaluator {
             currentRoadObject.radius = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadObject.radius, currentRoadObject.additionalId, "radius", messageList, parameters.numberTolerance)
             currentRoadObject.length = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadObject.length, currentRoadObject.additionalId, "length", messageList, parameters.numberTolerance)
             currentRoadObject.width = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadObject.width, currentRoadObject.additionalId, "width", messageList, parameters.numberTolerance)
+
+            currentRoadObject.validity.filter { it.fromLane > it.toLane }.forEach { currentValidity ->
+                messageList += DefaultMessage.of("LaneValidityElementNotOrdered", "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.", currentRoadObject.additionalId, Severity.ERROR, wasFixed = true)
+                currentValidity.fromLane = min(currentValidity.fromLane, currentValidity.toLane)
+                currentValidity.toLane = max(currentValidity.fromLane, currentValidity.toLane)
+            }
 
             if (currentRoadObject.outlines.exists { it.outline.isEmpty() }) {
                 messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'outlines' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasFixed = true)

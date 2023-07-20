@@ -18,7 +18,7 @@ package io.rtron.model.opendrive.lane
 
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadLanesLaneOffset(
+data class RoadLanesLaneOffset(
     var a: Double = Double.NaN,
     var b: Double = Double.NaN,
     var c: Double = Double.NaN,

@@ -20,7 +20,7 @@ import arrow.core.None
 import arrow.core.Option
 import io.rtron.model.opendrive.core.OpendriveElement
 
-class RoadLanesLaneSectionLCRLaneRoadMarkTypeLine(
+data class RoadLanesLaneSectionLCRLaneRoadMarkTypeLine(
     var color: Option<ERoadMarkColor> = None,
     var length: Double = Double.NaN,
     var rule: Option<ERoadMarkRule> = None,
