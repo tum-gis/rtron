@@ -65,7 +65,6 @@ data class RoadObjectsObject(
 
     // Validation Properties
 
-    /** height is None */
     val heightValidated: Option<Double>
         get() = height.flatMap { if (it == 0.0) None else it.some() }
 
@@ -96,19 +95,16 @@ data class RoadObjectsObject(
         outlines.fold({ emptyList() }, { it.getLinearRingsDefinedByLocalCorners() })
 
     /** Returns true, if the provided geometry information correspond to a cuboid. */
-    fun isCuboid() = length.isDefined() && width.isDefined() && heightValidated.isDefined() && outlines.isEmpty() && repeat.isEmpty()
+    fun containsCuboid() = length.isDefined() && width.isDefined() && heightValidated.isDefined()
 
     /** Returns true, if the provided geometry information correspond to a rectangle. */
-    fun isRectangle() = length.isDefined() && width.isDefined() && heightValidated.isEmpty() && outlines.isEmpty() && repeat.isEmpty()
+    fun containsRectangle() = length.isDefined() && width.isDefined() && heightValidated.isEmpty()
 
     /** Returns true, if the provided geometry information correspond to a cylinder. */
-    fun isCylinder() = radius.isDefined() && heightValidated.isDefined() && outlines.isEmpty() && repeat.isEmpty()
+    fun containsCylinder() = radius.isDefined() && heightValidated.isDefined()
 
     /** Returns true, if the provided geometry information correspond to a circle. */
-    fun isCircle() = radius.isDefined() && heightValidated.isEmpty() && outlines.isEmpty() && repeat.isEmpty()
-
-    /** Returns true, if the provided geometry information correspond to a point. */
-    fun isPoint() = !isCuboid() && !isRectangle() && !isCylinder() && outlines.isEmpty() && repeat.isEmpty()
+    fun containsCircle() = radius.isDefined() && heightValidated.isEmpty()
 
     companion object
 }

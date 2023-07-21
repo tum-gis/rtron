@@ -28,8 +28,8 @@ import io.rtron.math.transform.AffineSequence3D
 /**
  * Rectangle with a certain [length] and [width] whereby the origin is located at the rectangle's center at z=0.
  *
- * @param length length of rectangle in the direction of the x axis
- * @param width width of rectangle in the direction of the y axis
+ * @param length length of rectangle in the direction of the x-axis
+ * @param width width of rectangle in the direction of the y-axis
  */
 data class Rectangle3D(
     val length: Double,

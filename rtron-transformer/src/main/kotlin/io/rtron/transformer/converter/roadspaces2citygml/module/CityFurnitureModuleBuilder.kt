@@ -23,8 +23,9 @@ import io.rtron.io.messages.Severity
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
-import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1ImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod3Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.cityfurniture.CityFurniture
@@ -45,12 +46,23 @@ class CityFurnitureModuleBuilder(
         val messageList = DefaultMessageList()
 
         // geometry
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
-        cityFurnitureFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+        val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
+        cityFurnitureFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
 
-        geometryTransformer.rotation.tap {
-            attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
+        roadspaceObject.boundingBoxGeometry.tap { currentBoundingBoxGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
+            cityFurnitureFeature.populateLod2Geometry(geometryTransformer)
+                .mapLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+        }
+
+        roadspaceObject.complexGeometry.tap { currentComplexGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
+            cityFurnitureFeature.populateLod3Geometry(geometryTransformer)
+                .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod3", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+
+            geometryTransformer.rotation.tap {
+                attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
+            }
         }
 
         // semantics

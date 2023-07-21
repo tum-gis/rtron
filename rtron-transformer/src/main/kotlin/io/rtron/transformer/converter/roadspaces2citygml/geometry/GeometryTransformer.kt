@@ -32,6 +32,7 @@ import io.rtron.math.geometry.euclidean.threed.Geometry3DVisitor
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.curve.LineString3D
+import io.rtron.math.geometry.euclidean.threed.point.AbstractPoint3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
 import io.rtron.math.geometry.euclidean.threed.solid.Cylinder3D
@@ -43,7 +44,6 @@ import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.math.std.THREE_QUARTER_PI
 import io.rtron.math.transform.Affine3D
-import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.handleEmpty
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.generateRandomUUID
@@ -301,8 +301,12 @@ class GeometryTransformer(
         private val geometryFactory = GeometryFactory.newInstance()
         private const val DIMENSION = 3
 
-        fun of(roadspaceObject: RoadspaceObject, parameters: Roadspaces2CitygmlParameters): GeometryTransformer {
-            return GeometryTransformer(parameters).also { roadspaceObject.geometry.accept(it) }
+        fun of(point: AbstractPoint3D, parameters: Roadspaces2CitygmlParameters): GeometryTransformer {
+            return GeometryTransformer(parameters).also { point.accept(it) }
+        }
+
+        fun of(point: AbstractGeometry3D, parameters: Roadspaces2CitygmlParameters): GeometryTransformer {
+            return GeometryTransformer(parameters).also { point.accept(it) }
         }
     }
 }

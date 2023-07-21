@@ -27,8 +27,9 @@ import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
-import io.rtron.transformer.converter.roadspaces2citygml.geometry.LevelOfDetail
-import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateGeometryOrImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1Geometry
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1ImplicitGeometry
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.vegetation.SolitaryVegetationObject
@@ -46,18 +47,31 @@ class VegetationModuleBuilder(
 
     // Methods
 
-    fun createSolitaryVegetationFeature(roadspaceObject: RoadspaceObject): ContextMessageList<SolitaryVegetationObject> {
+    fun createSolitaryVegetationObjectFeature(roadspaceObject: RoadspaceObject): ContextMessageList<SolitaryVegetationObject> {
         val messageList = DefaultMessageList()
 
-        val geometryTransformer = GeometryTransformer.of(roadspaceObject, parameters)
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
-        solitaryVegetationObjectFeature.populateGeometryOrImplicitGeometry(geometryTransformer, LevelOfDetail.TWO)
-            .mapLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
-        geometryTransformer.rotation.tap {
+        // geometry
+        val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
+        solitaryVegetationObjectFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
+        pointGeometryTransformer.rotation.tap {
             attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
         }
-        addAttributes(solitaryVegetationObjectFeature, geometryTransformer).getOrElse { throw it }
+
+        roadspaceObject.boundingBoxGeometry.tap { currentBoundingBoxGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
+            solitaryVegetationObjectFeature.populateLod1Geometry(geometryTransformer)
+                .mapLeft { messageList += DefaultMessage.of("NoSuitableGeometryForSolitaryVegetationObjectLod1", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+
+            addAttributes(solitaryVegetationObjectFeature, geometryTransformer).getOrElse { throw it }
+        }
+
+        roadspaceObject.complexGeometry.tap { currentComplexGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
+            solitaryVegetationObjectFeature.populateLod2Geometry(geometryTransformer)
+                .mapLeft { messageList += DefaultMessage.of("NoSuitableGeometryForSolitaryVegetationObjectLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+        }
 
         // semantics
         IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), solitaryVegetationObjectFeature)

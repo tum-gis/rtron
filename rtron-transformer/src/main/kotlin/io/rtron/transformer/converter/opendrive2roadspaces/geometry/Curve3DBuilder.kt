@@ -75,7 +75,7 @@ object Curve3DBuilder {
      */
     fun buildCurve3D(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D, numberTolerance: Double): List<Curve3D> {
         if (roadObject.repeat.isEmpty()) return emptyList() // TODO fix repeat list handling
-        if (!roadObject.repeat.first().isCurve()) return emptyList() // TODO fix repeat list handling
+        if (!roadObject.repeat.first().containsCurve()) return emptyList() // TODO fix repeat list handling
 
         val curve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObject.repeat.first(), roadReferenceLine, numberTolerance) // TODO fix repeat list handling
         val heightFunction = FunctionBuilder

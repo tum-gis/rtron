@@ -100,13 +100,13 @@ class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) : Ab
 
         val leftLaneBoundaryTransitionDistance = laneLeftLaneBoundaryPoint.distance(laneLeftLaneBoundarySuccessorPoint)
         if (leftLaneBoundaryTransitionDistance >= parameters.laneTransitionDistanceTolerance) {
-            val infoValues = mapOf("euclidean_distance" to leftLaneBoundaryTransitionDistance)
+            val infoValues = mapOf("euclideanDistance" to leftLaneBoundaryTransitionDistance)
             messageList += DefaultMessage("LeftLaneBoundaryTransitionGap", "Left boundary of lane should be connected to its successive lane (euclidean distance: $leftLaneBoundaryTransitionDistance, successor: $successorContactStart).", location, Severity.WARNING, wasFixed = false, infoValues)
         }
 
         val rightLaneBoundaryTransitionDistance = laneRightLaneBoundaryPoint.distance(laneRightLaneBoundarySuccessorPoint)
         if (rightLaneBoundaryTransitionDistance >= parameters.laneTransitionDistanceTolerance) {
-            val infoValues = mapOf("euclidean_distance" to rightLaneBoundaryTransitionDistance)
+            val infoValues = mapOf("euclideanDistance" to rightLaneBoundaryTransitionDistance)
             messageList += DefaultMessage("RightLaneBoundaryTransitionGap", "Right boundary of lane should be connected to its successive lane (euclidean distance: $rightLaneBoundaryTransitionDistance successor: $successorContactStart).", location, Severity.WARNING, wasFixed = false, infoValues)
         }
 

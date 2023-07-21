@@ -55,48 +55,36 @@ object Solid3DBuilder {
      * Builds a list of cuboids from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCuboids(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<Cuboid3D>> {
-        val cuboidList = mutableListOf<Cuboid3D>()
-        val messageList = DefaultMessageList()
+    fun buildCuboids(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): Cuboid3D {
+        require(roadObject.containsCuboid()) { "Road object must contain cuboid." }
 
-        if (roadObject.isCuboid()) {
-            val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
-            val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cuboidList += Cuboid3D.of(roadObject.length, roadObject.width, roadObject.heightValidated, numberTolerance, affineSequence)
-        }
+        val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
+        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
-        if (roadObject.repeat.any { it.isRepeatedCuboid() }) {
-            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
-        }
-
-        return ContextMessageList(cuboidList, messageList)
+        return Cuboid3D.of(
+            roadObject.length,
+            roadObject.width,
+            roadObject.heightValidated,
+            numberTolerance,
+            affineSequence
+        )
     }
 
     /**
      * Builds a list of cylinders from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCylinders(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<Cylinder3D>> {
-        val cylinderList = mutableListOf<Cylinder3D>()
-        val messageList = DefaultMessageList()
+    fun buildCylinders(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): Cylinder3D {
+        require(roadObject.containsCylinder()) { "Road object must contain cylinder." }
 
-        if (roadObject.isCylinder()) {
-            val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
-            val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            cylinderList += Cylinder3D.of(roadObject.radius, roadObject.height, numberTolerance, affineSequence)
-        }
-
-        if (roadObject.repeat.any { it.isRepeatCylinder() }) {
-            messageList += DefaultMessage.of("", "Cylinder geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
-        }
-
-        return ContextMessageList(cylinderList, messageList)
+        val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
+        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
+        return Cylinder3D.of(roadObject.radius, roadObject.height, numberTolerance, affineSequence)
     }
 
     /**
      * Builds a list of polyhedrons from OpenDRIVE road objects defined by road corner outlines.
      *
-     * @param id identifier of the road space object for error logging
      * @param roadObject road object of OpenDRIVE
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      * @return list of polyhedrons
@@ -132,7 +120,7 @@ object Solid3DBuilder {
     }
 
     /**
-     * Builds a vertical outline element from OpenDRIVE's road corner element and it's height.
+     * Builds a vertical outline element from OpenDRIVE's road corner element, and it's height.
      *
      * @param cornerRoad road corner element of OpenDRIVE which defines one corner of a road object
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
@@ -151,7 +139,6 @@ object Solid3DBuilder {
     /**
      * Builds a list of polyhedrons from OpenDRIVE road objects defined by local corner outlines.
      *
-     * @param id identifier of the road space object for error logging
      * @param roadObject road object of OpenDRIVE
      * @param curveAffine affine transformation matrix from the curve
      * @return list of polyhedrons
@@ -203,8 +190,8 @@ object Solid3DBuilder {
      * @param roadObjectRepeat repeated road object of OpenDRIVE
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      */
-    fun buildParametricSweeps(roadObjectRepeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D, numberTolerance: Double): Option<ParametricSweep3D> {
-        if (!roadObjectRepeat.isParametricSweep()) return None
+    fun buildParametricSweep(roadObjectRepeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D, numberTolerance: Double): Option<ParametricSweep3D> {
+        if (!roadObjectRepeat.containsParametricSweep()) return None
 
         // curve over which the object is moved
         val objectReferenceCurve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine, numberTolerance)

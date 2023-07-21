@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.converter.roadspaces2citygml.geometry
+package io.rtron.std
 
-enum class LevelOfDetail {
-    ZERO,
-    ONE,
-    TWO,
-    THREE
-}
+fun Boolean.toInt() = if (this) 1 else 0

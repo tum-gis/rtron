@@ -97,6 +97,7 @@ class RoadspaceBuilder(
         })
         val roadspaceObjectsFromRoadSignals: List<RoadspaceObject> = road.signals.fold({ emptyList() }, { roadSignals ->
             roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, roadspaceRoad, attributes)
+                .handleMessageList { messageList += it }
         })
 
         // combine the models into a road space object

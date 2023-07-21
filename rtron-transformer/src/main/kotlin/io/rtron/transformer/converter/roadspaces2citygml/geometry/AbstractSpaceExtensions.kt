@@ -22,22 +22,7 @@ import arrow.core.left
 import org.citygml4j.core.model.core.AbstractSpace
 
 /**
- * Populates the [lod] geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
- *
- * @param geometryTransformer source geometries
- * @param lod target level of detail
- * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
- */
-fun AbstractSpace.populateGeometry(geometryTransformer: GeometryTransformer, lod: LevelOfDetail): Either<GeometryTransformerException, Unit> =
-    when (lod) {
-        LevelOfDetail.ZERO -> populateLod0Geometry(geometryTransformer)
-        LevelOfDetail.ONE -> populateLod1Geometry(geometryTransformer)
-        LevelOfDetail.TWO -> populateLod2Geometry(geometryTransformer)
-        LevelOfDetail.THREE -> populateLod3Geometry(geometryTransformer)
-    }
-
-/**
- * Populates the LoD0 point geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
+ * Populates the LOD0 point geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
  *
  * @param geometryTransformer source geometries
  * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
@@ -48,12 +33,12 @@ fun AbstractSpace.populateLod0Geometry(geometryTransformer: GeometryTransformer)
         return@eager
     }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LoD0 geometry of the abstract space.").left().bind()
+    GeometryTransformerException.NoSuiteableSourceGeometry("LOD0 geometry of the abstract space.").left().bind()
 }
 
 /**
- * Populates the LoD1 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
- * So only the solid geometry are populated at LoD1 (since multiSurface, multiCurve are not available at this LoD).
+ * Populates the LOD1 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
+ * So only the solid geometry are populated at LOD1 (since multiSurface, multiCurve are not available at this LOD).
  *
  * @param geometryTransformer source geometries
  * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
@@ -64,11 +49,11 @@ fun AbstractSpace.populateLod1Geometry(geometryTransformer: GeometryTransformer)
         return@eager
     }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LoD1 geometry of the abstract space.").left().bind()
+    GeometryTransformerException.NoSuiteableSourceGeometry("LOD1 geometry of the abstract space.").left().bind()
 }
 
 /**
- * Populates the LoD2 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
+ * Populates the LOD2 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
  * Only the first available geometry type is populated, with the prioritization order being: solid, multiSurface, multiCurve.
  *
  * @param geometryTransformer source geometries
@@ -90,11 +75,11 @@ fun AbstractSpace.populateLod2Geometry(geometryTransformer: GeometryTransformer)
         return@eager
     }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LoD2 geometry of the abstract space.").left().bind()
+    GeometryTransformerException.NoSuiteableSourceGeometry("LOD2 geometry of the abstract space.").left().bind()
 }
 
 /**
- * Populates the LoD2 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
+ * Populates the LOD2 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
  * Only the first available geometry type is populated, with the prioritization order being: solid, multiSurface, multiCurve.
  *
  * @param geometryTransformer source geometries
@@ -116,5 +101,5 @@ fun AbstractSpace.populateLod3Geometry(geometryTransformer: GeometryTransformer)
         return@eager
     }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LoD3 geometry of the abstract space").left().bind()
+    GeometryTransformerException.NoSuiteableSourceGeometry("LOD3 geometry of the abstract space").left().bind()
 }

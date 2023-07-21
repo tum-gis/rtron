@@ -35,11 +35,8 @@ object Vector3DBuilder {
      *
      * @param roadObject road object of OpenDRIVE
      * @param curveAffine affine transformation matrix at the reference curve
-     * @param force true, if the point generation shall be forced
      */
-    fun buildVector3Ds(roadObject: RoadObjectsObject, curveAffine: Affine3D, force: Boolean = false): Vector3D {
-        require(roadObject.isPoint() || force) { "Not a point geometry." }
-
+    fun buildVector3Ds(roadObject: RoadObjectsObject, curveAffine: Affine3D): Vector3D {
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         return Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
     }
@@ -52,9 +49,7 @@ object Vector3DBuilder {
      * @param curveAffine affine transformation matrix at the reference curve
      * @param force true, if the point generation shall be forced
      */
-    fun buildVector3Ds(roadSignal: RoadSignalsSignal, curveAffine: Affine3D, force: Boolean = false): Vector3D {
-        require(roadSignal.isPoint() || force) { "Not a point geometry." }
-
+    fun buildVector3Ds(roadSignal: RoadSignalsSignal, curveAffine: Affine3D): Vector3D {
         val objectAffine = Affine3D.of(roadSignal.referenceLinePointRelativePose)
         return Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
     }

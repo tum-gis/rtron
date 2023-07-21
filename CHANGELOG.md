@@ -19,7 +19,7 @@
 ## [1.2.1] - 2021-08-25
 ### Added
 - added Docker support for deployment
-- creation of LoD2 building models by estimating semantics (wall, roof, ground surface) based on normal vectors
+- creation of LOD2 building models by estimating semantics (wall, roof, ground surface) based on normal vectors
 
 
 ## [1.2.0] - 2021-05-18

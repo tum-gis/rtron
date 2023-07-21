@@ -75,7 +75,7 @@ class RoadspaceObjectTransformer(
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> None
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> None
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> None
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> vegetationModuleBuilder.createSolitaryVegetationFeature(roadspaceObject).handleMessageList { messageList += it }.some()
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> vegetationModuleBuilder.createSolitaryVegetationObjectFeature(roadspaceObject).handleMessageList { messageList += it }.some()
         }
 
         return ContextMessageList(cityObjects, messageList)

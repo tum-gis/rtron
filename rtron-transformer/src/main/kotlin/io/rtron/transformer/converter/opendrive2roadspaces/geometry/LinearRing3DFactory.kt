@@ -27,6 +27,7 @@ import io.rtron.io.messages.DefaultMessageList
 import io.rtron.io.messages.Severity
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
+import io.rtron.math.processing.isClockwiseOrdered
 import io.rtron.math.processing.removeConsecutiveSideDuplicates
 import io.rtron.math.processing.removeRedundantVerticesOnLineSegmentsEnclosing
 import io.rtron.model.opendrive.additions.identifier.RoadObjectOutlineIdentifier
@@ -76,7 +77,16 @@ object LinearRing3DFactory {
             GeometryBuilderException.NotEnoughValidOutlineElementsForLinearRing(outlineId).left().bind<ContextMessageList<LinearRing3D>>()
         }
 
-        val linearRing = LinearRing3D(preparedVertices.toNonEmptyListOrNull()!!, tolerance)
+        // if the outline elements are ordered clockwise yielding a wrong polygon orientation
+        val projectedVertices = preparedVertices.map { it.toVector2D(Vector3D.Z_AXIS) }
+        val orderedVertices = if (projectedVertices.distinct().size > 2 && projectedVertices.isClockwiseOrdered()) {
+            messageList += DefaultMessage.of("IncorrectOutlineOrientation", "Outline elements are ordered clockwise but should be ordered counter-clockwise.", outlineId, Severity.ERROR, wasFixed = true)
+            preparedVertices.reversed()
+        } else {
+            preparedVertices
+        }
+
+        val linearRing = LinearRing3D(orderedVertices.toNonEmptyListOrNull()!!, tolerance)
         ContextMessageList(linearRing, messageList)
     }
 }

@@ -27,18 +27,21 @@ import io.rtron.io.messages.Severity
 import io.rtron.io.messages.handleMessageList
 import io.rtron.io.messages.mergeToReport
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
+import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Circle3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.euclidean.threed.surface.ParametricBoundedSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.Rectangle3D
+import io.rtron.math.std.PI
 import io.rtron.math.transform.Affine3D
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.model.opendrive.objects.RoadObjectsObject
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlinesOutlineCornerRoad
 import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat
+import io.rtron.model.opendrive.signal.RoadSignalsSignal
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
 import io.rtron.transformer.messages.opendrive.of
 
@@ -49,46 +52,34 @@ object Surface3DBuilder {
 
     // Methods
 
-    /**
-     * Builds a list of rectangles from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
-     * repeated entries defined in [RoadObjectsObjectRepeat].
-     */
-    fun buildRectangles(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<Rectangle3D>> {
-        val rectangleList = mutableListOf<Rectangle3D>()
-        val messageList = DefaultMessageList()
+    /** Builds a rectangle from an [RoadObjectsObject] with [curveAffine] being the affine transformation at respective curve. */
+    fun buildRectangle(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): Rectangle3D {
+        require(roadObject.containsRectangle()) { "Road object must contain rectangle." }
 
-        if (roadObject.isRectangle()) {
-            val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
-            val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            rectangleList += Rectangle3D.of(roadObject.length, roadObject.width, numberTolerance, affineSequence)
-        }
-
-        if (roadObject.repeat.any { it.isRepeatedCuboid() }) {
-            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
-        }
-
-        return ContextMessageList(rectangleList, messageList)
+        val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
+        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
+        return Rectangle3D.of(roadObject.length, roadObject.width, numberTolerance, affineSequence)
     }
 
-    /**
-     * Builds a list of circles from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
-     * repeated entries defined in [RoadObjectsObjectRepeat].
-     */
-    fun buildCircles(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<Circle3D>> {
-        val circleList = mutableListOf<Circle3D>()
-        val messageList = DefaultMessageList()
+    /** Builds a rectangle from an [RoadSignalsSignal] with [curveAffine] being the affine transformation at respective curve. */
+    fun buildRectangle(roadObject: RoadSignalsSignal, curveAffine: Affine3D, numberTolerance: Double): Rectangle3D {
+        require(roadObject.containsRectangle()) { "Road signal must contain rectangle." }
 
-        if (roadObject.isCircle()) {
-            val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
-            val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
-            circleList += Circle3D.of(roadObject.radius, numberTolerance, affineSequence)
-        }
+        val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
+        // needs to be rotated since rectangle is defined with length in x-axis and width in y-axis
+        val objectRotation = Affine3D.of(Rotation3D.of(0.0, -PI / 2.0, 0.0))
+        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine, objectRotation)
+        return Rectangle3D.of(roadObject.height, roadObject.width, numberTolerance, affineSequence)
+    }
 
-        if (roadObject.repeat.any { it.isRepeatCylinder() }) {
-            messageList += DefaultMessage.of("", "Cuboid geometries in the repeat elements are currently not supported.", roadObject.additionalId, Severity.WARNING, wasFixed = false)
-        }
+    /** Builds a circle from an [RoadObjectsObject] with [curveAffine] being the affine transformation at respective curve. */
 
-        return ContextMessageList(circleList, messageList)
+    fun buildCircle(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): Circle3D {
+        require(roadObject.containsCircle()) { "Road object must contain circle." }
+
+        val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
+        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
+        return Circle3D.of(roadObject.radius, numberTolerance, affineSequence)
     }
 
     /**
@@ -177,7 +168,7 @@ object Surface3DBuilder {
         roadReferenceLine: Curve3D,
         numberTolerance: Double
     ): List<ParametricBoundedSurface3D> {
-        if (!roadObjectRepeat.isHorizontalParametricBoundedSurface()) return emptyList()
+        if (!roadObjectRepeat.containsHorizontalParametricBoundedSurface()) return emptyList()
 
         // curve over which the object is moved
         val objectReferenceCurve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine, numberTolerance)
@@ -204,7 +195,7 @@ object Surface3DBuilder {
         roadReferenceLine: Curve3D,
         numberTolerance: Double
     ): List<ParametricBoundedSurface3D> {
-        if (!roadObjectRepeat.isVerticalParametricBoundedSurface()) return emptyList()
+        if (!roadObjectRepeat.containsVerticalParametricBoundedSurface()) return emptyList()
 
         // curve over which the object is moved
         val objectReferenceCurve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObjectRepeat, roadReferenceLine, numberTolerance)

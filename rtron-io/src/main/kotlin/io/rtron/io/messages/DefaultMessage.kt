@@ -38,5 +38,5 @@ data class DefaultMessage(
         else -> incidentSeverity
     }
 
-    companion object { }
+    companion object
 }

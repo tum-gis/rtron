@@ -78,10 +78,9 @@ data class RoadSignalsSignal(
         get() = Pose3D(referenceLinePointRelativePosition, referenceLinePointRelativeRotation)
 
     // Methods
-    fun isPolygon() = width.isDefined() && height.isDefined()
-    fun isVerticalLine() = width.isEmpty() && height.isDefined()
-    fun isHorizontalLine() = width.isDefined() && height.isEmpty()
-    fun isPoint() = !isPolygon() && !isVerticalLine() && !isHorizontalLine()
+    fun containsRectangle() = width.isDefined() && height.isDefined()
+    fun containsVerticalLine() = width.isEmpty() && height.isDefined()
+    fun containsHorizontalLine() = width.isDefined() && height.isEmpty()
 
     companion object
 }

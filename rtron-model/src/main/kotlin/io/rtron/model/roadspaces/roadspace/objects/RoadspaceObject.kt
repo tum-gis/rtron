@@ -16,7 +16,9 @@
 
 package io.rtron.model.roadspaces.roadspace.objects
 
+import arrow.core.Option
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
+import io.rtron.math.geometry.euclidean.threed.point.AbstractPoint3D
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
@@ -25,14 +27,16 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 /**
  * Represents an object within the road space.
  *
- * @param geometry geometry of the road space object
+ * @param complexGeometry geometry of the road space object
  * @param laneRelations object relations to road lanes
  * @param attributes attributes containing information about the road space object
  */
 data class RoadspaceObject(
     val id: RoadspaceObjectIdentifier,
     val type: RoadObjectType = RoadObjectType.NONE,
-    val geometry: AbstractGeometry3D,
+    val pointGeometry: AbstractPoint3D,
+    val boundingBoxGeometry: Option<AbstractGeometry3D>,
+    val complexGeometry: Option<AbstractGeometry3D>,
     val laneRelations: List<LateralLaneRangeIdentifier>,
     val attributes: AttributeList
 ) {
@@ -47,6 +51,6 @@ data class RoadspaceObject(
 
     // Conversions
     override fun toString(): String {
-        return "RoadObject(attributes=$attributes, geometry=$geometry)"
+        return "RoadObject(attributes=$attributes, complexGeometry=$complexGeometry)"
     }
 }

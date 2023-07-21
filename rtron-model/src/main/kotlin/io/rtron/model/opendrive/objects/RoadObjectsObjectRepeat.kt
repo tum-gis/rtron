@@ -20,6 +20,8 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.optics.optics
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
+import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
+import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.range.Range
 import io.rtron.model.opendrive.additions.identifier.AdditionalRoadObjectRepeatIdentifier
 import io.rtron.model.opendrive.additions.identifier.RoadObjectRepeatIdentifier
@@ -45,6 +47,12 @@ data class RoadObjectsObjectRepeat(
 
     override var additionalId: Option<RoadObjectRepeatIdentifier> = None
 ) : OpendriveElement(), AdditionalRoadObjectRepeatIdentifier {
+
+    // Properties and Initializers
+    val curveRelativeStartPosition get() = CurveRelativeVector1D(s)
+
+    /** position of the object relative to the point on the road reference line */
+    val referenceLinePointRelativePosition get() = Vector3D(0.0, tStart, zOffsetStart)
 
     // Methods
     fun isContinuous() = distance == 0.0
@@ -72,30 +80,35 @@ data class RoadObjectsObjectRepeat(
     fun getObjectHeightFunction() = LinearFunction.ofInclusiveInterceptAndPoint(heightStart, length, heightEnd)
     fun getObjectRadiusFunction() = LinearFunction.ofInclusiveInterceptAndPoint(radiusStart, length, radiusEnd)
 
-    fun isSet() = isParametricSweep() || isCurve() || isHorizontalParametricBoundedSurface() || isVerticalParametricBoundedSurface() ||
-        isRepeatedCuboid() || isRepeatCylinder()
-
-    fun isParametricSweep() = isContinuous() &&
+    fun containsParametricSweep() = isContinuous() &&
         isLengthNonZero() &&
         isObjectWidthNonZero() && isObjectHeightNonZero()
 
-    fun isCurve() = isContinuous() &&
+    fun containsCurve() = isContinuous() &&
         isLengthNonZero() &&
         isObjectWidthZero() && isObjectHeightZero()
 
-    fun isHorizontalParametricBoundedSurface() = isContinuous() &&
+    fun containsHorizontalParametricBoundedSurface() = isContinuous() &&
         isLengthNonZero() &&
         isObjectWidthNonZero() && isObjectHeightZero()
 
-    fun isVerticalParametricBoundedSurface() = isContinuous() &&
+    fun containsVerticalParametricBoundedSurface() = isContinuous() &&
         isLengthNonZero() &&
         isObjectWidthZero() && isObjectHeightNonZero()
 
-    fun isRepeatedCuboid() = isDiscrete() &&
+    fun containsRepeatedCuboid() = isDiscrete() &&
         isLengthNonZero() &&
         isObjectHeightNonZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
 
-    fun isRepeatCylinder() = isDiscrete() &&
+    fun containsRepeatedRectangle() = isDiscrete() &&
+        isLengthNonZero() &&
+        isObjectHeightZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
+
+    fun containsRepeatCylinder() = isDiscrete() &&
+        isLengthNonZero() &&
+        isObjectHeightNonZero() && isObjectRadiusNonZero()
+
+    fun containsRepeatCircle() = isDiscrete() &&
         isLengthNonZero() &&
         isObjectHeightNonZero() && isObjectRadiusNonZero()
 

@@ -35,6 +35,7 @@ import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.solid.Polyhedron3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.linear.dimensionOfSpan
+import io.rtron.math.processing.isClockwiseOrdered
 import io.rtron.math.processing.triangulation.Triangulator
 import io.rtron.math.range.Tolerable
 import io.rtron.model.opendrive.additions.identifier.RoadObjectOutlineIdentifier
@@ -275,7 +276,16 @@ object Polyhedron3DFactory {
             GeometryBuilderException.ColinearOutlineElementsForPolyhedron(outlineId).left().bind<ContextMessageList<NonEmptyList<VerticalOutlineElement>>>()
         }
 
-        val elements: ContextMessageList<NonEmptyList<VerticalOutlineElement>> = cleanedElements
+        // if the outline elements are ordered clockwise yielding a wrong polygon orientation
+        val projectedBasePoints = cleanedElements.map { it.basePoint.toVector2D(Vector3D.Z_AXIS) }
+        val orderedElements = if (projectedBasePoints.distinct().size > 2 && projectedBasePoints.isClockwiseOrdered()) {
+            messageList += DefaultMessage.of("IncorrectOutlineOrientation", "Outline elements are ordered clockwise but should be ordered counter-clockwise.", outlineId, Severity.ERROR, wasFixed = true)
+            cleanedElements.reversed()
+        } else {
+            cleanedElements
+        }
+
+        val elements: ContextMessageList<NonEmptyList<VerticalOutlineElement>> = orderedElements
             .zipWithConsecutivesEnclosing { it.basePoint }
             .map { VerticalOutlineElement.of(it, tolerance) }
             .mergeMessageLists()

@@ -17,6 +17,7 @@
 package io.rtron.model.roadspaces.identifier
 
 import arrow.core.Option
+import arrow.core.getOrElse
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 
@@ -29,19 +30,25 @@ import io.rtron.model.roadspaces.roadspace.attribute.attributes
  */
 data class RoadspaceObjectIdentifier(
     val roadspaceObjectId: String,
+    val roadspaceObjectRepeatIndex: Option<Int>,
     val roadspaceObjectName: Option<String>,
     val roadspaceIdentifier: RoadspaceIdentifier
 ) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface by roadspaceIdentifier {
 
     // Properties and Initializers
-    val hashKey get() = "RoadspaceObject_${roadspaceObjectId}_${roadspaceIdentifier.roadspaceId}"
+    val hashKey get() = "RoadspaceObject_${roadspaceObjectId}_${roadspaceObjectRepeatIndex}_${roadspaceIdentifier.roadspaceId}"
 
     // Conversions
     override fun toAttributes(prefix: String): AttributeList {
         val roadspaceObjectIdentifier = this
         return attributes(prefix) {
             attribute("roadObjectId", roadspaceObjectIdentifier.roadspaceObjectId)
-            attribute("roadObjectName", roadspaceObjectIdentifier.roadspaceObjectName)
+            roadspaceObjectIdentifier.roadspaceObjectRepeatIndex.tap {
+                attribute("roadObjectRepeatIndex", it)
+            }
+            roadspaceObjectIdentifier.roadspaceObjectName.tap {
+                attribute("roadObjectName", it)
+            }
         } + roadspaceObjectIdentifier.roadspaceIdentifier.toAttributes(prefix)
     }
 
@@ -50,6 +57,9 @@ data class RoadspaceObjectIdentifier(
 
     // Conversions
     override fun toIdentifierText(): String {
-        return "RoadspaceObjectIdentifier(roadspaceObjectId=$roadspaceObjectId, roadspaceId=$roadspaceId)"
+        val repeatIndex: String = roadspaceObjectRepeatIndex.map { " roadspaceObjectRepeatIndex=$it," }.getOrElse { "" }
+        val objectName: String = roadspaceObjectName.map { " roadspaceObjectName=$it," }.getOrElse { "" }
+
+        return "RoadspaceObjectIdentifier(roadspaceObjectId=$roadspaceObjectId,$repeatIndex$objectName roadspaceId=$roadspaceId)"
     }
 }
