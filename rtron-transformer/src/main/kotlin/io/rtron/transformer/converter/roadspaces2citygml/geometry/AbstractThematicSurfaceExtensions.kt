@@ -26,7 +26,7 @@ fun AbstractThematicSurface.populateLod2MultiSurfaceOrLod0Geometry(geometryTrans
     val lod2MultiSurfaceError = populateLod2MultiSurface(geometryTransformer).fold({ it }, { return it.right() })
     val lod0GeometryError = populateLod0Geometry(geometryTransformer).fold({ it }, { return it.right() })
 
-    return GeometryTransformerException.NoSuiteableSourceGeometry("No suitable source geometry found for populating the LOD2 multi surface (${lod2MultiSurfaceError.message}) or LOD0 geometry (${lod0GeometryError.message}) of the abstract thematic surface.").left()
+    return GeometryTransformerException.NoSuiteableSourceGeometry("LOD2 multi surface or LOD0 geometry of the abstract thematic surface.").left()
 }
 
 /**

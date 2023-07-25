@@ -97,7 +97,7 @@ object Solid3DBuilder {
             .map { buildPolyhedronByRoadCorners(it, roadReferenceLine, numberTolerance) }
             .separateEither()
 
-        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
+        messageList += builderExceptions.map { DefaultMessage.of("PolyhedronNotConstructableFromRoadCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
         val polyhedrons = polyhedronsWithContext.handleMessageList { messageList += it.messageList }
 
         return ContextMessageList(polyhedrons, messageList)
@@ -155,7 +155,7 @@ object Solid3DBuilder {
             .separateEither()
 
         messageList += builderExceptions
-            .map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }
+            .map { DefaultMessage.of("PolyhedronNotConstructableFromLocalCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }
             .mergeToReport()
         val polyhedrons = polyhedronsWithContext
             .handleMessageList { messageList += it.messageList }

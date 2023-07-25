@@ -163,7 +163,7 @@ class GenericsModuleBuilder(
             .also { abstractGeometry.accept(it) }
         // geometry
         genericLogicalSpaceFeature.populateLod2Geometry(geometryTransformer)
-            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForLogicalOccupiedSpaceFeatureLod2", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(genericLogicalSpaceFeature, messageList)
     }

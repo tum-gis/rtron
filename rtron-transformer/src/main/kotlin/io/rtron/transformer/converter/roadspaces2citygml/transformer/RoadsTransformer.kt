@@ -182,13 +182,13 @@ class RoadsTransformer(
     private fun addSingleLane(id: LaneIdentifier, road: Road, longitudinalFillerSurfaces: List<LongitudinalFillerSurface>, relatedObjects: List<RoadspaceObject>, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         val lane = road.getLane(id)
-            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
+            .getOrElse { messageList += DefaultMessage.of("LaneNotConstructable", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val surface = road.getLaneSurface(id, parameters.discretizationStepSize)
-            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
+            .getOrElse { messageList += DefaultMessage.of("LaneSurfaceNotConstructable", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val centerLine = road.getCurveOnLane(id, 0.5)
-            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
+            .getOrElse { messageList += DefaultMessage.of("CenterLineNotConstructable", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
         val lateralFillerSurface = road.getLateralFillerSurface(id, parameters.discretizationStepSize)
-            .getOrElse { messageList += DefaultMessage.of("", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
+            .getOrElse { messageList += DefaultMessage.of("LateralFillerSurfaceNotConstructable", "${it.message} Ignoring lane.", id, Severity.WARNING, wasFixed = true); return messageList }
 
         messageList += when (LaneRouter.route(lane)) {
             LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
@@ -228,7 +228,7 @@ class RoadsTransformer(
     private fun addRoadMarkings(id: LaneIdentifier, road: Road, dstTransportationSpace: AbstractTransportationSpace): DefaultMessageList {
         val messageList = DefaultMessageList()
         road.getRoadMarkings(id, parameters.discretizationStepSize)
-            .handleLeftAndFilter { messageList += DefaultMessage.of("", it.value.message!!, id, Severity.WARNING, wasFixed = true) }
+            .handleLeftAndFilter { messageList += DefaultMessage.of("RoadMarkingNotConstructable", it.value.message!!, id, Severity.WARNING, wasFixed = true) }
             .forEachIndexed { index, (roadMarking, geometry) ->
                 messageList += transportationModuleBuilder.addMarkingFeature(id, index, roadMarking, geometry, dstTransportationSpace)
             }

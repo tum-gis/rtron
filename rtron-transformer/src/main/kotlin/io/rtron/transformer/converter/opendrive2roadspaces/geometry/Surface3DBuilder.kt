@@ -92,7 +92,7 @@ object Surface3DBuilder {
             .map { buildLinearRingByRoadCorners(it, referenceLine, numberTolerance) }
             .separateEither()
 
-        messageList += builderExceptions.map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
+        messageList += builderExceptions.map { DefaultMessage.of("LinearRingNotConstructableFromRoadCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
         val linearRings = linearRingsWithContext.handleMessageList { messageList += it.messageList }
 
         return ContextMessageList(linearRings, messageList)
@@ -138,7 +138,7 @@ object Surface3DBuilder {
             .separateEither()
 
         messageList += builderExceptions
-            .map { DefaultMessage.of("", it.message, it.location, Severity.WARNING, wasFixed = true) }
+            .map { DefaultMessage.of("LinearRingNotConstructableFromLocalCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }
             .mergeToReport()
         val linearRings = linearRingsWithContext
             .handleMessageList { messageList += it.messageList }

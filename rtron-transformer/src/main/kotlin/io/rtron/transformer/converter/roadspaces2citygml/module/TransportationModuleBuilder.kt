@@ -199,7 +199,7 @@ class TransportationModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
             trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-                .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+                .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForTrafficAreaLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
             // semantics
             IdentifierAdder.addIdentifier(roadspaceObject.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), trafficAreaFeature)
@@ -225,7 +225,7 @@ class TransportationModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
             auxiliaryTrafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-                .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+                .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForAuxiliaryTrafficAreaLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
             // semantics
             IdentifierAdder.addIdentifier(roadspaceObject.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix), auxiliaryTrafficAreaFeature)
@@ -247,7 +247,7 @@ class TransportationModuleBuilder(
         // geometry
         val geometryTransformer = GeometryTransformer(parameters).also { geometry.accept(it) }
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
-            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForMarkingLod2", it.message, id, Severity.WARNING, wasFixed = true) }
 
         // semantics
         IdentifierAdder.addIdentifier(id.deriveRoadMarkingGmlIdentifier(parameters.gmlIdPrefix, roadMarkingIndex), "RoadMarking", markingFeature)
@@ -266,7 +266,7 @@ class TransportationModuleBuilder(
         roadspaceObject.complexGeometry.tap { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
-                .onLeft { messageList += DefaultMessage.of("", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+                .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForMarkingLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
         }
 
         // semantics
@@ -298,7 +298,7 @@ class TransportationModuleBuilder(
             .also { abstractGeometry.accept(it) }
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
         trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForTrafficAreaLod2", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(trafficAreaFeature, messageList)
     }
@@ -312,7 +312,7 @@ class TransportationModuleBuilder(
 
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
         auxiliaryTrafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
-            .onLeft { messageList += DefaultMessage.of("", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForAuxiliaryTrafficAreaLod2", it.message, id, Severity.WARNING, wasFixed = true) }
 
         return ContextMessageList(auxiliaryTrafficAreaFeature, messageList)
     }
