@@ -75,9 +75,9 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
     private val sweepDiscretizationStepSize by option(help = "distance between each discretization step for solid geometries of ParametricSweep3D").double()
-            .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
+        .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
     private val circleSlices by option(help = "number of discretization points for a circle or cylinder").int()
-            .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
+        .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
     private val generateRandomGeometryIds by option(help = "true, if random ids shall be generated for the gml geometries").flag()
     private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed").flag()
 
