@@ -19,7 +19,6 @@ package io.rtron.cli
 import arrow.core.toOption
 import com.charleskorn.kaml.Yaml
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
@@ -42,10 +41,6 @@ import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdde
 class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml", help = "Transform OpenDRIVE datasets to CityGML.", printHelpOnEmptyArgs = true) {
 
     // Properties and Initializers
-    init {
-        context { helpFormatter = ColorFormatter() }
-    }
-
     private val parametersPath by option(
         help = "Path to a YAML file containing the parameters of the process."
     ).path(mustExist = true)
@@ -64,13 +59,13 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     private val tolerance by option(help = "allowed tolerance when comparing double values").double()
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
     private val planViewGeometryDistanceTolerance by option(help = "allowed distance tolerance between two geometry elements in the plan view").double()
-        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE)
+            .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE)
     private val planViewGeometryDistanceWarningTolerance by option(help = "warning distance tolerance between two geometry elements in the plan view").double()
-        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE)
+            .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE)
     private val planViewGeometryAngleTolerance by option(help = "allowed angle tolerance between two geometry elements in the plan view").double()
-        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE)
+            .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE)
     private val planViewGeometryAngleWarningTolerance by option(help = "warning angle tolerance between two geometry elements in the plan view").double()
-        .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
+            .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
     private val addOffset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
@@ -78,11 +73,11 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset (experimental)").double().pair().multiple(default = emptyList())
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
-        .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
+            .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
     private val sweepDiscretizationStepSize by option(help = "distance between each discretization step for solid geometries of ParametricSweep3D").double()
-        .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
+            .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
     private val circleSlices by option(help = "number of discretization points for a circle or cylinder").int()
-        .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
+            .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
     private val generateRandomGeometryIds by option(help = "true, if random ids shall be generated for the gml geometries").flag()
     private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed").flag()
 

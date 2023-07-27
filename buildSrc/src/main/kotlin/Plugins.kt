@@ -22,7 +22,7 @@ object PluginVersions {
     const val versionChecker = "0.47.0"
     const val dokka = "1.8.20"
     const val serialization = "1.9.0"
-    const val ksp = "1.9.0-1.0.11"
+    const val ksp = "1.9.0-1.0.12"
 }
 
 object Plugins {

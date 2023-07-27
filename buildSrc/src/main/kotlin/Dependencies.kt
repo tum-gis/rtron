@@ -18,11 +18,11 @@
 object DependencyVersions {
     // standard libraries
     const val kotlin = "1.9.0"
-    const val coroutines = "1.7.2"
+    const val coroutines = "1.7.3"
     const val arrow = "1.1.5"
 
     // testing libraries
-    const val junit = "5.9.3"
+    const val junit = "5.10.0"
     const val assertj = "3.24.2"
     const val mockk = "1.13.5"
 
@@ -41,13 +41,13 @@ object DependencyVersions {
     const val mapstruct = "1.5.5.Final"
 
     // io libraries
-    const val clikt = "3.5.2"
+    const val clikt = "4.1.0"
     const val mordant = "1.2.1"
     const val commonsIO = "2.13.0"
     const val commonsCSV = "1.10.0"
     const val commonsLang = "3.12.0"
     const val commonsCompress = "1.23.0"
-    const val zstdJni = "1.5.5-4"
+    const val zstdJni = "1.5.5-5"
     const val emojiJava = "5.1.1"
 
     // math libraries
