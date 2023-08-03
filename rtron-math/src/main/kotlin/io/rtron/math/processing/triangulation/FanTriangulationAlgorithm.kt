@@ -23,6 +23,7 @@ import arrow.core.nonEmptyListOf
 import arrow.core.right
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
+import io.rtron.math.processing.isColinear
 
 /**
  * Fan triangulation algorithm by simply selecting a base vertex and generating the triangles by iterating over
@@ -38,6 +39,7 @@ class FanTriangulationAlgorithm : TriangulationAlgorithm() {
 
         val polygons = vertices.tail
             .zipWithNext()
+            .filter { !listOf(vertices.head, it.first, it.second).isColinear(tolerance) }
             .map { Polygon3D(nonEmptyListOf(vertices.head, it.first, it.second), tolerance) }
 
         return polygons.right()
