@@ -23,6 +23,7 @@ import io.rtron.model.citygml.code.AuxiliaryTrafficAreaFunctionCode
 import io.rtron.model.citygml.code.TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode
 import io.rtron.model.citygml.code.TrafficAreaFunctionCode
 import io.rtron.model.citygml.code.TrafficAreaUsageCode
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.LaneType
 
@@ -141,5 +142,68 @@ object CodeAdder {
             in "GRASS" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.GRASS.some()
             in "SPEC_CONCRETE_3D" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.GRASS.some()
             else -> None
+        }
+
+    fun mapToTrafficAreaFunctionCodes(roadObjectType: RoadObjectType): List<TrafficAreaFunctionCode> =
+        when (roadObjectType) {
+            RoadObjectType.NONE -> emptyList()
+            RoadObjectType.OBSTACLE -> emptyList()
+            RoadObjectType.POLE -> emptyList()
+            RoadObjectType.TREE -> emptyList()
+            RoadObjectType.VEGETATION -> emptyList()
+            RoadObjectType.BARRIER -> emptyList()
+            RoadObjectType.BUILDING -> emptyList()
+            RoadObjectType.PARKING_SPACE -> listOf(TrafficAreaFunctionCode.PARKING_LAY_BY)
+            RoadObjectType.PATCH -> emptyList()
+            RoadObjectType.RAILING -> emptyList()
+            RoadObjectType.TRAFFIC_ISLAND -> emptyList()
+            RoadObjectType.CROSSWALK -> listOf(TrafficAreaFunctionCode.CROSSWALK)
+            RoadObjectType.STREET_LAMP -> emptyList()
+            RoadObjectType.GANTRY -> emptyList()
+            RoadObjectType.SOUND_BARRIER -> emptyList()
+            RoadObjectType.ROAD_MARK -> emptyList()
+            RoadObjectType.SIGNAL -> emptyList()
+        }
+
+    fun mapToAuxiliaryTrafficAreaFunctionCodes(roadObjectType: RoadObjectType): List<AuxiliaryTrafficAreaFunctionCode> =
+        when (roadObjectType) {
+            RoadObjectType.NONE -> emptyList()
+            RoadObjectType.OBSTACLE -> emptyList()
+            RoadObjectType.POLE -> emptyList()
+            RoadObjectType.TREE -> emptyList()
+            RoadObjectType.VEGETATION -> emptyList()
+            RoadObjectType.BARRIER -> emptyList()
+            RoadObjectType.BUILDING -> emptyList()
+            RoadObjectType.PARKING_SPACE -> listOf(AuxiliaryTrafficAreaFunctionCode.PARKING_BAY)
+            RoadObjectType.PATCH -> emptyList()
+            RoadObjectType.RAILING -> emptyList()
+            RoadObjectType.TRAFFIC_ISLAND -> listOf(AuxiliaryTrafficAreaFunctionCode.TRAFFIC_ISLAND)
+            RoadObjectType.CROSSWALK -> emptyList()
+            RoadObjectType.STREET_LAMP -> emptyList()
+            RoadObjectType.GANTRY -> emptyList()
+            RoadObjectType.SOUND_BARRIER -> emptyList()
+            RoadObjectType.ROAD_MARK -> emptyList()
+            RoadObjectType.SIGNAL -> emptyList()
+        }
+
+    fun mapToTrafficAreaUsageCodes(roadObjectType: RoadObjectType): List<TrafficAreaUsageCode> =
+        when (roadObjectType) {
+            RoadObjectType.NONE -> emptyList()
+            RoadObjectType.OBSTACLE -> emptyList()
+            RoadObjectType.POLE -> emptyList()
+            RoadObjectType.TREE -> emptyList()
+            RoadObjectType.VEGETATION -> emptyList()
+            RoadObjectType.BARRIER -> emptyList()
+            RoadObjectType.BUILDING -> emptyList()
+            RoadObjectType.PARKING_SPACE -> listOf(TrafficAreaUsageCode.CAR)
+            RoadObjectType.PATCH -> emptyList()
+            RoadObjectType.RAILING -> emptyList()
+            RoadObjectType.TRAFFIC_ISLAND -> emptyList()
+            RoadObjectType.CROSSWALK -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
+            RoadObjectType.STREET_LAMP -> emptyList()
+            RoadObjectType.GANTRY -> emptyList()
+            RoadObjectType.SOUND_BARRIER -> emptyList()
+            RoadObjectType.ROAD_MARK -> emptyList()
+            RoadObjectType.SIGNAL -> emptyList()
         }
 }

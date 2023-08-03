@@ -220,7 +220,7 @@ class LaneBuilder(
             attribute("_curvePositionStart", roadMark.sOffset)
             attribute("_width", roadMark.width)
             attribute("_type", roadMark.typeAttribute.toString())
-            attribute("_weight", roadMark.weight.toString())
+            attribute("_weight", roadMark.weight.map { it.toString() })
             attribute("_color", roadMark.color.toString())
             attribute("_material", roadMark.material)
         }

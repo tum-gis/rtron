@@ -131,7 +131,7 @@ class RoadspaceBuilder(
         attributes("${parameters.attributesPrefix}road_") {
             attribute("length", road.length)
             attribute("junction", road.getJunctionOption())
-            attribute("rule", road.rule.toString())
+            attribute("rule", road.rule.map { it.toString() })
 
             road.link.tap { roadLink ->
                 roadLink.predecessor.tap { predecessor ->

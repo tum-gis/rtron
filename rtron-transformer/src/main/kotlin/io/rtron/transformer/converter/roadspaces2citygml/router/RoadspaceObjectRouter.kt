@@ -66,7 +66,7 @@ object RoadspaceObjectRouter {
             RoadObjectType.VEGETATION -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
             RoadObjectType.BARRIER -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.BUILDING -> CitygmlTargetFeatureType.BUILDING_BUILDING
-            RoadObjectType.PARKING_SPACE -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
+            RoadObjectType.PARKING_SPACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             RoadObjectType.PATCH -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.RAILING -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.TRAFFIC_ISLAND -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
