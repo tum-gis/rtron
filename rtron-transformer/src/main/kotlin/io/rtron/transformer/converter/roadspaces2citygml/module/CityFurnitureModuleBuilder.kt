@@ -23,9 +23,9 @@ import io.rtron.io.messages.Severity
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1ImplicitGeometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
-import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod3Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.messages.roadspaces.of
 import org.citygml4j.core.model.cityfurniture.CityFurniture
@@ -51,14 +51,14 @@ class CityFurnitureModuleBuilder(
 
         roadspaceObject.boundingBoxGeometry.tap { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
-            cityFurnitureFeature.populateLod2Geometry(geometryTransformer)
-                .mapLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+            cityFurnitureFeature.populateLod1Geometry(geometryTransformer)
+                .mapLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod1", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
         }
 
         roadspaceObject.complexGeometry.tap { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
-            cityFurnitureFeature.populateLod3Geometry(geometryTransformer)
-                .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod3", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+            cityFurnitureFeature.populateLod2Geometry(geometryTransformer)
+                .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
 
             geometryTransformer.rotation.tap {
                 attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
