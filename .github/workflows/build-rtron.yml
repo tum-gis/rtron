@@ -48,6 +48,7 @@ jobs:
         if: matrix.os == 'ubuntu'
       - name: "Build documentation"
         run: ./gradlew dokkaHtmlMultiModule --no-daemon
+        if: matrix.os == 'ubuntu'
       - name: "Build uber JAR with Gradle"
         run: ./gradlew shadowJar
       - name: "Sanity testing: Validation test runs"
