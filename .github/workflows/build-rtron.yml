@@ -8,11 +8,27 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu', 'macos', 'windows']
-        java: [ '11', '17' ]
-        distribution: [ 'temurin', 'zulu' ]
-        exclude:
-          - os: macos
+        java: [ '17' ]
+        distribution: [ 'temurin' ]
+        include:
+          - os: 'ubuntu'
+            java: '11'
+            distribution: 'temurin'
+         # - os: 'ubuntu'
+         #   java: '20'
+         #   distribution: 'temurin'
+          - os: 'ubuntu'
+            java: '17'
             distribution: 'zulu'
+          - os: 'ubuntu'
+            java: '17'
+            distribution: 'microsoft'
+          - os: 'ubuntu'
+            java: '17'
+            distribution: 'corretto'
+          - os: 'windows'
+            java: '17'
+            distribution: 'oracle'
       fail-fast: false
 
     steps:
@@ -32,7 +48,6 @@ jobs:
         if: matrix.os == 'ubuntu'
       - name: "Build documentation"
         run: ./gradlew dokkaHtmlMultiModule --no-daemon
-
       - name: "Build uber JAR with Gradle"
         run: ./gradlew shadowJar
       - name: "Sanity testing: Validation test runs"
