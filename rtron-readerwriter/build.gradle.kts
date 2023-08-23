@@ -1,3 +1,4 @@
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 
@@ -104,6 +105,11 @@ tasks.named<Jar>("sourcesJar") {
 tasks.named<org.gradle.jvm.tasks.Jar>("kotlinSourcesJar") {
     dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+tasks.withType<DokkaTaskPartial> {
+    dependsOn("${ProjectComponents.readerWriter}:kaptKotlin")
+    dependsOn("${ProjectComponents.readerWriter}:xjcGeneration")
 }
 
 tasks.withType<KtLintCheckTask> {

@@ -30,6 +30,8 @@ jobs:
       - name: "Test local publishing"
         run: ./gradlew build publishToMavenLocal -Pskip.signing
         if: matrix.os == 'ubuntu'
+      - name: "Build documentation"
+        run: ./gradlew dokkaHtmlMultiModule --no-daemon
 
       - name: "Build uber JAR with Gradle"
         run: ./gradlew shadowJar
