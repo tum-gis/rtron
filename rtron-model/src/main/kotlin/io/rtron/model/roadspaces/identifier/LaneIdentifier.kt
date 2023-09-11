@@ -36,6 +36,12 @@ data class LaneIdentifier(
     val hashKey get() = "Lane_${laneId}_${laneSectionIdentifier.laneSectionId}_${laneSectionIdentifier.roadspaceIdentifier.roadspaceId}"
 
     // Methods
+    fun getRoadSide(): RoadSide = when {
+        laneId > 0 -> RoadSide.LEFT
+        laneId == 0 -> RoadSide.CENTER
+        else -> RoadSide.RIGHT
+    }
+
     fun isLeft() = laneId > 0
     fun isCenter() = laneId == 0
     fun isRight() = laneId < 0

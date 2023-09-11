@@ -16,7 +16,9 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
@@ -51,6 +53,24 @@ data class Lane(
     // Properties and Initializers
     init {
         require(id.isLeft() || id.isRight()) { "Identifier must be either for a left or right lane." }
+    }
+
+    // Methods
+    fun getLaneChange(): Option<LaneChange> {
+        if (roadMarkings.isEmpty()) {
+            return None
+        }
+
+        val laneChangeSet = roadMarkings.map { it.laneChange }.toSet()
+        val combinedLaneChange = when {
+            laneChangeSet.size == 1 -> laneChangeSet.first()
+            laneChangeSet.contains(LaneChange.BOTH) -> LaneChange.BOTH
+            laneChangeSet.contains(LaneChange.INCREASE) && laneChangeSet.contains(LaneChange.DECREASE) -> LaneChange.BOTH
+            laneChangeSet.contains(LaneChange.INCREASE) -> LaneChange.INCREASE
+            laneChangeSet.contains(LaneChange.DECREASE) -> LaneChange.DECREASE
+            else -> LaneChange.NONE
+        }
+        return Some(combinedLaneChange)
     }
 }
 

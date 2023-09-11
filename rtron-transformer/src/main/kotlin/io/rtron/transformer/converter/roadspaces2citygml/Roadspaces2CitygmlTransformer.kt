@@ -19,6 +19,7 @@ package io.rtron.transformer.converter.roadspaces2citygml
 import arrow.core.Option
 import arrow.core.flattenOption
 import arrow.core.getOrElse
+import arrow.core.toOption
 import io.rtron.io.logging.ProgressBar
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessageList
@@ -26,7 +27,11 @@ import io.rtron.io.messages.mergeMessageLists
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
+import io.rtron.model.roadspaces.identifier.opposite
+import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneChange
 import io.rtron.std.getValueEither
+import io.rtron.transformer.converter.roadspaces2citygml.module.RelationAdder
 import io.rtron.transformer.converter.roadspaces2citygml.report.Roadspaces2CitygmlReport
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadsTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadspaceObjectTransformer
@@ -37,6 +42,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.transportation.Road
+import org.citygml4j.core.model.transportation.TrafficSpaceProperty
 import org.citygml4j.core.model.transportation.TrafficSpaceReference
 import org.xmlobjects.gml.model.feature.BoundingShape
 import org.xmlobjects.gml.model.geometry.Envelope
@@ -55,6 +61,7 @@ class Roadspaces2CitygmlTransformer(
 
     private val roadObjectTransformer = RoadspaceObjectTransformer(parameters)
     private val roadLanesTransformer = RoadsTransformer(parameters)
+    private val relationAdder = RelationAdder(parameters)
 
     // Methods
 
@@ -173,26 +180,57 @@ class Roadspaces2CitygmlTransformer(
             dstTransportationSpaces.flatMap { it.sections }.filter { it.isSetObject }.flatMap { it.`object`.trafficSpaces } +
             dstTransportationSpaces.flatMap { it.intersections }.filter { it.isSetObject }.flatMap { it.`object`.trafficSpaces }
         // TODO: trace the traffic space created without id
-        val trafficSpacePropertiesAdjusted = trafficSpaceProperties.filter { it.`object`.id != null }
+        val trafficSpacePropertyMap: Map<String, TrafficSpaceProperty> = trafficSpaceProperties
+            .filter { it.`object`.id != null }
+            .associateBy { it.`object`.id }
 
-        val lanesMap = roadspacesModel.getAllLeftRightLanes().associateBy { it.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix) }
-        trafficSpacePropertiesAdjusted.forEach { currentTrafficSpace ->
-            val currentLane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrElse { return@forEach }
+        val lanesMap: Map<String, Lane> = roadspacesModel
+            .getAllLeftRightLanes()
+            .associateBy { it.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix) }
+        trafficSpacePropertyMap.values.forEach { currentTrafficSpace ->
+            val currentLane: Lane = lanesMap.getValueEither(currentTrafficSpace.`object`.id).getOrElse { return@forEach }
+
+            // predecessor
             val predecessorLaneIds =
                 if (currentLane.id.isForward()) {
                     roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
                 } else {
                     roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
                 }
+            currentTrafficSpace.`object`.predecessors = predecessorLaneIds
+                .map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }
+
+            // successor
             val successorLaneIds =
                 if (currentLane.id.isForward()) {
                     roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
                 } else {
                     roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
                 }
+            currentTrafficSpace.`object`.successors = successorLaneIds
+                .map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }
 
-            currentTrafficSpace.`object`.predecessors = predecessorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }
-            currentTrafficSpace.`object`.successors = successorLaneIds.map { TrafficSpaceReference(parameters.xlinkPrefix + it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)) }
+            // lateral lane changes
+            val outerLaneId = currentLane.id.getAdjacentOuterLaneIdentifier()
+            val outerLaneGmlId = outerLaneId.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)
+            val outerLaneOptional = lanesMap[outerLaneGmlId].toOption()
+            val outerTrafficSpaceOptional = trafficSpacePropertyMap[outerLaneGmlId].toOption()
+
+            if (outerLaneOptional.isDefined() && outerTrafficSpaceOptional.isDefined()) {
+                val outerLane = outerLaneOptional.getOrElse { throw IllegalStateException("OuterLane must exist.") }
+                val outerTrafficSpace = outerTrafficSpaceOptional.getOrElse { throw IllegalStateException("OuterTrafficSpace must exist") }
+
+                val laneChangeType = currentLane.getLaneChange().getOrElse { LaneChange.BOTH }
+
+                val laneChangeDirection = currentLane.id.getRoadSide()
+
+                if (laneChangeType == LaneChange.BOTH || laneChangeType == LaneChange.INCREASE) {
+                    relationAdder.addLaneChangeRelation(outerLane, laneChangeDirection, currentTrafficSpace.`object`)
+                }
+                if (laneChangeType == LaneChange.BOTH || laneChangeType == LaneChange.DECREASE) {
+                    relationAdder.addLaneChangeRelation(currentLane, laneChangeDirection.opposite(), outerTrafficSpace.`object`)
+                }
+            }
         }
     }
 

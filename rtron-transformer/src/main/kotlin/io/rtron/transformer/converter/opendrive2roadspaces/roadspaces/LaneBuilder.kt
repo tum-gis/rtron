@@ -34,6 +34,7 @@ import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
 import io.rtron.math.range.length
 import io.rtron.math.std.fuzzyEquals
+import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLane
@@ -45,6 +46,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.CenterLane
 import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneChange
 import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.isStrictlySortedBy
@@ -221,11 +223,19 @@ class LaneBuilder(
             attribute("_width", roadMark.width)
             attribute("_type", roadMark.typeAttribute.toString())
             attribute("_weight", roadMark.weight.map { it.toString() })
+            attribute("_laneChange", roadMark.laneChange.map { it.toString() })
             attribute("_color", roadMark.color.toString())
             attribute("_material", roadMark.material)
         }
 
-        return RoadMarking(width, attributes)
+        val laneChange = when (roadMark.laneChange.getOrElse { ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH }) {
+            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.INCREASE -> LaneChange.INCREASE
+            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.DECREASE -> LaneChange.DECREASE
+            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH -> LaneChange.BOTH
+            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE -> LaneChange.NONE
+        }
+
+        return RoadMarking(width, laneChange, attributes)
     }
 
     private fun buildLaneMaterial(laneMaterials: List<RoadLanesLaneSectionLRLaneMaterial>): Option<LaneMaterial> {

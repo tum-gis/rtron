@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package io.rtron.model.roadspaces.roadspace.road
+package io.rtron.model.roadspaces.identifier
 
-import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
-import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
+enum class RoadSide {
+    LEFT,
+    CENTER,
+    RIGHT
+}
 
-/**
- * Represents a single road marking.
- *
- * @param width lateral width of the road marking
- * @param attributes further information attributes
- */
-data class RoadMarking(
-    val width: ConstantFunction,
-    val laneChange: LaneChange,
-    val attributes: AttributeList
-) {
-
-    // Properties and Initializers
-    init {
-        require(width.domain.isNotEmpty()) { "The domain of the road marking's width must not be empty." }
-    }
+fun RoadSide.opposite() = when (this) {
+    RoadSide.LEFT -> RoadSide.RIGHT
+    RoadSide.CENTER -> RoadSide.CENTER
+    RoadSide.RIGHT -> RoadSide.LEFT
 }

@@ -18,7 +18,9 @@ package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.RoadSide
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
+import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
@@ -26,6 +28,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTraff
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.core.CityObjectRelation
 import org.citygml4j.core.model.core.CityObjectRelationProperty
+import org.citygml4j.core.model.transportation.TrafficSpace
 import org.xmlobjects.gml.model.basictypes.Code
 
 /**
@@ -55,6 +58,20 @@ class RelationAdder(
 
     fun addBelongToRelations(roadspaceObject: RoadspaceObject, dstCityObject: AbstractCityObject) {
         dstCityObject.relatedTo = roadspaceObject.laneRelations.flatMap { it.getAllLeftRightLaneIdentifiers() }.map { createCityObjectRelation(it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), "belongsTo", it) }
+    }
+
+    /**
+     * Adds a lane change relation to the [dstTrafficSpace] object
+     */
+    fun addLaneChangeRelation(lane: Lane, direction: RoadSide, dstTrafficSpace: TrafficSpace) {
+        val gmlId = lane.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)
+        val relationType = when (direction) {
+            RoadSide.LEFT -> "leftLaneChange"
+            RoadSide.RIGHT -> "rightLaneChange"
+            RoadSide.CENTER -> throw IllegalArgumentException("Direction of a laneChange relation must not be center.")
+        }
+        val relation: CityObjectRelationProperty = createCityObjectRelation(gmlId, relationType, lane.id)
+        dstTrafficSpace.relatedTo.add(relation)
     }
 
     private fun createCityObjectRelation(gmlId: String, type: String, id: AbstractRoadspacesIdentifier): CityObjectRelationProperty {

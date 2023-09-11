@@ -16,23 +16,6 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
-import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
-import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
-
-/**
- * Represents a single road marking.
- *
- * @param width lateral width of the road marking
- * @param attributes further information attributes
- */
-data class RoadMarking(
-    val width: ConstantFunction,
-    val laneChange: LaneChange,
-    val attributes: AttributeList
-) {
-
-    // Properties and Initializers
-    init {
-        require(width.domain.isNotEmpty()) { "The domain of the road marking's width must not be empty." }
-    }
+enum class LaneChange {
+    BOTH, DECREASE, INCREASE, NONE
 }
