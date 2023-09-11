@@ -16,16 +16,13 @@
 
 package io.rtron.math.linear
 
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class RealVectorUtilsTest {
+class RealVectorUtilsTest : FunSpec({
+    context("TestDimensionOfSpan") {
 
-    @Nested
-    inner class TestDimensionOfSpan {
-        @Test
-        fun `two linearly independent and one dependent vector should have a span's dimension of 2`() {
+        test("two linearly independent and one dependent vector should have a span's dimension of 2") {
             val vectorA = RealVector(doubleArrayOf(1.0, -2.0, 1.0))
             val vectorB = RealVector(doubleArrayOf(2.0, 3.0, 0.0)) // 2*B = A + C
             val vectorC = RealVector(doubleArrayOf(3.0, 8.0, -1.0))
@@ -36,8 +33,7 @@ internal class RealVectorUtilsTest {
             assertThat(actualSpan).isEqualTo(2)
         }
 
-        @Test
-        fun `four linearly independent vectors should have a span's dimension of 4`() {
+        test("four linearly independent vectors should have a span's dimension of 4") {
             val vectorA = RealVector(doubleArrayOf(1.0, 0.0, 0.0, 0.0))
             val vectorB = RealVector(doubleArrayOf(0.0, 1.0, 0.0, 0.0))
             val vectorC = RealVector(doubleArrayOf(0.0, 0.0, 1.0, 0.0))
@@ -49,8 +45,7 @@ internal class RealVectorUtilsTest {
             assertThat(actualSpan).isEqualTo(4)
         }
 
-        @Test
-        fun `no vector should have a span's dimension of 0`() {
+        test("no vector should have a span's dimension of 0") {
             val rowVectors = emptyList<RealVector>()
 
             val actualSpan = rowVectors.dimensionOfSpan()
@@ -58,4 +53,4 @@ internal class RealVectorUtilsTest {
             assertThat(actualSpan).isEqualTo(0)
         }
     }
-}
+})

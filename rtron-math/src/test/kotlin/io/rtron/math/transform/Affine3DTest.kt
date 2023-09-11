@@ -16,6 +16,9 @@
 
 package io.rtron.math.transform
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.linear.RealMatrix
@@ -24,43 +27,35 @@ import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import kotlin.math.cos
 import kotlin.math.sin
 import org.joml.Matrix4d as JOMLMatrix4d
 
-internal class Affine3DTest {
+class Affine3DTest : FunSpec({
 
-    @Nested
-    inner class TestCreation {
+    context("TestCreation") {
 
-        @Test
-        fun `last entry must be 1 when creating a translation`() {
+        test("last entry must be 1 when creating a translation") {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affine = Affine3D.of(translation)
 
             val actual = affine.toRealMatrix()[3][3]
 
-            assertThat(actual).isEqualTo(1.0)
+            actual shouldBe 1.0
         }
     }
 
-    @Nested
-    inner class TestDecomposition {
+    context("TestDecomposition") {
 
-        @Test
-        fun `test translation from 3x3 matrix`() {
+        test("test translation from 3x3 matrix") {
             val affine = Affine3D(JOMLMatrix4d())
 
             val actual = affine.extractTranslation()
 
-            assertThat(actual).isEqualTo(Vector3D(0.0, 0.0, 0.0))
+            actual shouldBe Vector3D(0.0, 0.0, 0.0)
         }
 
-        @Test
-        fun `test translation from 3x4 matrix`() {
+        test("test translation from 3x4 matrix") {
             val values = doubleArrayOf(
                 1.0, 0.0, 0.0, 0.0,
                 0.0, 1.0, 0.0, 3.0,
@@ -72,31 +67,28 @@ internal class Affine3DTest {
 
             val actual = affine.extractTranslation()
 
-            assertThat(actual).isEqualTo(Vector3D(0.0, 3.0, 2.0))
+            actual shouldBe Vector3D(0.0, 3.0, 2.0)
         }
 
-        @Test
-        fun `test translation`() {
+        test("test translation") {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affine = Affine3D.of(translation)
 
             val actual = affine.extractTranslation()
 
-            assertThat(actual).isEqualTo(translation)
+            actual shouldBe translation
         }
 
-        @Test
-        fun `test scale`() {
+        test("test scale") {
             val scaling = RealVector(doubleArrayOf(3.0, 2.0, 1.0))
             val affine = Affine3D.of(scaling)
 
             val actual = affine.extractScaling()
 
-            assertThat(actual).isEqualTo(scaling)
+            actual shouldBe scaling
         }
 
-        @Test
-        fun `test rotation`() {
+        test("test rotation") {
             val scaling = RealVector(doubleArrayOf(3.0, 2.0, 1.0))
             val translation = Vector3D(3.0, 2.0, 1.0)
             val heading = HALF_PI
@@ -114,16 +106,16 @@ internal class Affine3DTest {
 
             val actual = affine.extractRotationAffine().toRealMatrix()
 
-            assertThat(actual.dimension).isEqualTo(expectedRotationMatrix.dimension)
-            assertArrayEquals(expectedRotationMatrix.toDoubleArray(), actual.toDoubleArray(), DBL_EPSILON)
+            actual.dimension shouldBe expectedRotationMatrix.dimension
+            expectedRotationMatrix.toDoubleArray().zip(actual.toDoubleArray()).forEach {
+                it.first.shouldBe(it.second plusOrMinus DBL_EPSILON)
+            }
         }
     }
 
-    @Nested
-    inner class TestAffineMultiplication {
+    context("TestAffineMultiplication") {
 
-        @Test
-        fun `test appending`() {
+        test("test appending") {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affineA = Affine3D.of(translation)
             val scaling = RealVector.of(2.0, 3.0, 4.0)
@@ -139,40 +131,35 @@ internal class Affine3DTest {
             val actualAppended = affineA.append(affineB)
             val actualMatrix = actualAppended.toRealMatrix()
 
-            assertThat(actualMatrix.dimension).isEqualTo(expectedMatrix.dimension)
-            assertArrayEquals(expectedMatrix.toDoubleArray(), actualMatrix.toDoubleArray())
+            actualMatrix.dimension shouldBe expectedMatrix.dimension
+            expectedMatrix.toDoubleArray() shouldBe actualMatrix.toDoubleArray()
         }
     }
 
-    @Nested
-    inner class TestTransforms {
+    context("TestTransforms") {
 
-        @Test
-        fun `test translation`() {
+        test("test translation") {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affine = Affine3D.of(translation)
 
             val actualTranslated = affine.transform(Vector3D.ZERO)
 
-            assertThat(actualTranslated).isEqualTo(translation)
+            actualTranslated shouldBe translation
         }
 
-        @Test
-        fun `test inverse translation`() {
+        test("test inverse translation") {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affine = Affine3D.of(translation)
 
             val actualTranslated = affine.inverseTransform(Vector3D.ZERO)
 
-            assertThat(actualTranslated).isEqualTo(-translation)
+            actualTranslated shouldBe -translation
         }
     }
 
-    @Nested
-    inner class TestRotations {
+    context("TestRotations") {
 
-        @Test
-        fun `test heading rotation`() {
+        test("test heading rotation") {
             val rotation = Rotation3D(HALF_PI, 0.0, 0.0)
             val affine = Affine3D.of(rotation)
 
@@ -183,8 +170,7 @@ internal class Affine3DTest {
             assertThat(actualRotated.z).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test pitch rotation`() {
+        test("test pitch rotation") {
             val rotation = Rotation3D(0.0, HALF_PI, 0.0)
             val affine = Affine3D.of(rotation)
 
@@ -195,8 +181,7 @@ internal class Affine3DTest {
             assertThat(actualRotated.z).isCloseTo(-1.0, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test rotation based on new standard basis`() {
+        test("test rotation based on new standard basis") {
             val basisX = Vector3D(-1.0, 1.0, 0.0)
             val basisY = Vector3D(-1.0, 0.0, 1.0)
             val basisZ = Vector3D(1.0, 1.0, 1.0)
@@ -211,11 +196,9 @@ internal class Affine3DTest {
         }
     }
 
-    @Nested
-    inner class TestConversions {
+    context("TestConversions") {
 
-        @Test
-        fun `test to double array`() {
+        test("test to double array") {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affine = Affine3D.of(translation)
             val expectedDoubleArray = doubleArrayOf(
@@ -227,7 +210,7 @@ internal class Affine3DTest {
 
             val actualDoubleArray = affine.toDoubleArray()
 
-            assertArrayEquals(expectedDoubleArray, actualDoubleArray)
+            expectedDoubleArray shouldBe actualDoubleArray
         }
     }
-}
+})

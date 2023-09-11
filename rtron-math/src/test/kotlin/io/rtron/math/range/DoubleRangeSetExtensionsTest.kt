@@ -16,18 +16,14 @@
 
 package io.rtron.math.range
 
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class DoubleRangeSetExtensionsTest {
+class DoubleRangeSetExtensionsTest : FunSpec({
+    context("TestCreation") {
 
-    @Nested
-    inner class TestCreation {
-
-        @Test
-        fun `intersecting ranges should throw an IllegalArgumentException`() {
+        test("intersecting ranges should throw an IllegalArgumentException") {
             val rangeA = Range.closed(0.0, 2.0)
             val rangeB = Range.closed(1.0, 4.0)
 
@@ -36,8 +32,7 @@ internal class DoubleRangeSetExtensionsTest {
             }
         }
 
-        @Test
-        fun `connected ranges are combined to one range`() {
+        test("connected ranges are combined to one range") {
             val rangeA = Range.closedOpen(0.0, 2.0)
             val rangeB = Range.closed(2.0, 4.0)
 
@@ -46,4 +41,4 @@ internal class DoubleRangeSetExtensionsTest {
             assertThat(actualRangeSet.asRanges()).hasSize(1)
         }
     }
-}
+})

@@ -16,18 +16,14 @@
 
 package io.rtron.std
 
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class ListsKtTest {
+class ListsKtTest : FunSpec({
+    context("TestMoveWindow") {
 
-    @Nested
-    inner class TestMoveWindow {
-
-        @Test
-        fun `basic moving window test with differently sized lists`() {
+        test("basic moving window test with differently sized lists") {
             val listA = listOf(false, false, true, false, false)
             val listB = listOf(true, true, false)
             val expectedList = listOf(false, false, true, true, false, false, false)
@@ -41,8 +37,7 @@ internal class ListsKtTest {
             assertThat(actualList).isEqualTo(expectedList)
         }
 
-        @Test
-        fun `fail if base list is empty`() {
+        test("fail if base list is empty") {
             val listA = listOf<Boolean>()
             val listB = listOf(true, false)
 
@@ -55,8 +50,7 @@ internal class ListsKtTest {
             }
         }
 
-        @Test
-        fun `fail if other list is empty`() {
+        test("fail if other list is empty") {
             val listA = listOf(true, false)
             val listB = listOf<Boolean>()
 
@@ -69,8 +63,7 @@ internal class ListsKtTest {
             }
         }
 
-        @Test
-        fun `moving window with same type shape`() {
+        test("moving window with same type shape") {
             val listA = listOf(false, false, true, false, false)
             val listB = listOf(true, true, false)
             val expectedList = listOf(false, false, true, true, false)
@@ -85,8 +78,7 @@ internal class ListsKtTest {
             assertThat(actualList).isEqualTo(expectedList)
         }
 
-        @Test
-        fun `moving window with doubles`() {
+        test("moving window with doubles") {
             val listA = listOf(0.0, 2.0, 1.0, 0.0, 0.0)
             val listB = listOf(1.0, 1.0, 0.0)
             val expectedList = listOf(0.0, 2.0, 3.0, 1.0, 0.0, 0.0, 0.0)
@@ -101,10 +93,9 @@ internal class ListsKtTest {
         }
     }
 
-    @Nested
-    inner class TestSlidedWindowBoolean {
-        @Test
-        fun `moving window with booleans and type same`() {
+    context("TestSlidedWindowBoolean") {
+
+        test("moving window with booleans and type same") {
             val listA = listOf(false, true, false, false, false, true, false)
             val listB = listOf(true, false, true)
             val expectedList = listOf(false, true, false, true, false, true, false)
@@ -115,11 +106,9 @@ internal class ListsKtTest {
         }
     }
 
-    @Nested
-    inner class TestFilterWindowedEnclosing {
+    context("TestFilterWindowedEnclosing") {
 
-        @Test
-        fun `fail if requested sublist size is greater than list size`() {
+        test("fail if requested sublist size is greater than list size") {
             val mainList = listOf("a", "a", "a", "b", "c", "c")
 
             assertThatIllegalArgumentException().isThrownBy {
@@ -127,8 +116,7 @@ internal class ListsKtTest {
             }
         }
 
-        @Test
-        fun `test basic sublist pattern filter`() {
+        test("test basic sublist pattern filter") {
             val mainList = listOf(1, 2, 3, 4, 4, 3, 3, 4, 4, 5, 6, 7, 8)
             val expectedList = listOf(1, 2, 3, 5, 6, 7, 8)
 
@@ -137,8 +125,7 @@ internal class ListsKtTest {
             assertThat(actualList).isEqualTo(expectedList)
         }
 
-        @Test
-        fun `sublist pattern filter with drop indices on characters`() {
+        test("sublist pattern filter with drop indices on characters") {
             val mainList = listOf("P1", "P2", "P3", "P4", "P3", "P5", "P6", "P7", "P8")
             val dropIndices = listOf(false, true, true)
             val expectedList = listOf("P1", "P2", "P3", "P5", "P6", "P7", "P8")
@@ -148,8 +135,7 @@ internal class ListsKtTest {
             assertThat(actualList).isEqualTo(expectedList)
         }
 
-        @Test
-        fun `test removal of consecutive duplicates`() {
+        test("test removal of consecutive duplicates") {
             val mainList = listOf("A", "A", "B", "C", "D")
             val dropIndices = listOf(false, true)
             val expectedList = listOf("A", "B", "C", "D")
@@ -159,8 +145,7 @@ internal class ListsKtTest {
             assertThat(actualList).isEqualTo(expectedList)
         }
 
-        @Test
-        fun `test removal of consecutive and enclosing duplicates by dropping the first window indices`() {
+        test("test removal of consecutive and enclosing duplicates by dropping the first window indices") {
             val mainList = listOf("A", "A", "B", "C", "A")
             val dropIndices = listOf(true, false)
             val expectedList = listOf("A", "B", "C")
@@ -170,8 +155,7 @@ internal class ListsKtTest {
             assertThat(actualList).isEqualTo(expectedList)
         }
 
-        @Test
-        fun `test removal of consecutive and enclosing duplicates by dropping the second window indices`() {
+        test("test removal of consecutive and enclosing duplicates by dropping the second window indices") {
             val mainList = listOf("A", "A", "B", "C", "A")
             val dropIndices = listOf(false, true)
             val expectedList = listOf("A", "B", "C", "A")
@@ -181,4 +165,4 @@ internal class ListsKtTest {
             assertThat(actualList).isEqualTo(expectedList)
         }
     }
-}
+})

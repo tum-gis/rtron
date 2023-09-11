@@ -70,7 +70,7 @@ allprojects {
         implementation(Dependencies.arrowCore)
         implementation(Dependencies.arrowOptics)
 
-        testImplementation(Dependencies.junit)
+        testImplementation(Dependencies.kotest)
         testImplementation(Dependencies.assertj)
         testImplementation(Dependencies.mockk)
     }

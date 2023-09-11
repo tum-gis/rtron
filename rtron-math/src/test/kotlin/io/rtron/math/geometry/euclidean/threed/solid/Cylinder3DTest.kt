@@ -16,23 +16,20 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.transform.AffineSequence3D
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Cylinder3DTest {
+class Cylinder3DTest : FunSpec({
+    context("PolygonsGeneration") {
 
-    @Nested
-    inner class PolygonsGeneration {
-        @Test
-        fun `polygons start at level zero`() {
+        test("polygons start at level zero") {
             val cylinder = Cylinder3D(0.5, 1.0, DBL_EPSILON_1, AffineSequence3D.EMPTY)
 
             val actualPolygons = cylinder.calculatePolygonsGlobalCS()
 
-            assertTrue(actualPolygons.any { polygon -> polygon.vertices.any { it.z == 0.0 } })
+            actualPolygons.any { polygon -> polygon.vertices.any { it.z == 0.0 } }.shouldBeTrue()
         }
     }
-}
+})

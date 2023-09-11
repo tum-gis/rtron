@@ -16,19 +16,15 @@
 
 package io.rtron.math.geometry.euclidean.threed.solid
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Cuboid3DTest {
+class Cuboid3DTest : FunSpec({
+    context("PolygonsGeneration") {
 
-    @Nested
-    inner class PolygonsGeneration {
-
-        @Test
-        fun `correct number of polygons`() {
+        test("correct number of polygons") {
             val cuboid = Cuboid3D.UNIT
 
             val actualPolygons = cuboid.calculatePolygonsGlobalCS()
@@ -36,8 +32,7 @@ internal class Cuboid3DTest {
             assertThat(actualPolygons).hasSize(6)
         }
 
-        @Test
-        fun `generated polygons list contain base polygon`() {
+        test("generated polygons list contain base polygon") {
             val length = 6.0
             val width = 4.0
             val cuboid = Cuboid3D(length = length, width = width, height = 1.0, tolerance = 0.0)
@@ -52,8 +47,7 @@ internal class Cuboid3DTest {
             assertThat(actualPolygons).contains(expectedBasePolygon)
         }
 
-        @Test
-        fun `generated polygons list contain elevated polygon`() {
+        test("generated polygons list contain elevated polygon") {
             val length = 5.0
             val width = 3.0
             val height = 1.0
@@ -69,8 +63,7 @@ internal class Cuboid3DTest {
             assertThat(actualPolygons).contains(expectedBasePolygon)
         }
 
-        @Test
-        fun `generated polygons list contain front polygon`() {
+        test("generated polygons list contain front polygon") {
             val length = 5.0
             val width = 3.0
             val height = 1.0
@@ -86,4 +79,4 @@ internal class Cuboid3DTest {
             assertThat(actualPolygons).contains(expectedBasePolygon)
         }
     }
-}
+})

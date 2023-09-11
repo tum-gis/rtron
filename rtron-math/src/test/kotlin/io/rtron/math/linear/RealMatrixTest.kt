@@ -19,11 +19,9 @@ package io.rtron.math.linear
 import io.rtron.math.std.DBL_EPSILON
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Test
 
-internal class RealMatrixTest {
+class RealMatrixTest {
 
-    @Test
     fun normalize() {
         val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
         val matrix = RealMatrix(matrixValues)

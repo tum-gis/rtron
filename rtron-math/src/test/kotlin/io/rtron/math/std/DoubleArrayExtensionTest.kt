@@ -16,18 +16,15 @@
 
 package io.rtron.math.std
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class DoubleArrayExtensionTest {
+class DoubleArrayExtensionTest : FunSpec({
 
-    @Nested
-    inner class TestReshapeByColumnDimension {
+    context("TestReshapeByColumnDimension") {
 
-        @Test
-        fun `test reshape of square matrix`() {
+        test("test reshape of square matrix") {
             val expectedMatrix = arrayOf(
                 doubleArrayOf(1.0, 0.0, 0.0, 1.0),
                 doubleArrayOf(0.0, 1.0, 0.0, 2.0),
@@ -43,22 +40,19 @@ internal class DoubleArrayExtensionTest {
 
             val actualReshapedMatrix = matrix.reshapeByColumnDimension(4)
 
-            assertThat(actualReshapedMatrix).isEqualTo(expectedMatrix)
+            actualReshapedMatrix shouldBe expectedMatrix
         }
     }
 
-    @Nested
-    inner class TestReshapeByRowDimension {
+    context("TestReshapeByRowDimension") {
 
-        @Test
-        fun `test fail for wrong dimension`() {
+        test("test fail for wrong dimension") {
             val values = doubleArrayOf(2.0, 1.0, 2.0, 1.0)
 
             assertThatIllegalArgumentException().isThrownBy { values.reshapeByRowDimension(5) }
         }
 
-        @Test
-        fun `test reshape of square matrix`() {
+        test("test reshape of square matrix") {
             val expectedMatrix = arrayOf(
                 doubleArrayOf(0.0, 0.0, 1.0),
                 doubleArrayOf(1.0, 0.0, 2.0),
@@ -74,7 +68,7 @@ internal class DoubleArrayExtensionTest {
 
             val actualReshapedMatrix = matrix.reshapeByRowDimension(4)
 
-            assertThat(actualReshapedMatrix).isEqualTo(expectedMatrix)
+            actualReshapedMatrix shouldBe expectedMatrix
         }
     }
-}
+})

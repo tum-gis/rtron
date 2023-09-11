@@ -16,6 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
@@ -28,21 +29,16 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import java.io.FileReader
 import java.lang.Math.abs
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
 
-internal class Spiral2DTest {
+class Spiral2DTest : FunSpec({
+    context("TestPointCalculation") {
 
-    @Nested
-    inner class TestPointCalculation {
-
-        @Test
-        fun `return (0,0) at l=0`() {
+        test("return (0,0) at l=0") {
             val spiral = Spiral2D(1.0)
 
             val actualPoint = spiral.calculatePoint(0.0)
@@ -50,8 +46,7 @@ internal class Spiral2DTest {
             assertThat(actualPoint).isEqualTo(Vector2D.ZERO)
         }
 
-        @Test
-        fun `return asymptotic point at l=+infinity`() {
+        test("return asymptotic point at l=+infinity") {
             val asymptoticPoint = Vector2D(0.5, 0.5)
             val spiral = Spiral2D(PI)
 
@@ -61,8 +56,7 @@ internal class Spiral2DTest {
             assertThat(actualPoint.y).isCloseTo(asymptoticPoint.y, Offset.offset(DBL_EPSILON_1))
         }
 
-        @Test
-        fun `return asymptotic point at l=-infinity`() {
+        test("return asymptotic point at l=-infinity") {
             val asymptoticPoint = Vector2D(-0.5, -0.5)
             val spiral = Spiral2D(PI)
 
@@ -73,11 +67,9 @@ internal class Spiral2DTest {
         }
     }
 
-    @Nested
-    inner class TestRotationCalculation {
+    context("TestRotationCalculation") {
 
-        @Test
-        fun `return 0 at l=0`() {
+        test("return 0 at l=0") {
             val spiral = Spiral2D(1.0)
 
             val actualRotation = spiral.calculateRotation(0.0)
@@ -86,17 +78,15 @@ internal class Spiral2DTest {
         }
     }
 
-    @Nested
-    inner class TestDatasetCalculation {
+    context("TestDatasetCalculation") {
 
-        private val logger = KotlinLogging.logger {}
+        val logger = KotlinLogging.logger {}
 
-        @Test
-        fun `test point and rotation calculation against csv sample dataset`() {
+        test("test point and rotation calculation against csv sample dataset") {
             val filePath = Path("src/test/cpp/spiral/build/sampled_spiral.csv").absolute()
             if (!filePath.exists()) {
                 logger.warn { "Dataset does not exist at $filePath, skipping test" }
-                return
+                return@test
             }
             val fileReader = FileReader(filePath.toFile())
 
@@ -122,8 +112,7 @@ internal class Spiral2DTest {
             }
         }
 
-        @Test
-        fun `test point calculation against sample value 1`() {
+        test("test point calculation against sample value 1") {
             val spiral = Spiral2D(-0.067773987108739761)
 
             val actualPoint = spiral.calculatePoint(-5330.827396000006)
@@ -132,8 +121,7 @@ internal class Spiral2DTest {
             assertThat(actualPoint.y).isCloseTo(3.403385667520832, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test rotation calculation against sample value 1`() {
+        test("test rotation calculation against sample value 1") {
             val spiral = Spiral2D(-0.067773987108739761)
 
             val actualPoint = spiral.calculateRotation(-5330.827396000006)
@@ -141,8 +129,7 @@ internal class Spiral2DTest {
             assertThat(actualPoint.angle).isCloseTo(Rotation2D(-962991.11906995473).angle, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test point calculation against sample value 2`() {
+        test("test point calculation against sample value 2") {
             val spiral = Spiral2D(0.011823698552189441)
 
             val actualPoint = spiral.calculatePoint(38679.185313200163)
@@ -151,8 +138,7 @@ internal class Spiral2DTest {
             assertThat(actualPoint.y).isCloseTo(8.1487837011384663, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test rotation calculation against sample value 2`() {
+        test("test rotation calculation against sample value 2") {
             val spiral = Spiral2D(0.011823698552189441)
 
             val actualPoint = spiral.calculateRotation(38679.185313200163)
@@ -160,8 +146,7 @@ internal class Spiral2DTest {
             assertThat(actualPoint.angle).isCloseTo(Rotation2D(8844595.7788996678).angle, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test point calculation against sample value 3`() {
+        test("test point calculation against sample value 3") {
             val spiral = Spiral2D(-0.051693646571178295)
 
             val actualPoint = spiral.calculatePoint(6884.6109795996472)
@@ -171,8 +156,7 @@ internal class Spiral2DTest {
             assertThat(actualPoint.y).isCloseTo(-3.8974453107566154, Offset.offset(DBL_EPSILON_2))
         }
 
-        @Test
-        fun `test rotation calculation against sample value 3`() {
+        test("test rotation calculation against sample value 3") {
             val spiral = Spiral2D(-0.051693646571178295)
 
             val actualPoint = spiral.calculateRotation(6884.6109795996472)
@@ -180,4 +164,4 @@ internal class Spiral2DTest {
             assertThat(actualPoint.angle).isCloseTo(Rotation2D(-1225084.3271085601).angle, Offset.offset(DBL_EPSILON))
         }
     }
-}
+})

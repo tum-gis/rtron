@@ -18,15 +18,14 @@ package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
 import arrow.core.nonEmptyListOf
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
 
-internal class ConcatenatedFunctionTest {
+class ConcatenatedFunctionTest : FunSpec({
 
-    class TestCreationOfLinearFunctions {
+    context("TestCreationOfLinearFunctions") {
 
-        @Test
-        fun `concatenated function with absolute start at 0`() {
+        test("concatenated function with absolute start at 0") {
             val starts = listOf(0.0, 5.0)
             val intercepts = listOf(0.0, -5.0)
             val concatenatedFunction = ConcatenatedFunction.ofLinearFunctions(starts, intercepts)
@@ -45,8 +44,7 @@ internal class ConcatenatedFunctionTest {
             assertThat(actualResult4.value).isEqualTo(-5.0)
         }
 
-        @Test
-        fun `concatenated function with absolute start at -2`() {
+        test("concatenated function with absolute start at -2") {
             val starts = listOf(-2.0, 3.0)
             val intercepts = listOf(0.0, -5.0)
             val concatenatedFunction = ConcatenatedFunction.ofLinearFunctions(starts, intercepts)
@@ -65,8 +63,7 @@ internal class ConcatenatedFunctionTest {
             assertThat(actualResult4.value).isEqualTo(-5.0)
         }
 
-        @Test
-        fun `concatenated function with absolute start at 2`() {
+        test("concatenated function with absolute start at 2") {
             val starts = listOf(2.0, 7.0)
             val intercepts = listOf(0.0, -5.0)
             val concatenatedFunction = ConcatenatedFunction.ofLinearFunctions(starts, intercepts)
@@ -86,10 +83,9 @@ internal class ConcatenatedFunctionTest {
         }
     }
 
-    class TestCreationOfPolynomialFunctions {
+    context("TestCreationOfPolynomialFunctions") {
 
-        @Test
-        fun `concatenated function with absolute start at 0`() {
+        test("concatenated function with absolute start at 0") {
             val starts = nonEmptyListOf(0.0, 5.0)
             val coefficients = nonEmptyListOf(
                 doubleArrayOf(2.0, 3.0, 4.0, 1.0),
@@ -113,8 +109,7 @@ internal class ConcatenatedFunctionTest {
             assertThat(actualResult4.value).isEqualTo(49.0)
         }
 
-        @Test
-        fun `concatenated function with absolute start at -2`() {
+        test("concatenated function with absolute start at -2") {
             val starts = nonEmptyListOf(-2.0, 3.0)
             val coefficients = nonEmptyListOf(
                 doubleArrayOf(2.0, 3.0, 4.0, 1.0),
@@ -138,8 +133,7 @@ internal class ConcatenatedFunctionTest {
             assertThat(actualResult4.value).isEqualTo(49.0)
         }
 
-        @Test
-        fun `concatenated function with absolute start at 2`() {
+        test("concatenated function with absolute start at 2") {
             val starts = nonEmptyListOf(2.0, 7.0)
             val coefficients = nonEmptyListOf(
                 doubleArrayOf(2.0, 3.0, 4.0, 1.0),
@@ -163,4 +157,4 @@ internal class ConcatenatedFunctionTest {
             assertThat(actualResult4.value).isEqualTo(49.0)
         }
     }
-}
+})

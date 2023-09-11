@@ -22,7 +22,7 @@ object DependencyVersions {
     const val arrow = "1.2.1"
 
     // testing libraries
-    const val junit = "5.10.0"
+    const val kotest = "5.7.1"
     const val assertj = "3.24.2"
     const val mockk = "1.13.7"
 
@@ -70,7 +70,7 @@ object Dependencies {
     const val arrowOpticsKspPlugin = "io.arrow-kt:arrow-optics-ksp-plugin:${DependencyVersions.arrow}"
 
     // testing libraries
-    const val junit = "org.junit.jupiter:junit-jupiter:${DependencyVersions.junit}"
+    const val kotest = "io.kotest:kotest-runner-junit5:${DependencyVersions.kotest}"
     const val assertj = "org.assertj:assertj-core:${DependencyVersions.assertj}"
     const val mockk = "io.mockk:mockk:${DependencyVersions.mockk}"
 

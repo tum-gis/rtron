@@ -16,19 +16,15 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.processing.removeConsecutiveSideDuplicates
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class LinearRing3DUtilTest {
+class LinearRing3DUtilTest : FunSpec({
+    context("TestRemoveCuts") {
 
-    @Nested
-    inner class TestRemoveCuts {
-
-        @Test
-        fun `remove cut with edge matching pattern`() {
+        test("remove cut with edge matching pattern") {
             val pointA = Vector3D.ZERO
             val pointB = Vector3D(-1.0, -1.0, 0.0)
             val pointC = Vector3D.X_AXIS
@@ -41,4 +37,4 @@ internal class LinearRing3DUtilTest {
             assertThat(actualRemovedVerticesList).isEqualTo(expected)
         }
     }
-}
+})

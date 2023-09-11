@@ -16,17 +16,13 @@
 
 package io.rtron.math.linear
 
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class MatrixUtilsTest {
+class MatrixUtilsTest : FunSpec({
+    context("TestAppendColumn") {
 
-    @Nested
-    inner class TestAppendColumn {
-
-        @Test
-        fun `append column with two elements`() {
+        test("append column with two elements") {
             val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
             val matrix = RealMatrix(matrixValues)
             val column = doubleArrayOf(2.0, 1.0)
@@ -37,4 +33,4 @@ internal class MatrixUtilsTest {
             assertThat(actualAppendedMatrix.getRow(1)).isEqualTo(doubleArrayOf(0.0, 4.0, 1.0))
         }
     }
-}
+})

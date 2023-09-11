@@ -16,26 +16,23 @@
 
 package io.rtron.math.geometry.euclidean.twod.point
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.PI
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
-internal class Vector2DTest {
+class Vector2DTest : FunSpec({
 
-    @Test
     fun scalarMultiply() {
         val actualValue = Vector2D(1.0, 1.0).scalarMultiply(4.0)
 
         assertThat(actualValue).isEqualTo(Vector2D(4.0, 4.0))
     }
 
-    @Nested
-    inner class TestDistanceCalculation {
-        @Test
-        fun `even value distance between two point`() {
+    context("TestDistanceCalculation") {
+
+        test("even value distance between two point") {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(3.0, 0.0)
 
@@ -44,8 +41,7 @@ internal class Vector2DTest {
             assertThat(actualDistance).isEqualTo(3.0)
         }
 
-        @Test
-        fun `uneven value distance between two point`() {
+        test("uneven value distance between two point") {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(1.0, 1.0)
 
@@ -55,10 +51,9 @@ internal class Vector2DTest {
         }
     }
 
-    @Nested
-    inner class TestAngleCalculation {
-        @Test
-        fun `half pi angle between to axes`() {
+    context("TestAngleCalculation") {
+
+        test("half pi angle between to axes") {
             val pointA = Vector2D.X_AXIS
             val pointB = Vector2D.Y_AXIS
 
@@ -67,8 +62,7 @@ internal class Vector2DTest {
             assertThat(actualAngle).isEqualTo(HALF_PI)
         }
 
-        @Test
-        fun `uneven radians angle`() {
+        test("uneven radians angle") {
             val pointA = Vector2D.X_AXIS
             val pointB = Vector2D(1.0, -1.0)
 
@@ -77,8 +71,7 @@ internal class Vector2DTest {
             assertThat(actualAngle).isEqualTo(1.75 * PI)
         }
 
-        @Test
-        fun `-half pi degree angle axes`() {
+        test("-half pi degree angle axes") {
             val pointA = Vector2D.X_AXIS
             val pointB = Vector2D(0.0, -1.0)
 
@@ -87,4 +80,4 @@ internal class Vector2DTest {
             assertThat(actualAngle).isEqualTo(1.5 * PI)
         }
     }
-}
+})

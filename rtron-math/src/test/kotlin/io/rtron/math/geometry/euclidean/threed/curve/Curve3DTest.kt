@@ -16,6 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -26,17 +27,12 @@ import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
-internal class Curve3DTest {
+class Curve3DTest : FunSpec({
+    context("TestTorsion") {
 
-    @Nested
-    inner class TestTorsion {
-
-        @Test
-        fun `curve with zero torsion`() {
+        test("curve with zero torsion") {
             val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS, 0.0)
             val heightFunction = LinearFunction.X_AXIS
             val curve3D = Curve3D(curveXY, heightFunction)
@@ -48,8 +44,7 @@ internal class Curve3DTest {
             assertThat(actualPointGlobal).isEqualTo(Vector3D(0.5, 1.0, 0.0))
         }
 
-        @Test
-        fun `curve with constant torsion of quarter pi`() {
+        test("curve with constant torsion of quarter pi") {
             val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS, 0.0)
             val heightFunction = LinearFunction.X_AXIS
             val torsionFunction = LinearFunction(0.0, QUARTER_PI)
@@ -63,8 +58,7 @@ internal class Curve3DTest {
             assertThat(actualPointGlobal.z).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `curve with constant torsion of half pi`() {
+        test("curve with constant torsion of half pi") {
             val curveXY = LineSegment2D.of(Vector2D.ZERO, Vector2D.X_AXIS, 0.0)
             val heightFunction = LinearFunction.X_AXIS
             val torsionFunction = LinearFunction(0.0, HALF_PI)
@@ -77,4 +71,4 @@ internal class Curve3DTest {
             assertThat(actualPointGlobal).isEqualTo(Vector3D(0.5, 0.0, 1.0))
         }
     }
-}
+})

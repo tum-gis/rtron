@@ -16,18 +16,14 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class LineSegment3DTest {
+class LineSegment3DTest : FunSpec({
+    context("TestDistance") {
 
-    @Nested
-    inner class TestDistance {
-
-        @Test
-        fun `point located on line segment returns zero distance`() {
+        test("point located on line segment returns zero distance") {
             val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
             val point = Vector3D(0.5, 0.0, 0.0)
             val expectedDistance = 0.0
@@ -37,8 +33,7 @@ internal class LineSegment3DTest {
             assertThat(actualResultingVertices).isEqualTo(expectedDistance)
         }
 
-        @Test
-        fun `point located outside of line segment returns the distance to closest boundary point`() {
+        test("point located outside of line segment returns the distance to closest boundary point") {
             val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
             val point = Vector3D(1.5, 0.0, 0.0)
             val expectedDistance = 0.5
@@ -48,8 +43,7 @@ internal class LineSegment3DTest {
             assertThat(actualResultingVertices).isEqualTo(expectedDistance)
         }
 
-        @Test
-        fun `point located not on line segment returns the correct distance`() {
+        test("point located not on line segment returns the correct distance") {
             val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
             val point = Vector3D(0.5, 2.3, 0.0)
             val expectedDistance = 2.3
@@ -59,8 +53,7 @@ internal class LineSegment3DTest {
             assertThat(actualResultingVertices).isEqualTo(expectedDistance)
         }
 
-        @Test
-        fun `boundary point of line segment returns the zero distance`() {
+        test("boundary point of line segment returns the zero distance") {
             val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
             val point = Vector3D.X_AXIS
             val expectedDistance = 0.0
@@ -70,8 +63,7 @@ internal class LineSegment3DTest {
             assertThat(actualResultingVertices).isEqualTo(expectedDistance)
         }
 
-        @Test
-        fun `point on line but outside of line segment return distances to the shortest boundary point`() {
+        test("point on line but outside of line segment return distances to the shortest boundary point") {
             val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
             val point = Vector3D(1.5, 0.0, 0.0)
             val expectedDistance = 0.5
@@ -81,4 +73,4 @@ internal class LineSegment3DTest {
             assertThat(actualResultingVertices).isEqualTo(expectedDistance)
         }
     }
-}
+})

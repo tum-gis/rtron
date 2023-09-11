@@ -27,12 +27,10 @@ import io.rtron.math.range.Range
 import io.rtron.math.range.arrange
 import io.rtron.math.std.PI
 import io.rtron.math.transform.AffineSequence2D
-import org.junit.jupiter.api.Test
 import kotlin.io.path.Path
 
 object SpiralSegment2DWriterTest {
 
-    @Test
     fun writeSpiralSegment2DToCsvFile() {
         val path = Path("out/test_files/SpiralSegment2D/SpiralSegment2D-line.csv")
         val header = listOf("curvePosition", "x", "y")

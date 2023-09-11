@@ -16,18 +16,14 @@
 
 package io.rtron.math.linear
 
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class SingularValueDecompositionTest {
+class SingularValueDecompositionTest : FunSpec({
+    context("TestRank") {
 
-    @Nested
-    inner class TestRank {
-
-        @Test
-        fun `matrix of two orthogonal vectors should have rank 2`() {
+        test("matrix of two orthogonal vectors should have rank 2") {
             val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
             val matrix = RealMatrix(matrixValues)
             val singularValueDecomposition = SingularValueDecomposition(matrix)
@@ -37,8 +33,7 @@ internal class SingularValueDecompositionTest {
             assertThat(actualRank).isEqualTo(2)
         }
 
-        @Test
-        fun `matrix with two colinear vectors should have rank 1`() {
+        test("matrix with two colinear vectors should have rank 1") {
             val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(3.0, 0.0))
             val matrix = RealMatrix(matrixValues)
             val singularValueDecomposition = SingularValueDecomposition(matrix)
@@ -48,8 +43,7 @@ internal class SingularValueDecompositionTest {
             assertThat(actualRank).isEqualTo(1)
         }
 
-        @Test
-        fun `matrix of two zero vectors should have rank 0`() {
+        test("matrix of two zero vectors should have rank 0") {
             val matrixValues = arrayOf(doubleArrayOf(0.0, 0.0), doubleArrayOf(0.0, 0.0))
             val matrix = RealMatrix(matrixValues)
             val singularValueDecomposition = SingularValueDecomposition(matrix)
@@ -60,11 +54,9 @@ internal class SingularValueDecompositionTest {
         }
     }
 
-    @Nested
-    inner class TestMatrixUCalculation {
+    context("TestMatrixUCalculation") {
 
-        @Test
-        fun `decomposition of 2x2 matrix`() {
+        test("decomposition of 2x2 matrix") {
             val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
             val matrix = RealMatrix(matrixValues)
             val singularValueDecomposition = SingularValueDecomposition(matrix)
@@ -78,11 +70,9 @@ internal class SingularValueDecompositionTest {
         }
     }
 
-    @Nested
-    inner class TestMatrixSCalculation {
+    context("TestMatrixSCalculation") {
 
-        @Test
-        fun `decomposition of 2x2 matrix`() {
+        test("decomposition of 2x2 matrix") {
             val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
             val matrix = RealMatrix(matrixValues)
             val singularValueDecomposition = SingularValueDecomposition(matrix)
@@ -96,11 +86,9 @@ internal class SingularValueDecompositionTest {
         }
     }
 
-    @Nested
-    inner class TestMatrixVCalculation {
+    context("TestMatrixVCalculation") {
 
-        @Test
-        fun `decomposition of 2x2 matrix`() {
+        test("decomposition of 2x2 matrix") {
             val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
             val matrix = RealMatrix(matrixValues)
             val singularValueDecomposition = SingularValueDecomposition(matrix)
@@ -113,4 +101,4 @@ internal class SingularValueDecompositionTest {
                 .containsExactly(expectedMatrixV.entriesFlattened, Offset.offset(0.01))
         }
     }
-}
+})

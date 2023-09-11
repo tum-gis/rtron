@@ -16,88 +16,78 @@
 
 package io.rtron.math.geometry.euclidean.twod
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.std.DBL_EPSILON_2
 import io.rtron.math.std.DBL_EPSILON_4
 import io.rtron.math.std.TWO_PI
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Rotation2DTest {
+class Rotation2DTest : FunSpec({
+    context("TestFuzzyEquals") {
 
-    @Nested
-    inner class TestFuzzyEquals {
-
-        @Test
-        fun `two rotations with same angle are fuzzily equal`() {
+        test("two rotations with same angle are fuzzily equal") {
             val rotationA = Rotation2D(1.3)
             val rotationB = Rotation2D(1.3)
 
             val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_1)
 
-            assertTrue(actualEquality)
+            actualEquality.shouldBeTrue()
         }
 
-        @Test
-        fun `two rotations with different angle are not fuzzily equal`() {
+        test("two rotations with different angle are not fuzzily equal") {
             val rotationA = Rotation2D(1.3)
             val rotationB = Rotation2D(1.4)
 
             val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_1)
 
-            assertFalse(actualEquality)
+            actualEquality.shouldBeFalse()
         }
 
-        @Test
-        fun `two rotations at zero radians and two pi minus epsilon radians are fuzzily equal`() {
+        test("two rotations at zero radians and two pi minus epsilon radians are fuzzily equal") {
             val rotationA = Rotation2D.ZERO
             val rotationB = Rotation2D(TWO_PI - DBL_EPSILON_2)
 
             val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
 
-            assertTrue(actualEquality)
+            actualEquality.shouldBeTrue()
         }
 
-        @Test
-        fun `two rotations at zero radians and two pi plus epsilon radians are fuzzily equal`() {
+        test("two rotations at zero radians and two pi plus epsilon radians are fuzzily equal") {
             val rotationA = Rotation2D.ZERO
             val rotationB = Rotation2D(TWO_PI + DBL_EPSILON_2)
 
             val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
 
-            assertTrue(actualEquality)
+            actualEquality.shouldBeTrue()
         }
 
-        @Test
-        fun `two rotations at two pi minus epsilon radians and zero radians are fuzzily equal`() {
+        test("two rotations at two pi minus epsilon radians and zero radians are fuzzily equal") {
             val rotationA = Rotation2D(TWO_PI - DBL_EPSILON_2)
             val rotationB = Rotation2D.ZERO
 
             val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
 
-            assertTrue(actualEquality)
+            actualEquality.shouldBeTrue()
         }
 
-        @Test
-        fun `two rotations at two pi plus epsilon radians and zero radians are fuzzily equal`() {
+        test("two rotations at two pi plus epsilon radians and zero radians are fuzzily equal") {
             val rotationA = Rotation2D(TWO_PI + DBL_EPSILON_2)
             val rotationB = Rotation2D.ZERO
 
             val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
 
-            assertTrue(actualEquality)
+            actualEquality.shouldBeTrue()
         }
 
-        @Test
-        fun `two rotations at two pi plus larger epsilon radians and zero radians are not fuzzily equal`() {
+        test("two rotations at two pi plus larger epsilon radians and zero radians are not fuzzily equal") {
             val rotationA = Rotation2D(TWO_PI + DBL_EPSILON_4)
             val rotationB = Rotation2D.ZERO
 
             val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
 
-            assertFalse(actualEquality)
+            actualEquality.shouldBeFalse()
         }
     }
-}
+})

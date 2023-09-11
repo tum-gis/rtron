@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -27,16 +28,11 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.std.cumulativeSum
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class CompositeCurve2DTest {
+class CompositeCurve2DTest : FunSpec({
+    context("TestPoseCalculation") {
 
-    @Nested
-    inner class TestPoseCalculation {
-
-        @Test
-        fun `calculating last point on curve is not NaN`() {
+        test("calculating last point on curve is not NaN") {
             val tolerance = DBL_EPSILON_7
             // example from Crossing8Course road with id=515
 
@@ -104,4 +100,4 @@ internal class CompositeCurve2DTest {
             assertThat(actualPoint.value.point).isNotEqualTo(Vector2D.ZERO)
         }
     }
-}
+})

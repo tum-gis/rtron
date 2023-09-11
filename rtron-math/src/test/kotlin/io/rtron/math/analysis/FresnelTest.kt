@@ -16,32 +16,29 @@
 
 package io.rtron.math.analysis
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.std.DBL_EPSILON
 import mu.KotlinLogging
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import java.io.FileReader
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
 
-class FresnelTest {
+class FresnelTest : FunSpec({
 
-    private val logger = KotlinLogging.logger {}
+    val logger = KotlinLogging.logger {}
 
-    @Nested
-    inner class TestDatasetCalculation {
+    context("TestDatasetCalculation") {
 
-        @Test
-        fun `test against csv sample dataset`() {
+        test("test against csv sample dataset") {
             val filePath = Path("src/test/cpp/spiral/build/sampled_fresnel_integral.csv").absolute()
             if (!filePath.exists()) {
                 logger.warn { "Dataset does not exist at $filePath, skipping test" }
-                return
+                return@test
             }
             val fileReader = FileReader(filePath.toFile())
 
@@ -59,28 +56,25 @@ class FresnelTest {
             }
         }
 
-        @Test
-        fun `test against sample value 1`() {
+        test("test against sample value 1") {
             val (actualX, actualY) = Fresnel.calculatePoint(-4.2284028867950161)
 
             assertThat(actualX).isCloseTo(-0.51547336206019945, Offset.offset(DBL_EPSILON))
             assertThat(actualY).isCloseTo(-0.5736113070569262, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test against sample value 2`() {
+        test("test against sample value 2") {
             val (actualX, actualY) = Fresnel.calculatePoint(883.12677767970729)
 
             assertThat(actualX).isCloseTo(0.50035646758310326, Offset.offset(DBL_EPSILON))
             assertThat(actualY).isCloseTo(0.49994666781760994, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `test against sample value 3`() {
+        test("test against sample value 3") {
             val (actualX, actualY) = Fresnel.calculatePoint(-1.8154077322757265)
 
             assertThat(actualX).isCloseTo(-0.33992314562581244, Offset.offset(DBL_EPSILON))
             assertThat(actualY).isCloseTo(-0.43687889962705617, Offset.offset(DBL_EPSILON))
         }
     }
-}
+})

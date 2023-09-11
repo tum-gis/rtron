@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -28,16 +29,12 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
-internal class ParametricCubicCurve2DTest {
+class ParametricCubicCurve2DTest : FunSpec({
+    context("TestPoseCalculation") {
 
-    @Nested
-    inner class TestPoseCalculation {
-        @Test
-        fun `simple quadratic curve`() {
+        test("simple quadratic curve") {
             val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0)
@@ -50,8 +47,7 @@ internal class ParametricCubicCurve2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(2.0, 4.0))
         }
 
-        @Test
-        fun `simple linear curve`() {
+        test("simple linear curve") {
             val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val coefficientY = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
             val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(QUARTER_PI))
@@ -67,8 +63,7 @@ internal class ParametricCubicCurve2DTest {
             assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `simple quadratic negative curve`() {
+        test("simple quadratic negative curve") {
             val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
             val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(PI))
@@ -84,8 +79,7 @@ internal class ParametricCubicCurve2DTest {
             assertThat(actualReturn.value.point.y).isCloseTo(-4.0, Offset.offset(DBL_EPSILON_2))
         }
 
-        @Test
-        fun `quadratic curve`() {
+        test("quadratic curve") {
             val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
             val length = 1.479
@@ -100,4 +94,4 @@ internal class ParametricCubicCurve2DTest {
             assertThat(actualReturn.value.point.y).isCloseTo(length * length, Offset.offset(DBL_EPSILON))
         }
     }
-}
+})

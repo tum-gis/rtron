@@ -17,17 +17,14 @@
 package io.rtron.math.projection
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class CoordinateReferenceSystemTest {
+class CoordinateReferenceSystemTest : FunSpec({
 
-    @Nested
-    inner class TestProperties {
+    context("TestProperties") {
 
-        @Test
-        fun `build crs 4326 from epsg name`() {
+        test("build crs 4326 from epsg name") {
             val crsName = "EPSG:4326"
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
@@ -36,8 +33,7 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.name).isEqualTo(crsName)
         }
 
-        @Test
-        fun `build crs 32632 from epsg name`() {
+        test("build crs 32632 from epsg name") {
             val crsName = "EPSG:32632"
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
@@ -46,8 +42,7 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.name).isEqualTo(crsName)
         }
 
-        @Test
-        fun `extract epsg code 4326`() {
+        test("extract epsg code 4326") {
             val crsName = "EPSG:4326"
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
@@ -56,8 +51,7 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(4326)
         }
 
-        @Test
-        fun `extract epsg code 32632`() {
+        test("extract epsg code 32632") {
             val crsName = "EPSG:32632"
 
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
@@ -66,8 +60,7 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(32632)
         }
 
-        @Test
-        fun `build crs 32632 from parameters`() {
+        test("build crs 32632 from parameters") {
             val parameters = "+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs"
 
             val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
@@ -76,8 +69,7 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(32632)
         }
 
-        @Test
-        fun `build crs 4326 from parameters`() {
+        test("build crs 4326 from parameters") {
             val parameters = "+proj=longlat +datum=WGS84 +no_defs"
 
             val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
@@ -86,4 +78,4 @@ internal class CoordinateReferenceSystemTest {
             assertThat(actualCrsResult.value.epsgCode).isEqualTo(4326)
         }
     }
-}
+})

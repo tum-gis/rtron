@@ -16,21 +16,17 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Line3DTest {
+class Line3DTest : FunSpec({
+    context("Addition") {
 
-    @Nested
-    inner class Addition {
-
-        @Test
-        fun `throws error if `() {
+        test("throws error if ") {
             val point = Vector3D(1.0, 1.0, 1.0)
 
             assertThatIllegalArgumentException().isThrownBy { Line3D(point, point, 0.0) }
         }
     }
-}
+})

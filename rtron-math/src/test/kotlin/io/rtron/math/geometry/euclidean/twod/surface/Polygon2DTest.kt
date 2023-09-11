@@ -18,18 +18,14 @@ package io.rtron.math.geometry.euclidean.twod.surface
 
 import arrow.core.NonEmptyList
 import arrow.core.toNonEmptyListOrNull
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Polygon2DTest {
+class Polygon2DTest : FunSpec({
+    context("TestContainsCalculation") {
 
-    @Nested
-    inner class TestContainsCalculation {
-
-        @Test
-        fun `basic triangle contains point`() {
+        test("basic triangle contains point") {
             val vertices: NonEmptyList<Vector2D> = listOf(Vector2D.ZERO, Vector2D.X_AXIS, Vector2D.Y_AXIS).toNonEmptyListOrNull()!!
             val polygon = Polygon2D(vertices, 0.0)
 
@@ -38,8 +34,7 @@ internal class Polygon2DTest {
             assertThat(actualReturn).isTrue
         }
 
-        @Test
-        fun `basic triangle does not contain point`() {
+        test("basic triangle does not contain point") {
             val vertices: NonEmptyList<Vector2D> = listOf(
                 Vector2D.ZERO,
                 Vector2D.X_AXIS,
@@ -52,8 +47,7 @@ internal class Polygon2DTest {
             assertThat(actualReturn).isFalse
         }
 
-        @Test
-        fun `concave polygon does contain point`() {
+        test("concave polygon does contain point") {
             val vertices: NonEmptyList<Vector2D> = listOf(
                 Vector2D.ZERO,
                 Vector2D(1.0, 1.0),
@@ -68,4 +62,4 @@ internal class Polygon2DTest {
             assertThat(actualReturn).isTrue
         }
     }
-}
+})

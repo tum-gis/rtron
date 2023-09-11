@@ -16,33 +16,28 @@
 
 package io.rtron.math.range
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class RangeSetTest {
+class RangeSetTest : FunSpec({
 
-    @Nested
-    inner class TestContains {
+    context("TestContains") {
 
-        @Test
-        fun `contains primitive value`() {
+        test("contains primitive value") {
             val rangeA = Range.closedOpen(1.0, 1.3)
             val rangeB = Range.closedOpen(10.0, 12.0)
             val rangeC = Range.closed(1.3, 2.0)
             val rangeSet = RangeSet.of(rangeA, rangeB, rangeC)
 
-            assertTrue(rangeSet.contains(1.3))
+            rangeSet.contains(1.3).shouldBeTrue()
         }
     }
 
-    @Nested
-    inner class TestUnion {
+    context("TestUnion") {
 
-        @Test
-        fun `simple union of two disconnected range sets`() {
+        test("simple union of two disconnected range sets") {
             val rangeA = Range.closedOpen(1.0, 1.3)
             val rangeB = Range.closed(1.4, 2.0)
             val rangeSetA = RangeSet.of(rangeA)
@@ -54,8 +49,7 @@ internal class RangeSetTest {
                 .containsExactlyInAnyOrder(rangeA, rangeB)
         }
 
-        @Test
-        fun `simple union of two connected range sets`() {
+        test("simple union of two connected range sets") {
             val rangeA = Range.closedOpen(1.0, 1.3)
             val rangeB = Range.closed(1.3, 2.0)
             val rangeSetA = RangeSet.of(rangeA)
@@ -68,37 +62,33 @@ internal class RangeSetTest {
         }
     }
 
-    @Nested
-    inner class TestIntersection {
+    context("TestIntersection") {
 
-        @Test
-        fun `two disconnected range sets do not intersect`() {
+        test("two disconnected range sets do not intersect") {
             val rangeA = Range.closedOpen(1.0, 1.3)
             val rangeB = Range.closed(1.4, 2.0)
             val rangeSetA = RangeSet.of(rangeA)
             val rangeSetB = RangeSet.of(rangeB)
 
-            assertFalse(rangeSetA.intersects(rangeSetB))
+            rangeSetA.intersects(rangeSetB).shouldBeFalse()
         }
 
-        @Test
-        fun `two connected range sets do not intersect`() {
+        test("two connected range sets do not intersect") {
             val rangeA = Range.closedOpen(1.0, 1.3)
             val rangeB = Range.closed(1.3, 2.0)
             val rangeSetA = RangeSet.of(rangeA)
             val rangeSetB = RangeSet.of(rangeB)
 
-            assertFalse(rangeSetA.intersects(rangeSetB))
+            rangeSetA.intersects(rangeSetB).shouldBeFalse()
         }
 
-        @Test
-        fun `two connected and closed range sets do intersect`() {
+        test("two connected and closed range sets do intersect") {
             val rangeA = Range.closed(1.0, 1.3)
             val rangeB = Range.closed(1.3, 2.0)
             val rangeSetA = RangeSet.of(rangeA)
             val rangeSetB = RangeSet.of(rangeB)
 
-            assertTrue(rangeSetA.intersects(rangeSetB))
+            rangeSetA.intersects(rangeSetB).shouldBeTrue()
         }
     }
-}
+})

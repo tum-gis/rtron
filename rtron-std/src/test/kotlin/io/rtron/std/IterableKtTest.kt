@@ -16,42 +16,35 @@
 
 package io.rtron.std
 
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 
-internal class IterableKtTest {
+class IterableKtTest : FunSpec({
+    context("TestIsSorted") {
 
-    @Nested
-    inner class TestIsSorted {
-
-        @Test
-        fun `isSorted() returns true if integer list is sorted ascending`() {
+        test("isSorted() returns true if integer list is sorted ascending") {
             val sortedList = listOf(1, 7, 7, 12, 13)
 
-            assertTrue(sortedList.isSorted())
+            sortedList.isSorted().shouldBeTrue()
         }
 
-        @Test
-        fun `isSorted() returns false if integer list is not sorted ascending`() {
+        test("isSorted() returns false if integer list is not sorted ascending") {
             val sortedList = listOf(1, 7, 3, 12, 13)
 
-            assertFalse(sortedList.isSorted())
+            sortedList.isSorted().shouldBeFalse()
         }
 
-        @Test
-        fun `isSortedDescending() returns true if integer list is sorted descending`() {
+        test("isSortedDescending() returns true if integer list is sorted descending") {
             val sortedList = listOf(13, 7, 7, 1, -1)
 
-            assertTrue(sortedList.isSortedDescending())
+            sortedList.isSortedDescending().shouldBeTrue()
         }
 
-        @Test
-        fun `isSortedDescending() returns false if integer list is not sorted descending`() {
+        test("isSortedDescending() returns false if integer list is not sorted descending") {
             val sortedList = listOf(13, 7, 7, 1, -1, 0)
 
-            assertFalse(sortedList.isSortedDescending())
+            sortedList.isSortedDescending().shouldBeFalse()
         }
     }
-}
+})

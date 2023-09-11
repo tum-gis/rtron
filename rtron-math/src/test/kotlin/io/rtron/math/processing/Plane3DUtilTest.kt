@@ -16,23 +16,19 @@
 
 package io.rtron.math.processing
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Plane3D
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.std.DBL_EPSILON_2
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Plane3DUtilTest {
+class Plane3DUtilTest : FunSpec({
+    context("TestBestFittingPlaneCalculation") {
 
-    @Nested
-    inner class TestBestFittingPlaneCalculation {
-
-        @Test
-        fun `normal for clockwise point in XY-plane`() {
+        test("normal for clockwise point in XY-plane") {
             val pointA = -Vector3D.X_AXIS
             val pointB = Vector3D.Y_AXIS
             val pointC = Vector3D.X_AXIS
@@ -43,8 +39,7 @@ internal class Plane3DUtilTest {
             assertThat(actualBestFittingPlane.normal).isEqualTo(expectedNormal)
         }
 
-        @Test
-        fun `normal for counter clockwise point in XY-plane`() {
+        test("normal for counter clockwise point in XY-plane") {
             val pointA = Vector3D.X_AXIS
             val pointB = Vector3D.Y_AXIS
             val pointC = -Vector3D.X_AXIS
@@ -55,8 +50,7 @@ internal class Plane3DUtilTest {
             assertThat(actualBestFittingPlane.normal).isEqualTo(expectedNormal)
         }
 
-        @Test
-        fun `plane fitting with three points`() {
+        test("plane fitting with three points") {
             val pointA = Vector3D(1.0, 0.0, 0.0)
             val pointB = Vector3D(1.0, 3.0, 0.0)
             val pointC = Vector3D(1.0, 0.0, 3.0)
@@ -69,8 +63,7 @@ internal class Plane3DUtilTest {
             assertThat(actualBestFittingPlane).isEqualTo(expectedPlane)
         }
 
-        @Test
-        fun `plane fitting with multiple points`() {
+        test("plane fitting with multiple points") {
             val pointA = Vector3D(4.0, 1.0, -3.0)
             val pointB = Vector3D(2.0, 2.0, -2.0)
             val pointC = Vector3D(1.0, 1.0, 3.0)
@@ -84,11 +77,10 @@ internal class Plane3DUtilTest {
 
             assertThat(actualBestFittingPlane.normal.toDoubleArray())
                 .containsExactly(expectedPlane.normal.toDoubleArray(), Offset.offset(DBL_EPSILON_2))
-            assertTrue(actualBestFittingPlane.isSimilarTo(expectedPlane))
+            actualBestFittingPlane.isSimilarTo(expectedPlane).shouldBeTrue()
         }
 
-        @Test
-        fun `plane fitting with five points not in the same plane`() {
+        test("plane fitting with five points not in the same plane") {
             val pointA = Vector3D(1.0, 0.0, 0.0)
             val pointB = Vector3D(1.0, 3.0, 0.0)
             val pointC = Vector3D(1.0, 0.0, 3.0)
@@ -103,4 +95,4 @@ internal class Plane3DUtilTest {
             assertThat(actualBestFittingPlane).isEqualTo(expectedPlane)
         }
     }
-}
+})

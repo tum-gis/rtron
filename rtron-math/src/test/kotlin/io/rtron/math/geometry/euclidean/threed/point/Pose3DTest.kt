@@ -16,22 +16,18 @@
 
 package io.rtron.math.geometry.euclidean.threed.point
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Pose3DTest {
+class Pose3DTest : FunSpec({
+    context("TestConversionToPose2D") {
 
-    @Nested
-    inner class TestConversionToPose2D {
-
-        @Test
-        fun `conversion to pose2D within x-z-plane `() {
+        test("conversion to pose2D within x-z-plane ") {
             val point = Vector3D(1.0, 2.0, 3.0)
             val rotation = Rotation3D(1.0, 2.0, 3.0)
             val pose3D = Pose3D(point, rotation)
@@ -42,4 +38,4 @@ internal class Pose3DTest {
             assertThat(actualPose2D).isEqualTo(expectedPose2D)
         }
     }
-}
+})

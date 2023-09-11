@@ -17,20 +17,16 @@
 package io.rtron.math.analysis.function
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class LinearFunctionTest {
+class LinearFunctionTest : FunSpec({
+    context("TestValueCalculation") {
 
-    @Nested
-    inner class TestValueCalculation {
-
-        @Test
-        fun `f(3)=5 times x plus 25 should be 40`() {
+        test("f(3)=5 times x plus 25 should be 40") {
             val linearFunction = LinearFunction(5.0, 25.0)
 
             val actualResult = linearFunction.value(3.0)
@@ -39,8 +35,7 @@ internal class LinearFunctionTest {
             assertThat(actualResult.value).isEqualTo(40.0)
         }
 
-        @Test
-        fun `out of range value evaluation throws an IllegalArgumentException`() {
+        test("out of range value evaluation throws an IllegalArgumentException") {
             val linearFunction = LinearFunction(-5.0, 25.0, Range.closedOpen(1.0, 3.0))
 
             val actualResult = linearFunction.value(3.0)
@@ -50,11 +45,9 @@ internal class LinearFunctionTest {
         }
     }
 
-    @Nested
-    inner class TestFactoryMethodOfInclusivePoints {
+    context("TestFactoryMethodOfInclusivePoints") {
 
-        @Test
-        fun `basic creation of linear function with two points`() {
+        test("basic creation of linear function with two points") {
             val expectedLinearFunction = LinearFunction(
                 -3.0 / 2.0,
                 13.0 / 2.0,
@@ -66,8 +59,7 @@ internal class LinearFunctionTest {
             assertThat(actualLinearFunction).isEqualTo(expectedLinearFunction)
         }
 
-        @Test
-        fun `creation of linear function with two equal points throws an IllegalArgumentException`() {
+        test("creation of linear function with two equal points throws an IllegalArgumentException") {
             val x = 2.1
             val y = 3.4
 
@@ -75,11 +67,9 @@ internal class LinearFunctionTest {
         }
     }
 
-    @Nested
-    inner class TestFactoryMethodOfInclusiveYValueAndUnitSlope {
+    context("TestFactoryMethodOfInclusiveYValueAndUnitSlope") {
 
-        @Test
-        fun `with positive unit slope`() {
+        test("with positive unit slope") {
             val expectedLinearFunction = LinearFunction(
                 1.0,
                 2.0,
@@ -91,8 +81,7 @@ internal class LinearFunctionTest {
             assertThat(actualLinearFunction).isEqualTo(expectedLinearFunction)
         }
 
-        @Test
-        fun `with negative unit slope`() {
+        test("with negative unit slope") {
             val expectedLinearFunction = LinearFunction(
                 -1.0,
                 17.0,
@@ -104,4 +93,4 @@ internal class LinearFunctionTest {
             assertThat(actualLinearFunction).isEqualTo(expectedLinearFunction)
         }
     }
-}
+})

@@ -16,47 +16,40 @@
 
 package io.rtron.math.geometry.euclidean.twod
 
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.PI
 import io.rtron.math.std.TWO_PI
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Pose2DTest {
+class Pose2DTest : FunSpec({
+    context("TestPointAssignment") {
 
-    @Nested
-    inner class TestPointAssignment {
-
-        @Test
-        fun `assignment of positive point`() {
+        test("assignment of positive point") {
             val pose = Pose2D(Vector2D(5.0, 3.0), Rotation2D.ZERO)
 
             assertThat(pose.point).isEqualTo(Vector2D(5.0, 3.0))
         }
 
-        @Test
-        fun `assignment of negative point`() {
+        test("assignment of negative point") {
             val pose = Pose2D(Vector2D(-3.0, 1.0), Rotation2D.ZERO)
 
             assertThat(pose.point).isEqualTo(Vector2D(-3.0, 1.0))
         }
     }
 
-    @Nested
-    inner class TestRotationAssignment {
-        @Test
-        fun `assignment of two pi rotation`() {
+    context("TestRotationAssignment") {
+
+        test("assignment of two pi rotation") {
             val pose = Pose2D(Vector2D(5.0, 3.0), Rotation2D(TWO_PI))
 
             assertThat(pose.rotation.toAngleRadians()).isEqualTo(0.0)
         }
 
-        @Test
-        fun `assignment of pi rotation`() {
+        test("assignment of pi rotation") {
             val pose = Pose2D(Vector2D(-3.0, 1.0), Rotation2D(PI))
 
             assertThat(pose.rotation.toAngleRadians()).isEqualTo(PI)
         }
     }
-}
+})

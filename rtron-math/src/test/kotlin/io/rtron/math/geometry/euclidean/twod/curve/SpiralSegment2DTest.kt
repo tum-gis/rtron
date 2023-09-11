@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
@@ -35,20 +36,15 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import java.io.FileReader
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
 
-internal class SpiralSegment2DTest {
+class SpiralSegment2DTest : FunSpec({
+    context("TestPointCalculation") {
 
-    @Nested
-    inner class TestPointCalculation {
-
-        @Test
-        fun `first spiral of the ASAM example dataset Ex_Line-Spiral-Arc`() {
+        test("first spiral of the ASAM example dataset Ex_Line-Spiral-Arc") {
             val pose = Pose2D(Vector2D(3.8003686923043311e+01, -1.8133261823256248e+00), Rotation2D(3.3186980419884304e-01))
             val affine = Affine2D.of(pose)
             val curvatureFunction = LinearFunction.ofSpiralCurvature(0.0, 1.3333327910466574e-02, 2.9999999999999996e+01)
@@ -67,8 +63,7 @@ internal class SpiralSegment2DTest {
             )
         }
 
-        @Test
-        fun `second spiral of the ASAM example dataset Ex_Line-Spiral-Arc`() {
+        test("second spiral of the ASAM example dataset Ex_Line-Spiral-Arc") {
             val pose = Pose2D(Vector2D(8.7773023553010319e+01, 2.9721920045249909e+01), Rotation2D(9.3186944634590163e-01))
             val affine = Affine2D.of(pose)
             val curvatureFunction = LinearFunction.ofSpiralCurvature(1.3333327910466574e-02, 6.6666666666666671e-03, 2.0000000000000000e+01)
@@ -84,8 +79,7 @@ internal class SpiralSegment2DTest {
             assertThat(actualReturn.value.rotation.angle).isCloseTo(1.1318693921172343e+00, Offset.offset(DBL_EPSILON_4))
         }
 
-        @Test
-        fun `first spiral of the example dataset CrossingComplex8Course`() {
+        test("first spiral of the example dataset CrossingComplex8Course") {
             val pose = Pose2D(Vector2D(4.5002666984590900e+02, 5.2071081556728734e+02), Rotation2D(4.7173401120976974e+00))
             val affine = Affine2D.of(pose)
             val curvatureFunction = LinearFunction.ofSpiralCurvature(-0.0000000000000000e+00, -1.0126582278481013e-01, 4.9620253164556960e+00)
@@ -101,8 +95,7 @@ internal class SpiralSegment2DTest {
             assertThat(actualReturn.value.rotation.angle).isCloseTo(4.4660983239227257e+00, Offset.offset(DBL_EPSILON_2))
         }
 
-        @Test
-        fun `second spiral of the example dataset CrossingComplex8Course`() {
+        test("second spiral of the example dataset CrossingComplex8Course") {
             val pose = Pose2D(Vector2D(4.4256271579386976e+02, 5.0863294215453800e+02), Rotation2D(3.3977855734777722e+00))
             val affine = Affine2D.of(pose)
             val curvatureFunction = LinearFunction.ofSpiralCurvature(-1.0126582278481013e-01, -0.0000000000000000e+00, 4.9620253164556960e+00)
@@ -119,17 +112,15 @@ internal class SpiralSegment2DTest {
         }
     }
 
-    @Nested
-    inner class TestDatasetCalculation {
+    context("TestDatasetCalculation") {
 
-        private val logger = KotlinLogging.logger {}
+        val logger = KotlinLogging.logger {}
 
-        @Test
-        fun `test point and rotation calculation against csv sample dataset`() {
+        test("test point and rotation calculation against csv sample dataset") {
             val filePath = Path("src/test/datasets/spiral_test_dataset/spiral_segments.csv").absolute()
             if (!filePath.exists()) {
                 logger.warn { "Dataset does not exist at $filePath, skipping test" }
-                return
+                return@test
             }
             val fileReader = FileReader(filePath.toFile())
 
@@ -151,4 +142,4 @@ internal class SpiralSegment2DTest {
             }
         }
     }
-}
+})

@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -28,16 +29,11 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Arc2DTest {
+class Arc2DTest : FunSpec({
+    context("TestCenterCalculation") {
 
-    @Nested
-    inner class TestCenterCalculation {
-
-        @Test
-        fun `unit curvature with center above origin`() {
+        test("unit curvature with center above origin") {
             val arc = Arc2D(1.0, 2.0, 0.0)
 
             val actualCenter = arc.center
@@ -45,8 +41,7 @@ internal class Arc2DTest {
             assertThat(actualCenter).isEqualTo(Vector2D(0.0, 1.0))
         }
 
-        @Test
-        fun `unit curvature with center below origin`() {
+        test("unit curvature with center below origin") {
             val arc = Arc2D(-1.0, 2.0, 0.0)
 
             val actualCenter = arc.center
@@ -55,11 +50,9 @@ internal class Arc2DTest {
         }
     }
 
-    @Nested
-    inner class TestStartAngleCalculation {
+    context("TestStartAngleCalculation") {
 
-        @Test
-        fun `starting angle with center above origin`() {
+        test("starting angle with center above origin") {
             val arc = Arc2D(1.0, HALF_PI, 0.0)
 
             val actualStartAngle = arc.startAngle.toAngleRadians()
@@ -67,8 +60,7 @@ internal class Arc2DTest {
             assertThat(actualStartAngle).isEqualTo(PI + HALF_PI)
         }
 
-        @Test
-        fun `starting angle with center below origin`() {
+        test("starting angle with center below origin") {
             val arc = Arc2D(-1.0, HALF_PI, 0.0)
 
             val actualStartAngle = arc.startAngle.toAngleRadians()
@@ -77,11 +69,9 @@ internal class Arc2DTest {
         }
     }
 
-    @Nested
-    inner class TestEndAngleCalculation {
+    context("TestEndAngleCalculation") {
 
-        @Test
-        fun `ending angle at 0`() {
+        test("ending angle at 0") {
             val arc = Arc2D(1.0, HALF_PI, 0.0)
 
             val actualEndAngle = arc.endAngle.toAngleRadians()
@@ -90,11 +80,9 @@ internal class Arc2DTest {
         }
     }
 
-    @Nested
-    inner class TestLocalPoseCalculation {
+    context("TestLocalPoseCalculation") {
 
-        @Test
-        fun `calculate pose point on the start`() {
+        test("calculate pose point on the start") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
 
             val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
@@ -104,8 +92,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D.ZERO)
         }
 
-        @Test
-        fun `calculate pose point on the curve`() {
+        test("calculate pose point on the curve") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
             val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
@@ -116,8 +103,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(1.0, 1.0))
         }
 
-        @Test
-        fun `calculate pose angle on the start`() {
+        test("calculate pose angle on the start") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
 
             val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
@@ -127,8 +113,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(0.0)
         }
 
-        @Test
-        fun `calculate pose angle on the curve`() {
+        test("calculate pose angle on the curve") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
             val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
@@ -140,11 +125,9 @@ internal class Arc2DTest {
         }
     }
 
-    @Nested
-    inner class TestGlobalPoseCalculation {
+    context("TestGlobalPoseCalculation") {
 
-        @Test
-        fun `calculate pose point on the start`() {
+        test("calculate pose point on the start") {
             val point = Vector2D(3.0, 5.0)
             val rotation = Rotation2D(HALF_PI)
             val affine = Affine2D.of(point, rotation)
@@ -158,8 +141,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(3.0, 5.0))
         }
 
-        @Test
-        fun `calculate pose point on the curve`() {
+        test("calculate pose point on the curve") {
             val point = Vector2D(3.0, 5.0)
             val rotation = Rotation2D(HALF_PI)
             val affine = Affine2D.of(point, rotation)
@@ -174,8 +156,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(2.0, 6.0))
         }
 
-        @Test
-        fun `calculate pose in fourth quadrant`() {
+        test("calculate pose in fourth quadrant") {
             val point = Vector2D(60.0, -50.0)
             val rotation = Rotation2D(5.5)
             val affine = Affine2D.of(point, rotation)
@@ -190,8 +171,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.point.y).isCloseTo(point.y, Offset.offset(DBL_EPSILON_4))
         }
 
-        @Test
-        fun `calculate pose angle on the start`() {
+        test("calculate pose angle on the start") {
             val point = Vector2D(3.0, 5.0)
             val rotation = Rotation2D(HALF_PI)
             val affine = Affine2D.of(point, rotation)
@@ -205,8 +185,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(HALF_PI)
         }
 
-        @Test
-        fun `calculate pose angle on the curve`() {
+        test("calculate pose angle on the curve") {
             val point = Vector2D(3.0, 5.0)
             val rotation = Rotation2D(HALF_PI)
             val affine = Affine2D.of(point, rotation)
@@ -221,8 +200,7 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(PI)
         }
 
-        @Test
-        fun `calculate pose angle in fourth quadrant`() {
+        test("calculate pose angle in fourth quadrant") {
             val point = Vector2D(3.0, 5.0)
             val rotation = Rotation2D(HALF_PI)
             val affine = Affine2D.of(point, rotation)
@@ -237,4 +215,4 @@ internal class Arc2DTest {
             assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(PI + HALF_PI)
         }
     }
-}
+})

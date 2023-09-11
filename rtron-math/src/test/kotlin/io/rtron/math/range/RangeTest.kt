@@ -16,173 +16,150 @@
 
 package io.rtron.math.range
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldBeNull
 import io.rtron.math.std.DBL_EPSILON
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class RangeTest {
+class RangeTest : FunSpec({
+    context("UpperLowerEndpoint") {
 
-    @Nested
-    inner class UpperLowerEndpoint {
-
-        @Test
-        fun `lowerEndpoint should yield null, if no lower endpoint exists`() {
+        test("lowerEndpoint should yield null, if no lower endpoint exists") {
             val range: Range<Double> = Range.all()
 
-            assertNull(range.lowerEndpointOrNull())
+            range.lowerEndpointOrNull().shouldBeNull()
         }
 
-        @Test
-        fun `upperEndpoint should yield null, if no upper endpoint exists`() {
+        test("upperEndpoint should yield null, if no upper endpoint exists") {
             val range: Range<Double> = Range.all()
 
-            assertNull(range.upperEndpointOrNull())
+            range.upperEndpointOrNull().shouldBeNull()
         }
     }
 
-    @Nested
-    inner class ContainsValue {
+    context("ContainsValue") {
 
-        @Test
-        fun `closed range should contain basic value`() {
+        test("closed range should contain basic value") {
             val range = Range.closed(-5.0, -2.0)
 
             val actualContains = range.contains(-2.0)
 
-            assertTrue(actualContains)
+            actualContains.shouldBeTrue()
         }
 
-        @Test
-        fun `closed range should contain lower value`() {
+        test("closed range should contain lower value") {
             val range = Range.closed(-5.0, -2.0)
 
             val actualContains = range.contains(-5.0)
 
-            assertTrue(actualContains)
+            actualContains.shouldBeTrue()
         }
 
-        @Test
-        fun `closed range should contain upper value`() {
+        test("closed range should contain upper value") {
             val range = Range.closed(-5.0, -2.0)
 
             val actualContains = range.contains(-2.0)
 
-            assertTrue(actualContains)
+            actualContains.shouldBeTrue()
         }
 
-        @Test
-        fun `greaterThan range contains infinity`() {
+        test("greaterThan range contains infinity") {
             val range = Range.greaterThan(1.0)
 
             val actualContains = range.contains(Double.POSITIVE_INFINITY)
-            assertTrue(actualContains)
+
+            actualContains.shouldBeTrue()
         }
 
-        @Test
-        fun `lessThan range contains negative infinity`() {
+        test("lessThan range contains negative infinity") {
             val range = Range.lessThan(-12.0)
 
             val actualContains = range.contains(Double.NEGATIVE_INFINITY)
 
-            assertTrue(actualContains)
+            actualContains.shouldBeTrue()
         }
 
-        @Test
-        fun `closed range does not contain positive infinity`() {
+        test("closed range does not contain positive infinity") {
             val range = Range.open(1.0, 555.3)
 
             val actualContains = range.contains(Double.POSITIVE_INFINITY)
 
-            assertFalse(actualContains)
+            actualContains.shouldBeFalse()
         }
 
-        @Test
-        fun `closed start range does not contain negative infinity`() {
+        test("closed start range does not contain negative infinity") {
             val range = Range.closed(-20.0, 0.0)
 
             val actualContains = range.contains(Double.NEGATIVE_INFINITY)
 
-            assertFalse(actualContains)
+            actualContains.shouldBeFalse()
         }
 
-        @Test
-        fun `closed range contains negative start limit`() {
+        test("closed range contains negative start limit") {
             val actualContains = Range.closed(-3.1, 2.0).contains(-3.1)
 
-            assertTrue(actualContains)
+            actualContains.shouldBeTrue()
         }
 
-        @Test
-        fun `closed range contains positive end limit`() {
+        test("closed range contains positive end limit") {
             val actualContains = Range.closed(0.0, 2.0).contains(2.0)
 
-            assertTrue(actualContains)
+            actualContains.shouldBeTrue()
         }
 
-        @Test
-        fun `closed range does not contain negative start limit`() {
+        test("closed range does not contain negative start limit") {
             val actualContains = Range.closed(-3.1, 2.0).contains(-3.10000001)
 
-            assertFalse(actualContains)
+            actualContains.shouldBeFalse()
         }
 
-        @Test
-        fun `closed range does not contain positive start limit`() {
+        test("closed range does not contain positive start limit") {
             val actualContains = Range.closed(0.0, 2.0).contains(2.0001)
 
-            assertFalse(actualContains)
+            actualContains.shouldBeFalse()
         }
     }
 
-    @Nested
-    inner class TestConstruction {
+    context("TestConstruction") {
 
-        @Test
-        fun `negative orientation of the range throws an illegal argument exception`() {
+        test("negative orientation of the range throws an illegal argument exception") {
             assertThatIllegalArgumentException().isThrownBy { Range.closed(-1.0, -1.25) }
         }
     }
 
-    @Nested
-    inner class TestIsConnected {
+    context("TestIsConnected") {
 
-        @Test
-        fun `is not connected`() {
+        test("is not connected") {
             val rangeA = Range.closed(1.0, 1.0)
             val rangeB = Range.closed(2.0, 2.0)
 
             val actualIsConnected = rangeA.isConnected(rangeB)
 
-            assertFalse(actualIsConnected)
+            actualIsConnected.shouldBeFalse()
         }
 
-        @Test
-        fun `is not connected with epsilon`() {
+        test("is not connected with epsilon") {
             val rangeA = Range.closed(0.0, 1.0)
             val rangeB = Range.closed((1.0 + DBL_EPSILON), 2.0)
 
             val actualIsConnected = rangeA.isConnected(rangeB)
 
-            assertFalse(actualIsConnected)
+            actualIsConnected.shouldBeFalse()
         }
 
-        @Test
-        fun `is connected`() {
+        test("is connected") {
             val rangeA = Range.closed(0.0, 1.0)
             val rangeB = Range.closed((1.0 - DBL_EPSILON), 2.0)
 
             val actualIsConnected = rangeA.isConnected(rangeB)
 
-            assertTrue(actualIsConnected)
+            actualIsConnected.shouldBeTrue()
         }
 
-        @Test
-        fun `connected range joins with positive values`() {
+        test("connected range joins with positive values") {
             val rangeA = Range.closed(0.0, 1.0)
             val rangeB = Range.closed(1.0, 2.0)
 
@@ -191,8 +168,7 @@ internal class RangeTest {
             assertThat(actualJoin).isEqualTo(Range.closed(0.0, 2.0))
         }
 
-        @Test
-        fun `Connected joins with negative values`() {
+        test("Connected joins with negative values") {
             val rangeA = Range.closed(-1.0, -0.5)
             val rangeB = Range.closed(-0.5, -0.2)
 
@@ -201,12 +177,11 @@ internal class RangeTest {
             assertThat(actualJoin).isEqualTo(Range.closed(-1.0, -0.2))
         }
 
-        @Test
-        fun `join throws exception if the ranges are not connected`() {
+        test("join throws exception if the ranges are not connected") {
             val rangeA = Range.closed(-1.0, -0.51)
             val rangeB = Range.closed(-0.5, -0.2)
 
             assertThatIllegalArgumentException().isThrownBy { rangeA.join(rangeB) }
         }
     }
-}
+})

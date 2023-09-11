@@ -16,17 +16,13 @@
 
 package io.rtron.std
 
+import io.kotest.core.spec.style.FunSpec
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class SetsKtTest {
+class SetsKtTest : FunSpec({
+    context("TestCombinations") {
 
-    @Nested
-    inner class TestCombinations {
-
-        @Test
-        fun `test basic combination generation`() {
+        test("test basic combination generation") {
             val startSet = setOf("a", "b", "c")
             val expectedCombinations = setOf(
                 setOf("a", "b"),
@@ -39,4 +35,4 @@ internal class SetsKtTest {
             assertThat(actualCombinations).isEqualTo(expectedCombinations)
         }
     }
-}
+})

@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
@@ -24,16 +25,12 @@ import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import kotlin.math.sqrt
 
-internal class LineSegment2DTest {
+class LineSegment2DTest : FunSpec({
+    context("TestLengthCalculation") {
 
-    @Nested
-    inner class TestLengthCalculation {
-        @Test
-        fun `length of line segment on axis`() {
+        test("length of line segment on axis") {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(7.0, 0.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
@@ -41,8 +38,7 @@ internal class LineSegment2DTest {
             assertThat(lineSegment.length).isCloseTo(7.0, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `length of diagonal line segment`() {
+        test("length of diagonal line segment") {
             val pointA = Vector2D(3.0, 0.0)
             val pointB = Vector2D(0.0, 4.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
@@ -51,10 +47,9 @@ internal class LineSegment2DTest {
         }
     }
 
-    @Nested
-    inner class TestPoseAngleCalculation {
-        @Test
-        fun `angle of line segment on axis`() {
+    context("TestPoseAngleCalculation") {
+
+        test("angle of line segment on axis") {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(0.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
@@ -66,8 +61,7 @@ internal class LineSegment2DTest {
             assertThat(actualReturn.value.rotation.angle).isEqualTo(HALF_PI)
         }
 
-        @Test
-        fun `angle of diagonal line segment`() {
+        test("angle of diagonal line segment") {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(1.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
@@ -80,10 +74,9 @@ internal class LineSegment2DTest {
         }
     }
 
-    @Nested
-    inner class TestPosePointCalculation {
-        @Test
-        fun `point on line segment on axis`() {
+    context("TestPosePointCalculation") {
+
+        test("point on line segment on axis") {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(10.0, 0.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
@@ -96,8 +89,7 @@ internal class LineSegment2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(5.0, 0.0))
         }
 
-        @Test
-        fun `point on diagonal line segment on axis`() {
+        test("point on diagonal line segment on axis") {
             val pointA = Vector2D(0.0, 0.0)
             val pointB = Vector2D(1.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
@@ -111,8 +103,7 @@ internal class LineSegment2DTest {
             assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `point on diagonal line segment on axis 2`() {
+        test("point on diagonal line segment on axis 2") {
             val pointA = Vector2D(-1.0, 0.0)
             val pointB = Vector2D(0.0, 0.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
@@ -125,4 +116,4 @@ internal class LineSegment2DTest {
             assertThat(actualReturn.value.point).isEqualTo(Vector2D(0.0, 0.0))
         }
     }
-}
+})

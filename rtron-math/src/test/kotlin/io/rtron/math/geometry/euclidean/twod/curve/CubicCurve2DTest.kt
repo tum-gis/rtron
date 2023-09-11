@@ -17,6 +17,7 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
+import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -27,16 +28,11 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.data.Offset
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class CubicCurve2DTest {
+class CubicCurve2DTest : FunSpec({
+    context("TestPoseCalculation") {
 
-    @Nested
-    inner class TestPoseCalculation {
-
-        @Test
-        fun `pose calculation of straight line`() {
+        test("pose calculation of straight line") {
             val coefficients = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val pose = Pose2D(Vector2D(0.0, 0.0), Rotation2D(0.0))
             val affine = Affine2D.of(pose)
@@ -53,8 +49,7 @@ internal class CubicCurve2DTest {
             assertThat(actualReturn.value.rotation.angle).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
         }
 
-        @Test
-        fun `pose calculation of straight line with start pose offset`() {
+        test("pose calculation of straight line with start pose offset") {
             val coefficients = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
             val pose = Pose2D(Vector2D(0.0, 0.0), Rotation2D(HALF_PI))
             val affine = Affine2D.of(pose)
@@ -74,8 +69,8 @@ internal class CubicCurve2DTest {
          * Cubic curve geometry from the poly3 example dataset of [ASAM](https://www.asam.net/standards/detail/opendrive/).
          * The sample dataset contains gaps between the geometry elements of the reference line.
          */
-        @Test
-        fun `cubic curve geometry from OpenDRIVE poly3 example dataset with gap to the next curve element`() {
+
+        test("cubic curve geometry from OpenDRIVE poly3 example dataset with gap to the next curve element") {
             val coefficients = doubleArrayOf(0.0, 0.0, 1.1010160043712483e-02, -4.0376563467901658e-04)
             val pose = Pose2D(Vector2D(-2.6331198952545350e+01, -7.4309373646250769e+00), Rotation2D(6.7579136200528211e-01))
             val affine = Affine2D.of(pose)
@@ -93,4 +88,4 @@ internal class CubicCurve2DTest {
             assertThat(actualReturn.value.rotation.angle).isNotCloseTo(3.8412114603351055e-01, Offset.offset(DBL_EPSILON)) // not coincident with next curve element
         }
     }
-}
+})

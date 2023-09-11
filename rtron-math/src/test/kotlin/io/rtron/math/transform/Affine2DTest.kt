@@ -16,6 +16,8 @@
 
 package io.rtron.math.transform
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -23,47 +25,35 @@ import io.rtron.math.linear.RealMatrix
 import io.rtron.math.linear.RealVector
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 
-internal class Affine2DTest {
+class Affine2DTest : FunSpec({
 
-    @Nested
-    inner class TestTransform {
-        @Test
-        fun `test rotation`() {
+    context("TestTransform") {
+        test("test rotation") {
             val point = Vector2D.X_AXIS
             val rotationAngle = Rotation2D(HALF_PI)
             val affine = Affine2D.of(rotationAngle)
 
             val actualTransformed = affine.transform(point)
 
-            assertThat(actualTransformed).isEqualTo(Vector2D(0.0, 1.0))
+            actualTransformed shouldBe Vector2D(0.0, 1.0)
         }
     }
 
-    @Nested
-    inner class TestInverseTransform {
-
-        @Test
-        fun `inverse translation transform`() {
+    context("TestInverseTransform") {
+        test("inverse translation transform") {
             val point = Vector2D(10.0, 12.0)
             val translation = Vector2D(5.0, 2.0)
             val affine = Affine2D.of(translation)
 
             val actualTransformed = affine.inverseTransform(point)
 
-            assertThat(actualTransformed).isEqualTo(Vector2D(5.0, 10.0))
+            actualTransformed shouldBe Vector2D(5.0, 10.0)
         }
     }
 
-    @Nested
-    inner class TestAffineMultiplication {
-
-        @Test
-        fun `test appending`() {
+    context("TestAffineMultiplication") {
+        test("test appending") {
             val translation = Vector2D(1.0, 2.0)
             val affineA = Affine2D.of(translation)
             val scaling = RealVector.of(2.0, 3.0)
@@ -78,16 +68,13 @@ internal class Affine2DTest {
             val actualAppended = affineA.append(affineB)
             val actualMatrix = actualAppended.toMatrix()
 
-            assertThat(actualMatrix.dimension).isEqualTo(expectedMatrix.dimension)
-            assertArrayEquals(expectedMatrix.toDoubleArray(), actualMatrix.toDoubleArray())
+            actualMatrix.dimension shouldBe expectedMatrix.dimension
+            expectedMatrix.toDoubleArray() shouldBe actualMatrix.toDoubleArray()
         }
     }
 
-    @Nested
-    inner class TestPoseTransforms {
-
-        @Test
-        fun `test translation`() {
+    context("TestPoseTransforms") {
+        test("test translation") {
             val point = Vector2D(5.0, 3.0)
             val pose = Pose2D(Vector2D(-10.0, -5.0), Rotation2D(0.0))
             val affineTranslation = Affine2D.of(pose.point)
@@ -96,78 +83,69 @@ internal class Affine2DTest {
 
             val actualTransformed = affine.transform(point)
 
-            assertThat(actualTransformed).isEqualTo(Vector2D(-5.0, -2.0))
+            actualTransformed shouldBe Vector2D(-5.0, -2.0)
         }
 
-        @Test
-        fun `inverse transform with pose in origin`() {
+        test("inverse transform with pose in origin") {
             val point = Vector2D(5.0, 3.0)
             val pose = Pose2D(Vector2D(0.0, 0.0), Rotation2D(0.0))
             val affine = Affine2D.of(Affine2D.of(pose.point), Affine2D.of(pose.rotation))
 
             val actualTransformed = affine.inverseTransform(point)
 
-            assertThat(actualTransformed).isEqualTo(Vector2D(5.0, 3.0))
+            actualTransformed shouldBe Vector2D(5.0, 3.0)
         }
 
-        @Test
-        fun `transform with rotated pose in origin`() {
+        test("transform with rotated pose in origin") {
             val point = Vector2D(5.0, 0.0)
             val pose = Pose2D(Vector2D(0.0, 0.0), Rotation2D(HALF_PI))
             val affine = Affine2D.of(Affine2D.of(pose.point), Affine2D.of(pose.rotation))
 
             val actualTransformed = affine.transform(point)
 
-            assertThat(actualTransformed).isEqualTo(Vector2D(0.0, 5.0))
+            actualTransformed shouldBe Vector2D(0.0, 5.0)
         }
 
-        @Test
-        fun `transform with rotated pose and offset point`() {
+        test("transform with rotated pose and offset point") {
             val point = Vector2D(2.0, 3.0)
             val pose = Pose2D(Vector2D(0.0, 0.0), Rotation2D(HALF_PI))
             val affine = Affine2D.of(Affine2D.of(pose.point), Affine2D.of(pose.rotation))
 
             val actualTransformed = affine.transform(point)
 
-            assertThat(actualTransformed).isEqualTo(Vector2D(-3.0, 2.0))
+            actualTransformed shouldBe Vector2D(-3.0, 2.0)
         }
     }
 
-    @Nested
-    inner class TestDecomposition {
-
-        @Test
-        fun `extract translation point from basic affine`() {
+    context("TestDecomposition") {
+        test("extract translation point from basic affine") {
             val translation = Vector2D(1.0, 2.0)
             val affine = Affine2D.of(translation)
 
             val actual = affine.extractTranslation()
 
-            assertThat(actual).isEqualTo(translation)
+            actual shouldBe translation
         }
 
-        @Test
-        fun `extract rotation from basic affine`() {
+        test("extract rotation from basic affine") {
             val rotation = Rotation2D(QUARTER_PI)
             val affine = Affine2D.of(rotation)
 
             val actual = affine.extractRotation()
 
-            assertThat(actual).isEqualTo(rotation)
+            actual shouldBe rotation
         }
 
-        @Test
-        fun `extract scale vector from basic affine`() {
+        test("extract scale vector from basic affine") {
             val scaling = RealVector(doubleArrayOf(3.0, 2.0))
             val affine = Affine2D.of(scaling)
 
             val actual = affine.extractScaling()
 
-            assertThat(actual).isEqualTo(scaling)
+            actual shouldBe scaling
         }
 
-        @Test
-        fun `extract rotation from affine with scaling, translation and rotation`() {
+        test("extract rotation from affine with scaling, translation and rotation") {
             val scaling = RealVector(doubleArrayOf(3.0, 2.0))
             val translation = Vector2D(3.0, 2.0)
             val rotation = Rotation2D(HALF_PI)
@@ -175,7 +153,7 @@ internal class Affine2DTest {
 
             val actual = affine.extractRotation()
 
-            assertThat(actual.toAngleRadians()).isEqualTo(rotation.toAngleRadians())
+            actual.toAngleRadians() shouldBe rotation.toAngleRadians()
         }
     }
-}
+})
