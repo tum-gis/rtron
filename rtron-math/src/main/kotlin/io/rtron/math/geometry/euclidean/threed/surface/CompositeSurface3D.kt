@@ -18,8 +18,8 @@ package io.rtron.math.geometry.euclidean.threed.surface
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.nonEmptyListOf
+import arrow.core.raise.either
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 
@@ -44,7 +44,7 @@ class CompositeSurface3D(
     constructor(surfaceMember: AbstractSurface3D) : this(nonEmptyListOf(surfaceMember))
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either.eager {
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either {
         val polygons: List<Polygon3D> = surfaceMembers.map { it.calculatePolygonsGlobalCS().bind() }.flatten()
         polygons.let { it.toNonEmptyListOrNull()!! }
     }

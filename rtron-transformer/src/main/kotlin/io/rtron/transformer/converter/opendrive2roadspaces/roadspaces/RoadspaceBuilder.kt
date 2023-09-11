@@ -133,16 +133,22 @@ class RoadspaceBuilder(
             attribute("junction", road.getJunctionOption())
             attribute("rule", road.rule.map { it.toString() })
 
-            road.link.tap { roadLink ->
-                roadLink.predecessor.tap { predecessor ->
+            road.link.onSome { roadLink ->
+                roadLink.predecessor.onSome { predecessor ->
                     attribute("predecessor_road", predecessor.getRoadPredecessorSuccessor().map { it.first })
-                    attribute("predecessor_contactPoint", predecessor.getRoadPredecessorSuccessor().map { it.second.toString() })
+                    attribute(
+                        "predecessor_contactPoint",
+                        predecessor.getRoadPredecessorSuccessor().map { it.second.toString() }
+                    )
                     attribute("predecessor_junction", predecessor.getJunctionPredecessorSuccessor())
                 }
 
-                roadLink.successor.tap { successor ->
+                roadLink.successor.onSome { successor ->
                     attribute("successor_road", successor.getRoadPredecessorSuccessor().map { it.first })
-                    attribute("successor_contactPoint", successor.getRoadPredecessorSuccessor().map { it.second.toString() })
+                    attribute(
+                        "successor_contactPoint",
+                        successor.getRoadPredecessorSuccessor().map { it.second.toString() }
+                    )
                     attribute("successor_junction", successor.getJunctionPredecessorSuccessor())
                 }
             }

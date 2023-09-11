@@ -43,10 +43,10 @@ data class RoadspaceObjectIdentifier(
         val roadspaceObjectIdentifier = this
         return attributes(prefix) {
             attribute("roadObjectId", roadspaceObjectIdentifier.roadspaceObjectId)
-            roadspaceObjectIdentifier.roadspaceObjectRepeatIndex.tap {
+            roadspaceObjectIdentifier.roadspaceObjectRepeatIndex.onSome {
                 attribute("roadObjectRepeatIndex", it)
             }
-            roadspaceObjectIdentifier.roadspaceObjectName.tap {
+            roadspaceObjectIdentifier.roadspaceObjectName.onSome {
                 attribute("roadObjectName", it)
             }
         } + roadspaceObjectIdentifier.roadspaceIdentifier.toAttributes(prefix)

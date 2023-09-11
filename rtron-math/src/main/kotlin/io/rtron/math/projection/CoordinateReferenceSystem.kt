@@ -17,8 +17,8 @@
 package io.rtron.math.projection
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import arrow.core.right
 import org.locationtech.proj4j.CRSFactory as ProjCRSFactory
 import org.locationtech.proj4j.CoordinateReferenceSystem as ProjCoordinateReferenceSystem
@@ -78,7 +78,7 @@ class CoordinateReferenceSystem(
          *
          * @param parameters PROJ.4 projection parameter string
          */
-        fun ofParameters(parameters: String): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> = either.eager {
+        fun ofParameters(parameters: String): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> = either {
             val epsgCode = parametersToEpsgCode(parameters).bind()
             of(epsgCode).bind()
         }

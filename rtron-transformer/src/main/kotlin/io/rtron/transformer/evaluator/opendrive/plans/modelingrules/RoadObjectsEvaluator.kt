@@ -35,10 +35,17 @@ object RoadObjectsEvaluator {
 
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
-            currentRoad.objects.tap { currentRoadObjects ->
-                val roadObjectsFiltered = currentRoadObjects.roadObject.filter { it.s <= currentRoad.length + parameters.numberTolerance }
+            currentRoad.objects.onSome { currentRoadObjects ->
+                val roadObjectsFiltered =
+                    currentRoadObjects.roadObject.filter { it.s <= currentRoad.length + parameters.numberTolerance }
                 if (currentRoadObjects.roadObject.size > roadObjectsFiltered.size) {
-                    messageList += DefaultMessage.of("RoadObjectPositionNotInSValueRange", "Road object (number of objects affected: ${currentRoadObjects.roadObject.size - roadObjectsFiltered.size}) were removed since they were positioned outside the defined length of the road.", currentRoad.additionalId, Severity.ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of(
+                        "RoadObjectPositionNotInSValueRange",
+                        "Road object (number of objects affected: ${currentRoadObjects.roadObject.size - roadObjectsFiltered.size}) were removed since they were positioned outside the defined length of the road.",
+                        currentRoad.additionalId,
+                        Severity.ERROR,
+                        wasFixed = true
+                    )
                 }
                 currentRoadObjects.roadObject = roadObjectsFiltered
             }
@@ -49,19 +56,33 @@ object RoadObjectsEvaluator {
         modifiedOpendriveModel = everyRoadObject.modify(modifiedOpendriveModel) { currentRoadObject ->
 
             // adding ids for outline elements
-            currentRoadObject.outlines.tap { currentOutlinesElement ->
-                val outlineElementsWithoutId = currentOutlinesElement.outline.filter { it.id.isEmpty() }
+            currentRoadObject.outlines.onSome { currentOutlinesElement ->
+                val outlineElementsWithoutId = currentOutlinesElement.outline.filter { it.id.isNone() }
 
                 if (outlineElementsWithoutId.isNotEmpty()) {
                     val startId: Int = currentOutlinesElement.outline.map { it.id }.flattenOption().maxOrNull() ?: 0
-                    messageList += DefaultMessage.of("MissingValue", "Missing value for attribute 'id'.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
-                    outlineElementsWithoutId.forEachIndexed { index, outlineElement -> outlineElement.id = Some(startId + index) }
+                    messageList += DefaultMessage.of(
+                        "MissingValue",
+                        "Missing value for attribute 'id'.",
+                        currentRoadObject.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true
+                    )
+                    outlineElementsWithoutId.forEachIndexed { index, outlineElement ->
+                        outlineElement.id = Some(startId + index)
+                    }
                 }
             }
 
-            currentRoadObject.outlines.tap { currentRoadObjectOutline ->
+            currentRoadObject.outlines.onSome { currentRoadObjectOutline ->
                 if (currentRoadObjectOutline.outline.any { it.isPolyhedron() && !it.isPolyhedronUniquelyDefined() }) {
-                    messageList += DefaultMessage.of("SimultaneousDefinitionCornerRoadCornerLocal", "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more <cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of(
+                        "SimultaneousDefinitionCornerRoadCornerLocal",
+                        "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more <cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.",
+                        currentRoadObject.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true
+                    )
                     currentRoadObjectOutline.outline.forEach { it.cornerLocal = emptyList() }
                 }
             }
@@ -69,7 +90,13 @@ object RoadObjectsEvaluator {
             val repeatElementsFiltered = currentRoadObject.repeat.filter { it.length >= parameters.numberTolerance }
             if (repeatElementsFiltered.size < currentRoadObject.repeat.size) {
                 // TODO: double check handling
-                messageList += DefaultMessage.of("RepeatElementHasZeroLength", "A repeat element should have a length higher than zero and tolerance.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                messageList += DefaultMessage.of(
+                    "RepeatElementHasZeroLength",
+                    "A repeat element should have a length higher than zero and tolerance.",
+                    currentRoadObject.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = true
+                )
                 currentRoadObject.repeat = repeatElementsFiltered
             }
 

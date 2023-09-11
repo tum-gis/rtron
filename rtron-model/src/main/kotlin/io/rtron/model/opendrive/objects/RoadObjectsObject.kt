@@ -95,16 +95,16 @@ data class RoadObjectsObject(
         outlines.fold({ emptyList() }, { it.getLinearRingsDefinedByLocalCorners() })
 
     /** Returns true, if the provided geometry information correspond to a cuboid. */
-    fun containsCuboid() = length.isDefined() && width.isDefined() && heightValidated.isDefined()
+    fun containsCuboid() = length.isSome() && width.isSome() && heightValidated.isSome()
 
     /** Returns true, if the provided geometry information correspond to a rectangle. */
-    fun containsRectangle() = length.isDefined() && width.isDefined() && heightValidated.isEmpty()
+    fun containsRectangle() = length.isSome() && width.isSome() && heightValidated.isNone()
 
     /** Returns true, if the provided geometry information correspond to a cylinder. */
-    fun containsCylinder() = radius.isDefined() && heightValidated.isDefined()
+    fun containsCylinder() = radius.isSome() && heightValidated.isSome()
 
     /** Returns true, if the provided geometry information correspond to a circle. */
-    fun containsCircle() = radius.isDefined() && heightValidated.isEmpty()
+    fun containsCircle() = radius.isSome() && heightValidated.isNone()
 
     companion object
 }

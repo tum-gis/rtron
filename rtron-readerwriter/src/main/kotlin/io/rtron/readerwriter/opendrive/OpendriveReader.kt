@@ -17,8 +17,8 @@
 package io.rtron.readerwriter.opendrive
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import io.rtron.io.files.CompressedFileExtension
 import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
@@ -42,7 +42,7 @@ object OpendriveFileReader {
     private val logger = KotlinLogging.logger {}
 
     // Methods
-    fun readFromFile(filePath: Path): Either<OpendriveReaderException, OpendriveModel> = either.eager {
+    fun readFromFile(filePath: Path): Either<OpendriveReaderException, OpendriveModel> = either {
         if (!filePath.isRegularFile()) {
             OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
         }
@@ -63,7 +63,7 @@ object OpendriveFileReader {
         opendriveModel
     }
     fun readFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, OpendriveModel> =
-        either.eager {
+        either {
             val unmarshallerOpendriveVersion = when (opendriveVersion) {
                 OpendriveVersion.V0_7 -> OpendriveVersion.V1_4
                 OpendriveVersion.V1_1 -> OpendriveVersion.V1_4

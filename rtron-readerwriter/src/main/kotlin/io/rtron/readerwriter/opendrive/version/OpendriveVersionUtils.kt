@@ -17,8 +17,8 @@
 package io.rtron.readerwriter.opendrive.version
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import io.rtron.readerwriter.opendrive.OpendriveReaderException
 import org.w3c.dom.Document
 import java.io.InputStream
@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 object OpendriveVersionUtils {
 
-    fun getOpendriveVersion(filePath: InputStream): Either<OpendriveReaderException, OpendriveVersion> = either.eager {
+    fun getOpendriveVersion(filePath: InputStream): Either<OpendriveReaderException, OpendriveVersion> = either {
         val xmlDoc: Document = Either.catch { DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(filePath) }
             .mapLeft { OpendriveReaderException.MalformedXmlDocument(it.message ?: "") }
             .bind()

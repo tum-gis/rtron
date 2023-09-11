@@ -48,34 +48,70 @@ object RoadLanesEvaluator {
 
         everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
             if (currentLaneSection.center.getNumberOfLanes() != 1) {
-                messageList += DefaultMessage.of("LaneSectionContainsNoCenterLane", "Lane section contains no center lane.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                messageList += DefaultMessage.of(
+                    "LaneSectionContainsNoCenterLane",
+                    "Lane section contains no center lane.",
+                    currentLaneSection.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = false
+                )
             }
 
             if (currentLaneSection.getNumberOfLeftRightLanes() == 0) {
-                messageList += DefaultMessage.of("LaneSectionContainsNoLeftOrRightLane", "Lane section contains neither a left nor a right lane.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                messageList += DefaultMessage.of(
+                    "LaneSectionContainsNoLeftOrRightLane",
+                    "Lane section contains neither a left nor a right lane.",
+                    currentLaneSection.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = false
+                )
             }
 
-            currentLaneSection.left.tap { currentLaneSectionLeft ->
+            currentLaneSection.left.onSome { currentLaneSectionLeft ->
                 val leftLaneIds = currentLaneSectionLeft.lane.map { it.id }
                 val expectedIds = (currentLaneSectionLeft.getNumberOfLanes() downTo 1).toList()
 
                 if (leftLaneIds.distinct().size < leftLaneIds.size) {
-                    messageList += DefaultMessage.of("LaneIdDuplicatesWithinLeftLaneSection", "Lane ids are not unique within the left lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                    messageList += DefaultMessage.of(
+                        "LaneIdDuplicatesWithinLeftLaneSection",
+                        "Lane ids are not unique within the left lane section.",
+                        currentLaneSection.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false
+                    )
                 }
                 if (!leftLaneIds.containsAll(expectedIds)) {
-                    messageList += DefaultMessage.of("NonConsecutiveLaneIdsWithinLeftLaneSection", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                    messageList += DefaultMessage.of(
+                        "NonConsecutiveLaneIdsWithinLeftLaneSection",
+                        "Lane numbering shall be consecutive without any gaps.",
+                        currentLaneSection.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false
+                    )
                 }
             }
 
-            currentLaneSection.right.tap { currentLaneSectionRight ->
+            currentLaneSection.right.onSome { currentLaneSectionRight ->
                 val rightLaneIds = currentLaneSectionRight.lane.map { it.id }
                 val expectedIds = (-1 downTo -currentLaneSectionRight.getNumberOfLanes()).toList()
 
                 if (rightLaneIds.distinct().size < rightLaneIds.size) {
-                    messageList += DefaultMessage.of("LaneIdDuplicatesWithinRightLaneSection", "Lane ids are not unique within the right lane section.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                    messageList += DefaultMessage.of(
+                        "LaneIdDuplicatesWithinRightLaneSection",
+                        "Lane ids are not unique within the right lane section.",
+                        currentLaneSection.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false
+                    )
                 }
                 if (!rightLaneIds.containsAll(expectedIds)) {
-                    messageList += DefaultMessage.of("NonConsecutiveLaneIdsWithinRightLaneSection", "Lane numbering shall be consecutive without any gaps.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                    messageList += DefaultMessage.of(
+                        "NonConsecutiveLaneIdsWithinRightLaneSection",
+                        "Lane numbering shall be consecutive without any gaps.",
+                        currentLaneSection.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false
+                    )
                 }
             }
 

@@ -18,8 +18,8 @@ package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
@@ -43,7 +43,7 @@ object LinearRing3DFactory {
     /**
      * Builds a [LinearRing3D] from a list of vertices by filtering and preparing the vertices.
      */
-    fun buildFromVertices(outlineId: RoadObjectOutlineIdentifier, vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> = either.eager {
+    fun buildFromVertices(outlineId: RoadObjectOutlineIdentifier, vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> = either {
         val messageList = DefaultMessageList()
 
         // remove end element, if start and end element are equal

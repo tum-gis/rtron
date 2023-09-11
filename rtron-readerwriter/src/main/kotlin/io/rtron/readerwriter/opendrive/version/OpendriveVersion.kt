@@ -72,7 +72,7 @@ enum class OpendriveVersion(val rev: Pair<Int, Int>) {
     override fun toString() = "v.${rev.first}.${rev.second}"
 
     companion object {
-        private val map = OpendriveVersion.values().associateBy(OpendriveVersion::rev)
+        private val map = OpendriveVersion.entries.associateBy(OpendriveVersion::rev)
 
         fun ofRevision(revMajor: Int, revMinor: Int): Either<UnknownOpendriveVersion, OpendriveVersion> =
             map.getValueEither(Pair(revMajor, revMinor)).mapLeft { UnknownOpendriveVersion(it.message) }

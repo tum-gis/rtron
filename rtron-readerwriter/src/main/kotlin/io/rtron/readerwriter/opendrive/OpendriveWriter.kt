@@ -17,7 +17,7 @@
 package io.rtron.readerwriter.opendrive
 
 import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.writer.OpendriveMarshaller
@@ -34,7 +34,7 @@ class OpendriveFileWriter(
     private val opendriveMarshaller by lazy { OpendriveMarshaller() }
 
     // Methods
-    fun write(model: OpendriveModel, directoryPath: Path): Either<OpendriveWriterException, Path> = either.eager {
+    fun write(model: OpendriveModel, directoryPath: Path): Either<OpendriveWriterException, Path> = either {
         val filePath = opendriveMarshaller.writeToFile(model, directoryPath, parameters.fileCompression).bind()
         logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
 

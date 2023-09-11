@@ -32,7 +32,7 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: String) {
-        StringAttribute.of(namePrefix + name, value).tap { attributes += it }
+        StringAttribute.of(namePrefix + name, value).onSome { attributes += it }
     }
 
     fun attribute(name: String, value: Int) {
@@ -40,7 +40,7 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: Double) {
-        DoubleAttribute.of(namePrefix + name, value).tap { attributes += it }
+        DoubleAttribute.of(namePrefix + name, value).onSome { attributes += it }
     }
 
     fun attribute(name: String, value: Boolean) {
@@ -48,19 +48,19 @@ class AttributeListBuilder(
     }
 
     fun attribute(name: String, value: Double, unitOfMeasure: UnitOfMeasure) {
-        MeasureAttribute.of(namePrefix + name, value, unitOfMeasure).tap { attributes += it }
+        MeasureAttribute.of(namePrefix + name, value, unitOfMeasure).onSome { attributes += it }
     }
 
     @JvmName("OptionalDoubleAttribute")
     fun attribute(name: String, optionalValue: Option<Double>) {
-        optionalValue.tap {
+        optionalValue.onSome {
             attributes += DoubleAttribute(namePrefix + name, it)
         }
     }
 
     @JvmName("OptionalStringAttribute")
     fun attribute(name: String, optionalValue: Option<String>) {
-        optionalValue.tap {
+        optionalValue.onSome {
             if (it.isNotBlank()) {
                 attributes += StringAttribute(namePrefix + name, it)
             }

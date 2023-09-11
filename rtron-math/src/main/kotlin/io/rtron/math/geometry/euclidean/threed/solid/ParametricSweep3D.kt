@@ -18,9 +18,9 @@ package io.rtron.math.geometry.euclidean.threed.solid
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.nonEmptyListOf
+import arrow.core.raise.either
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
@@ -180,7 +180,7 @@ data class ParametricSweep3D(
     }
 
     private fun createPolygons(leftVertices: NonEmptyList<Vector3D>, rightVertices: NonEmptyList<Vector3D>):
-        Either<GeometryException, List<Polygon3D>> = either.eager {
+        Either<GeometryException, List<Polygon3D>> = either {
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
             .bind()
             .map { it.calculatePolygonsGlobalCS().bind() }

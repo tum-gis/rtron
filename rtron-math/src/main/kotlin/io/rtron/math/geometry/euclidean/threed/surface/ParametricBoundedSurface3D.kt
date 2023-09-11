@@ -18,8 +18,8 @@ package io.rtron.math.geometry.euclidean.threed.surface
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
@@ -63,7 +63,7 @@ data class ParametricBoundedSurface3D(
 
     // Methods
 
-    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either.eager {
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either {
         LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
             .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
             .bind()

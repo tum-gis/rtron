@@ -34,7 +34,11 @@ import io.rtron.transformer.messages.opendrive.of
 object RoadLanesEvaluator {
 
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    fun evaluate(
+        opendriveModel: OpendriveModel,
+        parameters: OpendriveEvaluatorParameters,
+        messageList: DefaultMessageList
+    ): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         everyRoadLanesLaneSectionLeftLane.modify(modifiedOpendriveModel) { currentLeftLane ->
@@ -49,32 +53,51 @@ object RoadLanesEvaluator {
 
         modifiedOpendriveModel = everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
 
-            currentLaneSection.left.tap {
+            currentLaneSection.left.onSome {
                 if (it.lane.isEmpty()) {
-                    messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'left' is set with an empty value even though the attribute itself is optional.", currentLaneSection.additionalId, Severity.WARNING, wasFixed = true)
+                    messageList += DefaultMessage.of(
+                        "EmptyValueForOptionalAttribute",
+                        "Attribute 'left' is set with an empty value even though the attribute itself is optional.",
+                        currentLaneSection.additionalId,
+                        Severity.WARNING,
+                        wasFixed = true
+                    )
                     currentLaneSection.left = None
                 }
             }
 
-            currentLaneSection.right.tap {
+            currentLaneSection.right.onSome {
                 if (it.lane.isEmpty()) {
-                    messageList += DefaultMessage.of("EmptyValueForOptionalAttribute", "Attribute 'right' is set with an empty value even though the attribute itself is optional.", currentLaneSection.additionalId, Severity.WARNING, wasFixed = true)
+                    messageList += DefaultMessage.of(
+                        "EmptyValueForOptionalAttribute",
+                        "Attribute 'right' is set with an empty value even though the attribute itself is optional.",
+                        currentLaneSection.additionalId,
+                        Severity.WARNING,
+                        wasFixed = true
+                    )
                     currentLaneSection.right = None
                 }
             }
 
             if (currentLaneSection.center.lane.isEmpty()) {
-                messageList += DefaultMessage.of("NoLanesInLaneSection", "Lane section does not contain lanes.", currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                messageList += DefaultMessage.of(
+                    "NoLanesInLaneSection",
+                    "Lane section does not contain lanes.",
+                    currentLaneSection.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = false
+                )
                 currentLaneSection.center.lane += RoadLanesLaneSectionCenterLane()
             }
 
             currentLaneSection
         }
 
-        modifiedOpendriveModel = everyRoadLanesLaneSectionCenterLane.modify(modifiedOpendriveModel) { currentCenterLane ->
-            messageList += evaluateNonFatalViolations(currentCenterLane, parameters)
-            currentCenterLane
-        }
+        modifiedOpendriveModel =
+            everyRoadLanesLaneSectionCenterLane.modify(modifiedOpendriveModel) { currentCenterLane ->
+                messageList += evaluateNonFatalViolations(currentCenterLane, parameters)
+                currentCenterLane
+            }
 
         modifiedOpendriveModel = everyRoadLanesLaneSectionLeftLane.modify(modifiedOpendriveModel) { currentLeftLane ->
             messageList += evaluateNonFatalViolations(currentLeftLane, parameters)
@@ -89,53 +112,113 @@ object RoadLanesEvaluator {
         return modifiedOpendriveModel
     }
 
-    private fun evaluateFatalViolations(lane: RoadLanesLaneSectionLRLane, parameters: OpendriveEvaluatorParameters): DefaultMessageList {
+    private fun evaluateFatalViolations(
+        lane: RoadLanesLaneSectionLRLane,
+        parameters: OpendriveEvaluatorParameters
+    ): DefaultMessageList {
         val messageList = DefaultMessageList()
         return messageList
     }
 
-    private fun evaluateNonFatalViolations(lane: RoadLanesLaneSectionLRLane, parameters: OpendriveEvaluatorParameters): DefaultMessageList {
+    private fun evaluateNonFatalViolations(
+        lane: RoadLanesLaneSectionLRLane,
+        parameters: OpendriveEvaluatorParameters
+    ): DefaultMessageList {
         val messageList = DefaultMessageList()
 
-        lane.getLaneWidthEntries().tap {
+        lane.getLaneWidthEntries().onSome {
             if (it.head.sOffset > parameters.numberTolerance) {
-                messageList += DefaultMessage.of("LaneWidthEntriesNotDefinedFromStart", "The width of the lane shall be defined for the full length of the lane section starting with a <width> element for s=0. The first available element is copied and positioned at s=0.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                messageList += DefaultMessage.of(
+                    "LaneWidthEntriesNotDefinedFromStart",
+                    "The width of the lane shall be defined for the full length of the lane section starting with a <width> element for s=0. The first available element is copied and positioned at s=0.",
+                    lane.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = true
+                )
                 val firstEntry = it.head.copy().apply { sOffset = 0.0 }
                 lane.width = listOf(firstEntry) + lane.width
             }
         }
 
-        lane.width = BasicDataTypeModifier.filterToStrictlySorted(lane.width, { it.sOffset }, lane.additionalId, "width", messageList)
+        lane.width = BasicDataTypeModifier.filterToStrictlySorted(
+            lane.width,
+            { it.sOffset },
+            lane.additionalId,
+            "width",
+            messageList
+        )
 
-        val widthEntriesFilteredBySOffsetFinite = lane.width.filter { currentWidth -> currentWidth.sOffset.isFinite() && currentWidth.sOffset >= 0.0 }
+        val widthEntriesFilteredBySOffsetFinite =
+            lane.width.filter { currentWidth -> currentWidth.sOffset.isFinite() && currentWidth.sOffset >= 0.0 }
         if (widthEntriesFilteredBySOffsetFinite.size < lane.width.size) {
-            messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is not-finite and positive.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+            messageList += DefaultMessage.of(
+                "UnexpectedValues",
+                "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is not-finite and positive.",
+                lane.additionalId,
+                Severity.FATAL_ERROR,
+                wasFixed = true
+            )
             lane.width = widthEntriesFilteredBySOffsetFinite
         }
 
-        val widthEntriesFilteredByCoefficientsFinite = lane.width.filter { currentWidth -> currentWidth.coefficients.all { it.isFinite() } }
+        val widthEntriesFilteredByCoefficientsFinite =
+            lane.width.filter { currentWidth -> currentWidth.coefficients.all { it.isFinite() } }
         if (widthEntriesFilteredByCoefficientsFinite.size < lane.width.size) {
-            messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where coefficients \"a, b, c, d\", are not finite.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+            messageList += DefaultMessage.of(
+                "UnexpectedValues",
+                "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where coefficients \"a, b, c, d\", are not finite.",
+                lane.additionalId,
+                Severity.FATAL_ERROR,
+                wasFixed = true
+            )
             lane.width = widthEntriesFilteredByCoefficientsFinite
         }
 
-        lane.height = BasicDataTypeModifier.filterToStrictlySorted(lane.height, { it.sOffset }, lane.additionalId, "height", messageList)
+        lane.height = BasicDataTypeModifier.filterToStrictlySorted(
+            lane.height,
+            { it.sOffset },
+            lane.additionalId,
+            "height",
+            messageList
+        )
 
-        val heightEntriesFilteredByCoefficientsFinite = lane.height.filter { it.inner.isFinite() && it.outer.isFinite() }
+        val heightEntriesFilteredByCoefficientsFinite =
+            lane.height.filter { it.inner.isFinite() && it.outer.isFinite() }
         if (heightEntriesFilteredByCoefficientsFinite.size < lane.height.size) {
-            messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.", lane.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+            messageList += DefaultMessage.of(
+                "UnexpectedValues",
+                "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or outer is not finite.",
+                lane.additionalId,
+                Severity.FATAL_ERROR,
+                wasFixed = true
+            )
             lane.height = heightEntriesFilteredByCoefficientsFinite
         }
 
-        lane.roadMark = BasicDataTypeModifier.filterToStrictlySorted(lane.roadMark, { it.sOffset }, lane.additionalId, "roadMark", messageList)
+        lane.roadMark = BasicDataTypeModifier.filterToStrictlySorted(
+            lane.roadMark,
+            { it.sOffset },
+            lane.additionalId,
+            "roadMark",
+            messageList
+        )
 
         return messageList
     }
 
-    private fun evaluateNonFatalViolations(lane: RoadLanesLaneSectionCenterLane, parameters: OpendriveEvaluatorParameters): DefaultMessageList {
+    private fun evaluateNonFatalViolations(
+        lane: RoadLanesLaneSectionCenterLane,
+        parameters: OpendriveEvaluatorParameters
+    ): DefaultMessageList {
         val messageList = DefaultMessageList()
 
-        lane.roadMark = BasicDataTypeModifier.filterToStrictlySorted(lane.roadMark, { it.sOffset }, lane.additionalId, "roadMark", messageList)
+        lane.roadMark = BasicDataTypeModifier.filterToStrictlySorted(
+            lane.roadMark,
+            { it.sOffset },
+            lane.additionalId,
+            "roadMark",
+            messageList
+        )
 
         return messageList
     }

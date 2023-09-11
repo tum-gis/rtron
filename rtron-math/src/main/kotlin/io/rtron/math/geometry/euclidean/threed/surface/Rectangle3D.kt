@@ -63,10 +63,10 @@ data class Rectangle3D(
     companion object {
 
         fun of(length: Option<Double>, width: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY): Rectangle3D {
-            require(length.isDefined()) { "Length must be defined." }
-            require(width.isDefined()) { "Width must be defined." }
+            require(length.isSome()) { "Length must be defined." }
+            require(width.isSome()) { "Width must be defined." }
 
-            return Rectangle3D(length.orNull()!!, width.orNull()!!, tolerance, affineSequence)
+            return Rectangle3D(length.getOrNull()!!, width.getOrNull()!!, tolerance, affineSequence)
         }
     }
 }

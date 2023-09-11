@@ -56,7 +56,12 @@ object Curve2DBuilder {
      *
      * @param planViewGeometryList source geometry curve segments of OpenDRIVE
      */
-    fun buildCurve2DFromPlanViewGeometries(planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>, numberTolerance: Double, distanceTolerance: Double, angleTolerance: Double): CompositeCurve2D {
+    fun buildCurve2DFromPlanViewGeometries(
+        planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>,
+        numberTolerance: Double,
+        distanceTolerance: Double,
+        angleTolerance: Double
+    ): CompositeCurve2D {
         require(planViewGeometryList.all { it.length > numberTolerance }) { "All plan view geometry elements must have a length greater than zero (above the tolerance threshold)." }
         require(planViewGeometryList.isStrictlySortedBy { it.s }) { "Plan view geometry elements must be sorted in strict order according to s." }
 
@@ -95,13 +100,24 @@ object Curve2DBuilder {
      * @param length length of the constructed curve element
      * @param endBoundType applied end bound type for the curve element
      */
-    private fun buildPlanViewGeometry(geometry: RoadPlanViewGeometry, length: Double, endBoundType: BoundType = BoundType.OPEN, numberTolerance: Double): AbstractCurve2D {
-        require(fuzzyEquals(geometry.length, length, numberTolerance)) { "Plan view geometry element (s=${geometry.s}) contains a length value that does not match the start value of the next geometry element." }
+    private fun buildPlanViewGeometry(
+        geometry: RoadPlanViewGeometry,
+        length: Double,
+        endBoundType: BoundType = BoundType.OPEN,
+        numberTolerance: Double
+    ): AbstractCurve2D {
+        require(
+            fuzzyEquals(
+                geometry.length,
+                length,
+                numberTolerance
+            )
+        ) { "Plan view geometry element (s=${geometry.s}) contains a length value that does not match the start value of the next geometry element." }
 
         val startPose = Pose2D(Vector2D(geometry.x, geometry.y), Rotation2D(geometry.hdg))
         val affineSequence = AffineSequence2D(Affine2D.of(startPose))
 
-        geometry.spiral.tap {
+        geometry.spiral.onSome {
             val curvatureFunction = LinearFunction.ofInclusiveInterceptAndPoint(
                 it.curvStart,
                 length,
@@ -110,7 +126,7 @@ object Curve2DBuilder {
             return SpiralSegment2D(curvatureFunction, numberTolerance, affineSequence, endBoundType)
         }
 
-        geometry.arc.tap {
+        geometry.arc.onSome {
             return Arc2D(
                 it.curvature,
                 length,
@@ -120,7 +136,7 @@ object Curve2DBuilder {
             )
         }
 
-        geometry.poly3.tap {
+        geometry.poly3.onSome {
             return CubicCurve2D(
                 it.coefficients,
                 length,
@@ -130,9 +146,10 @@ object Curve2DBuilder {
             )
         }
 
-        geometry.paramPoly3.tap {
+        geometry.paramPoly3.onSome {
             return if (it.isNormalized()) {
-                val parameterTransformation: (CurveRelativeVector1D) -> CurveRelativeVector1D = { curveRelativePoint -> curveRelativePoint / length }
+                val parameterTransformation: (CurveRelativeVector1D) -> CurveRelativeVector1D =
+                    { curveRelativePoint -> curveRelativePoint / length }
                 val baseCurve = ParametricCubicCurve2D(
                     it.coefficientsU,
                     it.coefficientsV,
@@ -171,7 +188,12 @@ object Curve2DBuilder {
         numberTolerance: Double
     ): LateralTranslatedCurve2D {
         val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
-        require(roadReferenceLine.curveXY.domain.fuzzyEncloses(repeatObjectDomain, numberTolerance)) { "Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance." }
+        require(
+            roadReferenceLine.curveXY.domain.fuzzyEncloses(
+                repeatObjectDomain,
+                numberTolerance
+            )
+        ) { "Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance." }
 
         val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
         return LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), numberTolerance)

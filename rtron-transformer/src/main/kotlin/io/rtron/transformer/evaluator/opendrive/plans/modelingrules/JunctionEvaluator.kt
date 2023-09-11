@@ -53,23 +53,47 @@ object JunctionEvaluator {
 
             // The @mainRoad, @orientation, @sStart and @sEnd attributes shall only be specified for virtual junctions.
             if (currentJunction.typeValidated != EJunctionType.VIRTUAL) {
-                currentJunction.mainRoad.tap {
-                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'mainRoad' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                currentJunction.mainRoad.onSome {
+                    messageList += DefaultMessage.of(
+                        "InvalidJunctionAttribute",
+                        "Attribute 'mainRoad' shall only be specified for virtual junctions",
+                        currentJunction.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true
+                    )
                     currentJunction.mainRoad = None
                 }
 
-                currentJunction.orientation.tap {
-                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'orientation' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                currentJunction.orientation.onSome {
+                    messageList += DefaultMessage.of(
+                        "InvalidJunctionAttribute",
+                        "Attribute 'orientation' shall only be specified for virtual junctions",
+                        currentJunction.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true
+                    )
                     currentJunction.orientation = None
                 }
 
-                currentJunction.sStart.tap {
-                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'sStart' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                currentJunction.sStart.onSome {
+                    messageList += DefaultMessage.of(
+                        "InvalidJunctionAttribute",
+                        "Attribute 'sStart' shall only be specified for virtual junctions",
+                        currentJunction.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true
+                    )
                     currentJunction.sStart = None
                 }
 
-                currentJunction.sEnd.tap {
-                    messageList += DefaultMessage.of("InvalidJunctionAttribute", "Attribute 'sEnd' shall only be specified for virtual junctions", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                currentJunction.sEnd.onSome {
+                    messageList += DefaultMessage.of(
+                        "InvalidJunctionAttribute",
+                        "Attribute 'sEnd' shall only be specified for virtual junctions",
+                        currentJunction.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true
+                    )
                     currentJunction.sEnd = None
                 }
             }
@@ -108,7 +132,15 @@ object JunctionEvaluator {
                 .flattenOption()
                 .map { opendriveModel.getRoad(it) }
                 .flattenOption()
-                .map { ConnectionRoadIds(connectingRoadId = it.id, predecessorRoadId = it.link.flatMap { it.predecessor }.flatMap { it.getRoadPredecessorSuccessor() }.orNull()!!.first, successorRoadId = it.link.flatMap { it.successor }.flatMap { it.getRoadPredecessorSuccessor() }.orNull()!!.first) }
+                .map {
+                    ConnectionRoadIds(
+                        connectingRoadId = it.id,
+                        predecessorRoadId = it.link.flatMap { it.predecessor }.flatMap { it.getRoadPredecessorSuccessor() }
+                            .getOrNull()!!.first,
+                        successorRoadId = it.link.flatMap { it.successor }.flatMap { it.getRoadPredecessorSuccessor() }
+                            .getOrNull()!!.first
+                    )
+                }
             val predecessorSuccessorRoadIds = junctionConnectionRoadIds.flatMap { listOf(it.predecessorRoadId, it.successorRoadId) }
             if (predecessorSuccessorRoadIds.distinct().size < predecessorSuccessorRoadIds.size) {
                 messageList += DefaultMessage.of("InvalidJunctionUsage", "Junction shall not be used, since all roads can be directly linked without ambiguities. The connecting roads do not share a predecessor or successor road.", currentJunction.additionalId, Severity.ERROR, wasFixed = false)

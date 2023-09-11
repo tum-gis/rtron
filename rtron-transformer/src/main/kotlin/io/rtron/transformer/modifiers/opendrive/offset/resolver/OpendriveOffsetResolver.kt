@@ -38,12 +38,12 @@ class OpendriveOffsetResolver {
 
         var modifiedOpendriveModel = opendriveModel.copy()
         modifiedOpendriveModel.updateAdditionalIdentifiers()
-        if (modifiedOpendriveModel.header.offset.isEmpty()) {
+        if (modifiedOpendriveModel.header.offset.isNone()) {
             report.messages += "No offset values in header available."
             return modifiedOpendriveModel to report
         }
 
-        val headerOffset: HeaderOffset = modifiedOpendriveModel.header.offset.orNull()!!
+        val headerOffset: HeaderOffset = modifiedOpendriveModel.header.offset.getOrNull()!!
         modifiedOpendriveModel.header.offset = None
 
         // XY axes
@@ -56,20 +56,21 @@ class OpendriveOffsetResolver {
         }
 
         // Z axis
-        modifiedOpendriveModel = everyRoadElevationProfileElement.modify(modifiedOpendriveModel) { currentElevationProfileElement ->
-            val modifiedElevationProfileElement = currentElevationProfileElement.copy()
-            modifiedElevationProfileElement.a = modifiedElevationProfileElement.a + headerOffset.z
-            modifiedElevationProfileElement
-        }
+        modifiedOpendriveModel =
+            everyRoadElevationProfileElement.modify(modifiedOpendriveModel) { currentElevationProfileElement ->
+                val modifiedElevationProfileElement = currentElevationProfileElement.copy()
+                modifiedElevationProfileElement.a = modifiedElevationProfileElement.a + headerOffset.z
+                modifiedElevationProfileElement
+            }
 
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             val modifiedRoad = currentRoad.copy()
 
-            if (modifiedRoad.elevationProfile.isEmpty()) {
+            if (modifiedRoad.elevationProfile.isNone()) {
                 modifiedRoad.elevationProfile = RoadElevationProfile(emptyList()).some()
             }
 
-            modifiedRoad.elevationProfile.tap {
+            modifiedRoad.elevationProfile.onSome {
                 if (it.elevation.isEmpty()) {
                     it.elevation += RoadElevationProfileElevation(headerOffset.z, 0.0, 0.0, 0.0, 0.0)
                 }

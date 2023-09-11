@@ -69,8 +69,14 @@ object BasicDataTypeModifier {
         modifyToOptionalString(optionalElement, location.toIdentifierText(), attributeName, messageList)
 
     fun modifyToOptionalString(optionalElement: Option<String>, location: String, attributeName: String, messageList: DefaultMessageList): Option<String> {
-        if (optionalElement.exists { it.isBlank() }) {
-            messageList += DefaultMessage("BlankStringAttributeValueForOptionalAttribute", "The value of the attribute '$attributeName' is blank. The attribute is unset as it is optional.", location, Severity.WARNING, wasFixed = true)
+        if (optionalElement.isSome { it.isBlank() }) {
+            messageList += DefaultMessage(
+                "BlankStringAttributeValueForOptionalAttribute",
+                "The value of the attribute '$attributeName' is blank. The attribute is unset as it is optional.",
+                location,
+                Severity.WARNING,
+                wasFixed = true
+            )
             return None
         }
 
@@ -81,8 +87,14 @@ object BasicDataTypeModifier {
         modifyToOptionalFiniteDouble(optionalElement, location.toIdentifierText(), attributeName, messageList)
 
     fun modifyToOptionalFiniteDouble(optionalElement: Option<Double>, location: String, attributeName: String, messageList: DefaultMessageList): Option<Double> {
-        if (optionalElement.exists { !it.isFinite() }) {
-            messageList += DefaultMessage("NonFiniteDoubleAttributeValue", "The value of the attribute '$attributeName' is not finite. The attribute is unset as it is optional.", location, Severity.WARNING, wasFixed = true)
+        if (optionalElement.isSome { !it.isFinite() }) {
+            messageList += DefaultMessage(
+                "NonFiniteDoubleAttributeValue",
+                "The value of the attribute '$attributeName' is not finite. The attribute is unset as it is optional.",
+                location,
+                Severity.WARNING,
+                wasFixed = true
+            )
             return None
         }
 
@@ -90,8 +102,14 @@ object BasicDataTypeModifier {
     }
 
     fun modifyToOptionalFinitePositiveDouble(optionalElement: Option<Double>, location: Option<AbstractOpendriveIdentifier>, attributeName: String, messageList: DefaultMessageList, tolerance: Double = 0.0): Option<Double> {
-        if (optionalElement.exists { !it.isFinite() || it < tolerance }) {
-            messageList += DefaultMessage("NonFinitePositiveDoubleAttributeValue", "The value of the attribute '$attributeName' is not finite or not positive (applied tolerance: $tolerance). The attribute is unset as it is optional.", location.toIdentifierText(), Severity.WARNING, wasFixed = true)
+        if (optionalElement.isSome { !it.isFinite() || it < tolerance }) {
+            messageList += DefaultMessage(
+                "NonFinitePositiveDoubleAttributeValue",
+                "The value of the attribute '$attributeName' is not finite or not positive (applied tolerance: $tolerance). The attribute is unset as it is optional.",
+                location.toIdentifierText(),
+                Severity.WARNING,
+                wasFixed = true
+            )
             return None
         }
 

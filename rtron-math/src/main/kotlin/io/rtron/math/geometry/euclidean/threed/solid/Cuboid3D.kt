@@ -126,11 +126,11 @@ data class Cuboid3D(
         val UNIT = Cuboid3D(1.0, 1.0, 1.0, DEFAULT_TOLERANCE)
 
         fun of(length: Option<Double>, width: Option<Double>, height: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY): Cuboid3D {
-            require(length.isDefined()) { "Length must be defined." }
-            require(width.isDefined()) { "Width must be defined." }
-            require(height.isDefined()) { "Height must be defined." }
+            require(length.isSome()) { "Length must be defined." }
+            require(width.isSome()) { "Width must be defined." }
+            require(height.isSome()) { "Height must be defined." }
 
-            return Cuboid3D(length.orNull()!!, width.orNull()!!, height.orNull()!!, tolerance, affineSequence)
+            return Cuboid3D(length.getOrNull()!!, width.getOrNull()!!, height.getOrNull()!!, tolerance, affineSequence)
         }
     }
 }

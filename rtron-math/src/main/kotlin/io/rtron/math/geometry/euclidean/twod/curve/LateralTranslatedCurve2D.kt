@@ -17,8 +17,8 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -89,7 +89,7 @@ data class LateralTranslatedCurve2D(
      * Returns the lateral translation at the [curveRelativePoint].
      */
     private fun calculateTranslation(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, CurveRelativeVector2D> = either.eager {
+        Either<Exception, CurveRelativeVector2D> = either {
         val translation = lateralTranslationFunction
             .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
             .bind()

@@ -57,8 +57,8 @@ data class RoadspaceIdentifier(
 
     companion object {
         fun of(roadspaceId: Option<String>): RoadspaceIdentifier {
-            require(roadspaceId.isDefined()) { "RoadspaceId must be defined." }
-            return RoadspaceIdentifier(roadspaceId.orNull()!!)
+            require(roadspaceId.isSome()) { "RoadspaceId must be defined." }
+            return RoadspaceIdentifier(roadspaceId.getOrNull()!!)
         }
     }
 }

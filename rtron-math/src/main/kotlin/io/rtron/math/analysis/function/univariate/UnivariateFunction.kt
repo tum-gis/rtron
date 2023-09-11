@@ -17,7 +17,7 @@
 package io.rtron.math.analysis.function.univariate
 
 import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.range.DefinableDomain
 import io.rtron.math.range.fuzzyContains
@@ -59,7 +59,7 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * @param x parameter [x] of function
      * @return returns Result.Success(z) = f(x), if [x] is strictly contained in [domain] and evaluation was successful
      */
-    fun value(x: Double): Either<Exception, Double> = either.eager {
+    fun value(x: Double): Either<Exception, Double> = either {
         domain.containsResult(x).bind()
         valueUnbounded(x).bind()
     }

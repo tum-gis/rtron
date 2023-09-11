@@ -50,40 +50,89 @@ object RoadEvaluator {
 
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
-            if (currentRoad.elevationProfile.exists { it.elevation.isEmpty() }) {
-                messageList += DefaultMessage.of("NoElevationProfileElements", "Elevation profile contains no elements.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+            if (currentRoad.elevationProfile.isSome { it.elevation.isEmpty() }) {
+                messageList += DefaultMessage.of(
+                    "NoElevationProfileElements",
+                    "Elevation profile contains no elements.",
+                    currentRoad.additionalId,
+                    Severity.WARNING,
+                    wasFixed = true
+                )
                 currentRoad.elevationProfile = None
             }
 
-            currentRoad.elevationProfile.tap { elevationProfile ->
-                elevationProfile.elevation = BasicDataTypeModifier.filterToStrictlySorted(elevationProfile.elevation, { it.s }, currentRoad.additionalId, "elevation", messageList)
+            currentRoad.elevationProfile.onSome { elevationProfile ->
+                elevationProfile.elevation = BasicDataTypeModifier.filterToStrictlySorted(
+                    elevationProfile.elevation,
+                    { it.s },
+                    currentRoad.additionalId,
+                    "elevation",
+                    messageList
+                )
             }
 
-            currentRoad.lateralProfile.tap { currentLateralProfile ->
+            currentRoad.lateralProfile.onSome { currentLateralProfile ->
                 if (currentLateralProfile.containsShapeProfile() && currentRoad.lanes.containsLaneOffset()) {
-                    messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'lateralProfile.shape'", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+                    messageList += DefaultMessage.of(
+                        "UnexpectedValue",
+                        "Unexpected value for attribute 'lateralProfile.shape'",
+                        currentRoad.additionalId,
+                        Severity.WARNING,
+                        wasFixed = true
+                    )
                     if (!parameters.skipRoadShapeRemoval) {
                         currentLateralProfile.shape = emptyList()
                     }
                 }
 
-                currentLateralProfile.superelevation = BasicDataTypeModifier.filterToStrictlySorted(currentLateralProfile.superelevation, { it.s }, currentRoad.additionalId, "superelevation", messageList)
-                currentLateralProfile.shape = BasicDataTypeModifier.filterToSorted(currentLateralProfile.shape, { it.s }, currentRoad.additionalId, "shape", messageList)
+                currentLateralProfile.superelevation = BasicDataTypeModifier.filterToStrictlySorted(
+                    currentLateralProfile.superelevation,
+                    { it.s },
+                    currentRoad.additionalId,
+                    "superelevation",
+                    messageList
+                )
+                currentLateralProfile.shape = BasicDataTypeModifier.filterToSorted(
+                    currentLateralProfile.shape,
+                    { it.s },
+                    currentRoad.additionalId,
+                    "shape",
+                    messageList
+                )
 
-                val shapeEntriesFilteredByT: List<RoadLateralProfileShape> = currentLateralProfile.shape.groupBy { it.s }.flatMap { currentShapeSubEntries ->
-                    currentShapeSubEntries.value.filterToStrictSortingBy { it.t }
-                }
+                val shapeEntriesFilteredByT: List<RoadLateralProfileShape> =
+                    currentLateralProfile.shape.groupBy { it.s }.flatMap { currentShapeSubEntries ->
+                        currentShapeSubEntries.value.filterToStrictSortingBy { it.t }
+                    }
                 if (shapeEntriesFilteredByT.size < currentLateralProfile.shape.size) {
                     // OpendriveException.NonStrictlySortedList("shape", "Ignoring ${it.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.").toMessage(currentRoad.additionalId, isFatal = false, wasFixed = true)
-                    messageList += DefaultMessage.of("NonStrictlySortedList", "Ignoring ${currentLateralProfile.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+                    messageList += DefaultMessage.of(
+                        "NonStrictlySortedList",
+                        "Ignoring ${currentLateralProfile.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.",
+                        currentRoad.additionalId,
+                        Severity.WARNING,
+                        wasFixed = true
+                    )
                     currentLateralProfile.shape = shapeEntriesFilteredByT
                 }
             }
 
-            currentRoad.lanes.laneOffset = BasicDataTypeModifier.filterToStrictlySorted(currentRoad.lanes.laneOffset, { it.s }, currentRoad.additionalId, "shape", messageList)
+            currentRoad.lanes.laneOffset = BasicDataTypeModifier.filterToStrictlySorted(
+                currentRoad.lanes.laneOffset,
+                { it.s },
+                currentRoad.additionalId,
+                "shape",
+                messageList
+            )
 
             if (!currentRoad.lanes.laneSection.isSortedBy { it.s }) {
-                messageList += DefaultMessage.of("NonSortedList", "Sorting lane sections according to s.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+                messageList += DefaultMessage.of(
+                    "NonSortedList",
+                    "Sorting lane sections according to s.",
+                    currentRoad.additionalId,
+                    Severity.WARNING,
+                    wasFixed = true
+                )
                 currentRoad.lanes.laneSection = currentRoad.lanes.laneSection.sortedBy { it.s }
             }
 

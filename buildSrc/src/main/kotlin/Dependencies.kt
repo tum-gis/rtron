@@ -19,7 +19,7 @@ object DependencyVersions {
     // standard libraries
     const val kotlin = "1.9.10"
     const val coroutines = "1.7.3"
-    const val arrow = "1.1.5"
+    const val arrow = "1.2.1"
 
     // testing libraries
     const val junit = "5.10.0"

@@ -47,7 +47,7 @@ object RoadSignalsEvaluator {
             currentRoadSignal.type = BasicDataTypeModifier.modifyToNonBlankString(currentRoadSignal.type, currentRoadSignal.additionalId, "type", messageList, fallbackValue = "-1")
             currentRoadSignal.value = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.value, currentRoadSignal.additionalId, "value", messageList)
 
-            if (currentRoadSignal.value.isDefined() && currentRoadSignal.unit.isEmpty()) {
+            if (currentRoadSignal.value.isSome() && currentRoadSignal.unit.isNone()) {
                 messageList += DefaultMessage.of("UnitAttributeMustBeDefinedWhenValueAttributeIsDefined", "Attribute 'unit' shall be defined, when attribute 'value' is defined.", currentRoadSignal.additionalId, Severity.WARNING, wasFixed = true)
                 currentRoadSignal.unit = EUnit.KILOMETER_PER_HOUR.some()
             }

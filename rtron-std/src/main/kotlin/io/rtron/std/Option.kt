@@ -17,13 +17,7 @@
 package io.rtron.std
 
 import arrow.core.Option
-import arrow.core.Validated
-import arrow.core.invalid
-import arrow.core.valid
 
 /** Handle the None of [Option] with [block] and return the [V]. */
 inline fun <V : Any?> Option<V>.handleEmpty(block: (Option<V>) -> Nothing): V =
-    if (isDefined()) orNull()!! else block(this)
-
-fun <L, A> Option<A>.toValidated(ifEmpty: () -> L): Validated<L, A> =
-    fold({ ifEmpty().invalid() }, { it.valid() })
+    if (isSome()) getOrNull()!! else block(this)

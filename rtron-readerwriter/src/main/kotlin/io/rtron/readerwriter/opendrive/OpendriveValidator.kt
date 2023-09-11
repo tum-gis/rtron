@@ -17,9 +17,9 @@
 package io.rtron.readerwriter.opendrive
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
+import arrow.core.raise.either
 import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
 import io.rtron.io.messages.MessageList
 import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
@@ -36,7 +36,7 @@ object OpendriveValidator {
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    fun validateFromFile(filePath: Path): Either<OpendriveReaderException, SchemaValidationReport> = either.eager {
+    fun validateFromFile(filePath: Path): Either<OpendriveReaderException, SchemaValidationReport> = either {
         val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(filePath.inputStreamFromDirectOrCompressedFile()).bind()
 
         val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
@@ -46,11 +46,11 @@ object OpendriveValidator {
         reportResult.bind()
     }
 
-    fun validateFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, SchemaValidationReport> = either.eager {
+    fun validateFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, SchemaValidationReport> = either {
         val messageList = runValidation(opendriveVersion, inputStream)
             .getOrElse {
                 logger.warn("Schema validation was aborted due the following error: ${it.message}")
-                return@eager SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
+                return@either SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
             }
         if (!messageList.isEmpty()) {
             logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.size} incidents.")
@@ -62,7 +62,7 @@ object OpendriveValidator {
     }
 
     private fun runValidation(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> =
-        either.eager {
+        either {
             val unmarshaller = OpendriveUnmarshaller.of(opendriveVersion).bind()
 
             try {

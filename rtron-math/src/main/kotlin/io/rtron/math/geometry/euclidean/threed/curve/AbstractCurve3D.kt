@@ -18,8 +18,8 @@ package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.GeometryException
@@ -118,7 +118,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @return list of points on this curve
      */
     fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true):
-        Either<GeometryException.ValueNotContainedInDomain, NonEmptyList<Vector3D>> = either.eager {
+        Either<GeometryException.ValueNotContainedInDomain, NonEmptyList<Vector3D>> = either {
         domain.arrange(step, includeEndPoint, tolerance)
             .map(::CurveRelativeVector1D)
             .map { calculatePointGlobalCS(it).bind() }
@@ -130,7 +130,7 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      *
      * @param step step size between the points
      */
-    fun calculateLineStringGlobalCS(step: Double): Either<GeometryException, LineString3D> = either.eager {
+    fun calculateLineStringGlobalCS(step: Double): Either<GeometryException, LineString3D> = either {
         val point = calculatePointListGlobalCS(step, true).bind()
         LineString3D.of(point, tolerance).bind()
     }

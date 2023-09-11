@@ -58,13 +58,21 @@ class BuildingModuleBuilder(
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         buildingFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
 
-        roadspaceObject.boundingBoxGeometry.tap { currentBoundingBoxGeometry ->
+        roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             buildingFeature.populateLod1Geometry(geometryTransformer)
-                .mapLeft { messageList += DefaultMessage.of("NoSuitableGeometryForBuildingLod1", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+                .mapLeft {
+                    messageList += DefaultMessage.of(
+                        "NoSuitableGeometryForBuildingLod1",
+                        it.message,
+                        roadspaceObject.id,
+                        Severity.WARNING,
+                        wasFixed = true
+                    )
+                }
         }
 
-        roadspaceObject.complexGeometry.tap { currentComplexGeometry ->
+        roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             addLod2BuildingInformation(roadspaceObject.id, geometryTransformer, buildingFeature)
         }
@@ -81,40 +89,82 @@ class BuildingModuleBuilder(
      * Creates a building feature with individual roof, ground and wall surfaces.
      * In order to cut out the respective geometries of the roof, ground and wall, a solid must be set in the [geometryTransformer].
      */
-    private fun addLod2BuildingInformation(id: RoadspaceObjectIdentifier, geometryTransformer: GeometryTransformer, dstBuildingFeature: Building): ContextMessageList<Building> {
-        require(geometryTransformer.getSolid().isDefined()) { "Solid geometry is required to create an LOD2 building." }
+    private fun addLod2BuildingInformation(
+        id: RoadspaceObjectIdentifier,
+        geometryTransformer: GeometryTransformer,
+        dstBuildingFeature: Building
+    ): ContextMessageList<Building> {
+        require(geometryTransformer.getSolid().isSome()) { "Solid geometry is required to create an LOD2 building." }
         val messageList = DefaultMessageList()
 
         dstBuildingFeature.populateLod2Geometry(geometryTransformer)
-            .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForBuildingLod2", it.message, id, Severity.WARNING, wasFixed = true) }
+            .onLeft {
+                messageList += DefaultMessage.of(
+                    "NoSuitableGeometryForBuildingLod2",
+                    it.message,
+                    id,
+                    Severity.WARNING,
+                    wasFixed = true
+                )
+            }
 
         val roofSurfaceFeature = RoofSurface()
-        geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).tap {
+        geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).onSome {
             roofSurfaceFeature.lod2MultiSurface = it
-        }.tapNone {
-            messageList += DefaultMessage.of("NoSuitableGeometryForRoofSurfaceLod2", "No LOD2 MultiSurface for roof feature available.", id, Severity.WARNING, wasFixed = true)
+        }.onNone {
+            messageList += DefaultMessage.of(
+                "NoSuitableGeometryForRoofSurfaceLod2",
+                "No LOD2 MultiSurface for roof feature available.",
+                id,
+                Severity.WARNING,
+                wasFixed = true
+            )
         }
         dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
-        IdentifierAdder.addIdentifier(id.deriveLod2RoofGmlIdentifier(parameters.gmlIdPrefix), "RoofSurface", dstCityObject = roofSurfaceFeature)
+        IdentifierAdder.addIdentifier(
+            id.deriveLod2RoofGmlIdentifier(parameters.gmlIdPrefix),
+            "RoofSurface",
+            dstCityObject = roofSurfaceFeature
+        )
 
         val groundSurfaceFeature = GroundSurface()
-        geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).tap {
+        geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).onSome {
             groundSurfaceFeature.lod2MultiSurface = it
-        }.tapNone {
-            messageList += DefaultMessage.of("NoSuitableGeometryForGroundSurfaceLod2", "No LOD2 MultiSurface for ground feature available.", id, Severity.WARNING, wasFixed = true)
+        }.onNone {
+            messageList += DefaultMessage.of(
+                "NoSuitableGeometryForGroundSurfaceLod2",
+                "No LOD2 MultiSurface for ground feature available.",
+                id,
+                Severity.WARNING,
+                wasFixed = true
+            )
         }
         dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
-        IdentifierAdder.addIdentifier(id.deriveLod2GroundGmlIdentifier(parameters.gmlIdPrefix), "GroundSurface", dstCityObject = groundSurfaceFeature)
+        IdentifierAdder.addIdentifier(
+            id.deriveLod2GroundGmlIdentifier(parameters.gmlIdPrefix),
+            "GroundSurface",
+            dstCityObject = groundSurfaceFeature
+        )
 
-        geometryTransformer.getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE).tap { wallSurfaceResult ->
+        geometryTransformer.getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE).onSome { wallSurfaceResult ->
             wallSurfaceResult.forEachIndexed { index, multiSurfaceProperty ->
                 val wallSurfaceFeature = WallSurface()
                 wallSurfaceFeature.lod2MultiSurface = multiSurfaceProperty
                 dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(wallSurfaceFeature))
-                IdentifierAdder.addIdentifier(id.deriveLod2WallGmlIdentifier(parameters.gmlIdPrefix, index), "WallSurface", dstCityObject = wallSurfaceFeature)
+                IdentifierAdder.addIdentifier(
+                    id.deriveLod2WallGmlIdentifier(parameters.gmlIdPrefix, index),
+                    "WallSurface",
+                    dstCityObject = wallSurfaceFeature
+                )
             }
-        }.tapNone {
-            messageList += DefaultMessage.of("NoSuitableGeometryForWallSurfaceLod2", "No LOD2 MultiSurface for wall feature available.", id, Severity.WARNING, wasFixed = true)
+        }.onNone {
+            messageList += DefaultMessage.of(
+                "NoSuitableGeometryForWallSurfaceLod2",
+                "No LOD2 MultiSurface for wall feature available.",
+                id,
+                Severity.WARNING,
+                wasFixed = true
+            )
         }
 
         return ContextMessageList(dstBuildingFeature, messageList)

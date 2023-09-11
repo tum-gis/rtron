@@ -18,9 +18,9 @@ package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
+import arrow.core.raise.either
 import arrow.core.toNonEmptyListOrNone
 import io.rtron.math.container.ConcatenationContainer
 import io.rtron.math.geometry.GeometryException
@@ -69,7 +69,7 @@ class LineString3D(
 
     companion object {
 
-        fun of(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryException, LineString3D> = either.eager {
+        fun of(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryException, LineString3D> = either {
             val adjustedVertices = vertices
                 .filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
                 .toNonEmptyListOrNone()

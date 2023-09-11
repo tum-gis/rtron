@@ -98,9 +98,9 @@ data class Cylinder3D(
         const val DEFAULT_NUMBER_SLICES: Int = 16 // used for tesselation
 
         fun of(radius: Option<Double>, height: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY, numberSlices: Int = DEFAULT_NUMBER_SLICES): Cylinder3D {
-            require(radius.isDefined()) { "Radius must be defined." }
-            require(height.isDefined()) { "Height must be defined." }
-            return Cylinder3D(radius.orNull()!!, height.orNull()!!, tolerance, affineSequence, numberSlices)
+            require(radius.isSome()) { "Radius must be defined." }
+            require(height.isSome()) { "Height must be defined." }
+            return Cylinder3D(radius.getOrNull()!!, height.getOrNull()!!, tolerance, affineSequence, numberSlices)
         }
     }
 }

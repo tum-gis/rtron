@@ -18,8 +18,8 @@ package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -37,7 +37,7 @@ import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
  */
 class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
+    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either {
         val polygon = P2TPolygon(vertices.toList().map { P2TPolygonPoint(it.x, it.y, it.z) })
 
         poly2TriTriangulation(polygon).bind()

@@ -157,7 +157,7 @@ object RoadEvaluator {
 
         val junctionIdentifiers = modifiedOpendriveModel.junction.map { it.id }
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
-            currentRoad.getJunctionOption().tap { currentJunctionId ->
+            currentRoad.getJunctionOption().onSome { currentJunctionId ->
                 if (currentJunctionId !in junctionIdentifiers) {
                     messageList += DefaultMessage(
                         "RoadBelongsToNonExistingJunction",
@@ -170,21 +170,38 @@ object RoadEvaluator {
                 }
             }
 
-            currentRoad.link.tap { currentLink ->
-                if (currentLink.predecessor.exists { currentPredecessor -> currentPredecessor.getJunctionPredecessorSuccessor().exists { !junctionIdentifiers.contains(it) } }) {
+            currentRoad.link.onSome { currentLink ->
+                if (currentLink.predecessor.isSome { currentPredecessor ->
+                    currentPredecessor.getJunctionPredecessorSuccessor()
+                        .isSome { !junctionIdentifiers.contains(it) }
+                }
+                ) {
                     messageList += DefaultMessage(
                         "RoadLinkPredecessorRefersToNonExistingJunction",
-                        "Road link predecessor references a junction (id=${currentLink.predecessor.fold({ "" }, { it.elementId })}) that does not exist.",
+                        "Road link predecessor references a junction (id=${
+                        currentLink.predecessor.fold(
+                            { "" },
+                            { it.elementId }
+                        )
+                        }) that does not exist.",
                         currentRoad.id,
                         Severity.ERROR,
                         wasFixed = true
                     )
                     currentLink.predecessor = None
                 }
-                if (currentLink.successor.exists { currentSuccessor -> currentSuccessor.getJunctionPredecessorSuccessor().exists { !junctionIdentifiers.contains(it) } }) {
+                if (currentLink.successor.isSome { currentSuccessor ->
+                    currentSuccessor.getJunctionPredecessorSuccessor().isSome { !junctionIdentifiers.contains(it) }
+                }
+                ) {
                     messageList += DefaultMessage(
                         "RoadLinkSuccessorRefersToNonExistingJunction",
-                        "Road link successor references a junction (id=${currentLink.successor.fold({ "" }, { it.elementId })}) that does not exist.",
+                        "Road link successor references a junction (id=${
+                        currentLink.successor.fold(
+                            { "" },
+                            { it.elementId }
+                        )
+                        }) that does not exist.",
                         currentRoad.id,
                         Severity.ERROR,
                         wasFixed = true

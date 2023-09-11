@@ -46,13 +46,13 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
             roadLanesLaneSection.additionalId = LaneSectionIdentifier(index, roadId).some()
         }
 
-        currentRoad.objects.tap { roadObjects ->
+        currentRoad.objects.onSome { roadObjects ->
             roadObjects.roadObject.forEach {
                 it.additionalId = RoadObjectIdentifier(it.id, roadId).some()
             }
         }
 
-        currentRoad.signals.tap { roadSignals ->
+        currentRoad.signals.onSome { roadSignals ->
             roadSignals.signal.forEach {
                 it.additionalId = RoadSignalIdentifier(it.id, roadId).some()
             }
@@ -70,13 +70,13 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
             currentLane.additionalId = LaneIdentifier(currentLane.id, currentLaneSectionId).some()
         }
 
-        currentLaneSection.left.tap { currentLeft ->
+        currentLaneSection.left.onSome { currentLeft ->
             currentLeft.lane.forEach { currentLane ->
                 currentLane.additionalId = LaneIdentifier(currentLane.id, currentLaneSectionId).some()
             }
         }
 
-        currentLaneSection.right.tap { currentRight ->
+        currentLaneSection.right.onSome { currentRight ->
             currentRight.lane.forEach { currentLane ->
                 currentLane.additionalId = LaneIdentifier(currentLane.id, currentLaneSectionId).some()
             }
@@ -137,10 +137,11 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
             .toEither { IllegalStateException("Additional ID not available.") }
             .getOrElse { throw it }
 
-        currentRoadObject.outlines.tap { currentRoadObjectOutlines ->
+        currentRoadObject.outlines.onSome { currentRoadObjectOutlines ->
 
             currentRoadObjectOutlines.outline.forEach {
-                it.additionalId = RoadObjectOutlineIdentifier(it.id.getOrElse { Int.MIN_VALUE }, currentRoadObjectId).some()
+                it.additionalId =
+                    RoadObjectOutlineIdentifier(it.id.getOrElse { Int.MIN_VALUE }, currentRoadObjectId).some()
             }
         }
 

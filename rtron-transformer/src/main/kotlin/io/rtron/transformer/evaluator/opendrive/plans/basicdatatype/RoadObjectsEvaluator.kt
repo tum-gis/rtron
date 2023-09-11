@@ -39,36 +39,108 @@ object RoadObjectsEvaluator {
 
         modifiedOpendriveModel = everyRoadObject.modify(modifiedOpendriveModel) { currentRoadObject ->
 
-            currentRoadObject.s = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRoadObject.s, currentRoadObject.additionalId, "s", messageList)
-            currentRoadObject.t = BasicDataTypeModifier.modifyToFiniteDouble(currentRoadObject.t, currentRoadObject.additionalId, "t", messageList)
-            currentRoadObject.zOffset = BasicDataTypeModifier.modifyToFiniteDouble(currentRoadObject.zOffset, currentRoadObject.additionalId, "zOffset", messageList)
-            currentRoadObject.hdg = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadObject.hdg, currentRoadObject.additionalId, "hdg", messageList)
-            currentRoadObject.roll = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadObject.roll, currentRoadObject.additionalId, "roll", messageList)
-            currentRoadObject.pitch = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadObject.pitch, currentRoadObject.additionalId, "pitch", messageList)
-            currentRoadObject.height = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadObject.height, currentRoadObject.additionalId, "height", messageList)
+            currentRoadObject.s = BasicDataTypeModifier.modifyToFinitePositiveDouble(
+                currentRoadObject.s,
+                currentRoadObject.additionalId,
+                "s",
+                messageList
+            )
+            currentRoadObject.t = BasicDataTypeModifier.modifyToFiniteDouble(
+                currentRoadObject.t,
+                currentRoadObject.additionalId,
+                "t",
+                messageList
+            )
+            currentRoadObject.zOffset = BasicDataTypeModifier.modifyToFiniteDouble(
+                currentRoadObject.zOffset,
+                currentRoadObject.additionalId,
+                "zOffset",
+                messageList
+            )
+            currentRoadObject.hdg = BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                currentRoadObject.hdg,
+                currentRoadObject.additionalId,
+                "hdg",
+                messageList
+            )
+            currentRoadObject.roll = BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                currentRoadObject.roll,
+                currentRoadObject.additionalId,
+                "roll",
+                messageList
+            )
+            currentRoadObject.pitch = BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                currentRoadObject.pitch,
+                currentRoadObject.additionalId,
+                "pitch",
+                messageList
+            )
+            currentRoadObject.height = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                currentRoadObject.height,
+                currentRoadObject.additionalId,
+                "height",
+                messageList
+            )
 
-            if (currentRoadObject.height.exists { 0.0 < it && it < parameters.numberTolerance }) {
+            if (currentRoadObject.height.isSome { 0.0 < it && it < parameters.numberTolerance }) {
                 currentRoadObject.height = parameters.numberTolerance.some()
             }
 
-            currentRoadObject.radius = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadObject.radius, currentRoadObject.additionalId, "radius", messageList, parameters.numberTolerance)
-            currentRoadObject.length = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadObject.length, currentRoadObject.additionalId, "length", messageList, parameters.numberTolerance)
-            currentRoadObject.width = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadObject.width, currentRoadObject.additionalId, "width", messageList, parameters.numberTolerance)
+            currentRoadObject.radius = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                currentRoadObject.radius,
+                currentRoadObject.additionalId,
+                "radius",
+                messageList,
+                parameters.numberTolerance
+            )
+            currentRoadObject.length = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                currentRoadObject.length,
+                currentRoadObject.additionalId,
+                "length",
+                messageList,
+                parameters.numberTolerance
+            )
+            currentRoadObject.width = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                currentRoadObject.width,
+                currentRoadObject.additionalId,
+                "width",
+                messageList,
+                parameters.numberTolerance
+            )
 
             currentRoadObject.validity.filter { it.fromLane > it.toLane }.forEach { currentValidity ->
-                messageList += DefaultMessage.of("LaneValidityElementNotOrdered", "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.", currentRoadObject.additionalId, Severity.ERROR, wasFixed = true)
+                messageList += DefaultMessage.of(
+                    "LaneValidityElementNotOrdered",
+                    "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.",
+                    currentRoadObject.additionalId,
+                    Severity.ERROR,
+                    wasFixed = true
+                )
                 currentValidity.fromLane = min(currentValidity.fromLane, currentValidity.toLane)
                 currentValidity.toLane = max(currentValidity.fromLane, currentValidity.toLane)
             }
 
-            if (currentRoadObject.outlines.exists { it.outline.isEmpty() }) {
-                messageList += DefaultMessage("EmptyValueForOptionalAttribute", "Attribute 'outlines' is set with an empty value even though the attribute itself is optional.", "Header element", Severity.WARNING, wasFixed = true)
+            if (currentRoadObject.outlines.isSome { it.outline.isEmpty() }) {
+                messageList += DefaultMessage(
+                    "EmptyValueForOptionalAttribute",
+                    "Attribute 'outlines' is set with an empty value even though the attribute itself is optional.",
+                    "Header element",
+                    Severity.WARNING,
+                    wasFixed = true
+                )
                 currentRoadObject.outlines = None
             }
 
-            val repeatElementsFiltered = currentRoadObject.repeat.filter { it.s.isFinite() && it.tStart.isFinite() && it.zOffsetStart.isFinite() }
+            val repeatElementsFiltered =
+                currentRoadObject.repeat.filter { it.s.isFinite() && it.tStart.isFinite() && it.zOffsetStart.isFinite() }
             if (repeatElementsFiltered.size < currentRoadObject.repeat.size) {
-                messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a finite s, tStart, zOffsetStart value.", currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                messageList += DefaultMessage.of(
+                    "UnexpectedValues",
+                    "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a finite s, tStart, zOffsetStart value.",
+                    currentRoadObject.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = true
+                )
                 // messageList += OpendriveException.UnexpectedValues("s, tStart, zOffsetStart", "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a finite s, tStart and zOffsetStart value.").toMessage(currentRoadObject.additionalId, isFatal = false, wasFixed: Boolean)
                 currentRoadObject.repeat = repeatElementsFiltered
             }

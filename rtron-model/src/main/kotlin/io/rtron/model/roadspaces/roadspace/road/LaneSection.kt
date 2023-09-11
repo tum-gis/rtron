@@ -17,7 +17,7 @@
 package io.rtron.model.roadspaces.roadspace.road
 
 import arrow.core.Either
-import arrow.core.continuations.either
+import arrow.core.raise.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -88,7 +88,7 @@ data class LaneSection(
      * @param factor if the [factor] is 0.0 the inner lane boundary is returned. If the [factor] is 1.0 the outer lane
      * boundary is returned. An offset function within the middle of the lane is achieved by a [factor] of 0.5.
      */
-    fun getLateralLaneOffset(laneId: Int, factor: Double): Either<Exception, UnivariateFunction> = either.eager {
+    fun getLateralLaneOffset(laneId: Int, factor: Double): Either<Exception, UnivariateFunction> = either {
         val selectedLanes = (1..abs(laneId)).toList()
             .map { sign(laneId) * it }
             .map { getLane(it).bind() }
@@ -113,7 +113,7 @@ data class LaneSection(
      * of the lane is achieved by a [factor] of 0.5.
      */
     fun getLaneHeightOffset(laneIdentifier: LaneIdentifier, factor: Double):
-        Either<IllegalArgumentException, UnivariateFunction> = either.eager {
+        Either<IllegalArgumentException, UnivariateFunction> = either {
         val inner = getInnerLaneHeightOffset(laneIdentifier).bind()
         val outer = getOuterLaneHeightOffset(laneIdentifier).bind()
         val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })

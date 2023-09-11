@@ -20,9 +20,9 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.continuations.either
 import arrow.core.flattenOption
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.some
 import arrow.core.toNonEmptyListOrNull
@@ -127,7 +127,7 @@ class RoadspacesModel(
             .distinct()
 
     /** Returns a list of [Roadspace]s that belong to the junction with [junctionIdentifier]. */
-    fun getRoadspacesWithinJunction(junctionIdentifier: JunctionIdentifier): Either<Exception, List<Roadspace>> = either.eager {
+    fun getRoadspacesWithinJunction(junctionIdentifier: JunctionIdentifier): Either<Exception, List<Roadspace>> = either {
         val junction = getJunction(junctionIdentifier).bind()
         val connectingRoadspaces = junction.getConnectingRoadspaceIds().map { getRoadspace(it).bind() }
         connectingRoadspaces
@@ -143,9 +143,9 @@ class RoadspacesModel(
             .getOrElse { throw it.toIllegalArgumentException() }.road
 
         return when {
-            road.isInFirstLaneSection(laneId) && road.linkage.predecessorRoadspaceContactPointId.isDefined() ->
+            road.isInFirstLaneSection(laneId) && road.linkage.predecessorRoadspaceContactPointId.isSome() ->
                 getPredecessorLanesBetweenRoads(laneId)
-            road.isInFirstLaneSection(laneId) && road.linkage.predecessorJunctionId.isDefined() ->
+            road.isInFirstLaneSection(laneId) && road.linkage.predecessorJunctionId.isSome() ->
                 getPredecessorLanesBetweenRoadsInJunction(laneId)
             !road.isInFirstLaneSection(laneId) -> getPredecessorLanesWithinRoad(laneId)
             else -> emptyList<LaneIdentifier>().right()
@@ -162,16 +162,16 @@ class RoadspacesModel(
             .getOrElse { throw it.toIllegalArgumentException() }.road
 
         return when {
-            road.isInLastLaneSection(laneId) && road.linkage.successorRoadspaceContactPointId.isDefined() ->
+            road.isInLastLaneSection(laneId) && road.linkage.successorRoadspaceContactPointId.isSome() ->
                 getSuccessorLanesBetweenRoads(laneId)
-            road.isInLastLaneSection(laneId) && road.linkage.successorJunctionId.isDefined() ->
+            road.isInLastLaneSection(laneId) && road.linkage.successorJunctionId.isSome() ->
                 getSuccessorLanesBetweenRoadsInJunction(laneId)
             !road.isInLastLaneSection(laneId) -> getSuccessorLanesWithinRoad(laneId)
             else -> emptyList<LaneIdentifier>().right()
         }
     }
 
-    fun getLongitudinalFillerSurfaces(laneId: LaneIdentifier): Either<Exception, List<LongitudinalFillerSurface>> = either.eager {
+    fun getLongitudinalFillerSurfaces(laneId: LaneIdentifier): Either<Exception, List<LongitudinalFillerSurface>> = either {
         val successorLaneIds = getSuccessorLaneIdentifiers(laneId).bind()
 
         val fillerSurfaces = successorLaneIds.map { getLongitudinalFillerSurface(laneId, it) }.flattenOption()
@@ -226,7 +226,8 @@ class RoadspacesModel(
             if (laneId.isWithinSameRoad(successorLaneId)) {
                 true
             } else {
-                !road.linkage.successorRoadspaceContactPointId.map { it.roadspaceContactPoint }.exists { it == ContactPoint.END }
+                !road.linkage.successorRoadspaceContactPointId.map { it.roadspaceContactPoint }
+                    .isSome { it == ContactPoint.END }
             }
 
         val successorLaneBoundaries =

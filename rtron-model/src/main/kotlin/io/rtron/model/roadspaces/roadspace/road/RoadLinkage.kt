@@ -33,12 +33,12 @@ data class RoadLinkage(
 ) {
     // Properties and Initializers
     init {
-        require(!(predecessorRoadspaceContactPointId.isDefined() && predecessorJunctionId.isDefined())) { "Predecessor must be either a roadspace or junction or neither." }
-        require(!(successorRoadspaceContactPointId.isDefined() && successorJunctionId.isDefined())) { "Successor must be either a roadspace or junction or neither." }
+        require(!(predecessorRoadspaceContactPointId.isSome() && predecessorJunctionId.isSome())) { "Predecessor must be either a roadspace or junction or neither." }
+        require(!(successorRoadspaceContactPointId.isSome() && successorJunctionId.isSome())) { "Successor must be either a roadspace or junction or neither." }
 
-        belongsToJunctionId.tap {
-            require(predecessorJunctionId.isEmpty()) { "If a road belongs to a junction (id=$it), a predecessing junction must not exist." }
-            require(successorJunctionId.isEmpty()) { "If a road belongs to a junction (id=$it), a successing junction must not exist." }
+        belongsToJunctionId.onSome {
+            require(predecessorJunctionId.isNone()) { "If a road belongs to a junction (id=$it), a predecessing junction must not exist." }
+            require(successorJunctionId.isNone()) { "If a road belongs to a junction (id=$it), a successing junction must not exist." }
         }
     }
 

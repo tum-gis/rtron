@@ -49,24 +49,43 @@ class CityFurnitureModuleBuilder(
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         cityFurnitureFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
 
-        roadspaceObject.boundingBoxGeometry.tap { currentBoundingBoxGeometry ->
+        roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             cityFurnitureFeature.populateLod1Geometry(geometryTransformer)
-                .mapLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod1", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+                .mapLeft {
+                    messageList += DefaultMessage.of(
+                        "NoSuitableGeometryForCityFurnitureLod1",
+                        it.message,
+                        roadspaceObject.id,
+                        Severity.WARNING,
+                        wasFixed = true
+                    )
+                }
         }
 
-        roadspaceObject.complexGeometry.tap { currentComplexGeometry ->
+        roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             cityFurnitureFeature.populateLod2Geometry(geometryTransformer)
-                .onLeft { messageList += DefaultMessage.of("NoSuitableGeometryForCityFurnitureLod2", it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true) }
+                .onLeft {
+                    messageList += DefaultMessage.of(
+                        "NoSuitableGeometryForCityFurnitureLod2",
+                        it.message,
+                        roadspaceObject.id,
+                        Severity.WARNING,
+                        wasFixed = true
+                    )
+                }
 
-            geometryTransformer.rotation.tap {
+            geometryTransformer.rotation.onSome {
                 attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
             }
         }
 
         // semantics
-        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), cityFurnitureFeature)
+        IdentifierAdder.addIdentifier(
+            roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix),
+            cityFurnitureFeature
+        )
         relationAdder.addBelongToRelations(roadspaceObject, cityFurnitureFeature)
         attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 

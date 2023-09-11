@@ -18,8 +18,8 @@ package io.rtron.math.analysis.function.univariate.combination
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -47,17 +47,17 @@ class ConcatenatedFunction(
     override val domain: Range<Double> get() = container.domain
 
     // Methods
-    override fun valueUnbounded(x: Double): Either<Exception, Double> = either.eager {
+    override fun valueUnbounded(x: Double): Either<Exception, Double> = either {
         val localMember = container.strictSelectMember(x).bind()
         localMember.member.valueUnbounded(localMember.localParameter).bind()
     }
 
-    override fun slopeUnbounded(x: Double): Either<Exception, Double> = either.eager {
+    override fun slopeUnbounded(x: Double): Either<Exception, Double> = either {
         val localMember = container.strictSelectMember(x).bind()
         localMember.member.slopeUnbounded(localMember.localParameter).bind()
     }
 
-    override fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> = either.eager {
+    override fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> = either {
         val localMember = container.fuzzySelectMember(x, tolerance).bind()
         localMember.member.valueUnbounded(localMember.localParameter).bind()
     }

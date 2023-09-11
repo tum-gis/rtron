@@ -74,7 +74,8 @@ class GeometryTransformer(
 
     // Properties and Initializers
     private var polygonsOfSolidResult: Option<NonEmptyList<Polygon3D>> = None
-    private var polygonsOfSurfaceResult: Option<Either<GeometryException.BoundaryRepresentationGenerationError, List<Polygon3D>>> = None
+    private var polygonsOfSurfaceResult: Option<Either<GeometryException.BoundaryRepresentationGenerationError, List<Polygon3D>>> =
+        None
     private var multiCurveResult: Option<Either<GeometryException, LineString3D>> = None
     private var pointResult: Option<Vector3D> = None
 
@@ -155,7 +156,7 @@ class GeometryTransformer(
         }
 
         // implicitGeometry.libraryObject = ""
-        rotation.tap {
+        rotation.onSome {
             implicitGeometry.transformationMatrix = Affine3D.of(it).toGmlTransformationMatrix4x4()
         }
 
@@ -193,11 +194,11 @@ class GeometryTransformer(
      * @return cutout of a solid geometry or a [MultiSurfaceProperty]
      */
     fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Option<Either<GeometryException.BoundaryRepresentationGenerationError, MultiSurfaceProperty>> {
-        getSolidCutout(*solidFaceSelection).tap {
+        getSolidCutout(*solidFaceSelection).onSome {
             return it.right().some()
         }
 
-        getMultiSurface().tap {
+        getMultiSurface().onSome {
             return it.some()
         }
 
@@ -223,7 +224,8 @@ class GeometryTransformer(
      * @return list of [MultiSurfaceProperty], each constructed from an individual polygon of the solid geometry
      */
     fun getIndividualSolidCutouts(vararg faceSelection: FaceType): Option<NonEmptyList<MultiSurfaceProperty>> {
-        val filteredPolygons: NonEmptyList<Polygon3D> = getFilteredPolygonsOfSolid(*faceSelection).handleEmpty { return None }
+        val filteredPolygons: NonEmptyList<Polygon3D> =
+            getFilteredPolygonsOfSolid(*faceSelection).handleEmpty { return None }
 
         return filteredPolygons.map { polygonsToMultiSurfaceProperty(nonEmptyListOf(it)) }.some()
     }
@@ -256,7 +258,8 @@ class GeometryTransformer(
     }
 
     override fun visit(parametricBoundedSurface3D: ParametricBoundedSurface3D) {
-        val adjustedParametricBoundedSurface = parametricBoundedSurface3D.copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
+        val adjustedParametricBoundedSurface =
+            parametricBoundedSurface3D.copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
         visit(adjustedParametricBoundedSurface as AbstractSurface3D)
     }
 

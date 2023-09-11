@@ -71,9 +71,9 @@ data class Circle3D(
         private const val DEFAULT_NUMBER_SLICES: Int = 16 // used for tesselation
 
         fun of(radius: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY): Circle3D {
-            require(radius.isDefined()) { "Radius must be defined." }
+            require(radius.isSome()) { "Radius must be defined." }
 
-            return Circle3D(radius.orNull()!!, tolerance, affineSequence)
+            return Circle3D(radius.getOrNull()!!, tolerance, affineSequence)
         }
     }
 }

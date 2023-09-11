@@ -19,8 +19,8 @@ package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import arrow.core.separateEither
 import arrow.core.some
 import arrow.core.toNonEmptyListOrNull
@@ -168,7 +168,7 @@ object Solid3DBuilder {
      * Builds a single polyhedron from an OpenDRIVE road object defined by local corner outlines.
      */
     private fun buildPolyhedronByLocalCorners(outline: RoadObjectsObjectOutlinesOutline, numberTolerance: Double):
-        Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> = either.eager {
+        Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> = either {
         require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
         require(outline.cornerLocal.all { it.height == 0.0 || numberTolerance <= it.height }) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }

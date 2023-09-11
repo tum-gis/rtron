@@ -17,8 +17,8 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
@@ -111,7 +111,7 @@ data class Curve3D(
      * @param curveRelativeLineSegment line segment in curve relative coordinates
      * @return line segment in cartesian coordinates
      */
-    fun transform(curveRelativeLineSegment: CurveRelativeLineSegment3D): Either<Exception, LineSegment3D> = either.eager {
+    fun transform(curveRelativeLineSegment: CurveRelativeLineSegment3D): Either<Exception, LineSegment3D> = either {
         val start = transform(curveRelativeLineSegment.start)
         val end = transform(curveRelativeLineSegment.end)
 

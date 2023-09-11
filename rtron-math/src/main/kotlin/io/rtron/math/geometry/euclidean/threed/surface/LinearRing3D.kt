@@ -18,9 +18,9 @@ package io.rtron.math.geometry.euclidean.threed.surface
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.left
 import arrow.core.nonEmptyListOf
+import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNone
 import arrow.core.toNonEmptyListOrNull
@@ -120,7 +120,7 @@ data class LinearRing3D(
          * @param rightVertices right vertices for the linear rings construction
          */
         fun ofWithDuplicatesRemoval(leftVertices: NonEmptyList<Vector3D>, rightVertices: NonEmptyList<Vector3D>, tolerance: Double):
-            Either<GeometryException.NotEnoughValidLinearRings, NonEmptyList<LinearRing3D>> = either.eager {
+            Either<GeometryException.NotEnoughValidLinearRings, NonEmptyList<LinearRing3D>> = either {
             require(leftVertices.size >= 2) { "At least two left vertices required." }
             require(rightVertices.size >= 2) { "At least two right vertices required." }
 

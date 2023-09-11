@@ -17,8 +17,8 @@
 package io.rtron.math.analysis.function.bivariate.pure
 
 import arrow.core.Either
-import arrow.core.continuations.either
 import arrow.core.getOrElse
+import arrow.core.raise.either
 import io.rtron.math.analysis.function.bivariate.BivariateFunction
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
@@ -89,7 +89,7 @@ class ShapeFunction(
         .firstKey()
         .let { Either.Right(it) }
 
-    private fun calculateZ(key: Double, y: Double): Either<Exception, Double> = either.eager {
+    private fun calculateZ(key: Double, y: Double): Either<Exception, Double> = either {
         val selectedFunction = functions.getValueEither(key).mapLeft { it.toIllegalArgumentException() }.bind()
 
         val yAdjusted = if (!extrapolateY) {

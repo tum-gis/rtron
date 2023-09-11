@@ -53,6 +53,6 @@ data class Connection(
     fun getSuccessorLane(laneIdentifier: LaneIdentifier): Option<LaneIdentifier> {
         if (incomingRoadspaceContactPointId.roadspaceIdentifier != laneIdentifier.toRoadspaceIdentifier()) return None
 
-        return laneLinks.getValueEither(laneIdentifier).orNone()
+        return laneLinks.getValueEither(laneIdentifier).getOrNone()
     }
 }

@@ -21,10 +21,10 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.continuations.either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.nonEmptyListOf
+import arrow.core.raise.either
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.messages.ContextMessageList
 import io.rtron.io.messages.DefaultMessage
@@ -59,7 +59,7 @@ object Polyhedron3DFactory {
      * @param outlineElements vertical line segments or points bounding the polyhedron
      */
     fun buildFromVerticalOutlineElements(outlineId: RoadObjectOutlineIdentifier, outlineElements: NonEmptyList<VerticalOutlineElement>, tolerance: Double):
-        Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> = either.eager {
+        Either<GeometryBuilderException, ContextMessageList<Polyhedron3D>> = either {
         val messageList = DefaultMessageList()
 
         // prepare vertical outline elements
@@ -102,16 +102,31 @@ object Polyhedron3DFactory {
 
         // Properties and Initializers
         init {
-            rightHeadPoint.tap {
-                require(leftHeadPoint.isDefined()) { "Left head point must be present, if right head point is present." }
+            rightHeadPoint.onSome {
+                require(leftHeadPoint.isSome()) { "Left head point must be present, if right head point is present." }
             }
 
-            leftHeadPoint.tap { currentLeftHeadPoint ->
-                require(basePoint.fuzzyUnequals(currentLeftHeadPoint, tolerance)) { "Left head point must be fuzzily unequal to base point." }
+            leftHeadPoint.onSome { currentLeftHeadPoint ->
+                require(
+                    basePoint.fuzzyUnequals(
+                        currentLeftHeadPoint,
+                        tolerance
+                    )
+                ) { "Left head point must be fuzzily unequal to base point." }
 
-                rightHeadPoint.tap { currentRightHeadPoint ->
-                    require(basePoint.fuzzyUnequals(currentRightHeadPoint, tolerance)) { "Right head point must be fuzzily unequal to base point." }
-                    require(currentLeftHeadPoint.fuzzyUnequals(currentRightHeadPoint, tolerance)) { "Left head point must be fuzzily unequal to the right point." }
+                rightHeadPoint.onSome { currentRightHeadPoint ->
+                    require(
+                        basePoint.fuzzyUnequals(
+                            currentRightHeadPoint,
+                            tolerance
+                        )
+                    ) { "Right head point must be fuzzily unequal to base point." }
+                    require(
+                        currentLeftHeadPoint.fuzzyUnequals(
+                            currentRightHeadPoint,
+                            tolerance
+                        )
+                    ) { "Left head point must be fuzzily unequal to the right point." }
                 }
             }
         }
@@ -120,8 +135,8 @@ object Polyhedron3DFactory {
         private val rightLength: Double get() = rightHeadPoint.map { basePoint.distance(it) }.getOrElse { 0.0 }
 
         // Methods
-        fun containsHeadPoint() = leftHeadPoint.isDefined() || rightHeadPoint.isDefined()
-        fun containsOneHeadPoint() = leftHeadPoint.isDefined() && rightHeadPoint.isEmpty()
+        fun containsHeadPoint() = leftHeadPoint.isSome() || rightHeadPoint.isSome()
+        fun containsOneHeadPoint() = leftHeadPoint.isSome() && rightHeadPoint.isNone()
 
         fun getVerticesAsLeftBoundary(): List<Vector3D> {
             val midPoint = if (containsOneHeadPoint() || leftLength < rightLength) {
@@ -137,7 +152,7 @@ object Polyhedron3DFactory {
             return listOf(basePoint) + midPoint + leftHeadPoint.toList()
         }
 
-        fun getHeadPointAdjacentToTheRight() = if (rightHeadPoint.isDefined()) rightHeadPoint else leftHeadPoint
+        fun getHeadPointAdjacentToTheRight() = if (rightHeadPoint.isSome()) rightHeadPoint else leftHeadPoint
 
         fun getHighestPointAdjacentToTheTop(): NonEmptyList<Vector3D> =
             if (containsHeadPoint()) {
@@ -160,7 +175,13 @@ object Polyhedron3DFactory {
                 // remove head points that are fuzzily equal to base point
                 val prepHeadPoints = headPoints.filter { it.fuzzyUnequals(basePoint, tolerance) }
                 if (prepHeadPoints.size < headPoints.size) {
-                    messageList += DefaultMessage("", "Height of outline element must be above tolerance.", "", Severity.WARNING, true)
+                    messageList += DefaultMessage(
+                        "",
+                        "Height of outline element must be above tolerance.",
+                        "",
+                        Severity.WARNING,
+                        true
+                    )
                 }
 
                 if (prepHeadPoints.size <= 1) {
@@ -199,9 +220,15 @@ object Polyhedron3DFactory {
              * @param elements list of [VerticalOutlineElement] which must all contain the same base point
              * @param tolerance allowed tolerance
              */
-            fun of(elements: List<VerticalOutlineElement>, tolerance: Double): ContextMessageList<VerticalOutlineElement> {
+            fun of(
+                elements: List<VerticalOutlineElement>,
+                tolerance: Double
+            ): ContextMessageList<VerticalOutlineElement> {
                 require(elements.isNotEmpty()) { "List of elements must not be empty." }
-                require(elements.drop(1).all { it.basePoint == elements.first().basePoint }) { "All elements must have the same base point." }
+                require(
+                    elements.drop(1)
+                        .all { it.basePoint == elements.first().basePoint }
+                ) { "All elements must have the same base point." }
                 val messageList = DefaultMessageList()
 
                 if (elements.size == 1) {
@@ -209,7 +236,13 @@ object Polyhedron3DFactory {
                 }
 
                 if (elements.size > 2) {
-                    messageList += DefaultMessage("OutlineContainsConsecutivelyFollowingElementDuplicates", "Contains more than two consecutively following outline element duplicates.", "", Severity.WARNING, wasFixed = false)
+                    messageList += DefaultMessage(
+                        "OutlineContainsConsecutivelyFollowingElementDuplicates",
+                        "Contains more than two consecutively following outline element duplicates.",
+                        "",
+                        Severity.WARNING,
+                        wasFixed = false
+                    )
                 }
 
                 val basePoint = elements.first().basePoint
@@ -248,7 +281,7 @@ object Polyhedron3DFactory {
      * Preparation and cleanup of [verticalOutlineElements] including the removal of duplicates and error messaging.
      */
     private fun prepareOutlineElements(outlineId: RoadObjectOutlineIdentifier, verticalOutlineElements: NonEmptyList<VerticalOutlineElement>, tolerance: Double):
-        Either<GeometryBuilderException, ContextMessageList<NonEmptyList<VerticalOutlineElement>>> = either.eager {
+        Either<GeometryBuilderException, ContextMessageList<NonEmptyList<VerticalOutlineElement>>> = either {
         val messageList = DefaultMessageList()
 
         // remove consecutively following line segment duplicates

@@ -39,7 +39,7 @@ object RoadspaceObjectRouter {
      * Returns the feature type [CitygmlTargetFeatureType] onto which [roadspaceObject] shall be mapped.
      */
     fun route(roadspaceObject: RoadspaceObject): CitygmlTargetFeatureType {
-        roadspaceObject.name.tap {
+        roadspaceObject.name.onSome {
             when (it) {
                 "bench" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
                 "bus" -> return CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE

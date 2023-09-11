@@ -18,8 +18,8 @@ package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 
@@ -36,7 +36,7 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    fun triangulateChecked(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
+    fun triangulateChecked(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either {
         val triangles = triangulate(vertices, tolerance).bind()
 
         val newVertices = triangles.flatMap { it.vertices }

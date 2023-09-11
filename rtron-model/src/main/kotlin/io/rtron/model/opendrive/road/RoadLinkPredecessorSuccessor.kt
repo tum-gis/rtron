@@ -34,14 +34,14 @@ data class RoadLinkPredecessorSuccessor(
     // Methods
 
     fun getRoadPredecessorSuccessor(): Option<Pair<String, EContactPoint>> =
-        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.ROAD }) {
+        if (elementId.isNotEmpty() && elementType.isSome { it == ERoadLinkElementType.ROAD }) {
             contactPoint.map { elementId to it }
         } else {
             None
         }
 
     fun getJunctionPredecessorSuccessor(): Option<String> =
-        if (elementId.isNotEmpty() && elementType.exists { it == ERoadLinkElementType.JUNCTION }) {
+        if (elementId.isNotEmpty() && elementType.isSome { it == ERoadLinkElementType.JUNCTION }) {
             Some(elementId)
         } else {
             None

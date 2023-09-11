@@ -102,10 +102,10 @@ data class LinearFunction(
          * @param pointY linear function stopping at ([pointX], [pointY])
          */
         fun ofInclusiveInterceptAndPoint(intercept: Option<Double>, pointX: Double, pointY: Option<Double>): LinearFunction {
-            require(intercept.exists { it.isFinite() }) { "Intercept must be finite, if defined." }
+            require(intercept.isSome { it.isFinite() }) { "Intercept must be finite, if defined." }
             require(pointX.isFinite()) { "PointX must be finite." }
-            require(pointY.exists { it.isFinite() }) { "PointY must be finite, if defined." }
-            require(intercept.isDefined() || pointY.isDefined()) { "Either intercept or pointY must be finite." }
+            require(pointY.isSome { it.isFinite() }) { "PointY must be finite, if defined." }
+            require(intercept.isSome() || pointY.isSome()) { "Either intercept or pointY must be finite." }
 
             val adjustedIntercept = intercept.getOrElse {
                 pointY.toEither { IllegalStateException("PointY must be set.") }.getOrElse { throw it }

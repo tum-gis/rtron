@@ -18,8 +18,8 @@ package io.rtron.math.processing.triangulation
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import arrow.core.continuations.either
 import arrow.core.left
+import arrow.core.raise.either
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
 import io.rtron.math.processing.calculateBestFittingPlane
@@ -37,7 +37,7 @@ class ProjectedTriangulationAlgorithm(
     private val triangulationAlgorithm: TriangulationAlgorithm
 ) : TriangulationAlgorithm() {
 
-    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either.eager {
+    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either {
         val projectedVertices = projectVertices(vertices, tolerance)
         val projectedPolygonsTriangulated = triangulationAlgorithm
             .triangulate(projectedVertices, tolerance).bind()

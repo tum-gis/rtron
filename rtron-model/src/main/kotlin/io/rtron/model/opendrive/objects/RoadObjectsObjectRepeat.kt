@@ -60,15 +60,15 @@ data class RoadObjectsObjectRepeat(
 
     fun isLengthNonZero() = length != 0.0
 
-    fun isObjectWidthZero() = widthStart.isEmpty() && widthEnd.isEmpty()
-    fun isObjectLengthZero() = lengthStart.isEmpty() && lengthEnd.isEmpty()
+    fun isObjectWidthZero() = widthStart.isNone() && widthEnd.isNone()
+    fun isObjectLengthZero() = lengthStart.isNone() && lengthEnd.isNone()
     fun isObjectHeightZero() = heightStart == 0.0 && heightEnd == 0.0
-    fun isObjectRadiusZero() = radiusStart.isEmpty() && radiusEnd.isEmpty()
+    fun isObjectRadiusZero() = radiusStart.isNone() && radiusEnd.isNone()
 
-    fun isObjectWidthNonZero() = widthStart.isDefined() || widthEnd.isDefined()
-    fun isObjectLengthNonZero() = lengthStart.isDefined() || lengthEnd.isDefined()
+    fun isObjectWidthNonZero() = widthStart.isSome() || widthEnd.isSome()
+    fun isObjectLengthNonZero() = lengthStart.isSome() || lengthEnd.isSome()
     fun isObjectHeightNonZero() = heightStart != 0.0 || heightEnd != 0.0
-    fun isObjectRadiusNonZero() = radiusStart.isDefined() || radiusEnd.isDefined()
+    fun isObjectRadiusNonZero() = radiusStart.isSome() || radiusEnd.isSome()
 
     fun getRoadReferenceLineParameterSection() = Range.closed(s, s + length)
 

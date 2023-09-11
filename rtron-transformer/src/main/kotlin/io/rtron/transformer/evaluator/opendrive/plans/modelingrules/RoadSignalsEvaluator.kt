@@ -32,10 +32,17 @@ object RoadSignalsEvaluator {
 
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
-            currentRoad.signals.tap { currentRoadSignals ->
-                val signalsFiltered = currentRoadSignals.signal.filter { it.s <= currentRoad.length + parameters.numberTolerance }
+            currentRoad.signals.onSome { currentRoadSignals ->
+                val signalsFiltered =
+                    currentRoadSignals.signal.filter { it.s <= currentRoad.length + parameters.numberTolerance }
                 if (currentRoadSignals.signal.size > signalsFiltered.size) {
-                    messageList += DefaultMessage.of("RoadSignalPositionNotInSValueRange", "Road signals (number of objects affected: ${currentRoadSignals.signal.size - signalsFiltered.size}) were removed since they were positioned outside the defined length of the road.", currentRoad.additionalId, Severity.ERROR, wasFixed = true)
+                    messageList += DefaultMessage.of(
+                        "RoadSignalPositionNotInSValueRange",
+                        "Road signals (number of objects affected: ${currentRoadSignals.signal.size - signalsFiltered.size}) were removed since they were positioned outside the defined length of the road.",
+                        currentRoad.additionalId,
+                        Severity.ERROR,
+                        wasFixed = true
+                    )
                 }
                 currentRoadSignals.signal = signalsFiltered
             }

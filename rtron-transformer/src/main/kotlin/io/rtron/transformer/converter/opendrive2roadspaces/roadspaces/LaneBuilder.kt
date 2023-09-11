@@ -265,11 +265,11 @@ class LaneBuilder(
     private fun buildAttributes(leftRightLane: RoadLanesLaneSectionLRLane) =
         attributes("${parameters.attributesPrefix}lane_") {
             attribute("type", leftRightLane.type.toString())
-            leftRightLane.level.tap {
+            leftRightLane.level.onSome {
                 attribute("level", it)
             }
 
-            leftRightLane.link.tap {
+            leftRightLane.link.onSome {
                 attributes("predecessor_lane") {
                     it.predecessor.forEachIndexed { i, element ->
                         attribute("_$i", element.id)
@@ -296,9 +296,9 @@ class LaneBuilder(
                 leftRightLane.speed.forEachIndexed { i, element ->
                     attribute("_curvePositionStart_$i", element.sOffset)
 
-                    element.unit.tap {
+                    element.unit.onSome {
                         attribute("_max_$i", element.max, it.toUnitOfMeasure())
-                    }.tapNone {
+                    }.onNone {
                         attribute("_max_$i", element.max)
                     }
                 }

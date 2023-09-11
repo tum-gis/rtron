@@ -25,7 +25,7 @@ import org.citygml4j.core.model.core.AbstractOccupiedSpace
  */
 fun AbstractOccupiedSpace.populateLod1ImplicitGeometry(geometryTransformer: GeometryTransformer) {
     val implicitGeometryPropertyResult = geometryTransformer.getImplicitGeometry()
-    require(implicitGeometryPropertyResult.isDefined()) { "Must contain implicit geometry." }
+    require(implicitGeometryPropertyResult.isSome()) { "Must contain implicit geometry." }
 
-    lod1ImplicitRepresentation = implicitGeometryPropertyResult.orNull()!!
+    lod1ImplicitRepresentation = implicitGeometryPropertyResult.getOrNull()!!
 }
