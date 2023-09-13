@@ -16,13 +16,13 @@
 
 package io.rtron.math.range
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 import io.rtron.math.std.DBL_EPSILON
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 class RangeTest : FunSpec({
     context("UpperLowerEndpoint") {
@@ -126,7 +126,7 @@ class RangeTest : FunSpec({
     context("TestConstruction") {
 
         test("negative orientation of the range throws an illegal argument exception") {
-            assertThatIllegalArgumentException().isThrownBy { Range.closed(-1.0, -1.25) }
+            shouldThrow<IllegalArgumentException> { Range.closed(-1.0, -1.25) }
         }
     }
 
@@ -165,7 +165,7 @@ class RangeTest : FunSpec({
 
             val actualJoin = rangeA.join(rangeB)
 
-            assertThat(actualJoin).isEqualTo(Range.closed(0.0, 2.0))
+            actualJoin shouldBe Range.closed(0.0, 2.0)
         }
 
         test("Connected joins with negative values") {
@@ -174,14 +174,14 @@ class RangeTest : FunSpec({
 
             val actualJoin = rangeA.join(rangeB)
 
-            assertThat(actualJoin).isEqualTo(Range.closed(-1.0, -0.2))
+            actualJoin shouldBe Range.closed(-1.0, -0.2)
         }
 
         test("join throws exception if the ranges are not connected") {
             val rangeA = Range.closed(-1.0, -0.51)
             val rangeB = Range.closed(-0.5, -0.2)
 
-            assertThatIllegalArgumentException().isThrownBy { rangeA.join(rangeB) }
+            shouldThrow<IllegalArgumentException> { rangeA.join(rangeB) }
         }
     }
 })

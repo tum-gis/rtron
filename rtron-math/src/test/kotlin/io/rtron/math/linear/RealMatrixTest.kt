@@ -16,23 +16,23 @@
 
 package io.rtron.math.linear
 
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.std.DBL_EPSILON
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 
 class RealMatrixTest {
 
     fun normalize() {
         val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
         val matrix = RealMatrix(matrixValues)
-        val toleratedOffset = Offset.offset(DBL_EPSILON)
+        val toleratedOffset = DBL_EPSILON
 
         val actualMatrix = matrix
             .normalize(matrix.rowDimension - 1, matrix.columnDimension - 1)
 
-        assertThat(actualMatrix[0][0]).isCloseTo(0.25, toleratedOffset)
-        assertThat(actualMatrix[0][1]).isCloseTo(0.0, toleratedOffset)
-        assertThat(actualMatrix[1][0]).isCloseTo(0.0, toleratedOffset)
-        assertThat(actualMatrix[1][1]).isCloseTo(1.0, toleratedOffset)
+        actualMatrix[0][0].shouldBe(0.25 plusOrMinus toleratedOffset)
+        actualMatrix[0][1].shouldBe(0.0 plusOrMinus toleratedOffset)
+        actualMatrix[1][0].shouldBe(0.0 plusOrMinus toleratedOffset)
+        actualMatrix[1][1].shouldBe(1.0 plusOrMinus toleratedOffset)
     }
 }

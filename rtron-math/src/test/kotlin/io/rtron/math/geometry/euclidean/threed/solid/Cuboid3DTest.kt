@@ -17,9 +17,10 @@
 package io.rtron.math.geometry.euclidean.threed.solid
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldHaveSize
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
-import org.assertj.core.api.Assertions.assertThat
 
 class Cuboid3DTest : FunSpec({
     context("PolygonsGeneration") {
@@ -29,7 +30,7 @@ class Cuboid3DTest : FunSpec({
 
             val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygons).hasSize(6)
+            actualPolygons shouldHaveSize 6
         }
 
         test("generated polygons list contain base polygon") {
@@ -44,7 +45,7 @@ class Cuboid3DTest : FunSpec({
 
             val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygons).contains(expectedBasePolygon)
+            actualPolygons.shouldContain(expectedBasePolygon)
         }
 
         test("generated polygons list contain elevated polygon") {
@@ -60,7 +61,7 @@ class Cuboid3DTest : FunSpec({
 
             val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygons).contains(expectedBasePolygon)
+            actualPolygons.shouldContain(expectedBasePolygon)
         }
 
         test("generated polygons list contain front polygon") {
@@ -76,7 +77,7 @@ class Cuboid3DTest : FunSpec({
 
             val actualPolygons = cuboid.calculatePolygonsGlobalCS()
 
-            assertThat(actualPolygons).contains(expectedBasePolygon)
+            actualPolygons.shouldContain(expectedBasePolygon)
         }
     }
 })

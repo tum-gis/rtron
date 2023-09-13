@@ -19,7 +19,7 @@ package io.rtron.math.analysis.function.univariate.combination
 import arrow.core.Either
 import arrow.core.nonEmptyListOf
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.shouldBe
 
 class ConcatenatedFunctionTest : FunSpec({
 
@@ -37,11 +37,11 @@ class ConcatenatedFunctionTest : FunSpec({
 
             require(actualResult1 is Either.Left)
             require(actualResult2 is Either.Right)
-            assertThat(actualResult2.value).isEqualTo(0.0)
+            actualResult2.value shouldBe 0.0
             require(actualResult3 is Either.Right)
-            assertThat(actualResult3.value).isEqualTo(-5.0)
+            actualResult3.value shouldBe -5.0
             require(actualResult4 is Either.Right)
-            assertThat(actualResult4.value).isEqualTo(-5.0)
+            actualResult4.value shouldBe -5.0
         }
 
         test("concatenated function with absolute start at -2") {
@@ -56,11 +56,11 @@ class ConcatenatedFunctionTest : FunSpec({
 
             require(actualResult1 is Either.Left)
             require(actualResult2 is Either.Right)
-            assertThat(actualResult2.value).isEqualTo(0.0)
+            actualResult2.value shouldBe 0.0
             require(actualResult3 is Either.Right)
-            assertThat(actualResult3.value).isEqualTo(-5.0)
+            actualResult3.value shouldBe -5.0
             require(actualResult4 is Either.Right)
-            assertThat(actualResult4.value).isEqualTo(-5.0)
+            actualResult4.value shouldBe -5.0
         }
 
         test("concatenated function with absolute start at 2") {
@@ -75,11 +75,11 @@ class ConcatenatedFunctionTest : FunSpec({
 
             require(actualResult1 is Either.Left)
             require(actualResult2 is Either.Right)
-            assertThat(actualResult2.value).isEqualTo(0.0)
+            actualResult2.value shouldBe 0.0
             require(actualResult3 is Either.Right)
-            assertThat(actualResult3.value).isEqualTo(-5.0)
+            actualResult3.value shouldBe -5.0
             require(actualResult4 is Either.Right)
-            assertThat(actualResult4.value).isEqualTo(-5.0)
+            actualResult4.value shouldBe -5.0
         }
     }
 
@@ -100,13 +100,13 @@ class ConcatenatedFunctionTest : FunSpec({
             val actualResult4 = concatenatedFunction.valueInFuzzy(7.0, 1E-7)
 
             require(actualResult1 is Either.Right)
-            assertThat(actualResult1.value).isEqualTo(2.0)
+            actualResult1.value shouldBe 2.0
             require(actualResult2 is Either.Right)
-            assertThat(actualResult2.value).isEqualTo(32.0)
+            actualResult2.value shouldBe 32.0
             require(actualResult3 is Either.Right)
-            assertThat(actualResult3.value).isEqualTo(1.0)
+            actualResult3.value shouldBe 1.0
             require(actualResult4 is Either.Right)
-            assertThat(actualResult4.value).isEqualTo(49.0)
+            actualResult4.value shouldBe 49.0
         }
 
         test("concatenated function with absolute start at -2") {
@@ -124,13 +124,13 @@ class ConcatenatedFunctionTest : FunSpec({
             val actualResult4 = concatenatedFunction.valueInFuzzy(5.0, 1E-7)
 
             require(actualResult1 is Either.Right)
-            assertThat(actualResult1.value).isEqualTo(2.0)
+            actualResult1.value shouldBe 2.0
             require(actualResult2 is Either.Right)
-            assertThat(actualResult2.value).isEqualTo(32.0)
+            actualResult2.value shouldBe 32.0
             require(actualResult3 is Either.Right)
-            assertThat(actualResult3.value).isEqualTo(1.0)
+            actualResult3.value shouldBe 1.0
             require(actualResult4 is Either.Right)
-            assertThat(actualResult4.value).isEqualTo(49.0)
+            actualResult4.value shouldBe 49.0
         }
 
         test("concatenated function with absolute start at 2") {
@@ -148,13 +148,13 @@ class ConcatenatedFunctionTest : FunSpec({
             val actualResult4 = concatenatedFunction.valueInFuzzy(9.0, 1E-7)
 
             require(actualResult1 is Either.Right)
-            assertThat(actualResult1.value).isEqualTo(2.0)
+            actualResult1.value shouldBe 2.0
             require(actualResult2 is Either.Right)
-            assertThat(actualResult2.value).isEqualTo(32.0)
+            actualResult2.value shouldBe 32.0
             require(actualResult3 is Either.Right)
-            assertThat(actualResult3.value).isEqualTo(1.0)
+            actualResult3.value shouldBe 1.0
             require(actualResult4 is Either.Right)
-            assertThat(actualResult4.value).isEqualTo(49.0)
+            actualResult4.value shouldBe 49.0
         }
     }
 })

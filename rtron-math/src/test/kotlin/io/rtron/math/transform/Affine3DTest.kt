@@ -25,8 +25,6 @@ import io.rtron.math.linear.RealMatrix
 import io.rtron.math.linear.RealVector
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 import kotlin.math.cos
 import kotlin.math.sin
 import org.joml.Matrix4d as JOMLMatrix4d
@@ -165,9 +163,9 @@ class Affine3DTest : FunSpec({
 
             val actualRotated = affine.transform(Vector3D.X_AXIS)
 
-            assertThat(actualRotated.x).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualRotated.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualRotated.z).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
+            actualRotated.x.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+            actualRotated.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            actualRotated.z.shouldBe(0.0 plusOrMinus DBL_EPSILON)
         }
 
         test("test pitch rotation") {
@@ -176,9 +174,9 @@ class Affine3DTest : FunSpec({
 
             val actualRotated = affine.transform(Vector3D.X_AXIS)
 
-            assertThat(actualRotated.x).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualRotated.y).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualRotated.z).isCloseTo(-1.0, Offset.offset(DBL_EPSILON))
+            actualRotated.x.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+            actualRotated.y.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+            actualRotated.z.shouldBe(-1.0 plusOrMinus DBL_EPSILON)
         }
 
         test("test rotation based on new standard basis") {
@@ -190,9 +188,9 @@ class Affine3DTest : FunSpec({
 
             val actualRotated = affine.transform(Vector3D.X_AXIS)
 
-            assertThat(actualRotated.x).isCloseTo(expected.x, Offset.offset(DBL_EPSILON))
-            assertThat(actualRotated.y).isCloseTo(expected.y, Offset.offset(DBL_EPSILON))
-            assertThat(actualRotated.z).isCloseTo(expected.z, Offset.offset(DBL_EPSILON))
+            actualRotated.x.shouldBe(expected.x plusOrMinus DBL_EPSILON)
+            actualRotated.y.shouldBe(expected.y plusOrMinus DBL_EPSILON)
+            actualRotated.z.shouldBe(expected.z plusOrMinus DBL_EPSILON)
         }
     }
 

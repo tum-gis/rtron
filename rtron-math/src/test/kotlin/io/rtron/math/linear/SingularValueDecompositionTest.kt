@@ -17,8 +17,8 @@
 package io.rtron.math.linear
 
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 
 class SingularValueDecompositionTest : FunSpec({
     context("TestRank") {
@@ -30,7 +30,7 @@ class SingularValueDecompositionTest : FunSpec({
 
             val actualRank = singularValueDecomposition.rank
 
-            assertThat(actualRank).isEqualTo(2)
+            actualRank shouldBe 2
         }
 
         test("matrix with two colinear vectors should have rank 1") {
@@ -40,7 +40,7 @@ class SingularValueDecompositionTest : FunSpec({
 
             val actualRank = singularValueDecomposition.rank
 
-            assertThat(actualRank).isEqualTo(1)
+            actualRank shouldBe 1
         }
 
         test("matrix of two zero vectors should have rank 0") {
@@ -50,7 +50,7 @@ class SingularValueDecompositionTest : FunSpec({
 
             val actualRank = singularValueDecomposition.rank
 
-            assertThat(actualRank).isEqualTo(0)
+            actualRank shouldBe 0
         }
     }
 
@@ -64,9 +64,9 @@ class SingularValueDecompositionTest : FunSpec({
 
             val actualMatrixU = singularValueDecomposition.matrixU
 
-            assertThat(actualMatrixU.dimension).isEqualTo(expectedMatrixU.dimension)
-            assertThat(actualMatrixU.entriesFlattened)
-                .containsExactly(expectedMatrixU.entriesFlattened, Offset.offset(0.01))
+            actualMatrixU.dimension shouldBe expectedMatrixU.dimension
+            actualMatrixU.entriesFlattened.zip(expectedMatrixU.entriesFlattened)
+                .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
         }
     }
 
@@ -80,9 +80,9 @@ class SingularValueDecompositionTest : FunSpec({
 
             val actualMatrixS = singularValueDecomposition.matrixS
 
-            assertThat(actualMatrixS.dimension).isEqualTo(expectedMatrixS.dimension)
-            assertThat(actualMatrixS.entriesFlattened)
-                .containsExactly(expectedMatrixS.entriesFlattened, Offset.offset(0.01))
+            actualMatrixS.dimension shouldBe expectedMatrixS.dimension
+            actualMatrixS.entriesFlattened.zip(expectedMatrixS.entriesFlattened)
+                .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
         }
     }
 
@@ -96,9 +96,9 @@ class SingularValueDecompositionTest : FunSpec({
 
             val actualMatrixVT = singularValueDecomposition.matrixVT
 
-            assertThat(actualMatrixVT.dimension).isEqualTo(expectedMatrixV.dimension)
-            assertThat(actualMatrixVT.entriesFlattened)
-                .containsExactly(expectedMatrixV.entriesFlattened, Offset.offset(0.01))
+            actualMatrixVT.dimension shouldBe expectedMatrixV.dimension
+            actualMatrixVT.entriesFlattened.zip(expectedMatrixV.entriesFlattened)
+                .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
         }
     }
 })

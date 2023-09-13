@@ -18,12 +18,12 @@ package io.rtron.math.processing
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.Plane3D
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.std.DBL_EPSILON_2
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 
 class Plane3DUtilTest : FunSpec({
     context("TestBestFittingPlaneCalculation") {
@@ -36,7 +36,7 @@ class Plane3DUtilTest : FunSpec({
 
             val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
 
-            assertThat(actualBestFittingPlane.normal).isEqualTo(expectedNormal)
+            actualBestFittingPlane.normal shouldBe expectedNormal
         }
 
         test("normal for counter clockwise point in XY-plane") {
@@ -47,7 +47,7 @@ class Plane3DUtilTest : FunSpec({
 
             val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
 
-            assertThat(actualBestFittingPlane.normal).isEqualTo(expectedNormal)
+            actualBestFittingPlane.normal shouldBe expectedNormal
         }
 
         test("plane fitting with three points") {
@@ -60,7 +60,7 @@ class Plane3DUtilTest : FunSpec({
 
             val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
 
-            assertThat(actualBestFittingPlane).isEqualTo(expectedPlane)
+            actualBestFittingPlane shouldBe expectedPlane
         }
 
         test("plane fitting with multiple points") {
@@ -75,8 +75,9 @@ class Plane3DUtilTest : FunSpec({
             val actualBestFittingPlane = listOf(pointA, pointB, pointC, pointD)
                 .calculateBestFittingPlane(DBL_EPSILON_2)
 
-            assertThat(actualBestFittingPlane.normal.toDoubleArray())
-                .containsExactly(expectedPlane.normal.toDoubleArray(), Offset.offset(DBL_EPSILON_2))
+            actualBestFittingPlane.normal.toDoubleArray().zip(expectedPlane.normal.toDoubleArray()).forEach {
+                it.first.shouldBe(it.second plusOrMinus DBL_EPSILON_2)
+            }
             actualBestFittingPlane.isSimilarTo(expectedPlane).shouldBeTrue()
         }
 
@@ -92,7 +93,7 @@ class Plane3DUtilTest : FunSpec({
             val actualBestFittingPlane = listOf(pointA, pointB, pointC, pointD, pointE)
                 .calculateBestFittingPlane(DBL_EPSILON_1)
 
-            assertThat(actualBestFittingPlane).isEqualTo(expectedPlane)
+            actualBestFittingPlane shouldBe expectedPlane
         }
     }
 })

@@ -1,10 +1,10 @@
 package io.rtron.math.processing
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-import org.assertj.core.api.Assertions
 
 class Vector2DListExtensionsTest : FunSpec({
     context("TestVectorsAreClockwiseOrdered") {
@@ -49,7 +49,7 @@ class Vector2DListExtensionsTest : FunSpec({
             val pointB = Vector2D.Y_AXIS
             val vertices = listOf(pointA, pointB)
 
-            Assertions.assertThatIllegalArgumentException().isThrownBy {
+            shouldThrow<IllegalArgumentException> {
                 vertices.isClockwiseOrdered()
             }
         }

@@ -17,7 +17,7 @@
 package io.rtron.std
 
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.shouldBe
 
 class CollectionsKtTest : FunSpec({
     context("TestDistinctConsecutive") {
@@ -27,7 +27,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveBy { it }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test basic list with same enclosing pair") {
@@ -35,19 +35,19 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveBy { it }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test empty list") {
             val actualValues = emptyList<String>().distinctConsecutiveBy { it }
 
-            assertThat(actualValues).isEqualTo(emptyList<String>())
+            actualValues shouldBe emptyList<String>()
         }
 
         test("test list with a single element") {
             val actualValues = listOf("a").distinctConsecutiveBy { it }
 
-            assertThat(actualValues).isEqualTo(listOf("a"))
+            actualValues shouldBe listOf("a")
         }
     }
 
@@ -58,7 +58,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveEnclosingBy { it }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test basic list with same enclosing pair") {
@@ -66,7 +66,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveEnclosingBy { it }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test removal of multiple consecutive objects") {
@@ -74,19 +74,19 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "b", "b", "b", "c").distinctConsecutiveEnclosingBy { it }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test empty list") {
             val actualValues = emptyList<String>().distinctConsecutiveEnclosingBy { it }
 
-            assertThat(actualValues).isEqualTo(emptyList<String>())
+            actualValues shouldBe emptyList<String>()
         }
 
         test("test list with a single element") {
             val actualValues = listOf("a").distinctConsecutiveEnclosingBy { it }
 
-            assertThat(actualValues).isEqualTo(listOf("a"))
+            actualValues shouldBe listOf("a")
         }
     }
 
@@ -97,7 +97,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf(1, 1, 2, 3).filterToSorting { first, second -> first < second }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test unsorted list") {
@@ -105,19 +105,19 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf(3, 1, 2, 4, 12, 5, 3).filterToSorting { first, second -> first < second }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test empty list") {
             val actualValues = emptyList<String>().filterToSorting { first, second -> first < second }
 
-            assertThat(actualValues).isEqualTo(emptyList<String>())
+            actualValues shouldBe emptyList<String>()
         }
 
         test("test list with a single element") {
             val actualValues = listOf("a").filterToSorting { first, second -> first < second }
 
-            assertThat(actualValues).isEqualTo(listOf("a"))
+            actualValues shouldBe listOf("a")
         }
     }
 
@@ -134,7 +134,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualSequence = baseSequence.windowedEnclosing(3)
 
-            assertThat(actualSequence.toList()).isEqualTo(expectedSequence.toList())
+            actualSequence.toList() shouldBe expectedSequence.toList()
         }
 
         test("test basic enclosed windowing of integer sequence") {
@@ -150,7 +150,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = baseSequence.windowedEnclosing(3)
 
-            assertThat(actualValues.toList()).isEqualTo(expectedSequence.toList())
+            actualValues.toList() shouldBe expectedSequence.toList()
         }
     }
 
@@ -161,7 +161,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c").filterWithNext { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test basic list with same enclosing pair") {
@@ -169,7 +169,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c", "a").filterWithNext { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test list with three consecutively following duplicates") {
@@ -177,19 +177,19 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "a", "b", "b", "c", "a").filterWithNext { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test empty list") {
             val actualValues = emptyList<String>().filterWithNext { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(emptyList<String>())
+            actualValues shouldBe emptyList<String>()
         }
 
         test("test list with a single element") {
             val actualValues = listOf("a").filterWithNext { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(listOf("a"))
+            actualValues shouldBe listOf("a")
         }
     }
 
@@ -200,7 +200,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c").filterWithNextEnclosing { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test basic list with same enclosing pair") {
@@ -208,7 +208,7 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "a", "b", "c", "a").filterWithNextEnclosing { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test removal of multiple consecutive objects") {
@@ -216,19 +216,19 @@ class CollectionsKtTest : FunSpec({
 
             val actualValues = listOf("a", "b", "b", "b", "c").filterWithNextEnclosing { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(expectedValues)
+            actualValues shouldBe expectedValues
         }
 
         test("test empty list") {
             val actualValues = emptyList<String>().filterWithNextEnclosing { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(emptyList<String>())
+            actualValues shouldBe emptyList<String>()
         }
 
         test("test list with a single element") {
             val actualValues = listOf("a").filterWithNextEnclosing { a, b -> a != b }
 
-            assertThat(actualValues).isEqualTo(listOf("a"))
+            actualValues shouldBe listOf("a")
         }
     }
 })

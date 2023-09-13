@@ -19,9 +19,9 @@ package io.rtron.math.processing
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.DBL_EPSILON_1
-import org.assertj.core.api.Assertions.assertThat
 
 class Vector3DListExtensionsTest : FunSpec({
     context("TestTripleIsColinear") {
@@ -65,7 +65,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+            actualResultingVertices shouldBe expectedVertices
         }
 
         test("two different point should yield the exact points") {
@@ -76,7 +76,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+            actualResultingVertices shouldBe expectedVertices
         }
 
         test("two equal points should yield only one point") {
@@ -87,7 +87,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+            actualResultingVertices shouldBe expectedVertices
         }
 
         test("three points of pattern ABB") {
@@ -99,7 +99,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+            actualResultingVertices shouldBe expectedVertices
         }
 
         test("basic four points") {
@@ -112,7 +112,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+            actualResultingVertices shouldBe expectedVertices
         }
 
         test("four points of pattern ABBA") {
@@ -125,7 +125,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+            actualResultingVertices shouldBe expectedVertices
         }
 
         test("five points of pattern ABBBA") {
@@ -139,7 +139,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedVertices)
+            actualResultingVertices shouldBe expectedVertices
         }
     }
 
@@ -202,7 +202,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualCentroid = listOf(pointA, pointB, pointC).calculateCentroid()
 
-            assertThat(actualCentroid).isEqualTo(expectedCentroid)
+            actualCentroid shouldBe expectedCentroid
         }
 
         test("centroid of multiple points") {
@@ -215,7 +215,7 @@ class Vector3DListExtensionsTest : FunSpec({
 
             val actualCentroid = points.calculateCentroid()
 
-            assertThat(actualCentroid).isEqualTo(expectedCentroid)
+            actualCentroid shouldBe expectedCentroid
         }
     }
 })

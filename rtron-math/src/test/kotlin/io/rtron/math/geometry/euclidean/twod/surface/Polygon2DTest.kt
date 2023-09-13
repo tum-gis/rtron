@@ -19,8 +19,9 @@ package io.rtron.math.geometry.euclidean.twod.surface
 import arrow.core.NonEmptyList
 import arrow.core.toNonEmptyListOrNull
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-import org.assertj.core.api.Assertions.assertThat
 
 class Polygon2DTest : FunSpec({
     context("TestContainsCalculation") {
@@ -31,7 +32,7 @@ class Polygon2DTest : FunSpec({
 
             val actualReturn = polygon.contains(Vector2D(0.25, 0.25))
 
-            assertThat(actualReturn).isTrue
+            actualReturn.shouldBeTrue()
         }
 
         test("basic triangle does not contain point") {
@@ -44,7 +45,7 @@ class Polygon2DTest : FunSpec({
 
             val actualReturn = polygon.contains(Vector2D(1.25, 1.25))
 
-            assertThat(actualReturn).isFalse
+            actualReturn.shouldBeFalse()
         }
 
         test("concave polygon does contain point") {
@@ -59,7 +60,7 @@ class Polygon2DTest : FunSpec({
 
             val actualReturn = polygon.contains(Vector2D(1.0, 1.1))
 
-            assertThat(actualReturn).isTrue
+            actualReturn.shouldBeTrue()
         }
     }
 })

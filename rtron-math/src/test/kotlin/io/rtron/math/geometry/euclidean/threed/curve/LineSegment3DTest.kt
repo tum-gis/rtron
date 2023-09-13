@@ -17,8 +17,8 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import org.assertj.core.api.Assertions.assertThat
 
 class LineSegment3DTest : FunSpec({
     context("TestDistance") {
@@ -30,7 +30,7 @@ class LineSegment3DTest : FunSpec({
 
             val actualResultingVertices = lineSegment.distance(point)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedDistance)
+            actualResultingVertices shouldBe expectedDistance
         }
 
         test("point located outside of line segment returns the distance to closest boundary point") {
@@ -40,7 +40,7 @@ class LineSegment3DTest : FunSpec({
 
             val actualResultingVertices = lineSegment.distance(point)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedDistance)
+            actualResultingVertices shouldBe expectedDistance
         }
 
         test("point located not on line segment returns the correct distance") {
@@ -50,7 +50,7 @@ class LineSegment3DTest : FunSpec({
 
             val actualResultingVertices = lineSegment.distance(point)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedDistance)
+            actualResultingVertices shouldBe expectedDistance
         }
 
         test("boundary point of line segment returns the zero distance") {
@@ -60,7 +60,7 @@ class LineSegment3DTest : FunSpec({
 
             val actualResultingVertices = lineSegment.distance(point)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedDistance)
+            actualResultingVertices shouldBe expectedDistance
         }
 
         test("point on line but outside of line segment return distances to the shortest boundary point") {
@@ -70,7 +70,7 @@ class LineSegment3DTest : FunSpec({
 
             val actualResultingVertices = lineSegment.distance(point)
 
-            assertThat(actualResultingVertices).isEqualTo(expectedDistance)
+            actualResultingVertices shouldBe expectedDistance
         }
     }
 })

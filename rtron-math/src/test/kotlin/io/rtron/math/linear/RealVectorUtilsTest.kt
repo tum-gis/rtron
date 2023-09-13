@@ -17,7 +17,7 @@
 package io.rtron.math.linear
 
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.shouldBe
 
 class RealVectorUtilsTest : FunSpec({
     context("TestDimensionOfSpan") {
@@ -30,7 +30,7 @@ class RealVectorUtilsTest : FunSpec({
 
             val actualSpan = rowVectors.dimensionOfSpan()
 
-            assertThat(actualSpan).isEqualTo(2)
+            actualSpan shouldBe 2
         }
 
         test("four linearly independent vectors should have a span's dimension of 4") {
@@ -42,7 +42,7 @@ class RealVectorUtilsTest : FunSpec({
 
             val actualSpan = rowVectors.dimensionOfSpan()
 
-            assertThat(actualSpan).isEqualTo(4)
+            actualSpan shouldBe 4
         }
 
         test("no vector should have a span's dimension of 0") {
@@ -50,7 +50,7 @@ class RealVectorUtilsTest : FunSpec({
 
             val actualSpan = rowVectors.dimensionOfSpan()
 
-            assertThat(actualSpan).isEqualTo(0)
+            actualSpan shouldBe 0
         }
     }
 })

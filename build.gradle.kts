@@ -71,7 +71,7 @@ allprojects {
         implementation(Dependencies.arrowOptics)
 
         testImplementation(Dependencies.kotest)
-        testImplementation(Dependencies.assertj)
+        testImplementation(Dependencies.kotestExtensionArrow)
         testImplementation(Dependencies.mockk)
     }
 

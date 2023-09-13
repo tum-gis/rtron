@@ -17,10 +17,10 @@
 package io.rtron.math.geometry.euclidean.twod
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.PI
 import io.rtron.math.std.TWO_PI
-import org.assertj.core.api.Assertions.assertThat
 
 class Pose2DTest : FunSpec({
     context("TestPointAssignment") {
@@ -28,13 +28,13 @@ class Pose2DTest : FunSpec({
         test("assignment of positive point") {
             val pose = Pose2D(Vector2D(5.0, 3.0), Rotation2D.ZERO)
 
-            assertThat(pose.point).isEqualTo(Vector2D(5.0, 3.0))
+            pose.point shouldBe Vector2D(5.0, 3.0)
         }
 
         test("assignment of negative point") {
             val pose = Pose2D(Vector2D(-3.0, 1.0), Rotation2D.ZERO)
 
-            assertThat(pose.point).isEqualTo(Vector2D(-3.0, 1.0))
+            pose.point shouldBe Vector2D(-3.0, 1.0)
         }
     }
 
@@ -43,13 +43,13 @@ class Pose2DTest : FunSpec({
         test("assignment of two pi rotation") {
             val pose = Pose2D(Vector2D(5.0, 3.0), Rotation2D(TWO_PI))
 
-            assertThat(pose.rotation.toAngleRadians()).isEqualTo(0.0)
+            pose.rotation.toAngleRadians() shouldBe 0.0
         }
 
         test("assignment of pi rotation") {
             val pose = Pose2D(Vector2D(-3.0, 1.0), Rotation2D(PI))
 
-            assertThat(pose.rotation.toAngleRadians()).isEqualTo(PI)
+            pose.rotation.toAngleRadians() shouldBe PI
         }
     }
 })

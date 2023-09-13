@@ -16,14 +16,14 @@
 
 package io.rtron.math.geometry.euclidean.threed
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.PI
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.assertThat
 
 class Vector3DTest : FunSpec({
     context("Addition") {
@@ -34,7 +34,7 @@ class Vector3DTest : FunSpec({
 
             val actualSum = pointA + pointB
 
-            assertThat(actualSum).isEqualTo(Vector3D(2.0, 2.0, 2.0))
+            actualSum shouldBe Vector3D(2.0, 2.0, 2.0)
         }
 
         test("adding points with negative coordinates") {
@@ -43,7 +43,7 @@ class Vector3DTest : FunSpec({
 
             val actualSum = pointA + pointB
 
-            assertThat(actualSum).isEqualTo(Vector3D(0.0, 0.0, 0.0))
+            actualSum shouldBe Vector3D(0.0, 0.0, 0.0)
         }
     }
 
@@ -55,7 +55,7 @@ class Vector3DTest : FunSpec({
 
             val actualDifference = pointA - pointB
 
-            assertThat(actualDifference).isEqualTo(Vector3D(2.0, 2.0, 2.0))
+            actualDifference shouldBe Vector3D(2.0, 2.0, 2.0)
         }
     }
 
@@ -64,7 +64,7 @@ class Vector3DTest : FunSpec({
         test("scalar multiplication of basic point (1,1,1)") {
             val actualResult = Vector3D(1.0, 1.0, 1.0).scalarMultiply(4.0)
 
-            assertThat(actualResult).isEqualTo(Vector3D(4.0, 4.0, 4.0))
+            actualResult shouldBe Vector3D(4.0, 4.0, 4.0)
         }
     }
 
@@ -73,11 +73,11 @@ class Vector3DTest : FunSpec({
         test("scalar division of basic point") {
             val actualResult = Vector3D(2.0, 4.0, 1.0).scalarDivide(4.0)
 
-            assertThat(actualResult).isEqualTo(Vector3D(0.5, 1.0, 0.25))
+            actualResult shouldBe Vector3D(0.5, 1.0, 0.25)
         }
 
         test("scalar division by zero throws error") {
-            Assertions.assertThatIllegalArgumentException().isThrownBy {
+            shouldThrow<IllegalArgumentException> {
                 Vector3D(2.0, 4.0, 1.0).scalarDivide(0.0)
             }
         }
@@ -90,7 +90,7 @@ class Vector3DTest : FunSpec({
 
             point.normalized()
 
-            assertThat(point).isEqualTo(Vector3D(2.0, 4.0, 1.0))
+            point shouldBe Vector3D(2.0, 4.0, 1.0)
         }
     }
 
@@ -102,7 +102,7 @@ class Vector3DTest : FunSpec({
 
             val actualSum = pointA.angle(pointB)
 
-            assertThat(actualSum).isEqualTo(HALF_PI)
+            actualSum shouldBe HALF_PI
         }
 
         test("adding points with positive coordinates") {
@@ -111,7 +111,7 @@ class Vector3DTest : FunSpec({
 
             val actualSum = pointA.angle(pointB)
 
-            assertThat(actualSum).isEqualTo(PI)
+            actualSum shouldBe PI
         }
     }
 

@@ -16,15 +16,15 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 import kotlin.math.sqrt
 
 class LineSegment2DTest : FunSpec({
@@ -35,7 +35,7 @@ class LineSegment2DTest : FunSpec({
             val pointB = Vector2D(7.0, 0.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            assertThat(lineSegment.length).isCloseTo(7.0, Offset.offset(DBL_EPSILON))
+            lineSegment.length.shouldBe(7.0 plusOrMinus DBL_EPSILON)
         }
 
         test("length of diagonal line segment") {
@@ -43,7 +43,7 @@ class LineSegment2DTest : FunSpec({
             val pointB = Vector2D(0.0, 4.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            assertThat(lineSegment.length).isCloseTo(5.0, Offset.offset(DBL_EPSILON))
+            lineSegment.length.shouldBe(5.0 plusOrMinus DBL_EPSILON)
         }
     }
 
@@ -54,11 +54,9 @@ class LineSegment2DTest : FunSpec({
             val pointB = Vector2D(0.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
+            val actualPose = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.rotation.angle).isEqualTo(HALF_PI)
+            actualPose.rotation.angle shouldBe HALF_PI
         }
 
         test("angle of diagonal line segment") {
@@ -66,11 +64,9 @@ class LineSegment2DTest : FunSpec({
             val pointB = Vector2D(1.0, 1.0)
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            val actualReturn = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
+            val actualPose = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.rotation.angle).isEqualTo(QUARTER_PI)
+            actualPose.rotation.angle shouldBe QUARTER_PI
         }
     }
 
@@ -82,11 +78,9 @@ class LineSegment2DTest : FunSpec({
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
             val curveRelativePoint = CurveRelativeVector1D(5.0)
 
-            val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point).isEqualTo(Vector2D(5.0, 0.0))
+            actualPose.point shouldBe Vector2D(5.0, 0.0)
         }
 
         test("point on diagonal line segment on axis") {
@@ -95,12 +89,10 @@ class LineSegment2DTest : FunSpec({
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
             val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
 
-            val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
+            actualPose.point.x.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
         }
 
         test("point on diagonal line segment on axis 2") {
@@ -109,11 +101,9 @@ class LineSegment2DTest : FunSpec({
             val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
             val curveRelativePoint = CurveRelativeVector1D(1.0)
 
-            val actualReturn = lineSegment.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point).isEqualTo(Vector2D(0.0, 0.0))
+            actualPose.point shouldBe Vector2D(0.0, 0.0)
         }
     }
 })

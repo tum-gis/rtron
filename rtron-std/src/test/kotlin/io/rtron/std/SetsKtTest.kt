@@ -17,7 +17,7 @@
 package io.rtron.std
 
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.shouldBe
 
 class SetsKtTest : FunSpec({
     context("TestCombinations") {
@@ -32,7 +32,7 @@ class SetsKtTest : FunSpec({
 
             val actualCombinations = startSet.combinations(2)
 
-            assertThat(actualCombinations).isEqualTo(expectedCombinations)
+            actualCombinations shouldBe expectedCombinations
         }
     }
 })

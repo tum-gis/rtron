@@ -16,8 +16,10 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -27,8 +29,6 @@ import io.rtron.math.std.PI
 import io.rtron.math.std.TWO_PI
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 
 class Arc2DTest : FunSpec({
     context("TestCenterCalculation") {
@@ -38,7 +38,7 @@ class Arc2DTest : FunSpec({
 
             val actualCenter = arc.center
 
-            assertThat(actualCenter).isEqualTo(Vector2D(0.0, 1.0))
+            actualCenter shouldBe Vector2D(0.0, 1.0)
         }
 
         test("unit curvature with center below origin") {
@@ -46,7 +46,7 @@ class Arc2DTest : FunSpec({
 
             val actualCenter = arc.center
 
-            assertThat(actualCenter).isEqualTo(Vector2D(0.0, -1.0))
+            actualCenter shouldBe Vector2D(0.0, -1.0)
         }
     }
 
@@ -57,7 +57,7 @@ class Arc2DTest : FunSpec({
 
             val actualStartAngle = arc.startAngle.toAngleRadians()
 
-            assertThat(actualStartAngle).isEqualTo(PI + HALF_PI)
+            actualStartAngle shouldBe PI + HALF_PI
         }
 
         test("starting angle with center below origin") {
@@ -65,7 +65,7 @@ class Arc2DTest : FunSpec({
 
             val actualStartAngle = arc.startAngle.toAngleRadians()
 
-            assertThat(actualStartAngle).isEqualTo(HALF_PI)
+            actualStartAngle shouldBe HALF_PI
         }
     }
 
@@ -76,7 +76,7 @@ class Arc2DTest : FunSpec({
 
             val actualEndAngle = arc.endAngle.toAngleRadians()
 
-            assertThat(actualEndAngle).isEqualTo(0.0)
+            actualEndAngle shouldBe 0.0
         }
     }
 
@@ -85,43 +85,35 @@ class Arc2DTest : FunSpec({
         test("calculate pose point on the start") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
+            val actualPose = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point).isEqualTo(Vector2D.ZERO)
+            actualPose.point shouldBe Vector2D.ZERO
         }
 
         test("calculate pose point on the curve") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
             val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
-            val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = arc.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point).isEqualTo(Vector2D(1.0, 1.0))
+            actualPose.point shouldBe Vector2D(1.0, 1.0)
         }
 
         test("calculate pose angle on the start") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
+            val actualPose = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(0.0)
+            actualPose.rotation.toAngleRadians() shouldBe 0.0
         }
 
         test("calculate pose angle on the curve") {
             val arc = Arc2D(1.0, TWO_PI, 0.0, AffineSequence2D.EMPTY)
             val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
-            val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = arc.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(HALF_PI)
+            actualPose.rotation.toAngleRadians() shouldBe HALF_PI
         }
     }
 
@@ -134,11 +126,9 @@ class Arc2DTest : FunSpec({
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
+            val actualPose = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point).isEqualTo(Vector2D(3.0, 5.0))
+            actualPose.point shouldBe Vector2D(3.0, 5.0)
         }
 
         test("calculate pose point on the curve") {
@@ -149,11 +139,9 @@ class Arc2DTest : FunSpec({
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
-            val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = arc.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point).isEqualTo(Vector2D(2.0, 6.0))
+            actualPose.point shouldBe Vector2D(2.0, 6.0)
         }
 
         test("calculate pose in fourth quadrant") {
@@ -163,12 +151,10 @@ class Arc2DTest : FunSpec({
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(0.0125, 170.0, 0.0, affineSequence)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
+            val actualPose = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isCloseTo(point.x, Offset.offset(DBL_EPSILON_4))
-            assertThat(actualReturn.value.point.y).isCloseTo(point.y, Offset.offset(DBL_EPSILON_4))
+            actualPose.point.x.shouldBe(point.x plusOrMinus DBL_EPSILON_4)
+            actualPose.point.y.shouldBe(point.y plusOrMinus DBL_EPSILON_4)
         }
 
         test("calculate pose angle on the start") {
@@ -178,11 +164,9 @@ class Arc2DTest : FunSpec({
             val affineSequence = AffineSequence2D.of(affine)
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
 
-            val actualReturn = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO)
+            val actualPose = arc.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(HALF_PI)
+            actualPose.rotation.toAngleRadians() shouldBe HALF_PI
         }
 
         test("calculate pose angle on the curve") {
@@ -193,11 +177,9 @@ class Arc2DTest : FunSpec({
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(HALF_PI)
 
-            val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = arc.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(PI)
+            actualPose.rotation.toAngleRadians() shouldBe PI
         }
 
         test("calculate pose angle in fourth quadrant") {
@@ -208,11 +190,9 @@ class Arc2DTest : FunSpec({
             val arc = Arc2D(1.0, TWO_PI, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(PI)
 
-            val actualReturn = arc.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = arc.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.rotation.toAngleRadians()).isEqualTo(PI + HALF_PI)
+            actualPose.rotation.toAngleRadians() shouldBe PI + HALF_PI
         }
     }
 })

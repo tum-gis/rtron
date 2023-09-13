@@ -23,7 +23,7 @@ object DependencyVersions {
 
     // testing libraries
     const val kotest = "5.7.1"
-    const val assertj = "3.24.2"
+    const val kotestExtensionArrow = "1.3.3"
     const val mockk = "1.13.7"
 
     // logging libraries
@@ -71,7 +71,7 @@ object Dependencies {
 
     // testing libraries
     const val kotest = "io.kotest:kotest-runner-junit5:${DependencyVersions.kotest}"
-    const val assertj = "org.assertj:assertj-core:${DependencyVersions.assertj}"
+    const val kotestExtensionArrow = "io.kotest.extensions:kotest-assertions-arrow:${DependencyVersions.kotestExtensionArrow}"
     const val mockk = "io.mockk:mockk:${DependencyVersions.mockk}"
 
     // logging libraries

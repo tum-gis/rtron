@@ -17,13 +17,13 @@
 package io.rtron.math.geometry.euclidean.threed
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.DBL_EPSILON_3
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.math.std.TWO_PI
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 
 class Rotation3DTest : FunSpec({
     context("TestAngleAssignments") {
@@ -31,55 +31,55 @@ class Rotation3DTest : FunSpec({
         test("heading assignment with half pi") {
             val actualHeading = Rotation3D(HALF_PI, 0.0, 0.0).heading
 
-            assertThat(actualHeading).isCloseTo(HALF_PI, Offset.offset(DBL_EPSILON))
+            actualHeading.shouldBe(HALF_PI plusOrMinus DBL_EPSILON)
         }
 
         test("heading assignment with two pi") {
             val actualHeading = Rotation3D(TWO_PI, 0.0, 0.0).heading
 
-            assertThat(actualHeading).isCloseTo(0.0, Offset.offset(DBL_EPSILON_3))
+            actualHeading.shouldBe(0.0 plusOrMinus DBL_EPSILON_3)
         }
 
         test("heading assignment with two and a half pi") {
             val actualHeading = Rotation3D(HALF_PI + TWO_PI, 0.0, 0.0).heading
 
-            assertThat(actualHeading).isCloseTo(HALF_PI, Offset.offset(DBL_EPSILON_3))
+            actualHeading.shouldBe(HALF_PI plusOrMinus DBL_EPSILON_3)
         }
 
         test("pitch assignment with quarter pi") {
             val actualPitch = Rotation3D(0.0, QUARTER_PI, 0.0).pitch
 
-            assertThat(actualPitch).isCloseTo(QUARTER_PI, Offset.offset(DBL_EPSILON))
+            actualPitch.shouldBe(QUARTER_PI plusOrMinus DBL_EPSILON)
         }
 
         test("pitch assignment with two pi") {
             val actualPitch = Rotation3D(0.0, TWO_PI, 0.0).pitch
 
-            assertThat(actualPitch).isCloseTo(0.0, Offset.offset(DBL_EPSILON_3))
+            actualPitch.shouldBe(0.0 plusOrMinus DBL_EPSILON_3)
         }
 
         test("pitch assignment with two and a half pi") {
             val actualPitch = Rotation3D(0.0, QUARTER_PI + TWO_PI, 0.0).pitch
 
-            assertThat(actualPitch).isCloseTo(QUARTER_PI, Offset.offset(DBL_EPSILON_3))
+            actualPitch.shouldBe(QUARTER_PI plusOrMinus DBL_EPSILON_3)
         }
 
         test("roll assignment with quarter pi") {
             val actualRoll = Rotation3D(0.0, 0.0, HALF_PI).roll
 
-            assertThat(actualRoll).isCloseTo(HALF_PI, Offset.offset(DBL_EPSILON))
+            actualRoll.shouldBe(HALF_PI plusOrMinus DBL_EPSILON)
         }
 
         test("roll assignment with two pi") {
             val actualRoll = Rotation3D(0.0, 0.0, TWO_PI).roll
 
-            assertThat(actualRoll).isCloseTo(0.0, Offset.offset(DBL_EPSILON_3))
+            actualRoll.shouldBe(0.0 plusOrMinus DBL_EPSILON_3)
         }
 
         test("roll assignment with two and a half pi") {
             val actualRoll = Rotation3D(0.0, 0.0, HALF_PI + TWO_PI).roll
 
-            assertThat(actualRoll).isCloseTo(HALF_PI, Offset.offset(DBL_EPSILON_3))
+            actualRoll.shouldBe(HALF_PI plusOrMinus DBL_EPSILON_3)
         }
     }
 })

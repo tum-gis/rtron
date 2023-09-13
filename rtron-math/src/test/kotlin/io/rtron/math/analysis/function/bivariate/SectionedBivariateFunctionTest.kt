@@ -18,10 +18,10 @@ package io.rtron.math.analysis.function.bivariate
 
 import arrow.core.Either
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.analysis.function.bivariate.combination.SectionedBivariateFunction
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.range.Range
-import org.assertj.core.api.Assertions.assertThat
 
 class SectionedBivariateFunctionTest : FunSpec({
     context("TestCreation") {
@@ -33,7 +33,7 @@ class SectionedBivariateFunctionTest : FunSpec({
             val actualResult = sectionedPlane.value(0.0, 0.0)
 
             require(actualResult is Either.Right)
-            assertThat(actualResult.value).isEqualTo(1.0)
+            actualResult.value shouldBe 1.0
         }
     }
 })

@@ -16,14 +16,14 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
-import arrow.core.Either
 import arrow.core.nonEmptyListOf
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.DBL_EPSILON
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 
 class LineString3DTest : FunSpec({
     context("TestLengthCalculation") {
@@ -33,7 +33,7 @@ class LineString3DTest : FunSpec({
 
             val actualLength = lineString.length
 
-            assertThat(actualLength).isEqualTo(1.0)
+            actualLength shouldBe 1.0
         }
 
         test("line string with multiple points should have a length of 1") {
@@ -45,7 +45,7 @@ class LineString3DTest : FunSpec({
 
             val actualLength = lineString.length
 
-            assertThat(actualLength).isEqualTo(3.0)
+            actualLength shouldBe 3.0
         }
     }
 
@@ -56,13 +56,11 @@ class LineString3DTest : FunSpec({
             val pointB = Vector3D(0.0, 10.0, 0.0)
             val lineString = LineString3D(nonEmptyListOf(pointA, pointB), 0.0)
 
-            val actualReturn = lineString.calculatePointGlobalCS(CurveRelativeVector1D(5.0))
+            val actualPoint = lineString.calculatePointGlobalCS(CurveRelativeVector1D(5.0)).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.x).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.y).isCloseTo(5.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.z).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
+            actualPoint.x.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+            actualPoint.y.shouldBe(5.0 plusOrMinus DBL_EPSILON)
+            actualPoint.z.shouldBe(0.0 plusOrMinus DBL_EPSILON)
         }
 
         test("line string with multiple points yields point on the top") {
@@ -72,13 +70,11 @@ class LineString3DTest : FunSpec({
             val pointD = Vector3D(0.0, 1.0, 0.0)
             val lineString = LineString3D(nonEmptyListOf(pointA, pointB, pointC, pointD), 0.0)
 
-            val actualReturn = lineString.calculatePointGlobalCS(CurveRelativeVector1D(2.5))
+            val actualPoint = lineString.calculatePointGlobalCS(CurveRelativeVector1D(2.5)).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.x).isCloseTo(0.5, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.z).isCloseTo(0.0, Offset.offset(DBL_EPSILON))
+            actualPoint.x.shouldBe(0.5 plusOrMinus DBL_EPSILON)
+            actualPoint.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            actualPoint.z.shouldBe(0.0 plusOrMinus DBL_EPSILON)
         }
     }
 })

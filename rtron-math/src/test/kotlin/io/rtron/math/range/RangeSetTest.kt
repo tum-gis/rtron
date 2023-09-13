@@ -19,7 +19,8 @@ package io.rtron.math.range
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 
 class RangeSetTest : FunSpec({
 
@@ -45,8 +46,7 @@ class RangeSetTest : FunSpec({
 
             val actualUnion = rangeSetA.union(rangeSetB)
 
-            assertThat(actualUnion.asRanges())
-                .containsExactlyInAnyOrder(rangeA, rangeB)
+            actualUnion.asRanges().shouldContainExactlyInAnyOrder(rangeA, rangeB)
         }
 
         test("simple union of two connected range sets") {
@@ -58,7 +58,7 @@ class RangeSetTest : FunSpec({
 
             val actualUnion = rangeSetA.union(rangeSetB)
 
-            assertThat(actualUnion.asRanges()).containsOnly(expectedRange)
+            actualUnion.asRanges().shouldContainExactly(expectedRange)
         }
     }
 

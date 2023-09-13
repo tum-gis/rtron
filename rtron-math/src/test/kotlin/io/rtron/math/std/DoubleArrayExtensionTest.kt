@@ -16,9 +16,9 @@
 
 package io.rtron.math.std
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 class DoubleArrayExtensionTest : FunSpec({
 
@@ -49,7 +49,7 @@ class DoubleArrayExtensionTest : FunSpec({
         test("test fail for wrong dimension") {
             val values = doubleArrayOf(2.0, 1.0, 2.0, 1.0)
 
-            assertThatIllegalArgumentException().isThrownBy { values.reshapeByRowDimension(5) }
+            shouldThrow<IllegalArgumentException> { values.reshapeByRowDimension(5) }
         }
 
         test("test reshape of square matrix") {

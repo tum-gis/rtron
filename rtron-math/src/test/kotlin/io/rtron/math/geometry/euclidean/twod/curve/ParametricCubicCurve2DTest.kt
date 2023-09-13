@@ -16,8 +16,10 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
@@ -27,8 +29,6 @@ import io.rtron.math.std.PI
 import io.rtron.math.std.QUARTER_PI
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 import kotlin.math.sqrt
 
 class ParametricCubicCurve2DTest : FunSpec({
@@ -40,11 +40,9 @@ class ParametricCubicCurve2DTest : FunSpec({
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0)
             val curveRelativePoint = CurveRelativeVector1D(2.0)
 
-            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point).isEqualTo(Vector2D(2.0, 4.0))
+            actualPose.point shouldBe Vector2D(2.0, 4.0)
         }
 
         test("simple linear curve") {
@@ -55,12 +53,10 @@ class ParametricCubicCurve2DTest : FunSpec({
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
 
-            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
+            actualPose.point.x.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
         }
 
         test("simple quadratic negative curve") {
@@ -71,12 +67,10 @@ class ParametricCubicCurve2DTest : FunSpec({
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(2.0)
 
-            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isCloseTo(-2.0, Offset.offset(DBL_EPSILON_2))
-            assertThat(actualReturn.value.point.y).isCloseTo(-4.0, Offset.offset(DBL_EPSILON_2))
+            actualPose.point.x.shouldBe(-2.0 plusOrMinus DBL_EPSILON_2)
+            actualPose.point.y.shouldBe(-4.0 plusOrMinus DBL_EPSILON_2)
         }
 
         test("quadratic curve") {
@@ -86,12 +80,10 @@ class ParametricCubicCurve2DTest : FunSpec({
             val curveRelativePoint = CurveRelativeVector1D(length)
             val curve = ParametricCubicCurve2D(coefficientX, coefficientY, length, 0.0)
 
-            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isCloseTo(length, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.point.y).isCloseTo(length * length, Offset.offset(DBL_EPSILON))
+            actualPose.point.x.shouldBe(length plusOrMinus DBL_EPSILON)
+            actualPose.point.y.shouldBe(length * length plusOrMinus DBL_EPSILON)
         }
     }
 })

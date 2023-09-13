@@ -16,9 +16,9 @@
 
 package io.rtron.math.range
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
+import io.kotest.matchers.collections.shouldHaveSize
 
 class DoubleRangeSetExtensionsTest : FunSpec({
     context("TestCreation") {
@@ -27,7 +27,7 @@ class DoubleRangeSetExtensionsTest : FunSpec({
             val rangeA = Range.closed(0.0, 2.0)
             val rangeB = Range.closed(1.0, 4.0)
 
-            assertThatIllegalArgumentException().isThrownBy {
+            shouldThrow<IllegalArgumentException> {
                 RangeSet.ofNonIntersectingRanges(rangeA, rangeB)
             }
         }
@@ -38,7 +38,7 @@ class DoubleRangeSetExtensionsTest : FunSpec({
 
             val actualRangeSet = RangeSet.ofNonIntersectingRanges(rangeA, rangeB)
 
-            assertThat(actualRangeSet.asRanges()).hasSize(1)
+            actualRangeSet.asRanges() shouldHaveSize 1
         }
     }
 })

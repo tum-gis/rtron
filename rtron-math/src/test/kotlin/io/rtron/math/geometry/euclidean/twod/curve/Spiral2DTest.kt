@@ -17,6 +17,8 @@
 package io.rtron.math.geometry.euclidean.twod.curve
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
@@ -27,8 +29,6 @@ import io.rtron.math.std.PI
 import mu.KotlinLogging
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 import java.io.FileReader
 import java.lang.Math.abs
 import kotlin.io.path.Path
@@ -43,7 +43,7 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculatePoint(0.0)
 
-            assertThat(actualPoint).isEqualTo(Vector2D.ZERO)
+            actualPoint shouldBe Vector2D.ZERO
         }
 
         test("return asymptotic point at l=+infinity") {
@@ -52,8 +52,8 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculatePoint(Double.POSITIVE_INFINITY)
 
-            assertThat(actualPoint.x).isCloseTo(asymptoticPoint.x, Offset.offset(DBL_EPSILON_1))
-            assertThat(actualPoint.y).isCloseTo(asymptoticPoint.y, Offset.offset(DBL_EPSILON_1))
+            actualPoint.x.shouldBe(asymptoticPoint.x plusOrMinus DBL_EPSILON_1)
+            actualPoint.y.shouldBe(asymptoticPoint.y plusOrMinus DBL_EPSILON_1)
         }
 
         test("return asymptotic point at l=-infinity") {
@@ -62,8 +62,8 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculatePoint(Double.NEGATIVE_INFINITY)
 
-            assertThat(actualPoint.x).isCloseTo(asymptoticPoint.x, Offset.offset(DBL_EPSILON_1))
-            assertThat(actualPoint.y).isCloseTo(asymptoticPoint.y, Offset.offset(DBL_EPSILON_1))
+            actualPoint.x.shouldBe(asymptoticPoint.x plusOrMinus DBL_EPSILON_1)
+            actualPoint.y.shouldBe(asymptoticPoint.y plusOrMinus DBL_EPSILON_1)
         }
     }
 
@@ -74,7 +74,7 @@ class Spiral2DTest : FunSpec({
 
             val actualRotation = spiral.calculateRotation(0.0)
 
-            assertThat(actualRotation.toAngleRadians()).isEqualTo(0.0)
+            actualRotation.toAngleRadians() shouldBe 0.0
         }
     }
 
@@ -106,9 +106,9 @@ class Spiral2DTest : FunSpec({
                 if (abs(actualPoint.x - x) > DBL_EPSILON_1 || abs(actualPoint.y - y) > DBL_EPSILON_1) {
                     println("test")
                 }
-                assertThat(actualPoint.x).isCloseTo(x, Offset.offset(DBL_EPSILON_3))
-                assertThat(actualPoint.y).isCloseTo(y, Offset.offset(DBL_EPSILON_3))
-                assertThat(actualRotation.angle).isCloseTo(Rotation2D(t).angle, Offset.offset(DBL_EPSILON_1))
+                actualPoint.x.shouldBe(x plusOrMinus DBL_EPSILON_3)
+                actualPoint.y.shouldBe(y plusOrMinus DBL_EPSILON_3)
+                actualRotation.angle.shouldBe(Rotation2D(t).angle plusOrMinus DBL_EPSILON_1)
             }
         }
 
@@ -117,8 +117,8 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculatePoint(-5330.827396000006)
 
-            assertThat(actualPoint.x).isCloseTo(-3.401537830619735, Offset.offset(DBL_EPSILON))
-            assertThat(actualPoint.y).isCloseTo(3.403385667520832, Offset.offset(DBL_EPSILON))
+            actualPoint.x.shouldBe(-3.401537830619735 plusOrMinus DBL_EPSILON)
+            actualPoint.y.shouldBe(3.403385667520832 plusOrMinus DBL_EPSILON)
         }
 
         test("test rotation calculation against sample value 1") {
@@ -126,7 +126,7 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculateRotation(-5330.827396000006)
 
-            assertThat(actualPoint.angle).isCloseTo(Rotation2D(-962991.11906995473).angle, Offset.offset(DBL_EPSILON))
+            actualPoint.angle.shouldBe(Rotation2D(-962991.11906995473).angle plusOrMinus DBL_EPSILON)
         }
 
         test("test point calculation against sample value 2") {
@@ -134,8 +134,8 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculatePoint(38679.185313200163)
 
-            assertThat(actualPoint.x).isCloseTo(8.1518659286823159, Offset.offset(DBL_EPSILON))
-            assertThat(actualPoint.y).isCloseTo(8.1487837011384663, Offset.offset(DBL_EPSILON))
+            actualPoint.x.shouldBe(8.1518659286823159 plusOrMinus DBL_EPSILON)
+            actualPoint.y.shouldBe(8.1487837011384663 plusOrMinus DBL_EPSILON)
         }
 
         test("test rotation calculation against sample value 2") {
@@ -143,7 +143,7 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculateRotation(38679.185313200163)
 
-            assertThat(actualPoint.angle).isCloseTo(Rotation2D(8844595.7788996678).angle, Offset.offset(DBL_EPSILON))
+            actualPoint.angle.shouldBe(Rotation2D(8844595.7788996678).angle plusOrMinus DBL_EPSILON)
         }
 
         test("test point calculation against sample value 3") {
@@ -152,8 +152,8 @@ class Spiral2DTest : FunSpec({
             val actualPoint = spiral.calculatePoint(6884.6109795996472)
 
             // this higher offset is caused by accumulated floating point errors
-            assertThat(actualPoint.x).isCloseTo(3.9006399958644153, Offset.offset(DBL_EPSILON_2))
-            assertThat(actualPoint.y).isCloseTo(-3.8974453107566154, Offset.offset(DBL_EPSILON_2))
+            actualPoint.x.shouldBe(3.9006399958644153 plusOrMinus DBL_EPSILON_2)
+            actualPoint.y.shouldBe(-3.8974453107566154 plusOrMinus DBL_EPSILON_2)
         }
 
         test("test rotation calculation against sample value 3") {
@@ -161,7 +161,7 @@ class Spiral2DTest : FunSpec({
 
             val actualPoint = spiral.calculateRotation(6884.6109795996472)
 
-            assertThat(actualPoint.angle).isCloseTo(Rotation2D(-1225084.3271085601).angle, Offset.offset(DBL_EPSILON))
+            actualPoint.angle.shouldBe(Rotation2D(-1225084.3271085601).angle plusOrMinus DBL_EPSILON)
         }
     }
 })

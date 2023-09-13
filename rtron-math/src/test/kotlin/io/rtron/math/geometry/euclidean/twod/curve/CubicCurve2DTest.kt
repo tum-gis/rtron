@@ -16,8 +16,11 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -26,8 +29,6 @@ import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 
 class CubicCurve2DTest : FunSpec({
     context("TestPoseCalculation") {
@@ -40,13 +41,11 @@ class CubicCurve2DTest : FunSpec({
             val curve = CubicCurve2D(coefficients, 1.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(1.0)
 
-            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.rotation.angle).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
+            actualPose.point.x.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            actualPose.rotation.angle.shouldBe(1.0 plusOrMinus DBL_EPSILON)
         }
 
         test("pose calculation of straight line with start pose offset") {
@@ -57,12 +56,10 @@ class CubicCurve2DTest : FunSpec({
             val curve = CubicCurve2D(coefficients, 1.0, 0.0, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(1.0)
 
-            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isCloseTo(-1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualReturn.value.point.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
+            actualPose.point.x.shouldBe(-1.0 plusOrMinus DBL_EPSILON)
+            actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
         }
 
         /**
@@ -79,13 +76,11 @@ class CubicCurve2DTest : FunSpec({
             val curve = CubicCurve2D(coefficients, length, 1E-4, affineSequence)
             val curveRelativePoint = CurveRelativeVector1D(length)
 
-            val actualReturn = curve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value.point.x).isNotCloseTo(-5.0558344684384622e+00, Offset.offset(DBL_EPSILON)) // not coincident with next curve element
-            assertThat(actualReturn.value.point.y).isNotCloseTo(9.6260358855640789e+00, Offset.offset(DBL_EPSILON)) // not coincident with next curve element
-            assertThat(actualReturn.value.rotation.angle).isNotCloseTo(3.8412114603351055e-01, Offset.offset(DBL_EPSILON)) // not coincident with next curve element
+            actualPose.point.x.shouldNotBe(-5.0558344684384622e+00 plusOrMinus DBL_EPSILON) // not coincident with next curve element
+            actualPose.point.y.shouldNotBe(9.6260358855640789e+00 plusOrMinus DBL_EPSILON) // not coincident with next curve element
+            actualPose.rotation.angle.shouldNotBe(3.8412114603351055e-01 plusOrMinus DBL_EPSILON) // not coincident with next curve element
         }
     }
 })

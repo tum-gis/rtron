@@ -16,8 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
-import arrow.core.Either
+import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldNotBe
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
@@ -27,7 +28,6 @@ import io.rtron.math.std.DBL_EPSILON_7
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import io.rtron.std.cumulativeSum
-import org.assertj.core.api.Assertions.assertThat
 
 class CompositeCurve2DTest : FunSpec({
     context("TestPoseCalculation") {
@@ -93,11 +93,9 @@ class CompositeCurve2DTest : FunSpec({
             val compositeCurve = CompositeCurve2D(curveMembers, absoluteDomains, absoluteStarts.dropLast(1))
             val curveRelativePoint = CurveRelativeVector1D(compositeCurve.length)
 
-            val actualPoint = compositeCurve.calculatePoseGlobalCS(curveRelativePoint)
+            val actualPose = compositeCurve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            assertThat(actualPoint).isInstanceOf(Either.Right::class.java)
-            require(actualPoint is Either.Right)
-            assertThat(actualPoint.value.point).isNotEqualTo(Vector2D.ZERO)
+            actualPose.point shouldNotBe Vector2D.ZERO
         }
     }
 })

@@ -16,12 +16,12 @@
 
 package io.rtron.math.geometry.euclidean.threed.surface
 
-import arrow.core.Either
 import arrow.core.nonEmptyListOf
+import io.kotest.assertions.arrow.core.shouldBeRight
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 class Polygon3DTest : FunSpec({
     context("TestCreation") {
@@ -30,27 +30,26 @@ class Polygon3DTest : FunSpec({
             val pointA = Vector3D(0.0, 0.0, 0.0)
             val pointB = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(nonEmptyListOf(pointA, pointB), 0.0) }
+            shouldThrow<IllegalArgumentException> { Polygon3D(nonEmptyListOf(pointA, pointB), 0.0) }
         }
 
         test("creation of polygon with only one point should fail") {
             val pointA = Vector3D(0.0, 0.0, 0.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(nonEmptyListOf(pointA), 0.0) }
+            shouldThrow<IllegalArgumentException> { Polygon3D(nonEmptyListOf(pointA), 0.0) }
         }
 
         test("creation of polygon with no point should fail") {
             val pointA = Vector3D(0.0, 0.0, 0.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Polygon3D(nonEmptyListOf(pointA), 0.0) }
+            shouldThrow<IllegalArgumentException> { Polygon3D(nonEmptyListOf(pointA), 0.0) }
         }
 
         test("creation of polygon with consecutive point duplicates should fail") {
             val pointA = Vector3D(0.0, 0.0, 0.0)
             val pointB = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException()
-                .isThrownBy { Polygon3D(nonEmptyListOf(pointA, pointB, pointA), 0.0) }
+            shouldThrow<IllegalArgumentException> { Polygon3D(nonEmptyListOf(pointA, pointB, pointA), 0.0) }
         }
 
         test("creation of polygon with three colinear points should fail") {
@@ -58,8 +57,7 @@ class Polygon3DTest : FunSpec({
             val pointB = Vector3D(2.0, 3.0, 0.0)
             val pointC = Vector3D(3.0, 4.0, 0.0)
 
-            assertThatIllegalArgumentException()
-                .isThrownBy { Polygon3D(nonEmptyListOf(pointA, pointB, pointC), 0.0) }
+            shouldThrow<IllegalArgumentException> { Polygon3D(nonEmptyListOf(pointA, pointB, pointC), 0.0) }
         }
 
         test("creation of polygon with non-planar points should fail") {
@@ -68,8 +66,7 @@ class Polygon3DTest : FunSpec({
             val pointC = Vector3D.Y_AXIS
             val pointD = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException()
-                .isThrownBy { Polygon3D(nonEmptyListOf(pointA, pointB, pointC, pointD), 0.0) }
+            shouldThrow<IllegalArgumentException> { Polygon3D(nonEmptyListOf(pointA, pointB, pointC, pointD), 0.0) }
         }
     }
 
@@ -81,11 +78,9 @@ class Polygon3DTest : FunSpec({
             val pointC = Vector3D(2.0, 2.0, 1.0)
             val triangle = Polygon3D(nonEmptyListOf(pointA, pointB, pointC), 0.0)
 
-            val actualReturn = triangle.getNormal()
+            val actualNormal = triangle.getNormal().shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value).isEqualTo(Vector3D.Z_AXIS)
+            actualNormal shouldBe Vector3D.Z_AXIS
         }
 
         test("test planar quadrilateral polygon") {
@@ -100,11 +95,9 @@ class Polygon3DTest : FunSpec({
             )
             val expectedResult = Vector3D(0.0, -1.0, 0.0)
 
-            val actualReturn = planarQuadrilateral.getNormal()
+            val actualNormal = planarQuadrilateral.getNormal().shouldBeRight()
 
-            assertThat(actualReturn).isInstanceOf(Either.Right::class.java)
-            require(actualReturn is Either.Right)
-            assertThat(actualReturn.value).isEqualTo(expectedResult)
+            actualNormal shouldBe expectedResult
         }
     }
 })

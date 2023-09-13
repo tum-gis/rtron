@@ -18,7 +18,7 @@ package io.rtron.math.projection
 
 import arrow.core.Either
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.shouldBe
 
 class CoordinateReferenceSystemTest : FunSpec({
 
@@ -30,7 +30,7 @@ class CoordinateReferenceSystemTest : FunSpec({
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
             require(actualCrsResult is Either.Right)
-            assertThat(actualCrsResult.value.name).isEqualTo(crsName)
+            actualCrsResult.value.name shouldBe crsName
         }
 
         test("build crs 32632 from epsg name") {
@@ -39,7 +39,7 @@ class CoordinateReferenceSystemTest : FunSpec({
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
             require(actualCrsResult is Either.Right)
-            assertThat(actualCrsResult.value.name).isEqualTo(crsName)
+            actualCrsResult.value.name shouldBe crsName
         }
 
         test("extract epsg code 4326") {
@@ -48,7 +48,7 @@ class CoordinateReferenceSystemTest : FunSpec({
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
             require(actualCrsResult is Either.Right)
-            assertThat(actualCrsResult.value.epsgCode).isEqualTo(4326)
+            actualCrsResult.value.epsgCode shouldBe 4326
         }
 
         test("extract epsg code 32632") {
@@ -57,7 +57,7 @@ class CoordinateReferenceSystemTest : FunSpec({
             val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
             require(actualCrsResult is Either.Right)
-            assertThat(actualCrsResult.value.epsgCode).isEqualTo(32632)
+            actualCrsResult.value.epsgCode shouldBe 32632
         }
 
         test("build crs 32632 from parameters") {
@@ -66,7 +66,7 @@ class CoordinateReferenceSystemTest : FunSpec({
             val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
 
             require(actualCrsResult is Either.Right)
-            assertThat(actualCrsResult.value.epsgCode).isEqualTo(32632)
+            actualCrsResult.value.epsgCode shouldBe 32632
         }
 
         test("build crs 4326 from parameters") {
@@ -75,7 +75,7 @@ class CoordinateReferenceSystemTest : FunSpec({
             val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
 
             require(actualCrsResult is Either.Right)
-            assertThat(actualCrsResult.value.epsgCode).isEqualTo(4326)
+            actualCrsResult.value.epsgCode shouldBe 4326
         }
     }
 })

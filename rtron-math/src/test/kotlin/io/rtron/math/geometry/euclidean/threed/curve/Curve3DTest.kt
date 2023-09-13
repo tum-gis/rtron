@@ -17,6 +17,8 @@
 package io.rtron.math.geometry.euclidean.threed.curve
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
@@ -25,8 +27,6 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.DBL_EPSILON
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 import kotlin.math.sqrt
 
 class Curve3DTest : FunSpec({
@@ -41,7 +41,7 @@ class Curve3DTest : FunSpec({
 
             val actualPointGlobal = affine.transform(pointLocal)
 
-            assertThat(actualPointGlobal).isEqualTo(Vector3D(0.5, 1.0, 0.0))
+            actualPointGlobal shouldBe Vector3D(0.5, 1.0, 0.0)
         }
 
         test("curve with constant torsion of quarter pi") {
@@ -54,8 +54,8 @@ class Curve3DTest : FunSpec({
 
             val actualPointGlobal = affine.transform(pointLocal)
 
-            assertThat(actualPointGlobal.y).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
-            assertThat(actualPointGlobal.z).isCloseTo(1.0, Offset.offset(DBL_EPSILON))
+            actualPointGlobal.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            actualPointGlobal.z.shouldBe(1.0 plusOrMinus DBL_EPSILON)
         }
 
         test("curve with constant torsion of half pi") {
@@ -68,7 +68,7 @@ class Curve3DTest : FunSpec({
 
             val actualPointGlobal = affine.transform(pointLocal)
 
-            assertThat(actualPointGlobal).isEqualTo(Vector3D(0.5, 0.0, 1.0))
+            actualPointGlobal shouldBe Vector3D(0.5, 0.0, 1.0)
         }
     }
 })

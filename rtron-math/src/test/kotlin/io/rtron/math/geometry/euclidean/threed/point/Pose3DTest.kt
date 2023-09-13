@@ -17,12 +17,12 @@
 package io.rtron.math.geometry.euclidean.threed.point
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.Pose3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
-import org.assertj.core.api.Assertions.assertThat
 
 class Pose3DTest : FunSpec({
     context("TestConversionToPose2D") {
@@ -35,7 +35,7 @@ class Pose3DTest : FunSpec({
 
             val actualPose2D = pose3D.toPose2D(Vector3D.Y_AXIS)
 
-            assertThat(actualPose2D).isEqualTo(expectedPose2D)
+            actualPose2D shouldBe expectedPose2D
         }
     }
 })

@@ -17,12 +17,12 @@
 package io.rtron.math.analysis
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import io.rtron.math.std.DBL_EPSILON
 import mu.KotlinLogging
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.data.Offset
 import java.io.FileReader
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
@@ -51,30 +51,30 @@ class FresnelTest : FunSpec({
 
                 val (actualX, actualY) = Fresnel.calculatePoint(l)
 
-                assertThat(actualX).isCloseTo(x, Offset.offset(DBL_EPSILON))
-                assertThat(actualY).isCloseTo(y, Offset.offset(DBL_EPSILON))
+                actualX.shouldBe(x plusOrMinus DBL_EPSILON)
+                actualY.shouldBe(y plusOrMinus DBL_EPSILON)
             }
         }
 
         test("test against sample value 1") {
             val (actualX, actualY) = Fresnel.calculatePoint(-4.2284028867950161)
 
-            assertThat(actualX).isCloseTo(-0.51547336206019945, Offset.offset(DBL_EPSILON))
-            assertThat(actualY).isCloseTo(-0.5736113070569262, Offset.offset(DBL_EPSILON))
+            actualX.shouldBe(-0.51547336206019945 plusOrMinus DBL_EPSILON)
+            actualY.shouldBe(-0.5736113070569262 plusOrMinus DBL_EPSILON)
         }
 
         test("test against sample value 2") {
             val (actualX, actualY) = Fresnel.calculatePoint(883.12677767970729)
 
-            assertThat(actualX).isCloseTo(0.50035646758310326, Offset.offset(DBL_EPSILON))
-            assertThat(actualY).isCloseTo(0.49994666781760994, Offset.offset(DBL_EPSILON))
+            actualX.shouldBe(0.50035646758310326 plusOrMinus DBL_EPSILON)
+            actualY.shouldBe(0.49994666781760994 plusOrMinus DBL_EPSILON)
         }
 
         test("test against sample value 3") {
             val (actualX, actualY) = Fresnel.calculatePoint(-1.8154077322757265)
 
-            assertThat(actualX).isCloseTo(-0.33992314562581244, Offset.offset(DBL_EPSILON))
-            assertThat(actualY).isCloseTo(-0.43687889962705617, Offset.offset(DBL_EPSILON))
+            actualX.shouldBe(-0.33992314562581244 plusOrMinus DBL_EPSILON)
+            actualY.shouldBe(-0.43687889962705617 plusOrMinus DBL_EPSILON)
         }
     }
 })

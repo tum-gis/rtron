@@ -17,7 +17,7 @@
 package io.rtron.std
 
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.shouldBe
 
 class SequencesKtTest : FunSpec({
     context("TestZipWithNextEnclosing") {
@@ -27,19 +27,19 @@ class SequencesKtTest : FunSpec({
 
             val actualZips = listOf("a", "b", "c").zipWithNextEnclosing()
 
-            assertThat(actualZips).isEqualTo(expectedZips)
+            actualZips shouldBe expectedZips
         }
 
         test("empty list should return an empty list") {
             val actualZips = emptyList<String>().zipWithNextEnclosing()
 
-            assertThat(actualZips).isEqualTo(emptyList<String>())
+            actualZips shouldBe emptyList<String>()
         }
 
         test("list with a single element should return an empty list") {
             val actualZips = listOf("a").zipWithNextEnclosing()
 
-            assertThat(actualZips).isEqualTo(emptyList<String>())
+            actualZips shouldBe emptyList<String>()
         }
     }
 
@@ -50,7 +50,7 @@ class SequencesKtTest : FunSpec({
 
             val actual = listOf("a", "a", "a", "b", "c", "c").zipWithConsecutives { it }
 
-            assertThat(actual).isEqualTo(expected)
+            actual shouldBe expected
         }
 
         test("test basic sequence with same enclosing pair") {
@@ -58,19 +58,19 @@ class SequencesKtTest : FunSpec({
 
             val actual = listOf("a", "a", "a", "b", "c", "c", "a").zipWithConsecutives { it }
 
-            assertThat(actual).isEqualTo(expected)
+            actual shouldBe expected
         }
 
         test("empty list should return an empty list") {
             val actualZips = emptyList<String>().zipWithConsecutives { it }
 
-            assertThat(actualZips).isEqualTo(emptyList<String>())
+            actualZips shouldBe emptyList<String>()
         }
 
         test("test single element") {
             val actualZips = listOf("a").zipWithConsecutives { it }
 
-            assertThat(actualZips).isEqualTo(listOf(listOf("a")))
+            actualZips shouldBe listOf(listOf("a"))
         }
     }
 
@@ -81,7 +81,7 @@ class SequencesKtTest : FunSpec({
 
             val actual = listOf("a", "a", "a", "b", "c", "c").zipWithConsecutivesEnclosing { it }
 
-            assertThat(actual).isEqualTo(expected)
+            actual shouldBe expected
         }
 
         test("test basic sequence with same enclosing pair") {
@@ -90,19 +90,19 @@ class SequencesKtTest : FunSpec({
 
             val actualZips = elements.zipWithConsecutivesEnclosing { it }
 
-            assertThat(actualZips).isEqualTo(expectedZips)
+            actualZips shouldBe expectedZips
         }
 
         test("empty list should return an empty list") {
             val actualZips = emptyList<String>().zipWithConsecutivesEnclosing { it }
 
-            assertThat(actualZips).isEqualTo(emptyList<String>())
+            actualZips shouldBe emptyList<String>()
         }
 
         test("test single element") {
             val actualZips = listOf("a").zipWithConsecutivesEnclosing { it }
 
-            assertThat(actualZips).isEqualTo(listOf(listOf("a")))
+            actualZips shouldBe listOf(listOf("a"))
         }
 
         test("test ordering") {
@@ -121,7 +121,7 @@ class SequencesKtTest : FunSpec({
 
             val actualZips = startList.zipWithConsecutivesEnclosing { it.first }
 
-            assertThat(actualZips).isEqualTo(expectedZips)
+            actualZips shouldBe expectedZips
         }
     }
 })

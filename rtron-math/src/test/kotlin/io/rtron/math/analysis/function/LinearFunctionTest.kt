@@ -17,11 +17,12 @@
 package io.rtron.math.analysis.function
 
 import arrow.core.Either
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 class LinearFunctionTest : FunSpec({
     context("TestValueCalculation") {
@@ -32,7 +33,7 @@ class LinearFunctionTest : FunSpec({
             val actualResult = linearFunction.value(3.0)
 
             require(actualResult is Either.Right)
-            assertThat(actualResult.value).isEqualTo(40.0)
+            actualResult.value shouldBe 40.0
         }
 
         test("out of range value evaluation throws an IllegalArgumentException") {
@@ -41,7 +42,7 @@ class LinearFunctionTest : FunSpec({
             val actualResult = linearFunction.value(3.0)
 
             require(actualResult is Either.Left)
-            assertThat(actualResult.value).isInstanceOf(IllegalArgumentException::class.java)
+            actualResult.value.shouldBeInstanceOf<IllegalArgumentException>()
         }
     }
 
@@ -56,14 +57,16 @@ class LinearFunctionTest : FunSpec({
 
             val actualLinearFunction = LinearFunction.ofInclusivePoints(3.0, 2.0, 7.0, -4.0)
 
-            assertThat(actualLinearFunction).isEqualTo(expectedLinearFunction)
+            actualLinearFunction shouldBe expectedLinearFunction
         }
 
         test("creation of linear function with two equal points throws an IllegalArgumentException") {
             val x = 2.1
             val y = 3.4
 
-            assertThatIllegalArgumentException().isThrownBy { LinearFunction.ofInclusivePoints(x, y, x, y) }
+            shouldThrow<IllegalArgumentException> {
+                LinearFunction.ofInclusivePoints(x, y, x, y)
+            }
         }
     }
 
@@ -78,7 +81,7 @@ class LinearFunctionTest : FunSpec({
 
             val actualLinearFunction = LinearFunction.ofInclusiveYValuesAndUnitSlope(2.0, 4.0)
 
-            assertThat(actualLinearFunction).isEqualTo(expectedLinearFunction)
+            actualLinearFunction shouldBe expectedLinearFunction
         }
 
         test("with negative unit slope") {
@@ -90,7 +93,7 @@ class LinearFunctionTest : FunSpec({
 
             val actualLinearFunction = LinearFunction.ofInclusiveYValuesAndUnitSlope(17.0, 14.0)
 
-            assertThat(actualLinearFunction).isEqualTo(expectedLinearFunction)
+            actualLinearFunction shouldBe expectedLinearFunction
         }
     }
 })

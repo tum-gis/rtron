@@ -16,9 +16,9 @@
 
 package io.rtron.std
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
+import io.kotest.matchers.shouldBe
 
 class ListsKtTest : FunSpec({
     context("TestMoveWindow") {
@@ -34,14 +34,14 @@ class ListsKtTest : FunSpec({
                 { a, b -> a || b }
             )
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
 
         test("fail if base list is empty") {
             val listA = listOf<Boolean>()
             val listB = listOf(true, false)
 
-            assertThatIllegalArgumentException().isThrownBy {
+            shouldThrow<IllegalArgumentException> {
                 listA.moveWindow(
                     listB,
                     { baseElement, otherElement -> baseElement && otherElement },
@@ -54,7 +54,7 @@ class ListsKtTest : FunSpec({
             val listA = listOf(true, false)
             val listB = listOf<Boolean>()
 
-            assertThatIllegalArgumentException().isThrownBy {
+            shouldThrow<IllegalArgumentException> {
                 listA.moveWindow(
                     listB,
                     { baseElement, otherElement -> baseElement && otherElement },
@@ -75,7 +75,7 @@ class ListsKtTest : FunSpec({
                 shape = MovingWindowShape.SAME
             )
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
 
         test("moving window with doubles") {
@@ -89,7 +89,7 @@ class ListsKtTest : FunSpec({
                 { a, b -> a + b }
             )
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
     }
 
@@ -102,7 +102,7 @@ class ListsKtTest : FunSpec({
 
             val actualList = listA.moveWindow(listB, shape = MovingWindowShape.SAME)
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
     }
 
@@ -111,7 +111,7 @@ class ListsKtTest : FunSpec({
         test("fail if requested sublist size is greater than list size") {
             val mainList = listOf("a", "a", "a", "b", "c", "c")
 
-            assertThatIllegalArgumentException().isThrownBy {
+            shouldThrow<IllegalArgumentException> {
                 mainList.filterWindowedEnclosing(7) { it[0] == it[1] }
             }
         }
@@ -122,7 +122,7 @@ class ListsKtTest : FunSpec({
 
             val actualList = mainList.filterWindowedEnclosing(3) { it[0] == 3 && it[1] == 4 && it[2] == 4 }
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
 
         test("sublist pattern filter with drop indices on characters") {
@@ -132,7 +132,7 @@ class ListsKtTest : FunSpec({
 
             val actualList = mainList.filterWindowedEnclosing(dropIndices) { it[0] == it[2] }
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
 
         test("test removal of consecutive duplicates") {
@@ -142,7 +142,7 @@ class ListsKtTest : FunSpec({
 
             val actualList = mainList.filterWindowedEnclosing(dropIndices) { it[0] == it[1] }
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
 
         test("test removal of consecutive and enclosing duplicates by dropping the first window indices") {
@@ -152,7 +152,7 @@ class ListsKtTest : FunSpec({
 
             val actualList = mainList.filterWindowedEnclosing(dropIndices) { it[0] == it[1] }
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
 
         test("test removal of consecutive and enclosing duplicates by dropping the second window indices") {
@@ -162,7 +162,7 @@ class ListsKtTest : FunSpec({
 
             val actualList = mainList.filterWindowedEnclosing(dropIndices) { it[0] == it[1] }
 
-            assertThat(actualList).isEqualTo(expectedList)
+            actualList shouldBe expectedList
         }
     }
 })

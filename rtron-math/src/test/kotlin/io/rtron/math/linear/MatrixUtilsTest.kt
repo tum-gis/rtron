@@ -17,7 +17,7 @@
 package io.rtron.math.linear
 
 import io.kotest.core.spec.style.FunSpec
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.shouldBe
 
 class MatrixUtilsTest : FunSpec({
     context("TestAppendColumn") {
@@ -29,8 +29,8 @@ class MatrixUtilsTest : FunSpec({
 
             val actualAppendedMatrix = matrix.appendColumn(column)
 
-            assertThat(actualAppendedMatrix.getRow(0)).isEqualTo(doubleArrayOf(1.0, 0.0, 2.0))
-            assertThat(actualAppendedMatrix.getRow(1)).isEqualTo(doubleArrayOf(0.0, 4.0, 1.0))
+            actualAppendedMatrix.getRow(0) shouldBe doubleArrayOf(1.0, 0.0, 2.0)
+            actualAppendedMatrix.getRow(1) shouldBe doubleArrayOf(0.0, 4.0, 1.0)
         }
     }
 })

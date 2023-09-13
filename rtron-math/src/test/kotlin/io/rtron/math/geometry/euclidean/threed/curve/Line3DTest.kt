@@ -16,9 +16,9 @@
 
 package io.rtron.math.geometry.euclidean.threed.curve
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
-import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 class Line3DTest : FunSpec({
     context("Addition") {
@@ -26,7 +26,9 @@ class Line3DTest : FunSpec({
         test("throws error if ") {
             val point = Vector3D(1.0, 1.0, 1.0)
 
-            assertThatIllegalArgumentException().isThrownBy { Line3D(point, point, 0.0) }
+            shouldThrow<IllegalArgumentException> {
+                Line3D(point, point, 0.0)
+            }
         }
     }
 })

@@ -17,9 +17,9 @@
 package io.rtron.math.geometry.euclidean.twod.point
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.PI
-import org.assertj.core.api.Assertions.assertThat
 import kotlin.math.sqrt
 
 class Vector2DTest : FunSpec({
@@ -27,7 +27,7 @@ class Vector2DTest : FunSpec({
     fun scalarMultiply() {
         val actualValue = Vector2D(1.0, 1.0).scalarMultiply(4.0)
 
-        assertThat(actualValue).isEqualTo(Vector2D(4.0, 4.0))
+        actualValue shouldBe Vector2D(4.0, 4.0)
     }
 
     context("TestDistanceCalculation") {
@@ -38,7 +38,7 @@ class Vector2DTest : FunSpec({
 
             val actualDistance = pointA.distance(pointB)
 
-            assertThat(actualDistance).isEqualTo(3.0)
+            actualDistance shouldBe 3.0
         }
 
         test("uneven value distance between two point") {
@@ -47,7 +47,7 @@ class Vector2DTest : FunSpec({
 
             val actualDistance = pointA.distance(pointB)
 
-            assertThat(actualDistance).isEqualTo(sqrt(2.0))
+            actualDistance shouldBe sqrt(2.0)
         }
     }
 
@@ -59,7 +59,7 @@ class Vector2DTest : FunSpec({
 
             val actualAngle = pointA.angle(pointB).toAngleRadians()
 
-            assertThat(actualAngle).isEqualTo(HALF_PI)
+            actualAngle shouldBe HALF_PI
         }
 
         test("uneven radians angle") {
@@ -68,7 +68,7 @@ class Vector2DTest : FunSpec({
 
             val actualAngle = pointA.angle(pointB).toAngleRadians()
 
-            assertThat(actualAngle).isEqualTo(1.75 * PI)
+            actualAngle shouldBe 1.75 * PI
         }
 
         test("-half pi degree angle axes") {
@@ -77,7 +77,7 @@ class Vector2DTest : FunSpec({
 
             val actualAngle = pointA.angle(pointB).toAngleRadians()
 
-            assertThat(actualAngle).isEqualTo(1.5 * PI)
+            actualAngle shouldBe 1.5 * PI
         }
     }
 })

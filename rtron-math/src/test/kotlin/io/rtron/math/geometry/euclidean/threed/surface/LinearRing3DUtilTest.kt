@@ -17,9 +17,9 @@
 package io.rtron.math.geometry.euclidean.threed.surface
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.processing.removeConsecutiveSideDuplicates
-import org.assertj.core.api.Assertions.assertThat
 
 class LinearRing3DUtilTest : FunSpec({
     context("TestRemoveCuts") {
@@ -34,7 +34,7 @@ class LinearRing3DUtilTest : FunSpec({
 
             val actualRemovedVerticesList = vertices.removeConsecutiveSideDuplicates()
 
-            assertThat(actualRemovedVerticesList).isEqualTo(expected)
+            actualRemovedVerticesList shouldBe expected
         }
     }
 })
