@@ -19,26 +19,31 @@ package io.rtron.readerwriter.opendrive
 import arrow.core.Either
 import arrow.core.raise.either
 import io.rtron.io.files.getFileSizeToDisplay
+import io.rtron.io.files.outputStreamDirectOrCompressed
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.writer.OpendriveMarshaller
 import io.rtron.std.BaseException
 import mu.KotlinLogging
+import java.io.OutputStream
 import java.nio.file.Path
 
-class OpendriveFileWriter(
-    val parameters: OpendriveWriterParameters
-) {
+object OpendriveWriter {
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
     private val opendriveMarshaller by lazy { OpendriveMarshaller() }
 
     // Methods
-    fun write(model: OpendriveModel, directoryPath: Path): Either<OpendriveWriterException, Path> = either {
-        val filePath = opendriveMarshaller.writeToFile(model, directoryPath, parameters.fileCompression).bind()
-        logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+    fun writeToFile(model: OpendriveModel, filePath: Path): Either<OpendriveWriterException, Unit> = either {
+        val outputStream: OutputStream = filePath.outputStreamDirectOrCompressed()
+        writeToStream(model, outputStream)
+        outputStream.close()
 
-        filePath
+        logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+    }
+
+    fun writeToStream(model: OpendriveModel, outputStream: OutputStream) {
+        opendriveMarshaller.writeToStream(model, outputStream)
     }
 }
 

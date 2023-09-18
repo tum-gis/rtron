@@ -20,8 +20,6 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import io.rtron.readerwriter.citygml.CitygmlVersion
-import io.rtron.readerwriter.citygml.CitygmlWriterParameters
-import io.rtron.readerwriter.opendrive.OpendriveWriterParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
@@ -101,10 +99,6 @@ data class OpendriveToCitygmlParameters(
         cropPolygonY = cropPolygonY
     )
 
-    fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
-        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
-    )
-
     fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
         concurrentProcessing = false,
 
@@ -136,10 +130,5 @@ data class OpendriveToCitygmlParameters(
         transformAdditionalRoadLines = transformAdditionalRoadLines,
         generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
         mappingBackwardsCompatibility = convertToCitygml2
-    )
-
-    fun deriveCitygmlWriterParameters() = CitygmlWriterParameters(
-        versions = setOf(this.getCitygmlWriteVersion()),
-        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 }

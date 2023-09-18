@@ -22,10 +22,9 @@ import io.rtron.model.citygml.CitygmlModel
 import mu.KotlinLogging
 import org.citygml4j.xml.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
+import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.div
 
 object CitygmlWriter {
 
@@ -36,17 +35,17 @@ object CitygmlWriter {
 
     // Methods
 
-    fun writeModel(model: CitygmlModel, directoryPath: Path, fileNameWithoutExtension: String, parameters: CitygmlWriterParameters): List<Path> {
-        return parameters.versions.map { write(model, it, directoryPath, fileNameWithoutExtension, parameters) }
+    fun writeToFile(model: CitygmlModel, version: CitygmlVersion, filePath: Path) {
+        val outputStream = filePath.outputStreamDirectOrCompressed()
+        writeToStream(model, version, outputStream)
+        outputStream.close()
+
+        logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
     }
 
-    private fun write(model: CitygmlModel, version: CitygmlVersion, directoryPath: Path, fileNameWithoutExtension: String, parameters: CitygmlWriterParameters): Path {
+    fun writeToStream(model: CitygmlModel, version: CitygmlVersion, outputStream: OutputStream) {
         val citygmlVersion = version.toGmlCitygml()
         val out = citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
-
-        val fileName = fileNameWithoutExtension + ".gml" + parameters.fileCompression.fold({ "" }, { it.extensionWithDot })
-        val filePath = directoryPath / Path(fileName)
-        val outputStream = filePath.outputStreamDirectOrCompressed()
 
         val writer = out.createCityGMLChunkWriter(outputStream, StandardCharsets.UTF_8.name())
         writer.apply {
@@ -61,10 +60,5 @@ object CitygmlWriter {
         }
 
         writer.close()
-        outputStream.close()
-        logger.info("Completed writing of file $fileName (around ${filePath.getFileSizeToDisplay()}).")
-        return filePath
     }
-
-    val supportedFilenameEndings: Set<String> = setOf("gml")
 }

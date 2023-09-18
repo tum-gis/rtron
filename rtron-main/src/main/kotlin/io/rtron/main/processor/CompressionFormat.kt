@@ -16,11 +16,6 @@
 
 package io.rtron.main.processor
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.some
-import io.rtron.io.files.CompressedFileExtension
-
 enum class CompressionFormat {
     NONE,
     GZ,
@@ -28,9 +23,9 @@ enum class CompressionFormat {
     ZST
 }
 
-fun CompressionFormat.toOptionalCompressedFileExtension(): Option<CompressedFileExtension> = when (this) {
-    CompressionFormat.NONE -> None
-    CompressionFormat.GZ -> CompressedFileExtension.GZ.some()
-    CompressionFormat.ZIP -> CompressedFileExtension.ZIP.some()
-    CompressionFormat.ZST -> CompressedFileExtension.ZST.some()
+fun CompressionFormat.toFileExtension(): String = when (this) {
+    CompressionFormat.NONE -> ""
+    CompressionFormat.GZ -> ".gz"
+    CompressionFormat.ZIP -> ".zip"
+    CompressionFormat.ZST -> ".zst"
 }

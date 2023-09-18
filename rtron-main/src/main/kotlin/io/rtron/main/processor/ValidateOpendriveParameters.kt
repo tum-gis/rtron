@@ -16,9 +16,6 @@
 
 package io.rtron.main.processor
 
-import io.rtron.readerwriter.citygml.CitygmlVersion
-import io.rtron.readerwriter.citygml.CitygmlWriterParameters
-import io.rtron.readerwriter.opendrive.OpendriveWriterParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
@@ -51,10 +48,6 @@ data class ValidateOpendriveParameters(
         planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
         planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance
-    )
-
-    fun deriveOpendriveWriterParameters() = OpendriveWriterParameters(
-        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 
     fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
@@ -103,15 +96,5 @@ data class ValidateOpendriveParameters(
         transformAdditionalRoadLines = true,
         generateLongitudinalFillerSurfaces = false,
         mappingBackwardsCompatibility = false
-    )
-
-    fun deriveCitygml2WriterParameters() = CitygmlWriterParameters(
-        versions = setOf(CitygmlVersion.V2_0),
-        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
-    )
-
-    fun deriveCitygml3WriterParameters() = CitygmlWriterParameters(
-        versions = setOf(CitygmlVersion.V3_0),
-        fileCompression = compressionFormat.toOptionalCompressedFileExtension()
     )
 }

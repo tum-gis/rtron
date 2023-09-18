@@ -36,7 +36,7 @@ import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.isRegularFile
 
-object OpendriveFileReader {
+object OpendriveReader {
 
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
