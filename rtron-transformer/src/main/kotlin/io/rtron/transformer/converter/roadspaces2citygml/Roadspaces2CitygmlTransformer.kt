@@ -30,6 +30,7 @@ import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.identifier.opposite
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneChange
+import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.std.getValueEither
 import io.rtron.transformer.converter.roadspaces2citygml.module.RelationAdder
 import io.rtron.transformer.converter.roadspaces2citygml.report.Roadspaces2CitygmlReport
@@ -209,7 +210,10 @@ class Roadspaces2CitygmlTransformer(
 
             // predecessor
             val predecessorLaneIds =
-                if (currentLane.id.isForward()) {
+                if (currentLane.type == LaneType.BIDIRECTIONAL) {
+                    roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it } +
+                        roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+                } else if (currentLane.id.isForward()) {
                     roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
                 } else {
                     roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
@@ -225,7 +229,10 @@ class Roadspaces2CitygmlTransformer(
 
             // successor
             val successorLaneIds =
-                if (currentLane.id.isForward()) {
+                if (currentLane.type == LaneType.BIDIRECTIONAL) {
+                    roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it } +
+                        roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
+                } else if (currentLane.id.isForward()) {
                     roadspacesModel.getSuccessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
                 } else {
                     roadspacesModel.getPredecessorLaneIdentifiers(currentLane.id).getOrElse { throw it }
