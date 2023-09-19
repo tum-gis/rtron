@@ -17,7 +17,6 @@
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
-import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.RoadSide
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
@@ -41,7 +40,7 @@ class RelationAdder(
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
-    fun addRelatedToRelation(roadspaceObject: RoadspaceObject, dstCityObject: AbstractCityObject) {
+    fun addRelatedToRelation(roadspaceObject: RoadspaceObject, dstTrafficSpace: TrafficSpace) {
         val relationType = "related" + when (RoadspaceObjectRouter.route(roadspaceObject)) {
             RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> "Building"
             RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> "Furniture"
@@ -52,12 +51,16 @@ class RelationAdder(
             RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> "Vegetation"
         }
 
-        val relations: HashSet<LaneIdentifier> = roadspaceObject.laneRelations.flatMap { it.getAllLeftRightLaneIdentifiers() }.toHashSet()
-        dstCityObject.relatedTo = relations.map { createCityObjectRelation(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), relationType, it) }
+        val relation = createCityObjectRelation(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), relationType, roadspaceObject.id)
+        dstTrafficSpace.relatedTo.add(relation)
     }
 
     fun addBelongToRelations(roadspaceObject: RoadspaceObject, dstCityObject: AbstractCityObject) {
-        dstCityObject.relatedTo = roadspaceObject.laneRelations.flatMap { it.getAllLeftRightLaneIdentifiers() }.map { createCityObjectRelation(it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), "belongsTo", it) }
+        val relations = roadspaceObject.laneRelations
+            .flatMap { it.getAllLeftRightLaneIdentifiers() }
+            .map { createCityObjectRelation(it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), "belongsTo", it) }
+
+        dstCityObject.relatedTo.addAll(relations)
     }
 
     /**
