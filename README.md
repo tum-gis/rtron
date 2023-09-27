@@ -24,17 +24,16 @@ r:trån reads road network models in [OpenDRIVE](https://www.asam.net/standards/
 
 This enables you to
 
-* [inspect](https://rtron.io/demos/model-inspection) your spatio-semantic road space models
-* conduct further [model transformations](https://rtron.io/demos/model-transformations) with tools like [FME](https://www.safe.com/fme/)
-* perform geospatial analyses on the [3D City Database](https://rtron.io/demos/3dcitydb)
-* deploy [virtual globes](https://rtron.io/demos/web-map)
-* load your models into a [desktop GIS](https://rtron.io/demos/desktop-gis)
-* [compare and validate](https://rtron.io/demos/model-validation) your models with models from other data sources
+* [inspect](https://rtron.io/examples/model-inspection) your spatio-semantic road space models
+* conduct further [model transformations](https://rtron.io/examples/model-transformations) with tools like [FME](https://www.safe.com/fme/)
+* perform geospatial analyses on the [3D City Database](https://rtron.io/examples/3dcitydb)
+* deploy [virtual globes](https://rtron.io/examples/web-map)
+* load your models into a [desktop GIS](https://rtron.io/examples/desktop-gis)
 
 ## :inbox_tray: Datasets
 
 Download some sample OpenDRIVE datasets of the city of Ingolstadt from the company [3D Mapping Solutions](https://www.3d-mapping.de/en/customer-area/demo-data) (initial registration required).
-Additionally, [awesome-openx](https://github.com/b-schwab/awesome-openx#datasets) provides a list of further OpenDRIVE datasets.
+Additionally, [awesome-openx](https://github.com/beneschwab/awesome-openx#datasets) provides a list of further OpenDRIVE datasets.
 
 ## :rocket: Usage
 
