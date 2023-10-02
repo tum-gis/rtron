@@ -17,9 +17,9 @@
 
 object PluginVersions {
     const val shadowjar = "8.1.1"
-    const val ktlint = "11.5.1"
+    const val ktlint = "11.6.0"
     const val xjc = "1.6"
-    const val versionChecker = "0.47.0"
+    const val versionChecker = "0.48.0"
     const val dokka = "1.9.0"
     const val serialization = "1.9.10"
     const val ksp = "1.9.10-1.0.13"
