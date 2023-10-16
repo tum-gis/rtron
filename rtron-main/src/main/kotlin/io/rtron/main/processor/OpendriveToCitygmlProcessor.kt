@@ -126,7 +126,11 @@ class OpendriveToCitygmlProcessor(
             citygmlModelResult.second.serializeToJsonFile(outputSubDirectoryPath / ROADSPACES_TO_CITYGML_REPORT_PATH)
 
             // write CityGML model
-            CitygmlWriter.writeToFile(citygmlModelResult.first, parameters.getCitygmlWriteVersion(), outputSubDirectoryPath / "citygml_model.gml")
+            CitygmlWriter.writeToFile(
+                citygmlModelResult.first,
+                parameters.getCitygmlWriteVersion(),
+                outputSubDirectoryPath / ("citygml_model.gml" + parameters.compressionFormat.toFileExtension())
+            )
         }
     }
 
