@@ -282,6 +282,7 @@ class Roadspaces2CitygmlTransformer(
     ): BoundingShape {
         val envelope = Envelope()
         crs.onSome { envelope.srsName = it.srsName }
+        envelope.srsDimension = 3
         abstractCityObjects.forEach { envelope.include(it.computeEnvelope()) }
         return BoundingShape(envelope)
     }
