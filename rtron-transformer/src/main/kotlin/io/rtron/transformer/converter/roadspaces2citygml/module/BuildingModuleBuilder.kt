@@ -16,10 +16,10 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
@@ -31,7 +31,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlId
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLod2GroundGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLod2RoofGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveLod2WallGmlIdentifier
-import io.rtron.transformer.messages.roadspaces.of
+import io.rtron.transformer.issues.roadspaces.of
 import org.citygml4j.core.model.building.Building
 import org.citygml4j.core.model.construction.GroundSurface
 import org.citygml4j.core.model.construction.RoofSurface
@@ -49,8 +49,8 @@ class BuildingModuleBuilder(
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
-    fun createBuildingFeature(roadspaceObject: RoadspaceObject): ContextMessageList<Building> {
-        val messageList = DefaultMessageList()
+    fun createBuildingFeature(roadspaceObject: RoadspaceObject): ContextIssueList<Building> {
+        val issueList = DefaultIssueList()
 
         val buildingFeature = Building()
 
@@ -62,7 +62,7 @@ class BuildingModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             buildingFeature.populateLod1Geometry(geometryTransformer)
                 .mapLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForBuildingLod1",
                         it.message,
                         roadspaceObject.id,
@@ -82,7 +82,7 @@ class BuildingModuleBuilder(
         relationAdder.addBelongToRelations(roadspaceObject, buildingFeature)
         attributesAdder.addAttributes(roadspaceObject, buildingFeature)
 
-        return ContextMessageList(buildingFeature, messageList)
+        return ContextIssueList(buildingFeature, issueList)
     }
 
     /**
@@ -93,13 +93,13 @@ class BuildingModuleBuilder(
         id: RoadspaceObjectIdentifier,
         geometryTransformer: GeometryTransformer,
         dstBuildingFeature: Building
-    ): ContextMessageList<Building> {
+    ): ContextIssueList<Building> {
         require(geometryTransformer.getSolid().isSome()) { "Solid geometry is required to create an LOD2 building." }
-        val messageList = DefaultMessageList()
+        val issueList = DefaultIssueList()
 
         dstBuildingFeature.populateLod2Geometry(geometryTransformer)
             .onLeft {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "NoSuitableGeometryForBuildingLod2",
                     it.message,
                     id,
@@ -112,7 +112,7 @@ class BuildingModuleBuilder(
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).onSome {
             roofSurfaceFeature.lod2MultiSurface = it
         }.onNone {
-            messageList += DefaultMessage.of(
+            issueList += DefaultIssue.of(
                 "NoSuitableGeometryForRoofSurfaceLod2",
                 "No LOD2 MultiSurface for roof feature available.",
                 id,
@@ -131,7 +131,7 @@ class BuildingModuleBuilder(
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).onSome {
             groundSurfaceFeature.lod2MultiSurface = it
         }.onNone {
-            messageList += DefaultMessage.of(
+            issueList += DefaultIssue.of(
                 "NoSuitableGeometryForGroundSurfaceLod2",
                 "No LOD2 MultiSurface for ground feature available.",
                 id,
@@ -158,7 +158,7 @@ class BuildingModuleBuilder(
                 )
             }
         }.onNone {
-            messageList += DefaultMessage.of(
+            issueList += DefaultIssue.of(
                 "NoSuitableGeometryForWallSurfaceLod2",
                 "No LOD2 MultiSurface for wall feature available.",
                 id,
@@ -167,6 +167,6 @@ class BuildingModuleBuilder(
             )
         }
 
-        return ContextMessageList(dstBuildingFeature, messageList)
+        return ContextIssueList(dstBuildingFeature, issueList)
     }
 }

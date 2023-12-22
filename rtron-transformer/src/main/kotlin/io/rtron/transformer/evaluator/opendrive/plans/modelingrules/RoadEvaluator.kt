@@ -17,26 +17,26 @@
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
 import arrow.core.None
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.std.fuzzyEquals
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyRoad
 import io.rtron.transformer.converter.opendrive2roadspaces.geometry.Curve2DBuilder
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 
 object RoadEvaluator {
 
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             if (currentRoad.planView.geometry.any { it.s > currentRoad.length + parameters.numberTolerance }) {
-                messageList += DefaultMessage.of("PlanViewGeometrySValueExceedsRoadLength", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = false)
+                issueList += DefaultIssue.of("PlanViewGeometrySValueExceedsRoadLength", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = false)
             }
 
             currentRoad
@@ -46,7 +46,7 @@ object RoadEvaluator {
             // TODO: consolidate location handling
 
             if (currentRoad.planView.geometry.any { it.length <= parameters.numberTolerance }) {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "PlanViewGeometryElementZeroLength",
                     "Plan view contains geometry elements with a length of zero (below tolerance threshold), which are removed.",
                     currentRoad.additionalId,
@@ -62,7 +62,7 @@ object RoadEvaluator {
 
         modifiedOpendriveModel.road = modifiedOpendriveModel.road.filter { currentRoad ->
             if (currentRoad.planView.geometry.isEmpty()) {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "RoadWithoutValidPlanViewGeometryElement",
                     "Road does not contain any valid geometry element in the planView.",
                     currentRoad.additionalId,
@@ -85,13 +85,13 @@ object RoadEvaluator {
             currentRoad.planView.geometry.zipWithNext().forEach {
                 val actualLength = it.second.s - it.first.s
                 if (!fuzzyEquals(it.first.length, actualLength, parameters.numberTolerance)) {
-                    messageList += DefaultMessage.of("PlanViewGeometryElementLengthNotMatchingNextElement", "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) does not match the start position (s=${it.second.s}) of the next geometry element.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+                    issueList += DefaultIssue.of("PlanViewGeometryElementLengthNotMatchingNextElement", "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) does not match the start position (s=${it.second.s}) of the next geometry element.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
                     it.first.length = actualLength
                 }
             }
 
             if (!fuzzyEquals(currentRoad.planView.geometry.last().s + currentRoad.planView.geometry.last().length, currentRoad.length, parameters.numberTolerance)) {
-                messageList += DefaultMessage.of("LastPlanPlanViewGeometryElementNotMatchingRoadLength", "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length (length=${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
+                issueList += DefaultIssue.of("LastPlanPlanViewGeometryElementNotMatchingRoadLength", "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length (length=${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
                 currentRoad.planView.geometry.last().length = currentRoad.length - currentRoad.planView.geometry.last().s
             }
 
@@ -107,7 +107,7 @@ object RoadEvaluator {
 
                 val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
                 if (distance > parameters.planViewGeometryDistanceTolerance) {
-                    messageList += DefaultMessage(
+                    issueList += DefaultIssue(
                         "GapBetweenPlanViewGeometryElements",
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
@@ -117,7 +117,7 @@ object RoadEvaluator {
                         wasFixed = false
                     )
                 } else if (distance > parameters.planViewGeometryDistanceWarningTolerance) {
-                    messageList += DefaultMessage(
+                    issueList += DefaultIssue(
                         "GapBetweenPlanViewGeometryElements",
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
@@ -130,7 +130,7 @@ object RoadEvaluator {
 
                 val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
                 if (angleDifference > parameters.planViewGeometryAngleTolerance) {
-                    messageList += DefaultMessage(
+                    issueList += DefaultIssue(
                         "KinkBetweenPlanViewGeometryElements",
                         "Geometry elements contain a kink " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
@@ -140,7 +140,7 @@ object RoadEvaluator {
                         wasFixed = false
                     )
                 } else if (angleDifference > parameters.planViewGeometryAngleWarningTolerance) {
-                    messageList += DefaultMessage(
+                    issueList += DefaultIssue(
                         "KinkBetweenPlanViewGeometryElements",
                         "Geometry elements contain a gap " +
                             "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
@@ -159,7 +159,7 @@ object RoadEvaluator {
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             currentRoad.getJunctionOption().onSome { currentJunctionId ->
                 if (currentJunctionId !in junctionIdentifiers) {
-                    messageList += DefaultMessage(
+                    issueList += DefaultIssue(
                         "RoadBelongsToNonExistingJunction",
                         "Road belongs to a junction (id=${currentRoad.junction}) that does not exist.",
                         currentRoad.id,
@@ -176,7 +176,7 @@ object RoadEvaluator {
                         .isSome { !junctionIdentifiers.contains(it) }
                 }
                 ) {
-                    messageList += DefaultMessage(
+                    issueList += DefaultIssue(
                         "RoadLinkPredecessorRefersToNonExistingJunction",
                         "Road link predecessor references a junction (id=${
                         currentLink.predecessor.fold(
@@ -194,7 +194,7 @@ object RoadEvaluator {
                     currentSuccessor.getJunctionPredecessorSuccessor().isSome { !junctionIdentifiers.contains(it) }
                 }
                 ) {
-                    messageList += DefaultMessage(
+                    issueList += DefaultIssue(
                         "RoadLinkSuccessorRefersToNonExistingJunction",
                         "Road link successor references a junction (id=${
                         currentLink.successor.fold(

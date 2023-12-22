@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package io.rtron.io.messages
+package io.rtron.io.issues
 
-typealias DefaultMessageList = MessageList<DefaultMessage>
+typealias DefaultIssueList = IssueList<DefaultIssue>
 
 /**
  * Returns the number of entries with a certain [severity].
  */
-fun DefaultMessageList.getNumberOfMessages(severity: Severity) = getMessages().filter { it.messageSeverity == severity }.size
+fun DefaultIssueList.getNumberOfIssues(severity: Severity) = getIssues().count { it.issueSeverity == severity }
 
 /**
- * Returns true, if list contains messages with fatal error severity.
+ * Returns true, if list contains issues with fatal error severity.
  */
-fun DefaultMessageList.containsFatalErrors() = getMessages().any { it.messageSeverity == Severity.FATAL_ERROR }
+fun DefaultIssueList.containsFatalErrors() = getIssues().any { it.issueSeverity == Severity.FATAL_ERROR }
 
 /**
- * Returns a summary of the message numbers depending on the severity.
+ * Returns a summary of the issue numbers depending on the severity.
  */
-fun DefaultMessageList.getTextSummary(): String {
-    val numberOfWarnings = getNumberOfMessages(severity = Severity.WARNING)
-    val numberOfErrors = getNumberOfMessages(severity = Severity.ERROR)
-    val numberOfFatalErrors = getNumberOfMessages(severity = Severity.FATAL_ERROR)
+fun DefaultIssueList.getTextSummary(): String {
+    val numberOfWarnings = getNumberOfIssues(severity = Severity.WARNING)
+    val numberOfErrors = getNumberOfIssues(severity = Severity.ERROR)
+    val numberOfFatalErrors = getNumberOfIssues(severity = Severity.FATAL_ERROR)
 
     return "$numberOfWarnings warnings, $numberOfErrors errors, $numberOfFatalErrors fatal errors"
 }

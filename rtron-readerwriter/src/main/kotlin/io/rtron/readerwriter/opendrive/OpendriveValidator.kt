@@ -21,10 +21,10 @@ import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.raise.either
 import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
-import io.rtron.io.messages.MessageList
+import io.rtron.io.issues.IssueList
 import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
+import io.rtron.readerwriter.opendrive.report.SchemaValidationIssue
 import io.rtron.readerwriter.opendrive.report.SchemaValidationReport
-import io.rtron.readerwriter.opendrive.report.SchemaValidationReportMessage
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import io.rtron.readerwriter.opendrive.version.OpendriveVersionUtils
 import mu.KotlinLogging
@@ -47,21 +47,21 @@ object OpendriveValidator {
     }
 
     fun validateFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, SchemaValidationReport> = either {
-        val messageList = runValidation(opendriveVersion, inputStream)
+        val issueList = runValidation(opendriveVersion, inputStream)
             .getOrElse {
                 logger.warn("Schema validation was aborted due the following error: ${it.message}")
-                return@either SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortMessage = it.message)
+                return@either SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortIssue = it.message)
             }
-        if (!messageList.isEmpty()) {
-            logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${messageList.size} incidents.")
+        if (!issueList.isEmpty()) {
+            logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${issueList.size} incidents.")
         } else {
             logger.info("Schema validation report for OpenDRIVE $opendriveVersion: Everything ok.")
         }
 
-        SchemaValidationReport(opendriveVersion, messageList)
+        SchemaValidationReport(opendriveVersion, issueList)
     }
 
-    private fun runValidation(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, MessageList<SchemaValidationReportMessage>> =
+    private fun runValidation(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, IssueList<SchemaValidationIssue>> =
         either {
             val unmarshaller = OpendriveUnmarshaller.of(opendriveVersion).bind()
 
@@ -76,7 +76,7 @@ object OpendriveValidator {
                     .bind<OpendriveReaderException.FatalSchemaValidationError>()
             }
 
-            val messageList = unmarshaller.validationEventHandler.toMessageList()
-            messageList
+            val issueList = unmarshaller.validationEventHandler.toIssueList()
+            issueList
         }
 }

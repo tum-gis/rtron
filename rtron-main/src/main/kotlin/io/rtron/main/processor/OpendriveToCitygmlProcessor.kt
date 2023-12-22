@@ -18,7 +18,7 @@ package io.rtron.main.processor
 
 import arrow.core.getOrElse
 import com.charleskorn.kaml.Yaml
-import io.rtron.io.messages.getTextSummary
+import io.rtron.io.issues.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlWriter
@@ -56,8 +56,8 @@ class OpendriveToCitygmlProcessor(
             val outputSubDirectoryPath = outputDirectoryPath / "citygml_${parameters.getCitygmlWriteVersion()}"
             outputSubDirectoryPath.createDirectories()
             // check if parameters are valid
-            parameters.isValid().onLeft { messages ->
-                messages.forEach { logger.warn("Parameters are not valid: $it") }
+            parameters.isValid().onLeft { issues ->
+                issues.forEach { logger.warn("Parameters are not valid: $it") }
                 return@processAllFiles
             }
             // write the parameters as yaml file

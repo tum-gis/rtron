@@ -16,9 +16,9 @@
 
 package io.rtron.readerwriter.opendrive.reader.validation
 
-import io.rtron.io.messages.MessageList
-import io.rtron.readerwriter.opendrive.report.SchemaValidationReportMessage
-import io.rtron.readerwriter.opendrive.report.toMessage
+import io.rtron.io.issues.IssueList
+import io.rtron.readerwriter.opendrive.report.SchemaValidationIssue
+import io.rtron.readerwriter.opendrive.report.toIssue
 import jakarta.xml.bind.ValidationEvent
 import jakarta.xml.bind.ValidationEventHandler
 
@@ -38,8 +38,8 @@ class OpendriveValidationEventHandler : ValidationEventHandler {
     }
 
     // Conversions
-    fun toMessageList(): MessageList<SchemaValidationReportMessage> {
-        val messages = this.validationEvents.map { it.toMessage() }
-        return MessageList.of(messages)
+    fun toIssueList(): IssueList<SchemaValidationIssue> {
+        val issues = this.validationEvents.map { it.toIssue() }
+        return IssueList.of(issues)
     }
 }

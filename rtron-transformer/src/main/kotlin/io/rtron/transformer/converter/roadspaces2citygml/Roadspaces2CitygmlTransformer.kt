@@ -20,10 +20,10 @@ import arrow.core.Option
 import arrow.core.flattenOption
 import arrow.core.getOrElse
 import arrow.core.toOption
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.mergeIssueLists
 import io.rtron.io.logging.ProgressBar
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.mergeMessageLists
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.citygml.CitygmlModel
 import io.rtron.model.roadspaces.RoadspacesModel
@@ -79,9 +79,9 @@ class Roadspaces2CitygmlTransformer(
         logger.info("Parameters: $parameters.")
         val abstractCityObjects =
             if (parameters.concurrentProcessing) {
-                transformRoadspacesConcurrently(roadspacesModel).handleMessageList { report.conversion += it }
+                transformRoadspacesConcurrently(roadspacesModel).handleIssueList { report.conversion += it }
             } else {
-                transformRoadspacesSequentially(roadspacesModel).handleMessageList { report.conversion += it }
+                transformRoadspacesSequentially(roadspacesModel).handleIssueList { report.conversion += it }
             }
 
         // create CityGML model
@@ -94,16 +94,16 @@ class Roadspaces2CitygmlTransformer(
 
     private fun transformRoadspacesSequentially(
         roadspacesModel: RoadspacesModel
-    ): ContextMessageList<List<AbstractCityObject>> {
-        val messageList = DefaultMessageList()
+    ): ContextIssueList<List<AbstractCityObject>> {
+        val issueList = DefaultIssueList()
 
         // build objects
         val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
         val roadFeatures = roadspacesModel
             .getAllRoadspaceNames()
             .map { roadLanesTransformer.transformRoad(it, roadspacesModel).also { roadFeaturesProgressBar.step() } }
-            .mergeMessageLists()
-            .handleMessageList { messageList += it }
+            .mergeIssueLists()
+            .handleIssueList { issueList += it }
             .flattenOption()
 
         val roadspaceObjectsProgressBar =
@@ -114,8 +114,8 @@ class Roadspaces2CitygmlTransformer(
                 roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects)
                     .also { roadspaceObjectsProgressBar.step() }
             }
-            .mergeMessageLists()
-            .handleMessageList { messageList += it }
+            .mergeIssueLists()
+            .handleIssueList { issueList += it }
             .flatten()
 
         val additionalRoadLines: List<AbstractCityObject> = if (parameters.transformAdditionalRoadLines) {
@@ -123,20 +123,20 @@ class Roadspaces2CitygmlTransformer(
                 ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
             roadspacesModel.getAllRoadspaces().map {
                 roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
-            }.mergeMessageLists().handleMessageList { messageList += it }.flatten()
+            }.mergeIssueLists().handleIssueList { issueList += it }.flatten()
         } else {
             emptyList()
         }
 
         addLaneTopology(roadspacesModel, roadFeatures)
         val cityObjects: List<AbstractCityObject> = roadFeatures + roadspaceObjects + additionalRoadLines
-        return ContextMessageList(cityObjects, messageList)
+        return ContextIssueList(cityObjects, issueList)
     }
 
     private fun transformRoadspacesConcurrently(
         roadspacesModel: RoadspacesModel
-    ): ContextMessageList<List<AbstractCityObject>> {
-        val messageList = DefaultMessageList()
+    ): ContextIssueList<List<AbstractCityObject>> {
+        val issueList = DefaultIssueList()
 
         // build objects
         val roadFeaturesProgressBar = ProgressBar("Transforming road", roadspacesModel.getAllRoadspaceNames().size)
@@ -171,23 +171,23 @@ class Roadspaces2CitygmlTransformer(
 
         val roadFeatures = runBlocking {
             roadFeaturesDeferred.map { currentRoadFeature ->
-                currentRoadFeature.await().handleMessageList { messageList += it }
+                currentRoadFeature.await().handleIssueList { issueList += it }
             }.flattenOption()
         }
         val roadspaceObjects = runBlocking {
             roadspaceObjectsDeferred.map { currentRoadSpaceObject ->
-                currentRoadSpaceObject.await().handleMessageList { messageList += it }
+                currentRoadSpaceObject.await().handleIssueList { issueList += it }
             }.flatten()
         }
         val additionalRoadLines = runBlocking {
             additionalRoadLinesDeferred.flatMap { currentRoadLines ->
-                currentRoadLines.await().handleMessageList { messageList += it }
+                currentRoadLines.await().handleIssueList { issueList += it }
             }
         }
 
         addLaneTopology(roadspacesModel, roadFeatures)
         val cityObjects: List<AbstractCityObject> = roadFeatures + roadspaceObjects + additionalRoadLines
-        return ContextMessageList(cityObjects, messageList)
+        return ContextIssueList(cityObjects, issueList)
     }
 
     private fun addLaneTopology(roadspacesModel: RoadspacesModel, dstTransportationSpaces: List<Road>) {

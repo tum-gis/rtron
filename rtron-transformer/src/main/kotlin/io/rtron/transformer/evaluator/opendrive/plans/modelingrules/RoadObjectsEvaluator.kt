@@ -18,19 +18,19 @@ package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
 import arrow.core.Some
 import arrow.core.flattenOption
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyRoad
 import io.rtron.model.opendrive.additions.optics.everyRoadObject
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 
 object RoadObjectsEvaluator {
 
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
@@ -39,7 +39,7 @@ object RoadObjectsEvaluator {
                 val roadObjectsFiltered =
                     currentRoadObjects.roadObject.filter { it.s <= currentRoad.length + parameters.numberTolerance }
                 if (currentRoadObjects.roadObject.size > roadObjectsFiltered.size) {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "RoadObjectPositionNotInSValueRange",
                         "Road object (number of objects affected: ${currentRoadObjects.roadObject.size - roadObjectsFiltered.size}) were removed since they were positioned outside the defined length of the road.",
                         currentRoad.additionalId,
@@ -61,7 +61,7 @@ object RoadObjectsEvaluator {
 
                 if (outlineElementsWithoutId.isNotEmpty()) {
                     val startId: Int = currentOutlinesElement.outline.map { it.id }.flattenOption().maxOrNull() ?: 0
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "MissingValue",
                         "Missing value for attribute 'id'.",
                         currentRoadObject.additionalId,
@@ -76,7 +76,7 @@ object RoadObjectsEvaluator {
 
             currentRoadObject.outlines.onSome { currentRoadObjectOutline ->
                 if (currentRoadObjectOutline.outline.any { it.isPolyhedron() && !it.isPolyhedronUniquelyDefined() }) {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "SimultaneousDefinitionCornerRoadCornerLocal",
                         "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more <cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.",
                         currentRoadObject.additionalId,
@@ -90,7 +90,7 @@ object RoadObjectsEvaluator {
             val repeatElementsFiltered = currentRoadObject.repeat.filter { it.length >= parameters.numberTolerance }
             if (repeatElementsFiltered.size < currentRoadObject.repeat.size) {
                 // TODO: double check handling
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "RepeatElementHasZeroLength",
                     "A repeat element should have a length higher than zero and tolerance.",
                     currentRoadObject.additionalId,

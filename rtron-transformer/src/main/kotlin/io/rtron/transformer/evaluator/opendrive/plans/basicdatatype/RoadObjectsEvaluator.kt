@@ -18,23 +18,23 @@ package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
 import arrow.core.None
 import arrow.core.some
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyRoadObject
 import io.rtron.model.opendrive.additions.optics.everyRoadObjectOutlineElement
 import io.rtron.model.opendrive.additions.optics.everyRoadObjectRepeatElement
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 import kotlin.math.max
 import kotlin.math.min
 
 object RoadObjectsEvaluator {
 
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         modifiedOpendriveModel = everyRoadObject.modify(modifiedOpendriveModel) { currentRoadObject ->
@@ -43,43 +43,43 @@ object RoadObjectsEvaluator {
                 currentRoadObject.s,
                 currentRoadObject.additionalId,
                 "s",
-                messageList
+                issueList
             )
             currentRoadObject.t = BasicDataTypeModifier.modifyToFiniteDouble(
                 currentRoadObject.t,
                 currentRoadObject.additionalId,
                 "t",
-                messageList
+                issueList
             )
             currentRoadObject.zOffset = BasicDataTypeModifier.modifyToFiniteDouble(
                 currentRoadObject.zOffset,
                 currentRoadObject.additionalId,
                 "zOffset",
-                messageList
+                issueList
             )
             currentRoadObject.hdg = BasicDataTypeModifier.modifyToOptionalFiniteDouble(
                 currentRoadObject.hdg,
                 currentRoadObject.additionalId,
                 "hdg",
-                messageList
+                issueList
             )
             currentRoadObject.roll = BasicDataTypeModifier.modifyToOptionalFiniteDouble(
                 currentRoadObject.roll,
                 currentRoadObject.additionalId,
                 "roll",
-                messageList
+                issueList
             )
             currentRoadObject.pitch = BasicDataTypeModifier.modifyToOptionalFiniteDouble(
                 currentRoadObject.pitch,
                 currentRoadObject.additionalId,
                 "pitch",
-                messageList
+                issueList
             )
             currentRoadObject.height = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
                 currentRoadObject.height,
                 currentRoadObject.additionalId,
                 "height",
-                messageList
+                issueList
             )
 
             if (currentRoadObject.height.isSome { 0.0 < it && it < parameters.numberTolerance }) {
@@ -90,26 +90,26 @@ object RoadObjectsEvaluator {
                 currentRoadObject.radius,
                 currentRoadObject.additionalId,
                 "radius",
-                messageList,
+                issueList,
                 parameters.numberTolerance
             )
             currentRoadObject.length = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
                 currentRoadObject.length,
                 currentRoadObject.additionalId,
                 "length",
-                messageList,
+                issueList,
                 parameters.numberTolerance
             )
             currentRoadObject.width = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
                 currentRoadObject.width,
                 currentRoadObject.additionalId,
                 "width",
-                messageList,
+                issueList,
                 parameters.numberTolerance
             )
 
             currentRoadObject.validity.filter { it.fromLane > it.toLane }.forEach { currentValidity ->
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "LaneValidityElementNotOrdered",
                     "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.",
                     currentRoadObject.additionalId,
@@ -121,7 +121,7 @@ object RoadObjectsEvaluator {
             }
 
             if (currentRoadObject.outlines.isSome { it.outline.isEmpty() }) {
-                messageList += DefaultMessage(
+                issueList += DefaultIssue(
                     "EmptyValueForOptionalAttribute",
                     "Attribute 'outlines' is set with an empty value even though the attribute itself is optional.",
                     "Header element",
@@ -134,14 +134,14 @@ object RoadObjectsEvaluator {
             val repeatElementsFiltered =
                 currentRoadObject.repeat.filter { it.s.isFinite() && it.tStart.isFinite() && it.zOffsetStart.isFinite() }
             if (repeatElementsFiltered.size < currentRoadObject.repeat.size) {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "UnexpectedValues",
                     "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a finite s, tStart, zOffsetStart value.",
                     currentRoadObject.additionalId,
                     Severity.FATAL_ERROR,
                     wasFixed = true
                 )
-                // messageList += OpendriveException.UnexpectedValues("s, tStart, zOffsetStart", "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a finite s, tStart and zOffsetStart value.").toMessage(currentRoadObject.additionalId, isFatal = false, wasFixed: Boolean)
+                // issueList += OpendriveException.UnexpectedValues("s, tStart, zOffsetStart", "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a finite s, tStart and zOffsetStart value.").toIssue(currentRoadObject.additionalId, isFatal = false, wasFixed: Boolean)
                 currentRoadObject.repeat = repeatElementsFiltered
             }
 
@@ -152,15 +152,15 @@ object RoadObjectsEvaluator {
 
             val cornerRoadElementsFiltered = currentOutlineElement.cornerRoad.filter { it.s.isFinite() && it.t.isFinite() && it.dz.isFinite() }
             if (cornerRoadElementsFiltered.size < currentOutlineElement.cornerRoad.size) {
-                // messageList += OpendriveException.UnexpectedValues("s, t, dz", "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries which do not have a finite s, t and dz value.").toMessage(currentOutlineElement.additionalId, isFatal = false, wasFixed: Boolean)
-                messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries which do not have a finite s, t and dz value.", currentOutlineElement.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                // issueList += OpendriveException.UnexpectedValues("s, t, dz", "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries which do not have a finite s, t and dz value.").toIssue(currentOutlineElement.additionalId, isFatal = false, wasFixed: Boolean)
+                issueList += DefaultIssue.of("UnexpectedValues", "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries which do not have a finite s, t and dz value.", currentOutlineElement.additionalId, Severity.FATAL_ERROR, wasFixed = true)
 
                 currentOutlineElement.cornerRoad = cornerRoadElementsFiltered
             }
 
             currentOutlineElement.cornerRoad.forEach { currentCornerRoad ->
                 if (!currentCornerRoad.height.isFinite() || currentCornerRoad.height < 0.0) {
-                    messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'height'", currentOutlineElement.additionalId, Severity.WARNING, wasFixed = true)
+                    issueList += DefaultIssue.of("UnexpectedValue", "Unexpected value for attribute 'height'", currentOutlineElement.additionalId, Severity.WARNING, wasFixed = true)
                     currentCornerRoad.height = 0.0
                 }
 
@@ -171,15 +171,15 @@ object RoadObjectsEvaluator {
 
             val cornerLocalElementsFiltered = currentOutlineElement.cornerLocal.filter { it.u.isFinite() && it.v.isFinite() && it.z.isFinite() }
             if (cornerLocalElementsFiltered.size < currentOutlineElement.cornerLocal.size) {
-                // messageList += OpendriveException.UnexpectedValues("s, t, dz", "Ignoring ${currentOutlineElement.cornerLocal.size - cornerLocalElementsFiltered.size} cornerLocal entries which do not have a finite u, v and z value.").toMessage(currentOutlineElement.additionalId, isFatal = false, wasFixed = true)
-                messageList += DefaultMessage.of("UnexpectedValues", "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries which do not have a finite s, t and dz value.", currentOutlineElement.additionalId, Severity.FATAL_ERROR, wasFixed = true)
+                // issueList += OpendriveException.UnexpectedValues("s, t, dz", "Ignoring ${currentOutlineElement.cornerLocal.size - cornerLocalElementsFiltered.size} cornerLocal entries which do not have a finite u, v and z value.").toIssue(currentOutlineElement.additionalId, isFatal = false, wasFixed = true)
+                issueList += DefaultIssue.of("UnexpectedValues", "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries which do not have a finite s, t and dz value.", currentOutlineElement.additionalId, Severity.FATAL_ERROR, wasFixed = true)
 
                 currentOutlineElement.cornerLocal = cornerLocalElementsFiltered
             }
 
             currentOutlineElement.cornerLocal.forEach { currentCornerLocal ->
                 if (!currentCornerLocal.height.isFinite() || currentCornerLocal.height < 0.0) {
-                    messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'height'", currentOutlineElement.additionalId, Severity.WARNING, wasFixed = true)
+                    issueList += DefaultIssue.of("UnexpectedValue", "Unexpected value for attribute 'height'", currentOutlineElement.additionalId, Severity.WARNING, wasFixed = true)
                     currentCornerLocal.height = 0.0
                 }
 
@@ -196,22 +196,22 @@ object RoadObjectsEvaluator {
             require(currentRepeatElement.tStart.isFinite()) { "Must already be filtered." }
             require(currentRepeatElement.zOffsetStart.isFinite()) { "Must already be filtered." }
 
-            currentRepeatElement.distance = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.distance, currentRepeatElement.additionalId, "distance", messageList)
-            currentRepeatElement.heightEnd = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.heightEnd, currentRepeatElement.additionalId, "heightEnd", messageList)
-            currentRepeatElement.heightStart = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.heightStart, currentRepeatElement.additionalId, "heightStart", messageList)
-            currentRepeatElement.length = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.length, currentRepeatElement.additionalId, "length", messageList)
-            currentRepeatElement.lengthEnd = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.lengthEnd, currentRepeatElement.additionalId, "lengthEnd", messageList, parameters.numberTolerance)
-            currentRepeatElement.lengthStart = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.lengthStart, currentRepeatElement.additionalId, "lengthStart", messageList, parameters.numberTolerance)
-            currentRepeatElement.radiusEnd = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.radiusEnd, currentRepeatElement.additionalId, "radiusEnd", messageList, parameters.numberTolerance)
-            currentRepeatElement.radiusStart = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.radiusStart, currentRepeatElement.additionalId, "radiusStart", messageList, parameters.numberTolerance)
+            currentRepeatElement.distance = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.distance, currentRepeatElement.additionalId, "distance", issueList)
+            currentRepeatElement.heightEnd = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.heightEnd, currentRepeatElement.additionalId, "heightEnd", issueList)
+            currentRepeatElement.heightStart = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.heightStart, currentRepeatElement.additionalId, "heightStart", issueList)
+            currentRepeatElement.length = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRepeatElement.length, currentRepeatElement.additionalId, "length", issueList)
+            currentRepeatElement.lengthEnd = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.lengthEnd, currentRepeatElement.additionalId, "lengthEnd", issueList, parameters.numberTolerance)
+            currentRepeatElement.lengthStart = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.lengthStart, currentRepeatElement.additionalId, "lengthStart", issueList, parameters.numberTolerance)
+            currentRepeatElement.radiusEnd = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.radiusEnd, currentRepeatElement.additionalId, "radiusEnd", issueList, parameters.numberTolerance)
+            currentRepeatElement.radiusStart = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.radiusStart, currentRepeatElement.additionalId, "radiusStart", issueList, parameters.numberTolerance)
 
             if (!currentRepeatElement.tEnd.isFinite()) {
-                messageList += DefaultMessage.of("UnexpectedValue", "Unexpected value for attribute 'tEnd'", currentRepeatElement.additionalId, Severity.WARNING, wasFixed = true)
+                issueList += DefaultIssue.of("UnexpectedValue", "Unexpected value for attribute 'tEnd'", currentRepeatElement.additionalId, Severity.WARNING, wasFixed = true)
                 currentRepeatElement.tEnd = currentRepeatElement.tStart
             }
-            currentRepeatElement.widthEnd = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.widthEnd, currentRepeatElement.additionalId, "widthEnd", messageList, parameters.numberTolerance)
-            currentRepeatElement.widthStart = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.widthStart, currentRepeatElement.additionalId, "widthStart", messageList, parameters.numberTolerance)
-            currentRepeatElement.zOffsetEnd = BasicDataTypeModifier.modifyToFiniteDouble(currentRepeatElement.zOffsetEnd, currentRepeatElement.additionalId, "zOffsetEnd", messageList)
+            currentRepeatElement.widthEnd = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.widthEnd, currentRepeatElement.additionalId, "widthEnd", issueList, parameters.numberTolerance)
+            currentRepeatElement.widthStart = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRepeatElement.widthStart, currentRepeatElement.additionalId, "widthStart", issueList, parameters.numberTolerance)
+            currentRepeatElement.zOffsetEnd = BasicDataTypeModifier.modifyToFiniteDouble(currentRepeatElement.zOffsetEnd, currentRepeatElement.additionalId, "zOffsetEnd", issueList)
 
             currentRepeatElement
         }

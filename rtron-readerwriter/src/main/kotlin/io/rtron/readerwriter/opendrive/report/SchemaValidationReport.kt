@@ -16,8 +16,8 @@
 
 package io.rtron.readerwriter.opendrive.report
 
-import io.rtron.io.messages.MessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.IssueList
+import io.rtron.io.issues.Severity
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import kotlinx.serialization.Serializable
 
@@ -25,14 +25,14 @@ import kotlinx.serialization.Serializable
 class SchemaValidationReport(
     val opendriveVersion: OpendriveVersion,
 
-    val validationMessages: MessageList<SchemaValidationReportMessage> = MessageList(),
+    val validationIssues: IssueList<SchemaValidationIssue> = IssueList(),
 
     val completedSuccessfully: Boolean = true,
-    val validationAbortMessage: String = ""
+    val validationAbortIssue: String = ""
 ) {
 
     fun validationProcessAborted() = !completedSuccessfully
 
-    fun containsFatalErrorMessages(): Boolean =
-        validationMessages.getMessages().any { it.severity == Severity.FATAL_ERROR }
+    fun containsFatalErrorIssues(): Boolean =
+        validationIssues.getIssues().any { it.severity == Severity.FATAL_ERROR }
 }

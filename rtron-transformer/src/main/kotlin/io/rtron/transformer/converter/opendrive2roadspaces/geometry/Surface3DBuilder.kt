@@ -20,12 +20,12 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.separateEither
 import arrow.core.toNonEmptyListOrNull
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
-import io.rtron.io.messages.handleMessageList
-import io.rtron.io.messages.mergeToReport
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
+import io.rtron.io.issues.handleIssueList
+import io.rtron.io.issues.mergeToReport
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
@@ -43,7 +43,7 @@ import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlinesOutlineCornerRo
 import io.rtron.model.opendrive.objects.RoadObjectsObjectRepeat
 import io.rtron.model.opendrive.signal.RoadSignalsSignal
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 
 /**
  * Builder for surface geometries in 3D from the OpenDRIVE data model.
@@ -85,24 +85,24 @@ object Surface3DBuilder {
     /**
      * Builds a list of linear rings from an OpenDRIVE road object defined by road corner outlines.
      */
-    fun buildLinearRingsByRoadCorners(roadObject: RoadObjectsObject, referenceLine: Curve3D, numberTolerance: Double): ContextMessageList<List<LinearRing3D>> {
-        val messageList = DefaultMessageList()
+    fun buildLinearRingsByRoadCorners(roadObject: RoadObjectsObject, referenceLine: Curve3D, numberTolerance: Double): ContextIssueList<List<LinearRing3D>> {
+        val issueList = DefaultIssueList()
 
         val (builderExceptions, linearRingsWithContext) = roadObject.getLinearRingsDefinedByRoadCorners()
             .map { buildLinearRingByRoadCorners(it, referenceLine, numberTolerance) }
             .separateEither()
 
-        messageList += builderExceptions.map { DefaultMessage.of("LinearRingNotConstructableFromRoadCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
-        val linearRings = linearRingsWithContext.handleMessageList { messageList += it.messageList }
+        issueList += builderExceptions.map { DefaultIssue.of("LinearRingNotConstructableFromRoadCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
+        val linearRings = linearRingsWithContext.handleIssueList { issueList += it.issueList }
 
-        return ContextMessageList(linearRings, messageList)
+        return ContextIssueList(linearRings, issueList)
     }
 
     /**
      * Builds a single linear ring from an OpenDRIVE road object defined by road corner outlines.
      */
     private fun buildLinearRingByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D, numberTolerance: Double):
-        Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> {
+        Either<GeometryBuilderException, ContextIssueList<LinearRing3D>> {
         require(outline.isLinearRingDefinedByRoadCorners()) { "Outline does not contain a linear ring represented by road corners." }
         require(outline.cornerRoad.all { it.height == 0.0 }) { "All cornerRoad elements must have a zero height." }
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
@@ -127,8 +127,8 @@ object Surface3DBuilder {
     /**
      * Builds a list of linear rings from an OpenDRIVE road object defined by local corner outlines.
      */
-    fun buildLinearRingsByLocalCorners(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextMessageList<List<LinearRing3D>> {
-        val messageList = DefaultMessageList()
+    fun buildLinearRingsByLocalCorners(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): ContextIssueList<List<LinearRing3D>> {
+        val issueList = DefaultIssueList()
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
@@ -137,20 +137,20 @@ object Surface3DBuilder {
             .map { buildLinearRingByLocalCorners(it, numberTolerance) }
             .separateEither()
 
-        messageList += builderExceptions
-            .map { DefaultMessage.of("LinearRingNotConstructableFromLocalCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }
+        issueList += builderExceptions
+            .map { DefaultIssue.of("LinearRingNotConstructableFromLocalCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }
             .mergeToReport()
         val linearRings = linearRingsWithContext
-            .handleMessageList { messageList += it.messageList }
+            .handleIssueList { issueList += it.issueList }
             .map { it.copy(affineSequence = affineSequence) }
 
-        return ContextMessageList(linearRings, messageList)
+        return ContextIssueList(linearRings, issueList)
     }
 
     /**
      * Builds a single linear ring from an OpenDRIVE road object defined by local corner outlines.
      */
-    private fun buildLinearRingByLocalCorners(outline: RoadObjectsObjectOutlinesOutline, numberTolerance: Double): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> {
+    private fun buildLinearRingByLocalCorners(outline: RoadObjectsObjectOutlinesOutline, numberTolerance: Double): Either<GeometryBuilderException, ContextIssueList<LinearRing3D>> {
         val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
 
         val vertices = outline.cornerLocal

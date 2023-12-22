@@ -14,29 +14,15 @@
  * limitations under the License.
  */
 
-package io.rtron.io.messages
+package io.rtron.readerwriter.opendrive.report
 
+import io.rtron.io.issues.Severity
 import kotlinx.serialization.Serializable
 
-/**
- * Single message.
- */
 @Serializable
-data class DefaultMessage(
-    val type: String,
-    val info: String,
-    val location: String,
-    val incidentSeverity: Severity,
-    val wasFixed: Boolean,
-    val infoValues: Map<String, Double> = emptyMap()
-) {
-
-    // Properties and Initializers
-    val messageSeverity: Severity = when (Pair(incidentSeverity, wasFixed)) {
-        Pair(Severity.FATAL_ERROR, true) -> Severity.ERROR
-        Pair(Severity.ERROR, true) -> Severity.WARNING
-        else -> incidentSeverity
-    }
-
-    companion object
-}
+data class SchemaValidationIssue(
+    val description: String,
+    val severity: Severity,
+    val lineNumber: Int,
+    val columnNumber: Int
+)

@@ -16,10 +16,10 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
@@ -27,7 +27,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1Ge
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1ImplicitGeometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
-import io.rtron.transformer.messages.roadspaces.of
+import io.rtron.transformer.issues.roadspaces.of
 import org.citygml4j.core.model.cityfurniture.CityFurniture
 
 /**
@@ -41,9 +41,9 @@ class CityFurnitureModuleBuilder(
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
-    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): ContextMessageList<CityFurniture> {
+    fun createCityFurnitureFeature(roadspaceObject: RoadspaceObject): ContextIssueList<CityFurniture> {
         val cityFurnitureFeature = CityFurniture()
-        val messageList = DefaultMessageList()
+        val issueList = DefaultIssueList()
 
         // geometry
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
@@ -53,7 +53,7 @@ class CityFurnitureModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             cityFurnitureFeature.populateLod1Geometry(geometryTransformer)
                 .mapLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForCityFurnitureLod1",
                         it.message,
                         roadspaceObject.id,
@@ -67,7 +67,7 @@ class CityFurnitureModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             cityFurnitureFeature.populateLod2Geometry(geometryTransformer)
                 .onLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForCityFurnitureLod2",
                         it.message,
                         roadspaceObject.id,
@@ -89,6 +89,6 @@ class CityFurnitureModuleBuilder(
         relationAdder.addBelongToRelations(roadspaceObject, cityFurnitureFeature)
         attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 
-        return ContextMessageList(cityFurnitureFeature, messageList)
+        return ContextIssueList(cityFurnitureFeature, issueList)
     }
 }

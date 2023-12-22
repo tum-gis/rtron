@@ -18,28 +18,28 @@ package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
 import arrow.core.None
 import arrow.core.flattenOption
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyJunction
 import io.rtron.model.opendrive.junction.EJunctionType
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 
 object JunctionEvaluator {
 
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
-        modifiedOpendriveModel = evaluateAllJunctions(modifiedOpendriveModel, parameters, messageList)
-        modifiedOpendriveModel = evaluateDirectJunctions(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = evaluateAllJunctions(modifiedOpendriveModel, parameters, issueList)
+        modifiedOpendriveModel = evaluateDirectJunctions(modifiedOpendriveModel, parameters, issueList)
 
         return modifiedOpendriveModel
     }
 
-    private fun evaluateAllJunctions(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    private fun evaluateAllJunctions(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         modifiedOpendriveModel = everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
@@ -47,14 +47,14 @@ object JunctionEvaluator {
             // It is deprecated to omit the <laneLink> element.
             val junctionConnectionsFiltered = currentJunction.connection.filter { it.laneLink.isNotEmpty() }
             if (currentJunction.connection.size > junctionConnectionsFiltered.size) {
-                messageList += DefaultMessage.of("JunctionConnectionWithoutLaneLinks", "Junction connections (number of connections: ${currentJunction.connection.size - junctionConnectionsFiltered.size}) were removed since they did not contain any laneLinks.", currentJunction.additionalId, Severity.ERROR, wasFixed = true)
+                issueList += DefaultIssue.of("JunctionConnectionWithoutLaneLinks", "Junction connections (number of connections: ${currentJunction.connection.size - junctionConnectionsFiltered.size}) were removed since they did not contain any laneLinks.", currentJunction.additionalId, Severity.ERROR, wasFixed = true)
             }
             currentJunction.connection = junctionConnectionsFiltered
 
             // The @mainRoad, @orientation, @sStart and @sEnd attributes shall only be specified for virtual junctions.
             if (currentJunction.typeValidated != EJunctionType.VIRTUAL) {
                 currentJunction.mainRoad.onSome {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "InvalidJunctionAttribute",
                         "Attribute 'mainRoad' shall only be specified for virtual junctions",
                         currentJunction.additionalId,
@@ -65,7 +65,7 @@ object JunctionEvaluator {
                 }
 
                 currentJunction.orientation.onSome {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "InvalidJunctionAttribute",
                         "Attribute 'orientation' shall only be specified for virtual junctions",
                         currentJunction.additionalId,
@@ -76,7 +76,7 @@ object JunctionEvaluator {
                 }
 
                 currentJunction.sStart.onSome {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "InvalidJunctionAttribute",
                         "Attribute 'sStart' shall only be specified for virtual junctions",
                         currentJunction.additionalId,
@@ -87,7 +87,7 @@ object JunctionEvaluator {
                 }
 
                 currentJunction.sEnd.onSome {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "InvalidJunctionAttribute",
                         "Attribute 'sEnd' shall only be specified for virtual junctions",
                         currentJunction.additionalId,
@@ -104,7 +104,7 @@ object JunctionEvaluator {
         return modifiedOpendriveModel
     }
 
-    private fun evaluateDirectJunctions(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    private fun evaluateDirectJunctions(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         modifiedOpendriveModel = everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
@@ -115,7 +115,7 @@ object JunctionEvaluator {
             // Each connecting road shall be represented by exactly one <connection> element. A connecting road may contain as many lanes as required.
             val connectingRoadIdsRepresentedByMultipleConnections = currentJunction.connection.map { it.connectingRoad }.flattenOption().groupingBy { it }.eachCount().filter { it.value > 1 }
             if (connectingRoadIdsRepresentedByMultipleConnections.isNotEmpty()) {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "MultipleConnectionsRepresentingSameConnectionRoad",
                     "Junctions contains multiple connections representing the same connecting road (affected connecting roads: ${connectingRoadIdsRepresentedByMultipleConnections.keys.joinToString()} )",
                     currentJunction.additionalId,
@@ -143,7 +143,7 @@ object JunctionEvaluator {
                 }
             val predecessorSuccessorRoadIds = junctionConnectionRoadIds.flatMap { listOf(it.predecessorRoadId, it.successorRoadId) }
             if (predecessorSuccessorRoadIds.distinct().size < predecessorSuccessorRoadIds.size) {
-                messageList += DefaultMessage.of("InvalidJunctionUsage", "Junction shall not be used, since all roads can be directly linked without ambiguities. The connecting roads do not share a predecessor or successor road.", currentJunction.additionalId, Severity.ERROR, wasFixed = false)
+                issueList += DefaultIssue.of("InvalidJunctionUsage", "Junction shall not be used, since all roads can be directly linked without ambiguities. The connecting roads do not share a predecessor or successor road.", currentJunction.additionalId, Severity.ERROR, wasFixed = false)
             }
 
             currentJunction

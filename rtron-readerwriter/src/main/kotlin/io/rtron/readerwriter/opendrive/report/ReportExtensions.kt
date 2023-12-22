@@ -16,10 +16,10 @@
 
 package io.rtron.readerwriter.opendrive.report
 
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.Severity
 import jakarta.xml.bind.ValidationEvent
 
-fun ValidationEvent.toMessage(): SchemaValidationReportMessage {
+fun ValidationEvent.toIssue(): SchemaValidationIssue {
     val text = this.message ?: ""
     val severity = when (this.severity) {
         ValidationEvent.WARNING -> Severity.WARNING
@@ -31,5 +31,5 @@ fun ValidationEvent.toMessage(): SchemaValidationReportMessage {
     val lineNumber = this.locator.lineNumber
     val columnNumber = this.locator.columnNumber
 
-    return SchemaValidationReportMessage(text, severity, lineNumber, columnNumber)
+    return SchemaValidationIssue(text, severity, lineNumber, columnNumber)
 }

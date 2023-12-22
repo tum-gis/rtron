@@ -17,9 +17,9 @@
 package io.rtron.transformer.evaluator.opendrive.plans.basicdatatype
 
 import arrow.core.None
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyRoad
 import io.rtron.model.opendrive.road.lateral.RoadLateralProfileShape
@@ -27,22 +27,22 @@ import io.rtron.std.filterToStrictSortingBy
 import io.rtron.std.isSortedBy
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 
 object RoadEvaluator {
 
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, messageList: DefaultMessageList): OpendriveModel {
+    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
             if (currentRoad.planView.geometry.isEmpty()) {
-                messageList += DefaultMessage.of("NoPlanViewGeometryElements", "Plan view of road does not contain any geometry elements.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                issueList += DefaultIssue.of("NoPlanViewGeometryElements", "Plan view of road does not contain any geometry elements.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
             }
 
             if (currentRoad.lanes.laneSection.isEmpty()) {
-                messageList += DefaultMessage.of("NoLaneSections", "Road does not contain any lane sections.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                issueList += DefaultIssue.of("NoLaneSections", "Road does not contain any lane sections.", currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false)
             }
 
             currentRoad
@@ -51,7 +51,7 @@ object RoadEvaluator {
         modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
             if (currentRoad.elevationProfile.isSome { it.elevation.isEmpty() }) {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "NoElevationProfileElements",
                     "Elevation profile contains no elements.",
                     currentRoad.additionalId,
@@ -67,13 +67,13 @@ object RoadEvaluator {
                     { it.s },
                     currentRoad.additionalId,
                     "elevation",
-                    messageList
+                    issueList
                 )
             }
 
             currentRoad.lateralProfile.onSome { currentLateralProfile ->
                 if (currentLateralProfile.containsShapeProfile() && currentRoad.lanes.containsLaneOffset()) {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "UnexpectedValue",
                         "Unexpected value for attribute 'lateralProfile.shape'",
                         currentRoad.additionalId,
@@ -90,14 +90,14 @@ object RoadEvaluator {
                     { it.s },
                     currentRoad.additionalId,
                     "superelevation",
-                    messageList
+                    issueList
                 )
                 currentLateralProfile.shape = BasicDataTypeModifier.filterToSorted(
                     currentLateralProfile.shape,
                     { it.s },
                     currentRoad.additionalId,
                     "shape",
-                    messageList
+                    issueList
                 )
 
                 val shapeEntriesFilteredByT: List<RoadLateralProfileShape> =
@@ -105,8 +105,8 @@ object RoadEvaluator {
                         currentShapeSubEntries.value.filterToStrictSortingBy { it.t }
                     }
                 if (shapeEntriesFilteredByT.size < currentLateralProfile.shape.size) {
-                    // OpendriveException.NonStrictlySortedList("shape", "Ignoring ${it.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.").toMessage(currentRoad.additionalId, isFatal = false, wasFixed = true)
-                    messageList += DefaultMessage.of(
+                    // OpendriveException.NonStrictlySortedList("shape", "Ignoring ${it.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.").toIssue(currentRoad.additionalId, isFatal = false, wasFixed = true)
+                    issueList += DefaultIssue.of(
                         "NonStrictlySortedList",
                         "Ignoring ${currentLateralProfile.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed in ascending order according to t for each s group.",
                         currentRoad.additionalId,
@@ -122,11 +122,11 @@ object RoadEvaluator {
                 { it.s },
                 currentRoad.additionalId,
                 "shape",
-                messageList
+                issueList
             )
 
             if (!currentRoad.lanes.laneSection.isSortedBy { it.s }) {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "NonSortedList",
                     "Sorting lane sections according to s.",
                     currentRoad.additionalId,

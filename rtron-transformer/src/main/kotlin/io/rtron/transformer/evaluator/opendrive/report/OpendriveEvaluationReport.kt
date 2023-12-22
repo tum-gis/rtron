@@ -16,9 +16,9 @@
 
 package io.rtron.transformer.evaluator.opendrive.report
 
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.containsFatalErrors
-import io.rtron.io.messages.getTextSummary
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.containsFatalErrors
+import io.rtron.io.issues.getTextSummary
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import kotlinx.serialization.Serializable
 
@@ -26,9 +26,9 @@ import kotlinx.serialization.Serializable
 data class OpendriveEvaluationReport(
     val parameters: OpendriveEvaluatorParameters,
 
-    var basicDataTypePlan: DefaultMessageList = DefaultMessageList(),
-    var modelingRulesPlan: DefaultMessageList = DefaultMessageList(),
-    var conversionRequirementsPlan: DefaultMessageList = DefaultMessageList()
+    var basicDataTypePlan: DefaultIssueList = DefaultIssueList(),
+    var modelingRulesPlan: DefaultIssueList = DefaultIssueList(),
+    var conversionRequirementsPlan: DefaultIssueList = DefaultIssueList()
 ) {
 
     /**

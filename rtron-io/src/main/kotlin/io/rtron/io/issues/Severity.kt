@@ -1,4 +1,4 @@
-package io.rtron.io.messages
+package io.rtron.io.issues
 
 import kotlinx.serialization.Serializable
 

@@ -17,10 +17,10 @@
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import arrow.core.Option
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
@@ -40,7 +40,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlId
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadMarkingGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier
-import io.rtron.transformer.messages.roadspaces.of
+import io.rtron.transformer.issues.roadspaces.of
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
 import org.citygml4j.core.model.core.AbstractThematicSurface
 import org.citygml4j.core.model.transportation.AbstractTransportationSpace
@@ -93,8 +93,8 @@ class TransportationModuleBuilder(
         longitudinalFillerSurfaces: List<LongitudinalFillerSurface>,
         relatedObjects: List<RoadspaceObject>,
         dstTransportationSpace: AbstractTransportationSpace
-    ): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    ): DefaultIssueList {
+        val issueList = DefaultIssueList()
 
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
         // semantics
@@ -114,7 +114,7 @@ class TransportationModuleBuilder(
         trafficSpaceFeature.populateLod2Geometry(centerLineGeometryTransformer)
 
         // traffic area feature
-        val trafficAreaFeature = createTrafficAreaFeature(lane.id, surface).handleMessageList { messageList += it }
+        val trafficAreaFeature = createTrafficAreaFeature(lane.id, surface).handleIssueList { issueList += it }
         IdentifierAdder.addIdentifier(
             lane.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix),
             "Lane",
@@ -132,7 +132,7 @@ class TransportationModuleBuilder(
             val fillerTrafficArea = createTrafficAreaFeature(
                 fillerSurface.id,
                 fillerSurface.surface
-            ).handleMessageList { messageList += it }
+            ).handleIssueList { issueList += it }
 
             IdentifierAdder.addIdentifier(
                 fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(
@@ -146,7 +146,7 @@ class TransportationModuleBuilder(
         }
         longitudinalFillerSurfaces.forEach { fillerSurface ->
             val fillerTrafficArea =
-                createTrafficAreaFeature(lane.id, fillerSurface.surface).handleMessageList { messageList += it }
+                createTrafficAreaFeature(lane.id, fillerSurface.surface).handleIssueList { issueList += it }
 
             IdentifierAdder.addIdentifier(
                 fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(
@@ -163,7 +163,7 @@ class TransportationModuleBuilder(
         val trafficSpaceProperty = TrafficSpaceProperty(trafficSpaceFeature)
         dstTransportationSpace.trafficSpaces.add(trafficSpaceProperty)
 
-        return messageList
+        return issueList
     }
 
     /**
@@ -177,8 +177,8 @@ class TransportationModuleBuilder(
         lateralFillerSurface: Option<LateralFillerSurface>,
         longitudinalFillerSurfaces: List<LongitudinalFillerSurface>,
         dstTransportationSpace: AbstractTransportationSpace
-    ): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    ): DefaultIssueList {
+        val issueList = DefaultIssueList()
 
         val auxiliaryTrafficSpaceFeature = createAuxiliaryTrafficSpaceFeature(TransportationGranularityValue.LANE)
         // semantics
@@ -195,7 +195,7 @@ class TransportationModuleBuilder(
 
         // auxiliary traffic area feature
         val auxiliaryTrafficAreaFeature = createAuxiliaryTrafficAreaFeature(lane.id, surface)
-            .handleMessageList { messageList += it }
+            .handleIssueList { issueList += it }
         IdentifierAdder.addIdentifier(
             lane.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix),
             "Lane",
@@ -213,7 +213,7 @@ class TransportationModuleBuilder(
             val fillerAuxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(
                 fillerSurface.id,
                 fillerSurface.surface
-            ).handleMessageList { messageList += it }
+            ).handleIssueList { issueList += it }
 
             IdentifierAdder.addIdentifier(
                 fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(
@@ -227,7 +227,7 @@ class TransportationModuleBuilder(
         }
         longitudinalFillerSurfaces.forEach { fillerSurface ->
             val fillerAuxiliaryTrafficArea = createAuxiliaryTrafficAreaFeature(lane.id, fillerSurface.surface)
-                .handleMessageList { messageList += it }
+                .handleIssueList { issueList += it }
 
             IdentifierAdder.addIdentifier(
                 fillerSurface.id.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(
@@ -244,14 +244,14 @@ class TransportationModuleBuilder(
         val auxiliaryTrafficSpaceProperty = AuxiliaryTrafficSpaceProperty(auxiliaryTrafficSpaceFeature)
         dstTransportationSpace.auxiliaryTrafficSpaces.add(auxiliaryTrafficSpaceProperty)
 
-        return messageList
+        return issueList
     }
 
     fun addTrafficSpaceFeature(
         roadspaceObject: RoadspaceObject,
         dstTransportationSpace: AbstractTransportationSpace
-    ): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    ): DefaultIssueList {
+        val issueList = DefaultIssueList()
 
         val trafficSpaceFeature = createTrafficSpaceFeature(TransportationGranularityValue.LANE)
         IdentifierAdder.addIdentifier(
@@ -283,7 +283,7 @@ class TransportationModuleBuilder(
             val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
             trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
                 .onLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForTrafficAreaLod2",
                         it.message,
                         roadspaceObject.id,
@@ -299,14 +299,14 @@ class TransportationModuleBuilder(
         val trafficSpaceProperty = TrafficSpaceProperty(trafficSpaceFeature)
         dstTransportationSpace.trafficSpaces.add(trafficSpaceProperty)
 
-        return messageList
+        return issueList
     }
 
     fun addAuxiliaryTrafficSpaceFeature(
         roadspaceObject: RoadspaceObject,
         dstTransportationSpace: AbstractTransportationSpace
-    ): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    ): DefaultIssueList {
+        val issueList = DefaultIssueList()
 
         val auxiliaryTrafficSpaceFeature = createAuxiliaryTrafficSpaceFeature(TransportationGranularityValue.LANE)
         IdentifierAdder.addIdentifier(
@@ -340,7 +340,7 @@ class TransportationModuleBuilder(
                 solidFaceSelection
             )
                 .onLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForAuxiliaryTrafficAreaLod2",
                         it.message,
                         roadspaceObject.id,
@@ -356,7 +356,7 @@ class TransportationModuleBuilder(
         val auxiliaryTrafficSpaceProperty = AuxiliaryTrafficSpaceProperty(auxiliaryTrafficSpaceFeature)
         dstTransportationSpace.auxiliaryTrafficSpaces.add(auxiliaryTrafficSpaceProperty)
 
-        return messageList
+        return issueList
     }
 
     fun addMarkingFeature(
@@ -365,15 +365,15 @@ class TransportationModuleBuilder(
         roadMarking: RoadMarking,
         geometry: AbstractGeometry3D,
         dstTransportationSpace: AbstractTransportationSpace
-    ): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    ): DefaultIssueList {
+        val issueList = DefaultIssueList()
         val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
 
         // geometry
         val geometryTransformer = GeometryTransformer(parameters).also { geometry.accept(it) }
         markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
             .onLeft {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "NoSuitableGeometryForMarkingLod2",
                     it.message,
                     id,
@@ -392,14 +392,14 @@ class TransportationModuleBuilder(
 
         // populate transportation space
         addMarkingFeature(markingFeature, dstTransportationSpace)
-        return messageList
+        return issueList
     }
 
     fun addMarkingFeature(
         roadspaceObject: RoadspaceObject,
         dstTransportationSpace: AbstractTransportationSpace
-    ): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    ): DefaultIssueList {
+        val issueList = DefaultIssueList()
         val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
 
         // geometry
@@ -407,7 +407,7 @@ class TransportationModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
                 .onLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForMarkingLod2",
                         it.message,
                         roadspaceObject.id,
@@ -423,7 +423,7 @@ class TransportationModuleBuilder(
 
         // populate transportation space
         addMarkingFeature(markingFeature, dstTransportationSpace)
-        return messageList
+        return issueList
     }
 
     private fun createTrafficSpaceFeature(granularity: TransportationGranularityValue): TrafficSpace {
@@ -441,8 +441,8 @@ class TransportationModuleBuilder(
     private fun createTrafficAreaFeature(
         id: AbstractRoadspacesIdentifier,
         abstractGeometry: AbstractGeometry3D
-    ): ContextMessageList<TrafficArea> {
-        val messageList = DefaultMessageList()
+    ): ContextIssueList<TrafficArea> {
+        val issueList = DefaultIssueList()
         val trafficAreaFeature = TrafficArea()
 
         val geometryTransformer = GeometryTransformer(parameters)
@@ -450,7 +450,7 @@ class TransportationModuleBuilder(
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
         trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
             .onLeft {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "NoSuitableGeometryForTrafficAreaLod2",
                     it.message,
                     id,
@@ -459,14 +459,14 @@ class TransportationModuleBuilder(
                 )
             }
 
-        return ContextMessageList(trafficAreaFeature, messageList)
+        return ContextIssueList(trafficAreaFeature, issueList)
     }
 
     private fun createAuxiliaryTrafficAreaFeature(
         id: AbstractRoadspacesIdentifier,
         abstractGeometry: AbstractGeometry3D
-    ): ContextMessageList<AuxiliaryTrafficArea> {
-        val messageList = DefaultMessageList()
+    ): ContextIssueList<AuxiliaryTrafficArea> {
+        val issueList = DefaultIssueList()
         val auxiliaryTrafficAreaFeature = AuxiliaryTrafficArea()
 
         val geometryTransformer = GeometryTransformer(parameters)
@@ -478,7 +478,7 @@ class TransportationModuleBuilder(
             solidFaceSelection
         )
             .onLeft {
-                messageList += DefaultMessage.of(
+                issueList += DefaultIssue.of(
                     "NoSuitableGeometryForAuxiliaryTrafficAreaLod2",
                     it.message,
                     id,
@@ -487,7 +487,7 @@ class TransportationModuleBuilder(
                 )
             }
 
-        return ContextMessageList(auxiliaryTrafficAreaFeature, messageList)
+        return ContextIssueList(auxiliaryTrafficAreaFeature, issueList)
     }
 
     /**

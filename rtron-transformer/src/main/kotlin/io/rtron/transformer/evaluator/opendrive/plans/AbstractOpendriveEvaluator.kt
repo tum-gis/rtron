@@ -16,11 +16,11 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans
 
-import io.rtron.io.messages.ContextMessageList
+import io.rtron.io.issues.ContextIssueList
 import io.rtron.model.opendrive.OpendriveModel
 
 abstract class AbstractOpendriveEvaluator {
 
     // Methods
-    abstract fun evaluate(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel>
+    abstract fun evaluate(opendriveModel: OpendriveModel): ContextIssueList<OpendriveModel>
 }

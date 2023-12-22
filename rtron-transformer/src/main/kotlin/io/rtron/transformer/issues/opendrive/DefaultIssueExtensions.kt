@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package io.rtron.transformer.messages.opendrive
+package io.rtron.transformer.issues.opendrive
 
 import arrow.core.Option
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
 import io.rtron.model.opendrive.additions.identifier.toIdentifierText
 
-fun DefaultMessage.Companion.of(type: String, info: String, location: AbstractOpendriveIdentifier, incidentSeverity: Severity, wasFixed: Boolean): DefaultMessage {
-    return DefaultMessage(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
+fun DefaultIssue.Companion.of(type: String, info: String, location: AbstractOpendriveIdentifier, incidentSeverity: Severity, wasFixed: Boolean): DefaultIssue {
+    return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }
 
-fun DefaultMessage.Companion.of(type: String, info: String, location: Option<AbstractOpendriveIdentifier>, incidentSeverity: Severity, wasFixed: Boolean): DefaultMessage {
-    return DefaultMessage(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
+fun DefaultIssue.Companion.of(type: String, info: String, location: Option<AbstractOpendriveIdentifier>, incidentSeverity: Severity, wasFixed: Boolean): DefaultIssue {
+    return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }

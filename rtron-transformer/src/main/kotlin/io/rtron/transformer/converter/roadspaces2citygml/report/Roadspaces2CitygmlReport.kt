@@ -16,8 +16,8 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.report
 
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.getTextSummary
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.getTextSummary
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import kotlinx.serialization.Serializable
 
@@ -25,7 +25,7 @@ import kotlinx.serialization.Serializable
 data class Roadspaces2CitygmlReport(
     val parameters: Roadspaces2CitygmlParameters,
 
-    val conversion: DefaultMessageList = DefaultMessageList()
+    val conversion: DefaultIssueList = DefaultIssueList()
 ) {
 
     // Methods

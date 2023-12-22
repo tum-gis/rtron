@@ -19,10 +19,10 @@ package io.rtron.transformer.converter.roadspaces2citygml.module
 import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.raise.either
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
@@ -31,7 +31,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1Ge
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1ImplicitGeometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
-import io.rtron.transformer.messages.roadspaces.of
+import io.rtron.transformer.issues.roadspaces.of
 import org.citygml4j.core.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 
@@ -47,8 +47,8 @@ class VegetationModuleBuilder(
 
     // Methods
 
-    fun createSolitaryVegetationObjectFeature(roadspaceObject: RoadspaceObject): ContextMessageList<SolitaryVegetationObject> {
-        val messageList = DefaultMessageList()
+    fun createSolitaryVegetationObjectFeature(roadspaceObject: RoadspaceObject): ContextIssueList<SolitaryVegetationObject> {
+        val issueList = DefaultIssueList()
 
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
@@ -63,7 +63,7 @@ class VegetationModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             solitaryVegetationObjectFeature.populateLod1Geometry(geometryTransformer)
                 .mapLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForSolitaryVegetationObjectLod1",
                         it.message,
                         roadspaceObject.id,
@@ -79,7 +79,7 @@ class VegetationModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             solitaryVegetationObjectFeature.populateLod2Geometry(geometryTransformer)
                 .mapLeft {
-                    messageList += DefaultMessage.of(
+                    issueList += DefaultIssue.of(
                         "NoSuitableGeometryForSolitaryVegetationObjectLod2",
                         it.message,
                         roadspaceObject.id,
@@ -97,7 +97,7 @@ class VegetationModuleBuilder(
         relationAdder.addBelongToRelations(roadspaceObject, solitaryVegetationObjectFeature)
         attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
 
-        return ContextMessageList(solitaryVegetationObjectFeature, messageList)
+        return ContextIssueList(solitaryVegetationObjectFeature, issueList)
     }
 
     private fun addAttributes(

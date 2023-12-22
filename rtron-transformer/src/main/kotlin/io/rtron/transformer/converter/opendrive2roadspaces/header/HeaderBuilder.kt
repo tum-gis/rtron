@@ -20,10 +20,10 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.flatten
 import arrow.core.some
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.math.projection.CoordinateReferenceSystem
 import io.rtron.model.opendrive.core.HeaderGeoReference
 import io.rtron.model.roadspaces.Header
@@ -34,27 +34,27 @@ class HeaderBuilder(
     private val parameters: Opendrive2RoadspacesParameters
 ) {
     // Methods
-    fun buildHeader(header: OdrHeader): ContextMessageList<Header> {
-        val messageList = DefaultMessageList()
+    fun buildHeader(header: OdrHeader): ContextIssueList<Header> {
+        val issueList = DefaultIssueList()
 
-        val crs = header.geoReference.map { buildCoordinateSystem(it).handleMessageList { messageList += it } }.flatten()
+        val crs = header.geoReference.map { buildCoordinateSystem(it).handleIssueList { issueList += it } }.flatten()
         val roadspacesHeader = Header(coordinateReferenceSystem = crs, name = header.name, date = header.date, vendor = header.vendor)
 
-        return ContextMessageList(roadspacesHeader, messageList)
+        return ContextIssueList(roadspacesHeader, issueList)
     }
 
     /**
      * Builds the [CoordinateReferenceSystem] for the [Header].
      */
-    private fun buildCoordinateSystem(geoReference: HeaderGeoReference): ContextMessageList<Option<CoordinateReferenceSystem>> {
-        val messageList = DefaultMessageList()
+    private fun buildCoordinateSystem(geoReference: HeaderGeoReference): ContextIssueList<Option<CoordinateReferenceSystem>> {
+        val issueList = DefaultIssueList()
 
-        CoordinateReferenceSystem.of(parameters.crsEpsg).onRight { return ContextMessageList(it.some(), messageList) }
+        CoordinateReferenceSystem.of(parameters.crsEpsg).onRight { return ContextIssueList(it.some(), issueList) }
         if (parameters.deriveCrsEpsgAutomatically) {
-            CoordinateReferenceSystem.of(geoReference.content).onRight { return ContextMessageList(it.some(), messageList) }
-            messageList += DefaultMessage("AutomaticCrsEpsgCodeDerivationFailed", "EPSG code of the coordinate reference system cannot be derived automatically from the OpenDRIVE header element; add the code explicitly as a command line argument if correct georeferencing is required.", "Header element", Severity.WARNING, wasFixed = false)
+            CoordinateReferenceSystem.of(geoReference.content).onRight { return ContextIssueList(it.some(), issueList) }
+            issueList += DefaultIssue("AutomaticCrsEpsgCodeDerivationFailed", "EPSG code of the coordinate reference system cannot be derived automatically from the OpenDRIVE header element; add the code explicitly as a command line argument if correct georeferencing is required.", "Header element", Severity.WARNING, wasFixed = false)
         }
 
-        return ContextMessageList(None, messageList)
+        return ContextIssueList(None, issueList)
     }
 }

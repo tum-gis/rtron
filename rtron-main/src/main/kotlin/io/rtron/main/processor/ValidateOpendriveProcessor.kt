@@ -18,7 +18,7 @@ package io.rtron.main.processor
 
 import arrow.core.getOrElse
 import com.charleskorn.kaml.Yaml
-import io.rtron.io.messages.getTextSummary
+import io.rtron.io.issues.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
 import io.rtron.readerwriter.citygml.CitygmlVersion

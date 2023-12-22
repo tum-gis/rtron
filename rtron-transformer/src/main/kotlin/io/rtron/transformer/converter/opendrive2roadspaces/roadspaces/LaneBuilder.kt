@@ -23,10 +23,10 @@ import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.some
 import arrow.core.toNonEmptyListOrNull
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
@@ -52,7 +52,7 @@ import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.isStrictlySortedBy
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 
 /**
  * Builder for [Lane] objects of the RoadSpaces data model.
@@ -70,8 +70,8 @@ class LaneBuilder(
      * @param lrLane lane object of the OpenDRIVE data model
      * @param baseAttributes attributes attached to the transformed [Lane] object
      */
-    fun buildLane(id: LaneIdentifier, curvePositionDomain: Range<Double>, lrLane: RoadLanesLaneSectionLRLane, baseAttributes: AttributeList): ContextMessageList<Lane> {
-        val messageList = DefaultMessageList()
+    fun buildLane(id: LaneIdentifier, curvePositionDomain: Range<Double>, lrLane: RoadLanesLaneSectionLRLane, baseAttributes: AttributeList): ContextIssueList<Lane> {
+        val issueList = DefaultIssueList()
 
         // build lane geometry
         val width = lrLane.getLaneWidthEntries()
@@ -84,7 +84,7 @@ class LaneBuilder(
             if (lrLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
-                buildRoadMarkings(curvePositionDomain, lrLane.roadMark.toNonEmptyListOrNull()!!).handleMessageList { messageList += it }
+                buildRoadMarkings(curvePositionDomain, lrLane.roadMark.toNonEmptyListOrNull()!!).handleIssueList { issueList += it }
             }
 
         // lane topology
@@ -101,7 +101,7 @@ class LaneBuilder(
             id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, lrLane.getLevelWithDefault(), roadMarkings,
             predecessors, successors, type, laneMaterial, attributes
         )
-        return ContextMessageList(lane, messageList)
+        return ContextIssueList(lane, issueList)
     }
 
     /**
@@ -117,18 +117,18 @@ class LaneBuilder(
         curvePositionDomain: Range<Double>,
         centerLane: RoadLanesLaneSectionCenterLane,
         baseAttributes: AttributeList
-    ): ContextMessageList<CenterLane> {
+    ): ContextIssueList<CenterLane> {
         require(centerLane.id == 0) { "Center lane must have id 0, but has ${centerLane.id}." }
 
         val laneIdentifier = LaneIdentifier(0, id)
-        val messageList = DefaultMessageList()
+        val issueList = DefaultIssueList()
 
         val roadMarkings =
             if (centerLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
                 buildRoadMarkings(curvePositionDomain, centerLane.roadMark.toNonEmptyListOrNull()!!)
-                    .handleMessageList { messageList += it }
+                    .handleIssueList { issueList += it }
             }
 
         val type = centerLane.type.toLaneType()
@@ -136,7 +136,7 @@ class LaneBuilder(
         val attributes = baseAttributes + buildAttributes(centerLane)
 
         val lane = CenterLane(laneIdentifier, centerLane.getLevelWithDefault(), roadMarkings, type, laneMaterial, attributes)
-        return ContextMessageList(lane, messageList)
+        return ContextIssueList(lane, issueList)
     }
 
     /**
@@ -177,17 +177,17 @@ class LaneBuilder(
     private fun buildRoadMarkings(
         curvePositionDomain: Range<Double>,
         roadMark: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMark>
-    ): ContextMessageList<List<RoadMarking>> {
+    ): ContextIssueList<List<RoadMarking>> {
         require(curvePositionDomain.hasUpperBound()) { "curvePositionDomain must have an upper bound." }
         val roadMarkId = roadMark.head.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
-        val messageList = DefaultMessageList()
+        val issueList = DefaultIssueList()
 
         val curvePositionDomainEnd = curvePositionDomain.upperEndpointOrNull()!!
         val adjustedSrcRoadMark = roadMark
             .filter { it.sOffset in curvePositionDomain }
             .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, parameters.numberTolerance) }
         if (adjustedSrcRoadMark.size < roadMark.size) {
-            messageList += DefaultMessage.of(
+            issueList += DefaultIssue.of(
                 "RoadMarkEntriesNotLocatedWithinSRange",
                 "Road mark entries have been removed, as the sOffset is not located within " +
                     "the local curve position domain ($curvePositionDomain) of the lane section.",
@@ -197,13 +197,13 @@ class LaneBuilder(
             )
         }
 
-        if (adjustedSrcRoadMark.isEmpty()) return ContextMessageList(emptyList(), messageList)
+        if (adjustedSrcRoadMark.isEmpty()) return ContextIssueList(emptyList(), issueList)
 
         val roadMarkings = adjustedSrcRoadMark.zipWithNext()
             .map { buildRoadMarking(it.first, it.second.sOffset.some()) } +
             listOf(buildRoadMarking(adjustedSrcRoadMark.last()))
 
-        return ContextMessageList(roadMarkings, messageList)
+        return ContextIssueList(roadMarkings, issueList)
     }
 
     /**

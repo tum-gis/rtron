@@ -16,8 +16,8 @@
 
 package io.rtron.transformer.converter.opendrive2roadspaces.report
 
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.getTextSummary
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.getTextSummary
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import kotlinx.serialization.Serializable
 
@@ -25,7 +25,7 @@ import kotlinx.serialization.Serializable
 data class Opendrive2RoadspacesReport(
     val parameters: Opendrive2RoadspacesParameters,
 
-    val conversion: DefaultMessageList = DefaultMessageList()
+    val conversion: DefaultIssueList = DefaultIssueList()
 ) {
 
     // Methods

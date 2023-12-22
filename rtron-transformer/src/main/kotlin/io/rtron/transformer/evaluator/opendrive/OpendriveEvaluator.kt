@@ -19,7 +19,7 @@ package io.rtron.transformer.evaluator.opendrive
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
-import io.rtron.io.messages.containsFatalErrors
+import io.rtron.io.issues.containsFatalErrors
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.transformer.evaluator.opendrive.plans.basicdatatype.BasicDataTypeEvaluator
@@ -50,7 +50,7 @@ class OpendriveEvaluator(
 
         // basic data type evaluation
         basicDataTypeEvaluator.evaluate(modifiedOpendriveModel).let {
-            report.basicDataTypePlan = it.messageList
+            report.basicDataTypePlan = it.issueList
             modifiedOpendriveModel = it.value
         }
         if (report.basicDataTypePlan.containsFatalErrors()) {
@@ -59,7 +59,7 @@ class OpendriveEvaluator(
 
         // modeling rules evaluation
         modelingRulesEvaluator.evaluate(modifiedOpendriveModel).let {
-            report.modelingRulesPlan = it.messageList
+            report.modelingRulesPlan = it.issueList
             modifiedOpendriveModel = it.value
         }
         if (report.modelingRulesPlan.containsFatalErrors()) {
@@ -68,7 +68,7 @@ class OpendriveEvaluator(
 
         // conversion requirements evaluation
         conversionRequirementsEvaluator.evaluate(modifiedOpendriveModel).let {
-            report.conversionRequirementsPlan = it.messageList
+            report.conversionRequirementsPlan = it.issueList
             modifiedOpendriveModel = it.value
         }
         if (report.conversionRequirementsPlan.containsFatalErrors()) {

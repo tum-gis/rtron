@@ -16,11 +16,11 @@
 
 package io.rtron.transformer.evaluator.roadspaces.plans
 
-import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.issues.DefaultIssueList
 import io.rtron.model.roadspaces.RoadspacesModel
 
 abstract class AbstractRoadspacesEvaluator {
 
     // Methods
-    abstract fun evaluate(roadspacesModel: RoadspacesModel): DefaultMessageList
+    abstract fun evaluate(roadspacesModel: RoadspacesModel): DefaultIssueList
 }

@@ -17,10 +17,10 @@
 package io.rtron.transformer.evaluator.roadspaces.plans.modelingrules
 
 import arrow.core.getOrElse
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
-import io.rtron.io.messages.merge
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
+import io.rtron.io.issues.merge
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.toIllegalStateException
 import io.rtron.model.roadspaces.RoadspacesModel
@@ -34,36 +34,36 @@ import io.rtron.transformer.evaluator.roadspaces.plans.AbstractRoadspacesEvaluat
 class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) : AbstractRoadspacesEvaluator() {
 
     // Methods
-    override fun evaluate(roadspacesModel: RoadspacesModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    override fun evaluate(roadspacesModel: RoadspacesModel): DefaultIssueList {
+        val issueList = DefaultIssueList()
 
-        messageList += roadspacesModel.getAllRoadspaces().map { evaluateRoadLinkages(it, roadspacesModel) }.merge()
+        issueList += roadspacesModel.getAllRoadspaces().map { evaluateRoadLinkages(it, roadspacesModel) }.merge()
 
-        return messageList
+        return issueList
     }
 
-    private fun evaluateRoadLinkages(roadspace: Roadspace, roadspacesModel: RoadspacesModel): DefaultMessageList {
-        val messageList = DefaultMessageList()
+    private fun evaluateRoadLinkages(roadspace: Roadspace, roadspacesModel: RoadspacesModel): DefaultIssueList {
+        val issueList = DefaultIssueList()
 
         roadspace.road.getAllLeftRightLaneIdentifiers()
             .filter { roadspace.road.isInLastLaneSection(it) }
             .forEach { laneId ->
                 val successorLaneIds = roadspacesModel.getSuccessorLaneIdentifiers(laneId).getOrElse { throw it }
 
-                messageList += successorLaneIds.map { successorLaneId ->
+                issueList += successorLaneIds.map { successorLaneId ->
                     evaluateLaneTransition(laneId, successorLaneId, roadspace.road, roadspacesModel.getRoadspace(successorLaneId.toRoadspaceIdentifier()).getOrElse { throw it }.road, roadspacesModel)
                 }.merge()
             }
 
-        return messageList
+        return issueList
     }
 
-    private fun evaluateLaneTransition(laneId: LaneIdentifier, successorLaneId: LaneIdentifier, road: Road, successorRoad: Road, roadspacesModel: RoadspacesModel): DefaultMessageList {
+    private fun evaluateLaneTransition(laneId: LaneIdentifier, successorLaneId: LaneIdentifier, road: Road, successorRoad: Road, roadspacesModel: RoadspacesModel): DefaultIssueList {
         require(laneId !== successorLaneId) { "Lane identifiers of current and of successor lane must be different." }
         require(laneId.roadspaceId !== successorLaneId.roadspaceId) { "Lane identifiers of current and of successor lane must be different regarding their roadspaceId." }
         require(road.id !== successorRoad.id) { "Road and successor road must be different." }
 
-        val messageList = DefaultMessageList()
+        val issueList = DefaultIssueList()
 
         val laneLeftLaneBoundaryPoint: Vector3D = road.getLeftLaneBoundary(laneId).getOrElse { throw it }
             .calculateEndPointGlobalCS().mapLeft { it.toIllegalStateException() }.getOrElse { throw it }
@@ -77,9 +77,9 @@ class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) : Ab
 
         // TODO: identify inconsistencies in the topology of the model
         val successorLeftLaneBoundary = successorRoad.getLeftLaneBoundary(successorLaneId)
-            .fold({ return messageList }, { it })
+            .fold({ return issueList }, { it })
         val successorRightLaneBoundary = successorRoad.getRightLaneBoundary(successorLaneId)
-            .fold({ return messageList }, { it })
+            .fold({ return issueList }, { it })
 
         // if contact of successor at the start, normal connecting
         // if contact of the successor at the end, the end positions have to be calculated and left and right boundary have to be swapped
@@ -105,7 +105,7 @@ class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) : Ab
         val leftLaneBoundaryTransitionDistance = laneLeftLaneBoundaryPoint.distance(laneLeftLaneBoundarySuccessorPoint)
         if (leftLaneBoundaryTransitionDistance >= parameters.laneTransitionDistanceTolerance) {
             val infoValues = mapOf("euclideanDistance" to leftLaneBoundaryTransitionDistance)
-            messageList += DefaultMessage(
+            issueList += DefaultIssue(
                 "LeftLaneBoundaryTransitionGap",
                 "Left boundary of lane should be connected to its successive lane (euclidean distance: $leftLaneBoundaryTransitionDistance).",
                 location,
@@ -119,7 +119,7 @@ class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) : Ab
             laneRightLaneBoundaryPoint.distance(laneRightLaneBoundarySuccessorPoint)
         if (rightLaneBoundaryTransitionDistance >= parameters.laneTransitionDistanceTolerance) {
             val infoValues = mapOf("euclideanDistance" to rightLaneBoundaryTransitionDistance)
-            messageList += DefaultMessage(
+            issueList += DefaultIssue(
                 "RightLaneBoundaryTransitionGap",
                 "Right boundary of lane should be connected to its successive lane (euclidean distance: $rightLaneBoundaryTransitionDistance).",
                 location,
@@ -129,6 +129,6 @@ class ModelingRulesEvaluator(val parameters: RoadspacesEvaluatorParameters) : Ab
             )
         }
 
-        return messageList
+        return issueList
     }
 }

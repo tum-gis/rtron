@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package io.rtron.io.messages
+package io.rtron.io.issues
 
 import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-value class MessageList<T>(private val messages: MutableList<T> = mutableListOf()) {
+value class IssueList<T>(private val issues: MutableList<T> = mutableListOf()) {
 
     // Properties
     val size: Int
-        get() = messages.size
+        get() = issues.size
 
     // Operators
-    operator fun plusAssign(other: MessageList<T>) {
-        append(other.messages)
+    operator fun plusAssign(other: IssueList<T>) {
+        append(other.issues)
     }
 
     operator fun plusAssign(other: T) {
@@ -36,20 +36,20 @@ value class MessageList<T>(private val messages: MutableList<T> = mutableListOf(
     }
 
     // Methods
-    fun getMessages(): List<T> = messages
+    fun getIssues(): List<T> = issues
 
-    fun isEmpty(): Boolean = messages.isEmpty()
-    fun isNotEmpty(): Boolean = messages.isNotEmpty()
+    fun isEmpty(): Boolean = issues.isEmpty()
+    fun isNotEmpty(): Boolean = issues.isNotEmpty()
 
-    fun append(message: T) { this.messages += message }
-    fun append(messages: List<T>) { this.messages += messages }
+    fun append(issues: T) { this.issues += issues }
+    fun append(issues: List<T>) { this.issues += issues }
 
     companion object {
 
-        fun <T> of(messages: List<T>): MessageList<T> = MessageList(messages as MutableList<T>)
-        fun <T> of(message: T): MessageList<T> = MessageList(mutableListOf(message))
+        fun <T> of(issues: List<T>): IssueList<T> = IssueList(issues as MutableList<T>)
+        fun <T> of(issue: T): IssueList<T> = IssueList(mutableListOf(issue))
     }
 }
 
-fun <T> List<T>.mergeToReport(): MessageList<T> = MessageList.of(this)
-fun <T> List<MessageList<T>>.merge(): MessageList<T> = MessageList.of(flatMap { it.getMessages() })
+fun <T> List<T>.mergeToReport(): IssueList<T> = IssueList.of(this)
+fun <T> List<IssueList<T>>.merge(): IssueList<T> = IssueList.of(flatMap { it.getIssues() })

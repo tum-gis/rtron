@@ -16,8 +16,8 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements
 
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessageList
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssueList
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
@@ -25,12 +25,12 @@ import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
 class ConversionRequirementsEvaluator(val parameters: OpendriveEvaluatorParameters) : AbstractOpendriveEvaluator() {
 
     // Methods
-    override fun evaluate(opendriveModel: OpendriveModel): ContextMessageList<OpendriveModel> {
-        val messageList = DefaultMessageList()
+    override fun evaluate(opendriveModel: OpendriveModel): ContextIssueList<OpendriveModel> {
+        val issueList = DefaultIssueList()
         var modifiedOpendriveModel = opendriveModel.copy()
 
-        modifiedOpendriveModel = JunctionEvaluator.evaluate(modifiedOpendriveModel, parameters, messageList)
+        modifiedOpendriveModel = JunctionEvaluator.evaluate(modifiedOpendriveModel, parameters, issueList)
 
-        return ContextMessageList(modifiedOpendriveModel, messageList)
+        return ContextIssueList(modifiedOpendriveModel, issueList)
     }
 }

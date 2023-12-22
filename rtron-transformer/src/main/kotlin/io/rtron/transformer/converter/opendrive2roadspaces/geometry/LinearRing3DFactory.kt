@@ -21,10 +21,10 @@ import arrow.core.NonEmptyList
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.toNonEmptyListOrNull
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.DefaultMessage
-import io.rtron.io.messages.DefaultMessageList
-import io.rtron.io.messages.Severity
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.DefaultIssue
+import io.rtron.io.issues.DefaultIssueList
+import io.rtron.io.issues.Severity
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.processing.isClockwiseOrdered
@@ -32,7 +32,7 @@ import io.rtron.math.processing.removeConsecutiveSideDuplicates
 import io.rtron.math.processing.removeRedundantVerticesOnLineSegmentsEnclosing
 import io.rtron.model.opendrive.additions.identifier.RoadObjectOutlineIdentifier
 import io.rtron.std.filterWithNextEnclosing
-import io.rtron.transformer.messages.opendrive.of
+import io.rtron.transformer.issues.opendrive.of
 
 /**
  * Factory for building [LinearRing3D] for which multiple preparation steps are required to overcome
@@ -43,8 +43,8 @@ object LinearRing3DFactory {
     /**
      * Builds a [LinearRing3D] from a list of vertices by filtering and preparing the vertices.
      */
-    fun buildFromVertices(outlineId: RoadObjectOutlineIdentifier, vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryBuilderException, ContextMessageList<LinearRing3D>> = either {
-        val messageList = DefaultMessageList()
+    fun buildFromVertices(outlineId: RoadObjectOutlineIdentifier, vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryBuilderException, ContextIssueList<LinearRing3D>> = either {
+        val issueList = DefaultIssueList()
 
         // remove end element, if start and end element are equal
         val verticesWithoutClosing = if (vertices.first() == vertices.last()) {
@@ -56,37 +56,37 @@ object LinearRing3DFactory {
         // remove consecutively following point duplicates
         val verticesWithoutPointDuplicates = verticesWithoutClosing.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
         if (verticesWithoutPointDuplicates.size < verticesWithoutClosing.size) {
-            messageList += DefaultMessage.of("OutlineContainsConsecutivelyFollowingElementDuplicates", "Ignoring at least one consecutively following point duplicate.", outlineId, Severity.WARNING, wasFixed = true)
+            issueList += DefaultIssue.of("OutlineContainsConsecutivelyFollowingElementDuplicates", "Ignoring at least one consecutively following point duplicate.", outlineId, Severity.WARNING, wasFixed = true)
         }
 
         // remove consecutively following side duplicates
         val verticesWithoutSideDuplicates = verticesWithoutPointDuplicates.removeConsecutiveSideDuplicates()
         if (verticesWithoutSideDuplicates.size != verticesWithoutPointDuplicates.size) {
-            messageList += DefaultMessage.of("OutlineContainsConsecutivelyFollowingSideDuplicates", "Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…).", outlineId, Severity.WARNING, wasFixed = true)
+            issueList += DefaultIssue.of("OutlineContainsConsecutivelyFollowingSideDuplicates", "Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…).", outlineId, Severity.WARNING, wasFixed = true)
         }
 
         // remove vertices that are located on a line anyway
         val preparedVertices = verticesWithoutSideDuplicates
             .removeRedundantVerticesOnLineSegmentsEnclosing(tolerance)
         if (preparedVertices.size < verticesWithoutSideDuplicates.size) {
-            messageList += DefaultMessage.of("OutlineContainsLinearlyRedundantVertices", "Ignoring at least one vertex due to linear redundancy.", outlineId, Severity.WARNING, wasFixed = true)
+            issueList += DefaultIssue.of("OutlineContainsLinearlyRedundantVertices", "Ignoring at least one vertex due to linear redundancy.", outlineId, Severity.WARNING, wasFixed = true)
         }
 
         // if there are not enough points to construct a linear ring
         if (preparedVertices.size <= 2) {
-            GeometryBuilderException.NotEnoughValidOutlineElementsForLinearRing(outlineId).left().bind<ContextMessageList<LinearRing3D>>()
+            GeometryBuilderException.NotEnoughValidOutlineElementsForLinearRing(outlineId).left().bind<ContextIssueList<LinearRing3D>>()
         }
 
         // if the outline elements are ordered clockwise yielding a wrong polygon orientation
         val projectedVertices = preparedVertices.map { it.toVector2D(Vector3D.Z_AXIS) }
         val orderedVertices = if (projectedVertices.distinct().size > 2 && projectedVertices.isClockwiseOrdered()) {
-            messageList += DefaultMessage.of("IncorrectOutlineOrientation", "Outline elements are ordered clockwise but should be ordered counter-clockwise.", outlineId, Severity.ERROR, wasFixed = true)
+            issueList += DefaultIssue.of("IncorrectOutlineOrientation", "Outline elements are ordered clockwise but should be ordered counter-clockwise.", outlineId, Severity.ERROR, wasFixed = true)
             preparedVertices.reversed()
         } else {
             preparedVertices
         }
 
         val linearRing = LinearRing3D(orderedVertices.toNonEmptyListOrNull()!!, tolerance)
-        ContextMessageList(linearRing, messageList)
+        ContextIssueList(linearRing, issueList)
     }
 }

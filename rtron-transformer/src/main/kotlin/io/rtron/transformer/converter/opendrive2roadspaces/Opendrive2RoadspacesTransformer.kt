@@ -18,9 +18,9 @@ package io.rtron.transformer.converter.opendrive2roadspaces
 
 import arrow.core.Option
 import arrow.core.some
+import io.rtron.io.issues.ContextIssueList
+import io.rtron.io.issues.mergeIssueLists
 import io.rtron.io.logging.ProgressBar
-import io.rtron.io.messages.ContextMessageList
-import io.rtron.io.messages.mergeMessageLists
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.model.opendrive.junction.EJunctionType
@@ -66,7 +66,7 @@ class Opendrive2RoadspacesTransformer(
         val report = Opendrive2RoadspacesReport(parameters)
 
         // general model information
-        val header = headerBuilder.buildHeader(opendriveModel.header).handleMessageList { report.conversion += it }
+        val header = headerBuilder.buildHeader(opendriveModel.header).handleIssueList { report.conversion += it }
 
         // transformation of each road
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
@@ -77,7 +77,7 @@ class Opendrive2RoadspacesTransformer(
                 transformRoadspacesSequentially(opendriveModel, progressBar)
             }
 
-        val roadspaces = roadspacesWithContextReports.mergeMessageLists().handleMessageList { report.conversion += it }
+        val roadspaces = roadspacesWithContextReports.mergeIssueLists().handleIssueList { report.conversion += it }
 
         val junctions = opendriveModel.junction
             .filter { it.typeValidated == EJunctionType.DEFAULT }
@@ -92,7 +92,7 @@ class Opendrive2RoadspacesTransformer(
     private fun transformRoadspacesSequentially(
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<ContextMessageList<Roadspace>> =
+    ): List<ContextIssueList<Roadspace>> =
         opendriveModel.roadAsNonEmptyList.map {
             roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
         }
@@ -101,7 +101,7 @@ class Opendrive2RoadspacesTransformer(
     private fun transformRoadspacesConcurrently(
         opendriveModel: OpendriveModel,
         progressBar: ProgressBar
-    ): List<ContextMessageList<Roadspace>> {
+    ): List<ContextIssueList<Roadspace>> {
         val roadspacesDeferred = opendriveModel.roadAsNonEmptyList.map {
             GlobalScope.async {
                 roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }

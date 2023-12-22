@@ -57,21 +57,21 @@ data class OpendriveToCitygmlParameters(
 ) {
     // Methods
     fun isValid(): Either<List<String>, Unit> {
-        val messages = mutableListOf<String>()
+        val issues = mutableListOf<String>()
         if (cropPolygonX.size != cropPolygonY.size) {
-            messages += "cropPolygonX must have the same number of values as cropPolygonY"
+            issues += "cropPolygonX must have the same number of values as cropPolygonY"
         }
         if (cropPolygonX.isNotEmpty() && cropPolygonX.size < 3) {
-            messages += "cropPolygonX must be empty or have at least three values for representing a triangle"
+            issues += "cropPolygonX must be empty or have at least three values for representing a triangle"
         }
         if (cropPolygonY.isNotEmpty() && cropPolygonY.size < 3) {
-            messages += "cropPolygonX must be empty or have at least three values for representing a triangle"
+            issues += "cropPolygonX must be empty or have at least three values for representing a triangle"
         }
 
-        return if (messages.isEmpty()) {
+        return if (issues.isEmpty()) {
             Unit.right()
         } else {
-            messages.left()
+            issues.left()
         }
     }
 
