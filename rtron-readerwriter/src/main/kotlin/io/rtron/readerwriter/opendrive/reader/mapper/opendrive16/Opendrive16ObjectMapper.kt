@@ -19,6 +19,7 @@ package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
+import arrow.core.toOption
 import io.rtron.model.opendrive.lane.ELaneType
 import io.rtron.model.opendrive.objects.EObjectType
 import io.rtron.model.opendrive.objects.EOutlineFillType
@@ -42,8 +43,10 @@ import org.asam.opendrive16.T_Road_Objects_Object_Markings
 import org.asam.opendrive16.T_Road_Objects_Object_Outlines
 import org.asam.opendrive16.T_Road_Objects_Object_Outlines_Outline
 import org.asam.opendrive16.T_Road_Objects_Object_ParkingSpace
+import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.MappingTarget
 import org.mapstruct.NullValueCheckStrategy
 import org.mapstruct.ValueMapping
 
@@ -60,12 +63,19 @@ abstract class Opendrive16ObjectMapper {
     @Mapping(source = "object", target = "roadObject")
     abstract fun mapRoadObjects(source: T_Road_Objects): RoadObjects
 
-    @Mapping(source = "outline", target = "outlines")
     abstract fun mapRoadObjectsObject(source: T_Road_Objects_Object): RoadObjectsObject
 
-    fun mapRoadObjectsObjectOutline(source: T_Road_Objects_Object_Outlines_Outline): RoadObjectsObjectOutlines {
-        val outlines = listOf(mapRoadObjectsObjectOutlinesOutline(source))
-        return RoadObjectsObjectOutlines(outlines)
+    @AfterMapping
+    open fun afterMappingRoadObjectsObject(source: T_Road_Objects_Object, @MappingTarget target: RoadObjectsObject) {
+        // after mapping deprecated outline element by creating a new container or
+        // appending it to preexisting outlines container
+        source.outline.toOption().onSome { sourceOutline ->
+            val outline = mapRoadObjectsObjectOutlinesOutline(sourceOutline)
+            target.outlines = target.outlines.fold(
+                { RoadObjectsObjectOutlines(outline = listOf(outline)) },
+                { RoadObjectsObjectOutlines(outline = it.outline + outline) }
+            ).some()
+        }
     }
 
     //
