@@ -60,6 +60,9 @@ class GenericsModuleBuilder(
         // geometry
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         genericOccupiedSpaceFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
+        pointGeometryTransformer.rotation.onSome {
+            attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)
+        }
 
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
@@ -87,9 +90,6 @@ class GenericsModuleBuilder(
                         wasFixed = true
                     )
                 }
-            geometryTransformer.rotation.onSome {
-                attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)
-            }
         }
 
         // semantics

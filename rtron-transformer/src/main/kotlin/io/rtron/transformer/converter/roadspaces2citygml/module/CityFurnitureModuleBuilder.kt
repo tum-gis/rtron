@@ -48,6 +48,9 @@ class CityFurnitureModuleBuilder(
         // geometry
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         cityFurnitureFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
+        pointGeometryTransformer.rotation.onSome {
+            attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
+        }
 
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
@@ -75,10 +78,6 @@ class CityFurnitureModuleBuilder(
                         wasFixed = true
                     )
                 }
-
-            geometryTransformer.rotation.onSome {
-                attributesAdder.addRotationAttributes(it, cityFurnitureFeature)
-            }
         }
 
         // semantics
