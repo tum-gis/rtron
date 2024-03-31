@@ -33,6 +33,7 @@ import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluator
 import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropper
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdder
 import io.rtron.transformer.modifiers.opendrive.offset.resolver.OpendriveOffsetResolver
+import io.rtron.transformer.modifiers.opendrive.remover.OpendriveObjectRemover
 import mu.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -102,13 +103,18 @@ class OpendriveToCitygmlProcessor(
                 return@processAllFiles
             }
 
-            // write offset OpenDRIVE model
+            // remove objects from OpenDRIVE model
+            val opendriveObjectRemover = OpendriveObjectRemover(parameters.deriveOpendriveObjectRemoverParameters())
+            val opendriveRemovedObjectResult = opendriveObjectRemover.modify(opendriveCropped)
+            opendriveRemovedObjectResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_OBJECT_REMOVER_REPORT_PATH)
+
+            // write modified OpenDRIVE model
             val opendriveFilePath = outputSubDirectoryPath / ("opendrive.xodr" + parameters.compressionFormat.toFileExtension())
-            OpendriveWriter.writeToFile(opendriveCropped, opendriveFilePath)
+            OpendriveWriter.writeToFile(opendriveRemovedObjectResult.first, opendriveFilePath)
 
             // transform OpenDRIVE model to Roadspaces model
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
-            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveCropped)
+            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveRemovedObjectResult.first)
             roadspacesModelResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
                 logger.warn("Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}")
@@ -142,8 +148,9 @@ class OpendriveToCitygmlProcessor(
         val OPENDRIVE_OFFSET_ADDER_REPORT_PATH = REPORTS_PATH / Path("03_opendrive_offset_adder_report.json")
         val OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH = REPORTS_PATH / Path("04_opendrive_offset_resolver_report.json")
         val OPENDRIVE_CROP_REPORT_PATH = REPORTS_PATH / Path("05_opendrive_crop_report.json")
-        val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("06_opendrive_to_roadspaces_report.json")
-        val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("07_roadspaces_evaluator_report.json")
-        val ROADSPACES_TO_CITYGML_REPORT_PATH = REPORTS_PATH / Path("08_roadspaces_to_citygml_report.json")
+        val OPENDRIVE_OBJECT_REMOVER_REPORT_PATH = REPORTS_PATH / Path("06_opendrive_object_remover_report.json")
+        val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("07_opendrive_to_roadspaces_report.json")
+        val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("08_roadspaces_evaluator_report.json")
+        val ROADSPACES_TO_CITYGML_REPORT_PATH = REPORTS_PATH / Path("09_roadspaces_to_citygml_report.json")
     }
 }

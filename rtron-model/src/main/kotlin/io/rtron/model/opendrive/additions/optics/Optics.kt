@@ -73,8 +73,10 @@ val everyRoadLanesLaneSectionCenterLane = everyLaneSection compose RoadLanesLane
 val everyJunction = OpendriveModel.junction compose Traversal.list()
 val everyJunctionConnection = everyJunction compose Junction.connection compose Traversal.list()
 
-val everyRoadObject = everyRoad compose Road.objects compose PPrism.some() compose RoadObjects.roadObject compose Traversal.list()
+val everyRoadObjectContainer = everyRoad compose Road.objects compose PPrism.some()
+val everyRoadObject = everyRoadObjectContainer compose RoadObjects.roadObject compose Traversal.list()
 val everyRoadObjectOutlineElement = everyRoadObject compose RoadObjectsObject.outlines compose PPrism.some() compose RoadObjectsObjectOutlines.outline compose Traversal.list()
 val everyRoadObjectRepeatElement = everyRoadObject compose RoadObjectsObject.repeat compose Traversal.list()
 
-val everyRoadSignal = everyRoad compose Road.signals compose PPrism.some() compose RoadSignals.signal compose Traversal.list()
+val everyRoadSignalContainer = everyRoad compose Road.signals compose PPrism.some()
+val everyRoadSignal = everyRoadSignalContainer compose RoadSignals.signal compose Traversal.list()

@@ -19,6 +19,7 @@ package io.rtron.main.processor
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import io.rtron.model.opendrive.objects.EObjectType
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
@@ -26,6 +27,7 @@ import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluatorParameters
 import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropperParameters
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
+import io.rtron.transformer.modifiers.opendrive.remover.OpendriveObjectRemoverParameters
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -46,6 +48,7 @@ data class OpendriveToCitygmlParameters(
     val offsetZ: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z,
     val cropPolygonX: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_X,
     val cropPolygonY: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_Y,
+    val removeRoadObjectsOfTypes: Set<EObjectType> = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_OF_TYPES,
 
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
@@ -84,6 +87,11 @@ data class OpendriveToCitygmlParameters(
         planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
         planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
         planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance
+    )
+
+    fun deriveOpendriveObjectRemoverParameters() = OpendriveObjectRemoverParameters(
+        removeRoadObjectsWithoutType = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_WITHOUT_TYPE,
+        removeRoadObjectsOfTypes = removeRoadObjectsOfTypes
     )
 
     fun deriveOpendriveOffsetAdderParameters() = OpendriveOffsetAdderParameters(

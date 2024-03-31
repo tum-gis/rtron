@@ -26,6 +26,7 @@ import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.pair
 import com.github.ajalt.clikt.parameters.options.triple
+import com.github.ajalt.clikt.parameters.options.unique
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
@@ -33,6 +34,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import io.rtron.main.processor.CompressionFormat
 import io.rtron.main.processor.OpendriveToCitygmlParameters
 import io.rtron.main.processor.OpendriveToCitygmlProcessor
+import io.rtron.model.opendrive.objects.EObjectType
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
@@ -71,6 +73,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
     private val addOffset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
         .default(Triple(OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z))
     private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset (experimental)").double().pair().multiple(default = emptyList())
+    private val removeRoadObjectOfType by option(help = "Remove road object of a specific type").enum<EObjectType>().multiple().unique()
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
@@ -104,6 +107,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 offsetZ = addOffset.third,
                 cropPolygonX = cropPolygon.map { it.first },
                 cropPolygonY = cropPolygon.map { it.second },
+                removeRoadObjectsOfTypes = removeRoadObjectOfType,
 
                 discretizationStepSize = discretizationStepSize,
                 sweepDiscretizationStepSize = sweepDiscretizationStepSize,
