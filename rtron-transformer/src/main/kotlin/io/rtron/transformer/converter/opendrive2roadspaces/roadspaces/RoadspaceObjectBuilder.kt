@@ -35,6 +35,7 @@ import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.range.Range
 import io.rtron.math.transform.AffineSequence3D
 import io.rtron.model.opendrive.objects.EObjectType
@@ -114,7 +115,7 @@ class RoadspaceObjectBuilder(
                 RoadspaceObjectIdentifier(roadObject.id, repeatIdentifier.repeatIndex.some(), roadObject.name, id)
 
             val pointGeometry = buildPointGeometry(currentRoadObjectRepeat, roadReferenceLine)
-            val buildBoundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
+            val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
             val complexGeometry = buildComplexGeometry(
                 roadObject,
                 currentRoadObjectRepeat.some(),
@@ -124,7 +125,7 @@ class RoadspaceObjectBuilder(
                 roadspaceObjectId,
                 type,
                 pointGeometry,
-                buildBoundingBoxGeometry,
+                boundingBoxGeometry,
                 complexGeometry,
                 laneRelations,
                 attributes
@@ -134,7 +135,7 @@ class RoadspaceObjectBuilder(
         val roadObjects = if (roadObjectsFromRepeat.isEmpty()) {
             val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, None, roadObject.name, id)
             val pointGeometry = buildPointGeometry(roadObject, roadReferenceLine)
-            val buildBoundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
+            val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
             val complexGeometry =
                 buildComplexGeometry(roadObject, None, roadReferenceLine).handleIssueList { issueList += it }
             nonEmptyListOf(
@@ -142,7 +143,7 @@ class RoadspaceObjectBuilder(
                     roadspaceObjectId,
                     type,
                     pointGeometry,
-                    buildBoundingBoxGeometry,
+                    boundingBoxGeometry,
                     complexGeometry,
                     laneRelations,
                     attributes
@@ -387,8 +388,8 @@ class RoadspaceObjectBuilder(
         val objectId = RoadspaceObjectIdentifier(roadSignal.id, None, roadSignal.name, id)
 
         val pointGeometry = buildPointGeometry(roadSignal, roadReferenceLine)
-        val buildBoundingBoxGeometry =
-            buildBoundingBoxGeometry(roadSignal, roadReferenceLine).handleIssueList { issueList += it }
+        val complexGeometry =
+            buildComplexGeometry(roadSignal, roadReferenceLine).handleIssueList { issueList += it }
         val laneRelations = buildLaneRelations(roadSignal, road)
         val attributes = baseAttributes +
             buildAttributes(roadSignal) +
@@ -399,8 +400,8 @@ class RoadspaceObjectBuilder(
             objectId,
             RoadObjectType.SIGNAL,
             pointGeometry,
-            buildBoundingBoxGeometry,
             None,
+            complexGeometry,
             laneRelations,
             attributes
         )
@@ -429,10 +430,10 @@ class RoadspaceObjectBuilder(
         return Vector3DBuilder.buildVector3Ds(signal, curveAffine)
     }
 
-    private fun buildBoundingBoxGeometry(
+    private fun buildComplexGeometry(
         signal: RoadSignalsSignal,
         roadReferenceLine: Curve3D
-    ): ContextIssueList<Option<AbstractGeometry3D>> {
+    ): ContextIssueList<Option<AbstractSurface3D>> {
         val issueList = DefaultIssueList()
 
         // affine transformation matrix at the curve point of the object
