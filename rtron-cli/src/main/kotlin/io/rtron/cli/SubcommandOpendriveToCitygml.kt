@@ -72,9 +72,10 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
     private val addOffset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
         .default(Triple(OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z))
-    private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset (experimental)").double().pair().multiple(default = emptyList())
+    private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset").double().pair().multiple()
     private val removeRoadObjectOfType by option(help = "Remove road object of a specific type").enum<EObjectType>().multiple().unique()
 
+    private val skipRoadObjectBoundingBoxTransformation by option(help = "skip the transformation of the road object's bounding box").flag()
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
     private val sweepDiscretizationStepSize by option(help = "distance between each discretization step for solid geometries of ParametricSweep3D").double()
@@ -109,6 +110,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml",
                 cropPolygonY = cropPolygon.map { it.second },
                 removeRoadObjectsOfTypes = removeRoadObjectOfType,
 
+                skipRoadObjectBoundingBoxTransformation = skipRoadObjectBoundingBoxTransformation,
                 discretizationStepSize = discretizationStepSize,
                 sweepDiscretizationStepSize = sweepDiscretizationStepSize,
                 circleSlices = circleSlices,
