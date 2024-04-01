@@ -68,7 +68,9 @@ object Surface3DBuilder {
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         // needs to be rotated since rectangle is defined with length in x-axis and width in y-axis
         val objectRotation = Affine3D.of(Rotation3D.of(0.0, -PI / 2.0, 0.0))
-        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine, objectRotation)
+        // needs to be shifted upwards by half the height, as the reference point is defined at the signal's bottom end
+        val objectTranslation = Affine3D.of(Vector3D(roadObject.height.getOrElse { 0.0 } / 2.0, 0.0, 0.0))
+        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine, objectRotation, objectTranslation)
         return Rectangle3D.of(roadObject.height, roadObject.width, numberTolerance, affineSequence)
     }
 
