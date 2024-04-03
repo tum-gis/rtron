@@ -58,8 +58,7 @@ data class ValidateOpendriveParameters(
         attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
         deriveCrsEpsgAutomatically = false,
         crsEpsg = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
-        extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
-        skipRoadObjectBoundingBoxTransformation = Opendrive2RoadspacesParameters.DEFAULT_SKIP_ROAD_OBJECT_BOUNDING_BOX_TRANSFORMATION
+        extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
     )
 
     fun deriveRoadspacesEvaluatorParameters() = RoadspacesEvaluatorParameters(

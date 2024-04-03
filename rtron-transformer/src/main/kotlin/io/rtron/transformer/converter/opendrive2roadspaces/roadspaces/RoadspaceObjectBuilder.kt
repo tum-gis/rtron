@@ -115,12 +115,7 @@ class RoadspaceObjectBuilder(
                 RoadspaceObjectIdentifier(roadObject.id, repeatIdentifier.repeatIndex.some(), roadObject.name, id)
 
             val pointGeometry = buildPointGeometry(currentRoadObjectRepeat, roadReferenceLine)
-            val boundingBoxGeometry =
-                if (parameters.skipRoadObjectBoundingBoxTransformation) {
-                    None
-                } else {
-                    buildBoundingBoxGeometry(roadObject, roadReferenceLine)
-                }
+            val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
             val complexGeometry = buildComplexGeometry(
                 roadObject,
                 currentRoadObjectRepeat.some(),
@@ -140,12 +135,7 @@ class RoadspaceObjectBuilder(
         val roadObjects = if (roadObjectsFromRepeat.isEmpty()) {
             val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, None, roadObject.name, id)
             val pointGeometry = buildPointGeometry(roadObject, roadReferenceLine)
-            val boundingBoxGeometry =
-                if (parameters.skipRoadObjectBoundingBoxTransformation) {
-                    None
-                } else {
-                    buildBoundingBoxGeometry(roadObject, roadReferenceLine)
-                }
+            val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
             val complexGeometry =
                 buildComplexGeometry(roadObject, None, roadReferenceLine).handleIssueList { issueList += it }
             nonEmptyListOf(

@@ -50,7 +50,6 @@ data class OpendriveToCitygmlParameters(
     val cropPolygonY: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_Y,
     val removeRoadObjectsOfTypes: Set<EObjectType> = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_OF_TYPES,
 
-    val skipRoadObjectBoundingBoxTransformation: Boolean = Opendrive2RoadspacesParameters.DEFAULT_SKIP_ROAD_OBJECT_BOUNDING_BOX_TRANSFORMATION,
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
     val circleSlices: Int = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
@@ -117,8 +116,7 @@ data class OpendriveToCitygmlParameters(
         attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
         deriveCrsEpsgAutomatically = true,
         crsEpsg = crsEpsg,
-        extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
-        skipRoadObjectBoundingBoxTransformation = skipRoadObjectBoundingBoxTransformation
+        extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
     )
 
     fun deriveRoadspacesEvaluatorParameters() = RoadspacesEvaluatorParameters(

@@ -38,9 +38,7 @@ data class Opendrive2RoadspacesParameters(
     /** [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications) */
     val crsEpsg: Int,
     /** linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown) */
-    val extrapolateLateralRoadShapes: Boolean,
-    /** skip the transformation of bounding box geometries of road objects */
-    val skipRoadObjectBoundingBoxTransformation: Boolean
+    val extrapolateLateralRoadShapes: Boolean
 ) {
 
     companion object {
@@ -52,6 +50,5 @@ data class Opendrive2RoadspacesParameters(
         const val DEFAULT_DERIVE_CRS_EPSG_AUTOMATICALLY = false
         const val DEFAULT_CRS_EPSG = 0
         const val DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES = false
-        const val DEFAULT_SKIP_ROAD_OBJECT_BOUNDING_BOX_TRANSFORMATION = false
     }
 }
