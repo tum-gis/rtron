@@ -83,6 +83,7 @@ class CityFurnitureModuleBuilder(
         // semantics
         IdentifierAdder.addIdentifier(
             roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix),
+            roadspaceObject.name,
             cityFurnitureFeature
         )
         relationAdder.addBelongToRelations(roadspaceObject, cityFurnitureFeature)

@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
+import arrow.core.Option
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.xmlobjects.gml.model.basictypes.Code
 
@@ -29,6 +30,14 @@ object IdentifierAdder {
     /** Adds the [gmlId] to the [dstCityObject]. */
     fun addIdentifier(gmlId: String, dstCityObject: AbstractCityObject) {
         dstCityObject.id = gmlId
+    }
+
+    /** Adds the [gmlId] and optionally the [name] to the [dstCityObject]. */
+    fun addIdentifier(gmlId: String, name: Option<String>, dstCityObject: AbstractCityObject) {
+        dstCityObject.id = gmlId
+        name.onSome {
+            dstCityObject.names = listOf(Code(it))
+        }
     }
 
     /** Adds the [gmlId] and the [name] to the [dstCityObject]. */
