@@ -41,7 +41,7 @@ class OpendriveCropper(
             return modifiedOpendriveModel.some() to report
         }
 
-        // remove the roads according depending on the
+        // remove all roads for which the reference line lies in the crop polygon
         val roadsFiltered = modifiedOpendriveModel.road.filter { currentRoad ->
             currentRoad.planView.geometry.any { cropPolygon.contains(Vector2D(it.x, it.y)) }
         }
@@ -65,11 +65,16 @@ class OpendriveCropper(
             currentJunction
         }
         // remove all the junctions with no connections left
-        val filteredJunctions = modifiedOpendriveModel.junction.filter { it.connection.isNotEmpty() }
+        val junctionsFiltered = modifiedOpendriveModel.junction.filter { it.connection.isNotEmpty() }
         report.numberOfJunctionsOriginally = modifiedOpendriveModel.junction.size
-        report.numberOfJunctionsRemaining = filteredJunctions.size
-        modifiedOpendriveModel.junction = filteredJunctions
+        report.numberOfJunctionsRemaining = junctionsFiltered.size
+        modifiedOpendriveModel.junction = junctionsFiltered
         val remainingJunctionsIds = modifiedOpendriveModel.junction.map { it.id }
+
+        // remove roads belonging to a junction, which was removed
+        val remainingJunctionIds = junctionsFiltered.map { it.id }.toSet()
+        val roadsFilteredFiltered = roadsFiltered.filter { currentRoad -> currentRoad.getJunctionOption().fold({ true }, { remainingJunctionIds.contains(it) }) }
+        modifiedOpendriveModel.road = roadsFilteredFiltered
 
         // adjust the links of each road
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
