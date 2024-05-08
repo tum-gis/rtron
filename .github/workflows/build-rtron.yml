@@ -12,12 +12,6 @@ jobs:
         distribution: [ 'temurin' ]
         include:
           - os: 'ubuntu'
-            java: '11'
-            distribution: 'temurin'
-         # - os: 'ubuntu'
-         #   java: '20'
-         #   distribution: 'temurin'
-          - os: 'ubuntu'
             java: '17'
             distribution: 'zulu'
           - os: 'ubuntu'
@@ -29,6 +23,9 @@ jobs:
           - os: 'windows'
             java: '17'
             distribution: 'oracle'
+          - os: 'ubuntu'
+            java: '20'
+            distribution: 'temurin'
       fail-fast: false
 
     steps:
