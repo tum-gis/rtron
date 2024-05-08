@@ -20,9 +20,9 @@ object PluginVersions {
     const val ktlint = "11.6.1"
     const val xjc = "1.6"
     const val versionChecker = "0.51.0"
-    const val dokka = "1.9.10"
-    const val serialization = "1.9.22"
-    const val ksp = "1.9.22-1.0.17"
+    const val dokka = "1.9.20"
+    const val serialization = "1.9.24"
+    const val ksp = "1.9.24-1.0.20"
 }
 
 object Plugins {

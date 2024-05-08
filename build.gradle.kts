@@ -17,9 +17,9 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 
-if (!JavaVersion.current().isJava11Compatible) {
-    logger.warn(
-        "This build requires Java ${JavaVersion.VERSION_11}, " +
+if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
+    throw GradleException(
+        "This build requires Java ${JavaVersion.VERSION_17}, " +
             "but version ${JavaVersion.current()} is currently in use."
     )
 }
@@ -48,12 +48,12 @@ allprojects {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
         }
     }
 
