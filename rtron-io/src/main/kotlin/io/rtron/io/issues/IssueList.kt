@@ -21,7 +21,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 @JvmInline
 value class IssueList<T>(private val issues: MutableList<T> = mutableListOf()) {
-
     // Properties
     val size: Int
         get() = issues.size
@@ -39,17 +38,24 @@ value class IssueList<T>(private val issues: MutableList<T> = mutableListOf()) {
     fun getIssues(): List<T> = issues
 
     fun isEmpty(): Boolean = issues.isEmpty()
+
     fun isNotEmpty(): Boolean = issues.isNotEmpty()
 
-    fun append(issues: T) { this.issues += issues }
-    fun append(issues: List<T>) { this.issues += issues }
+    fun append(issues: T) {
+        this.issues += issues
+    }
+
+    fun append(issues: List<T>) {
+        this.issues += issues
+    }
 
     companion object {
-
         fun <T> of(issues: List<T>): IssueList<T> = IssueList(issues as MutableList<T>)
+
         fun <T> of(issue: T): IssueList<T> = IssueList(mutableListOf(issue))
     }
 }
 
 fun <T> List<T>.mergeToReport(): IssueList<T> = IssueList.of(this)
+
 fun <T> List<IssueList<T>>.merge(): IssueList<T> = IssueList.of(flatMap { it.getIssues() })

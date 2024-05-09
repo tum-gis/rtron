@@ -26,5 +26,5 @@ data class RoadSignalsSignalPositionInertial(
     var roll: Option<Double> = None,
     var x: Double = Double.NaN,
     var y: Double = Double.NaN,
-    var z: Double = Double.NaN
+    var z: Double = Double.NaN,
 ) : OpendriveElement()

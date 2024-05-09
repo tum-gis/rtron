@@ -28,12 +28,10 @@ import io.rtron.math.geometry.euclidean.twod.Pose2D
  */
 data class Pose3D(
     val point: Vector3D = Vector3D.ZERO,
-    val rotation: Rotation3D = Rotation3D.ZERO
+    val rotation: Rotation3D = Rotation3D.ZERO,
 ) {
-
     // Conversions
-    fun toPose2D(dropAxis: Vector3D = Vector3D.Z_AXIS) =
-        Pose2D(point.toVector2D(dropAxis), rotation.toRotation2D(dropAxis))
+    fun toPose2D(dropAxis: Vector3D = Vector3D.Z_AXIS) = Pose2D(point.toVector2D(dropAxis), rotation.toRotation2D(dropAxis))
 
     override fun toString(): String {
         return "Pose3D(position=$point, rotation=$rotation)"

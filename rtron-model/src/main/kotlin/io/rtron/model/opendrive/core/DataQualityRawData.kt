@@ -24,5 +24,5 @@ data class DataQualityRawData(
     var postProcessing: EDataQualityRawDataPostProcessing = EDataQualityRawDataPostProcessing.RAW,
     var postProcessingComment: Option<String> = None,
     var source: EDataQualityRawDataSource = EDataQualityRawDataSource.CUSTOM,
-    var sourceComment: Option<String> = None
+    var sourceComment: Option<String> = None,
 )

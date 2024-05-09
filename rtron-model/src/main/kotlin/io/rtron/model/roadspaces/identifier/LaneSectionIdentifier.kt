@@ -34,9 +34,8 @@ interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
  */
 data class LaneSectionIdentifier(
     override val laneSectionId: Int,
-    val roadspaceIdentifier: RoadspaceIdentifier
+    val roadspaceIdentifier: RoadspaceIdentifier,
 ) : AbstractRoadspacesIdentifier(), LaneSectionIdentifierInterface, RoadspaceIdentifierInterface by roadspaceIdentifier {
-
     // Properties and Initializers
     init {
         require(laneSectionId >= 0) { "Lane section id must be non-negative." }
@@ -45,12 +44,10 @@ data class LaneSectionIdentifier(
     // Methods
 
     /** Returns the identifier for the previous lane section. */
-    fun getPreviousLaneSectionIdentifier() =
-        LaneSectionIdentifier(this.laneSectionId - 1, this.roadspaceIdentifier)
+    fun getPreviousLaneSectionIdentifier() = LaneSectionIdentifier(this.laneSectionId - 1, this.roadspaceIdentifier)
 
     /** Returns the identifier for the next lane section. */
-    fun getNextLaneSectionIdentifier() =
-        LaneSectionIdentifier(this.laneSectionId + 1, this.roadspaceIdentifier)
+    fun getNextLaneSectionIdentifier() = LaneSectionIdentifier(this.laneSectionId + 1, this.roadspaceIdentifier)
 
     // Conversions
     override fun toAttributes(prefix: String): AttributeList {
@@ -60,8 +57,7 @@ data class LaneSectionIdentifier(
         } + laneSectionIdentifier.roadspaceIdentifier.toAttributes(prefix)
     }
 
-    override fun toStringMap(): Map<String, String> =
-        mapOf("laneSectionId" to laneSectionId.toString()) + roadspaceIdentifier.toStringMap()
+    override fun toStringMap(): Map<String, String> = mapOf("laneSectionId" to laneSectionId.toString()) + roadspaceIdentifier.toStringMap()
 
     override fun toIdentifierText(): String {
         return "LaneSectionIdentifier(laneSectionId=$laneSectionId, roadSpaceId=$roadspaceId)"

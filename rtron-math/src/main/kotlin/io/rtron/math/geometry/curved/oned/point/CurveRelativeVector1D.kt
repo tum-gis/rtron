@@ -26,9 +26,8 @@ import io.rtron.math.geometry.curved.twod.point.CurveRelativeVector2D
  * @param curvePosition distance between the start of the curve and the point to be referenced
  */
 data class CurveRelativeVector1D(
-    val curvePosition: Double
+    val curvePosition: Double,
 ) : Comparable<CurveRelativeVector1D> {
-
     // Properties and Initializers
     init {
         require(curvePosition.isFinite()) { "Curve position value must be finite." }
@@ -36,18 +35,22 @@ data class CurveRelativeVector1D(
 
     // Operators
     operator fun plus(v: CurveRelativeVector1D) = CurveRelativeVector1D(this.curvePosition + v.curvePosition)
+
     operator fun minus(v: CurveRelativeVector1D) = CurveRelativeVector1D(this.curvePosition - v.curvePosition)
+
     operator fun times(m: Double) = CurveRelativeVector1D(this.curvePosition * m)
+
     operator fun div(m: Double) = CurveRelativeVector1D(this.curvePosition / m)
 
     override fun compareTo(other: CurveRelativeVector1D): Int = curvePosition.compareTo(other.curvePosition)
 
     // Conversions
-    fun toCurveRelative2D(lateralOffset: Double = 0.0) =
-        CurveRelativeVector2D(curvePosition, lateralOffset)
+    fun toCurveRelative2D(lateralOffset: Double = 0.0) = CurveRelativeVector2D(curvePosition, lateralOffset)
 
-    fun toCurveRelative3D(lateralOffset: Double = 0.0, heightOffset: Double = 0.0) =
-        CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset)
+    fun toCurveRelative3D(
+        lateralOffset: Double = 0.0,
+        heightOffset: Double = 0.0,
+    ) = CurveRelativeVector3D(curvePosition, lateralOffset, heightOffset)
 
     companion object {
         val ZERO = CurveRelativeVector1D(0.0)

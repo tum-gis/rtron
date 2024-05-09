@@ -23,5 +23,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 data class RoadObjectsObjectMaterial(
     var friction: Option<Double> = None,
     var roughness: Option<Double> = None,
-    var surface: Option<String> = None
+    var surface: Option<String> = None,
 ) : OpendriveElement()

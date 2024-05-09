@@ -33,9 +33,8 @@ fun CMLine3D.toLine3D(tolerance: Double) =
 class Line3D(
     point1: Vector3D,
     point2: Vector3D,
-    private val tolerance: Double
+    private val tolerance: Double,
 ) {
-
     // Properties and Initializers
     init {
         require(point1 != point2) { "Points must not be identical." }

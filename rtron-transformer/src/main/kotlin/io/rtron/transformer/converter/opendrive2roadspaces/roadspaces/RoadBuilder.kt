@@ -45,9 +45,8 @@ import io.rtron.model.opendrive.road.Road as OpendriveRoad
  * Builder for [Road] objects of the RoadSpaces data model.
  */
 class RoadBuilder(
-    val parameters: Opendrive2RoadspacesParameters
+    val parameters: Opendrive2RoadspacesParameters,
 ) {
-
     // Properties and Initializers
     private val laneBuilder = LaneBuilder(parameters)
 
@@ -67,22 +66,27 @@ class RoadBuilder(
         road: OpendriveRoad,
         roadSurface: CurveRelativeParametricSurface3D,
         roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D,
-        baseAttributes: AttributeList
+        baseAttributes: AttributeList,
     ): ContextIssueList<Road> {
-        require(road.lanes.getLaneSectionLengths(road.length).all { it >= parameters.numberTolerance }) { "All lane sections must have a length above the tolerance threshold." }
+        require(
+            road.lanes.getLaneSectionLengths(road.length).all {
+                it >= parameters.numberTolerance
+            },
+        ) { "All lane sections must have a length above the tolerance threshold." }
         val issueList = DefaultIssueList()
 
         val laneOffset = road.lanes.getLaneOffsetEntries().fold({ LinearFunction.X_AXIS }, { FunctionBuilder.buildLaneOffset(it) })
-        val laneSections: NonEmptyList<LaneSection> = road.lanes.getLaneSectionsWithRanges(road.length)
-            .mapIndexed { currentId, currentLaneSection ->
-                buildLaneSection(
-                    LaneSectionIdentifier(currentId, id),
-                    currentLaneSection.first,
-                    currentLaneSection.second,
-                    baseAttributes
-                ).handleIssueList { issueList += it }
-            }
-            .let { it.toNonEmptyListOrNull()!! }
+        val laneSections: NonEmptyList<LaneSection> =
+            road.lanes.getLaneSectionsWithRanges(road.length)
+                .mapIndexed { currentId, currentLaneSection ->
+                    buildLaneSection(
+                        LaneSectionIdentifier(currentId, id),
+                        currentLaneSection.first,
+                        currentLaneSection.second,
+                        baseAttributes,
+                    ).handleIssueList { issueList += it }
+                }
+                .let { it.toNonEmptyListOrNull()!! }
 
         val roadLinkage = buildRoadLinkage(id, road)
 
@@ -97,63 +101,75 @@ class RoadBuilder(
         laneSectionIdentifier: LaneSectionIdentifier,
         curvePositionDomain: Range<Double>,
         laneSection: RoadLanesLaneSection,
-        baseAttributes: AttributeList
+        baseAttributes: AttributeList,
     ): ContextIssueList<LaneSection> {
         require(laneSection.center.lane.size == 1) { "Lane section ($laneSectionIdentifier) must contain exactly one center lane." }
-        require(laneSection.getNumberOfLeftLanes() + laneSection.getNumberOfRightLanes() >= 1) { "Lane section ($laneSectionIdentifier) must contain at least one left or right lane." }
+        require(laneSection.getNumberOfLeftLanes() + laneSection.getNumberOfRightLanes() >= 1) {
+            "Lane section ($laneSectionIdentifier) must contain at least one left or right lane."
+        }
 
         val issueList = DefaultIssueList()
 
         val localCurvePositionDomain = curvePositionDomain.shiftLowerEndpointTo(0.0)
 
         val laneSectionAttributes = buildAttributes(laneSection)
-        val lanes = laneSection.getLeftRightLanes()
-            .map { (currentLaneId, currentSrcLane) ->
-                val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
-                val attributes = baseAttributes + laneSectionAttributes
-                laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
-                    .handleIssueList { issueList += it }
-            }
+        val lanes =
+            laneSection.getLeftRightLanes()
+                .map { (currentLaneId, currentSrcLane) ->
+                    val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
+                    val attributes = baseAttributes + laneSectionAttributes
+                    laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
+                        .handleIssueList { issueList += it }
+                }
 
-        val centerLane = laneBuilder.buildCenterLane(
-            laneSectionIdentifier,
-            localCurvePositionDomain,
-            laneSection.center.getIndividualCenterLane(),
-            baseAttributes
-        ).handleIssueList { issueList += it }
+        val centerLane =
+            laneBuilder.buildCenterLane(
+                laneSectionIdentifier,
+                localCurvePositionDomain,
+                laneSection.center.getIndividualCenterLane(),
+                baseAttributes,
+            ).handleIssueList { issueList += it }
 
         val roadspaceLaneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
         return ContextIssueList(roadspaceLaneSection, issueList)
     }
 
-    private fun buildRoadLinkage(id: RoadspaceIdentifier, road: OpendriveRoad): RoadLinkage {
-        val belongsToJunctionId = road.getJunctionOption()
-            .map { JunctionIdentifier(it) }
+    private fun buildRoadLinkage(
+        id: RoadspaceIdentifier,
+        road: OpendriveRoad,
+    ): RoadLinkage {
+        val belongsToJunctionId =
+            road.getJunctionOption()
+                .map { JunctionIdentifier(it) }
 
-        val predecessorRoadspaceContactPointId = road.link
-            .flatMap { it.predecessor }
-            .flatMap { it.getRoadPredecessorSuccessor() }
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first)) }
-        val predecessorJunctionId = road.link
-            .flatMap { it.predecessor }
-            .flatMap { it.getJunctionPredecessorSuccessor() }
-            .map { JunctionIdentifier(it) }
+        val predecessorRoadspaceContactPointId =
+            road.link
+                .flatMap { it.predecessor }
+                .flatMap { it.getRoadPredecessorSuccessor() }
+                .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first)) }
+        val predecessorJunctionId =
+            road.link
+                .flatMap { it.predecessor }
+                .flatMap { it.getJunctionPredecessorSuccessor() }
+                .map { JunctionIdentifier(it) }
 
-        val successorRoadspaceContactPointId = road.link
-            .flatMap { it.successor }
-            .flatMap { it.getRoadPredecessorSuccessor() }
-            .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first)) }
-        val successorJunctionId = road.link
-            .flatMap { it.successor }
-            .flatMap { it.getJunctionPredecessorSuccessor() }
-            .map { JunctionIdentifier(it) }
+        val successorRoadspaceContactPointId =
+            road.link
+                .flatMap { it.successor }
+                .flatMap { it.getRoadPredecessorSuccessor() }
+                .map { RoadspaceContactPointIdentifier(it.second.toContactPoint(), RoadspaceIdentifier(it.first)) }
+        val successorJunctionId =
+            road.link
+                .flatMap { it.successor }
+                .flatMap { it.getJunctionPredecessorSuccessor() }
+                .map { JunctionIdentifier(it) }
 
         return RoadLinkage(
             belongsToJunctionId,
             predecessorRoadspaceContactPointId,
             predecessorJunctionId,
             successorRoadspaceContactPointId,
-            successorJunctionId
+            successorJunctionId,
         )
     }
 

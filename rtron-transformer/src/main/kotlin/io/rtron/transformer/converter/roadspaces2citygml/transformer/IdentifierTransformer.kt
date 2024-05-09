@@ -22,10 +22,9 @@ import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.LongitudinalLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
-import java.util.*
+import java.util.UUID
 
-fun RoadspaceObjectIdentifier.deriveGmlIdentifier(prefix: String): String =
-    generateGmlIdentifier(prefix, this.hashKey)
+fun RoadspaceObjectIdentifier.deriveGmlIdentifier(prefix: String): String = generateGmlIdentifier(prefix, this.hashKey)
 
 fun RoadspaceObjectIdentifier.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "TrafficSpaceOrAuxiliaryTrafficSpace_${this.hashKey}")
@@ -39,8 +38,10 @@ fun RoadspaceObjectIdentifier.deriveLod2RoofGmlIdentifier(prefix: String): Strin
 fun RoadspaceObjectIdentifier.deriveLod2GroundGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "Lod2GroundSurface_${this.hashKey}")
 
-fun RoadspaceObjectIdentifier.deriveLod2WallGmlIdentifier(prefix: String, wallIndex: Int): String =
-    generateGmlIdentifier(prefix, "Lod2WallSurface_${wallIndex}_${this.hashKey}")
+fun RoadspaceObjectIdentifier.deriveLod2WallGmlIdentifier(
+    prefix: String,
+    wallIndex: Int,
+): String = generateGmlIdentifier(prefix, "Lod2WallSurface_${wallIndex}_${this.hashKey}")
 
 fun JunctionIdentifier.deriveIntersectionGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "Intersection_${this.hashKey}")
@@ -51,8 +52,10 @@ fun LaneIdentifier.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(prefix
 fun LaneIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "TrafficAreaOrAuxiliaryTrafficArea_${this.hashKey}")
 
-fun LaneIdentifier.deriveRoadMarkingGmlIdentifier(prefix: String, roadMarkingIndex: Int): String =
-    generateGmlIdentifier(prefix, "RoadMarking_${roadMarkingIndex}_${this.hashKey}")
+fun LaneIdentifier.deriveRoadMarkingGmlIdentifier(
+    prefix: String,
+    roadMarkingIndex: Int,
+): String = generateGmlIdentifier(prefix, "RoadMarking_${roadMarkingIndex}_${this.hashKey}")
 
 fun LateralLaneRangeIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "LateralFillerSurface_${this.hashKey}")
@@ -60,11 +63,11 @@ fun LateralLaneRangeIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentif
 fun LongitudinalLaneRangeIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "LongitudinalFillerSurface_${this.hashKey}")
 
-fun RoadspaceIdentifier.deriveSectionGmlIdentifier(prefix: String): String =
-    generateGmlIdentifier(prefix, "Section_${this.hashKey}")
+fun RoadspaceIdentifier.deriveSectionGmlIdentifier(prefix: String): String = generateGmlIdentifier(prefix, "Section_${this.hashKey}")
 
 fun RoadspaceIdentifier.deriveRoadReferenceLineGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "RoadReferenceLine_${this.hashKey}")
+
 fun LaneIdentifier.deriveRoadCenterLaneLineGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "RoadCenterLaneLine_${this.hashKey}")
 
@@ -77,10 +80,15 @@ fun LaneIdentifier.deriveLeftLaneBoundaryGmlIdentifier(prefix: String): String =
 fun LaneIdentifier.deriveRightLaneBoundaryGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "RightLaneBoundary_${this.hashKey}")
 
-fun generateRoadIdentifier(roadName: String, prefix: String): String =
-    generateGmlIdentifier(prefix, "Road_$roadName")
+fun generateRoadIdentifier(
+    roadName: String,
+    prefix: String,
+): String = generateGmlIdentifier(prefix, "Road_$roadName")
 
-private fun generateGmlIdentifier(prefix: String, hashKey: String): String {
+private fun generateGmlIdentifier(
+    prefix: String,
+    hashKey: String,
+): String {
     val uuid = UUID.nameUUIDFromBytes(hashKey.toByteArray()).toString()
     return prefix + uuid
 }

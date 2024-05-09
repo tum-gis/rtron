@@ -30,9 +30,8 @@ data class OpendriveCropperParameters(
     /** x values of cropping polygon */
     val cropPolygonX: List<Double>,
     /** y values of cropping polygon */
-    val cropPolygonY: List<Double>
+    val cropPolygonY: List<Double>,
 ) {
-
     // Properties and Initializers
     init {
         require(cropPolygonX.isEmpty() || cropPolygonX.size >= 3) { "cropPolygonX must be empty or have at least three values." }
@@ -42,10 +41,11 @@ data class OpendriveCropperParameters(
 
     // Methods
     fun getPolygon(): Option<Polygon2D> {
-        val vertices = cropPolygonX.zip(cropPolygonY)
-            .map { Vector2D(it.first, it.second) }
-            .toNonEmptyListOrNull()
-            .toOption()
+        val vertices =
+            cropPolygonX.zip(cropPolygonY)
+                .map { Vector2D(it.first, it.second) }
+                .toNonEmptyListOrNull()
+                .toOption()
         return vertices.map { Polygon2D(it, numberTolerance) }
     }
 

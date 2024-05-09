@@ -49,44 +49,63 @@ import org.citygml4j.core.model.generics.StringAttribute as GmlStringAttribute
  * Adds [Attribute] and [AttributeList] classes (RoadSpaces model) to an [AbstractCityObject] (CityGML model).
  */
 class AttributesAdder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters,
 ) {
-
     // Methods
 
     /**
      * Adds the angle values of a [Rotation3D] in radians to the [dstCityObject].
      */
-    fun addRotationAttributes(rotation: Rotation3D, dstCityObject: AbstractCityObject) {
-        val attributeList = attributes("${parameters.geometryAttributesPrefix}rotation_") {
-            attribute("z", rotation.heading)
-            attribute("y", rotation.pitch)
-            attribute("x", rotation.roll)
-        }
+    fun addRotationAttributes(
+        rotation: Rotation3D,
+        dstCityObject: AbstractCityObject,
+    ) {
+        val attributeList =
+            attributes("${parameters.geometryAttributesPrefix}rotation_") {
+                attribute("z", rotation.heading)
+                attribute("y", rotation.pitch)
+                attribute("x", rotation.roll)
+            }
         addAttributes(attributeList, dstCityObject)
     }
 
-    fun addAttributes(lane: Lane, dstCityObject: AbstractCityObject) {
+    fun addAttributes(
+        lane: Lane,
+        dstCityObject: AbstractCityObject,
+    ) {
         val attributes = lane.id.toAttributes(parameters.identifierAttributesPrefix) + lane.attributes
         addAttributes(attributes, dstCityObject)
     }
 
-    fun addAttributes(roadspaceObject: RoadspaceObject, dstCityObject: AbstractCityObject) {
+    fun addAttributes(
+        roadspaceObject: RoadspaceObject,
+        dstCityObject: AbstractCityObject,
+    ) {
         val attributes = roadspaceObject.id.toAttributes(parameters.identifierAttributesPrefix) + roadspaceObject.attributes
         addAttributes(attributes, dstCityObject)
     }
 
-    fun addAttributes(longitudinalFillerSurface: LongitudinalFillerSurface, dstCityObject: AbstractCityObject) {
+    fun addAttributes(
+        longitudinalFillerSurface: LongitudinalFillerSurface,
+        dstCityObject: AbstractCityObject,
+    ) {
         val attributes = longitudinalFillerSurface.id.toAttributes(parameters.identifierAttributesPrefix)
         addAttributes(attributes, dstCityObject)
     }
 
-    fun addAttributes(lateralFillerSurface: LateralFillerSurface, dstCityObject: AbstractCityObject) {
+    fun addAttributes(
+        lateralFillerSurface: LateralFillerSurface,
+        dstCityObject: AbstractCityObject,
+    ) {
         val attributes = lateralFillerSurface.id.toAttributes(parameters.identifierAttributesPrefix)
         addAttributes(attributes, dstCityObject)
     }
 
-    fun addAttributes(laneId: LaneIdentifier, roadMarking: RoadMarking, dstCityObject: AbstractCityObject) {
+    fun addAttributes(
+        laneId: LaneIdentifier,
+        roadMarking: RoadMarking,
+        dstCityObject: AbstractCityObject,
+    ) {
         val attributes = laneId.toAttributes(parameters.identifierAttributesPrefix) + roadMarking.attributes
         addAttributes(attributes, dstCityObject)
     }
@@ -94,19 +113,27 @@ class AttributesAdder(
     /**
      * Adds an [attributeList] to the [dstCityObject].
      */
-    fun addAttributes(attributeList: AttributeList, dstCityObject: AbstractCityObject) {
-        dstCityObject.genericAttributes = dstCityObject.genericAttributes + attributeList.attributes
-            .flatMap { convertAttribute(it) }
-            .map { AbstractGenericAttributeProperty(it) }
+    fun addAttributes(
+        attributeList: AttributeList,
+        dstCityObject: AbstractCityObject,
+    ) {
+        dstCityObject.genericAttributes = dstCityObject.genericAttributes +
+            attributeList.attributes
+                .flatMap { convertAttribute(it) }
+                .map { AbstractGenericAttributeProperty(it) }
     }
 
     /**
      * Adds the attributes of an [id] to the [dstRelation].
      */
-    fun addAttributes(id: AbstractRoadspacesIdentifier, dstRelation: CityObjectRelation) {
-        dstRelation.genericAttributes = dstRelation.genericAttributes + id.toAttributes(parameters.identifierAttributesPrefix).attributes
-            .flatMap { convertAttribute(it) }
-            .map { AbstractGenericAttributeProperty(it) }
+    fun addAttributes(
+        id: AbstractRoadspacesIdentifier,
+        dstRelation: CityObjectRelation,
+    ) {
+        dstRelation.genericAttributes = dstRelation.genericAttributes +
+            id.toAttributes(parameters.identifierAttributesPrefix).attributes
+                .flatMap { convertAttribute(it) }
+                .map { AbstractGenericAttributeProperty(it) }
     }
 
     /**
@@ -143,12 +170,13 @@ class AttributesAdder(
 /**
  * Returns a unit of measurement as string.
  */
-fun UnitOfMeasure.toGmlString(): String = when (this) {
-    UnitOfMeasure.METER -> "#m"
-    UnitOfMeasure.KILOMETER -> "km"
-    UnitOfMeasure.METER_PER_SECOND -> "mps"
-    UnitOfMeasure.KILOMETER_PER_HOUR -> "kmph"
-    UnitOfMeasure.MILES_PER_HOUR -> "mph"
-    UnitOfMeasure.NONE -> TODO("Conversion of $this is not yet implemented.")
-    UnitOfMeasure.UNKNOWN -> TODO("Conversion of $this is not yet implemented.")
-}
+fun UnitOfMeasure.toGmlString(): String =
+    when (this) {
+        UnitOfMeasure.METER -> "#m"
+        UnitOfMeasure.KILOMETER -> "km"
+        UnitOfMeasure.METER_PER_SECOND -> "mps"
+        UnitOfMeasure.KILOMETER_PER_HOUR -> "kmph"
+        UnitOfMeasure.MILES_PER_HOUR -> "mph"
+        UnitOfMeasure.NONE -> TODO("Conversion of $this is not yet implemented.")
+        UnitOfMeasure.UNKNOWN -> TODO("Conversion of $this is not yet implemented.")
+    }

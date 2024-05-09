@@ -23,7 +23,6 @@ import jakarta.xml.bind.ValidationEvent
 import jakarta.xml.bind.ValidationEventHandler
 
 class OpendriveValidationEventHandler : ValidationEventHandler {
-
     // Properties and Initializers
     val validationEvents: MutableList<ValidationEvent> = mutableListOf()
 

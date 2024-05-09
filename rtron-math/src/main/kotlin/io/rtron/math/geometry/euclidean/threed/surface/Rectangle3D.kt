@@ -35,9 +35,8 @@ data class Rectangle3D(
     val length: Double,
     val width: Double,
     override val tolerance: Double,
-    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
 ) : AbstractSurface3D() {
-
     // Properties and Initializers
     init {
         require(length.isFinite()) { "Length value must be finite." }
@@ -61,8 +60,12 @@ data class Rectangle3D(
     }
 
     companion object {
-
-        fun of(length: Option<Double>, width: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY): Rectangle3D {
+        fun of(
+            length: Option<Double>,
+            width: Option<Double>,
+            tolerance: Double,
+            affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
+        ): Rectangle3D {
             require(length.isSome()) { "Length must be defined." }
             require(width.isSome()) { "Width must be defined." }
 

@@ -41,9 +41,8 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
     private val members: List<T>,
     private val absoluteDomains: List<Range<Double>>,
     private val absoluteStarts: List<Double>,
-    private val tolerance: Double = 0.0
+    private val tolerance: Double = 0.0,
 ) {
-
     // Properties and Initializers
     init {
         require(members.isNotEmpty()) { "Must contain members for concatenation." }
@@ -63,7 +62,11 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
             } else {
                 absoluteDomainsWithoutStart.dropLast(1)
             }
-        require(absoluteDomainsWithoutEndings.all { it.hasLowerBound() && it.hasUpperBound() }) { "All absolute domains (apart from the first and last one) must have an upper and lower bound." }
+        require(
+            absoluteDomainsWithoutEndings.all {
+                it.hasLowerBound() && it.hasUpperBound()
+            },
+        ) { "All absolute domains (apart from the first and last one) must have an upper and lower bound." }
         require(absoluteDomainsWithoutEndings.isSortedBy { it.lowerEndpointOrNull()!! }) { "Provided absolute domains must be sorted." }
 
         // requirement: no intersecting domains
@@ -74,7 +77,7 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
             members.zip(absoluteStarts)
                 .map { it.first.domain.shift(it.second) }
                 .zip(absoluteDomains)
-                .all { it.first.fuzzyEncloses(it.second, tolerance) }
+                .all { it.first.fuzzyEncloses(it.second, tolerance) },
         ) { "The local domains must be defined everywhere where the absolute (shifted) domain is also defined." }
     }
 
@@ -96,10 +99,11 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param parameter absolute parameter
      */
     fun strictSelectMember(parameter: Double): Either<Exception, LocalRequest<T>> {
-        val selection = absoluteDomains
-            .withIndex()
-            .filter { parameter in it.value }
-            .map { it.index }
+        val selection =
+            absoluteDomains
+                .withIndex()
+                .filter { parameter in it.value }
+                .map { it.index }
         return handleSelection(parameter, selection)
     }
 
@@ -110,13 +114,17 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param parameter absolute parameter
      * @param tolerance applied tolerance for the fuzzy selection
      */
-    fun fuzzySelectMember(parameter: Double, tolerance: Double): Either<Exception, LocalRequest<T>> {
+    fun fuzzySelectMember(
+        parameter: Double,
+        tolerance: Double,
+    ): Either<Exception, LocalRequest<T>> {
         strictSelectMember(parameter).onRight { return it.right() }
 
-        val selection = absoluteDomains
-            .withIndex()
-            .filter { it.value.fuzzyContains(parameter, tolerance) }
-            .map { it.index }
+        val selection =
+            absoluteDomains
+                .withIndex()
+                .filter { it.value.fuzzyContains(parameter, tolerance) }
+                .map { it.index }
         return handleSelection(parameter, selection)
     }
 
@@ -127,15 +135,19 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param parameter absolute parameter
      * @param selection list of selected members
      */
-    private fun handleSelection(parameter: Double, selection: List<Int>):
-        Either<Exception, LocalRequest<T>> = when (selection.size) {
-        0 -> Either.Left(
-            IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains.")
-        )
-        1 -> {
-            val localParameter = parameter - absoluteStarts[selection.first()]
-            Either.Right(LocalRequest(localParameter, members[selection.first()]))
+    private fun handleSelection(
+        parameter: Double,
+        selection: List<Int>,
+    ): Either<Exception, LocalRequest<T>> =
+        when (selection.size) {
+            0 ->
+                Either.Left(
+                    IllegalArgumentException("Parameter x=$parameter must be within in the domain $absoluteDomains."),
+                )
+            1 -> {
+                val localParameter = parameter - absoluteStarts[selection.first()]
+                Either.Right(LocalRequest(localParameter, members[selection.first()]))
+            }
+            else -> Either.Left(IllegalStateException("Parameter x=$parameter yields multiple members."))
         }
-        else -> Either.Left(IllegalStateException("Parameter x=$parameter yields multiple members."))
-    }
 }

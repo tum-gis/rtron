@@ -21,14 +21,14 @@ import io.kotest.matchers.shouldBe
 import io.rtron.math.std.DBL_EPSILON
 
 class RealMatrixTest {
-
     fun normalize() {
         val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
         val matrix = RealMatrix(matrixValues)
         val toleratedOffset = DBL_EPSILON
 
-        val actualMatrix = matrix
-            .normalize(matrix.rowDimension - 1, matrix.columnDimension - 1)
+        val actualMatrix =
+            matrix
+                .normalize(matrix.rowDimension - 1, matrix.columnDimension - 1)
 
         actualMatrix[0][0].shouldBe(0.25 plusOrMinus toleratedOffset)
         actualMatrix[0][1].shouldBe(0.0 plusOrMinus toleratedOffset)

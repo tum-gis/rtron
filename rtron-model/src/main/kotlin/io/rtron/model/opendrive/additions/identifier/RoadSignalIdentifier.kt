@@ -24,7 +24,6 @@ interface RoadSignalIdentifierInterface {
 
 data class RoadSignalIdentifier(override val roadSignalId: String, val roadIdentifier: RoadIdentifier) :
     AbstractOpendriveIdentifier(), RoadSignalIdentifierInterface, RoadIdentifierInterface by roadIdentifier {
-
     // Conversions
     override fun toIdentifierText() = "Road signal: roadSignalId=$roadSignalId, roadId=${roadIdentifier.roadId}"
 }

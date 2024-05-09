@@ -26,8 +26,8 @@ import io.rtron.math.range.fuzzyContains
  * Function with exactly one parameter of the form z = f(x).
  */
 abstract class UnivariateFunction : DefinableDomain<Double> {
-
     // Properties and Initializers
+
     /**
      * [startValue] = f(lowest endpoint of [domain]).
      */
@@ -40,11 +40,15 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
 
     // Operators
     operator fun plus(other: UnivariateFunction) = StackedFunction.ofSum(this, other)
+
     operator fun unaryMinus() = StackedFunction(this, { -it[0] })
+
     operator fun times(m: Double) = StackedFunction(this, { it[0] * m })
+
     operator fun div(m: Double) = StackedFunction(this, { it[0] / m })
 
     // Methods
+
     /**
      * Evaluation of z = f(x) without checking whether x is within the function's [domain].
      *
@@ -59,10 +63,11 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * @param x parameter [x] of function
      * @return returns Result.Success(z) = f(x), if [x] is strictly contained in [domain] and evaluation was successful
      */
-    fun value(x: Double): Either<Exception, Double> = either {
-        domain.containsResult(x).bind()
-        valueUnbounded(x).bind()
-    }
+    fun value(x: Double): Either<Exception, Double> =
+        either {
+            domain.containsResult(x).bind()
+            valueUnbounded(x).bind()
+        }
 
     /**
      * Evaluation of z = f(x) with fuzzy checking whether x is within the function's [domain].
@@ -71,7 +76,10 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * @param tolerance allowed tolerance for fuzzy checking
      * @return returns Result.Success(z) = f(x), if [x] is fuzzily contained in [domain] and evaluation was successful
      */
-    open fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> {
+    open fun valueInFuzzy(
+        x: Double,
+        tolerance: Double,
+    ): Either<Exception, Double> {
         return if (!domain.fuzzyContains(x, tolerance)) {
             Either.Left(IllegalArgumentException("Value x=$x must be within in the defined $domain."))
         } else {
@@ -108,7 +116,10 @@ abstract class UnivariateFunction : DefinableDomain<Double> {
      * @return returns Result.Success(slope) = f(x), if [x] is fuzzily contained in [domain] and evaluation was
      * successful
      */
-    fun slopeInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> {
+    fun slopeInFuzzy(
+        x: Double,
+        tolerance: Double,
+    ): Either<Exception, Double> {
         return if (!domain.fuzzyContains(x, tolerance)) {
             Either.Left(IllegalArgumentException("Value x=$x must be within in the defined $domain."))
         } else {

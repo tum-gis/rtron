@@ -38,9 +38,8 @@ import java.util.SortedMap
 class ShapeFunction(
     val functions: SortedMap<Double, UnivariateFunction>,
     val extrapolateX: Boolean = false,
-    val extrapolateY: Boolean = false
+    val extrapolateY: Boolean = false,
 ) : BivariateFunction() {
-
     // Properties and Initializers
     init {
         require(functions.isNotEmpty()) { "Must contain cross-sectional functions." }
@@ -54,7 +53,10 @@ class ShapeFunction(
 
     // Methods
 
-    override fun valueUnbounded(x: Double, y: Double): Either<Exception, Double> {
+    override fun valueUnbounded(
+        x: Double,
+        y: Double,
+    ): Either<Exception, Double> {
         val xAdjusted = if (extrapolateX) x.coerceIn(minimumX, maximumX) else x
         if (xAdjusted in functions) {
             return calculateZ(xAdjusted, y)
@@ -72,32 +74,39 @@ class ShapeFunction(
     /**
      * Returns the key of a function, which is located before [x].
      */
-    private fun getKeyBefore(x: Double): Either<Exception, Double> = functions
-        .filter { it.key < x }
-        .ifEmpty { return Either.Left(IllegalArgumentException("No relevant entry available.")) }
-        .toSortedMap()
-        .lastKey()
-        .let { Either.Right(it) }
+    private fun getKeyBefore(x: Double): Either<Exception, Double> =
+        functions
+            .filter { it.key < x }
+            .ifEmpty { return Either.Left(IllegalArgumentException("No relevant entry available.")) }
+            .toSortedMap()
+            .lastKey()
+            .let { Either.Right(it) }
 
     /**
      * Returns the key of a function, which is located after [x].
      */
-    private fun getKeyAfter(x: Double): Either<Exception, Double> = functions
-        .filter { x < it.key }
-        .ifEmpty { return Either.Left(IllegalArgumentException("No relevant entry available.")) }
-        .toSortedMap()
-        .firstKey()
-        .let { Either.Right(it) }
+    private fun getKeyAfter(x: Double): Either<Exception, Double> =
+        functions
+            .filter { x < it.key }
+            .ifEmpty { return Either.Left(IllegalArgumentException("No relevant entry available.")) }
+            .toSortedMap()
+            .firstKey()
+            .let { Either.Right(it) }
 
-    private fun calculateZ(key: Double, y: Double): Either<Exception, Double> = either {
-        val selectedFunction = functions.getValueEither(key).mapLeft { it.toIllegalArgumentException() }.bind()
+    private fun calculateZ(
+        key: Double,
+        y: Double,
+    ): Either<Exception, Double> =
+        either {
+            val selectedFunction = functions.getValueEither(key).mapLeft { it.toIllegalArgumentException() }.bind()
 
-        val yAdjusted = if (!extrapolateY) {
-            y
-        } else {
-            y.coerceIn(selectedFunction.domain.lowerEndpointOrNull(), selectedFunction.domain.upperEndpointOrNull())
+            val yAdjusted =
+                if (!extrapolateY) {
+                    y
+                } else {
+                    y.coerceIn(selectedFunction.domain.lowerEndpointOrNull(), selectedFunction.domain.upperEndpointOrNull())
+                }
+
+            selectedFunction.valueUnbounded(yAdjusted).bind()
         }
-
-        selectedFunction.valueUnbounded(yAdjusted).bind()
-    }
 }

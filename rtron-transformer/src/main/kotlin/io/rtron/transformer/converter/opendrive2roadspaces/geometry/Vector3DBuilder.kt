@@ -26,7 +26,6 @@ import io.rtron.model.opendrive.signal.RoadSignalsSignal
  * Builder for vectors in 3D from the OpenDRIVE data model.
  */
 object Vector3DBuilder {
-
     // Methods
 
     /**
@@ -36,7 +35,10 @@ object Vector3DBuilder {
      * @param roadObject road object of OpenDRIVE
      * @param curveAffine affine transformation matrix at the reference curve
      */
-    fun buildVector3Ds(roadObject: RoadObjectsObject, curveAffine: Affine3D): Vector3D {
+    fun buildVector3Ds(
+        roadObject: RoadObjectsObject,
+        curveAffine: Affine3D,
+    ): Vector3D {
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         return Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
     }
@@ -49,7 +51,10 @@ object Vector3DBuilder {
      * @param curveAffine affine transformation matrix at the reference curve
      * @param force true, if the point generation shall be forced
      */
-    fun buildVector3Ds(roadSignal: RoadSignalsSignal, curveAffine: Affine3D): Vector3D {
+    fun buildVector3Ds(
+        roadSignal: RoadSignalsSignal,
+        curveAffine: Affine3D,
+    ): Vector3D {
         val objectAffine = Affine3D.of(roadSignal.referenceLinePointRelativePose)
         return Vector3D.ZERO.copy(affineSequence = AffineSequence3D.of(curveAffine, objectAffine))
     }

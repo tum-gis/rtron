@@ -24,8 +24,22 @@ enum class EBorderType { CONCRETE, CURB }
 enum class EBridgeType { CONCRETE, STEEL, BRICK, WOOD }
 
 enum class EObjectType {
-    NONE, OBSTACLE, POLE, TREE, VEGETATION, BARRIER, BUILDING, PARKING_SPACE, PATCH,
-    RAILING, TRAFFIC_ISLAND, CROSSWALK, STREET_LAMP, GANTRY, SOUND_BARRIER, ROAD_MARK
+    NONE,
+    OBSTACLE,
+    POLE,
+    TREE,
+    VEGETATION,
+    BARRIER,
+    BUILDING,
+    PARKING_SPACE,
+    PATCH,
+    RAILING,
+    TRAFFIC_ISLAND,
+    CROSSWALK,
+    STREET_LAMP,
+    GANTRY,
+    SOUND_BARRIER,
+    ROAD_MARK,
 }
 // deprecated: CAR, VAN, BUS, TRAILER, BIKE, MOTORBIKE, TRAM, TRAIN, PEDESTRIAN, WIND
 
@@ -37,13 +51,14 @@ enum class EOrientation {
     MINUS,
 
     /** valid in both directions */
-    NONE
+    NONE,
 }
 
-fun EOrientation.toRotation2D() = when (this) {
-    EOrientation.MINUS -> Rotation2D(PI)
-    else -> Rotation2D(0.0)
-}
+fun EOrientation.toRotation2D() =
+    when (this) {
+        EOrientation.MINUS -> Rotation2D(PI)
+        else -> Rotation2D(0.0)
+    }
 
 enum class EOutlineFillType { GRASS, CONCRETE, COBBLE, ASPHALT, PAVEMENT, GRAVEL, SOIL }
 

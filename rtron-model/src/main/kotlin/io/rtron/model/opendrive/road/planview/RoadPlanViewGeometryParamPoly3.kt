@@ -28,10 +28,8 @@ data class RoadPlanViewGeometryParamPoly3(
     var cV: Double = Double.NaN,
     var dU: Double = Double.NaN,
     var dV: Double = Double.NaN,
-
-    var pRange: ParamPoly3PRange = ParamPoly3PRange.ARC_LENGTH
+    var pRange: ParamPoly3PRange = ParamPoly3PRange.ARC_LENGTH,
 ) : OpendriveElement() {
-
     // Properties and Initializers
     val coefficientsU get() = doubleArrayOf(aU, bU, cU, dU)
     val coefficientsV get() = doubleArrayOf(aV, bV, cV, dV)

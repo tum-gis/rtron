@@ -42,9 +42,8 @@ import kotlinx.coroutines.runBlocking
  * @param parameters parameters for the transformation
  */
 class Opendrive2RoadspacesTransformer(
-    val parameters: Opendrive2RoadspacesParameters
+    val parameters: Opendrive2RoadspacesParameters,
 ) {
-
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
@@ -79,9 +78,10 @@ class Opendrive2RoadspacesTransformer(
 
         val roadspaces = roadspacesWithContextReports.mergeIssueLists().handleIssueList { report.conversion += it }
 
-        val junctions = opendriveModel.junction
-            .filter { it.typeValidated == EJunctionType.DEFAULT }
-            .map { junctionBuilder.buildDefaultJunction(it, roadspaces) }
+        val junctions =
+            opendriveModel.junction
+                .filter { it.typeValidated == EJunctionType.DEFAULT }
+                .map { junctionBuilder.buildDefaultJunction(it, roadspaces) }
 
         val roadspacesModel = RoadspacesModel(header, roadspaces, junctions)
 
@@ -91,7 +91,7 @@ class Opendrive2RoadspacesTransformer(
 
     private fun transformRoadspacesSequentially(
         opendriveModel: OpendriveModel,
-        progressBar: ProgressBar
+        progressBar: ProgressBar,
     ): List<ContextIssueList<Roadspace>> =
         opendriveModel.roadAsNonEmptyList.map {
             roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
@@ -100,13 +100,14 @@ class Opendrive2RoadspacesTransformer(
     @OptIn(DelicateCoroutinesApi::class)
     private fun transformRoadspacesConcurrently(
         opendriveModel: OpendriveModel,
-        progressBar: ProgressBar
+        progressBar: ProgressBar,
     ): List<ContextIssueList<Roadspace>> {
-        val roadspacesDeferred = opendriveModel.roadAsNonEmptyList.map {
-            GlobalScope.async {
-                roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
+        val roadspacesDeferred =
+            opendriveModel.roadAsNonEmptyList.map {
+                GlobalScope.async {
+                    roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
+                }
             }
-        }
         return runBlocking { roadspacesDeferred.map { it.await() } }
     }
 }

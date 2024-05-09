@@ -58,18 +58,21 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16LaneMapper::class, Opendrive16ObjectMapper::class, Opendrive16JunctionMapper::class, Opendrive16SignalMapper::class],
+    uses = [
+        OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16LaneMapper::class, Opendrive16ObjectMapper::class,
+        Opendrive16JunctionMapper::class, Opendrive16SignalMapper::class,
+    ],
     imports = [Option::class],
-    injectionStrategy = InjectionStrategy.CONSTRUCTOR
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR,
 )
 abstract class Opendrive16RoadMapper {
-
     abstract fun mapRoad(source: T_Road): Road
 
     //
     // Road Link
     //
     abstract fun mapRoadLink(source: T_Road_Link): RoadLink
+
     abstract fun mapRoadLinkPredecessorSuccessor(source: T_Road_Link_PredecessorSuccessor): RoadLinkPredecessorSuccessor
 
     //
@@ -83,15 +86,20 @@ abstract class Opendrive16RoadMapper {
     abstract fun mapPlanViewGeometry(source: T_Road_PlanView_Geometry): RoadPlanViewGeometry
 
     abstract fun mapPlanViewGeometryLine(source: T_Road_PlanView_Geometry_Line): RoadPlanViewGeometryLine
+
     abstract fun mapPlanViewGeometrySpiral(source: T_Road_PlanView_Geometry_Spiral): RoadPlanViewGeometrySpiral
+
     abstract fun mapPlanViewGeometryArc(source: T_Road_PlanView_Geometry_Arc): RoadPlanViewGeometryArc
+
     abstract fun mapPlanViewGeometryPoly3(source: T_Road_PlanView_Geometry_Poly3): RoadPlanViewGeometryPoly3
+
     abstract fun mapPlanViewGeometryParamPoly3(source: T_Road_PlanView_Geometry_ParamPoly3): RoadPlanViewGeometryParamPoly3
 
     //
     // Profiles
     //
     abstract fun mapElevationProfile(source: T_Road_ElevationProfile): RoadElevationProfile
+
     abstract fun mapLateralProfile(source: T_Road_LateralProfile): RoadLateralProfile
 
     //
@@ -107,20 +115,20 @@ abstract class Opendrive16RoadMapper {
     //
     // Enumerations
     //
-    fun mapElementTypeToOption(source: String?): Option<ERoadLinkElementType> =
-        source?.let { mapElementType(it).some() } ?: None
+    fun mapElementTypeToOption(source: String?): Option<ERoadLinkElementType> = source?.let { mapElementType(it).some() } ?: None
 
-    fun mapElementType(source: String): ERoadLinkElementType = when (source.uppercase()) {
-        in ERoadLinkElementType.ROAD.name.toUpperCaseVariations() -> ERoadLinkElementType.ROAD
-        in ERoadLinkElementType.JUNCTION.name.toUpperCaseVariations() -> ERoadLinkElementType.JUNCTION
-        else -> ERoadLinkElementType.ROAD
-    }
+    fun mapElementType(source: String): ERoadLinkElementType =
+        when (source.uppercase()) {
+            in ERoadLinkElementType.ROAD.name.toUpperCaseVariations() -> ERoadLinkElementType.ROAD
+            in ERoadLinkElementType.JUNCTION.name.toUpperCaseVariations() -> ERoadLinkElementType.JUNCTION
+            else -> ERoadLinkElementType.ROAD
+        }
 
-    fun mapTrafficRuleToOption(source: E_TrafficRule?): Option<ETrafficRule> =
-        source?.let { mapTrafficRule(it).some() } ?: None
+    fun mapTrafficRuleToOption(source: E_TrafficRule?): Option<ETrafficRule> = source?.let { mapTrafficRule(it).some() } ?: None
 
-    fun mapTrafficRule(source: E_TrafficRule): ETrafficRule = when (source) {
-        E_TrafficRule.RHT -> ETrafficRule.RIGHT_HAND_TRAFFIC
-        E_TrafficRule.LHT -> ETrafficRule.LEFT_HAND_TRAFFIC
-    }
+    fun mapTrafficRule(source: E_TrafficRule): ETrafficRule =
+        when (source) {
+            E_TrafficRule.RHT -> ETrafficRule.RIGHT_HAND_TRAFFIC
+            E_TrafficRule.LHT -> ETrafficRule.LEFT_HAND_TRAFFIC
+        }
 }

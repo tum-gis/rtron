@@ -28,9 +28,8 @@ import org.apache.commons.math3.linear.RealMatrix as CMRealMatrix
  * @param rows the rows of the matrix represented as [DoubleArray]
  */
 class RealMatrix(
-    rows: Array<DoubleArray>
+    rows: Array<DoubleArray>,
 ) {
-
     // Properties and Initializers
 
     init {
@@ -96,8 +95,10 @@ class RealMatrix(
      * @param selectedColumns selected column indices
      * @return submatrix
      */
-    fun getSubMatrix(selectedRows: IntArray, selectedColumns: IntArray) =
-        RealMatrix(matrix.getSubMatrix(selectedRows, selectedColumns))
+    fun getSubMatrix(
+        selectedRows: IntArray,
+        selectedColumns: IntArray,
+    ) = RealMatrix(matrix.getSubMatrix(selectedRows, selectedColumns))
 
     /**
      * Returns a submatrix of the complete matrix by only selecting the [selectedRows] and [selectedColumns].
@@ -106,8 +107,10 @@ class RealMatrix(
      * @param selectedColumns selected column indices
      * @return submatrix
      */
-    fun getSubMatrix(selectedRows: IntRange, selectedColumns: IntRange) =
-        getSubMatrix(selectedRows.toList().toIntArray(), selectedColumns.toList().toIntArray())
+    fun getSubMatrix(
+        selectedRows: IntRange,
+        selectedColumns: IntRange,
+    ) = getSubMatrix(selectedRows.toList().toIntArray(), selectedColumns.toList().toIntArray())
 
     /** Returns this matrix multiplied with [other] (return = this x [other]). */
     fun multiply(other: RealMatrix) = RealMatrix(matrix.multiply(other.toRealMatrixCM()))
@@ -133,7 +136,10 @@ class RealMatrix(
     /** Returns the inverse matrix of this matrix. */
     fun inverse() = RealMatrix(MatrixUtils.inverse(matrix))
 
-    fun normalize(rowIndex: Int, columnIndex: Int): RealMatrix {
+    fun normalize(
+        rowIndex: Int,
+        columnIndex: Int,
+    ): RealMatrix {
         require(this[rowIndex][columnIndex] != 0.0) { "Normalizing element must not be zero." }
         return scalarMultiply(1.0 / this[rowIndex][columnIndex])
     }
@@ -156,6 +162,7 @@ class RealMatrix(
 
     // Conversions
     fun toDoubleArray(): DoubleArray = matrix.data.flatMap { it.asIterable() }.toDoubleArray()
+
     fun toDoubleList(): List<Double> = matrix.data.flatMap { it.asIterable() }.toList()
 
     /** Conversion to adapted Real Matrix class from Apache Commons Math. */
@@ -166,7 +173,6 @@ class RealMatrix(
     }
 
     companion object {
-
         /**
          * Creates a [RealMatrix] from a list of column [RealVector].
          *
@@ -178,7 +184,13 @@ class RealMatrix(
             require(columnVectors.isNotEmpty()) { "No column vectors provided for building a matrix." }
             require(columnVectors.all { it.dimension == rowDimension }) { "Provided column vectors have different dimensions." }
 
-            val matrixValues = (0 until rowDimension).fold(emptyList<DoubleArray>()) { acc, currentRowIndex -> acc + columnVectors.map { it[currentRowIndex] }.toDoubleArray() }
+            val matrixValues =
+                (0 until rowDimension).fold(emptyList<DoubleArray>()) { acc, currentRowIndex ->
+                    acc +
+                        columnVectors.map {
+                            it[currentRowIndex]
+                        }.toDoubleArray()
+                }
 
             return RealMatrix(matrixValues.toTypedArray())
         }
@@ -189,8 +201,7 @@ class RealMatrix(
          * @param vectors list of 3D vectors whereby each vector will be represented as a row
          */
         @JvmName("ofListVector3D")
-        fun of(vectors: List<Vector3D>): RealMatrix =
-            RealMatrix(vectors.map { it.toRealVector() })
+        fun of(vectors: List<Vector3D>): RealMatrix = RealMatrix(vectors.map { it.toRealVector() })
 
         /**
          * Creates an identity [RealMatrix] of the [dimension].

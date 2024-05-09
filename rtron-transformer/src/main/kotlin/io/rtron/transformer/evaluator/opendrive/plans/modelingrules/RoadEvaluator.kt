@@ -29,189 +29,215 @@ import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.issues.opendrive.of
 
 object RoadEvaluator {
-
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
+    fun evaluate(
+        opendriveModel: OpendriveModel,
+        parameters: OpendriveEvaluatorParameters,
+        issueList: DefaultIssueList,
+    ): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
             if (currentRoad.planView.geometry.any { it.s > currentRoad.length + parameters.numberTolerance }) {
-                issueList += DefaultIssue.of("PlanViewGeometrySValueExceedsRoadLength", "Road contains geometry elements in the plan view, where s exceeds the total length of the road (${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = false)
+                issueList +=
+                    DefaultIssue.of(
+                        "PlanViewGeometrySValueExceedsRoadLength",
+                        "Road contains geometry elements in the plan view, where s exceeds the total length of the road " +
+                            "(${currentRoad.length}).",
+                        currentRoad.additionalId, Severity.WARNING, wasFixed = false,
+                    )
             }
 
             currentRoad
         }
 
-        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
-            // TODO: consolidate location handling
+        modifiedOpendriveModel =
+            everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+                // TODO: consolidate location handling
 
-            if (currentRoad.planView.geometry.any { it.length <= parameters.numberTolerance }) {
-                issueList += DefaultIssue.of(
-                    "PlanViewGeometryElementZeroLength",
-                    "Plan view contains geometry elements with a length of zero (below tolerance threshold), which are removed.",
-                    currentRoad.additionalId,
-                    Severity.WARNING,
-                    wasFixed = true
-                )
-                currentRoad.planView.geometry =
-                    currentRoad.planView.geometry.filter { it.length > parameters.numberTolerance }
+                if (currentRoad.planView.geometry.any { it.length <= parameters.numberTolerance }) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "PlanViewGeometryElementZeroLength",
+                            "Plan view contains geometry elements with a length of zero (below tolerance threshold), " +
+                                "which are removed.",
+                            currentRoad.additionalId, Severity.WARNING, wasFixed = true,
+                        )
+                    currentRoad.planView.geometry =
+                        currentRoad.planView.geometry.filter { it.length > parameters.numberTolerance }
+                }
+
+                currentRoad
             }
 
-            currentRoad
-        }
-
-        modifiedOpendriveModel.road = modifiedOpendriveModel.road.filter { currentRoad ->
-            if (currentRoad.planView.geometry.isEmpty()) {
-                issueList += DefaultIssue.of(
-                    "RoadWithoutValidPlanViewGeometryElement",
-                    "Road does not contain any valid geometry element in the planView.",
-                    currentRoad.additionalId,
-                    Severity.FATAL_ERROR,
-                    wasFixed = false
-                )
+        modifiedOpendriveModel.road =
+            modifiedOpendriveModel.road.filter { currentRoad ->
+                if (currentRoad.planView.geometry.isEmpty()) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "RoadWithoutValidPlanViewGeometryElement",
+                            "Road does not contain any valid geometry element in the planView.",
+                            currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                        )
+                }
+                currentRoad.planView.geometry.isNotEmpty()
             }
-            currentRoad.planView.geometry.isNotEmpty()
-        }
 
-        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
-            val location = currentRoad.additionalId.fold({ "" }, { it.toIdentifierText() })
+        modifiedOpendriveModel =
+            everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+                val location = currentRoad.additionalId.fold({ "" }, { it.toIdentifierText() })
 
             /*val planViewGeometryLengthsSum = road.planView.geometry.sumOf { it.length }
             if (!fuzzyEquals(planViewGeometryLengthsSum, road.length, parameters.numberTolerance)) {
-                healedViolations += OpendriveException.UnexpectedValue("length", road.length.toString(), ", as the sum of the individual plan view elements is different")
+                healedViolations += OpendriveException.UnexpectedValue("length", road.length.toString(), ", as the sum of the
+                individual plan view elements is different")
                 road.length = planViewGeometryLengthsSum
             }*/
 
-            currentRoad.planView.geometry.zipWithNext().forEach {
-                val actualLength = it.second.s - it.first.s
-                if (!fuzzyEquals(it.first.length, actualLength, parameters.numberTolerance)) {
-                    issueList += DefaultIssue.of("PlanViewGeometryElementLengthNotMatchingNextElement", "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) does not match the start position (s=${it.second.s}) of the next geometry element.", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
-                    it.first.length = actualLength
-                }
-            }
-
-            if (!fuzzyEquals(currentRoad.planView.geometry.last().s + currentRoad.planView.geometry.last().length, currentRoad.length, parameters.numberTolerance)) {
-                issueList += DefaultIssue.of("LastPlanPlanViewGeometryElementNotMatchingRoadLength", "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length (length=${currentRoad.length}).", currentRoad.additionalId, Severity.WARNING, wasFixed = true)
-                currentRoad.planView.geometry.last().length = currentRoad.length - currentRoad.planView.geometry.last().s
-            }
-
-            // check gaps and kinks of reference line curve
-
-            val (curveMembers, _, _) = Curve2DBuilder.prepareCurveMembers(
-                currentRoad.planView.geometryAsNonEmptyList,
-                parameters.numberTolerance
-            )
-            curveMembers.zipWithNext().forEach {
-                val frontCurveMemberEndPose = it.first.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D(it.first.length))
-                val backCurveMemberStartPose = it.second.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D.ZERO)
-
-                val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
-                if (distance > parameters.planViewGeometryDistanceTolerance) {
-                    issueList += DefaultIssue(
-                        "GapBetweenPlanViewGeometryElements",
-                        "Geometry elements contain a gap " +
-                            "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
-                            "of $distance above the tolerance of ${parameters.planViewGeometryDistanceTolerance}.",
-                        location,
-                        Severity.FATAL_ERROR,
-                        wasFixed = false
-                    )
-                } else if (distance > parameters.planViewGeometryDistanceWarningTolerance) {
-                    issueList += DefaultIssue(
-                        "GapBetweenPlanViewGeometryElements",
-                        "Geometry elements contain a gap " +
-                            "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean distance " +
-                            "of $distance above the warning tolerance of ${parameters.planViewGeometryDistanceWarningTolerance}.",
-                        location,
-                        Severity.WARNING,
-                        wasFixed = false
-                    )
+                currentRoad.planView.geometry.zipWithNext().forEach {
+                    val actualLength = it.second.s - it.first.s
+                    if (!fuzzyEquals(it.first.length, actualLength, parameters.numberTolerance)) {
+                        issueList +=
+                            DefaultIssue.of(
+                                "PlanViewGeometryElementLengthNotMatchingNextElement",
+                                "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) " +
+                                    "does not match the start position (s=${it.second.s}) of the next geometry element.",
+                                currentRoad.additionalId, Severity.WARNING, wasFixed = true,
+                            )
+                        it.first.length = actualLength
+                    }
                 }
 
-                val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
-                if (angleDifference > parameters.planViewGeometryAngleTolerance) {
-                    issueList += DefaultIssue(
-                        "KinkBetweenPlanViewGeometryElements",
-                        "Geometry elements contain a kink " +
-                            "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
-                            "of $angleDifference above the tolerance of ${parameters.planViewGeometryAngleTolerance}.",
-                        location,
-                        Severity.FATAL_ERROR,
-                        wasFixed = false
+                if (!fuzzyEquals(
+                        currentRoad.planView.geometry.last().s + currentRoad.planView.geometry.last().length,
+                        currentRoad.length, parameters.numberTolerance,
                     )
-                } else if (angleDifference > parameters.planViewGeometryAngleWarningTolerance) {
-                    issueList += DefaultIssue(
-                        "KinkBetweenPlanViewGeometryElements",
-                        "Geometry elements contain a gap " +
-                            "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
-                            "of $angleDifference above the warning tolerance of ${parameters.planViewGeometryAngleWarningTolerance}.",
-                        location,
-                        Severity.WARNING,
-                        wasFixed = false
-                    )
+                ) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "LastPlanPlanViewGeometryElementNotMatchingRoadLength",
+                            "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry " +
+                                "element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length " +
+                                "(length=${currentRoad.length}).",
+                            currentRoad.additionalId, Severity.WARNING, wasFixed = true,
+                        )
+                    currentRoad.planView.geometry.last().length = currentRoad.length - currentRoad.planView.geometry.last().s
                 }
-            }
 
-            currentRoad
-        }
+                // check gaps and kinks of reference line curve
+
+                val (curveMembers, _, _) =
+                    Curve2DBuilder.prepareCurveMembers(
+                        currentRoad.planView.geometryAsNonEmptyList,
+                        parameters.numberTolerance,
+                    )
+                curveMembers.zipWithNext().forEach {
+                    val frontCurveMemberEndPose = it.first.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D(it.first.length))
+                    val backCurveMemberStartPose = it.second.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D.ZERO)
+
+                    val distance = frontCurveMemberEndPose.point.distance(backCurveMemberStartPose.point)
+                    if (distance > parameters.planViewGeometryDistanceTolerance) {
+                        issueList +=
+                            DefaultIssue(
+                                "GapBetweenPlanViewGeometryElements",
+                                "Geometry elements contain a gap " +
+                                    "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean " +
+                                    "distance of $distance above the tolerance of ${parameters.planViewGeometryDistanceTolerance}.",
+                                location, Severity.FATAL_ERROR, wasFixed = false,
+                            )
+                    } else if (distance > parameters.planViewGeometryDistanceWarningTolerance) {
+                        issueList +=
+                            DefaultIssue(
+                                "GapBetweenPlanViewGeometryElements",
+                                "Geometry elements contain a gap " +
+                                    "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean " +
+                                    "distance of $distance above the warning tolerance " +
+                                    "of ${parameters.planViewGeometryDistanceWarningTolerance}.",
+                                location, Severity.WARNING, wasFixed = false,
+                            )
+                    }
+
+                    val angleDifference = frontCurveMemberEndPose.rotation.difference(backCurveMemberStartPose.rotation)
+                    if (angleDifference > parameters.planViewGeometryAngleTolerance) {
+                        issueList +=
+                            DefaultIssue(
+                                "KinkBetweenPlanViewGeometryElements",
+                                "Geometry elements contain a kink " +
+                                    "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
+                                    "of $angleDifference above the tolerance of ${parameters.planViewGeometryAngleTolerance}.",
+                                location, Severity.FATAL_ERROR, wasFixed = false,
+                            )
+                    } else if (angleDifference > parameters.planViewGeometryAngleWarningTolerance) {
+                        issueList +=
+                            DefaultIssue(
+                                "KinkBetweenPlanViewGeometryElements",
+                                "Geometry elements contain a gap " +
+                                    "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
+                                    "of $angleDifference above the warning tolerance of " +
+                                    "${parameters.planViewGeometryAngleWarningTolerance}.",
+                                location, Severity.WARNING, wasFixed = false,
+                            )
+                    }
+                }
+
+                currentRoad
+            }
 
         val junctionIdentifiers = modifiedOpendriveModel.junction.map { it.id }
-        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
-            currentRoad.getJunctionOption().onSome { currentJunctionId ->
-                if (currentJunctionId !in junctionIdentifiers) {
-                    issueList += DefaultIssue(
-                        "RoadBelongsToNonExistingJunction",
-                        "Road belongs to a junction (id=${currentRoad.junction}) that does not exist.",
-                        currentRoad.id,
-                        Severity.ERROR,
-                        wasFixed = true
-                    )
-                    currentRoad.junction = ""
+        modifiedOpendriveModel =
+            everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+                currentRoad.getJunctionOption().onSome { currentJunctionId ->
+                    if (currentJunctionId !in junctionIdentifiers) {
+                        issueList +=
+                            DefaultIssue(
+                                "RoadBelongsToNonExistingJunction",
+                                "Road belongs to a junction (id=${currentRoad.junction}) that does not exist.",
+                                currentRoad.id, Severity.ERROR, wasFixed = true,
+                            )
+                        currentRoad.junction = ""
+                    }
                 }
-            }
 
-            currentRoad.link.onSome { currentLink ->
-                if (currentLink.predecessor.isSome { currentPredecessor ->
-                    currentPredecessor.getJunctionPredecessorSuccessor()
-                        .isSome { !junctionIdentifiers.contains(it) }
+                currentRoad.link.onSome { currentLink ->
+                    if (currentLink.predecessor.isSome { currentPredecessor ->
+                            currentPredecessor.getJunctionPredecessorSuccessor()
+                                .isSome { !junctionIdentifiers.contains(it) }
+                        }
+                    ) {
+                        issueList +=
+                            DefaultIssue(
+                                "RoadLinkPredecessorRefersToNonExistingJunction",
+                                "Road link predecessor references a junction (id=${
+                                    currentLink.predecessor.fold(
+                                        { "" },
+                                        { it.elementId },
+                                    )
+                                }) that does not exist.",
+                                currentRoad.id, Severity.ERROR, wasFixed = true,
+                            )
+                        currentLink.predecessor = None
+                    }
+                    if (currentLink.successor.isSome { currentSuccessor ->
+                            currentSuccessor.getJunctionPredecessorSuccessor().isSome { !junctionIdentifiers.contains(it) }
+                        }
+                    ) {
+                        issueList +=
+                            DefaultIssue(
+                                "RoadLinkSuccessorRefersToNonExistingJunction",
+                                "Road link successor references a junction (id=${
+                                    currentLink.successor.fold(
+                                        { "" },
+                                        { it.elementId },
+                                    )
+                                }) that does not exist.",
+                                currentRoad.id, Severity.ERROR, wasFixed = true,
+                            )
+                        currentLink.successor = None
+                    }
                 }
-                ) {
-                    issueList += DefaultIssue(
-                        "RoadLinkPredecessorRefersToNonExistingJunction",
-                        "Road link predecessor references a junction (id=${
-                        currentLink.predecessor.fold(
-                            { "" },
-                            { it.elementId }
-                        )
-                        }) that does not exist.",
-                        currentRoad.id,
-                        Severity.ERROR,
-                        wasFixed = true
-                    )
-                    currentLink.predecessor = None
-                }
-                if (currentLink.successor.isSome { currentSuccessor ->
-                    currentSuccessor.getJunctionPredecessorSuccessor().isSome { !junctionIdentifiers.contains(it) }
-                }
-                ) {
-                    issueList += DefaultIssue(
-                        "RoadLinkSuccessorRefersToNonExistingJunction",
-                        "Road link successor references a junction (id=${
-                        currentLink.successor.fold(
-                            { "" },
-                            { it.elementId }
-                        )
-                        }) that does not exist.",
-                        currentRoad.id,
-                        Severity.ERROR,
-                        wasFixed = true
-                    )
-                    currentLink.successor = None
-                }
-            }
 
-            currentRoad
-        }
+                currentRoad
+            }
 
         return modifiedOpendriveModel
     }

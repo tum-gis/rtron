@@ -24,9 +24,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RoadspacesEvaluatorParameters(
     val numberTolerance: Double,
-    val laneTransitionDistanceTolerance: Double
+    val laneTransitionDistanceTolerance: Double,
 ) {
-
     companion object {
         const val DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE = 1E-3
     }

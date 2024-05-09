@@ -33,9 +33,8 @@ import io.rtron.math.range.unionRanges
 class StackedFunction(
     private val memberFunctions: List<UnivariateFunction>,
     private val operation: (operands: List<Double>) -> Double,
-    private val defaultValue: Double = Double.NaN
+    private val defaultValue: Double = Double.NaN,
 ) : UnivariateFunction() {
-
     // Properties and Initializers
     init {
         require(memberFunctions.isNotEmpty()) { "Must contain member functions." }
@@ -52,7 +51,7 @@ class StackedFunction(
     constructor(
         memberFunction: UnivariateFunction,
         operation: (operands: List<Double>) -> Double,
-        defaultValue: Double = Double.NaN
+        defaultValue: Double = Double.NaN,
     ) :
         this(listOf(memberFunction), operation, defaultValue)
 
@@ -92,6 +91,16 @@ class StackedFunction(
     }
 
     companion object {
+        /**
+         * Creates a [StackedFunction] which serves sum of each [memberFunctions].
+         *
+         * @param memberFunctions member functions to be summed
+         * @param defaultValue used value if one of the [memberFunctions] is not defined at the requested parameter
+         */
+        fun ofSum(
+            memberFunctions: List<UnivariateFunction>,
+            defaultValue: Double = Double.NaN,
+        ): StackedFunction = StackedFunction(memberFunctions, { it.sum() }, defaultValue)
 
         /**
          * Creates a [StackedFunction] which serves sum of each [memberFunctions].
@@ -99,16 +108,9 @@ class StackedFunction(
          * @param memberFunctions member functions to be summed
          * @param defaultValue used value if one of the [memberFunctions] is not defined at the requested parameter
          */
-        fun ofSum(memberFunctions: List<UnivariateFunction>, defaultValue: Double = Double.NaN): StackedFunction =
-            StackedFunction(memberFunctions, { it.sum() }, defaultValue)
-
-        /**
-         * Creates a [StackedFunction] which serves sum of each [memberFunctions].
-         *
-         * @param memberFunctions member functions to be summed
-         * @param defaultValue used value if one of the [memberFunctions] is not defined at the requested parameter
-         */
-        fun ofSum(vararg memberFunctions: UnivariateFunction, defaultValue: Double = Double.NaN): StackedFunction =
-            StackedFunction(memberFunctions.toList(), { it.sum() }, defaultValue)
+        fun ofSum(
+            vararg memberFunctions: UnivariateFunction,
+            defaultValue: Double = Double.NaN,
+        ): StackedFunction = StackedFunction(memberFunctions.toList(), { it.sum() }, defaultValue)
     }
 }

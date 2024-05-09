@@ -22,10 +22,22 @@ import io.rtron.io.issues.Severity
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.toIdentifierText
 
-fun DefaultIssue.Companion.of(type: String, info: String, location: AbstractRoadspacesIdentifier, incidentSeverity: Severity, wasFixed: Boolean): DefaultIssue {
+fun DefaultIssue.Companion.of(
+    type: String,
+    info: String,
+    location: AbstractRoadspacesIdentifier,
+    incidentSeverity: Severity,
+    wasFixed: Boolean,
+): DefaultIssue {
     return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }
 
-fun DefaultIssue.Companion.of(type: String, info: String, location: Option<AbstractRoadspacesIdentifier>, incidentSeverity: Severity, wasFixed: Boolean): DefaultIssue {
+fun DefaultIssue.Companion.of(
+    type: String,
+    info: String,
+    location: Option<AbstractRoadspacesIdentifier>,
+    incidentSeverity: Severity,
+    wasFixed: Boolean,
+): DefaultIssue {
     return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }

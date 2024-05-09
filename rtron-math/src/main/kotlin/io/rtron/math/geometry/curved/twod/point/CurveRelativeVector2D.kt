@@ -28,9 +28,8 @@ import io.rtron.math.geometry.curved.threed.point.CurveRelativeVector3D
  */
 data class CurveRelativeVector2D(
     val curvePosition: Double,
-    val lateralOffset: Double = 0.0
+    val lateralOffset: Double = 0.0,
 ) {
-
     // Properties and Initializers
     init {
         require(curvePosition.isFinite()) { "Curve position value must be finite." }
@@ -39,8 +38,8 @@ data class CurveRelativeVector2D(
 
     // Conversions
     fun toCurveRelative1D() = CurveRelativeVector1D(this.curvePosition)
-    fun toCurveRelative3D(heightOffset: Double = 0.0) =
-        CurveRelativeVector3D(this.curvePosition, this.lateralOffset, heightOffset)
+
+    fun toCurveRelative3D(heightOffset: Double = 0.0) = CurveRelativeVector3D(this.curvePosition, this.lateralOffset, heightOffset)
 
     companion object {
         val ZERO = CurveRelativeVector2D(0.0, 0.0)

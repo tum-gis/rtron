@@ -21,15 +21,17 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
 data class RoadLanesLaneSectionLeft(
-    var lane: List<RoadLanesLaneSectionLeftLane> = emptyList()
+    var lane: List<RoadLanesLaneSectionLeftLane> = emptyList(),
 ) : OpendriveElement() {
-
     // Methods
     fun isEmpty() = lane.isEmpty()
+
     fun isNotEmpty() = lane.isNotEmpty()
+
     fun getNumberOfLanes() = lane.size
 
     fun getLanes() = lane.associateBy { it.id }
+
     fun getLanesAscending() = lane.sortedBy { it.id }
 
     companion object

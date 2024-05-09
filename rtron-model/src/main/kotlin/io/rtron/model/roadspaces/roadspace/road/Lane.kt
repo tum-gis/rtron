@@ -47,9 +47,8 @@ data class Lane(
     val successors: List<Int>,
     val type: LaneType,
     val laneMaterial: Option<LaneMaterial>,
-    val attributes: AttributeList
+    val attributes: AttributeList,
 ) {
-
     // Properties and Initializers
     init {
         require(id.isLeft() || id.isRight()) { "Identifier must be either for a left or right lane." }
@@ -62,14 +61,15 @@ data class Lane(
         }
 
         val laneChangeSet = roadMarkings.map { it.laneChange }.toSet()
-        val combinedLaneChange = when {
-            laneChangeSet.size == 1 -> laneChangeSet.first()
-            laneChangeSet.contains(LaneChange.BOTH) -> LaneChange.BOTH
-            laneChangeSet.contains(LaneChange.INCREASE) && laneChangeSet.contains(LaneChange.DECREASE) -> LaneChange.BOTH
-            laneChangeSet.contains(LaneChange.INCREASE) -> LaneChange.INCREASE
-            laneChangeSet.contains(LaneChange.DECREASE) -> LaneChange.DECREASE
-            else -> LaneChange.NONE
-        }
+        val combinedLaneChange =
+            when {
+                laneChangeSet.size == 1 -> laneChangeSet.first()
+                laneChangeSet.contains(LaneChange.BOTH) -> LaneChange.BOTH
+                laneChangeSet.contains(LaneChange.INCREASE) && laneChangeSet.contains(LaneChange.DECREASE) -> LaneChange.BOTH
+                laneChangeSet.contains(LaneChange.INCREASE) -> LaneChange.INCREASE
+                laneChangeSet.contains(LaneChange.DECREASE) -> LaneChange.DECREASE
+                else -> LaneChange.NONE
+            }
         return Some(combinedLaneChange)
     }
 }
@@ -89,7 +89,7 @@ data class CenterLane(
     val roadMarkings: List<RoadMarking> = emptyList(),
     val type: LaneType = LaneType.NONE,
     val laneMaterial: Option<LaneMaterial>,
-    val attributes: AttributeList = AttributeList.EMPTY
+    val attributes: AttributeList = AttributeList.EMPTY,
 ) {
     // Properties and Initializers
     init {

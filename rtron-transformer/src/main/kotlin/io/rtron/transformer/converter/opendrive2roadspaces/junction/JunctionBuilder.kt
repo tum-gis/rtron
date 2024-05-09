@@ -33,26 +33,36 @@ import io.rtron.transformer.converter.opendrive2roadspaces.roadspaces.toContactP
 import io.rtron.model.opendrive.junction.Junction as OpendriveJunction
 
 class JunctionBuilder(
-    private val parameters: Opendrive2RoadspacesParameters
+    private val parameters: Opendrive2RoadspacesParameters,
 ) {
     // Methods
-    fun buildDefaultJunction(junction: OpendriveJunction, roadspaces: List<Roadspace>): Junction {
+    fun buildDefaultJunction(
+        junction: OpendriveJunction,
+        roadspaces: List<Roadspace>,
+    ): Junction {
         val junctionId = JunctionIdentifier(junction.id)
         val connections = junction.connection.map { buildConnection(junctionId, it, roadspaces) }
         return Junction(junctionId, connections)
     }
 
-    private fun buildConnection(id: JunctionIdentifier, connection: JunctionConnection, roadspaces: List<Roadspace>): Connection {
+    private fun buildConnection(
+        id: JunctionIdentifier,
+        connection: JunctionConnection,
+        roadspaces: List<Roadspace>,
+    ): Connection {
         val connectionId = ConnectionIdentifier(connection.id, id)
         val incomingRoadspaceId = RoadspaceIdentifier.of(connection.incomingRoad)
         val connectingRoadspaceId = RoadspaceIdentifier.of(connection.connectingRoad)
 
         check(roadspaces.count { it.id == incomingRoadspaceId } == 1) { "Incoming roadspace with $incomingRoadspaceId does not exist." }
         val incomingRoadspace = roadspaces.find { it.id == incomingRoadspaceId }!!
-        val incomingRoadspaceContactPointId = incomingRoadspace.road.getRoadspaceContactPointToJunction(id)
-            .handleEmpty { throw Exception("Incoming roadspace with $incomingRoadspaceId must be connected to junction ($id).") }
+        val incomingRoadspaceContactPointId =
+            incomingRoadspace.road.getRoadspaceContactPointToJunction(id)
+                .handleEmpty { throw Exception("Incoming roadspace with $incomingRoadspaceId must be connected to junction ($id).") }
 
-        check(roadspaces.count { it.id == connectingRoadspaceId } == 1) { "Connecting roadspace with $connectingRoadspaceId does not exist." }
+        check(
+            roadspaces.count { it.id == connectingRoadspaceId } == 1,
+        ) { "Connecting roadspace with $connectingRoadspaceId does not exist." }
         val connectingRoadspace = roadspaces.find { it.id == connectingRoadspaceId }!!
         val connectingRoadspaceContactPoint = connection.contactPoint.getOrElse { EContactPoint.START }.toContactPoint()
         val connectingRoadspaceContactPointId =
@@ -62,9 +72,10 @@ class JunctionBuilder(
         val connectingLaneSectionId =
             connectingRoadspace.road.getLaneSectionIdentifier(connectingRoadspaceContactPointId)
 
-        val laneLinks = connection.laneLink.associate {
-            LaneIdentifier(it.from, incomingLaneSectionId) to LaneIdentifier(it.to, connectingLaneSectionId)
-        }
+        val laneLinks =
+            connection.laneLink.associate {
+                LaneIdentifier(it.from, incomingLaneSectionId) to LaneIdentifier(it.to, connectingLaneSectionId)
+            }
 
         return Connection(connectionId, incomingRoadspaceContactPointId, connectingRoadspaceContactPointId, laneLinks)
     }

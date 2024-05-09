@@ -20,7 +20,6 @@ import io.rtron.io.issues.DefaultIssueList
 import io.rtron.model.roadspaces.RoadspacesModel
 
 abstract class AbstractRoadspacesEvaluator {
-
     // Methods
     abstract fun evaluate(roadspacesModel: RoadspacesModel): DefaultIssueList
 }

@@ -31,9 +31,8 @@ import io.rtron.math.range.Range
 data class CompositeCurve2D(
     val curveMembers: List<AbstractCurve2D>,
     private val absoluteDomains: List<Range<Double>>,
-    private val absoluteStarts: List<Double>
+    private val absoluteStarts: List<Double>,
 ) : AbstractCurve2D() {
-
     // Properties and Initializers
     init {
         require(curveMembers.isNotEmpty()) { "Must contain at least one curve member." }
@@ -74,7 +73,7 @@ data class CompositeCurve2D(
             absoluteDomains: List<Range<Double>>,
             absoluteStarts: List<Double>,
             distanceTolerance: Double,
-            angleTolerance: Double
+            angleTolerance: Double,
         ): CompositeCurve2D {
             curveMembers.zipWithNext().forEach {
                 val frontCurveMemberEndPose = it.first.calculatePoseGlobalCSUnbounded(CurveRelativeVector1D(it.first.length))

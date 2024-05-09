@@ -26,7 +26,6 @@ import java.io.OutputStream
 import kotlin.io.path.div
 
 class OpendriveMarshaller {
-
     // Properties and Initializers
     val supportedVersion: OpendriveVersion = OpendriveVersion.V1_7
     private val jaxbMarshaller: Marshaller
@@ -40,7 +39,10 @@ class OpendriveMarshaller {
 
     // Methods
 
-    fun writeToStream(model: OpendriveModel, outputStream: OutputStream) {
+    fun writeToStream(
+        model: OpendriveModel,
+        outputStream: OutputStream,
+    ) {
         val converter = Mappers.getMapper(Opendrive17Mapper::class.java)
 
         val opendrive17Model = converter.mapModel(model)

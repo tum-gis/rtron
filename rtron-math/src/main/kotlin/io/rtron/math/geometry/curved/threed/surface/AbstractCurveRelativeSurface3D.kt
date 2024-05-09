@@ -31,7 +31,6 @@ import io.rtron.math.range.length
  * Abstract class for all geometric surface objects in an curve relative coordinate system in 3D.
  */
 abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerable {
-
     // Properties and Initializers
 
     /** length of the surface along the curve */
@@ -48,8 +47,10 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @param addHeightOffset adds an additional height offset to the surface
      * @return point in cartesian coordinates
      */
-    fun calculatePointGlobalCS(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double = 0.0):
-        Either<GeometryException.ValueNotContainedInDomain, Vector3D> {
+    fun calculatePointGlobalCS(
+        curveRelativePoint: CurveRelativeVector2D,
+        addHeightOffset: Double = 0.0,
+    ): Either<GeometryException.ValueNotContainedInDomain, Vector3D> {
         if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
         }
@@ -65,5 +66,8 @@ abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerab
      * @param addHeightOffset adds an additional height offset to the surface
      * @return point in cartesian coordinates
      */
-    abstract fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D
+    abstract fun calculatePointGlobalCSUnbounded(
+        curveRelativePoint: CurveRelativeVector2D,
+        addHeightOffset: Double,
+    ): Vector3D
 }

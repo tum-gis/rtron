@@ -58,25 +58,40 @@ import io.rtron.model.opendrive.signal.signal
 
 val everyHeaderOffset = OpendriveModel.header compose Header.offset compose PPrism.some()
 
+// road
 val everyRoad = OpendriveModel.road compose Traversal.list()
 val everyRoadPlanView = everyRoad compose Road.planView
 val everyRoadPlanViewGeometry = everyRoadPlanView compose RoadPlanView.geometry compose Traversal.list()
 val everyRoadElevationProfile = everyRoad compose Road.elevationProfile
-val everyRoadElevationProfileElement = everyRoadElevationProfile compose PPrism.some() compose RoadElevationProfile.elevation compose Traversal.list()
+val everyRoadElevationProfileElement =
+    everyRoadElevationProfile compose PPrism.some() compose RoadElevationProfile.elevation compose
+        Traversal.list()
 
+// lane section
 val everyLaneSection = everyRoad compose Road.lanes compose RoadLanes.laneSection compose Traversal.list()
 
-val everyRoadLanesLaneSectionLeftLane = everyLaneSection compose RoadLanesLaneSection.left compose PPrism.some() compose RoadLanesLaneSectionLeft.lane compose Traversal.list()
-val everyRoadLanesLaneSectionRightLane = everyLaneSection compose RoadLanesLaneSection.right compose PPrism.some() compose RoadLanesLaneSectionRight.lane compose Traversal.list()
-val everyRoadLanesLaneSectionCenterLane = everyLaneSection compose RoadLanesLaneSection.center compose RoadLanesLaneSectionCenter.lane compose Traversal.list()
+val everyRoadLanesLaneSectionLeftLane =
+    everyLaneSection compose RoadLanesLaneSection.left compose PPrism.some() compose
+        RoadLanesLaneSectionLeft.lane compose Traversal.list()
+val everyRoadLanesLaneSectionRightLane =
+    everyLaneSection compose RoadLanesLaneSection.right compose PPrism.some() compose
+        RoadLanesLaneSectionRight.lane compose Traversal.list()
+val everyRoadLanesLaneSectionCenterLane =
+    everyLaneSection compose RoadLanesLaneSection.center compose
+        RoadLanesLaneSectionCenter.lane compose Traversal.list()
 
+// junction
 val everyJunction = OpendriveModel.junction compose Traversal.list()
 val everyJunctionConnection = everyJunction compose Junction.connection compose Traversal.list()
 
+// road object
 val everyRoadObjectContainer = everyRoad compose Road.objects compose PPrism.some()
 val everyRoadObject = everyRoadObjectContainer compose RoadObjects.roadObject compose Traversal.list()
-val everyRoadObjectOutlineElement = everyRoadObject compose RoadObjectsObject.outlines compose PPrism.some() compose RoadObjectsObjectOutlines.outline compose Traversal.list()
+val everyRoadObjectOutlineElement =
+    everyRoadObject compose RoadObjectsObject.outlines compose PPrism.some() compose
+        RoadObjectsObjectOutlines.outline compose Traversal.list()
 val everyRoadObjectRepeatElement = everyRoadObject compose RoadObjectsObject.repeat compose Traversal.list()
 
+// road signal
 val everyRoadSignalContainer = everyRoad compose Road.signals compose PPrism.some()
 val everyRoadSignal = everyRoadSignalContainer compose RoadSignals.signal compose Traversal.list()

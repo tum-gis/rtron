@@ -44,10 +44,8 @@ data class RoadObjectsObjectRepeat(
     var widthStart: Option<Double> = None,
     var zOffsetEnd: Double = Double.NaN,
     var zOffsetStart: Double = Double.NaN,
-
-    override var additionalId: Option<RoadObjectRepeatIdentifier> = None
+    override var additionalId: Option<RoadObjectRepeatIdentifier> = None,
 ) : OpendriveElement(), AdditionalRoadObjectRepeatIdentifier {
-
     // Properties and Initializers
     val curveRelativeStartPosition get() = CurveRelativeVector1D(s)
 
@@ -56,61 +54,80 @@ data class RoadObjectsObjectRepeat(
 
     // Methods
     fun isContinuous() = distance == 0.0
+
     fun isDiscrete() = !isContinuous()
 
     fun isLengthNonZero() = length != 0.0
 
     fun isObjectWidthZero() = widthStart.isNone() && widthEnd.isNone()
+
     fun isObjectLengthZero() = lengthStart.isNone() && lengthEnd.isNone()
+
     fun isObjectHeightZero() = heightStart == 0.0 && heightEnd == 0.0
+
     fun isObjectRadiusZero() = radiusStart.isNone() && radiusEnd.isNone()
 
     fun isObjectWidthNonZero() = widthStart.isSome() || widthEnd.isSome()
+
     fun isObjectLengthNonZero() = lengthStart.isSome() || lengthEnd.isSome()
+
     fun isObjectHeightNonZero() = heightStart != 0.0 || heightEnd != 0.0
+
     fun isObjectRadiusNonZero() = radiusStart.isSome() || radiusEnd.isSome()
 
     fun getRoadReferenceLineParameterSection() = Range.closed(s, s + length)
 
     fun getLateralOffsetFunction() = LinearFunction.ofInclusiveInterceptAndPoint(tStart, length, tEnd)
+
     fun getHeightOffsetFunction() = LinearFunction.ofInclusiveInterceptAndPoint(zOffsetStart, length, zOffsetEnd)
 
     fun getObjectWidthFunction() = LinearFunction.ofInclusiveInterceptAndPoint(widthStart, length, widthEnd)
+
     fun getObjectLengthFunction() = LinearFunction.ofInclusiveInterceptAndPoint(lengthStart, length, lengthEnd)
+
     fun getObjectHeightFunction() = LinearFunction.ofInclusiveInterceptAndPoint(heightStart, length, heightEnd)
+
     fun getObjectRadiusFunction() = LinearFunction.ofInclusiveInterceptAndPoint(radiusStart, length, radiusEnd)
 
-    fun containsParametricSweep() = isContinuous() &&
-        isLengthNonZero() &&
-        isObjectWidthNonZero() && isObjectHeightNonZero()
+    fun containsParametricSweep() =
+        isContinuous() &&
+            isLengthNonZero() &&
+            isObjectWidthNonZero() && isObjectHeightNonZero()
 
-    fun containsCurve() = isContinuous() &&
-        isLengthNonZero() &&
-        isObjectWidthZero() && isObjectHeightZero()
+    fun containsCurve() =
+        isContinuous() &&
+            isLengthNonZero() &&
+            isObjectWidthZero() && isObjectHeightZero()
 
-    fun containsHorizontalParametricBoundedSurface() = isContinuous() &&
-        isLengthNonZero() &&
-        isObjectWidthNonZero() && isObjectHeightZero()
+    fun containsHorizontalParametricBoundedSurface() =
+        isContinuous() &&
+            isLengthNonZero() &&
+            isObjectWidthNonZero() && isObjectHeightZero()
 
-    fun containsVerticalParametricBoundedSurface() = isContinuous() &&
-        isLengthNonZero() &&
-        isObjectWidthZero() && isObjectHeightNonZero()
+    fun containsVerticalParametricBoundedSurface() =
+        isContinuous() &&
+            isLengthNonZero() &&
+            isObjectWidthZero() && isObjectHeightNonZero()
 
-    fun containsRepeatedCuboid() = isDiscrete() &&
-        isLengthNonZero() &&
-        isObjectHeightNonZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
+    fun containsRepeatedCuboid() =
+        isDiscrete() &&
+            isLengthNonZero() &&
+            isObjectHeightNonZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
 
-    fun containsRepeatedRectangle() = isDiscrete() &&
-        isLengthNonZero() &&
-        isObjectHeightZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
+    fun containsRepeatedRectangle() =
+        isDiscrete() &&
+            isLengthNonZero() &&
+            isObjectHeightZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
 
-    fun containsRepeatCylinder() = isDiscrete() &&
-        isLengthNonZero() &&
-        isObjectHeightNonZero() && isObjectRadiusNonZero()
+    fun containsRepeatCylinder() =
+        isDiscrete() &&
+            isLengthNonZero() &&
+            isObjectHeightNonZero() && isObjectRadiusNonZero()
 
-    fun containsRepeatCircle() = isDiscrete() &&
-        isLengthNonZero() &&
-        isObjectHeightNonZero() && isObjectRadiusNonZero()
+    fun containsRepeatCircle() =
+        isDiscrete() &&
+            isLengthNonZero() &&
+            isObjectHeightNonZero() && isObjectRadiusNonZero()
 
     companion object
 }

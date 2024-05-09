@@ -20,5 +20,5 @@ data class DataQualityError(
     var xyAbsolute: Double = Double.NaN,
     var xyRelative: Double = Double.NaN,
     var zAbsolute: Double = Double.NaN,
-    var zRelative: Double = Double.NaN
+    var zRelative: Double = Double.NaN,
 )

@@ -24,11 +24,12 @@ class SetsKtTest : FunSpec({
 
         test("test basic combination generation") {
             val startSet = setOf("a", "b", "c")
-            val expectedCombinations = setOf(
-                setOf("a", "b"),
-                setOf("a", "c"),
-                setOf("b", "c")
-            )
+            val expectedCombinations =
+                setOf(
+                    setOf("a", "b"),
+                    setOf("a", "c"),
+                    setOf("b", "c"),
+                )
 
             val actualCombinations = startSet.combinations(2)
 

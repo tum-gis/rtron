@@ -22,12 +22,11 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsTunnel(
     var validity: List<RoadObjectsObjectLaneValidity> = emptyList(),
-
     var daylight: Option<Double> = None,
     var id: String = "",
     var length: Double = Double.NaN,
     var lighting: Option<Double> = None,
     var name: Option<String> = None,
     var s: Double = Double.NaN,
-    var type: ETunnelType = ETunnelType.STANDARD
+    var type: ETunnelType = ETunnelType.STANDARD,
 ) : OpendriveElement()

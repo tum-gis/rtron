@@ -22,5 +22,5 @@ data class RoadLanesLaneSectionLRLaneMaterial(
     var friction: Double = Double.NaN,
     var roughness: Double = Double.NaN,
     var sOffset: Double = Double.NaN,
-    var surface: String = ""
+    var surface: String = "",
 ) : OpendriveElement()

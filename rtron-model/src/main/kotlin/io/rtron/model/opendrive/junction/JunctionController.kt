@@ -23,5 +23,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 data class JunctionController(
     var id: String = "",
     var sequence: Option<Int> = None,
-    var type: Option<String> = None
+    var type: Option<String> = None,
 ) : OpendriveElement()

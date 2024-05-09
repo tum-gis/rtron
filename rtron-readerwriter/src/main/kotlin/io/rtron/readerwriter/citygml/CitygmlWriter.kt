@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
 object CitygmlWriter {
-
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
@@ -35,7 +34,11 @@ object CitygmlWriter {
 
     // Methods
 
-    fun writeToFile(model: CitygmlModel, version: CitygmlVersion, filePath: Path) {
+    fun writeToFile(
+        model: CitygmlModel,
+        version: CitygmlVersion,
+        filePath: Path,
+    ) {
         val outputStream = filePath.outputStreamDirectOrCompressed()
         writeToStream(model, version, outputStream)
         outputStream.close()
@@ -43,7 +46,11 @@ object CitygmlWriter {
         logger.info { "Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
     }
 
-    fun writeToStream(model: CitygmlModel, version: CitygmlVersion, outputStream: OutputStream) {
+    fun writeToStream(
+        model: CitygmlModel,
+        version: CitygmlVersion,
+        outputStream: OutputStream,
+    ) {
         val citygmlVersion = version.toGmlCitygml()
         val out = citygmlContext.createCityGMLOutputFactory(citygmlVersion)!!
 

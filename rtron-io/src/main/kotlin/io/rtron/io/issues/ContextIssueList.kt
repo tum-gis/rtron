@@ -18,7 +18,7 @@ package io.rtron.io.issues
 
 class ContextIssueList<out V>(
     val value: V,
-    val issueList: DefaultIssueList
+    val issueList: DefaultIssueList,
 ) {
     // Properties and Initializers
 

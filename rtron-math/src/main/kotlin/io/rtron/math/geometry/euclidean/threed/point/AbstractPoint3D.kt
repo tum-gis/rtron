@@ -22,7 +22,6 @@ import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
  * Abstract class for all geometric point objects in 3D.
  */
 abstract class AbstractPoint3D : AbstractGeometry3D() {
-
     /**
      * Returns the point in the local coordinate system.
      */

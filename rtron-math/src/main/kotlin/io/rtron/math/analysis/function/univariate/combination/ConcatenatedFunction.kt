@@ -39,28 +39,33 @@ import io.rtron.std.isStrictlySorted
 class ConcatenatedFunction(
     memberFunctions: List<UnivariateFunction>,
     absoluteDomains: List<Range<Double>>,
-    absoluteStarts: List<Double>
+    absoluteStarts: List<Double>,
 ) : UnivariateFunction() {
-
     // Properties and Initializers
     private val container = ConcatenationContainer(memberFunctions, absoluteDomains, absoluteStarts)
     override val domain: Range<Double> get() = container.domain
 
     // Methods
-    override fun valueUnbounded(x: Double): Either<Exception, Double> = either {
-        val localMember = container.strictSelectMember(x).bind()
-        localMember.member.valueUnbounded(localMember.localParameter).bind()
-    }
+    override fun valueUnbounded(x: Double): Either<Exception, Double> =
+        either {
+            val localMember = container.strictSelectMember(x).bind()
+            localMember.member.valueUnbounded(localMember.localParameter).bind()
+        }
 
-    override fun slopeUnbounded(x: Double): Either<Exception, Double> = either {
-        val localMember = container.strictSelectMember(x).bind()
-        localMember.member.slopeUnbounded(localMember.localParameter).bind()
-    }
+    override fun slopeUnbounded(x: Double): Either<Exception, Double> =
+        either {
+            val localMember = container.strictSelectMember(x).bind()
+            localMember.member.slopeUnbounded(localMember.localParameter).bind()
+        }
 
-    override fun valueInFuzzy(x: Double, tolerance: Double): Either<Exception, Double> = either {
-        val localMember = container.fuzzySelectMember(x, tolerance).bind()
-        localMember.member.valueUnbounded(localMember.localParameter).bind()
-    }
+    override fun valueInFuzzy(
+        x: Double,
+        tolerance: Double,
+    ): Either<Exception, Double> =
+        either {
+            val localMember = container.fuzzySelectMember(x, tolerance).bind()
+            localMember.member.valueUnbounded(localMember.localParameter).bind()
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -76,7 +81,6 @@ class ConcatenatedFunction(
     }
 
     companion object {
-
         /**
          * Creates a concatenated function of a list of linear functions, whereby the slopes are adjusted so that the
          * concatenated function is continuous.
@@ -94,7 +98,7 @@ class ConcatenatedFunction(
             starts: List<Double>,
             intercepts: List<Double>,
             prependConstant: Boolean = false,
-            appendConstant: Boolean = true
+            appendConstant: Boolean = true,
         ): UnivariateFunction {
             require(starts.isNotEmpty() && intercepts.isNotEmpty()) { "List of starts and intercepts must not be empty." }
             require(starts.hasSameSizeAs(intercepts)) { "Equally sized starts and intercepts required." }
@@ -107,49 +111,57 @@ class ConcatenatedFunction(
 
             // prepare linear functions
             val preparedStarts = starts.dropLast(1)
-            val preparedLinearFunctions = slopes.zip(intercepts)
-                .map { LinearFunction(it.first, it.second) }
-            val preparedAbsoluteDomains = starts
-                .zipWithNext()
-                .map { Range.closedOpen(it.first, it.second) }
+            val preparedLinearFunctions =
+                slopes.zip(intercepts)
+                    .map { LinearFunction(it.first, it.second) }
+            val preparedAbsoluteDomains =
+                starts
+                    .zipWithNext()
+                    .map { Range.closedOpen(it.first, it.second) }
 
             // prepend function, if necessary
-            val prependedStart = if (prependConstant) {
-                listOf(Double.MIN_VALUE)
-            } else {
-                emptyList()
-            }
-            val prependedFunction = if (prependConstant) {
-                listOf(ConstantFunction(intercepts.first()))
-            } else {
-                emptyList()
-            }
-            val prependedAbsoluteDomain = if (prependConstant) {
-                listOf(Range.lessThan(starts.first()))
-            } else {
-                emptyList()
-            }
+            val prependedStart =
+                if (prependConstant) {
+                    listOf(Double.MIN_VALUE)
+                } else {
+                    emptyList()
+                }
+            val prependedFunction =
+                if (prependConstant) {
+                    listOf(ConstantFunction(intercepts.first()))
+                } else {
+                    emptyList()
+                }
+            val prependedAbsoluteDomain =
+                if (prependConstant) {
+                    listOf(Range.lessThan(starts.first()))
+                } else {
+                    emptyList()
+                }
             // append function, if necessary
-            val appendedStart = if (appendConstant) {
-                listOf(starts.last())
-            } else {
-                emptyList()
-            }
-            val appendedFunction = if (appendConstant) {
-                listOf(ConstantFunction(intercepts.last()))
-            } else {
-                emptyList()
-            }
-            val appendedAbsoluteDomain = if (appendConstant) {
-                listOf(Range.atLeast(starts.last()))
-            } else {
-                emptyList()
-            }
+            val appendedStart =
+                if (appendConstant) {
+                    listOf(starts.last())
+                } else {
+                    emptyList()
+                }
+            val appendedFunction =
+                if (appendConstant) {
+                    listOf(ConstantFunction(intercepts.last()))
+                } else {
+                    emptyList()
+                }
+            val appendedAbsoluteDomain =
+                if (appendConstant) {
+                    listOf(Range.atLeast(starts.last()))
+                } else {
+                    emptyList()
+                }
 
             return ConcatenatedFunction(
                 prependedFunction + preparedLinearFunctions + appendedFunction,
                 prependedAbsoluteDomain + preparedAbsoluteDomains + appendedAbsoluteDomain,
-                prependedStart + preparedStarts + appendedStart
+                prependedStart + preparedStarts + appendedStart,
             )
         }
 
@@ -169,45 +181,51 @@ class ConcatenatedFunction(
             starts: NonEmptyList<Double>,
             coefficients: NonEmptyList<DoubleArray>,
             prependConstant: Boolean = false,
-            prependConstantValue: Double = Double.NaN
+            prependConstantValue: Double = Double.NaN,
         ): UnivariateFunction {
             require(starts.hasSameSizeAs(coefficients)) { "Equally sized starts and coefficients required." }
             require(starts.isStrictlySorted()) { "Polynomials must be sorted in strict ascending order." }
 
             // prepare polynomial functions and domains
-            val polynomialFunctions = coefficients
-                .map { PolynomialFunction(it) }
-            val absoluteDomains = starts
-                .zipWithNext()
-                .map { Range.closedOpen(it.first, it.second) } + Range.atLeast(starts.last())
+            val polynomialFunctions =
+                coefficients
+                    .map { PolynomialFunction(it) }
+            val absoluteDomains =
+                starts
+                    .zipWithNext()
+                    .map { Range.closedOpen(it.first, it.second) } + Range.atLeast(starts.last())
 
             // prepend function, if necessary
-            val prependedStart = if (prependConstant) {
-                listOf(Double.MIN_VALUE)
-            } else {
-                emptyList()
-            }
-            val prependedFunction = if (prependConstant) {
-                val prependValue = if (prependConstantValue.isFinite()) {
-                    prependConstantValue
+            val prependedStart =
+                if (prependConstant) {
+                    listOf(Double.MIN_VALUE)
                 } else {
-                    polynomialFunctions.first().value(0.0).getOrElse { throw it }
+                    emptyList()
                 }
+            val prependedFunction =
+                if (prependConstant) {
+                    val prependValue =
+                        if (prependConstantValue.isFinite()) {
+                            prependConstantValue
+                        } else {
+                            polynomialFunctions.first().value(0.0).getOrElse { throw it }
+                        }
 
-                listOf(ConstantFunction(prependValue))
-            } else {
-                emptyList()
-            }
-            val prependedAbsoluteDomain = if (prependConstant) {
-                listOf(Range.lessThan(starts.first()))
-            } else {
-                emptyList()
-            }
+                    listOf(ConstantFunction(prependValue))
+                } else {
+                    emptyList()
+                }
+            val prependedAbsoluteDomain =
+                if (prependConstant) {
+                    listOf(Range.lessThan(starts.first()))
+                } else {
+                    emptyList()
+                }
 
             return ConcatenatedFunction(
                 prependedFunction + polynomialFunctions,
                 prependedAbsoluteDomain + absoluteDomains,
-                prependedStart + starts
+                prependedStart + starts,
             )
         }
     }

@@ -34,27 +34,35 @@ import io.rtron.math.transform.AffineSequence3D
  * @param triangulationAlgorithm actual triangulation algorithm applied after plane projection
  */
 class ProjectedTriangulationAlgorithm(
-    private val triangulationAlgorithm: TriangulationAlgorithm
+    private val triangulationAlgorithm: TriangulationAlgorithm,
 ) : TriangulationAlgorithm() {
+    override fun triangulate(
+        vertices: NonEmptyList<Vector3D>,
+        tolerance: Double,
+    ): Either<TriangulatorException, List<Polygon3D>> =
+        either {
+            val projectedVertices = projectVertices(vertices, tolerance)
+            val projectedPolygonsTriangulated =
+                triangulationAlgorithm
+                    .triangulate(projectedVertices, tolerance).bind()
 
-    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either {
-        val projectedVertices = projectVertices(vertices, tolerance)
-        val projectedPolygonsTriangulated = triangulationAlgorithm
-            .triangulate(projectedVertices, tolerance).bind()
-
-        projectedPolygonsTriangulated.map { constructPolygon(it, projectedVertices, vertices, tolerance).bind() }
-    }
+            projectedPolygonsTriangulated.map { constructPolygon(it, projectedVertices, vertices, tolerance).bind() }
+        }
 
     /**
      * Projects the [vertices] into a best fitting plane.
      */
-    private fun projectVertices(vertices: NonEmptyList<Vector3D>, tolerance: Double): NonEmptyList<Vector3D> {
-        val affine = run {
-            val plane = vertices.calculateBestFittingPlane(tolerance)
-            val affineTranslation = Affine3D.of(plane.point)
-            val affineNewBasis = Affine3D.of(plane.vectorU, plane.vectorV, plane.normal)
-            AffineSequence3D.of(affineTranslation, affineNewBasis).solve()
-        }
+    private fun projectVertices(
+        vertices: NonEmptyList<Vector3D>,
+        tolerance: Double,
+    ): NonEmptyList<Vector3D> {
+        val affine =
+            run {
+                val plane = vertices.calculateBestFittingPlane(tolerance)
+                val affineTranslation = Affine3D.of(plane.point)
+                val affineNewBasis = Affine3D.of(plane.vectorU, plane.vectorV, plane.normal)
+                AffineSequence3D.of(affineTranslation, affineNewBasis).solve()
+            }
         return affine.transform(vertices)
     }
 
@@ -72,16 +80,17 @@ class ProjectedTriangulationAlgorithm(
         projectedPolygon: Polygon3D,
         allProjectedVertices: List<Vector3D>,
         allOriginalVertices: List<Vector3D>,
-        tolerance: Double
+        tolerance: Double,
     ): Either<TriangulatorException, Polygon3D> {
         if (!allProjectedVertices.containsAll(projectedPolygon.vertices)) {
             return TriangulatorException.DifferentVertices().left()
         }
 
-        val constructedPolygon = projectedPolygon.vertices
-            .map { allProjectedVertices.indexOf(it) }
-            .map { allOriginalVertices[it] }
-            .let { Polygon3D(it, tolerance) }
+        val constructedPolygon =
+            projectedPolygon.vertices
+                .map { allProjectedVertices.indexOf(it) }
+                .map { allOriginalVertices[it] }
+                .let { Polygon3D(it, tolerance) }
         return Either.Right(constructedPolygon)
     }
 }

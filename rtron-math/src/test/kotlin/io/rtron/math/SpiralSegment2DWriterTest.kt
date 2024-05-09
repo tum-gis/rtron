@@ -30,7 +30,6 @@ import io.rtron.math.transform.AffineSequence2D
 import kotlin.io.path.Path
 
 object SpiralSegment2DWriterTest {
-
     fun writeSpiralSegment2DToCsvFile() {
         val path = Path("out/test_files/SpiralSegment2D/SpiralSegment2D-line.csv")
         val header = listOf("curvePosition", "x", "y")

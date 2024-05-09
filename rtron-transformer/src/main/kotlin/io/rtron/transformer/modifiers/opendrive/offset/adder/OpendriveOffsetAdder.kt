@@ -23,9 +23,8 @@ import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.model.opendrive.core.HeaderOffset
 
 class OpendriveOffsetAdder(
-    val parameters: OpendriveOffsetAdderParameters
+    val parameters: OpendriveOffsetAdderParameters,
 ) {
-
     /**
      * Adds the offset values to the OpenDRIVE header.
      */

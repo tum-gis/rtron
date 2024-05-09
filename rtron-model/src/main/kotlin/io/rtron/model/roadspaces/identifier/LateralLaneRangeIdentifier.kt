@@ -30,7 +30,7 @@ import kotlin.math.min
  */
 data class LateralLaneRangeIdentifier(
     val laneIdRange: Range<Int>,
-    val laneSectionIdentifier: LaneSectionIdentifier
+    val laneSectionIdentifier: LaneSectionIdentifier,
 ) : AbstractRoadspacesIdentifier(), LaneSectionIdentifierInterface by laneSectionIdentifier {
     // Properties and Initializers
     init {
@@ -38,7 +38,10 @@ data class LateralLaneRangeIdentifier(
         require(laneIdRange.hasUpperBound()) { "laneIdRange must have a upper bound." }
         // require(laneIdRange.lowerEndpointOrNull()!! != laneIdRange.upperEndpointOrNull()!!) { "lowerEndpoint and upperEndpoint must be different ." }
     }
-    val hashKey get() = "LateralLaneRange_${laneIdRange.lowerEndpointOrNull()!!}_${laneIdRange.upperEndpointOrNull()!!}_${laneSectionIdentifier.laneSectionId}_${laneSectionIdentifier.roadspaceIdentifier.roadspaceId}"
+
+    val hashKey get() =
+        "LateralLaneRange_${laneIdRange.lowerEndpointOrNull()!!}_${laneIdRange.upperEndpointOrNull()!!}_" +
+            "${laneSectionIdentifier.laneSectionId}_${laneSectionIdentifier.roadspaceIdentifier.roadspaceId}"
 
     val lowerLaneId get() = LaneIdentifier(laneIdRange.lowerEndpointOrNull()!!, laneSectionIdentifier)
     val upperLaneId get() = LaneIdentifier(laneIdRange.upperEndpointOrNull()!!, laneSectionIdentifier)
@@ -46,10 +49,14 @@ data class LateralLaneRangeIdentifier(
     // Methods
 
     /** Returns all lane identifiers contained in this range. */
-    fun getAllLeftRightLaneIdentifiers(): List<LaneIdentifier> = (laneIdRange.lowerEndpointOrNull()!!..laneIdRange.upperEndpointOrNull()!!).filter { it != 0 }.map { LaneIdentifier(it, this.laneSectionIdentifier) }
+    fun getAllLeftRightLaneIdentifiers(): List<LaneIdentifier> =
+        (laneIdRange.lowerEndpointOrNull()!!..laneIdRange.upperEndpointOrNull()!!).filter {
+            it != 0
+        }.map { LaneIdentifier(it, this.laneSectionIdentifier) }
 
     /** Returns true, if the [laneIdentifier] is contained in this range. */
-    fun contains(laneIdentifier: LaneIdentifier) = this.laneSectionIdentifier == laneIdentifier.laneSectionIdentifier && this.laneIdRange.contains(laneIdentifier.laneId)
+    fun contains(laneIdentifier: LaneIdentifier) =
+        this.laneSectionIdentifier == laneIdentifier.laneSectionIdentifier && this.laneIdRange.contains(laneIdentifier.laneId)
 
     // Conversions
     override fun toAttributes(prefix: String): AttributeList {
@@ -61,13 +68,20 @@ data class LateralLaneRangeIdentifier(
     }
 
     override fun toStringMap(): Map<String, String> =
-        mapOf("lowerLaneId" to laneIdRange.lowerEndpointOrNull()!!.toString(), "upperLaneId" to laneIdRange.upperEndpointOrNull()!!.toString()) + laneSectionIdentifier.toStringMap()
+        mapOf(
+            "lowerLaneId" to laneIdRange.lowerEndpointOrNull()!!.toString(),
+            "upperLaneId" to laneIdRange.upperEndpointOrNull()!!.toString(),
+        ) + laneSectionIdentifier.toStringMap()
 
-    override fun toIdentifierText() = "LateralLaneRangeIdentifier(lowerLaneId=${laneIdRange.lowerEndpointOrNull()!!}, upperLaneId=${laneIdRange.upperEndpointOrNull()!!}, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
+    override fun toIdentifierText() =
+        "LateralLaneRangeIdentifier(lowerLaneId=${laneIdRange.lowerEndpointOrNull()!!}, " +
+            "upperLaneId=${laneIdRange.upperEndpointOrNull()!!}, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
 
     companion object {
-
-        fun of(fromLaneId: LaneIdentifier, toLaneId: LaneIdentifier): LateralLaneRangeIdentifier {
+        fun of(
+            fromLaneId: LaneIdentifier,
+            toLaneId: LaneIdentifier,
+        ): LateralLaneRangeIdentifier {
             require(fromLaneId.laneSectionIdentifier == toLaneId.laneSectionIdentifier) { "Must have the same laneSectionId" }
             val lowerLaneId = min(fromLaneId.laneId, toLaneId.laneId)
             val upperLaneId = max(fromLaneId.laneId, toLaneId.laneId)

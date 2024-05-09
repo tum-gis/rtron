@@ -50,8 +50,7 @@ fun Path.getFileSizeToDisplay(): String = FileUtils.byteCountToDisplaySize(this.
  * @param maxDepth maximal depth to be traversed
  * @return sequence of [Path]
  */
-fun Path.walk(maxDepth: Int = Int.MAX_VALUE): Sequence<Path> =
-    Files.walk(this, maxDepth).asSequence().map { it }
+fun Path.walk(maxDepth: Int = Int.MAX_VALUE): Sequence<Path> = Files.walk(this, maxDepth).asSequence().map { it }
 
 /**
  * Constructs a new InputStream of this file either directly or compressed.

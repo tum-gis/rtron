@@ -48,9 +48,8 @@ data class Roadspaces2CitygmlParameters(
     /** if true, filler surfaces are generated to close gaps at lane transitions */
     val generateLongitudinalFillerSurfaces: Boolean,
     /** if true, only classes are populated that are also available in CityGML2 */
-    val mappingBackwardsCompatibility: Boolean
+    val mappingBackwardsCompatibility: Boolean,
 ) {
-
     init {
         require(PATTERN_NCNAME.matcher(gmlIdPrefix).matches()) { "Provided gmlIdPrefix ($gmlIdPrefix) requires valid NCName pattern." }
     }

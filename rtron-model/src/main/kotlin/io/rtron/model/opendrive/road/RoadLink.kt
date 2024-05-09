@@ -22,7 +22,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLink(
     var predecessor: Option<RoadLinkPredecessorSuccessor> = None,
-    var successor: Option<RoadLinkPredecessorSuccessor> = None
+    var successor: Option<RoadLinkPredecessorSuccessor> = None,
 ) : OpendriveElement() {
     companion object
 }

@@ -39,9 +39,8 @@ import org.apache.commons.math3.geometry.euclidean.threed.Rotation as CMRotation
 class Rotation3D(
     heading: Double,
     pitch: Double = 0.0,
-    roll: Double = 0.0
+    roll: Double = 0.0,
 ) {
-
     // Properties and Initializers
     init {
         require(heading.isFinite()) { "Heading angle must be finite." }
@@ -63,6 +62,7 @@ class Rotation3D(
 
     // Operators
     operator fun plus(v: Rotation3D) = Rotation3D(heading + v.heading, pitch + v.pitch, roll + v.roll)
+
     operator fun minus(v: Rotation3D) = Rotation3D(heading - v.heading, pitch - v.pitch, roll - v.roll)
 
     // Methods
@@ -96,7 +96,11 @@ class Rotation3D(
         /**
          * Returns a [Rotation3D] while replacing non-finite values for [heading], [roll] and [pitch] with 0.0.
          */
-        fun of(heading: Double, roll: Double = 0.0, pitch: Double = 0.0): Rotation3D {
+        fun of(
+            heading: Double,
+            roll: Double = 0.0,
+            pitch: Double = 0.0,
+        ): Rotation3D {
             val adjustedHeading = if (heading.isFinite()) heading else 0.0
             val adjustedRoll = if (roll.isFinite()) roll else 0.0
             val adjustedPitch = if (pitch.isFinite()) pitch else 0.0
@@ -106,7 +110,10 @@ class Rotation3D(
         /**
          * Returns a [Rotation3D] while replacing non-finite values for [heading], [roll] and [pitch] with 0.0.
          */
-        fun of(heading: Option<Double>, roll: Option<Double>, pitch: Option<Double>): Rotation3D =
-            Rotation3D(heading.getOrElse { 0.0 }, roll.getOrElse { 0.0 }, pitch.getOrElse { 0.0 })
+        fun of(
+            heading: Option<Double>,
+            roll: Option<Double>,
+            pitch: Option<Double>,
+        ): Rotation3D = Rotation3D(heading.getOrElse { 0.0 }, roll.getOrElse { 0.0 }, pitch.getOrElse { 0.0 })
     }
 }

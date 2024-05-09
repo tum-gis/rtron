@@ -28,7 +28,11 @@ import com.google.common.math.DoubleMath as GDoubleMath
  * @param tolerance allowed tolerance
  * @return true, if abs(a - b) <= tolerance
  */
-fun fuzzyEquals(a: Double, b: Double, tolerance: Double): Boolean =
+fun fuzzyEquals(
+    a: Double,
+    b: Double,
+    tolerance: Double,
+): Boolean =
     if (tolerance == 0.0) {
         a == b
     } else {
@@ -43,8 +47,11 @@ fun fuzzyEquals(a: Double, b: Double, tolerance: Double): Boolean =
  * @param tolerance allowed tolerance
  * @return 0 for a fuzzyEquals b; -1 for a < b; 1 for a > b
  */
-fun fuzzyCompare(a: Double, b: Double, tolerance: Double) =
-    GDoubleMath.fuzzyCompare(a, b, tolerance)
+fun fuzzyCompare(
+    a: Double,
+    b: Double,
+    tolerance: Double,
+) = GDoubleMath.fuzzyCompare(a, b, tolerance)
 
 /**
  * Returns true, if [a] <= [b] with a [tolerance].
@@ -54,8 +61,11 @@ fun fuzzyCompare(a: Double, b: Double, tolerance: Double) =
  * @param tolerance allowed tolerance
  * @return true, if [a] <= [b] with a [tolerance]; false otherwise
  */
-fun fuzzyLessThanOrEquals(a: Double, b: Double, tolerance: Double) =
-    a <= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
+fun fuzzyLessThanOrEquals(
+    a: Double,
+    b: Double,
+    tolerance: Double,
+) = a <= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
 
 /**
  * Returns true, if [a] >= [b] with a [tolerance].
@@ -65,8 +75,11 @@ fun fuzzyLessThanOrEquals(a: Double, b: Double, tolerance: Double) =
  * @param tolerance allowed tolerance
  * @return true, if [a] >= [b] with a [tolerance]; false otherwise
  */
-fun fuzzyMoreThanOrEquals(a: Double, b: Double, tolerance: Double) =
-    a >= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
+fun fuzzyMoreThanOrEquals(
+    a: Double,
+    b: Double,
+    tolerance: Double,
+) = a >= (b + abs(tolerance)) || a == b || a.isNaN() && b.isNaN()
 
 /**
  * Normalizes an [angle] around the [center].
@@ -75,4 +88,7 @@ fun fuzzyMoreThanOrEquals(a: Double, b: Double, tolerance: Double) =
  * @param center center of the desired normalization interval
  * @return normalized angle
  */
-fun normalizeAngle(angle: Double, center: Double = PI) = MathUtils.normalizeAngle(angle, center)
+fun normalizeAngle(
+    angle: Double,
+    center: Double = PI,
+) = MathUtils.normalizeAngle(angle, center)

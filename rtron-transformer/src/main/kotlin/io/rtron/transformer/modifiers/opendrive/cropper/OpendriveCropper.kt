@@ -28,23 +28,24 @@ import io.rtron.model.opendrive.additions.optics.everyJunction
 import io.rtron.model.opendrive.additions.optics.everyRoad
 
 class OpendriveCropper(
-    val parameters: OpendriveCropperParameters
+    val parameters: OpendriveCropperParameters,
 ) {
-
     fun modify(opendriveModel: OpendriveModel): Pair<Option<OpendriveModel>, OpendriveCropperReport> {
         val report = OpendriveCropperReport(parameters)
         val modifiedOpendriveModel = opendriveModel.copy()
         modifiedOpendriveModel.updateAdditionalIdentifiers()
 
-        val cropPolygon: Polygon2D = parameters.getPolygon().getOrElse {
-            report.message = "No cropping polygon available."
-            return modifiedOpendriveModel.some() to report
-        }
+        val cropPolygon: Polygon2D =
+            parameters.getPolygon().getOrElse {
+                report.message = "No cropping polygon available."
+                return modifiedOpendriveModel.some() to report
+            }
 
         // remove all roads for which the reference line lies in the crop polygon
-        val roadsFiltered = modifiedOpendriveModel.road.filter { currentRoad ->
-            currentRoad.planView.geometry.any { cropPolygon.contains(Vector2D(it.x, it.y)) }
-        }
+        val roadsFiltered =
+            modifiedOpendriveModel.road.filter { currentRoad ->
+                currentRoad.planView.geometry.any { cropPolygon.contains(Vector2D(it.x, it.y)) }
+            }
         report.numberOfRoadsOriginally = modifiedOpendriveModel.road.size
         report.numberOfRoadsRemaining = roadsFiltered.size
         if (roadsFiltered.isEmpty()) {
@@ -56,11 +57,12 @@ class OpendriveCropper(
 
         // remove all the connections in the junctions, which have links to removed roads
         everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
-            val connectionsFiltered = currentJunction.connection.filter { currentConnection ->
-                currentConnection.incomingRoad.fold({ true }, { it in remainingRoadIds }) &&
-                    currentConnection.connectingRoad.fold({ true }, { it in remainingRoadIds }) &&
-                    currentConnection.linkedRoad.fold({ true }, { it in remainingRoadIds })
-            }
+            val connectionsFiltered =
+                currentJunction.connection.filter { currentConnection ->
+                    currentConnection.incomingRoad.fold({ true }, { it in remainingRoadIds }) &&
+                        currentConnection.connectingRoad.fold({ true }, { it in remainingRoadIds }) &&
+                        currentConnection.linkedRoad.fold({ true }, { it in remainingRoadIds })
+                }
             currentJunction.connection = connectionsFiltered
             currentJunction
         }
@@ -73,7 +75,11 @@ class OpendriveCropper(
 
         // remove roads belonging to a junction, which was removed
         val remainingJunctionIds = junctionsFiltered.map { it.id }.toSet()
-        val roadsFilteredFiltered = roadsFiltered.filter { currentRoad -> currentRoad.getJunctionOption().fold({ true }, { remainingJunctionIds.contains(it) }) }
+        val roadsFilteredFiltered =
+            roadsFiltered.filter {
+                    currentRoad ->
+                currentRoad.getJunctionOption().fold({ true }, { remainingJunctionIds.contains(it) })
+            }
         modifiedOpendriveModel.road = roadsFilteredFiltered
 
         // adjust the links of each road
@@ -82,32 +88,32 @@ class OpendriveCropper(
             currentRoad.link.onSome { currentLink ->
                 // remove the predecessor link, if it is a junction, which is not contained in the remaining junctions
                 if (currentLink.predecessor.isSome { currentPredecessor ->
-                    currentPredecessor.getJunctionPredecessorSuccessor().isSome { it !in remainingJunctionsIds }
-                }
+                        currentPredecessor.getJunctionPredecessorSuccessor().isSome { it !in remainingJunctionsIds }
+                    }
                 ) {
                     currentLink.predecessor = None
                 }
 
                 // remove the predecessor link, if it is a road, which is not contained in the remaining roads
                 if (currentLink.predecessor.isSome { currentPredecessor ->
-                    currentPredecessor.getRoadPredecessorSuccessor().isSome { it.first !in remainingRoadIds }
-                }
+                        currentPredecessor.getRoadPredecessorSuccessor().isSome { it.first !in remainingRoadIds }
+                    }
                 ) {
                     currentLink.predecessor = None
                 }
 
                 // remove the successor link, if it is a junction, which is not contained in the remaining junctions
                 if (currentLink.successor.isSome { currentPredecessor ->
-                    currentPredecessor.getJunctionPredecessorSuccessor().isSome { it !in remainingJunctionsIds }
-                }
+                        currentPredecessor.getJunctionPredecessorSuccessor().isSome { it !in remainingJunctionsIds }
+                    }
                 ) {
                     currentLink.successor = None
                 }
 
                 // remove the successor link, if it is a junction, which is not contained in the remaining junctions
                 if (currentLink.successor.isSome { currentPredecessor ->
-                    currentPredecessor.getRoadPredecessorSuccessor().isSome { it.first !in remainingRoadIds }
-                }
+                        currentPredecessor.getRoadPredecessorSuccessor().isSome { it.first !in remainingRoadIds }
+                    }
                 ) {
                     currentLink.successor = None
                 }

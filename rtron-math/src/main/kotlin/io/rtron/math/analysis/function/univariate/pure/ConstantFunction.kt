@@ -28,9 +28,8 @@ import io.rtron.math.range.Range
  */
 data class ConstantFunction(
     val value: Double,
-    override val domain: Range<Double> = Range.all()
+    override val domain: Range<Double> = Range.all(),
 ) : UnivariateFunction() {
-
     // Properties and Initializers
     init {
         require(value.isFinite()) { "Value must be finite, but was $value." }

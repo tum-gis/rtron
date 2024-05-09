@@ -40,9 +40,8 @@ class Arc2D(
     length: Double,
     override val tolerance: Double,
     override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-    endBoundType: BoundType = BoundType.OPEN
+    endBoundType: BoundType = BoundType.OPEN,
 ) : AbstractCurve2D() {
-
     // Properties and Initializers
     init {
         require(curvature.isFinite()) { "Curvature must be finite." }

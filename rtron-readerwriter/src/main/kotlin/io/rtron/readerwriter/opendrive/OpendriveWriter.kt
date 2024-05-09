@@ -34,15 +34,22 @@ object OpendriveWriter {
     private val opendriveMarshaller by lazy { OpendriveMarshaller() }
 
     // Methods
-    fun writeToFile(model: OpendriveModel, filePath: Path): Either<OpendriveWriterException, Unit> = either {
-        val outputStream: OutputStream = filePath.outputStreamDirectOrCompressed()
-        writeToStream(model, outputStream)
-        outputStream.close()
+    fun writeToFile(
+        model: OpendriveModel,
+        filePath: Path,
+    ): Either<OpendriveWriterException, Unit> =
+        either {
+            val outputStream: OutputStream = filePath.outputStreamDirectOrCompressed()
+            writeToStream(model, outputStream)
+            outputStream.close()
 
-        logger.info { "Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
-    }
+            logger.info { "Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
+        }
 
-    fun writeToStream(model: OpendriveModel, outputStream: OutputStream) {
+    fun writeToStream(
+        model: OpendriveModel,
+        outputStream: OutputStream,
+    ) {
         opendriveMarshaller.writeToStream(model, outputStream)
     }
 }

@@ -37,9 +37,8 @@ class LineSegment2D(
     length: Double,
     override val tolerance: Double,
     override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-    endBoundType: BoundType = BoundType.OPEN
+    endBoundType: BoundType = BoundType.OPEN,
 ) : AbstractCurve2D() {
-
     // Properties and Initializers
     init {
         require(length.isFinite()) { "Length value must be finite." }
@@ -70,7 +69,6 @@ class LineSegment2D(
     fun toLineSegment2DCM() = segment2D
 
     companion object {
-
         /**
          * Creates a [LineSegment2D] based on a [start] and a [end] point.
          *
@@ -78,7 +76,11 @@ class LineSegment2D(
          * @param end end of line segment
          * @return returned [LineSegment2D] comprises an affine transformation matrix
          */
-        fun of(start: Vector2D, end: Vector2D, tolerance: Double): LineSegment2D {
+        fun of(
+            start: Vector2D,
+            end: Vector2D,
+            tolerance: Double,
+        ): LineSegment2D {
             val length = end.distance(start)
             val pose = Pose2D(start, Vector2D.X_AXIS.angle(end - start))
             val affineSequence = AffineSequence2D.of(Affine2D.of(pose))

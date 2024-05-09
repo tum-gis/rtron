@@ -55,9 +55,14 @@ import org.asam.opendrive17.T_Road_Type_Speed
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17LaneMapper::class, Opendrive17ObjectMapper::class, Opendrive17SignalMapper::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [
+        OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17LaneMapper::class, Opendrive17ObjectMapper::class,
+        Opendrive17SignalMapper::class,
+    ],
+)
 abstract class Opendrive17RoadMapper {
-
     //
     // Road
     //
@@ -67,76 +72,113 @@ abstract class Opendrive17RoadMapper {
     // Road link
     //
     fun mapOptionRoadLink(source: Option<RoadLink>): T_Road_Link? = source.fold({ null }, { mapRoadLink(it) })
+
     abstract fun mapRoadLink(source: RoadLink): T_Road_Link
 
-    fun mapOptionRoadLinkPredecessorSuccessor(source: Option<RoadLinkPredecessorSuccessor>): T_Road_Link_PredecessorSuccessor? = source.fold({ null }, { mapRoadLinkPredecessorSuccessor(it) })
+    fun mapOptionRoadLinkPredecessorSuccessor(source: Option<RoadLinkPredecessorSuccessor>): T_Road_Link_PredecessorSuccessor? =
+        source.fold({
+            null
+        }, { mapRoadLinkPredecessorSuccessor(it) })
+
     abstract fun mapRoadLinkPredecessorSuccessor(source: RoadLinkPredecessorSuccessor): T_Road_Link_PredecessorSuccessor
 
     fun mapOptionEContactPoint(source: Option<EContactPoint>): E_ContactPoint? = source.fold({ null }, { mapEContactPoint(it) })
+
     abstract fun mapEContactPoint(source: EContactPoint): E_ContactPoint
 
-    fun mapOptionERoadLinkElementType(source: Option<ERoadLinkElementType>): E_Road_Link_ElementType? = source.fold({ null }, { mapERoadLinkElementType(it) })
+    fun mapOptionERoadLinkElementType(source: Option<ERoadLinkElementType>): E_Road_Link_ElementType? =
+        source.fold({
+            null
+        }, { mapERoadLinkElementType(it) })
+
     abstract fun mapERoadLinkElementType(source: ERoadLinkElementType): E_Road_Link_ElementType
 
     //
     // Road type
     //
     fun mapOptionRoadTypeSpeed(source: Option<RoadTypeSpeed>): T_Road_Type_Speed? = source.fold({ null }, { mapRoadTypeSpeed(it) })
+
     abstract fun mapRoadTypeSpeed(source: RoadTypeSpeed): T_Road_Type_Speed
 
     //
     // Plan view
     //
-    fun mapOptionRoadPlanViewGeometryLine(source: Option<RoadPlanViewGeometryLine>): T_Road_PlanView_Geometry_Line? = source.fold({ null }, { mapRoadPlanViewGeometryLine(it) })
+    fun mapOptionRoadPlanViewGeometryLine(source: Option<RoadPlanViewGeometryLine>): T_Road_PlanView_Geometry_Line? =
+        source.fold({ null }, { mapRoadPlanViewGeometryLine(it) })
+
     abstract fun mapRoadPlanViewGeometryLine(source: RoadPlanViewGeometryLine): T_Road_PlanView_Geometry_Line
 
-    fun mapOptionRoadPlanViewGeometrySpiral(source: Option<RoadPlanViewGeometrySpiral>): T_Road_PlanView_Geometry_Spiral? = source.fold({ null }, { mapRoadPlanViewGeometrySpiral(it) })
+    fun mapOptionRoadPlanViewGeometrySpiral(source: Option<RoadPlanViewGeometrySpiral>): T_Road_PlanView_Geometry_Spiral? =
+        source.fold({
+            null
+        }, { mapRoadPlanViewGeometrySpiral(it) })
+
     abstract fun mapRoadPlanViewGeometrySpiral(source: RoadPlanViewGeometrySpiral): T_Road_PlanView_Geometry_Spiral
 
-    fun mapOptionRoadPlanViewGeometryArc(source: Option<RoadPlanViewGeometryArc>): T_Road_PlanView_Geometry_Arc? = source.fold({ null }, { mapRoadPlanViewGeometryArc(it) })
+    fun mapOptionRoadPlanViewGeometryArc(source: Option<RoadPlanViewGeometryArc>): T_Road_PlanView_Geometry_Arc? =
+        source.fold({
+            null
+        }, { mapRoadPlanViewGeometryArc(it) })
+
     abstract fun mapRoadPlanViewGeometryArc(source: RoadPlanViewGeometryArc): T_Road_PlanView_Geometry_Arc
 
-    fun mapOptionRoadPlanViewGeometryPoly3(source: Option<RoadPlanViewGeometryPoly3>): T_Road_PlanView_Geometry_Poly3? = source.fold({ null }, { mapRoadPlanViewGeometryPoly3(it) })
+    fun mapOptionRoadPlanViewGeometryPoly3(source: Option<RoadPlanViewGeometryPoly3>): T_Road_PlanView_Geometry_Poly3? =
+        source.fold({
+            null
+        }, { mapRoadPlanViewGeometryPoly3(it) })
+
     abstract fun mapRoadPlanViewGeometryPoly3(source: RoadPlanViewGeometryPoly3): T_Road_PlanView_Geometry_Poly3
 
-    fun mapOptionRoadPlanViewGeometryParamPoly3(source: Option<RoadPlanViewGeometryParamPoly3>): T_Road_PlanView_Geometry_ParamPoly3? = source.fold({ null }, { mapRoadPlanViewGeometryParamPoly3(it) })
+    fun mapOptionRoadPlanViewGeometryParamPoly3(source: Option<RoadPlanViewGeometryParamPoly3>): T_Road_PlanView_Geometry_ParamPoly3? =
+        source.fold({
+            null
+        }, { mapRoadPlanViewGeometryParamPoly3(it) })
+
     abstract fun mapRoadPlanViewGeometryParamPoly3(source: RoadPlanViewGeometryParamPoly3): T_Road_PlanView_Geometry_ParamPoly3
 
     //
     // Elevation profile
     //
-    fun mapOptionRoadElevationProfile(source: Option<RoadElevationProfile>): T_Road_ElevationProfile? = source.fold({ null }, { mapRoadElevationProfile(it) })
+    fun mapOptionRoadElevationProfile(source: Option<RoadElevationProfile>): T_Road_ElevationProfile? =
+        source.fold({ null }, { mapRoadElevationProfile(it) })
+
     abstract fun mapRoadElevationProfile(source: RoadElevationProfile): T_Road_ElevationProfile
 
     //
     // Lateral profile
     //
     fun mapLateralProfile(source: Option<RoadLateralProfile>): T_Road_LateralProfile? = source.fold({ null }, { mapLateralProfile(it) })
+
     abstract fun mapLateralProfile(source: RoadLateralProfile): T_Road_LateralProfile
 
     //
     // Surface
     //
     fun mapOptionRoadSurface(source: Option<RoadSurface>): T_Road_Surface? = source.fold({ null }, { mapRoadSurface(it) })
+
     abstract fun mapRoadSurface(source: RoadSurface): T_Road_Surface
 
     //
     // Railroad
     //
     fun mapOptionRoadRailroad(source: Option<RoadRailroad>): T_Road_Railroad? = source.fold({ null }, { mapRoadRailroad(it) })
+
     abstract fun mapRoadRailroad(source: RoadRailroad): T_Road_Railroad
 
     //
     // Enumerations
     //
     fun mapOptionETrafficRule(source: Option<ETrafficRule>): E_TrafficRule? = source.fold({ null }, { mapETrafficRule(it) })
-    fun mapETrafficRule(source: ETrafficRule): E_TrafficRule = when (source) {
-        ETrafficRule.RIGHT_HAND_TRAFFIC -> E_TrafficRule.RHT
-        ETrafficRule.LEFT_HAND_TRAFFIC -> E_TrafficRule.LHT
-    }
 
-    fun mapOptionEElementDir(source: Option<EElementDir>): String = when (source.getOrElse { EElementDir.PLUS }) {
-        EElementDir.PLUS -> "+"
-        EElementDir.MINUS -> "-"
-    }
+    fun mapETrafficRule(source: ETrafficRule): E_TrafficRule =
+        when (source) {
+            ETrafficRule.RIGHT_HAND_TRAFFIC -> E_TrafficRule.RHT
+            ETrafficRule.LEFT_HAND_TRAFFIC -> E_TrafficRule.LHT
+        }
+
+    fun mapOptionEElementDir(source: Option<EElementDir>): String =
+        when (source.getOrElse { EElementDir.PLUS }) {
+            EElementDir.PLUS -> "+"
+            EElementDir.MINUS -> "-"
+        }
 }

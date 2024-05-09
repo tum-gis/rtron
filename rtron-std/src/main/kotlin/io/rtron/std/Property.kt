@@ -26,7 +26,6 @@ import kotlin.reflect.KProperty
  * @param isDefault true, if value constitutes a default value
  */
 open class Property<T>(value: T, isDefault: Boolean = false) {
-
     // Properties and Initializers
     var value: T = value
         protected set
@@ -35,10 +34,14 @@ open class Property<T>(value: T, isDefault: Boolean = false) {
     val isNotDefault get() = !isDefault
 
     // Methods
+
     /**
      * Read method for property delegation.
      */
-    operator fun getValue(thisRef: Any?, prop: KProperty<*>): T {
+    operator fun getValue(
+        thisRef: Any?,
+        prop: KProperty<*>,
+    ): T {
         return value
     }
 
@@ -62,15 +65,19 @@ open class Property<T>(value: T, isDefault: Boolean = false) {
  * @param isDefault true, if value constitutes a default value and is set to false, when [value] is overwritten
  */
 class SettableProperty<T>(value: T, isDefault: Boolean = false) : Property<T>(value, isDefault) {
-
     // Secondary Constructors
     constructor(property: Property<T>) : this(property.value, property.isDefault)
 
     // Methods
+
     /**
      * Set method for property delegation.
      */
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    operator fun setValue(
+        thisRef: Any?,
+        property: KProperty<*>,
+        value: T,
+    ) {
         this.value = value
         this.isDefault = false
     }

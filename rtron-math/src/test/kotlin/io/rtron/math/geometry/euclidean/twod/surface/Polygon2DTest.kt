@@ -36,11 +36,12 @@ class Polygon2DTest : FunSpec({
         }
 
         test("basic triangle does not contain point") {
-            val vertices: NonEmptyList<Vector2D> = listOf(
-                Vector2D.ZERO,
-                Vector2D.X_AXIS,
-                Vector2D.Y_AXIS
-            ).toNonEmptyListOrNull()!!
+            val vertices: NonEmptyList<Vector2D> =
+                listOf(
+                    Vector2D.ZERO,
+                    Vector2D.X_AXIS,
+                    Vector2D.Y_AXIS,
+                ).toNonEmptyListOrNull()!!
             val polygon = Polygon2D(vertices, 0.0)
 
             val actualReturn = polygon.contains(Vector2D(1.25, 1.25))
@@ -49,13 +50,14 @@ class Polygon2DTest : FunSpec({
         }
 
         test("concave polygon does contain point") {
-            val vertices: NonEmptyList<Vector2D> = listOf(
-                Vector2D.ZERO,
-                Vector2D(1.0, 1.0),
-                Vector2D(2.0, 0.0),
-                Vector2D(2.0, 3.0),
-                Vector2D(0.0, 3.0)
-            ).toNonEmptyListOrNull()!!
+            val vertices: NonEmptyList<Vector2D> =
+                listOf(
+                    Vector2D.ZERO,
+                    Vector2D(1.0, 1.0),
+                    Vector2D(2.0, 0.0),
+                    Vector2D(2.0, 3.0),
+                    Vector2D(0.0, 3.0),
+                ).toNonEmptyListOrNull()!!
             val polygon = Polygon2D(vertices, 0.0)
 
             val actualReturn = polygon.contains(Vector2D(1.0, 1.1))

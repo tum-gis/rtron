@@ -19,5 +19,5 @@ package io.rtron.model.opendrive.road.planview
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadPlanViewGeometryArc(
-    var curvature: Double = Double.NaN
+    var curvature: Double = Double.NaN,
 ) : OpendriveElement()

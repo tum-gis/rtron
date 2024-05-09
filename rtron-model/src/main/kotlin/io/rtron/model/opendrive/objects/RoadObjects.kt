@@ -24,8 +24,7 @@ data class RoadObjects(
     var roadObject: List<RoadObjectsObject> = emptyList(),
     var objectReference: List<RoadObjectsObjectReference> = emptyList(),
     var tunnel: List<RoadObjectsTunnel> = emptyList(),
-    var bridge: List<RoadObjectsBridge> = emptyList()
+    var bridge: List<RoadObjectsBridge> = emptyList(),
 ) : OpendriveElement() {
-
     companion object
 }

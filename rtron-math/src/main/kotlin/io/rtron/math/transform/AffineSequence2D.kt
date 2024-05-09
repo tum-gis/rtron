@@ -22,7 +22,7 @@ package io.rtron.math.transform
  * @param affineList list of consecutively applied [Affine2D] transformation matrices
  */
 data class AffineSequence2D(
-    val affineList: List<Affine2D>
+    val affineList: List<Affine2D>,
 ) {
     // Properties and Initializers
 
@@ -34,6 +34,7 @@ data class AffineSequence2D(
 
     // Methods
     fun isEmpty() = affineList.isEmpty()
+
     fun isNotEmpty() = affineList.isNotEmpty()
 
     /**

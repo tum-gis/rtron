@@ -22,44 +22,65 @@ import arrow.core.Option
  * Environment for describing and building attribute lists.
  */
 class AttributeListBuilder(
-    private var namePrefix: String = ""
+    private var namePrefix: String = "",
 ) {
-
     private val attributes = mutableListOf<Attribute>()
 
     operator fun Attribute.unaryPlus() {
         attributes += this
     }
 
-    fun attribute(name: String, value: String) {
+    fun attribute(
+        name: String,
+        value: String,
+    ) {
         StringAttribute.of(namePrefix + name, value).onSome { attributes += it }
     }
 
-    fun attribute(name: String, value: Int) {
+    fun attribute(
+        name: String,
+        value: Int,
+    ) {
         attributes += IntAttribute(namePrefix + name, value)
     }
 
-    fun attribute(name: String, value: Double) {
+    fun attribute(
+        name: String,
+        value: Double,
+    ) {
         DoubleAttribute.of(namePrefix + name, value).onSome { attributes += it }
     }
 
-    fun attribute(name: String, value: Boolean) {
+    fun attribute(
+        name: String,
+        value: Boolean,
+    ) {
         attributes += BooleanAttribute(namePrefix + name, value)
     }
 
-    fun attribute(name: String, value: Double, unitOfMeasure: UnitOfMeasure) {
+    fun attribute(
+        name: String,
+        value: Double,
+        unitOfMeasure: UnitOfMeasure,
+    ) {
         MeasureAttribute.of(namePrefix + name, value, unitOfMeasure).onSome { attributes += it }
     }
 
     @JvmName("OptionalDoubleAttribute")
-    fun attribute(name: String, optionalValue: Option<Double>) {
+    fun attribute(
+        name: String,
+        optionalValue: Option<Double>,
+    ) {
         optionalValue.onSome {
             attributes += DoubleAttribute(namePrefix + name, it)
         }
     }
 
     @JvmName("OptionalStringAttribute")
-    fun attribute(name: String, optionalValue: Option<String>) {
+    fun attribute(
+        name: String,
+        optionalValue: Option<String>,
+    ) {
         optionalValue.onSome {
             if (it.isNotBlank()) {
                 attributes += StringAttribute(namePrefix + name, it)
@@ -70,13 +91,17 @@ class AttributeListBuilder(
     /**
      * Environment for building a nested attribute list within this attribute list.
      */
-    fun attributes(name: String = "", setup: AttributeListBuilder.() -> Unit) {
+    fun attributes(
+        name: String = "",
+        setup: AttributeListBuilder.() -> Unit,
+    ) {
         val attributeListBuilder = AttributeListBuilder(namePrefix + name)
         attributeListBuilder.setup()
         attributes += attributeListBuilder.toAttributeList(namePrefix + name)
     }
 
     fun build() = AttributeList(attributes)
+
     private fun toAttributeList(name: String) = AttributeList(attributes, name)
 }
 
@@ -86,7 +111,10 @@ class AttributeListBuilder(
  * @param namePrefix each attribute's name is prefixed with this variable
  * @param setup DSL environment for describing attribute lists
  */
-fun attributes(namePrefix: String = "", setup: AttributeListBuilder.() -> Unit): AttributeList {
+fun attributes(
+    namePrefix: String = "",
+    setup: AttributeListBuilder.() -> Unit,
+): AttributeList {
     val attributeListBuilder = AttributeListBuilder(namePrefix)
     attributeListBuilder.setup()
     return attributeListBuilder.build()

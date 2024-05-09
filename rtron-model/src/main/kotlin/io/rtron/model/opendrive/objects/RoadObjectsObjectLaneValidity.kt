@@ -20,5 +20,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectLaneValidity(
     var fromLane: Int = Int.MIN_VALUE,
-    var toLane: Int = Int.MIN_VALUE
+    var toLane: Int = Int.MIN_VALUE,
 ) : OpendriveElement()

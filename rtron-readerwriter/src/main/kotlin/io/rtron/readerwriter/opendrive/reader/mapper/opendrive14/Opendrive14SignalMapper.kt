@@ -26,10 +26,9 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14ObjectMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive14SignalMapper {
-
     //
     // Signal
     //

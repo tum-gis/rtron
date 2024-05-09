@@ -30,20 +30,22 @@ enum class BoundType {
     CLOSED,
 
     /** no bound, such as the upper bound in [3, ∞) */
-    NONE
+    NONE,
 }
 
 // Conversions
 
 /** Conversion from Guava Bound Type class. */
-fun GBoundType.toBoundType() = when (this) {
-    GBoundType.OPEN -> BoundType.OPEN
-    GBoundType.CLOSED -> BoundType.CLOSED
-}
+fun GBoundType.toBoundType() =
+    when (this) {
+        GBoundType.OPEN -> BoundType.OPEN
+        GBoundType.CLOSED -> BoundType.CLOSED
+    }
 
 /** Conversion to Guava Bound Type class. */
-fun BoundType.toBoundTypeG(): GBoundType? = when (this) {
-    BoundType.OPEN -> GBoundType.OPEN
-    BoundType.CLOSED -> GBoundType.CLOSED
-    BoundType.NONE -> null
-}
+fun BoundType.toBoundTypeG(): GBoundType? =
+    when (this) {
+        BoundType.OPEN -> GBoundType.OPEN
+        BoundType.CLOSED -> GBoundType.CLOSED
+        BoundType.NONE -> null
+    }

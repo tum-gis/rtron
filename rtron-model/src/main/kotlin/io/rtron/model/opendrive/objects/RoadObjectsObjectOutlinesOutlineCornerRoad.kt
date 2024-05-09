@@ -28,16 +28,18 @@ data class RoadObjectsObjectOutlinesOutlineCornerRoad(
     var height: Double = Double.NaN,
     var id: Option<Int> = None,
     var s: Double = Double.NaN,
-    var t: Double = Double.NaN
+    var t: Double = Double.NaN,
 ) : OpendriveElement() {
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector1D(s)
 
     // Methods
     fun hasZeroHeight(): Boolean = !height.isFinite() || height == 0.0
+
     fun hasPositiveHeight(): Boolean = !hasZeroHeight() && height > 0.0
 
     fun getBasePoint() = CurveRelativeVector3D(s, t, dz)
+
     fun getHeadPoint(): Option<CurveRelativeVector3D> =
         if (hasZeroHeight()) {
             None

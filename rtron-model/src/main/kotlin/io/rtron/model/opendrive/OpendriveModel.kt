@@ -36,9 +36,8 @@ data class OpendriveModel(
     var header: Header = Header(),
     var road: List<Road> = emptyList(),
     var controller: List<Controller> = emptyList(),
-    var junction: List<Junction> = emptyList()
+    var junction: List<Junction> = emptyList(),
 ) : AbstractModel() {
-
     // Properties and Initializers
     val roadAsNonEmptyList: NonEmptyList<Road>
         get() = road.toNonEmptyListOrNull()!!

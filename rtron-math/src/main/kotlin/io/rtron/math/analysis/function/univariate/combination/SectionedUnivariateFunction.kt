@@ -31,17 +31,14 @@ import io.rtron.math.range.shiftLowerEndpointTo
  */
 class SectionedUnivariateFunction(
     private val completeFunction: UnivariateFunction,
-    section: Range<Double>
+    section: Range<Double>,
 ) : UnivariateFunction() {
-
     // Properties and Initializers
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
     private val sectionStart = section.lowerEndpointResult().getOrElse { throw it }
 
     // Methods
-    override fun valueUnbounded(x: Double): Either<Exception, Double> =
-        completeFunction.valueUnbounded(sectionStart + x)
+    override fun valueUnbounded(x: Double): Either<Exception, Double> = completeFunction.valueUnbounded(sectionStart + x)
 
-    override fun slopeUnbounded(x: Double): Either<Exception, Double> =
-        completeFunction.slopeUnbounded(sectionStart + x)
+    override fun slopeUnbounded(x: Double): Either<Exception, Double> = completeFunction.slopeUnbounded(sectionStart + x)
 }

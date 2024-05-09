@@ -22,5 +22,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectParkingSpace(
     var access: ERoadObjectsObjectParkingSpaceAccess = ERoadObjectsObjectParkingSpaceAccess.ALL,
-    var restrictions: Option<String> = None
+    var restrictions: Option<String> = None,
 ) : OpendriveElement()

@@ -28,9 +28,8 @@ import io.rtron.model.opendrive.core.OpendriveElement
 @optics
 data class RoadLanes(
     var laneOffset: List<RoadLanesLaneOffset> = emptyList(),
-    var laneSection: List<RoadLanesLaneSection> = emptyList()
+    var laneSection: List<RoadLanesLaneSection> = emptyList(),
 ) : OpendriveElement() {
-
     // Validation Properties
     val laneSectionAsNonEmptyList: NonEmptyList<RoadLanesLaneSection>
         get() = laneSection.toNonEmptyListOrNull()!!
@@ -52,8 +51,7 @@ data class RoadLanes(
         return (laneSectionRanges + lastLaneSectionRange).toNonEmptyListOrNull()!!
     }
 
-    fun getLaneSectionLengths(lastLaneSectionEnd: Double): NonEmptyList<Double> =
-        getLaneSectionRanges(lastLaneSectionEnd).map { it.length }
+    fun getLaneSectionLengths(lastLaneSectionEnd: Double): NonEmptyList<Double> = getLaneSectionRanges(lastLaneSectionEnd).map { it.length }
 
     fun getLaneSectionsWithRanges(lastLaneSectionEnd: Double): NonEmptyList<Pair<Range<Double>, RoadLanesLaneSection>> =
         getLaneSectionRanges(lastLaneSectionEnd).zip(laneSection).toNonEmptyListOrNull()!!

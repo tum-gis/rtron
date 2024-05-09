@@ -22,5 +22,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadSignalsSignalDependency(
     var id: String = "",
-    var type: Option<String> = None
+    var type: Option<String> = None,
 ) : OpendriveElement()

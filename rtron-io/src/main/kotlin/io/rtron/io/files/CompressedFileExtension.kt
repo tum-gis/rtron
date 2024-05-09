@@ -22,5 +22,5 @@ package io.rtron.io.files
 enum class CompressedFileExtension(val extension: String, val extensionWithDot: String) {
     ZIP("zip", ".zip"),
     GZ("gz", ".gz"),
-    ZST("zst", ".zst")
+    ZST("zst", ".zst"),
 }

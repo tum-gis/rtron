@@ -35,7 +35,13 @@ import kotlin.time.measureTime
  * @param process user defined process to be executed
  */
 @OptIn(ExperimentalTime::class)
-fun processAllFiles(inputDirectoryPath: Path, withFilenameEndings: Set<String>, outputDirectoryPath: Path, recursive: Boolean = true, process: Project.() -> Unit) {
+fun processAllFiles(
+    inputDirectoryPath: Path,
+    withFilenameEndings: Set<String>,
+    outputDirectoryPath: Path,
+    recursive: Boolean = true,
+    process: Project.() -> Unit,
+) {
     val logger = KotlinLogging.logger {}
 
     if (!inputDirectoryPath.isDirectory()) {
@@ -53,11 +59,12 @@ fun processAllFiles(inputDirectoryPath: Path, withFilenameEndings: Set<String>, 
 
     val recursiveDepth = if (recursive) Int.MAX_VALUE else 1
 
-    val inputFilePaths = inputDirectoryPath
-        .walk(recursiveDepth)
-        .filter { path -> withFilenameEndings.any { path.fileName.toString().endsWith(it) } }
-        .toList()
-        .sorted()
+    val inputFilePaths =
+        inputDirectoryPath
+            .walk(recursiveDepth)
+            .filter { path -> withFilenameEndings.any { path.fileName.toString().endsWith(it) } }
+            .toList()
+            .sorted()
 
     if (inputFilePaths.isEmpty()) {
         logger.error { "No files have been found with $withFilenameEndings as extension in input directory: $outputDirectoryPath" }
@@ -72,10 +79,11 @@ fun processAllFiles(inputDirectoryPath: Path, withFilenameEndings: Set<String>, 
 
         logger.info { "Starting project (${index + 1}/$totalNumber): $inputFileRelativePath" }
 
-        val timeElapsed = measureTime {
-            val project = Project(currentPath, projectOutputDirectoryPath)
-            project.apply(process)
-        }
+        val timeElapsed =
+            measureTime {
+                val project = Project(currentPath, projectOutputDirectoryPath)
+                project.apply(process)
+            }
 
         logger.info { "Completed project after $timeElapsed." + System.lineSeparator() }
     }

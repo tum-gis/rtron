@@ -39,12 +39,13 @@ import io.rtron.math.transform.Affine2D
 data class LateralTranslatedCurve2D(
     private val baseCurve: AbstractCurve2D,
     private val lateralTranslationFunction: UnivariateFunction,
-    override val tolerance: Double
+    override val tolerance: Double,
 ) : AbstractCurve2D() {
-
     // Properties and Initializers
     init {
-        require(lateralTranslationFunction.domain.fuzzyEncloses(baseCurve.domain, tolerance)) { "The lateral translation function must be defined everywhere where the curve is also defined." }
+        require(lateralTranslationFunction.domain.fuzzyEncloses(baseCurve.domain, tolerance)) {
+            "The lateral translation function must be defined everywhere where the curve is also defined."
+        }
     }
 
     override val domain: Range<Double> get() = baseCurve.domain
@@ -52,8 +53,9 @@ data class LateralTranslatedCurve2D(
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-        val curveAffine = baseCurve.calculatePoseGlobalCSUnbounded(curveRelativePoint)
-            .let { Affine2D.of(it) }
+        val curveAffine =
+            baseCurve.calculatePoseGlobalCSUnbounded(curveRelativePoint)
+                .let { Affine2D.of(it) }
 
         val translation = calculateTranslation(curveRelativePoint).getOrElse { throw it }.lateralOffset
 
@@ -76,8 +78,10 @@ data class LateralTranslatedCurve2D(
      * @param multiplier multiplication factor, whereby 0.5 means that only 0.5 of the translation function is added
      * @return resulting [LateralTranslatedCurve2D]
      */
-    fun addLateralTranslation(lateralTranslationFunction: UnivariateFunction, multiplier: Double = 1.0):
-        LateralTranslatedCurve2D {
+    fun addLateralTranslation(
+        lateralTranslationFunction: UnivariateFunction,
+        multiplier: Double = 1.0,
+    ): LateralTranslatedCurve2D {
         require(multiplier.isFinite()) { "Multiplier must be finite." }
 
         val lateralFunctions = listOf(this.lateralTranslationFunction, lateralTranslationFunction)
@@ -88,13 +92,14 @@ data class LateralTranslatedCurve2D(
     /**
      * Returns the lateral translation at the [curveRelativePoint].
      */
-    private fun calculateTranslation(curveRelativePoint: CurveRelativeVector1D):
-        Either<Exception, CurveRelativeVector2D> = either {
-        val translation = lateralTranslationFunction
-            .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .bind()
-            .let { CurveRelativeVector2D(curveRelativePoint.curvePosition, it) }
+    private fun calculateTranslation(curveRelativePoint: CurveRelativeVector1D): Either<Exception, CurveRelativeVector2D> =
+        either {
+            val translation =
+                lateralTranslationFunction
+                    .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
+                    .bind()
+                    .let { CurveRelativeVector2D(curveRelativePoint.curvePosition, it) }
 
-        translation
-    }
+            translation
+        }
 }

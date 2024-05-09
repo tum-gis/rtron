@@ -38,10 +38,8 @@ data class RoadSignalsSignal(
     var validity: List<RoadObjectsObjectLaneValidity> = emptyList(),
     var dependency: List<RoadSignalsSignalDependency> = emptyList(),
     var reference: List<RoadSignalsSignalReference> = emptyList(),
-
     var positionInertial: Option<RoadSignalsSignalPositionInertial> = None,
     var positionRoad: Option<RoadSignalsSignalPositionRoad> = None,
-
     var country: Option<ECountryCode> = None,
     var countryRevision: Option<String> = None,
     var dynamic: Boolean = false,
@@ -61,8 +59,7 @@ data class RoadSignalsSignal(
     var value: Option<Double> = None,
     var width: Option<Double> = None,
     var zOffset: Double = Double.NaN,
-
-    override var additionalId: Option<RoadSignalIdentifier> = None
+    override var additionalId: Option<RoadSignalIdentifier> = None,
 ) : OpendriveElement(), AdditionalRoadSignalIdentifier {
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
@@ -79,7 +76,9 @@ data class RoadSignalsSignal(
 
     // Methods
     fun containsRectangle() = width.isSome() && height.isSome()
+
     fun containsVerticalLine() = width.isNone() && height.isSome()
+
     fun containsHorizontalLine() = width.isSome() && height.isNone()
 
     companion object

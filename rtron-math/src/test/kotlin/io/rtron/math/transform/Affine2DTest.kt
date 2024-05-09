@@ -58,11 +58,12 @@ class Affine2DTest : FunSpec({
             val affineA = Affine2D.of(translation)
             val scaling = RealVector.of(2.0, 3.0)
             val affineB = Affine2D.of(scaling)
-            val expectedValues = doubleArrayOf(
-                2.0, 0.0, 1.0,
-                0.0, 3.0, 2.0,
-                0.0, 0.0, 1.0
-            )
+            val expectedValues =
+                doubleArrayOf(
+                    2.0, 0.0, 1.0,
+                    0.0, 3.0, 2.0,
+                    0.0, 0.0, 1.0,
+                )
             val expectedMatrix = RealMatrix(expectedValues, 3)
 
             val actualAppended = affineA.append(affineB)

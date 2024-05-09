@@ -32,7 +32,6 @@ import io.rtron.model.opendrive.road.elevation.RoadElevationProfileElevation
  * This resolution is implemented as a transformer, since most software tools are not supporting this feature yet.
  */
 class OpendriveOffsetResolver {
-
     fun modify(opendriveModel: OpendriveModel): Pair<OpendriveModel, OpendriveOffsetResolverReport> {
         val report = OpendriveOffsetResolverReport(emptyList())
 
@@ -47,13 +46,14 @@ class OpendriveOffsetResolver {
         modifiedOpendriveModel.header.offset = None
 
         // XY axes
-        modifiedOpendriveModel = everyRoadPlanViewGeometry.modify(modifiedOpendriveModel) { currentPlanViewGeometry ->
-            val modifiedPlanViewGeometry = currentPlanViewGeometry.copy()
-            modifiedPlanViewGeometry.x = modifiedPlanViewGeometry.x + headerOffset.x
-            modifiedPlanViewGeometry.y = modifiedPlanViewGeometry.y + headerOffset.y
+        modifiedOpendriveModel =
+            everyRoadPlanViewGeometry.modify(modifiedOpendriveModel) { currentPlanViewGeometry ->
+                val modifiedPlanViewGeometry = currentPlanViewGeometry.copy()
+                modifiedPlanViewGeometry.x = modifiedPlanViewGeometry.x + headerOffset.x
+                modifiedPlanViewGeometry.y = modifiedPlanViewGeometry.y + headerOffset.y
 
-            modifiedPlanViewGeometry
-        }
+                modifiedPlanViewGeometry
+            }
 
         // Z axis
         modifiedOpendriveModel =
@@ -63,21 +63,22 @@ class OpendriveOffsetResolver {
                 modifiedElevationProfileElement
             }
 
-        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
-            val modifiedRoad = currentRoad.copy()
+        modifiedOpendriveModel =
+            everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+                val modifiedRoad = currentRoad.copy()
 
-            if (modifiedRoad.elevationProfile.isNone()) {
-                modifiedRoad.elevationProfile = RoadElevationProfile(emptyList()).some()
-            }
-
-            modifiedRoad.elevationProfile.onSome {
-                if (it.elevation.isEmpty()) {
-                    it.elevation += RoadElevationProfileElevation(headerOffset.z, 0.0, 0.0, 0.0, 0.0)
+                if (modifiedRoad.elevationProfile.isNone()) {
+                    modifiedRoad.elevationProfile = RoadElevationProfile(emptyList()).some()
                 }
-            }
 
-            modifiedRoad
-        }
+                modifiedRoad.elevationProfile.onSome {
+                    if (it.elevation.isEmpty()) {
+                        it.elevation += RoadElevationProfileElevation(headerOffset.z, 0.0, 0.0, 0.0, 0.0)
+                    }
+                }
+
+                modifiedRoad
+            }
 
         report.messages += "Offset of x=${headerOffset.x}, y=${headerOffset.y}, z=${headerOffset.z} resolved."
 

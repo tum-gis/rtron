@@ -52,38 +52,45 @@ import kotlin.collections.flatten
  * heterogeneous input.
  */
 object Polyhedron3DFactory {
-
     /**
      * Builds a [Polyhedron3D] from a list of [VerticalOutlineElement], which define the boundary of the [Polyhedron3D].
      *
      * @param outlineElements vertical line segments or points bounding the polyhedron
      */
-    fun buildFromVerticalOutlineElements(outlineId: RoadObjectOutlineIdentifier, outlineElements: NonEmptyList<VerticalOutlineElement>, tolerance: Double):
-        Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> = either {
-        val issueList = DefaultIssueList()
+    fun buildFromVerticalOutlineElements(
+        outlineId: RoadObjectOutlineIdentifier,
+        outlineElements: NonEmptyList<VerticalOutlineElement>,
+        tolerance: Double,
+    ): Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> =
+        either {
+            val issueList = DefaultIssueList()
 
-        // prepare vertical outline elements
-        val preparedOutlineElements = prepareOutlineElements(outlineId, outlineElements, tolerance)
-            .bind()
-            .handleIssueList { issueList += it }
+            // prepare vertical outline elements
+            val preparedOutlineElements =
+                prepareOutlineElements(outlineId, outlineElements, tolerance)
+                    .bind()
+                    .handleIssueList { issueList += it }
 
-        // construct faces
-        val baseFace = LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }.let { it.toNonEmptyListOrNull()!! }, tolerance)
-        val topFace = LinearRing3D(preparedOutlineElements.flatMap { it.getHighestPointAdjacentToTheTop() }, tolerance)
-        val sideFaces: List<LinearRing3D> = preparedOutlineElements
-            .zipWithNextEnclosing()
-            .flatMap { buildSideFace(it.first, it.second, tolerance).toList() }
+            // construct faces
+            val baseFace =
+                LinearRing3D(preparedOutlineElements.reversed().map { it.basePoint }.let { it.toNonEmptyListOrNull()!! }, tolerance)
+            val topFace = LinearRing3D(preparedOutlineElements.flatMap { it.getHighestPointAdjacentToTheTop() }, tolerance)
+            val sideFaces: List<LinearRing3D> =
+                preparedOutlineElements
+                    .zipWithNextEnclosing()
+                    .flatMap { buildSideFace(it.first, it.second, tolerance).toList() }
 
-        // triangulate faces
-        val triangulatedFaces = (sideFaces + baseFace + topFace)
-            .map { currentFace -> Triangulator.triangulate(currentFace, tolerance) }
-            .handleLeftAndFilter { GeometryBuilderException.TriangulationException(it.value.message, outlineId).left().bind() }
-            .flatten()
-            .let { it.toNonEmptyListOrNull()!! }
+            // triangulate faces
+            val triangulatedFaces =
+                (sideFaces + baseFace + topFace)
+                    .map { currentFace -> Triangulator.triangulate(currentFace, tolerance) }
+                    .handleLeftAndFilter { GeometryBuilderException.TriangulationException(it.value.message, outlineId).left().bind() }
+                    .flatten()
+                    .let { it.toNonEmptyListOrNull()!! }
 
-        val polyhedron = Polyhedron3D(triangulatedFaces, tolerance)
-        ContextIssueList(polyhedron, issueList)
-    }
+            val polyhedron = Polyhedron3D(triangulatedFaces, tolerance)
+            ContextIssueList(polyhedron, issueList)
+        }
 
     /**
      * A vertical outline element is represented by a [basePoint] and an optional [leftHeadPoint] and [rightHeadPoint].
@@ -97,9 +104,8 @@ object Polyhedron3DFactory {
         val basePoint: Vector3D,
         val leftHeadPoint: Option<Vector3D>,
         val rightHeadPoint: Option<Vector3D> = None,
-        override val tolerance: Double
+        override val tolerance: Double,
     ) : Tolerable {
-
         // Properties and Initializers
         init {
             rightHeadPoint.onSome {
@@ -110,22 +116,22 @@ object Polyhedron3DFactory {
                 require(
                     basePoint.fuzzyUnequals(
                         currentLeftHeadPoint,
-                        tolerance
-                    )
+                        tolerance,
+                    ),
                 ) { "Left head point must be fuzzily unequal to base point." }
 
                 rightHeadPoint.onSome { currentRightHeadPoint ->
                     require(
                         basePoint.fuzzyUnequals(
                             currentRightHeadPoint,
-                            tolerance
-                        )
+                            tolerance,
+                        ),
                     ) { "Right head point must be fuzzily unequal to base point." }
                     require(
                         currentLeftHeadPoint.fuzzyUnequals(
                             currentRightHeadPoint,
-                            tolerance
-                        )
+                            tolerance,
+                        ),
                     ) { "Left head point must be fuzzily unequal to the right point." }
                 }
             }
@@ -136,14 +142,16 @@ object Polyhedron3DFactory {
 
         // Methods
         fun containsHeadPoint() = leftHeadPoint.isSome() || rightHeadPoint.isSome()
+
         fun containsOneHeadPoint() = leftHeadPoint.isSome() && rightHeadPoint.isNone()
 
         fun getVerticesAsLeftBoundary(): List<Vector3D> {
-            val midPoint = if (containsOneHeadPoint() || leftLength < rightLength) {
-                leftHeadPoint.toList()
-            } else {
-                emptyList()
-            }
+            val midPoint =
+                if (containsOneHeadPoint() || leftLength < rightLength) {
+                    leftHeadPoint.toList()
+                } else {
+                    emptyList()
+                }
             return listOf(basePoint) + midPoint + rightHeadPoint.toList()
         }
 
@@ -162,12 +170,11 @@ object Polyhedron3DFactory {
             }
 
         companion object {
-
             fun of(
                 basePoint: Vector3D,
                 leftHeadPoint: Option<Vector3D>,
                 rightHeadPoint: Option<Vector3D>,
-                tolerance: Double
+                tolerance: Double,
             ): ContextIssueList<VerticalOutlineElement> {
                 val issueList = DefaultIssueList()
                 val headPoints = leftHeadPoint.toList() + rightHeadPoint.toList()
@@ -175,13 +182,12 @@ object Polyhedron3DFactory {
                 // remove head points that are fuzzily equal to base point
                 val prepHeadPoints = headPoints.filter { it.fuzzyUnequals(basePoint, tolerance) }
                 if (prepHeadPoints.size < headPoints.size) {
-                    issueList += DefaultIssue(
-                        "",
-                        "Height of outline element must be above tolerance.",
-                        "",
-                        Severity.WARNING,
-                        true
-                    )
+                    issueList +=
+                        DefaultIssue(
+                            "",
+                            "Height of outline element must be above tolerance.",
+                            "", Severity.WARNING, true,
+                        )
                 }
 
                 if (prepHeadPoints.size <= 1) {
@@ -205,7 +211,11 @@ object Polyhedron3DFactory {
              * @param headPoints a maximum number of two head points must be provided
              * @param tolerance allowed tolerance
              */
-            fun of(basePoint: Vector3D, headPoints: List<Vector3D>, tolerance: Double): VerticalOutlineElement {
+            fun of(
+                basePoint: Vector3D,
+                headPoints: List<Vector3D>,
+                tolerance: Double,
+            ): VerticalOutlineElement {
                 require(headPoints.size <= 2) { "Must contain not more than two head points." }
 
                 val leftHeadPoint = if (headPoints.isNotEmpty()) Some(headPoints.first()) else None
@@ -222,12 +232,12 @@ object Polyhedron3DFactory {
              */
             fun of(
                 elements: List<VerticalOutlineElement>,
-                tolerance: Double
+                tolerance: Double,
             ): ContextIssueList<VerticalOutlineElement> {
                 require(elements.isNotEmpty()) { "List of elements must not be empty." }
                 require(
                     elements.drop(1)
-                        .all { it.basePoint == elements.first().basePoint }
+                        .all { it.basePoint == elements.first().basePoint },
                 ) { "All elements must have the same base point." }
                 val issueList = DefaultIssueList()
 
@@ -236,13 +246,12 @@ object Polyhedron3DFactory {
                 }
 
                 if (elements.size > 2) {
-                    issueList += DefaultIssue(
-                        "OutlineContainsConsecutivelyFollowingElementDuplicates",
-                        "Contains more than two consecutively following outline element duplicates.",
-                        "",
-                        Severity.WARNING,
-                        wasFixed = false
-                    )
+                    issueList +=
+                        DefaultIssue(
+                            "OutlineContainsConsecutivelyFollowingElementDuplicates",
+                            "Contains more than two consecutively following outline element duplicates.",
+                            "", Severity.WARNING, wasFixed = false,
+                        )
                 }
 
                 val basePoint = elements.first().basePoint
@@ -266,7 +275,7 @@ object Polyhedron3DFactory {
     private fun buildSideFace(
         leftElement: VerticalOutlineElement,
         rightElement: VerticalOutlineElement,
-        tolerance: Double
+        tolerance: Double,
     ): Option<LinearRing3D> {
         if (!leftElement.containsHeadPoint() && !rightElement.containsHeadPoint()) {
             return None
@@ -280,50 +289,88 @@ object Polyhedron3DFactory {
     /**
      * Preparation and cleanup of [verticalOutlineElements] including the removal of duplicates and error messaging.
      */
-    private fun prepareOutlineElements(outlineId: RoadObjectOutlineIdentifier, verticalOutlineElements: NonEmptyList<VerticalOutlineElement>, tolerance: Double):
-        Either<GeometryBuilderException, ContextIssueList<NonEmptyList<VerticalOutlineElement>>> = either {
-        val issueList = DefaultIssueList()
+    private fun prepareOutlineElements(
+        outlineId: RoadObjectOutlineIdentifier,
+        verticalOutlineElements: NonEmptyList<VerticalOutlineElement>,
+        tolerance: Double,
+    ): Either<GeometryBuilderException, ContextIssueList<NonEmptyList<VerticalOutlineElement>>> =
+        either {
+            val issueList = DefaultIssueList()
 
-        // remove consecutively following line segment duplicates
-        val elementsWithoutDuplicates = verticalOutlineElements.filterWithNextEnclosing { a, b -> a.basePoint.fuzzyUnequals(b.basePoint, tolerance) }
-        if (elementsWithoutDuplicates.size < verticalOutlineElements.size) {
-            issueList += DefaultIssue.of("OutlineContainsConsecutivelyFollowingLineSegmentDuplicates", "Ignoring at least one consecutively following line segment duplicate.", outlineId, Severity.WARNING, wasFixed = true)
+            // remove consecutively following line segment duplicates
+            val elementsWithoutDuplicates =
+                verticalOutlineElements.filterWithNextEnclosing {
+                        a,
+                        b,
+                    ->
+                    a.basePoint.fuzzyUnequals(b.basePoint, tolerance)
+                }
+            if (elementsWithoutDuplicates.size < verticalOutlineElements.size) {
+                issueList +=
+                    DefaultIssue.of(
+                        "OutlineContainsConsecutivelyFollowingLineSegmentDuplicates",
+                        "Ignoring at least one consecutively following line segment duplicate.",
+                        outlineId, Severity.WARNING, wasFixed = true,
+                    )
+            }
+
+            // if there are not enough points to construct a polyhedron
+            if (elementsWithoutDuplicates.size < 3) {
+                GeometryBuilderException.NotEnoughValidOutlineElementsForPolyhedron(
+                    outlineId,
+                ).left().bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
+            }
+
+            // remove consecutively following side duplicates of the form (…, A, B, A, …)
+            val cleanedElements =
+                elementsWithoutDuplicates
+                    .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
+            if (cleanedElements.size < elementsWithoutDuplicates.size) {
+                issueList +=
+                    DefaultIssue.of(
+                        "OutlineContainsConsecutivelyFollowingSideDuplicates",
+                        "Ignoring consecutively following side duplicates of the form (…, A, B, A, …).",
+                        outlineId, Severity.WARNING, wasFixed = true,
+                    )
+            }
+
+            // if the base points of the outline element are located on a line (or point)
+            val innerBaseEdges =
+                cleanedElements.map { it.basePoint }.filterIndexed {
+                        index,
+                        _,
+                    ->
+                    index != 0
+                }.map { it - cleanedElements.first().basePoint }
+            val dimensionOfSpan = innerBaseEdges.map { it.toRealVector() }.dimensionOfSpan()
+            if (dimensionOfSpan < 2) {
+                GeometryBuilderException.ColinearOutlineElementsForPolyhedron(
+                    outlineId,
+                ).left().bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
+            }
+
+            // if the outline elements are ordered clockwise yielding a wrong polygon orientation
+            val projectedBasePoints = cleanedElements.map { it.basePoint.toVector2D(Vector3D.Z_AXIS) }
+            val orderedElements =
+                if (projectedBasePoints.distinct().size > 2 && projectedBasePoints.isClockwiseOrdered()) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "IncorrectOutlineOrientation",
+                            "Outline elements are ordered clockwise but should be ordered counter-clockwise.",
+                            outlineId, Severity.ERROR, wasFixed = true,
+                        )
+                    cleanedElements.reversed()
+                } else {
+                    cleanedElements
+                }
+
+            val elements: ContextIssueList<NonEmptyList<VerticalOutlineElement>> =
+                orderedElements
+                    .zipWithConsecutivesEnclosing { it.basePoint }
+                    .map { VerticalOutlineElement.of(it, tolerance) }
+                    .mergeIssueLists()
+                    .map { it.toNonEmptyListOrNull()!! }
+
+            elements
         }
-
-        // if there are not enough points to construct a polyhedron
-        if (elementsWithoutDuplicates.size < 3) {
-            GeometryBuilderException.NotEnoughValidOutlineElementsForPolyhedron(outlineId).left().bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
-        }
-
-        // remove consecutively following side duplicates of the form (…, A, B, A, …)
-        val cleanedElements = elementsWithoutDuplicates
-            .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }
-        if (cleanedElements.size < elementsWithoutDuplicates.size) {
-            issueList += DefaultIssue.of("OutlineContainsConsecutivelyFollowingSideDuplicates", "Ignoring consecutively following side duplicates of the form (…, A, B, A, …).", outlineId, Severity.WARNING, wasFixed = true)
-        }
-
-        // if the base points of the outline element are located on a line (or point)
-        val innerBaseEdges = cleanedElements.map { it.basePoint }.filterIndexed { index, _ -> index != 0 }.map { it - cleanedElements.first().basePoint }
-        val dimensionOfSpan = innerBaseEdges.map { it.toRealVector() }.dimensionOfSpan()
-        if (dimensionOfSpan < 2) {
-            GeometryBuilderException.ColinearOutlineElementsForPolyhedron(outlineId).left().bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
-        }
-
-        // if the outline elements are ordered clockwise yielding a wrong polygon orientation
-        val projectedBasePoints = cleanedElements.map { it.basePoint.toVector2D(Vector3D.Z_AXIS) }
-        val orderedElements = if (projectedBasePoints.distinct().size > 2 && projectedBasePoints.isClockwiseOrdered()) {
-            issueList += DefaultIssue.of("IncorrectOutlineOrientation", "Outline elements are ordered clockwise but should be ordered counter-clockwise.", outlineId, Severity.ERROR, wasFixed = true)
-            cleanedElements.reversed()
-        } else {
-            cleanedElements
-        }
-
-        val elements: ContextIssueList<NonEmptyList<VerticalOutlineElement>> = orderedElements
-            .zipWithConsecutivesEnclosing { it.basePoint }
-            .map { VerticalOutlineElement.of(it, tolerance) }
-            .mergeIssueLists()
-            .map { it.toNonEmptyListOrNull()!! }
-
-        elements
-    }
 }

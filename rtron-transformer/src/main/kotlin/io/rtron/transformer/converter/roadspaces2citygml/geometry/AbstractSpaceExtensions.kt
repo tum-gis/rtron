@@ -27,14 +27,15 @@ import org.citygml4j.core.model.core.AbstractSpace
  * @param geometryTransformer source geometries
  * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod0Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> = either {
-    geometryTransformer.getPoint().onSome {
-        lod0Point = it
-        return@either
-    }
+fun AbstractSpace.populateLod0Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> =
+    either {
+        geometryTransformer.getPoint().onSome {
+            lod0Point = it
+            return@either
+        }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LOD0 geometry of the abstract space.").left().bind()
-}
+        GeometryTransformerException.NoSuiteableSourceGeometry("LOD0 geometry of the abstract space.").left().bind()
+    }
 
 /**
  * Populates the LOD1 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
@@ -43,14 +44,15 @@ fun AbstractSpace.populateLod0Geometry(geometryTransformer: GeometryTransformer)
  * @param geometryTransformer source geometries
  * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod1Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> = either {
-    geometryTransformer.getSolid().onSome {
-        lod1Solid = it
-        return@either
-    }
+fun AbstractSpace.populateLod1Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> =
+    either {
+        geometryTransformer.getSolid().onSome {
+            lod1Solid = it
+            return@either
+        }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LOD1 geometry of the abstract space.").left().bind()
-}
+        GeometryTransformerException.NoSuiteableSourceGeometry("LOD1 geometry of the abstract space.").left().bind()
+    }
 
 /**
  * Populates the LOD2 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
@@ -59,24 +61,25 @@ fun AbstractSpace.populateLod1Geometry(geometryTransformer: GeometryTransformer)
  * @param geometryTransformer source geometries
  * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod2Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> = either {
-    geometryTransformer.getSolid().onSome {
-        lod2Solid = it
-        return@either
-    }
+fun AbstractSpace.populateLod2Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> =
+    either {
+        geometryTransformer.getSolid().onSome {
+            lod2Solid = it
+            return@either
+        }
 
-    geometryTransformer.getMultiSurface().onSome { currentMultiSurface ->
-        lod2MultiSurface = currentMultiSurface.mapLeft { it.toGeometryGenerationException() }.bind()
-        return@either
-    }
+        geometryTransformer.getMultiSurface().onSome { currentMultiSurface ->
+            lod2MultiSurface = currentMultiSurface.mapLeft { it.toGeometryGenerationException() }.bind()
+            return@either
+        }
 
-    geometryTransformer.getMultiCurve().onSome { currentMultiSurfaceResult ->
-        lod2MultiCurve = currentMultiSurfaceResult.mapLeft { it.toGeometryGenerationException() }.bind()
-        return@either
-    }
+        geometryTransformer.getMultiCurve().onSome { currentMultiSurfaceResult ->
+            lod2MultiCurve = currentMultiSurfaceResult.mapLeft { it.toGeometryGenerationException() }.bind()
+            return@either
+        }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LOD2 geometry of the abstract space.").left().bind()
-}
+        GeometryTransformerException.NoSuiteableSourceGeometry("LOD2 geometry of the abstract space.").left().bind()
+    }
 
 /**
  * Populates the LOD2 geometry of an [AbstractSpace] object with the source geometries of the [GeometryTransformer].
@@ -85,21 +88,22 @@ fun AbstractSpace.populateLod2Geometry(geometryTransformer: GeometryTransformer)
  * @param geometryTransformer source geometries
  * @return [Either.Right] is returned, if a geometry has been populated; [Either.Left], if no adequate geometry could be assigned
  */
-fun AbstractSpace.populateLod3Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> = either {
-    geometryTransformer.getSolid().onSome {
-        lod3Solid = it
-        return@either
-    }
+fun AbstractSpace.populateLod3Geometry(geometryTransformer: GeometryTransformer): Either<GeometryTransformerException, Unit> =
+    either {
+        geometryTransformer.getSolid().onSome {
+            lod3Solid = it
+            return@either
+        }
 
-    geometryTransformer.getMultiSurface().onSome { currentMultiSurfaceResult ->
-        lod3MultiSurface = currentMultiSurfaceResult.mapLeft { it.toGeometryGenerationException() }.bind()
-        return@either
-    }
+        geometryTransformer.getMultiSurface().onSome { currentMultiSurfaceResult ->
+            lod3MultiSurface = currentMultiSurfaceResult.mapLeft { it.toGeometryGenerationException() }.bind()
+            return@either
+        }
 
-    geometryTransformer.getMultiCurve().onSome { currentMultiCurveResult ->
-        lod3MultiCurve = currentMultiCurveResult.mapLeft { it.toGeometryGenerationException() }.bind()
-        return@either
-    }
+        geometryTransformer.getMultiCurve().onSome { currentMultiCurveResult ->
+            lod3MultiCurve = currentMultiCurveResult.mapLeft { it.toGeometryGenerationException() }.bind()
+            return@either
+        }
 
-    GeometryTransformerException.NoSuiteableSourceGeometry("LOD3 geometry of the abstract space").left().bind()
-}
+        GeometryTransformerException.NoSuiteableSourceGeometry("LOD3 geometry of the abstract space").left().bind()
+    }

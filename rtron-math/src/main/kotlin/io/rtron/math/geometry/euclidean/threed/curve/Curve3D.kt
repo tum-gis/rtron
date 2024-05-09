@@ -44,13 +44,16 @@ import io.rtron.math.transform.Affine3D
 data class Curve3D(
     val curveXY: AbstractCurve2D,
     val heightFunction: UnivariateFunction,
-    val torsionFunction: UnivariateFunction = LinearFunction.X_AXIS
+    val torsionFunction: UnivariateFunction = LinearFunction.X_AXIS,
 ) : AbstractCurve3D() {
-
     // Properties and Initializers
     init {
-        require(heightFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The height function must be defined everywhere where the curveXY is also defined." }
-        require(torsionFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) { "The torsion function must be defined everywhere where the curveXY is also defined." }
+        require(heightFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) {
+            "The height function must be defined everywhere where the curveXY is also defined."
+        }
+        require(torsionFunction.domain.fuzzyEncloses(curveXY.domain, tolerance)) {
+            "The torsion function must be defined everywhere where the curveXY is also defined."
+        }
 
         require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
@@ -91,8 +94,7 @@ data class Curve3D(
      * @param curveRelativePoint affine transformation matrix is calculated on the [curveRelativePoint]
      * @return affine transformation matrix whereby the orientation is tangential to this curve and its torsion
      */
-    fun calculateAffine(curveRelativePoint: CurveRelativeVector1D): Affine3D =
-        calculatePose(curveRelativePoint).let { Affine3D.of(it) }
+    fun calculateAffine(curveRelativePoint: CurveRelativeVector1D): Affine3D = calculatePose(curveRelativePoint).let { Affine3D.of(it) }
 
     /**
      * Transforms the [curveRelativePoint] (relative to this curve) to a [Vector3D] in cartesian coordinates.
@@ -111,12 +113,13 @@ data class Curve3D(
      * @param curveRelativeLineSegment line segment in curve relative coordinates
      * @return line segment in cartesian coordinates
      */
-    fun transform(curveRelativeLineSegment: CurveRelativeLineSegment3D): Either<Exception, LineSegment3D> = either {
-        val start = transform(curveRelativeLineSegment.start)
-        val end = transform(curveRelativeLineSegment.end)
+    fun transform(curveRelativeLineSegment: CurveRelativeLineSegment3D): Either<Exception, LineSegment3D> =
+        either {
+            val start = transform(curveRelativeLineSegment.start)
+            val end = transform(curveRelativeLineSegment.end)
 
-        LineSegment3D.of(start, end, curveRelativeLineSegment.tolerance, endBoundType).bind()
-    }
+            LineSegment3D.of(start, end, curveRelativeLineSegment.tolerance, endBoundType).bind()
+        }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

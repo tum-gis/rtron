@@ -26,10 +26,9 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16JunctionMapper::class, Opendrive16RoadMapper::class],
-    imports = [arrow.core.Option::class]
+    imports = [arrow.core.Option::class],
 )
 abstract class Opendrive16Mapper {
-
     private val logger = KotlinLogging.logger {}
 
     abstract fun mapModel(model: OpenDRIVE): OpendriveModel

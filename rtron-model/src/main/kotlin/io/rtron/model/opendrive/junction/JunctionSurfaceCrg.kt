@@ -25,5 +25,5 @@ data class JunctionSurfaceCrg(
     var mode: EJunctionSurfaceCRGMode = EJunctionSurfaceCRGMode.GLOBAL,
     var purpose: Option<ERoadSurfaceCrgPurpose> = None,
     var zOffset: Option<Double> = None,
-    var zScale: Option<Double> = None
+    var zScale: Option<Double> = None,
 ) : OpendriveElement()

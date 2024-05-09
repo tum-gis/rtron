@@ -22,8 +22,13 @@ import org.asam.opendrive17.OpenDRIVE
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17RoadMapper::class, Opendrive17ObjectMapper::class, Opendrive17SignalMapper::class, Opendrive17JunctionMapper::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [
+        OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17RoadMapper::class, Opendrive17ObjectMapper::class,
+        Opendrive17SignalMapper::class, Opendrive17JunctionMapper::class,
+    ],
+)
 abstract class Opendrive17Mapper {
-
     abstract fun mapModel(source: OpendriveModel): OpenDRIVE
 }

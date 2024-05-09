@@ -23,6 +23,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RoadspacesEvaluationReport(
     val parameters: RoadspacesEvaluatorParameters,
-
-    var modelingRulesEvaluation: DefaultIssueList = DefaultIssueList()
+    var modelingRulesEvaluation: DefaultIssueList = DefaultIssueList(),
 )

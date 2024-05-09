@@ -25,7 +25,6 @@ import io.rtron.model.opendrive.additions.identifier.LaneIdentifier
 @optics
 data class RoadLanesLaneSectionCenterLane(
     var id: Int = 0,
-
     override var link: Option<RoadLanesLaneSectionLCRLaneLink> = None,
     override var border: List<RoadLanesLaneSectionLRLaneBorder> = emptyList(),
     override var width: List<RoadLanesLaneSectionLRLaneWidth> = emptyList(),
@@ -35,12 +34,9 @@ data class RoadLanesLaneSectionCenterLane(
     override var access: List<RoadLanesLaneSectionLRLaneAccess> = emptyList(),
     override var height: List<RoadLanesLaneSectionLRLaneHeight> = emptyList(),
     override var rule: List<RoadLanesLaneSectionLRLaneRule> = emptyList(),
-
     override var level: Option<Boolean> = None,
     override var type: ELaneType = ELaneType.NONE,
-
-    override var additionalId: Option<LaneIdentifier> = None
+    override var additionalId: Option<LaneIdentifier> = None,
 ) : RoadLanesLaneSectionLRLane(), AdditionalLaneIdentifier {
-
     companion object
 }

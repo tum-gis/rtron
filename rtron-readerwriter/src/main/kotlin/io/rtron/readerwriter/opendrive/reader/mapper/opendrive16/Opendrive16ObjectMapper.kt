@@ -53,10 +53,9 @@ import org.mapstruct.ValueMapping
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16LaneMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive16ObjectMapper {
-
     //
     // Road Objects
     //
@@ -66,15 +65,19 @@ abstract class Opendrive16ObjectMapper {
     abstract fun mapRoadObjectsObject(source: T_Road_Objects_Object): RoadObjectsObject
 
     @AfterMapping
-    open fun afterMappingRoadObjectsObject(source: T_Road_Objects_Object, @MappingTarget target: RoadObjectsObject) {
+    open fun afterMappingRoadObjectsObject(
+        source: T_Road_Objects_Object,
+        @MappingTarget target: RoadObjectsObject,
+    ) {
         // after mapping deprecated outline element by creating a new container or
         // appending it to preexisting outlines container
         source.outline.toOption().onSome { sourceOutline ->
             val outline = mapRoadObjectsObjectOutlinesOutline(sourceOutline)
-            target.outlines = target.outlines.fold(
-                { RoadObjectsObjectOutlines(outline = listOf(outline)) },
-                { RoadObjectsObjectOutlines(outline = it.outline + outline) }
-            ).some()
+            target.outlines =
+                target.outlines.fold(
+                    { RoadObjectsObjectOutlines(outline = listOf(outline)) },
+                    { RoadObjectsObjectOutlines(outline = it.outline + outline) },
+                ).some()
         }
     }
 
@@ -82,11 +85,14 @@ abstract class Opendrive16ObjectMapper {
     // Outline
     //
     abstract fun mapRoadObjectsObjectOutlines(source: T_Road_Objects_Object_Outlines): RoadObjectsObjectOutlines
+
     abstract fun mapRoadObjectsObjectOutlinesOutline(source: T_Road_Objects_Object_Outlines_Outline): RoadObjectsObjectOutlinesOutline
 
     //
     abstract fun mapRoadObjectsObjectParkingSpace(source: T_Road_Objects_Object_ParkingSpace): RoadObjectsObjectParkingSpace
+
     abstract fun mapRoadObjectsObjectMarkings(source: T_Road_Objects_Object_Markings): RoadObjectsObjectMarkings
+
     abstract fun mapRoadObjectsObjectBorders(source: T_Road_Objects_Object_Borders): RoadObjectsObjectBorders
 
     //
@@ -94,18 +100,18 @@ abstract class Opendrive16ObjectMapper {
     //
     fun mapOutlineFileTypeToOption(source: E_OutlineFillType?): Option<EOutlineFillType> =
         source?.let { mapOutlineFileType(it).some() } ?: None
+
     abstract fun mapOutlineFileType(source: E_OutlineFillType): EOutlineFillType
 
-    fun mapLaneTypeToOption(source: E_LaneType?): Option<ELaneType> =
-        source?.let { mapLaneType(it).some() } ?: None
+    fun mapLaneTypeToOption(source: E_LaneType?): Option<ELaneType> = source?.let { mapLaneType(it).some() } ?: None
+
     abstract fun mapLaneType(source: E_LaneType): ELaneType
 
-    fun mapSideTypeToOption(source: E_SideType?): Option<ESideType> =
-        source?.let { mapSideType(it).some() } ?: None
+    fun mapSideTypeToOption(source: E_SideType?): Option<ESideType> = source?.let { mapSideType(it).some() } ?: None
+
     abstract fun mapSideType(source: E_SideType): ESideType
 
-    fun mapObjectTypeToOption(source: E_ObjectType?): Option<EObjectType> =
-        source?.let { mapObjectType(it).some() } ?: None
+    fun mapObjectTypeToOption(source: E_ObjectType?): Option<EObjectType> = source?.let { mapObjectType(it).some() } ?: None
 
     @ValueMapping(source = "CAR", target = "NONE")
     @ValueMapping(source = "VAN", target = "NONE")

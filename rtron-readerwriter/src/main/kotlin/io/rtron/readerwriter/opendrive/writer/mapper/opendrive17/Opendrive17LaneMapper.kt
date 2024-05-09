@@ -57,7 +57,11 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.NullValueCheckStrategy
 import org.mapstruct.ValueMapping
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class], imports = [Option::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class],
+    imports = [Option::class],
+)
 abstract class Opendrive17LaneMapper {
     //
     // Lane Section
@@ -66,10 +70,12 @@ abstract class Opendrive17LaneMapper {
 
     fun mapRoadLanesLaneSectionLeft(source: Option<RoadLanesLaneSectionLeft>): T_Road_Lanes_LaneSection_Left? =
         source.fold({ null }, { mapRoadLanesLaneSectionLeft(it) })
+
     abstract fun mapRoadLanesLaneSectionLeft(source: RoadLanesLaneSectionLeft): T_Road_Lanes_LaneSection_Left
 
     fun mapOptionRoadLanesLaneSectionRight(source: Option<RoadLanesLaneSectionRight>): T_Road_Lanes_LaneSection_Right? =
         source.fold({ null }, { mapRoadLanesLaneSectionRight(it) })
+
     abstract fun mapRoadLanesLaneSectionRight(source: RoadLanesLaneSectionRight): T_Road_Lanes_LaneSection_Right
 
     //
@@ -79,7 +85,10 @@ abstract class Opendrive17LaneMapper {
     abstract fun mapRoadLanesLaneSectionCenterLane(source: RoadLanesLaneSectionCenterLane): T_Road_Lanes_LaneSection_Center_Lane
 
     @AfterMapping
-    fun afterRoadLanesLaneSectionCenterLane(source: RoadLanesLaneSectionCenterLane, @MappingTarget target: T_Road_Lanes_LaneSection_Center_Lane) {
+    fun afterRoadLanesLaneSectionCenterLane(
+        source: RoadLanesLaneSectionCenterLane,
+        @MappingTarget target: T_Road_Lanes_LaneSection_Center_Lane,
+    ) {
         target.borderOrWidth += source.border.map { mapRoadLanesLaneSectionLRLaneBorder(it) }
     }
 
@@ -87,7 +96,10 @@ abstract class Opendrive17LaneMapper {
     abstract fun mapRoadLanesLaneSectionLeftLane(source: RoadLanesLaneSectionLeftLane): T_Road_Lanes_LaneSection_Left_Lane
 
     @AfterMapping
-    fun afterRoadLanesLaneSectionLeftLane(source: RoadLanesLaneSectionLeftLane, @MappingTarget target: T_Road_Lanes_LaneSection_Left_Lane) {
+    fun afterRoadLanesLaneSectionLeftLane(
+        source: RoadLanesLaneSectionLeftLane,
+        @MappingTarget target: T_Road_Lanes_LaneSection_Left_Lane,
+    ) {
         target.borderOrWidth += source.border.map { mapRoadLanesLaneSectionLRLaneBorder(it) }
     }
 
@@ -95,35 +107,53 @@ abstract class Opendrive17LaneMapper {
     abstract fun mapRoadLanesLaneSectionLeftRight(source: RoadLanesLaneSectionRightLane): T_Road_Lanes_LaneSection_Right_Lane
 
     @AfterMapping
-    fun afterRoadLanesLaneSectionRightLane(source: RoadLanesLaneSectionRightLane, @MappingTarget target: T_Road_Lanes_LaneSection_Right_Lane) {
+    fun afterRoadLanesLaneSectionRightLane(
+        source: RoadLanesLaneSectionRightLane,
+        @MappingTarget target: T_Road_Lanes_LaneSection_Right_Lane,
+    ) {
         target.borderOrWidth += source.border.map { mapRoadLanesLaneSectionLRLaneBorder(it) }
     }
 
     fun mapOptionRoadLanesLaneSectionLCRLaneLink(source: Option<RoadLanesLaneSectionLCRLaneLink>): T_Road_Lanes_LaneSection_Lcr_Lane_Link? =
         source.fold({ null }, { mapRoadLanesLaneSectionLCRLaneLink(it) })
+
     abstract fun mapRoadLanesLaneSectionLCRLaneLink(source: RoadLanesLaneSectionLCRLaneLink): T_Road_Lanes_LaneSection_Lcr_Lane_Link
 
     abstract fun mapRoadLanesLaneSectionLRLaneWidth(source: RoadLanesLaneSectionLRLaneWidth): T_Road_Lanes_LaneSection_Lr_Lane_Width
+
     abstract fun mapRoadLanesLaneSectionLRLaneBorder(source: RoadLanesLaneSectionLRLaneBorder): T_Road_Lanes_LaneSection_Lr_Lane_Border
 
     //
     // Road Mark
     //
-    fun mapOptionRoadLanesLaneSectionLCRLaneRoadMarkType(source: Option<RoadLanesLaneSectionLCRLaneRoadMarkType>): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type? =
-        source.fold({ null }, { mapRoadLanesLaneSectionLCRLaneRoadMarkType(it) })
-    abstract fun mapRoadLanesLaneSectionLCRLaneRoadMarkType(source: RoadLanesLaneSectionLCRLaneRoadMarkType): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type
+    fun mapOptionRoadLanesLaneSectionLCRLaneRoadMarkType(
+        source: Option<RoadLanesLaneSectionLCRLaneRoadMarkType>,
+    ): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type? = source.fold({ null }, { mapRoadLanesLaneSectionLCRLaneRoadMarkType(it) })
 
-    fun mapOptionRoadMarkWeight(source: Option<ERoadMarkWeight>): E_RoadMarkWeight? =
-        source.fold({ null }, { mapRoadMarkWeight(it) })
+    abstract fun mapRoadLanesLaneSectionLCRLaneRoadMarkType(
+        source: RoadLanesLaneSectionLCRLaneRoadMarkType,
+    ): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type
+
+    fun mapOptionRoadMarkWeight(source: Option<ERoadMarkWeight>): E_RoadMarkWeight? = source.fold({ null }, { mapRoadMarkWeight(it) })
+
     abstract fun mapRoadMarkWeight(source: ERoadMarkWeight): E_RoadMarkWeight
 
-    fun mapOptionRoadLanesLaneSectionLCRLaneRoadMarkLaneChange(source: Option<ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange>): E_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_LaneChange? =
+    fun mapOptionRoadLanesLaneSectionLCRLaneRoadMarkLaneChange(
+        source: Option<ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange>,
+    ): E_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_LaneChange? =
         source.fold({ null }, { mapRoadLanesLaneSectionLCRLaneRoadMarkLaneChange(it) })
-    abstract fun mapRoadLanesLaneSectionLCRLaneRoadMarkLaneChange(source: ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange): E_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_LaneChange
 
-    fun mapOptionRoadLanesLaneSectionLCRLaneRoadMarkExplicit(source: Option<RoadLanesLaneSectionLCRLaneRoadMarkExplicit>): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Explicit? =
-        source.fold({ null }, { mapRoadLanesLaneSectionLCRLaneRoadMarkExplicit(it) })
-    abstract fun mapRoadLanesLaneSectionLCRLaneRoadMarkExplicit(source: RoadLanesLaneSectionLCRLaneRoadMarkExplicit): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Explicit
+    abstract fun mapRoadLanesLaneSectionLCRLaneRoadMarkLaneChange(
+        source: ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange,
+    ): E_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_LaneChange
+
+    fun mapOptionRoadLanesLaneSectionLCRLaneRoadMarkExplicit(
+        source: Option<RoadLanesLaneSectionLCRLaneRoadMarkExplicit>,
+    ): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Explicit? = source.fold({ null }, { mapRoadLanesLaneSectionLCRLaneRoadMarkExplicit(it) })
+
+    abstract fun mapRoadLanesLaneSectionLCRLaneRoadMarkExplicit(
+        source: RoadLanesLaneSectionLCRLaneRoadMarkExplicit,
+    ): T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Explicit
 
     @ValueMapping(source = "SOLID_SOLID", target = "SOLID___SOLID")
     @ValueMapping(source = "SOLID_BROKEN", target = "SOLID___BROKEN")
@@ -138,5 +168,6 @@ abstract class Opendrive17LaneMapper {
     abstract fun mapRoadMarkRule(source: ERoadMarkRule): E_RoadMarkRule
 
     fun mapOptionRoadMarkColor(source: Option<ERoadMarkColor>): E_RoadMarkColor? = source.fold({ null }, { mapRoadMarkColor(it) })
+
     abstract fun mapRoadMarkColor(source: ERoadMarkColor): E_RoadMarkColor
 }

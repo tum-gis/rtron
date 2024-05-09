@@ -48,14 +48,17 @@ import io.rtron.transformer.issues.opendrive.of
  * Builder for solid geometries in 3D from the OpenDRIVE data model.
  */
 object Solid3DBuilder {
-
     // Methods
 
     /**
      * Builds a list of cuboids from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCuboids(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): Cuboid3D {
+    fun buildCuboids(
+        roadObject: RoadObjectsObject,
+        curveAffine: Affine3D,
+        numberTolerance: Double,
+    ): Cuboid3D {
         require(roadObject.containsCuboid()) { "Road object must contain cuboid." }
 
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
@@ -66,7 +69,7 @@ object Solid3DBuilder {
             roadObject.width,
             roadObject.heightValidated,
             numberTolerance,
-            affineSequence
+            affineSequence,
         )
     }
 
@@ -74,7 +77,11 @@ object Solid3DBuilder {
      * Builds a list of cylinders from the OpenDRIVE road object class ([RoadObjectsObject]) directly or from the
      * repeated entries defined in [RoadObjectsObjectRepeat].
      */
-    fun buildCylinders(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double): Cylinder3D {
+    fun buildCylinders(
+        roadObject: RoadObjectsObject,
+        curveAffine: Affine3D,
+        numberTolerance: Double,
+    ): Cylinder3D {
         require(roadObject.containsCylinder()) { "Road object must contain cylinder." }
 
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
@@ -89,15 +96,26 @@ object Solid3DBuilder {
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      * @return list of polyhedrons
      */
-    fun buildPolyhedronsByRoadCorners(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D, numberTolerance: Double): ContextIssueList<List<Polyhedron3D>> {
+    fun buildPolyhedronsByRoadCorners(
+        roadObject: RoadObjectsObject,
+        roadReferenceLine: Curve3D,
+        numberTolerance: Double,
+    ): ContextIssueList<List<Polyhedron3D>> {
         val issueList = DefaultIssueList()
 
-        val (builderExceptions, polyhedronsWithContext) = roadObject
-            .getPolyhedronsDefinedByRoadCorners()
-            .map { buildPolyhedronByRoadCorners(it, roadReferenceLine, numberTolerance) }
-            .separateEither()
+        val (builderExceptions, polyhedronsWithContext) =
+            roadObject
+                .getPolyhedronsDefinedByRoadCorners()
+                .map { buildPolyhedronByRoadCorners(it, roadReferenceLine, numberTolerance) }
+                .separateEither()
 
-        issueList += builderExceptions.map { DefaultIssue.of("PolyhedronNotConstructableFromRoadCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }.mergeToReport()
+        issueList +=
+            builderExceptions.map {
+                DefaultIssue.of(
+                    "PolyhedronNotConstructableFromRoadCornerOutlines", it.message, it.location,
+                    Severity.WARNING, wasFixed = true,
+                )
+            }.mergeToReport()
         val polyhedrons = polyhedronsWithContext.handleIssueList { issueList += it.issueList }
 
         return ContextIssueList(polyhedrons, issueList)
@@ -106,15 +124,28 @@ object Solid3DBuilder {
     /**
      * Builds a single polyhedron from an OpenDRIVE road object defined by road corner outlines.
      */
-    private fun buildPolyhedronByRoadCorners(outline: RoadObjectsObjectOutlinesOutline, referenceLine: Curve3D, numberTolerance: Double):
-        Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> {
+    private fun buildPolyhedronByRoadCorners(
+        outline: RoadObjectsObjectOutlinesOutline,
+        referenceLine: Curve3D,
+        numberTolerance: Double,
+    ): Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> {
         require(outline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
-        require(outline.cornerLocal.all { it.height == 0.0 || numberTolerance <= it.height }) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
-        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
+        require(
+            outline.cornerLocal.all {
+                it.height == 0.0 || numberTolerance <= it.height
+            },
+        ) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
+        val outlineId =
+            outline.additionalId.toEither {
+                IllegalStateException(
+                    "Additional outline ID must be available.",
+                )
+            }.getOrElse { throw it }
 
-        val verticalOutlineElements = outline.cornerRoad
-            .map { buildVerticalOutlineElement(it, referenceLine, numberTolerance) }
-            .let { it.toNonEmptyListOrNull()!! }
+        val verticalOutlineElements =
+            outline.cornerRoad
+                .map { buildVerticalOutlineElement(it, referenceLine, numberTolerance) }
+                .let { it.toNonEmptyListOrNull()!! }
 
         return Polyhedron3DFactory.buildFromVerticalOutlineElements(outlineId, verticalOutlineElements, numberTolerance)
     }
@@ -125,13 +156,17 @@ object Solid3DBuilder {
      * @param cornerRoad road corner element of OpenDRIVE which defines one corner of a road object
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      */
-    private fun buildVerticalOutlineElement(cornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad, roadReferenceLine: Curve3D, numberTolerance: Double):
-        Polyhedron3DFactory.VerticalOutlineElement {
+    private fun buildVerticalOutlineElement(
+        cornerRoad: RoadObjectsObjectOutlinesOutlineCornerRoad,
+        roadReferenceLine: Curve3D,
+        numberTolerance: Double,
+    ): Polyhedron3DFactory.VerticalOutlineElement {
         val curveRelativeOutlineElementGeometry = cornerRoad.getPoints()
 
         val basePoint = roadReferenceLine.transform(curveRelativeOutlineElementGeometry.first)
-        val headPoint = curveRelativeOutlineElementGeometry.second
-            .map { point -> roadReferenceLine.transform(point) }
+        val headPoint =
+            curveRelativeOutlineElementGeometry.second
+                .map { point -> roadReferenceLine.transform(point) }
 
         return Polyhedron3DFactory.VerticalOutlineElement(basePoint, headPoint, tolerance = numberTolerance)
     }
@@ -143,23 +178,34 @@ object Solid3DBuilder {
      * @param curveAffine affine transformation matrix from the curve
      * @return list of polyhedrons
      */
-    fun buildPolyhedronsByLocalCorners(roadObject: RoadObjectsObject, curveAffine: Affine3D, numberTolerance: Double):
-        ContextIssueList<List<Polyhedron3D>> {
+    fun buildPolyhedronsByLocalCorners(
+        roadObject: RoadObjectsObject,
+        curveAffine: Affine3D,
+        numberTolerance: Double,
+    ): ContextIssueList<List<Polyhedron3D>> {
         val issueList = DefaultIssueList()
         val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
         val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
 
-        val (builderExceptions, polyhedronsWithContext) = roadObject
-            .getPolyhedronsDefinedByLocalCorners()
-            .map { buildPolyhedronByLocalCorners(it, numberTolerance) }
-            .separateEither()
+        val (builderExceptions, polyhedronsWithContext) =
+            roadObject
+                .getPolyhedronsDefinedByLocalCorners()
+                .map { buildPolyhedronByLocalCorners(it, numberTolerance) }
+                .separateEither()
 
-        issueList += builderExceptions
-            .map { DefaultIssue.of("PolyhedronNotConstructableFromLocalCornerOutlines", it.message, it.location, Severity.WARNING, wasFixed = true) }
-            .mergeToReport()
-        val polyhedrons = polyhedronsWithContext
-            .handleIssueList { issueList += it.issueList }
-            .map { it.copy(affineSequence = affineSequence) }
+        issueList +=
+            builderExceptions
+                .map {
+                    DefaultIssue.of(
+                        "PolyhedronNotConstructableFromLocalCornerOutlines", it.message, it.location,
+                        Severity.WARNING, wasFixed = true,
+                    )
+                }
+                .mergeToReport()
+        val polyhedrons =
+            polyhedronsWithContext
+                .handleIssueList { issueList += it.issueList }
+                .map { it.copy(affineSequence = affineSequence) }
 
         return ContextIssueList(polyhedrons, issueList)
     }
@@ -167,22 +213,40 @@ object Solid3DBuilder {
     /**
      * Builds a single polyhedron from an OpenDRIVE road object defined by local corner outlines.
      */
-    private fun buildPolyhedronByLocalCorners(outline: RoadObjectsObjectOutlinesOutline, numberTolerance: Double):
-        Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> = either {
-        require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
-        require(outline.cornerLocal.all { it.height == 0.0 || numberTolerance <= it.height }) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
-        val outlineId = outline.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
+    private fun buildPolyhedronByLocalCorners(
+        outline: RoadObjectsObjectOutlinesOutline,
+        numberTolerance: Double,
+    ): Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> =
+        either {
+            require(outline.isPolyhedronDefinedByLocalCorners()) { "Outline does not contain a polyhedron represented by local corners." }
+            require(
+                outline.cornerLocal.all {
+                    it.height == 0.0 || numberTolerance <= it.height
+                },
+            ) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
+            val outlineId =
+                outline.additionalId.toEither {
+                    IllegalStateException(
+                        "Additional outline ID must be available.",
+                    )
+                }.getOrElse { throw it }
 
-        val issueList = DefaultIssueList()
+            val issueList = DefaultIssueList()
 
-        val verticalOutlineElements = outline.cornerLocal
-            .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.getBasePoint(), it.getHeadPoint(), None, numberTolerance) }
-            .handleIssueList { issueList += it.issueList }
-            .let { it.toNonEmptyListOrNull()!! }
+            val verticalOutlineElements =
+                outline.cornerLocal
+                    .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.getBasePoint(), it.getHeadPoint(), None, numberTolerance) }
+                    .handleIssueList { issueList += it.issueList }
+                    .let { it.toNonEmptyListOrNull()!! }
 
-        val polyhedronWithContextIssueList = Polyhedron3DFactory.buildFromVerticalOutlineElements(outlineId, verticalOutlineElements, numberTolerance).bind()
-        polyhedronWithContextIssueList
-    }
+            val polyhedronWithContextIssueList =
+                Polyhedron3DFactory.buildFromVerticalOutlineElements(
+                    outlineId,
+                    verticalOutlineElements,
+                    numberTolerance,
+                ).bind()
+            polyhedronWithContextIssueList
+        }
 
     /**
      * Builds a parametric sweep from OpenDRIVE road objects defined by the repeat entries.
@@ -190,7 +254,11 @@ object Solid3DBuilder {
      * @param roadObjectRepeat repeated road object of OpenDRIVE
      * @param roadReferenceLine road reference line for transforming curve relative coordinates
      */
-    fun buildParametricSweep(roadObjectRepeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D, numberTolerance: Double): Option<ParametricSweep3D> {
+    fun buildParametricSweep(
+        roadObjectRepeat: RoadObjectsObjectRepeat,
+        roadReferenceLine: Curve3D,
+        numberTolerance: Double,
+    ): Option<ParametricSweep3D> {
         if (!roadObjectRepeat.containsParametricSweep()) return None
 
         // curve over which the object is moved
@@ -201,14 +269,15 @@ object Solid3DBuilder {
         val heightFunction = roadObjectRepeat.getObjectHeightFunction()
         val widthFunction = roadObjectRepeat.getObjectWidthFunction()
 
-        val parametricSweep3D = ParametricSweep3D(
-            objectReferenceCurve2D,
-            objectReferenceHeight,
-            heightFunction,
-            widthFunction,
-            numberTolerance,
-            ParametricSweep3D.DEFAULT_STEP_SIZE
-        )
+        val parametricSweep3D =
+            ParametricSweep3D(
+                objectReferenceCurve2D,
+                objectReferenceHeight,
+                heightFunction,
+                widthFunction,
+                numberTolerance,
+                ParametricSweep3D.DEFAULT_STEP_SIZE,
+            )
         return parametricSweep3D.some()
     }
 }

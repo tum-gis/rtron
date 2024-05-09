@@ -30,7 +30,6 @@ import io.rtron.math.geometry.euclidean.threed.surface.ParametricBoundedSurface3
  * from the actual object structure of the 3D geometry.
  */
 interface Geometry3DVisitor {
-
     // point
     fun visit(vector3D: Vector3D)
 
@@ -39,12 +38,16 @@ interface Geometry3DVisitor {
 
     // surface
     fun visit(abstractSurface3D: AbstractSurface3D)
+
     fun visit(circle3D: Circle3D)
+
     fun visit(parametricBoundedSurface3D: ParametricBoundedSurface3D)
 
     // solid
     fun visit(abstractSolid3D: AbstractSolid3D)
+
     fun visit(cylinder3D: Cylinder3D)
+
     fun visit(parametricSweep3D: ParametricSweep3D)
 
     // abstract geometry

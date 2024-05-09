@@ -25,8 +25,7 @@ data class RoadElevationProfileElevation(
     var b: Double = Double.NaN,
     var c: Double = Double.NaN,
     var d: Double = Double.NaN,
-
-    var s: Double = Double.NaN
+    var s: Double = Double.NaN,
 ) : OpendriveElement() {
     // Properties and Initializers
     val coefficients get() = doubleArrayOf(a, b, c, d)

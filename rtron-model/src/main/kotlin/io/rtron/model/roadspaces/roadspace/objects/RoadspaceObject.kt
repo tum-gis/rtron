@@ -38,9 +38,8 @@ data class RoadspaceObject(
     val boundingBoxGeometry: Option<AbstractGeometry3D>,
     val complexGeometry: Option<AbstractGeometry3D>,
     val laneRelations: List<LateralLaneRangeIdentifier>,
-    val attributes: AttributeList
+    val attributes: AttributeList,
 ) {
-
     // Properties and Initializers
     val name get() = id.roadspaceObjectName
 

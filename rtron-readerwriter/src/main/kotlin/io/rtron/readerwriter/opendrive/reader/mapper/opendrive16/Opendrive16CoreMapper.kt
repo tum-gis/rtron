@@ -39,10 +39,9 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive16CoreMapper {
-
     private val logger = KotlinLogging.logger {}
 
     //
@@ -52,7 +51,9 @@ abstract class Opendrive16CoreMapper {
         return HeaderGeoReference(content = source.content.joinToString()).some()
     }
 
-    fun mapHeaderOffsetToOptionHeaderOffset(source: T_Header_Offset?): Option<HeaderOffset> = source?.let { mapHeaderOffset(it).some() } ?: None
+    fun mapHeaderOffsetToOptionHeaderOffset(source: T_Header_Offset?): Option<HeaderOffset> =
+        source?.let { mapHeaderOffset(it).some() } ?: None
+
     abstract fun mapHeaderOffset(source: T_Header_Offset): HeaderOffset
 
     fun mapAdditionalData(source: List<Any>): List<AdditionalData> {
@@ -63,36 +64,42 @@ abstract class Opendrive16CoreMapper {
     // Enumerations
     //
     fun mapEUnitSpeedToOption(source: E_UnitSpeed?): Option<EUnitSpeed> = source?.let { mapEUnitSpeed(it).some() } ?: None
-    fun mapEUnitSpeed(source: E_UnitSpeed): EUnitSpeed = when (source) {
-        E_UnitSpeed.M___S -> EUnitSpeed.METER_PER_SECOND
-        E_UnitSpeed.MPH -> EUnitSpeed.MILES_PER_HOUR
-        E_UnitSpeed.KM___H -> EUnitSpeed.KILOMETER_PER_HOUR
-    }
+
+    fun mapEUnitSpeed(source: E_UnitSpeed): EUnitSpeed =
+        when (source) {
+            E_UnitSpeed.M___S -> EUnitSpeed.METER_PER_SECOND
+            E_UnitSpeed.MPH -> EUnitSpeed.MILES_PER_HOUR
+            E_UnitSpeed.KM___H -> EUnitSpeed.KILOMETER_PER_HOUR
+        }
 
     fun mapUnitToOptionEUnit(source: String?): Option<EUnit> = source?.let { mapUnitToEUnit(it).some() } ?: None
-    fun mapUnitToEUnit(source: String): EUnit = when (source) {
-        E_UnitDistance.M.value() -> EUnit.METER
-        E_UnitDistance.KM.value() -> EUnit.KILOMETER
-        E_UnitDistance.FT.value() -> EUnit.FEET
-        E_UnitDistance.MILE.value() -> EUnit.MILE
 
-        E_UnitSpeed.M___S.value() -> EUnit.METER_PER_SECOND
-        E_UnitSpeed.MPH.value() -> EUnit.MILES_PER_HOUR
-        E_UnitSpeed.KM___H.value() -> EUnit.KILOMETER_PER_HOUR
+    fun mapUnitToEUnit(source: String): EUnit =
+        when (source) {
+            E_UnitDistance.M.value() -> EUnit.METER
+            E_UnitDistance.KM.value() -> EUnit.KILOMETER
+            E_UnitDistance.FT.value() -> EUnit.FEET
+            E_UnitDistance.MILE.value() -> EUnit.MILE
 
-        E_UnitMass.KG.value() -> EUnit.KILOGRAM
-        E_UnitMass.T.value() -> EUnit.TON
+            E_UnitSpeed.M___S.value() -> EUnit.METER_PER_SECOND
+            E_UnitSpeed.MPH.value() -> EUnit.MILES_PER_HOUR
+            E_UnitSpeed.KM___H.value() -> EUnit.KILOMETER_PER_HOUR
 
-        E_UnitSlope.PERCENT.value() -> EUnit.PERCENT
-        else -> {
-            logger.error { "Unknown mapping of $source to EUnit (falling back to PERCENT)" }
-            EUnit.PERCENT
+            E_UnitMass.KG.value() -> EUnit.KILOGRAM
+            E_UnitMass.T.value() -> EUnit.TON
+
+            E_UnitSlope.PERCENT.value() -> EUnit.PERCENT
+            else -> {
+                logger.error { "Unknown mapping of $source to EUnit (falling back to PERCENT)" }
+                EUnit.PERCENT
+            }
         }
-    }
 
     fun mapYesNoToOption(source: T_YesNo?): Option<Boolean> = source?.let { mapYesNo(it).some() } ?: None
-    fun mapYesNo(source: T_YesNo): Boolean = when (source) {
-        T_YesNo.YES -> true
-        T_YesNo.NO -> false
-    }
+
+    fun mapYesNo(source: T_YesNo): Boolean =
+        when (source) {
+            T_YesNo.YES -> true
+            T_YesNo.NO -> false
+        }
 }

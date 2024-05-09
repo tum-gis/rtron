@@ -29,21 +29,23 @@ import kotlin.math.abs
  */
 data class LaneIdentifier(
     val laneId: Int,
-    val laneSectionIdentifier: LaneSectionIdentifier
+    val laneSectionIdentifier: LaneSectionIdentifier,
 ) : AbstractRoadspacesIdentifier(), LaneSectionIdentifierInterface by laneSectionIdentifier {
-
     // Properties and Initializers
     val hashKey get() = "Lane_${laneId}_${laneSectionIdentifier.laneSectionId}_${laneSectionIdentifier.roadspaceIdentifier.roadspaceId}"
 
     // Methods
-    fun getRoadSide(): RoadSide = when {
-        laneId > 0 -> RoadSide.LEFT
-        laneId == 0 -> RoadSide.CENTER
-        else -> RoadSide.RIGHT
-    }
+    fun getRoadSide(): RoadSide =
+        when {
+            laneId > 0 -> RoadSide.LEFT
+            laneId == 0 -> RoadSide.CENTER
+            else -> RoadSide.RIGHT
+        }
 
     fun isLeft() = laneId > 0
+
     fun isCenter() = laneId == 0
+
     fun isRight() = laneId < 0
 
     /** Returns true, if lane id is in the direction of the reference line. */
@@ -55,14 +57,12 @@ data class LaneIdentifier(
     /** Returns the [LaneIdentifier] of the lane which is located adjacently inner (towards the reference line) to the
      * lane of this identifier.
      */
-    fun getAdjacentInnerLaneIdentifier(): LaneIdentifier =
-        LaneIdentifier(sign(laneId) * (abs(laneId) - 1), laneSectionIdentifier)
+    fun getAdjacentInnerLaneIdentifier(): LaneIdentifier = LaneIdentifier(sign(laneId) * (abs(laneId) - 1), laneSectionIdentifier)
 
     /** Returns the [LaneIdentifier] of the lane which is located adjacently outer (in the opposite direction of the
      * reference line) to the lane of this identifier.
      */
-    fun getAdjacentOuterLaneIdentifier(): LaneIdentifier =
-        LaneIdentifier(sign(laneId) * (abs(laneId) + 1), laneSectionIdentifier)
+    fun getAdjacentOuterLaneIdentifier(): LaneIdentifier = LaneIdentifier(sign(laneId) * (abs(laneId) + 1), laneSectionIdentifier)
 
     /** Returns the identifier for the adjacent lane to the left. */
     fun getAdjacentLeftLaneIdentifier(): LaneIdentifier = LaneIdentifier(laneId + 1, laneSectionIdentifier)
@@ -85,15 +85,17 @@ data class LaneIdentifier(
         } + laneIdentifier.laneSectionIdentifier.toAttributes(prefix)
     }
 
-    override fun toStringMap(): Map<String, String> =
-        mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
+    override fun toStringMap(): Map<String, String> = mapOf("laneId" to laneId.toString()) + laneSectionIdentifier.toStringMap()
 
     override fun toIdentifierText() = "LaneIdentifier(laneId=$laneId, laneSectionId=$laneSectionId, roadId=$roadspaceId)"
+
     fun toRoadspaceIdentifier() = laneSectionIdentifier.roadspaceIdentifier
 
     companion object {
-
-        fun of(laneId: Int, laneSectionId: Int, roadspaceIdentifier: RoadspaceIdentifier) =
-            LaneIdentifier(laneId, LaneSectionIdentifier(laneSectionId, roadspaceIdentifier))
+        fun of(
+            laneId: Int,
+            laneSectionId: Int,
+            roadspaceIdentifier: RoadspaceIdentifier,
+        ) = LaneIdentifier(laneId, LaneSectionIdentifier(laneSectionId, roadspaceIdentifier))
     }
 }

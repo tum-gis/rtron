@@ -20,5 +20,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OpendriveOffsetResolverReport(
-    var messages: List<String> = emptyList()
+    var messages: List<String> = emptyList(),
 )

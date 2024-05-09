@@ -17,5 +17,5 @@
 package io.rtron.model.opendrive.core
 
 open class OpendriveElement(
-    var g_AdditionalData: List<AdditionalData> = emptyList()
+    var g_AdditionalData: List<AdditionalData> = emptyList(),
 )

@@ -74,9 +74,8 @@ class Road(
     val surfaceWithoutTorsion: AbstractCurveRelativeSurface3D,
     val laneOffset: UnivariateFunction,
     val laneSections: NonEmptyList<LaneSection>,
-    val linkage: RoadLinkage
+    val linkage: RoadLinkage,
 ) {
-
     // Properties and Initializers
     init {
         require(surface.domain == surfaceWithoutTorsion.domain) { "Domains of provided surfaces must have the same domain." }
@@ -86,22 +85,30 @@ class Road(
         require(
             laneOffset.domain.fuzzyEncloses(
                 surface.domain,
-                surface.tolerance
-            )
+                surface.tolerance,
+            ),
         ) { "The lane offset function must be defined everywhere where the surface is also defined." }
         require(
             laneSections.mapIndexed { index, laneSection -> index to laneSection }
-                .all { it.first == it.second.id.laneSectionId }
+                .all { it.first == it.second.id.laneSectionId },
         ) { "LaneSection elements must be positioned according to their laneSection id on the list." }
         require(
             laneSections.dropLast(1)
-                .all { it.curvePositionDomain.lowerBoundType() == BoundType.CLOSED && it.curvePositionDomain.upperBoundType() == BoundType.OPEN }
+                .all {
+                    it.curvePositionDomain.lowerBoundType() == BoundType.CLOSED &&
+                        it.curvePositionDomain.upperBoundType() == BoundType.OPEN
+                },
         ) { "CurvePositionDomain of all LaneSections apart from the last must have a closed lower and open upper bound." }
-        require(laneSections.last().curvePositionDomain.lowerBoundType() == BoundType.CLOSED && laneSections.last().curvePositionDomain.upperBoundType() == BoundType.CLOSED) { "CurvePositionDomain of the last LaneSection must have a closed lower and upper bound." }
+        require(
+            laneSections.last().curvePositionDomain.lowerBoundType() == BoundType.CLOSED &&
+                laneSections.last().curvePositionDomain.upperBoundType() == BoundType.CLOSED,
+        ) {
+            "CurvePositionDomain of the last LaneSection must have a closed lower and upper bound."
+        }
 
         val expectedLaneIds = laneSections.indices.toList()
         require(
-            laneSections.indices.toList().containsAll(expectedLaneIds)
+            laneSections.indices.toList().containsAll(expectedLaneIds),
         ) { "There must be no gaps within the given laneSectionIds." }
         require(laneSections.isSortedBy { it.id.laneSectionId }) { "LaneSections have to be sorted." }
 
@@ -120,7 +127,7 @@ class Road(
         getLaneSectionCurvePositionDomains().map {
             SectionedCurveRelativeParametricSurface3D(
                 surfaceWithoutTorsion,
-                it
+                it,
             )
         }
 
@@ -165,12 +172,13 @@ class Road(
             throw IllegalArgumentException("Domains of lane sections must close flush.")
         }
 
-        val fuzzySelectedLaneSections = laneSections.filter {
-            it.curvePositionDomain.fuzzyContains(
-                curveRelativePoint.curvePosition,
-                geometricalTolerance
-            )
-        }
+        val fuzzySelectedLaneSections =
+            laneSections.filter {
+                it.curvePositionDomain.fuzzyContains(
+                    curveRelativePoint.curvePosition,
+                    geometricalTolerance,
+                )
+            }
         return when (fuzzySelectedLaneSections.size) {
             1 -> fuzzySelectedLaneSections.first().right()
             0 -> IllegalArgumentException("No laneSection found").left()
@@ -179,10 +187,11 @@ class Road(
     }
 
     /** Returns an individual lane referenced by [laneIdentifier]; if it does not exist, an [Either.Left] is returned. */
-    fun getLane(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, Lane> = either {
-        val laneSection = getLaneSection(laneIdentifier.laneSectionIdentifier).bind()
-        laneSection.getLane(laneIdentifier.laneId).bind()
-    }
+    fun getLane(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, Lane> =
+        either {
+            val laneSection = getLaneSection(laneIdentifier.laneSectionIdentifier).bind()
+            laneSection.getLane(laneIdentifier.laneId).bind()
+        }
 
     /** Returns true, if road belongs to a junction. */
     fun isLocatedInJunction() = linkage.belongsToJunctionId.isSome()
@@ -190,19 +199,21 @@ class Road(
     /** Returns the contact point of the roadspace which connects to the junction with the [junctionIdentifier]. */
     fun getRoadspaceContactPointToJunction(junctionIdentifier: JunctionIdentifier): Option<RoadspaceContactPointIdentifier> =
         when {
-            linkage.predecessorJunctionId.isSome { it == junctionIdentifier } -> Some(
-                RoadspaceContactPointIdentifier(
-                    ContactPoint.START,
-                    id
+            linkage.predecessorJunctionId.isSome { it == junctionIdentifier } ->
+                Some(
+                    RoadspaceContactPointIdentifier(
+                        ContactPoint.START,
+                        id,
+                    ),
                 )
-            )
 
-            linkage.successorJunctionId.isSome { it == junctionIdentifier } -> Some(
-                RoadspaceContactPointIdentifier(
-                    ContactPoint.END,
-                    id
+            linkage.successorJunctionId.isSome { it == junctionIdentifier } ->
+                Some(
+                    RoadspaceContactPointIdentifier(
+                        ContactPoint.END,
+                        id,
+                    ),
                 )
-            )
 
             else -> None
         }
@@ -210,7 +221,9 @@ class Road(
     /** Returns the [LaneSectionIdentifier] (first or last lane section) of the roadspace which is referenced by the
      * [roadspaceContactPointIdentifier]. */
     fun getLaneSectionIdentifier(roadspaceContactPointIdentifier: RoadspaceContactPointIdentifier): LaneSectionIdentifier {
-        require(roadspaceContactPointIdentifier.roadspaceIdentifier == id) { "RoadspaceContactIdentifier ($roadspaceContactPointIdentifier) must reference this road (id=$id)." }
+        require(roadspaceContactPointIdentifier.roadspaceIdentifier == id) {
+            "RoadspaceContactIdentifier ($roadspaceContactPointIdentifier) must reference this road (id=$id)."
+        }
 
         return when (roadspaceContactPointIdentifier.roadspaceContactPoint) {
             ContactPoint.START -> laneSections.first().id
@@ -219,12 +232,10 @@ class Road(
     }
 
     /** Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road. */
-    fun isInFirstLaneSection(laneIdentifier: LaneIdentifier) =
-        laneIdentifier.laneSectionIdentifier == laneSections.first().id
+    fun isInFirstLaneSection(laneIdentifier: LaneIdentifier) = laneIdentifier.laneSectionIdentifier == laneSections.first().id
 
     /** Returns true, if the lane with [laneIdentifier] is contained in the last lane section of the road. */
-    fun isInLastLaneSection(laneIdentifier: LaneIdentifier) =
-        laneIdentifier.laneSectionIdentifier == laneSections.last().id
+    fun isInLastLaneSection(laneIdentifier: LaneIdentifier) = laneIdentifier.laneSectionIdentifier == laneSections.last().id
 
     /** Returns the number of contained lane sections. */
     fun numberOfLaneSections(): Int = laneSections.size
@@ -289,12 +300,10 @@ class Road(
         }
 
     /** Returns the inner lane boundary of an individual lane with [laneIdentifier]. */
-    fun getInnerLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> =
-        getCurveOnLane(laneIdentifier, 0.0)
+    fun getInnerLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> = getCurveOnLane(laneIdentifier, 0.0)
 
     /** Returns the outer lane boundary of an individual lane with [laneIdentifier]. */
-    fun getOuterLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> =
-        getCurveOnLane(laneIdentifier, 1.0)
+    fun getOuterLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> = getCurveOnLane(laneIdentifier, 1.0)
 
     /** Returns the curve of the center lane with [laneSectionIdentifier]. */
     fun getCurveOfCenterLane(laneSectionIdentifier: LaneSectionIdentifier): Either<Exception, AbstractCurve3D> =
@@ -316,49 +325,51 @@ class Road(
     fun getCurveOnLane(
         laneIdentifier: LaneIdentifier,
         factor: Double,
-        addLateralOffset: UnivariateFunction = ConstantFunction.ZERO
-    ):
-        Either<Exception, AbstractCurve3D> = either {
-        require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
+        addLateralOffset: UnivariateFunction = ConstantFunction.ZERO,
+    ): Either<Exception, AbstractCurve3D> =
+        either {
+            require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
-        // select the requested lane
-        val selectedLaneSection = getLaneSection(laneIdentifier.laneSectionIdentifier).bind()
-        val selectedLane = selectedLaneSection.getLane(laneIdentifier.laneId).bind()
+            // select the requested lane
+            val selectedLaneSection = getLaneSection(laneIdentifier.laneSectionIdentifier).bind()
+            val selectedLane = selectedLaneSection.getLane(laneIdentifier.laneId).bind()
 
-        // select the correct surface and section it
-        val sectionedSurface =
-            if (selectedLane.level) {
-                sectionedSurfacesWithoutTorsion[laneIdentifier.laneSectionId]
-            } else {
-                sectionedSurfaces[laneIdentifier.laneSectionId]
-            }
+            // select the correct surface and section it
+            val sectionedSurface =
+                if (selectedLane.level) {
+                    sectionedSurfacesWithoutTorsion[laneIdentifier.laneSectionId]
+                } else {
+                    sectionedSurfaces[laneIdentifier.laneSectionId]
+                }
 
-        // calculate the total lateral offset function to the road's reference line
-        val sectionedLaneReferenceOffset = sectionedLaneOffset[laneIdentifier.laneSectionId]
-        val lateralLaneOffset = selectedLaneSection
-            .getLateralLaneOffset(laneIdentifier.laneId, factor)
-            .bind()
-        val lateralOffset = StackedFunction.ofSum(
-            sectionedLaneReferenceOffset,
-            lateralLaneOffset,
-            addLateralOffset
-        )
+            // calculate the total lateral offset function to the road's reference line
+            val sectionedLaneReferenceOffset = sectionedLaneOffset[laneIdentifier.laneSectionId]
+            val lateralLaneOffset =
+                selectedLaneSection
+                    .getLateralLaneOffset(laneIdentifier.laneId, factor)
+                    .bind()
+            val lateralOffset =
+                StackedFunction.ofSum(
+                    sectionedLaneReferenceOffset,
+                    lateralLaneOffset,
+                    addLateralOffset,
+                )
 
-        // calculate the additional height offset for the specific factor
-        val heightLaneOffset = selectedLaneSection
-            .getLaneHeightOffset(laneIdentifier, factor)
-            .bind()
+            // calculate the additional height offset for the specific factor
+            val heightLaneOffset =
+                selectedLaneSection
+                    .getLaneHeightOffset(laneIdentifier, factor)
+                    .bind()
 
-        // combine it to a curve on the sectioned road surface
-        CurveOnParametricSurface3D(sectionedSurface, lateralOffset, heightLaneOffset)
-    }
+            // combine it to a curve on the sectioned road surface
+            CurveOnParametricSurface3D(sectionedSurface, lateralOffset, heightLaneOffset)
+        }
 
     private fun getCurveOnLaneSectionSurface(
         laneSectionIdentifier: LaneSectionIdentifier,
         level: Boolean,
-        addLateralOffset: UnivariateFunction = ConstantFunction.ZERO
-    ):
-        Either<Exception, AbstractCurve3D> {
+        addLateralOffset: UnivariateFunction = ConstantFunction.ZERO,
+    ): Either<Exception, AbstractCurve3D> {
         // select the correct surface and section it
         val sectionedSurface =
             if (level) {
@@ -378,43 +389,50 @@ class Road(
     /**
      * Returns the surface of an individual lane with [laneIdentifier] and a certain discretization [step] size.
      */
-    fun getLaneSurface(laneIdentifier: LaneIdentifier, step: Double): Either<Exception, AbstractSurface3D> =
+    fun getLaneSurface(
+        laneIdentifier: LaneIdentifier,
+        step: Double,
+    ): Either<Exception, AbstractSurface3D> =
         either {
-            val laneSection = getLaneSection(laneIdentifier.laneSectionIdentifier)
-                .getOrElse { throw it }
+            val laneSection =
+                getLaneSection(laneIdentifier.laneSectionIdentifier)
+                    .getOrElse { throw it }
             if (laneSection.curvePositionDomain.length < geometricalTolerance) {
                 Either.Left(
                     IllegalStateException(
                         "${laneIdentifier.toIdentifierText()}: The length of the lane is almost zero " +
-                            "(below tolerance) and thus no surface can be constructed."
-                    )
+                            "(below tolerance) and thus no surface can be constructed.",
+                    ),
                 ).bind<AbstractSurface3D>()
             }
 
-            val leftBoundary = getLeftLaneBoundary(laneIdentifier)
-                .getOrElse { throw it }
-                .calculatePointListGlobalCS(step)
-                .mapLeft { it.toIllegalStateException() }
-                .getOrElse { throw it }
-            val rightBoundary = getRightLaneBoundary(laneIdentifier)
-                .getOrElse { throw it }
-                .calculatePointListGlobalCS(step)
-                .mapLeft { it.toIllegalStateException() }
-                .getOrElse { throw it }
+            val leftBoundary =
+                getLeftLaneBoundary(laneIdentifier)
+                    .getOrElse { throw it }
+                    .calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .getOrElse { throw it }
+            val rightBoundary =
+                getRightLaneBoundary(laneIdentifier)
+                    .getOrElse { throw it }
+                    .calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .getOrElse { throw it }
 
             if (leftBoundary.zip(rightBoundary).all { it.first.fuzzyEquals(it.second, geometricalTolerance) }) {
                 Either.Left(
                     IllegalStateException(
                         "${laneIdentifier.toIdentifierText()}: Lane has zero width (when discretized) and " +
-                            "thus no surface can be constructed."
-                    )
+                            "thus no surface can be constructed.",
+                    ),
                 ).bind<AbstractSurface3D>()
             }
 
-            val surface = LinearRing3D.ofWithDuplicatesRemoval(leftBoundary, rightBoundary, geometricalTolerance)
-                .mapLeft { IllegalStateException(it.message) }
-                .bind()
-                .let { CompositeSurface3D(it) }
+            val surface =
+                LinearRing3D.ofWithDuplicatesRemoval(leftBoundary, rightBoundary, geometricalTolerance)
+                    .mapLeft { IllegalStateException(it.message) }
+                    .bind()
+                    .let { CompositeSurface3D(it) }
             surface
         }
 
@@ -427,56 +445,63 @@ class Road(
      * @param laneIdentifier lane identifier for which the lateral filler surfaces to the left shall be created
      * @param step discretization step size
      */
-    fun getLateralFillerSurface(laneIdentifier: LaneIdentifier, step: Double):
-        Either<Exception, Option<LateralFillerSurface>> = either {
-        require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
+    fun getLateralFillerSurface(
+        laneIdentifier: LaneIdentifier,
+        step: Double,
+    ): Either<Exception, Option<LateralFillerSurface>> =
+        either {
+            require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
-        val innerLaneBoundaryOfThisLaneSampled = getInnerLaneBoundary(laneIdentifier).bind()
-            .calculatePointListGlobalCS(step)
-            .mapLeft { it.toIllegalStateException() }
-            .bind()
+            val innerLaneBoundaryOfThisLaneSampled =
+                getInnerLaneBoundary(laneIdentifier).bind()
+                    .calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .bind()
 
-        val innerLaneIdentifier = laneIdentifier.getAdjacentInnerLaneIdentifier()
+            val innerLaneIdentifier = laneIdentifier.getAdjacentInnerLaneIdentifier()
 
-        val outerLaneBoundaryOfInnerLane =
-            if (innerLaneIdentifier.isCenter()) {
-                getCurveOfCenterLane(innerLaneIdentifier.laneSectionIdentifier)
-            } else {
-                getOuterLaneBoundary(
-                    innerLaneIdentifier
-                )
+            val outerLaneBoundaryOfInnerLane =
+                if (innerLaneIdentifier.isCenter()) {
+                    getCurveOfCenterLane(innerLaneIdentifier.laneSectionIdentifier)
+                } else {
+                    getOuterLaneBoundary(
+                        innerLaneIdentifier,
+                    )
+                }
+            val outerLaneBoundaryOfInnerLaneSampled =
+                outerLaneBoundaryOfInnerLane.bind()
+                    .calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .bind()
+
+            // return no lateral filler surface, if there is no gap between the lane surfaces
+            if (innerLaneBoundaryOfThisLaneSampled.fuzzyEquals(outerLaneBoundaryOfInnerLaneSampled, geometricalTolerance)) {
+                return@either None
             }
-        val outerLaneBoundaryOfInnerLaneSampled = outerLaneBoundaryOfInnerLane.bind()
-            .calculatePointListGlobalCS(step)
-            .mapLeft { it.toIllegalStateException() }
-            .bind()
 
-        // return no lateral filler surface, if there is no gap between the lane surfaces
-        if (innerLaneBoundaryOfThisLaneSampled.fuzzyEquals(outerLaneBoundaryOfInnerLaneSampled, geometricalTolerance)) {
-            return@either None
+            val leftLaneBoundary =
+                if (laneIdentifier.isLeft()) outerLaneBoundaryOfInnerLaneSampled else innerLaneBoundaryOfThisLaneSampled
+            val rightLaneBoundary =
+                if (laneIdentifier.isLeft()) innerLaneBoundaryOfThisLaneSampled else outerLaneBoundaryOfInnerLaneSampled
+
+            LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary, geometricalTolerance)
+                .mapLeft { IllegalStateException(it.message) }
+                .bind()
+                .let { CompositeSurface3D(it) }
+                .let { LateralFillerSurface(LateralLaneRangeIdentifier.of(laneIdentifier, innerLaneIdentifier), it) }
+                .let { Some(it) }
         }
 
-        val leftLaneBoundary =
-            if (laneIdentifier.isLeft()) outerLaneBoundaryOfInnerLaneSampled else innerLaneBoundaryOfThisLaneSampled
-        val rightLaneBoundary =
-            if (laneIdentifier.isLeft()) innerLaneBoundaryOfThisLaneSampled else outerLaneBoundaryOfInnerLaneSampled
-
-        LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary, geometricalTolerance)
-            .mapLeft { IllegalStateException(it.message) }
-            .bind()
-            .let { CompositeSurface3D(it) }
-            .let { LateralFillerSurface(LateralLaneRangeIdentifier.of(laneIdentifier, innerLaneIdentifier), it) }
-            .let { Some(it) }
-    }
-
-    fun getRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
-        List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> =
+    fun getRoadMarkings(
+        laneIdentifier: LaneIdentifier,
+        step: Double,
+    ): List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> =
         if (laneIdentifier.isCenter()) {
             getCenterRoadMarkings(laneIdentifier, step)
         } else {
             getLeftRightRoadMarkings(
                 laneIdentifier,
-                step
+                step,
             )
         }
 
@@ -486,8 +511,10 @@ class Road(
      * @param laneIdentifier identifier of lane (must represent a center lane) for which the road markings shall be returned
      * @param step discretization step size
      */
-    private fun getCenterRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
-        List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> {
+    private fun getCenterRoadMarkings(
+        laneIdentifier: LaneIdentifier,
+        step: Double,
+    ): List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> {
         require(laneIdentifier.isCenter()) { "Identifier of lane must represent a center lane." }
 
         val centerLane = getLaneSection(laneIdentifier.laneSectionIdentifier).getOrElse { throw it }.centerLane
@@ -505,8 +532,11 @@ class Road(
      * @return either a [AbstractCurve3D], if the road marking has zero width, or a [AbstractSurface3D], if the width
      * is not zero
      */
-    private fun getCenterRoadMarkingGeometry(centerLane: CenterLane, roadMarking: RoadMarking, step: Double):
-        AbstractGeometry3D {
+    private fun getCenterRoadMarkingGeometry(
+        centerLane: CenterLane,
+        roadMarking: RoadMarking,
+        step: Double,
+    ): AbstractGeometry3D {
         if (roadMarking.width.value < geometricalTolerance) {
             return getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level)
                 .getOrElse { throw it }
@@ -530,7 +560,7 @@ class Road(
         return LinearRing3D.ofWithDuplicatesRemoval(
             leftRoadMarkingBoundary,
             rightRoadMarkingBoundary,
-            geometricalTolerance
+            geometricalTolerance,
         )
             .getOrElse { throw IllegalStateException(it.message) }
             .let { CompositeSurface3D(it) }
@@ -542,16 +572,19 @@ class Road(
      * @param laneIdentifier lane identifier for which the road markings shall be returned
      * @param step discretization step size
      */
-    private fun getLeftRightRoadMarkings(laneIdentifier: LaneIdentifier, step: Double):
-        List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> {
+    private fun getLeftRightRoadMarkings(
+        laneIdentifier: LaneIdentifier,
+        step: Double,
+    ): List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> {
         require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
         return getLane(laneIdentifier)
             .getOrElse { throw it }
             .roadMarkings
             .map { currentRoadMarking ->
-                val geometry: AbstractGeometry3D = getRoadMarkingGeometry(laneIdentifier, currentRoadMarking, step)
-                    .getOrElse { return@map it.left() }
+                val geometry: AbstractGeometry3D =
+                    getRoadMarkingGeometry(laneIdentifier, currentRoadMarking, step)
+                        .getOrElse { return@map it.left() }
                 Either.Right(currentRoadMarking to geometry)
             }
     }
@@ -564,13 +597,17 @@ class Road(
      * @return either a [AbstractCurve3D], if the road marking has zero width, or a [AbstractSurface3D], if the width
      * is not zero
      */
-    private fun getRoadMarkingGeometry(laneIdentifier: LaneIdentifier, roadMarking: RoadMarking, step: Double):
-        Either<Exception, AbstractGeometry3D> {
+    private fun getRoadMarkingGeometry(
+        laneIdentifier: LaneIdentifier,
+        roadMarking: RoadMarking,
+        step: Double,
+    ): Either<Exception, AbstractGeometry3D> {
         if (roadMarking.width.domain.length < geometricalTolerance) {
             return Either.Left(
                 IllegalStateException(
-                    "${laneIdentifier.toIdentifierText()}: Road marking's length is zero (or below tolerance threshold) and thus no surface can be constructed."
-                )
+                    "${laneIdentifier.toIdentifierText()}: Road marking's length is zero (or below tolerance threshold) and " +
+                        "thus no surface can be constructed.",
+                ),
             )
         }
 
@@ -579,17 +616,19 @@ class Road(
         }
 
         val leftOffsetFunction = roadMarking.width timesValue 0.5
-        val leftRoadMarkBoundary = getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
-            .getOrElse { throw it }
-            .calculatePointListGlobalCS(step)
-            .mapLeft { it.toIllegalStateException() }
-            .getOrElse { throw it }
+        val leftRoadMarkBoundary =
+            getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
+                .getOrElse { throw it }
+                .calculatePointListGlobalCS(step)
+                .mapLeft { it.toIllegalStateException() }
+                .getOrElse { throw it }
         val rightOffsetFunction = roadMarking.width timesValue -0.5
-        val rightRoadMarkBoundary = getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
-            .getOrElse { throw it }
-            .calculatePointListGlobalCS(step)
-            .mapLeft { it.toIllegalStateException() }
-            .getOrElse { throw it }
+        val rightRoadMarkBoundary =
+            getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
+                .getOrElse { throw it }
+                .calculatePointListGlobalCS(step)
+                .mapLeft { it.toIllegalStateException() }
+                .getOrElse { throw it }
 
         return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
             .getOrElse { return IllegalStateException(it.message).left() }
@@ -599,16 +638,18 @@ class Road(
 
     /** Returns the curve position domains of each lane section. */
     private fun getLaneSectionCurvePositionDomains(): List<Range<Double>> {
-        val laneSectionDomains = laneSections
-            .map { it.curvePositionStart.curvePosition }
-            .zipWithNext()
-            .map { Range.closed(it.first, it.second) }
+        val laneSectionDomains =
+            laneSections
+                .map { it.curvePositionStart.curvePosition }
+                .zipWithNext()
+                .map { Range.closed(it.first, it.second) }
 
-        val lastLaneSectionDomain = Range.closedX(
-            laneSections.last().curvePositionStart.curvePosition,
-            curvePositionDomain.upperEndpointOrNull()!!,
-            curvePositionDomain.upperBoundType()
-        )
+        val lastLaneSectionDomain =
+            Range.closedX(
+                laneSections.last().curvePositionStart.curvePosition,
+                curvePositionDomain.upperEndpointOrNull()!!,
+                curvePositionDomain.upperBoundType(),
+            )
 
         return laneSectionDomains + lastLaneSectionDomain
     }

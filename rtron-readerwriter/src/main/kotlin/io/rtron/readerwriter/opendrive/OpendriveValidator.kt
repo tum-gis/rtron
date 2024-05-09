@@ -32,40 +32,48 @@ import java.io.InputStream
 import java.nio.file.Path
 
 object OpendriveValidator {
-
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
-    fun validateFromFile(filePath: Path): Either<OpendriveReaderException, SchemaValidationReport> = either {
-        val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(filePath.inputStreamFromDirectOrCompressedFile()).bind()
+    fun validateFromFile(filePath: Path): Either<OpendriveReaderException, SchemaValidationReport> =
+        either {
+            val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(filePath.inputStreamFromDirectOrCompressedFile()).bind()
 
-        val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
-        val reportResult = validateFromStream(opendriveVersion, fileInputStream)
-        fileInputStream.close()
+            val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
+            val reportResult = validateFromStream(opendriveVersion, fileInputStream)
+            fileInputStream.close()
 
-        reportResult.bind()
-    }
-
-    fun validateFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, SchemaValidationReport> = either {
-        val issueList = runValidation(opendriveVersion, inputStream)
-            .getOrElse {
-                logger.warn { "Schema validation was aborted due the following error: ${it.message}" }
-                return@either SchemaValidationReport(
-                    opendriveVersion,
-                    completedSuccessfully = false,
-                    validationAbortIssue = it.message
-                )
-            }
-        if (!issueList.isEmpty()) {
-            logger.warn { "Schema validation for OpenDRIVE $opendriveVersion found ${issueList.size} incidents." }
-        } else {
-            logger.info { "Schema validation report for OpenDRIVE $opendriveVersion: Everything ok." }
+            reportResult.bind()
         }
 
-        SchemaValidationReport(opendriveVersion, issueList)
-    }
+    fun validateFromStream(
+        opendriveVersion: OpendriveVersion,
+        inputStream: InputStream,
+    ): Either<OpendriveReaderException, SchemaValidationReport> =
+        either {
+            val issueList =
+                runValidation(opendriveVersion, inputStream)
+                    .getOrElse {
+                        logger.warn { "Schema validation was aborted due the following error: ${it.message}" }
+                        return@either SchemaValidationReport(
+                            opendriveVersion,
+                            completedSuccessfully = false,
+                            validationAbortIssue = it.message,
+                        )
+                    }
+            if (!issueList.isEmpty()) {
+                logger.warn { "Schema validation for OpenDRIVE $opendriveVersion found ${issueList.size} incidents." }
+            } else {
+                logger.info { "Schema validation report for OpenDRIVE $opendriveVersion: Everything ok." }
+            }
 
-    private fun runValidation(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, IssueList<SchemaValidationIssue>> =
+            SchemaValidationReport(opendriveVersion, issueList)
+        }
+
+    private fun runValidation(
+        opendriveVersion: OpendriveVersion,
+        inputStream: InputStream,
+    ): Either<OpendriveReaderException, IssueList<SchemaValidationIssue>> =
         either {
             val unmarshaller = OpendriveUnmarshaller.of(opendriveVersion).bind()
 

@@ -17,5 +17,8 @@
 package io.rtron.model.roadspaces.roadspace.road
 
 enum class LaneChange {
-    BOTH, DECREASE, INCREASE, NONE
+    BOTH,
+    DECREASE,
+    INCREASE,
+    NONE,
 }

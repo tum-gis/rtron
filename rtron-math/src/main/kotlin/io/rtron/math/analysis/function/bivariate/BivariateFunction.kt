@@ -24,7 +24,6 @@ import io.rtron.math.range.fuzzyContains
  * Function with exactly two parameters of the form z = f(x, y).
  */
 abstract class BivariateFunction {
-
     // Properties and Initializers
 
     /** function's domain for x */
@@ -34,7 +33,10 @@ abstract class BivariateFunction {
     abstract val domainY: Range<Double>
 
     // Methods
-    internal abstract fun valueUnbounded(x: Double, y: Double): Either<Exception, Double>
+    internal abstract fun valueUnbounded(
+        x: Double,
+        y: Double,
+    ): Either<Exception, Double>
 
     /**
      * Returns the value z = f(x, y). If [x] is not in [domainX] or [y] is not in [domainY] an error is returned.
@@ -42,14 +44,17 @@ abstract class BivariateFunction {
      * @param x parameter x for the function evaluation
      * @param y parameter y for the function evaluation
      */
-    fun value(x: Double, y: Double): Either<Exception, Double> {
+    fun value(
+        x: Double,
+        y: Double,
+    ): Either<Exception, Double> {
         return if (x in domainX && y in domainY) {
             valueUnbounded(x, y)
         } else {
             Either.Left(
                 IllegalArgumentException(
-                    "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
-                )
+                    "Value x=$x must be within in the defined $domainX and value y=$y within $domainY.",
+                ),
             )
         }
     }
@@ -62,12 +67,16 @@ abstract class BivariateFunction {
      * @param y parameter y for the function evaluation
      * @param tolerance allowed tolerance for fuzzy contains evaluation
      */
-    fun valueInFuzzy(x: Double, y: Double, tolerance: Double): Either<Exception, Double> {
+    fun valueInFuzzy(
+        x: Double,
+        y: Double,
+        tolerance: Double,
+    ): Either<Exception, Double> {
         return if (!domainX.fuzzyContains(x, tolerance) || !domainY.fuzzyContains(y, tolerance)) {
             Either.Left(
                 IllegalArgumentException(
-                    "Value x=$x must be within in the defined $domainX and value y=$y within $domainY."
-                )
+                    "Value x=$x must be within in the defined $domainX and value y=$y within $domainY.",
+                ),
             )
         } else {
             valueUnbounded(x, y)

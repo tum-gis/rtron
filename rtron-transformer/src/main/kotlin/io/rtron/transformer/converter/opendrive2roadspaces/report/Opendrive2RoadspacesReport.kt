@@ -24,10 +24,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Opendrive2RoadspacesReport(
     val parameters: Opendrive2RoadspacesParameters,
-
-    val conversion: DefaultIssueList = DefaultIssueList()
+    val conversion: DefaultIssueList = DefaultIssueList(),
 ) {
-
     // Methods
     fun getTextSummary(): String = conversion.getTextSummary()
 }

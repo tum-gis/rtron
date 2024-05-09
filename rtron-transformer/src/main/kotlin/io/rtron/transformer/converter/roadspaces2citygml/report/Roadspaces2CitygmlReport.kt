@@ -24,10 +24,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Roadspaces2CitygmlReport(
     val parameters: Roadspaces2CitygmlParameters,
-
-    val conversion: DefaultIssueList = DefaultIssueList()
+    val conversion: DefaultIssueList = DefaultIssueList(),
 ) {
-
     // Methods
     fun getTextSummary(): String = conversion.getTextSummary()
 }

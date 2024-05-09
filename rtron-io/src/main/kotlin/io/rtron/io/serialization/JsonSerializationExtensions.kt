@@ -30,10 +30,11 @@ inline fun <reified T> T.serializeToJsonFile(filePath: Path) {
         filePath.parent.createDirectories()
     }
 
-    val jsonFormatter = Json {
-        prettyPrint = true
-        encodeDefaults = true
-    }
+    val jsonFormatter =
+        Json {
+            prettyPrint = true
+            encodeDefaults = true
+        }
 
     val jsonFileContent = jsonFormatter.encodeToString(this)
     filePath.toFile().writeText(jsonFileContent)

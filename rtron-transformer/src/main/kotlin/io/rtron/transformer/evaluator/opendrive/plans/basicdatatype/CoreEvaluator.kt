@@ -26,52 +26,105 @@ import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
 
 object CoreEvaluator {
-
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
+    fun evaluate(
+        opendriveModel: OpendriveModel,
+        parameters: OpendriveEvaluatorParameters,
+        issueList: DefaultIssueList,
+    ): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
         if (modifiedOpendriveModel.road.isEmpty()) {
-            issueList += DefaultIssue("NoRoadsContained", "Document does not contain any roads.", "", Severity.FATAL_ERROR, wasFixed = false)
+            issueList +=
+                DefaultIssue(
+                    "NoRoadsContained", "Document does not contain any roads.", "",
+                    Severity.FATAL_ERROR, wasFixed = false,
+                )
         }
 
         val duplicateRoadIds = modifiedOpendriveModel.road.map { it.id }.groupingBy { it }.eachCount().filter { it.value > 1 }
         if (duplicateRoadIds.isNotEmpty()) {
-            issueList += DefaultIssue("DuplicateRoadIds", "Multiple road elements are using the same ID (affected IDs: ${duplicateRoadIds.keys.joinToString()}).", "", Severity.FATAL_ERROR, wasFixed = false)
+            issueList +=
+                DefaultIssue(
+                    "DuplicateRoadIds",
+                    "Multiple road elements are using the same ID (affected IDs: ${duplicateRoadIds.keys.joinToString()}).", "",
+                    Severity.FATAL_ERROR, wasFixed = false,
+                )
         }
 
         OpendriveModel.header.get(modifiedOpendriveModel).also { header ->
             if (header.revMajor < 0) {
-                issueList += DefaultIssue("UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false)
+                issueList +=
+                    DefaultIssue(
+                        "UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false,
+                    )
             }
 
             if (header.revMinor < 0) {
-                issueList += DefaultIssue("UnkownOpendriveMinorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false)
+                issueList +=
+                    DefaultIssue(
+                        "UnkownOpendriveMinorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false,
+                    )
             }
         }
 
-        modifiedOpendriveModel = OpendriveModel.header.modify(modifiedOpendriveModel) { header ->
-            header.name = BasicDataTypeModifier.modifyToOptionalString(header.name, "Header element", "name", issueList)
-            header.date = BasicDataTypeModifier.modifyToOptionalString(header.date, "Header element", "date", issueList)
-            header.vendor = BasicDataTypeModifier.modifyToOptionalString(header.vendor, "Header element", "vendor", issueList)
+        modifiedOpendriveModel =
+            OpendriveModel.header.modify(modifiedOpendriveModel) { header ->
+                header.name =
+                    BasicDataTypeModifier.modifyToOptionalString(
+                        header.name, "Header element", "name", issueList,
+                    )
+                header.date =
+                    BasicDataTypeModifier.modifyToOptionalString(
+                        header.date, "Header element", "date", issueList,
+                    )
+                header.vendor =
+                    BasicDataTypeModifier.modifyToOptionalString(
+                        header.vendor, "Header element", "vendor", issueList,
+                    )
 
-            header.east = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.east, "Header element", "east", issueList)
-            header.north = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.north, "Header element", "north", issueList)
-            header.south = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.south, "Header element", "south", issueList)
-            header.west = BasicDataTypeModifier.modifyToOptionalFiniteDouble(header.south, "Header element", "west", issueList)
+                header.east =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        header.east, "Header element", "east", issueList,
+                    )
+                header.north =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        header.north, "Header element", "north", issueList,
+                    )
+                header.south =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        header.south, "Header element", "south", issueList,
+                    )
+                header.west =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        header.south, "Header element", "west", issueList,
+                    )
 
-            header
-        }
+                header
+            }
 
-        modifiedOpendriveModel = everyHeaderOffset.modify(modifiedOpendriveModel) { currentHeaderOffset ->
+        modifiedOpendriveModel =
+            everyHeaderOffset.modify(modifiedOpendriveModel) { currentHeaderOffset ->
 
-            currentHeaderOffset.x = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.x, "Header element", "x", issueList)
-            currentHeaderOffset.y = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.y, "Header element", "y", issueList)
-            currentHeaderOffset.z = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.z, "Header element", "z", issueList)
-            currentHeaderOffset.hdg = BasicDataTypeModifier.modifyToFiniteDouble(currentHeaderOffset.hdg, "Header element", "hdg", issueList)
+                currentHeaderOffset.x =
+                    BasicDataTypeModifier.modifyToFiniteDouble(
+                        currentHeaderOffset.x, "Header element", "x", issueList,
+                    )
+                currentHeaderOffset.y =
+                    BasicDataTypeModifier.modifyToFiniteDouble(
+                        currentHeaderOffset.y, "Header element", "y", issueList,
+                    )
+                currentHeaderOffset.z =
+                    BasicDataTypeModifier.modifyToFiniteDouble(
+                        currentHeaderOffset.z, "Header element", "z", issueList,
+                    )
+                currentHeaderOffset.hdg =
+                    BasicDataTypeModifier.modifyToFiniteDouble(
+                        currentHeaderOffset.hdg, "Header element", "hdg", issueList,
+                    )
 
-            currentHeaderOffset
-        }
+                currentHeaderOffset
+            }
 
         return modifiedOpendriveModel
     }

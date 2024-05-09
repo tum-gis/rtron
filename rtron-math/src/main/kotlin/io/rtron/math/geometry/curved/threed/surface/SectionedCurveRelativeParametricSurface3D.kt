@@ -33,12 +33,13 @@ import io.rtron.math.range.shiftLowerEndpointTo
  */
 class SectionedCurveRelativeParametricSurface3D(
     private val completeCurveRelativeSurface: AbstractCurveRelativeSurface3D,
-    section: Range<Double>
+    section: Range<Double>,
 ) : AbstractCurveRelativeSurface3D() {
-
     // Properties and Initializers
     init {
-        require(completeCurveRelativeSurface.domain.fuzzyEncloses(section, tolerance)) { "The complete surface must be defined everywhere where the section is also defined." }
+        require(completeCurveRelativeSurface.domain.fuzzyEncloses(section, tolerance)) {
+            "The complete surface must be defined everywhere where the section is also defined."
+        }
     }
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)
@@ -50,11 +51,15 @@ class SectionedCurveRelativeParametricSurface3D(
     }
 
     // Methods
-    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D {
-        val pointOnCompleteSurface = CurveRelativeVector2D(
-            sectionStart + curveRelativePoint.curvePosition,
-            curveRelativePoint.lateralOffset
-        )
+    override fun calculatePointGlobalCSUnbounded(
+        curveRelativePoint: CurveRelativeVector2D,
+        addHeightOffset: Double,
+    ): Vector3D {
+        val pointOnCompleteSurface =
+            CurveRelativeVector2D(
+                sectionStart + curveRelativePoint.curvePosition,
+                curveRelativePoint.lateralOffset,
+            )
         return completeCurveRelativeSurface.calculatePointGlobalCSUnbounded(pointOnCompleteSurface, addHeightOffset)
     }
 }

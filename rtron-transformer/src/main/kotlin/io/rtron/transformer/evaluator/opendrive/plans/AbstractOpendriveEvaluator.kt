@@ -20,7 +20,6 @@ import io.rtron.io.issues.ContextIssueList
 import io.rtron.model.opendrive.OpendriveModel
 
 abstract class AbstractOpendriveEvaluator {
-
     // Methods
     abstract fun evaluate(opendriveModel: OpendriveModel): ContextIssueList<OpendriveModel>
 }

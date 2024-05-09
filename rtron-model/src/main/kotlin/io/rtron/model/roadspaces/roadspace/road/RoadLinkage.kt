@@ -29,12 +29,16 @@ data class RoadLinkage(
     val predecessorRoadspaceContactPointId: Option<RoadspaceContactPointIdentifier>,
     val predecessorJunctionId: Option<JunctionIdentifier>,
     val successorRoadspaceContactPointId: Option<RoadspaceContactPointIdentifier>,
-    val successorJunctionId: Option<JunctionIdentifier>
+    val successorJunctionId: Option<JunctionIdentifier>,
 ) {
     // Properties and Initializers
     init {
-        require(!(predecessorRoadspaceContactPointId.isSome() && predecessorJunctionId.isSome())) { "Predecessor must be either a roadspace or junction or neither." }
-        require(!(successorRoadspaceContactPointId.isSome() && successorJunctionId.isSome())) { "Successor must be either a roadspace or junction or neither." }
+        require(!(predecessorRoadspaceContactPointId.isSome() && predecessorJunctionId.isSome())) {
+            "Predecessor must be either a roadspace or junction or neither."
+        }
+        require(!(successorRoadspaceContactPointId.isSome() && successorJunctionId.isSome())) {
+            "Successor must be either a roadspace or junction or neither."
+        }
 
         belongsToJunctionId.onSome {
             require(predecessorJunctionId.isNone()) { "If a road belongs to a junction (id=$it), a predecessing junction must not exist." }

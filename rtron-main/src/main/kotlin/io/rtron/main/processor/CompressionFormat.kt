@@ -20,12 +20,13 @@ enum class CompressionFormat {
     NONE,
     GZ,
     ZIP,
-    ZST
+    ZST,
 }
 
-fun CompressionFormat.toFileExtension(): String = when (this) {
-    CompressionFormat.NONE -> ""
-    CompressionFormat.GZ -> ".gz"
-    CompressionFormat.ZIP -> ".zip"
-    CompressionFormat.ZST -> ".zst"
-}
+fun CompressionFormat.toFileExtension(): String =
+    when (this) {
+        CompressionFormat.NONE -> ""
+        CompressionFormat.GZ -> ".gz"
+        CompressionFormat.ZIP -> ".zip"
+        CompressionFormat.ZST -> ".zst"
+    }

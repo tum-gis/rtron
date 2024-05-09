@@ -28,7 +28,6 @@ import io.rtron.math.range.Tolerable
  * Abstract class for all geometric surface objects in 3D.
  */
 abstract class AbstractSurface3D : AbstractGeometry3D(), Tolerable {
-
     /**
      * Calculates the polygons for the respective surface geometry within the local coordinate system of the surface.
      */
@@ -37,9 +36,10 @@ abstract class AbstractSurface3D : AbstractGeometry3D(), Tolerable {
     /**
      * Calculates the polygons for the respective surface geometry and transforms it to the global coordinate system.
      */
-    fun calculatePolygonsGlobalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = calculatePolygonsLocalCS()
-        .map { affineSequence.solve().transform(it) }
-        .map { it.toNonEmptyListOrNull()!! }
+    fun calculatePolygonsGlobalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
+        calculatePolygonsLocalCS()
+            .map { affineSequence.solve().transform(it) }
+            .map { it.toNonEmptyListOrNull()!! }
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 }

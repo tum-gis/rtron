@@ -22,5 +22,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionPriority(
     var high: Option<String> = None,
-    var low: Option<String> = None
+    var low: Option<String> = None,
 ) : OpendriveElement()

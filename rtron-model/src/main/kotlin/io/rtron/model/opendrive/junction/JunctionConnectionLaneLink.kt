@@ -20,5 +20,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionConnectionLaneLink(
     var from: Int = Int.MIN_VALUE,
-    var to: Int = Int.MIN_VALUE
+    var to: Int = Int.MIN_VALUE,
 ) : OpendriveElement()

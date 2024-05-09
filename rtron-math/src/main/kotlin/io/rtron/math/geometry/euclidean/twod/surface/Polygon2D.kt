@@ -28,14 +28,21 @@ import java.awt.geom.Path2D
  */
 data class Polygon2D(
     val vertices: NonEmptyList<Vector2D>,
-    override val tolerance: Double
+    override val tolerance: Double,
 ) : AbstractSurface2D() {
-
     // Properties and Initializers
     private val numberOfVertices = vertices.size
+
     init {
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a polygon." }
-        require(vertices.noneWithNextEnclosing { a, b -> a.fuzzyEquals(b, tolerance) }) { "Consecutively following point duplicates found." }
+        require(
+            vertices.noneWithNextEnclosing {
+                    a,
+                    b,
+                ->
+                a.fuzzyEquals(b, tolerance)
+            },
+        ) { "Consecutively following point duplicates found." }
     }
 
     private val awtPath by lazy {

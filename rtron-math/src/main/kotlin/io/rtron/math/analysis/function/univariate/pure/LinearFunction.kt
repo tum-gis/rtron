@@ -36,9 +36,8 @@ import kotlin.math.sign
 data class LinearFunction(
     val slope: Double,
     val intercept: Double = 0.0,
-    override val domain: Range<Double> = Range.all()
+    override val domain: Range<Double> = Range.all(),
 ) : UnivariateFunction() {
-
     // Properties and Initializers
     init {
         require(slope.isFinite()) { "Slope must be a finite value." }
@@ -46,13 +45,11 @@ data class LinearFunction(
     }
 
     // Methods
-    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> =
-        Either.Right(slope * x + intercept)
+    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> = Either.Right(slope * x + intercept)
 
     override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> = Either.Right(slope)
 
     companion object {
-
         /**
          * Linear function representing the x-axis.
          */
@@ -65,7 +62,10 @@ data class LinearFunction(
          * @param intercept linear function starting at (0.0, [intercept])
          * @param pointY linear function stopping at ([pointY] - [intercept] , [pointY])
          */
-        fun ofInclusiveYValuesAndUnitSlope(intercept: Double, pointY: Double): LinearFunction {
+        fun ofInclusiveYValuesAndUnitSlope(
+            intercept: Double,
+            pointY: Double,
+        ): LinearFunction {
             require(intercept.isFinite()) { "Intercept must be a finite value." }
             require(pointY.isFinite()) { "PointY must be a finite value." }
 
@@ -82,7 +82,11 @@ data class LinearFunction(
          * @param pointX linear function stopping at ([pointX], [pointY])
          * @param pointY linear function stopping at ([pointX], [pointY])
          */
-        fun ofInclusiveInterceptAndPoint(intercept: Double, pointX: Double, pointY: Double): LinearFunction {
+        fun ofInclusiveInterceptAndPoint(
+            intercept: Double,
+            pointX: Double,
+            pointY: Double,
+        ): LinearFunction {
             require(intercept.isFinite()) { "Intercept must be finite." }
             require(pointX.isFinite() && pointX != 0.0) { "Point must not be located on the y axis." }
             require(pointY.isFinite()) { "PointY must be finite." }
@@ -101,18 +105,24 @@ data class LinearFunction(
          * @param pointX linear function stopping at ([pointX], [pointY])
          * @param pointY linear function stopping at ([pointX], [pointY])
          */
-        fun ofInclusiveInterceptAndPoint(intercept: Option<Double>, pointX: Double, pointY: Option<Double>): LinearFunction {
+        fun ofInclusiveInterceptAndPoint(
+            intercept: Option<Double>,
+            pointX: Double,
+            pointY: Option<Double>,
+        ): LinearFunction {
             require(intercept.isSome { it.isFinite() }) { "Intercept must be finite, if defined." }
             require(pointX.isFinite()) { "PointX must be finite." }
             require(pointY.isSome { it.isFinite() }) { "PointY must be finite, if defined." }
             require(intercept.isSome() || pointY.isSome()) { "Either intercept or pointY must be finite." }
 
-            val adjustedIntercept = intercept.getOrElse {
-                pointY.toEither { IllegalStateException("PointY must be set.") }.getOrElse { throw it }
-            }
-            val adjustedPointY = pointY.getOrElse {
-                intercept.toEither { IllegalStateException("Intercept must be set.") }.getOrElse { throw it }
-            }
+            val adjustedIntercept =
+                intercept.getOrElse {
+                    pointY.toEither { IllegalStateException("PointY must be set.") }.getOrElse { throw it }
+                }
+            val adjustedPointY =
+                pointY.getOrElse {
+                    intercept.toEither { IllegalStateException("Intercept must be set.") }.getOrElse { throw it }
+                }
             return ofInclusiveInterceptAndPoint(adjustedIntercept, pointX, adjustedPointY)
         }
 
@@ -127,7 +137,12 @@ data class LinearFunction(
          *
          * @return linear function with inclusive starting and stopping points
          */
-        fun ofInclusivePoints(point1X: Double, point1Y: Double, point2X: Double, point2Y: Double): LinearFunction {
+        fun ofInclusivePoints(
+            point1X: Double,
+            point1Y: Double,
+            point2X: Double,
+            point2Y: Double,
+        ): LinearFunction {
             require(!(point1X == point2X && point1Y == point2Y)) { "Points are required to be different." }
 
             val slope = (point2Y - point1Y) / (point2X - point1X)

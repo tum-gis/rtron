@@ -19,5 +19,5 @@ package io.rtron.model.opendrive.objects
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectMarkings(
-    var marking: List<RoadObjectsObjectMarkingsMarking> = emptyList()
+    var marking: List<RoadObjectsObjectMarkingsMarking> = emptyList(),
 ) : OpendriveElement()

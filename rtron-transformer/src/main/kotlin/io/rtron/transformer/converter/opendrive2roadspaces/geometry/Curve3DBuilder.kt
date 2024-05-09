@@ -32,7 +32,6 @@ import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuil
  * Builder for curves in 3D from the OpenDRIVE data model.
  */
 object Curve3DBuilder {
-
     // Methods
 
     /**
@@ -43,14 +42,15 @@ object Curve3DBuilder {
         elevationProfiles: Option<NonEmptyList<RoadElevationProfileElevation>>,
         numberTolerance: Double,
         distanceTolerance: Double,
-        angleTolerance: Double
+        angleTolerance: Double,
     ): Curve3D {
-        val planViewCurve2D = Curve2DBuilder.buildCurve2DFromPlanViewGeometries(
-            planViewGeometries,
-            numberTolerance,
-            distanceTolerance,
-            angleTolerance
-        )
+        val planViewCurve2D =
+            Curve2DBuilder.buildCurve2DFromPlanViewGeometries(
+                planViewGeometries,
+                numberTolerance,
+                distanceTolerance,
+                angleTolerance,
+            )
         val heightFunction = elevationProfiles.fold({ LinearFunction.X_AXIS }, { buildHeightFunction(it) })
 
         return Curve3D(planViewCurve2D, heightFunction)
@@ -66,20 +66,30 @@ object Curve3DBuilder {
             elevationProfiles.map { it.s },
             elevationProfiles.map { it.coefficients },
             prependConstant = true,
-            prependConstantValue = 0.0
+            prependConstantValue = 0.0,
         )
     }
 
     /**
      * Builds a curve in 3D from OpenDRIVE's road object entry [roadObject].
      */
-    fun buildCurve3D(roadObject: RoadObjectsObject, roadReferenceLine: Curve3D, numberTolerance: Double): List<Curve3D> {
+    fun buildCurve3D(
+        roadObject: RoadObjectsObject,
+        roadReferenceLine: Curve3D,
+        numberTolerance: Double,
+    ): List<Curve3D> {
         if (roadObject.repeat.isEmpty()) return emptyList() // TODO fix repeat list handling
         if (!roadObject.repeat.first().containsCurve()) return emptyList() // TODO fix repeat list handling
 
-        val curve2D = Curve2DBuilder.buildLateralTranslatedCurve(roadObject.repeat.first(), roadReferenceLine, numberTolerance) // TODO fix repeat list handling
-        val heightFunction = FunctionBuilder
-            .buildStackedHeightFunctionFromRepeat(roadObject.repeat.first(), roadReferenceLine) // TODO fix repeat list handling
+        val curve2D =
+            Curve2DBuilder.buildLateralTranslatedCurve(
+                roadObject.repeat.first(),
+                roadReferenceLine,
+                numberTolerance,
+            ) // TODO fix repeat list handling
+        val heightFunction =
+            FunctionBuilder
+                .buildStackedHeightFunctionFromRepeat(roadObject.repeat.first(), roadReferenceLine) // TODO fix repeat list handling
 
         val curve3D = Curve3D(curve2D, heightFunction)
         return listOf(curve3D)

@@ -40,7 +40,6 @@ data class RoadObjectsObject(
     var markings: Option<RoadObjectsObjectMarkings> = None,
     var borders: Option<RoadObjectsObjectBorders> = None,
     var surface: Option<RoadObjectsObjectSurface> = None,
-
     var dynamic: Option<Boolean> = None,
     var hdg: Option<Double> = None,
     var height: Option<Double> = None,
@@ -59,10 +58,8 @@ data class RoadObjectsObject(
     var validLength: Option<Double> = None,
     var width: Option<Double> = None,
     var zOffset: Double = 0.0,
-
-    override var additionalId: Option<RoadObjectIdentifier> = None
+    override var additionalId: Option<RoadObjectIdentifier> = None,
 ) : OpendriveElement(), AdditionalRoadObjectIdentifier {
-
     // Validation Properties
 
     val heightValidated: Option<Double>

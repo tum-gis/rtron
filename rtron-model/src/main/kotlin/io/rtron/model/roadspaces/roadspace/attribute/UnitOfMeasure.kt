@@ -17,7 +17,11 @@
 package io.rtron.model.roadspaces.roadspace.attribute
 
 enum class UnitOfMeasure {
-    METER, KILOMETER,
-    METER_PER_SECOND, MILES_PER_HOUR, KILOMETER_PER_HOUR,
-    NONE, UNKNOWN
+    METER,
+    KILOMETER,
+    METER_PER_SECOND,
+    MILES_PER_HOUR,
+    KILOMETER_PER_HOUR,
+    NONE,
+    UNKNOWN,
 }

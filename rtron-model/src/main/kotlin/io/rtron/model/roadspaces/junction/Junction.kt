@@ -28,7 +28,7 @@ import io.rtron.model.roadspaces.identifier.LaneIdentifier
  */
 data class Junction(
     val id: JunctionIdentifier,
-    val connections: List<Connection>
+    val connections: List<Connection>,
 ) {
     // Properties and Initializers
     init {
@@ -37,9 +37,10 @@ data class Junction(
 
     // Methods
 
-    fun getConnectingRoadspaceIds() = connections
-        .map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }
-        .distinct()
+    fun getConnectingRoadspaceIds() =
+        connections
+            .map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }
+            .distinct()
 
     /*fun getConnection(incomingRoadspace: RoadspaceContactPointIdentifier): Option<RoadspaceContactPointIdentifier> {
         connections.filter { it.incomingRoadspaceContactPointId == incomingRoadspace }

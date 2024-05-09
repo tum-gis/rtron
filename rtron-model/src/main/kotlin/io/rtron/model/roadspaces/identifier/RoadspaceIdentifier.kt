@@ -34,9 +34,8 @@ interface RoadspaceIdentifierInterface {
  * @param modelIdentifier identifier of the model
  */
 data class RoadspaceIdentifier(
-    override val roadspaceId: String
+    override val roadspaceId: String,
 ) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface {
-
     // Properties and Initializers
     val hashKey get() = "Roadspace_$roadspaceId"
 
@@ -48,8 +47,7 @@ data class RoadspaceIdentifier(
         }
     }
 
-    override fun toStringMap(): Map<String, String> =
-        mapOf("roadspaceId" to roadspaceId)
+    override fun toStringMap(): Map<String, String> = mapOf("roadspaceId" to roadspaceId)
 
     override fun toIdentifierText(): String {
         return "RoadspaceIdentifier(roadspaceId=$roadspaceId)"

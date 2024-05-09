@@ -20,5 +20,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLanesLaneSectionLCRLaneLink(
     var predecessor: List<RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor> = emptyList(),
-    var successor: List<RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor> = emptyList()
+    var successor: List<RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor> = emptyList(),
 ) : OpendriveElement()

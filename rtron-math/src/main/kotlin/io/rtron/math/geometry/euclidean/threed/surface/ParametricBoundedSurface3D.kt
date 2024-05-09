@@ -32,9 +32,8 @@ data class ParametricBoundedSurface3D(
     val leftBoundary: Curve3D,
     val rightBoundary: Curve3D,
     override val tolerance: Double,
-    private val discretizationStepSize: Double
+    private val discretizationStepSize: Double,
 ) : AbstractSurface3D(), DefinableDomain<Double>, Tolerable {
-
     // Properties and Initializers
     init {
         require(leftBoundary.domain == rightBoundary.domain) { "Boundary curves must have the identical domain." }
@@ -48,29 +47,32 @@ data class ParametricBoundedSurface3D(
         get() = leftBoundary.length
 
     private val leftVertices by lazy {
-        val vertices = leftBoundary.calculatePointListGlobalCS(discretizationStepSize)
-            .mapLeft { it.toIllegalStateException() }
-            .getOrElse { throw it }
+        val vertices =
+            leftBoundary.calculatePointListGlobalCS(discretizationStepSize)
+                .mapLeft { it.toIllegalStateException() }
+                .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
     }
 
     private val rightVertices by lazy {
-        val vertices = rightBoundary.calculatePointListGlobalCS(discretizationStepSize)
-            .mapLeft { it.toIllegalStateException() }
-            .getOrElse { throw it }
+        val vertices =
+            rightBoundary.calculatePointListGlobalCS(discretizationStepSize)
+                .mapLeft { it.toIllegalStateException() }
+                .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
     }
 
     // Methods
 
-    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either {
-        LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
-            .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
-            .bind()
-            .map { it.calculatePolygonsGlobalCS().bind() }
-            .flatten()
-            .let { it.toNonEmptyListOrNull()!! }
-    }
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
+        either {
+            LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
+                .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
+                .bind()
+                .map { it.calculatePolygonsGlobalCS().bind() }
+                .flatten()
+                .let { it.toNonEmptyListOrNull()!! }
+        }
 
     companion object {
         const val DEFAULT_STEP_SIZE: Double = 0.3 // used for tesselation

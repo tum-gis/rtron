@@ -19,5 +19,4 @@ package io.rtron.std
 import arrow.core.Option
 
 /** Handle the None of [Option] with [block] and return the [V]. */
-inline fun <V : Any?> Option<V>.handleEmpty(block: (Option<V>) -> Nothing): V =
-    if (isSome()) getOrNull()!! else block(this)
+inline fun <V : Any?> Option<V>.handleEmpty(block: (Option<V>) -> Nothing): V = if (isSome()) getOrNull()!! else block(this)

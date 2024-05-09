@@ -39,20 +39,27 @@ import io.rtron.std.noneWithNext
  */
 class LineString3D(
     val vertices: NonEmptyList<Vector3D>,
-    override val tolerance: Double
+    override val tolerance: Double,
 ) : AbstractCurve3D() {
-
     // Properties and Initializers
     init {
         require(vertices.size >= 2) { "Must at least contain two vertices." }
-        require(vertices.noneWithNext { a, b -> a.fuzzyEquals(b, tolerance) }) { "Must not contain consecutively following point duplicates." }
+        require(
+            vertices.noneWithNext {
+                    a,
+                    b,
+                ->
+                a.fuzzyEquals(b, tolerance)
+            },
+        ) { "Must not contain consecutively following point duplicates." }
     }
 
     private val segments = vertices.zipWithNext().map { LineSegment3D(it.first, it.second, tolerance) }
     private val lengths = segments.map { it.length }
     private val absoluteStarts = lengths.cumulativeSum().dropLast(1)
-    private val absoluteDomains = absoluteStarts.zipWithNext().map { Range.closedOpen(it.first, it.second) } +
-        Range.closed(absoluteStarts.last(), absoluteStarts.last() + lengths.last())
+    private val absoluteDomains =
+        absoluteStarts.zipWithNext().map { Range.closedOpen(it.first, it.second) } +
+            Range.closed(absoluteStarts.last(), absoluteStarts.last() + lengths.last())
 
     private val container = ConcatenationContainer(segments, absoluteDomains, absoluteStarts, tolerance)
     override val domain get() = container.domain
@@ -60,27 +67,32 @@ class LineString3D(
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
-        val localMember = container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .getOrElse { throw it }
+        val localMember =
+            container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
+                .getOrElse { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePointGlobalCSUnbounded(localPoint)
     }
 
     companion object {
+        fun of(
+            vertices: NonEmptyList<Vector3D>,
+            tolerance: Double,
+        ): Either<GeometryException, LineString3D> =
+            either {
+                val adjustedVertices =
+                    vertices
+                        .filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
+                        .toNonEmptyListOrNone()
+                        .toEither { GeometryException.NotEnoughVertices("No vertex for constructing a line segment") }
+                        .bind()
 
-        fun of(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryException, LineString3D> = either {
-            val adjustedVertices = vertices
-                .filterWithNext { a, b -> a.fuzzyUnequals(b, tolerance) }
-                .toNonEmptyListOrNone()
-                .toEither { GeometryException.NotEnoughVertices("No vertex for constructing a line segment") }
-                .bind()
+                if (adjustedVertices.size < 2) {
+                    GeometryException.NotEnoughVertices("Not enough vertices for constructing a line segment").left().bind<LineString3D>()
+                }
 
-            if (adjustedVertices.size < 2) {
-                GeometryException.NotEnoughVertices("Not enough vertices for constructing a line segment").left().bind<LineString3D>()
+                LineString3D(adjustedVertices, tolerance)
             }
-
-            LineString3D(adjustedVertices, tolerance)
-        }
     }
 }

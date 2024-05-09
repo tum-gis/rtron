@@ -30,15 +30,15 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14ObjectMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive14JunctionMapper {
-
     abstract fun mapJunction(source: OpenDRIVE.Junction): Junction
 
     //
     // Enumerations
     //
     fun mapContactPointToOption(source: ContactPoint?): Option<EContactPoint> = source?.let { mapContactPoint(it).some() } ?: None
+
     abstract fun mapContactPoint(source: ContactPoint): EContactPoint
 }

@@ -28,9 +28,8 @@ fun CMRealVector.toRealVector() = RealVector(this.toArray()!!)
  * @param entries entry values of the real vector
  */
 class RealVector(
-    private val entries: DoubleArray
+    private val entries: DoubleArray,
 ) {
-
     // Properties and Initializers
 
     /** adapted Apache Commons Math vector */
@@ -48,7 +47,9 @@ class RealVector(
     // Operators
 
     operator fun get(index: Int): Double = vector.getEntry(index)
+
     operator fun plus(v: RealVector) = vector.add(v.vector).toRealVector()
+
     operator fun minus(v: RealVector) = vector.subtract(v.vector).toRealVector()
 
     // Methods
@@ -92,6 +93,7 @@ class RealVector(
     // Conversions
 
     fun toDoubleArray(): DoubleArray = vector.toArray()!!
+
     fun toDoubleList(): List<Double> = toDoubleArray().toList()
 
     /** Conversion to adapted Real Vector class from Apache Commons Math. */

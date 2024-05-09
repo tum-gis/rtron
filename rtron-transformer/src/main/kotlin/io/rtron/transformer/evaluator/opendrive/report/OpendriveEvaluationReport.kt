@@ -25,12 +25,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OpendriveEvaluationReport(
     val parameters: OpendriveEvaluatorParameters,
-
     var basicDataTypePlan: DefaultIssueList = DefaultIssueList(),
     var modelingRulesPlan: DefaultIssueList = DefaultIssueList(),
-    var conversionRequirementsPlan: DefaultIssueList = DefaultIssueList()
+    var conversionRequirementsPlan: DefaultIssueList = DefaultIssueList(),
 ) {
-
     /**
      * Returns a summary of the message numbers depending on the severity.
      */
@@ -39,6 +37,7 @@ data class OpendriveEvaluationReport(
             "modeling rules plan: ${modelingRulesPlan.getTextSummary()}, " +
             "conversion requirements plan: ${conversionRequirementsPlan.getTextSummary()}"
 
-    fun containsFatalErrors(): Boolean = basicDataTypePlan.containsFatalErrors() ||
-        modelingRulesPlan.containsFatalErrors() || conversionRequirementsPlan.containsFatalErrors()
+    fun containsFatalErrors(): Boolean =
+        basicDataTypePlan.containsFatalErrors() ||
+            modelingRulesPlan.containsFatalErrors() || conversionRequirementsPlan.containsFatalErrors()
 }

@@ -32,9 +32,8 @@ fun CMPolynomialFunction.toPolynomialFunction() = PolynomialFunction(this.coeffi
  */
 data class PolynomialFunction(
     val coefficients: DoubleArray,
-    override val domain: Range<Double> = Range.all()
+    override val domain: Range<Double> = Range.all(),
 ) : UnivariateFunction() {
-
     // Properties and Initializers
     init {
         require(coefficients.isNotEmpty()) { "At least one coefficient must be given." }
@@ -54,11 +53,9 @@ data class PolynomialFunction(
     constructor(coefficients: List<Double>) : this(coefficients.toDoubleArray())
 
     // Methods
-    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> =
-        Either.Right(polynomialFunction.value(x))
+    override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> = Either.Right(polynomialFunction.value(x))
 
-    override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> =
-        polynomialDerivative.valueUnbounded(x)
+    override fun slopeUnbounded(x: Double): Either<IllegalArgumentException, Double> = polynomialDerivative.valueUnbounded(x)
 
     /**
      * Returns the calculated value of f(x), if [x] is within the function's domain. Otherwise null is returned.
@@ -90,7 +87,6 @@ data class PolynomialFunction(
     }
 
     companion object {
-
         /**
          * Build a polynomial function with providing its length, which is used to construct the domain [0, [length]
          *
@@ -98,8 +94,11 @@ data class PolynomialFunction(
          * @param length the length of the domain [0, length]
          * @param upperBoundType open or closed upper bound type
          */
-        fun of(coefficients: DoubleArray, length: Double, upperBoundType: BoundType = BoundType.OPEN):
-            PolynomialFunction {
+        fun of(
+            coefficients: DoubleArray,
+            length: Double,
+            upperBoundType: BoundType = BoundType.OPEN,
+        ): PolynomialFunction {
             require(length > 0.0) { "Length must be greater than zero." }
 
             return when {

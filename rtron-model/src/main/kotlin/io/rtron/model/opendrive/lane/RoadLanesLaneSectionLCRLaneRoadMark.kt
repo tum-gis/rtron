@@ -28,7 +28,6 @@ data class RoadLanesLaneSectionLCRLaneRoadMark(
     var sway: List<RoadLanesLaneSectionLCRLaneRoadMarkSway> = emptyList(),
     var type: Option<RoadLanesLaneSectionLCRLaneRoadMarkType> = None,
     var explicit: Option<RoadLanesLaneSectionLCRLaneRoadMarkExplicit> = None,
-
     var color: ERoadMarkColor = ERoadMarkColor.STANDARD,
     var height: Option<Double> = None,
     var laneChange: Option<ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange> = None,
@@ -37,9 +36,7 @@ data class RoadLanesLaneSectionLCRLaneRoadMark(
     var typeAttribute: ERoadMarkType = ERoadMarkType.NONE,
     var weight: Option<ERoadMarkWeight> = None,
     var width: Option<Double> = None,
-
-    override var additionalId: Option<LaneRoadMarkIdentifier> = None
+    override var additionalId: Option<LaneRoadMarkIdentifier> = None,
 ) : OpendriveElement(), AdditionalLaneRoadMarkIdentifier {
-
     companion object
 }

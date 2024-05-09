@@ -27,14 +27,15 @@ data class RoadObjectsObjectOutlinesOutlineCornerLocal(
     var id: Option<Int> = None,
     var u: Double = Double.NaN,
     var v: Double = Double.NaN,
-    var z: Double = Double.NaN
+    var z: Double = Double.NaN,
 ) : OpendriveElement() {
-
     // Methods
     fun hasZeroHeight(): Boolean = !height.isFinite() || height == 0.0
+
     fun hasPositiveHeight(): Boolean = !hasZeroHeight() && height > 0.0
 
     fun getBasePoint() = Vector3D(u, v, z)
+
     fun getHeadPoint(): Option<Vector3D> =
         if (hasZeroHeight()) {
             None

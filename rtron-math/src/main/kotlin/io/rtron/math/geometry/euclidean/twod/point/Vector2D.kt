@@ -36,9 +36,8 @@ fun JOMLVector2D.toVector2D() = Vector2D(this.x, this.y)
  */
 data class Vector2D(
     val x: Double,
-    val y: Double
+    val y: Double,
 ) : AbstractPoint2D() {
-
     // Properties and Initializers
 
     init {
@@ -58,15 +57,27 @@ data class Vector2D(
     // Operators
 
     operator fun plus(v: Vector2D) = vector2D.add(v.vector2D).toVector2D()
+
     operator fun minus(v: Vector2D) = vector2D.subtract(v.vector2D).toVector2D()
+
     operator fun times(m: Double): Vector2D = scalarMultiply(m)
+
     operator fun div(m: Double): Vector2D = scalarDivide(m)
+
     operator fun unaryPlus() = Vector2D(x, y)
+
     operator fun unaryMinus() = Vector2D(-x, -y)
 
-    fun fuzzyEquals(o: Vector2D, tolerance: Double) = doubleFuzzyEquals(this.x, o.x, tolerance) &&
+    fun fuzzyEquals(
+        o: Vector2D,
+        tolerance: Double,
+    ) = doubleFuzzyEquals(this.x, o.x, tolerance) &&
         doubleFuzzyEquals(this.y, o.y, tolerance)
-    fun fuzzyUnequals(o: Vector2D, tolerance: Double) = !fuzzyEquals(o, tolerance)
+
+    fun fuzzyUnequals(
+        o: Vector2D,
+        tolerance: Double,
+    ) = !fuzzyEquals(o, tolerance)
 
     // Methods
 
@@ -93,7 +104,9 @@ data class Vector2D(
 
     // Conversions
     fun toVector3D(z: Double = 0.0) = Vector3D(this.x, this.y, z)
+
     fun toVector2DCm() = this.vector2D
+
     fun toVector2DJOML() = JOMLVector2D(this.x, this.y)
 
     companion object {

@@ -23,7 +23,7 @@ import io.rtron.model.opendrive.additions.optics.everyRoadObjectContainer
 import io.rtron.model.opendrive.objects.EObjectType
 
 class OpendriveObjectRemover(
-    val parameters: OpendriveObjectRemoverParameters
+    val parameters: OpendriveObjectRemoverParameters,
 ) {
     fun modify(opendriveModel: OpendriveModel): Pair<OpendriveModel, OpendriveObjectRemoverReport> {
         val report = OpendriveObjectRemoverReport(parameters)
@@ -31,48 +31,53 @@ class OpendriveObjectRemover(
         modifiedOpendriveModel.updateAdditionalIdentifiers()
 
         if (parameters.removeRoadObjectsWithoutType) {
-            modifiedOpendriveModel = everyRoadObjectContainer.modify(modifiedOpendriveModel) { currentRoadObjectContainer ->
-                val numberOfRoadObjectsBefore = currentRoadObjectContainer.roadObject.count()
+            modifiedOpendriveModel =
+                everyRoadObjectContainer.modify(modifiedOpendriveModel) { currentRoadObjectContainer ->
+                    val numberOfRoadObjectsBefore = currentRoadObjectContainer.roadObject.count()
 
-                currentRoadObjectContainer.roadObject = currentRoadObjectContainer.roadObject.filter { it.type.isSome() }
+                    currentRoadObjectContainer.roadObject = currentRoadObjectContainer.roadObject.filter { it.type.isSome() }
 
-                report.numberOfRemovedRoadObjectsWithoutType +=
-                    currentRoadObjectContainer.roadObject.count() - numberOfRoadObjectsBefore
+                    report.numberOfRemovedRoadObjectsWithoutType +=
+                        currentRoadObjectContainer.roadObject.count() - numberOfRoadObjectsBefore
 
-                currentRoadObjectContainer
-            }
+                    currentRoadObjectContainer
+                }
         }
 
         if (parameters.removeRoadObjectsOfTypes.isNotEmpty()) {
-            modifiedOpendriveModel = everyRoadObjectContainer.modify(modifiedOpendriveModel) { currentRoadObjectContainer ->
+            modifiedOpendriveModel =
+                everyRoadObjectContainer.modify(modifiedOpendriveModel) { currentRoadObjectContainer ->
 
-                val numberOfRoadObjectsBefore: Map<EObjectType, Int> = currentRoadObjectContainer.roadObject
-                    .map { it.type }
-                    .flattenOption()
-                    .groupingBy { it }
-                    .eachCount()
+                    val numberOfRoadObjectsBefore: Map<EObjectType, Int> =
+                        currentRoadObjectContainer.roadObject
+                            .map { it.type }
+                            .flattenOption()
+                            .groupingBy { it }
+                            .eachCount()
 
-                currentRoadObjectContainer.roadObject = currentRoadObjectContainer.roadObject
-                    .filter { currentRoadObject ->
-                        currentRoadObject.type.fold({ true }, { !parameters.removeRoadObjectsOfTypes.contains(it) })
-                    }
+                    currentRoadObjectContainer.roadObject =
+                        currentRoadObjectContainer.roadObject
+                            .filter { currentRoadObject ->
+                                currentRoadObject.type.fold({ true }, { !parameters.removeRoadObjectsOfTypes.contains(it) })
+                            }
 
-                val roadObjectTypeCountAfter: Map<EObjectType, Int> = currentRoadObjectContainer.roadObject
-                    .map { it.type }
-                    .flattenOption()
-                    .groupingBy { it }
-                    .eachCount()
+                    val roadObjectTypeCountAfter: Map<EObjectType, Int> =
+                        currentRoadObjectContainer.roadObject
+                            .map { it.type }
+                            .flattenOption()
+                            .groupingBy { it }
+                            .eachCount()
 
-                numberOfRoadObjectsBefore
-                    .map { it.key to it.value - roadObjectTypeCountAfter.getOrDefault(it.key, 0) }
-                    .filter { it.second != 0 }
-                    .forEach {
-                        report.numberOfRemovedRoadObjectsWithType[it.first] =
-                            report.numberOfRemovedRoadObjectsWithType.getOrDefault(it.first, 0) + it.second
-                    }
+                    numberOfRoadObjectsBefore
+                        .map { it.key to it.value - roadObjectTypeCountAfter.getOrDefault(it.key, 0) }
+                        .filter { it.second != 0 }
+                        .forEach {
+                            report.numberOfRemovedRoadObjectsWithType[it.first] =
+                                report.numberOfRemovedRoadObjectsWithType.getOrDefault(it.first, 0) + it.second
+                        }
 
-                currentRoadObjectContainer
-            }
+                    currentRoadObjectContainer
+                }
         }
 
         return modifiedOpendriveModel to report

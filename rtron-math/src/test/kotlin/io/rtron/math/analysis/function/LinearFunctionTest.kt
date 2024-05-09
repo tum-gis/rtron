@@ -49,11 +49,12 @@ class LinearFunctionTest : FunSpec({
     context("TestFactoryMethodOfInclusivePoints") {
 
         test("basic creation of linear function with two points") {
-            val expectedLinearFunction = LinearFunction(
-                -3.0 / 2.0,
-                13.0 / 2.0,
-                Range.closed(3.0, 7.0)
-            )
+            val expectedLinearFunction =
+                LinearFunction(
+                    -3.0 / 2.0,
+                    13.0 / 2.0,
+                    Range.closed(3.0, 7.0),
+                )
 
             val actualLinearFunction = LinearFunction.ofInclusivePoints(3.0, 2.0, 7.0, -4.0)
 
@@ -73,11 +74,12 @@ class LinearFunctionTest : FunSpec({
     context("TestFactoryMethodOfInclusiveYValueAndUnitSlope") {
 
         test("with positive unit slope") {
-            val expectedLinearFunction = LinearFunction(
-                1.0,
-                2.0,
-                Range.closed(0.0, 2.0)
-            )
+            val expectedLinearFunction =
+                LinearFunction(
+                    1.0,
+                    2.0,
+                    Range.closed(0.0, 2.0),
+                )
 
             val actualLinearFunction = LinearFunction.ofInclusiveYValuesAndUnitSlope(2.0, 4.0)
 
@@ -85,11 +87,12 @@ class LinearFunctionTest : FunSpec({
         }
 
         test("with negative unit slope") {
-            val expectedLinearFunction = LinearFunction(
-                -1.0,
-                17.0,
-                Range.closed(0.0, 3.0)
-            )
+            val expectedLinearFunction =
+                LinearFunction(
+                    -1.0,
+                    17.0,
+                    Range.closed(0.0, 3.0),
+                )
 
             val actualLinearFunction = LinearFunction.ofInclusiveYValuesAndUnitSlope(17.0, 14.0)
 

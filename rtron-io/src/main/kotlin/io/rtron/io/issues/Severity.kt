@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 enum class Severity {
     WARNING,
     ERROR,
-    FATAL_ERROR
+    FATAL_ERROR,
 }

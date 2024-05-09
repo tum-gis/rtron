@@ -26,23 +26,41 @@ import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.issues.opendrive.of
 
 object JunctionEvaluator {
-
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
+    fun evaluate(
+        opendriveModel: OpendriveModel,
+        parameters: OpendriveEvaluatorParameters,
+        issueList: DefaultIssueList,
+    ): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
-        modifiedOpendriveModel = everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
+        modifiedOpendriveModel =
+            everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
 
-            if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.incomingRoad.isNone() }) {
-                issueList += DefaultIssue.of("DefaultJunctionWithoutIncomingRoad", "Junction of type default has no connection with an incoming road.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
+                if (currentJunction.typeValidated == EJunctionType.DEFAULT &&
+                    currentJunction.connection.any { it.incomingRoad.isNone() }
+                ) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "DefaultJunctionWithoutIncomingRoad",
+                            "Junction of type default has no connection with an incoming road.",
+                            currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                        )
+                }
+
+                if (currentJunction.typeValidated == EJunctionType.DEFAULT &&
+                    currentJunction.connection.any { it.connectingRoad.isNone() }
+                ) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "DefaultJunctionWithoutConnectingRoad",
+                            "Junction of type default has no connection with a connecting road.",
+                            currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                        )
+                }
+
+                currentJunction
             }
-
-            if (currentJunction.typeValidated == EJunctionType.DEFAULT && currentJunction.connection.any { it.connectingRoad.isNone() }) {
-                issueList += DefaultIssue.of("DefaultJunctionWithoutConnectingRoad", "Junction of type default has no connection with a connecting road.", currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false)
-            }
-
-            currentJunction
-        }
 
         return modifiedOpendriveModel
     }

@@ -29,7 +29,7 @@ import io.rtron.transformer.evaluator.opendrive.plans.modelingrules.ModelingRule
 import io.rtron.transformer.evaluator.opendrive.report.OpendriveEvaluationReport
 
 class OpendriveEvaluator(
-    val parameters: OpendriveEvaluatorParameters
+    val parameters: OpendriveEvaluatorParameters,
 ) {
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}

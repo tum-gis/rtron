@@ -18,5 +18,5 @@ package io.rtron.model.opendrive.core
 
 data class HeaderGeoReference(
     var content: String,
-    var g_additionalData: List<AdditionalData> = emptyList()
+    var g_additionalData: List<AdditionalData> = emptyList(),
 )

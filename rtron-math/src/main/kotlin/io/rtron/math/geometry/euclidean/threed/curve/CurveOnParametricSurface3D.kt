@@ -40,17 +40,17 @@ import io.rtron.math.range.intersectingRange
 data class CurveOnParametricSurface3D(
     private val baseSurface: AbstractCurveRelativeSurface3D,
     private val lateralOffsetFunction: UnivariateFunction,
-    private val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
+    private val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS,
 ) : AbstractCurve3D() {
-
     // Properties and Initializers
     override val tolerance: Double get() = baseSurface.tolerance
 
-    override val domain: Range<Double> = setOf(
-        baseSurface.domain,
-        lateralOffsetFunction.domain,
-        heightOffsetFunction.domain
-    ).intersectingRange()
+    override val domain: Range<Double> =
+        setOf(
+            baseSurface.domain,
+            lateralOffsetFunction.domain,
+            heightOffsetFunction.domain,
+        ).intersectingRange()
 
     init {
         require(domain.isNotEmpty()) { "Domain must not be empty." }
@@ -59,17 +59,18 @@ data class CurveOnParametricSurface3D(
 
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
-        val lateralOffset = lateralOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .getOrElse { throw it }
-        val heightOffset = heightOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
-            .getOrElse { throw it }
+        val lateralOffset =
+            lateralOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
+                .getOrElse { throw it }
+        val heightOffset =
+            heightOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
+                .getOrElse { throw it }
 
         val curveRelativePoint2D = curveRelativePoint.toCurveRelative2D(lateralOffset)
         return baseSurface.calculatePointGlobalCSUnbounded(curveRelativePoint2D, heightOffset)
     }
 
     companion object {
-
         /**
          * Returns a [CurveOnParametricSurface3D]. Throws an error, if the [lateralOffsetFunction] or the
          * [heightOffsetFunction] is not defined everywhere, where the [baseSurface] is defined.
@@ -77,10 +78,14 @@ data class CurveOnParametricSurface3D(
         fun onCompleteSurface(
             baseSurface: AbstractCurveRelativeSurface3D,
             lateralOffsetFunction: UnivariateFunction,
-            heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS
+            heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS,
         ): CurveOnParametricSurface3D {
-            require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The lateral offset function must be defined everywhere where the baseSurface is also defined." }
-            require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) { "The height offset function must be defined everywhere where the baseSurface is also defined." }
+            require(lateralOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) {
+                "The lateral offset function must be defined everywhere where the baseSurface is also defined."
+            }
+            require(heightOffsetFunction.domain.fuzzyEncloses(baseSurface.domain, baseSurface.tolerance)) {
+                "The height offset function must be defined everywhere where the baseSurface is also defined."
+            }
 
             return CurveOnParametricSurface3D(baseSurface, lateralOffsetFunction, heightOffsetFunction)
         }

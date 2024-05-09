@@ -30,15 +30,15 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16ObjectMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive16SignalMapper {
-
     //
     // Signal
     //
     abstract fun mapSignals(source: T_Road_Signals): RoadSignals
 
     abstract fun mapSignalsSignalPositionInertial(source: T_Road_Signals_Signal_PositionInertial): RoadSignalsSignalPositionInertial
+
     abstract fun mapSignalsSignalPositionRoad(source: T_Road_Signals_Signal_PositionRoad): RoadSignalsSignalPositionRoad
 }

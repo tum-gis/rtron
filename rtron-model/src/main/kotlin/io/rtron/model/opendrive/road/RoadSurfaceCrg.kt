@@ -33,5 +33,5 @@ data class RoadSurfaceCrg(
     var sStart: Double = Double.NaN,
     var tOffset: Option<Double> = None,
     var zOffset: Option<Double> = None,
-    var zScale: Option<Double> = None
+    var zScale: Option<Double> = None,
 ) : OpendriveElement()

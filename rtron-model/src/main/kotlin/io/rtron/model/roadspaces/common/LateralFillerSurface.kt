@@ -21,7 +21,6 @@ import io.rtron.math.range.difference
 import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 
 data class LateralFillerSurface(val id: LateralLaneRangeIdentifier, val surface: AbstractSurface3D) {
-
     // Properties and Initializers
     init {
         require(id.laneIdRange.difference == 1) { "Lane identifiers must be laterally adjacent." }

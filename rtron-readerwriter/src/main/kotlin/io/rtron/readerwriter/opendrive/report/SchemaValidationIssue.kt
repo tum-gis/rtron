@@ -24,5 +24,5 @@ data class SchemaValidationIssue(
     val description: String,
     val severity: Severity,
     val lineNumber: Int,
-    val columnNumber: Int
+    val columnNumber: Int,
 )

@@ -33,9 +33,8 @@ import kotlin.math.sqrt
  * @param cDot first derivative of curvature
  */
 data class Spiral2D(
-    val cDot: Double
+    val cDot: Double,
 ) {
-
     // Properties and Initializers
     val constantA: Double = 1.0 / sqrt(abs(cDot))
     val constantAuxiliaryA: Double = constantA * sqrt(PI)

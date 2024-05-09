@@ -32,9 +32,8 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D as CMVector3D
 data class Plane3D(
     val point: Vector3D = Vector3D.ZERO,
     val normal: Vector3D,
-    val tolerance: Double
+    val tolerance: Double,
 ) {
-
     // Properties and Initializers
     init {
         require(normal.norm > tolerance) { "Norm of normal must be greater than zero and the tolerance threshold." }
@@ -49,6 +48,7 @@ data class Plane3D(
     val vectorV by lazy { plane.v.toVector3D() }
 
     // Methods
+
     /** Returns the oriented distance between the [point] and this plane. */
     fun getOffset(point: Vector3D): Double = plane.getOffset(point.toVector3DCm())
 

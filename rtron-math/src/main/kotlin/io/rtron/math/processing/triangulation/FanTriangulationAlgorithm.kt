@@ -31,16 +31,19 @@ import io.rtron.math.processing.isColinear
  * See the wikipedia article on [fan triangulation](https://en.wikipedia.org/wiki/Fan_triangulation).
  */
 class FanTriangulationAlgorithm : TriangulationAlgorithm() {
-
-    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> {
+    override fun triangulate(
+        vertices: NonEmptyList<Vector3D>,
+        tolerance: Double,
+    ): Either<TriangulatorException, List<Polygon3D>> {
         if (vertices.tail.any { vertices.head.fuzzyEquals(it, tolerance) }) {
             return TriangulatorException.FirstVertexDuplicated().left()
         }
 
-        val polygons = vertices.tail
-            .zipWithNext()
-            .filter { !listOf(vertices.head, it.first, it.second).isColinear(tolerance) }
-            .map { Polygon3D(nonEmptyListOf(vertices.head, it.first, it.second), tolerance) }
+        val polygons =
+            vertices.tail
+                .zipWithNext()
+                .filter { !listOf(vertices.head, it.first, it.second).isColinear(tolerance) }
+                .map { Polygon3D(nonEmptyListOf(vertices.head, it.first, it.second), tolerance) }
 
         return polygons.right()
     }

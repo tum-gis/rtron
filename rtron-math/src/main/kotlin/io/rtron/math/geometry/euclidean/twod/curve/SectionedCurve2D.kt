@@ -33,12 +33,13 @@ import io.rtron.math.range.shiftLowerEndpointTo
  */
 class SectionedCurve2D(
     private val completeCurve: AbstractCurve2D,
-    section: Range<Double>
+    section: Range<Double>,
 ) : AbstractCurve2D() {
-
     // Properties and Initializers
     init {
-        require(completeCurve.domain.fuzzyEncloses(section, tolerance)) { "The complete function must be defined everywhere where the section is also defined." }
+        require(completeCurve.domain.fuzzyEncloses(section, tolerance)) {
+            "The complete function must be defined everywhere where the section is also defined."
+        }
     }
 
     override val domain: Range<Double> = section.shiftLowerEndpointTo(0.0)

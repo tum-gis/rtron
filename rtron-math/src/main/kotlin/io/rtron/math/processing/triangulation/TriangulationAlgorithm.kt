@@ -28,7 +28,6 @@ import io.rtron.math.geometry.euclidean.threed.surface.Polygon3D
  * See the wikipedia article of [polygon triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation).
  */
 abstract class TriangulationAlgorithm {
-
     /**
      * Performs the triangulation operation and checks whether all input vertices are still represented
      * after triangulation.
@@ -36,16 +35,20 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    fun triangulateChecked(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either {
-        val triangles = triangulate(vertices, tolerance).bind()
+    fun triangulateChecked(
+        vertices: NonEmptyList<Vector3D>,
+        tolerance: Double,
+    ): Either<TriangulatorException, List<Polygon3D>> =
+        either {
+            val triangles = triangulate(vertices, tolerance).bind()
 
-        val newVertices = triangles.flatMap { it.vertices }
-        if (newVertices.any { it !in vertices }) {
-            TriangulatorException.DifferentVertices().left().bind<List<Polygon3D>>()
+            val newVertices = triangles.flatMap { it.vertices }
+            if (newVertices.any { it !in vertices }) {
+                TriangulatorException.DifferentVertices().left().bind<List<Polygon3D>>()
+            }
+
+            triangles
         }
-
-        triangles
-    }
 
     /**
      * Triangulation algorithm implemented by concrete classes.
@@ -53,5 +56,8 @@ abstract class TriangulationAlgorithm {
      * @param vertices list of vertices representing the outline to be triangulated
      * @return list of triangulated [Polygon3D]
      */
-    internal abstract fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>>
+    internal abstract fun triangulate(
+        vertices: NonEmptyList<Vector3D>,
+        tolerance: Double,
+    ): Either<TriangulatorException, List<Polygon3D>>
 }

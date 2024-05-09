@@ -42,9 +42,8 @@ data class LaneSection(
     val id: LaneSectionIdentifier,
     val curvePositionDomain: Range<Double>,
     val lanes: Map<Int, Lane>,
-    val centerLane: CenterLane
+    val centerLane: CenterLane,
 ) {
-
     // Properties and Initializers
     init {
         require(curvePositionDomain.hasLowerBound()) { "Curve position domain must have a lower bound." }
@@ -52,9 +51,10 @@ data class LaneSection(
         require(lanes.isNotEmpty()) { "LaneSection must contain lanes." }
         require(lanes.all { it.key == it.value.id.laneId }) { "Lane elements must be positioned according to their lane id on the map." }
 
-        val expectedLaneIds = (lanes.keys.minOrNull()!!..lanes.keys.maxOrNull()!!)
-            .toMutableList()
-            .also { it.remove(0) }
+        val expectedLaneIds =
+            (lanes.keys.minOrNull()!!..lanes.keys.maxOrNull()!!)
+                .toMutableList()
+                .also { it.remove(0) }
         require(lanes.keys.containsAll(expectedLaneIds)) { "There must be no gaps within the given laneIds." }
     }
 
@@ -66,12 +66,14 @@ data class LaneSection(
         id: LaneSectionIdentifier,
         curvePositionDomain: Range<Double>,
         lanes: List<Lane>,
-        centerLane: CenterLane
+        centerLane: CenterLane,
     ) :
         this(id, curvePositionDomain, lanes.associateBy { it.id.laneId }, centerLane)
 
     // Methods
-    fun getLane(laneId: Int): Either<IllegalArgumentException, Lane> = lanes.getValueEither(laneId).mapLeft { it.toIllegalArgumentException() }
+    fun getLane(laneId: Int): Either<IllegalArgumentException, Lane> =
+        lanes.getValueEither(laneId).mapLeft { it.toIllegalArgumentException() }
+
     fun getLane(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, Lane> =
         lanes.getValueEither(laneIdentifier.laneId).mapLeft { it.toIllegalArgumentException() }
 
@@ -88,21 +90,27 @@ data class LaneSection(
      * @param factor if the [factor] is 0.0 the inner lane boundary is returned. If the [factor] is 1.0 the outer lane
      * boundary is returned. An offset function within the middle of the lane is achieved by a [factor] of 0.5.
      */
-    fun getLateralLaneOffset(laneId: Int, factor: Double): Either<Exception, UnivariateFunction> = either {
-        val selectedLanes = (1..abs(laneId)).toList()
-            .map { sign(laneId) * it }
-            .map { getLane(it).bind() }
+    fun getLateralLaneOffset(
+        laneId: Int,
+        factor: Double,
+    ): Either<Exception, UnivariateFunction> =
+        either {
+            val selectedLanes =
+                (1..abs(laneId)).toList()
+                    .map { sign(laneId) * it }
+                    .map { getLane(it).bind() }
 
-        val currentLane = selectedLanes.last()
-        val innerLaneBoundaryOffset = selectedLanes.dropLast(1)
-            .map { it.width }
-            .let { if (it.isEmpty()) LinearFunction.X_AXIS else StackedFunction.ofSum(it) }
+            val currentLane = selectedLanes.last()
+            val innerLaneBoundaryOffset =
+                selectedLanes.dropLast(1)
+                    .map { it.width }
+                    .let { if (it.isEmpty()) LinearFunction.X_AXIS else StackedFunction.ofSum(it) }
 
-        StackedFunction(
-            listOf(innerLaneBoundaryOffset, currentLane.width),
-            { sign(laneId) * (it[0] + factor * it[1]) }
-        )
-    }
+            StackedFunction(
+                listOf(innerLaneBoundaryOffset, currentLane.width),
+                { sign(laneId) * (it[0] + factor * it[1]) },
+            )
+        }
 
     /**
      * Returns the height offset function located on lane with [laneIdentifier].
@@ -112,19 +120,20 @@ data class LaneSection(
      * is 1.0 the height offset of the outer lane boundary is returned. A height offset function within the middle
      * of the lane is achieved by a [factor] of 0.5.
      */
-    fun getLaneHeightOffset(laneIdentifier: LaneIdentifier, factor: Double):
-        Either<IllegalArgumentException, UnivariateFunction> = either {
-        val inner = getInnerLaneHeightOffset(laneIdentifier).bind()
-        val outer = getOuterLaneHeightOffset(laneIdentifier).bind()
-        val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
-        laneHeightOffset
-    }
+    fun getLaneHeightOffset(
+        laneIdentifier: LaneIdentifier,
+        factor: Double,
+    ): Either<IllegalArgumentException, UnivariateFunction> =
+        either {
+            val inner = getInnerLaneHeightOffset(laneIdentifier).bind()
+            val outer = getOuterLaneHeightOffset(laneIdentifier).bind()
+            val laneHeightOffset = StackedFunction(listOf(inner, outer), { it[0] * (1.0 - factor) + it[1] * factor })
+            laneHeightOffset
+        }
 
-    private fun getOuterLaneHeightOffset(laneIdentifier: LaneIdentifier):
-        Either<IllegalArgumentException, UnivariateFunction> =
+    private fun getOuterLaneHeightOffset(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, UnivariateFunction> =
         getLane(laneIdentifier).map { it.outerHeightOffset }
 
-    private fun getInnerLaneHeightOffset(laneIdentifier: LaneIdentifier):
-        Either<IllegalArgumentException, UnivariateFunction> =
+    private fun getInnerLaneHeightOffset(laneIdentifier: LaneIdentifier): Either<IllegalArgumentException, UnivariateFunction> =
         getLane(laneIdentifier).map { it.innerHeightOffset }
 }

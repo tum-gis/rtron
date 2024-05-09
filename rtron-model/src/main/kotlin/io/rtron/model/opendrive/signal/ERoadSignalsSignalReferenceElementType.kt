@@ -18,5 +18,5 @@ package io.rtron.model.opendrive.signal
 
 enum class ERoadSignalsSignalReferenceElementType {
     OBJECT,
-    SIGNAL
+    SIGNAL,
 }

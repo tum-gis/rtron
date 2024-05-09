@@ -27,7 +27,6 @@ import io.rtron.math.processing.isPlanar
  * See the wikipedia article of [polygon triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation).
  */
 object Triangulator {
-
     private val standardTriangulationAlgorithm = Poly2TriTriangulationAlgorithm()
     private val fallbackTriangulationAlgorithm = ProjectedTriangulationAlgorithm(standardTriangulationAlgorithm)
     private val fanTriangulationAlgorithm = FanTriangulationAlgorithm()
@@ -37,14 +36,18 @@ object Triangulator {
      *
      * @param linearRing linear ring to be triangulated
      */
-    fun triangulate(linearRing: LinearRing3D, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> {
+    fun triangulate(
+        linearRing: LinearRing3D,
+        tolerance: Double,
+    ): Either<TriangulatorException, List<Polygon3D>> {
         if (linearRing.vertices.isPlanar(tolerance)) {
             return Either.Right(listOf(Polygon3D(linearRing.vertices, tolerance)))
         }
 
         // run triangulation algorithms until one succeeds
-        val standardResult = standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
-            .onRight { return it.right() }
+        val standardResult =
+            standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
+                .onRight { return it.right() }
         fallbackTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
             .onRight { return it.right() }
         fanTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)

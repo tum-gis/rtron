@@ -17,5 +17,5 @@
 package io.rtron.model.opendrive.core
 
 data class Include(
-    var file: String = ""
+    var file: String = "",
 )

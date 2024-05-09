@@ -23,13 +23,14 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLateralProfile(
     var superelevation: List<RoadLateralProfileSuperelevation> = emptyList(),
-    var shape: List<RoadLateralProfileShape> = emptyList()
+    var shape: List<RoadLateralProfileShape> = emptyList(),
 ) : OpendriveElement() {
-
     // Methods
     fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = superelevation.toNonEmptyListOrNone()
+
     fun getShapeEntries(): Option<NonEmptyList<RoadLateralProfileShape>> = shape.toNonEmptyListOrNone()
 
     fun containsSuperelevationProfile() = superelevation.isNotEmpty()
+
     fun containsShapeProfile() = shape.isNotEmpty()
 }

@@ -21,7 +21,6 @@ package io.rtron.math.range
  * See wikipedia article on [domain of a function](https://en.wikipedia.org/wiki/Domain_of_a_function).
  */
 interface DefinableDomain<T : Comparable<*>> {
-
     /** definable [domain] */
     val domain: Range<T>
 }

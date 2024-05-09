@@ -28,9 +28,8 @@ data class RoadLinkPredecessorSuccessor(
     var elementDir: Option<EElementDir> = None,
     var elementId: String = "",
     var elementS: Option<Double> = None,
-    var elementType: Option<ERoadLinkElementType> = None
+    var elementType: Option<ERoadLinkElementType> = None,
 ) : OpendriveElement() {
-
     // Methods
 
     fun getRoadPredecessorSuccessor(): Option<Pair<String, EContactPoint>> =

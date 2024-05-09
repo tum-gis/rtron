@@ -45,7 +45,7 @@ import org.citygml4j.core.model.generics.GenericOccupiedSpace
  * Builder for city objects of the CityGML Generics module.
  */
 class GenericsModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters,
 ) {
     // Properties and Initializers
     private val relationAdder = RelationAdder(parameters)
@@ -68,13 +68,11 @@ class GenericsModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             genericOccupiedSpaceFeature.populateLod1Geometry(geometryTransformer)
                 .mapLeft {
-                    issueList += DefaultIssue.of(
-                        "NoSuitableGeometryForGenericOccupiedSpaceLod1",
-                        it.message,
-                        roadspaceObject.id,
-                        Severity.WARNING,
-                        wasFixed = true
-                    )
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForGenericOccupiedSpaceLod1",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
                 }
         }
 
@@ -82,20 +80,18 @@ class GenericsModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             genericOccupiedSpaceFeature.populateLod2Geometry(geometryTransformer)
                 .onLeft {
-                    issueList += DefaultIssue.of(
-                        "NoSuitableGeometryForGenericOccupiedSpaceLod2",
-                        it.message,
-                        roadspaceObject.id,
-                        Severity.WARNING,
-                        wasFixed = true
-                    )
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForGenericOccupiedSpaceLod2",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
                 }
         }
 
         // semantics
         IdentifierAdder.addIdentifier(
             roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix),
-            genericOccupiedSpaceFeature
+            genericOccupiedSpaceFeature,
         )
         relationAdder.addBelongToRelations(roadspaceObject, genericOccupiedSpaceFeature)
         attributesAdder.addAttributes(roadspaceObject, genericOccupiedSpaceFeature)
@@ -106,20 +102,21 @@ class GenericsModuleBuilder(
     fun createRoadReferenceLine(
         id: RoadspaceIdentifier,
         abstractGeometry: AbstractGeometry3D,
-        attributes: AttributeList
+        attributes: AttributeList,
     ): ContextIssueList<GenericLogicalSpace> {
         val issueList = DefaultIssueList()
 
-        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
-            .handleIssueList { issueList += it }
+        val genericLogicalSpace =
+            createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+                .handleIssueList { issueList += it }
         IdentifierAdder.addIdentifier(
             id.deriveRoadReferenceLineGmlIdentifier(parameters.gmlIdPrefix),
             "RoadReferenceLine",
-            genericLogicalSpace
+            genericLogicalSpace,
         )
         attributesAdder.addAttributes(
             id.toAttributes(parameters.identifierAttributesPrefix) + attributes,
-            genericLogicalSpace
+            genericLogicalSpace,
         )
 
         return ContextIssueList(genericLogicalSpace, issueList)
@@ -128,20 +125,21 @@ class GenericsModuleBuilder(
     fun createRoadCenterLaneLine(
         id: LaneIdentifier,
         abstractGeometry: AbstractGeometry3D,
-        attributes: AttributeList
+        attributes: AttributeList,
     ): ContextIssueList<GenericLogicalSpace> {
         val issueList = DefaultIssueList()
 
-        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
-            .handleIssueList { issueList += it }
+        val genericLogicalSpace =
+            createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+                .handleIssueList { issueList += it }
         IdentifierAdder.addIdentifier(
             id.deriveRoadCenterLaneLineGmlIdentifier(parameters.gmlIdPrefix),
             "RoadCenterLaneLine",
-            genericLogicalSpace
+            genericLogicalSpace,
         )
         attributesAdder.addAttributes(
             id.toAttributes(parameters.identifierAttributesPrefix) + attributes,
-            genericLogicalSpace
+            genericLogicalSpace,
         )
 
         return ContextIssueList(genericLogicalSpace, issueList)
@@ -149,20 +147,21 @@ class GenericsModuleBuilder(
 
     fun createCenterLaneLine(
         id: LaneIdentifier,
-        abstractGeometry: AbstractGeometry3D
+        abstractGeometry: AbstractGeometry3D,
     ): ContextIssueList<GenericLogicalSpace> {
         val issueList = DefaultIssueList()
 
-        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
-            .handleIssueList { issueList += it }
+        val genericLogicalSpace =
+            createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+                .handleIssueList { issueList += it }
         IdentifierAdder.addIdentifier(
             id.deriveLaneCenterLineGmlIdentifier(parameters.gmlIdPrefix),
             "LaneCenterLine",
-            genericLogicalSpace
+            genericLogicalSpace,
         )
         attributesAdder.addAttributes(
             id.toAttributes(parameters.identifierAttributesPrefix),
-            genericLogicalSpace
+            genericLogicalSpace,
         )
 
         return ContextIssueList(genericLogicalSpace, issueList)
@@ -170,20 +169,21 @@ class GenericsModuleBuilder(
 
     fun createLeftLaneBoundary(
         id: LaneIdentifier,
-        abstractGeometry: AbstractGeometry3D
+        abstractGeometry: AbstractGeometry3D,
     ): ContextIssueList<GenericLogicalSpace> {
         val issueList = DefaultIssueList()
 
-        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
-            .handleIssueList { issueList += it }
+        val genericLogicalSpace =
+            createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+                .handleIssueList { issueList += it }
         IdentifierAdder.addIdentifier(
             id.deriveLeftLaneBoundaryGmlIdentifier(parameters.gmlIdPrefix),
             "LeftLaneBoundary",
-            genericLogicalSpace
+            genericLogicalSpace,
         )
         attributesAdder.addAttributes(
             id.toAttributes(parameters.identifierAttributesPrefix),
-            genericLogicalSpace
+            genericLogicalSpace,
         )
 
         return ContextIssueList(genericLogicalSpace, issueList)
@@ -191,20 +191,21 @@ class GenericsModuleBuilder(
 
     fun createRightLaneBoundary(
         id: LaneIdentifier,
-        abstractGeometry: AbstractGeometry3D
+        abstractGeometry: AbstractGeometry3D,
     ): ContextIssueList<GenericLogicalSpace> {
         val issueList = DefaultIssueList()
 
-        val genericLogicalSpace = createLogicalOccupiedSpaceFeature(id, abstractGeometry)
-            .handleIssueList { issueList += it }
+        val genericLogicalSpace =
+            createLogicalOccupiedSpaceFeature(id, abstractGeometry)
+                .handleIssueList { issueList += it }
         IdentifierAdder.addIdentifier(
             id.deriveRightLaneBoundaryGmlIdentifier(parameters.gmlIdPrefix),
             "RightLaneBoundary",
-            genericLogicalSpace
+            genericLogicalSpace,
         )
         attributesAdder.addAttributes(
             id.toAttributes(parameters.identifierAttributesPrefix),
-            genericLogicalSpace
+            genericLogicalSpace,
         )
 
         return ContextIssueList(genericLogicalSpace, issueList)
@@ -212,24 +213,22 @@ class GenericsModuleBuilder(
 
     private fun createLogicalOccupiedSpaceFeature(
         id: AbstractRoadspacesIdentifier,
-        abstractGeometry: AbstractGeometry3D
-    ):
-        ContextIssueList<GenericLogicalSpace> {
+        abstractGeometry: AbstractGeometry3D,
+    ): ContextIssueList<GenericLogicalSpace> {
         val issueList = DefaultIssueList()
         val genericLogicalSpaceFeature = GenericLogicalSpace()
 
-        val geometryTransformer = GeometryTransformer(parameters)
-            .also { abstractGeometry.accept(it) }
+        val geometryTransformer =
+            GeometryTransformer(parameters)
+                .also { abstractGeometry.accept(it) }
         // geometry
         genericLogicalSpaceFeature.populateLod2Geometry(geometryTransformer)
             .onLeft {
-                issueList += DefaultIssue.of(
-                    "NoSuitableGeometryForLogicalOccupiedSpaceFeatureLod2",
-                    it.message,
-                    id,
-                    Severity.WARNING,
-                    wasFixed = true
-                )
+                issueList +=
+                    DefaultIssue.of(
+                        "NoSuitableGeometryForLogicalOccupiedSpaceFeatureLod2",
+                        it.message, id, Severity.WARNING, wasFixed = true,
+                    )
             }
 
         return ContextIssueList(genericLogicalSpaceFeature, issueList)

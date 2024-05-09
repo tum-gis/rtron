@@ -25,30 +25,35 @@ import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.issues.opendrive.of
 
 object RoadSignalsEvaluator {
-
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
+    fun evaluate(
+        opendriveModel: OpendriveModel,
+        parameters: OpendriveEvaluatorParameters,
+        issueList: DefaultIssueList,
+    ): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
-        modifiedOpendriveModel = everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
+        modifiedOpendriveModel =
+            everyRoad.modify(modifiedOpendriveModel) { currentRoad ->
 
-            currentRoad.signals.onSome { currentRoadSignals ->
-                val signalsFiltered =
-                    currentRoadSignals.signal.filter { it.s <= currentRoad.length + parameters.numberTolerance }
-                if (currentRoadSignals.signal.size > signalsFiltered.size) {
-                    issueList += DefaultIssue.of(
-                        "RoadSignalPositionNotInSValueRange",
-                        "Road signals (number of objects affected: ${currentRoadSignals.signal.size - signalsFiltered.size}) were removed since they were positioned outside the defined length of the road.",
-                        currentRoad.additionalId,
-                        Severity.ERROR,
-                        wasFixed = true
-                    )
+                currentRoad.signals.onSome { currentRoadSignals ->
+                    val signalsFiltered =
+                        currentRoadSignals.signal.filter { it.s <= currentRoad.length + parameters.numberTolerance }
+                    if (currentRoadSignals.signal.size > signalsFiltered.size) {
+                        issueList +=
+                            DefaultIssue.of(
+                                "RoadSignalPositionNotInSValueRange",
+                                "Road signals (number of objects affected: ${currentRoadSignals.signal.size -
+                                    signalsFiltered.size}) were removed since they were positioned outside the defined " +
+                                    "length of the road.",
+                                currentRoad.additionalId, Severity.ERROR, wasFixed = true,
+                            )
+                    }
+                    currentRoadSignals.signal = signalsFiltered
                 }
-                currentRoadSignals.signal = signalsFiltered
-            }
 
-            currentRoad
-        }
+                currentRoad
+            }
         return modifiedOpendriveModel
     }
 }

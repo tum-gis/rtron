@@ -37,9 +37,8 @@ import org.citygml4j.core.model.core.CityModel
  * Transforms [RoadspaceObject] classes (RoadSpaces model) to the [CityModel] (CityGML model).
  */
 class RoadspaceObjectTransformer(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters,
 ) {
-
     // Properties and Initializers
     private val genericsModuleBuilder = GenericsModuleBuilder(parameters)
     private val buildingModuleBuilder = BuildingModuleBuilder(parameters)
@@ -68,15 +67,36 @@ class RoadspaceObjectTransformer(
     private fun transformSingleRoadspaceObject(roadspaceObject: RoadspaceObject): ContextIssueList<Option<AbstractCityObject>> {
         val issueList = DefaultIssueList()
 
-        val cityObjects: Option<AbstractCityObject> = when (RoadspaceObjectRouter.route(roadspaceObject)) {
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> buildingModuleBuilder.createBuildingFeature(roadspaceObject).handleIssueList { issueList += it }.some()
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> cityFurnitureModuleBuilder.createCityFurnitureFeature(roadspaceObject).handleIssueList { issueList += it }.some()
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> genericsModuleBuilder.createGenericOccupiedSpaceFeature(roadspaceObject).handleIssueList { issueList += it }.some()
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> None
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> None
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> None
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> vegetationModuleBuilder.createSolitaryVegetationObjectFeature(roadspaceObject).handleIssueList { issueList += it }.some()
-        }
+        val cityObjects: Option<AbstractCityObject> =
+            when (RoadspaceObjectRouter.route(roadspaceObject)) {
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING ->
+                    buildingModuleBuilder.createBuildingFeature(
+                        roadspaceObject,
+                    ).handleIssueList {
+                        issueList += it
+                    }.some()
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE ->
+                    cityFurnitureModuleBuilder.createCityFurnitureFeature(
+                        roadspaceObject,
+                    ).handleIssueList {
+                        issueList += it
+                    }.some()
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE ->
+                    genericsModuleBuilder.createGenericOccupiedSpaceFeature(
+                        roadspaceObject,
+                    ).handleIssueList {
+                        issueList += it
+                    }.some()
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> None
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> None
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> None
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT ->
+                    vegetationModuleBuilder.createSolitaryVegetationObjectFeature(
+                        roadspaceObject,
+                    ).handleIssueList {
+                        issueList += it
+                    }.some()
+            }
 
         return ContextIssueList(cityObjects, issueList)
     }

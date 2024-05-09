@@ -29,17 +29,18 @@ import org.mapstruct.ValueMapping
 /**
  * Returns upper case string variations (with or without '_') of string.
  */
-fun String.toUpperCaseVariations(): List<String> =
-    listOf(uppercase(), replace("_", "").uppercase())
+fun String.toUpperCaseVariations(): List<String> = listOf(uppercase(), replace("_", "").uppercase())
 
 @Mapper(
-    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
 )
 abstract class OpendriveCommonMapper {
-
     fun <T> mapNullableToOption(source: T?): Option<T> = Option.fromNullable(source)
 
-    fun mapCountryCodeStringToOption(source: String?): Option<ECountryCode> = source?.let { Option.fromNullable(mapCountryCodeString(it)) } ?: None
+    fun mapCountryCodeStringToOption(source: String?): Option<ECountryCode> =
+        source?.let {
+            Option.fromNullable(mapCountryCodeString(it))
+        } ?: None
 
     @ValueMapping(source = "Austria", target = "AU")
     @ValueMapping(source = "Brazil", target = "BR")
@@ -60,9 +61,11 @@ abstract class OpendriveCommonMapper {
     abstract fun mapCountryCodeString(source: String): ECountryCode?
 
     fun mapOrientationStringToOption(source: String?): Option<EOrientation> = source?.let { mapOrientationString(it).some() } ?: None
-    fun mapOrientationString(source: String): EOrientation = when (source) {
-        "+" -> EOrientation.PLUS
-        "-" -> EOrientation.MINUS
-        else -> EOrientation.NONE
-    }
+
+    fun mapOrientationString(source: String): EOrientation =
+        when (source) {
+            "+" -> EOrientation.PLUS
+            "-" -> EOrientation.MINUS
+            else -> EOrientation.NONE
+        }
 }

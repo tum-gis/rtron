@@ -34,12 +34,15 @@ data class OpendriveEvaluatorParameters(
     /** angle tolerance between two geometry elements of the plan view */
     val planViewGeometryAngleTolerance: Double,
     /** warning tolerance for angles between two geometry elements of the plan view */
-    val planViewGeometryAngleWarningTolerance: Double
+    val planViewGeometryAngleWarningTolerance: Double,
 ) {
-
     init {
-        require(planViewGeometryDistanceTolerance >= planViewGeometryDistanceWarningTolerance) { "Distance tolerance must be greater or equal to the warning distance tolerance." }
-        require(planViewGeometryAngleTolerance >= planViewGeometryAngleWarningTolerance) { "Angle difference tolerance must be greater or equal to the warning angle difference tolerance." }
+        require(planViewGeometryDistanceTolerance >= planViewGeometryDistanceWarningTolerance) {
+            "Distance tolerance must be greater or equal to the warning distance tolerance."
+        }
+        require(planViewGeometryAngleTolerance >= planViewGeometryAngleWarningTolerance) {
+            "Angle difference tolerance must be greater or equal to the warning angle difference tolerance."
+        }
     }
 
     companion object {

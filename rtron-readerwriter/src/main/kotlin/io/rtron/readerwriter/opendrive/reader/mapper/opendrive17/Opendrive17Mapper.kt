@@ -24,7 +24,6 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 abstract class Opendrive17Mapper {
-
     @Mapping(target = "header", ignore = true)
     @Mapping(target = "road", ignore = true)
     @Mapping(target = "controller", ignore = true)

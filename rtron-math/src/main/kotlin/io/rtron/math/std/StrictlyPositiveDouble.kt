@@ -20,7 +20,6 @@ package io.rtron.math.std
  * Double number with value greater zero.
  */
 class StrictlyPositiveDouble(val value: Double) {
-
     // Properties and Initializers
     init {
         require(0 < value) { "Value must be positive (greater zero)." }

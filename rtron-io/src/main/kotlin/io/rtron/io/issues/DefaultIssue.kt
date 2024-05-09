@@ -28,15 +28,15 @@ data class DefaultIssue(
     val location: String,
     val incidentSeverity: Severity,
     val wasFixed: Boolean,
-    val infoValues: Map<String, Double> = emptyMap()
+    val infoValues: Map<String, Double> = emptyMap(),
 ) {
-
     // Properties and Initializers
-    val issueSeverity: Severity = when (Pair(incidentSeverity, wasFixed)) {
-        Pair(Severity.FATAL_ERROR, true) -> Severity.ERROR
-        Pair(Severity.ERROR, true) -> Severity.WARNING
-        else -> incidentSeverity
-    }
+    val issueSeverity: Severity =
+        when (Pair(incidentSeverity, wasFixed)) {
+            Pair(Severity.FATAL_ERROR, true) -> Severity.ERROR
+            Pair(Severity.ERROR, true) -> Severity.WARNING
+            else -> incidentSeverity
+        }
 
     companion object
 }

@@ -21,5 +21,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 data class RoadLanesLaneSectionLRLaneHeight(
     var inner: Double = Double.NaN,
     var outer: Double = Double.NaN,
-    var sOffset: Double = Double.NaN
+    var sOffset: Double = Double.NaN,
 ) : OpendriveElement()

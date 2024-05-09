@@ -37,13 +37,13 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class])
 abstract class Opendrive17CoreMapper {
-
     //
     // Header
     //
     abstract fun mapHeader(source: Header): T_Header
 
     fun mapOptionGeoReference(source: Option<HeaderGeoReference>): T_Header_GeoReference? = source.fold({ null }, { mapGeoReference(it) })
+
     fun mapGeoReference(source: HeaderGeoReference): T_Header_GeoReference {
         return T_Header_GeoReference().apply {
             content.add("![CDATA[${source.content}]]") // TODO
@@ -51,38 +51,45 @@ abstract class Opendrive17CoreMapper {
     }
 
     fun mapOptionHeaderOffset(source: Option<HeaderOffset>): T_Header_Offset? = source.fold({ null }, { mapHeaderOffset(it) })
+
     abstract fun mapHeaderOffset(source: HeaderOffset): T_Header_Offset
 
     //
     // Enumerations
     //
     fun mapOptionEUnitToString(source: Option<EUnit>): String? = source.fold({ null }, { mapEUnitToString(it) })
-    fun mapEUnitToString(source: EUnit): String = when (source) {
-        EUnit.METER -> E_UnitDistance.M.value()!!
-        EUnit.KILOMETER -> E_UnitDistance.KM.value()!!
-        EUnit.FEET -> E_UnitDistance.FT.value()!!
-        EUnit.MILE -> E_UnitDistance.M.value()!!
 
-        EUnit.METER_PER_SECOND -> E_UnitSpeed.M___S.value()!!
-        EUnit.MILES_PER_HOUR -> E_UnitSpeed.MPH.value()!!
-        EUnit.KILOMETER_PER_HOUR -> E_UnitSpeed.KM___H.value()!!
+    fun mapEUnitToString(source: EUnit): String =
+        when (source) {
+            EUnit.METER -> E_UnitDistance.M.value()!!
+            EUnit.KILOMETER -> E_UnitDistance.KM.value()!!
+            EUnit.FEET -> E_UnitDistance.FT.value()!!
+            EUnit.MILE -> E_UnitDistance.M.value()!!
 
-        EUnit.KILOGRAM -> E_UnitMass.KG.value()!!
-        EUnit.TON -> E_UnitMass.T.value()!!
+            EUnit.METER_PER_SECOND -> E_UnitSpeed.M___S.value()!!
+            EUnit.MILES_PER_HOUR -> E_UnitSpeed.MPH.value()!!
+            EUnit.KILOMETER_PER_HOUR -> E_UnitSpeed.KM___H.value()!!
 
-        EUnit.PERCENT -> E_UnitSlope.PERCENT.value()!!
-    }
+            EUnit.KILOGRAM -> E_UnitMass.KG.value()!!
+            EUnit.TON -> E_UnitMass.T.value()!!
+
+            EUnit.PERCENT -> E_UnitSlope.PERCENT.value()!!
+        }
 
     fun mapOptionEUnitSpeed(source: Option<EUnitSpeed>): E_UnitSpeed? = source.fold({ null }, { mapEUnitSpeed(it) })
-    fun mapEUnitSpeed(source: EUnitSpeed): E_UnitSpeed = when (source) {
-        EUnitSpeed.METER_PER_SECOND -> E_UnitSpeed.M___S
-        EUnitSpeed.MILES_PER_HOUR -> E_UnitSpeed.MPH
-        EUnitSpeed.KILOMETER_PER_HOUR -> E_UnitSpeed.KM___H
-    }
+
+    fun mapEUnitSpeed(source: EUnitSpeed): E_UnitSpeed =
+        when (source) {
+            EUnitSpeed.METER_PER_SECOND -> E_UnitSpeed.M___S
+            EUnitSpeed.MILES_PER_HOUR -> E_UnitSpeed.MPH
+            EUnitSpeed.KILOMETER_PER_HOUR -> E_UnitSpeed.KM___H
+        }
 
     fun mapOptionBooleanToBool(source: Option<Boolean>): T_Bool? = source.fold({ null }, { mapBooleanToBool(it) })
+
     fun mapBooleanToBool(source: Boolean): T_Bool = if (source) T_Bool.TRUE else T_Bool.FALSE
 
     fun mapOptionBooleanToYesNo(source: Option<Boolean>): T_YesNo? = source.fold({ null }, { mapBooleanToYesNo(it) })
+
     fun mapBooleanToYesNo(source: Boolean): T_YesNo = if (source) T_YesNo.YES else T_YesNo.NO
 }

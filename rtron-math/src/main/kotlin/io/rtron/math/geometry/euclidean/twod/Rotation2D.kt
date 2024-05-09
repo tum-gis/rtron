@@ -32,9 +32,8 @@ import io.rtron.math.std.fuzzyEquals as doubleFuzzyEquals
  * @param angle angle in radians, whereas the angle 0.0 corresponds to the x-axis
  */
 class Rotation2D(
-    angle: Double
+    angle: Double,
 ) {
-
     // Properties and Initializers
     init {
         require(angle.isFinite()) { "Rotation angle must be finite." }
@@ -46,21 +45,32 @@ class Rotation2D(
     // Operators
 
     operator fun plus(v: Rotation2D) = Rotation2D(angle + v.angle)
+
     operator fun minus(v: Rotation2D) = Rotation2D(angle - v.angle)
+
     operator fun times(m: Rotation2D) = Rotation2D(angle * m.angle)
+
     operator fun div(m: Rotation2D) = Rotation2D(angle * m.angle)
 
     operator fun unaryPlus() = Rotation2D(this.angle)
+
     operator fun unaryMinus() = Rotation2D(-this.angle)
 
     fun difference(v: Rotation2D): Double = normalizeAngle(normalizeAngle(angle, 0.0) - normalizeAngle(v.angle, 0.0), 0.0).absoluteValue
 
-    fun fuzzyEquals(o: Rotation2D, tolerance: Double): Boolean {
+    fun fuzzyEquals(
+        o: Rotation2D,
+        tolerance: Double,
+    ): Boolean {
         val adjustedThisAngle = if (doubleFuzzyEquals(this.angle, TWO_PI, tolerance)) this.angle - TWO_PI else this.angle
         val adjustedOtherAngle = if (doubleFuzzyEquals(o.angle, TWO_PI, tolerance)) o.angle - TWO_PI else o.angle
         return doubleFuzzyEquals(adjustedThisAngle, adjustedOtherAngle, tolerance)
     }
-    fun fuzzyUnequals(o: Rotation2D, tolerance: Double) = !fuzzyEquals(o, tolerance)
+
+    fun fuzzyUnequals(
+        o: Rotation2D,
+        tolerance: Double,
+    ) = !fuzzyEquals(o, tolerance)
 
     // Methods
 
@@ -82,9 +92,13 @@ class Rotation2D(
     // Conversions
 
     fun toAngleRadians() = this.angle
+
     fun toAngleDegree() = this.angle * RAD_TO_DEG
 
-    fun toRotation3D(pitch: Double = 0.0, roll: Double = 0.0) = Rotation3D(angle, pitch, roll)
+    fun toRotation3D(
+        pitch: Double = 0.0,
+        roll: Double = 0.0,
+    ) = Rotation3D(angle, pitch, roll)
 
     companion object {
         val ZERO = Rotation2D(0.0)

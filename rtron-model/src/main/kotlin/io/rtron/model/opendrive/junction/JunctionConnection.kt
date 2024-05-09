@@ -26,13 +26,11 @@ data class JunctionConnection(
     var predecessor: Option<JunctionPredecessorSuccessor> = None,
     var successor: Option<JunctionPredecessorSuccessor> = None,
     var laneLink: List<JunctionConnectionLaneLink> = emptyList(),
-
     var connectingRoad: Option<String> = None,
     var contactPoint: Option<EContactPoint> = None,
     var id: String = "",
     var incomingRoad: Option<String> = None,
     var linkedRoad: Option<String> = None,
     var type: Option<EConnectionType> = None,
-
-    override var additionalId: Option<JunctionConnectionIdentifier> = None
+    override var additionalId: Option<JunctionConnectionIdentifier> = None,
 ) : OpendriveElement(), AdditionalJunctionConnectionIdentifier

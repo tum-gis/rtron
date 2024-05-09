@@ -28,13 +28,11 @@ data class RoadPlanViewGeometry(
     var arc: Option<RoadPlanViewGeometryArc> = None,
     var poly3: Option<RoadPlanViewGeometryPoly3> = None,
     var paramPoly3: Option<RoadPlanViewGeometryParamPoly3> = None,
-
     var hdg: Double = Double.NaN,
     var length: Double = Double.NaN,
     var s: Double = Double.NaN,
     var x: Double = Double.NaN,
-    var y: Double = Double.NaN
+    var y: Double = Double.NaN,
 ) : OpendriveElement() {
-
     companion object
 }

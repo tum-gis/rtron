@@ -40,88 +40,110 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
 
-class SubcommandOpendriveToCitygml : CliktCommand(name = "opendrive-to-citygml", help = "Transform OpenDRIVE datasets to CityGML.", printHelpOnEmptyArgs = true) {
-
+class SubcommandOpendriveToCitygml : CliktCommand(
+    name = "opendrive-to-citygml",
+    help = "Transform OpenDRIVE datasets to CityGML.",
+    printHelpOnEmptyArgs = true,
+) {
     // Properties and Initializers
     private val parametersPath by option(
-        help = "Path to a YAML file containing the parameters of the process."
+        help = "Path to a YAML file containing the parameters of the process.",
     ).path(mustExist = true)
 
     private val inputPath by argument(
-        help = "Path to the directory containing OpenDRIVE datasets"
+        help = "Path to the directory containing OpenDRIVE datasets",
     ).path(mustExist = true)
     private val outputPath by argument(
-        help = "Path to the output directory into which the transformed CityGML models are written"
+        help = "Path to the output directory into which the transformed CityGML models are written",
     ).path()
 
-    private val skipRoadShapeRemoval by option(help = "skip the removal of the road shape, if a lateral lane offset exists (not compliant to standard)").flag()
+    private val skipRoadShapeRemoval by option(
+        help = "skip the removal of the road shape, if a lateral lane offset exists (not compliant to standard)",
+    ).flag()
 
     private val convertToCitygml2 by option(help = "convert to CityGML 2.0 (otherwise CityGML 3.0)").flag()
 
     private val tolerance by option(help = "allowed tolerance when comparing double values").double()
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
-    private val planViewGeometryDistanceTolerance by option(help = "allowed distance tolerance between two geometry elements in the plan view").double()
+    private val planViewGeometryDistanceTolerance by option(
+        help = "allowed distance tolerance between two geometry elements in the plan view",
+    ).double()
         .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE)
-    private val planViewGeometryDistanceWarningTolerance by option(help = "warning distance tolerance between two geometry elements in the plan view").double()
+    private val planViewGeometryDistanceWarningTolerance by option(
+        help = "warning distance tolerance between two geometry elements in the plan view",
+    ).double()
         .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE)
-    private val planViewGeometryAngleTolerance by option(help = "allowed angle tolerance between two geometry elements in the plan view").double()
+    private val planViewGeometryAngleTolerance by option(
+        help = "allowed angle tolerance between two geometry elements in the plan view",
+    ).double()
         .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE)
-    private val planViewGeometryAngleWarningTolerance by option(help = "warning angle tolerance between two geometry elements in the plan view").double()
+    private val planViewGeometryAngleWarningTolerance by option(
+        help = "warning angle tolerance between two geometry elements in the plan view",
+    ).double()
         .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
     private val addOffset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
-        .default(Triple(OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y, OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z))
+        .default(
+            Triple(
+                OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X,
+                OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y,
+                OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z,
+            ),
+        )
     private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset").double().pair().multiple()
     private val removeRoadObjectOfType by option(help = "Remove road object of a specific type").enum<EObjectType>().multiple().unique()
 
     private val discretizationStepSize by option(help = "distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
-    private val sweepDiscretizationStepSize by option(help = "distance between each discretization step for solid geometries of ParametricSweep3D").double()
+    private val sweepDiscretizationStepSize by option(
+        help = "distance between each discretization step for solid geometries of ParametricSweep3D",
+    ).double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
     private val circleSlices by option(help = "number of discretization points for a circle or cylinder").int()
         .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
     private val generateRandomGeometryIds by option(help = "true, if random ids shall be generated for the gml geometries").flag()
-    private val transformAdditionalRoadLines by option(help = "if true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed").flag()
+    private val transformAdditionalRoadLines by option(
+        help = "if true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed",
+    ).flag()
 
-    private val compressionFormat: CompressionFormat by option(help = "compress the output files with the respective compression format").enum<CompressionFormat>()
+    private val compressionFormat: CompressionFormat by option(
+        help = "compress the output files with the respective compression format",
+    ).enum<CompressionFormat>()
         .default(CompressionFormat.NONE)
 
     // Methods
 
     override fun run() {
-        val parameters = parametersPath.toOption().fold({
-            OpendriveToCitygmlParameters(
-                convertToCitygml2 = convertToCitygml2,
+        val parameters =
+            parametersPath.toOption().fold({
+                OpendriveToCitygmlParameters(
+                    convertToCitygml2 = convertToCitygml2,
+                    skipRoadShapeRemoval = skipRoadShapeRemoval,
+                    tolerance = tolerance,
+                    planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+                    planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
+                    planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+                    planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
+                    crsEpsg = crsEpsg,
+                    offsetX = addOffset.first,
+                    offsetY = addOffset.second,
+                    offsetZ = addOffset.third,
+                    cropPolygonX = cropPolygon.map { it.first },
+                    cropPolygonY = cropPolygon.map { it.second },
+                    removeRoadObjectsOfTypes = removeRoadObjectOfType,
+                    discretizationStepSize = discretizationStepSize,
+                    sweepDiscretizationStepSize = sweepDiscretizationStepSize,
+                    circleSlices = circleSlices,
+                    generateRandomGeometryIds = generateRandomGeometryIds,
+                    transformAdditionalRoadLines = transformAdditionalRoadLines,
+                    compressionFormat = compressionFormat,
+                )
+            }, { parametersFilePath ->
+                val parametersText = parametersFilePath.toFile().readText()
 
-                skipRoadShapeRemoval = skipRoadShapeRemoval,
-
-                tolerance = tolerance,
-                planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
-                planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
-                planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
-                planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
-                crsEpsg = crsEpsg,
-                offsetX = addOffset.first,
-                offsetY = addOffset.second,
-                offsetZ = addOffset.third,
-                cropPolygonX = cropPolygon.map { it.first },
-                cropPolygonY = cropPolygon.map { it.second },
-                removeRoadObjectsOfTypes = removeRoadObjectOfType,
-
-                discretizationStepSize = discretizationStepSize,
-                sweepDiscretizationStepSize = sweepDiscretizationStepSize,
-                circleSlices = circleSlices,
-                generateRandomGeometryIds = generateRandomGeometryIds,
-                transformAdditionalRoadLines = transformAdditionalRoadLines,
-
-                compressionFormat = compressionFormat
-            )
-        }, { parametersFilePath ->
-            val parametersText = parametersFilePath.toFile().readText()
-
-            Yaml.default.decodeFromString(OpendriveToCitygmlParameters.serializer(), parametersText)
-        })
+                Yaml.default.decodeFromString(OpendriveToCitygmlParameters.serializer(), parametersText)
+            })
 
         val processor = OpendriveToCitygmlProcessor(parameters)
         processor.process(inputPath, outputPath)

@@ -27,7 +27,6 @@ import io.rtron.math.range.Tolerable
  * Abstract class for all geometric solid objects in 3D.
  */
 abstract class AbstractSolid3D : AbstractGeometry3D(), Tolerable {
-
     /**
      * Calculates the polygons for the respective solid geometry within the local coordinate system of the surface.
      */

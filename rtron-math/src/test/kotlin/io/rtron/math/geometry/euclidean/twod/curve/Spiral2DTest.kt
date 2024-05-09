@@ -90,7 +90,10 @@ class Spiral2DTest : FunSpec({
             }
             val fileReader = FileReader(filePath.toFile())
 
-            val records: Iterable<CSVRecord> = CSVFormat.Builder.create().setDelimiter(",").setHeader("cDot", "s", "x", "y", "t").setSkipHeaderRecord(true).build().parse(fileReader)
+            val records: Iterable<CSVRecord> =
+                CSVFormat.Builder.create().setDelimiter(
+                    ",",
+                ).setHeader("cDot", "s", "x", "y", "t").setSkipHeaderRecord(true).build().parse(fileReader)
             for (record in records) {
                 val cDot: Double = record.get("cDot").toDouble()
                 val s: Double = record.get("s").toDouble()

@@ -23,9 +23,8 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
 data class RoadElevationProfile(
-    var elevation: List<RoadElevationProfileElevation> = emptyList()
+    var elevation: List<RoadElevationProfileElevation> = emptyList(),
 ) : OpendriveElement() {
-
     val elevationAsNonEmptyList: NonEmptyList<RoadElevationProfileElevation>
         get() = elevation.toNonEmptyListOrNull()!!
 

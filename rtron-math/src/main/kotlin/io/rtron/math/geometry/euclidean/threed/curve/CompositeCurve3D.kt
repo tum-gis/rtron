@@ -26,9 +26,8 @@ import io.rtron.math.range.Range
 data class CompositeCurve3D(
     val curveMembers: NonEmptyList<AbstractCurve3D>,
     private val absoluteDomains: NonEmptyList<Range<Double>>,
-    private val absoluteStarts: NonEmptyList<Double>
+    private val absoluteStarts: NonEmptyList<Double>,
 ) : AbstractCurve3D() {
-
     // Properties and Initializers
     init {
         require(curveMembers.all { it.tolerance == this.tolerance }) { "All curveMembers must have the same tolerance." }
@@ -42,9 +41,10 @@ data class CompositeCurve3D(
     // Methods
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
-        val localMember = container
-            .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
-            .getOrElse { throw it }
+        val localMember =
+            container
+                .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
+                .getOrElse { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 
         return localMember.member.calculatePointGlobalCSUnbounded(localPoint)

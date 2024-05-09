@@ -18,7 +18,10 @@ package io.rtron.math.processing.triangulation
 
 sealed class TriangulatorException(val message: String) {
     data class Poly2TriException(val reason: String) : TriangulatorException("Poly2Tri-Triangulation failure: $reason")
+
     data class DifferentVertices(val suffix: String = "") : TriangulatorException("Triangulation algorithm produced different vertices.")
+
     data class ColinearVertices(val suffix: String = "") : TriangulatorException("Triangulation failure (colinear vertices).")
+
     data class FirstVertexDuplicated(val suffix: String = "") : TriangulatorException("First vertex has duplicate vertices.")
 }

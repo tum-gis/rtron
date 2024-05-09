@@ -37,10 +37,9 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive14ObjectMapper {
-
     //
     // Road Objects
     //
@@ -57,10 +56,12 @@ abstract class Opendrive14ObjectMapper {
         val outlines = listOf(mapRoadObjectsObjectOutlinesOutline(source))
         return RoadObjectsObjectOutlines(outlines)
     }
+
     abstract fun mapRoadObjectsObjectOutlinesOutline(source: OpenDRIVE.Road.Objects.Object.Outline): RoadObjectsObjectOutlinesOutline
 
     fun mapMaterialList(source: OpenDRIVE.Road.Objects.Object.Material?): List<RoadObjectsObjectMaterial> =
         source?.let { listOf(mapRoadObjectsObjectMaterial(it)) } ?: emptyList()
+
     abstract fun mapRoadObjectsObjectMaterial(source: OpenDRIVE.Road.Objects.Object.Material): RoadObjectsObjectMaterial
 
     abstract fun mapParkingSpace(source: ParkingSpace): RoadObjectsObjectParkingSpace
@@ -70,23 +71,25 @@ abstract class Opendrive14ObjectMapper {
     //
 
     fun mapRoadObjectTypeToOption(source: String?): Option<EObjectType> = source?.let { mapRoadObjectType(it).some() } ?: None
-    fun mapRoadObjectType(source: String): EObjectType = when (source.uppercase()) {
-        in EObjectType.NONE.name.toUpperCaseVariations() -> EObjectType.NONE
-        in EObjectType.OBSTACLE.name.toUpperCaseVariations() -> EObjectType.OBSTACLE
-        in EObjectType.POLE.name.toUpperCaseVariations() -> EObjectType.POLE
-        in EObjectType.TREE.name.toUpperCaseVariations() -> EObjectType.TREE
-        in EObjectType.VEGETATION.name.toUpperCaseVariations() -> EObjectType.VEGETATION
-        in EObjectType.BARRIER.name.toUpperCaseVariations() -> EObjectType.BARRIER
-        in EObjectType.BUILDING.name.toUpperCaseVariations() -> EObjectType.BUILDING
-        in EObjectType.PARKING_SPACE.name.toUpperCaseVariations() -> EObjectType.PARKING_SPACE
-        in EObjectType.PATCH.name.toUpperCaseVariations() -> EObjectType.PATCH
-        in EObjectType.RAILING.name.toUpperCaseVariations() -> EObjectType.RAILING
-        in EObjectType.TRAFFIC_ISLAND.name.toUpperCaseVariations() -> EObjectType.TRAFFIC_ISLAND
-        in EObjectType.CROSSWALK.name.toUpperCaseVariations() -> EObjectType.CROSSWALK
-        in EObjectType.STREET_LAMP.name.toUpperCaseVariations() -> EObjectType.STREET_LAMP
-        in EObjectType.GANTRY.name.toUpperCaseVariations() -> EObjectType.GANTRY
-        in EObjectType.SOUND_BARRIER.name.toUpperCaseVariations() -> EObjectType.SOUND_BARRIER
-        in EObjectType.ROAD_MARK.name.toUpperCaseVariations() -> EObjectType.ROAD_MARK
-        else -> EObjectType.NONE
-    }
+
+    fun mapRoadObjectType(source: String): EObjectType =
+        when (source.uppercase()) {
+            in EObjectType.NONE.name.toUpperCaseVariations() -> EObjectType.NONE
+            in EObjectType.OBSTACLE.name.toUpperCaseVariations() -> EObjectType.OBSTACLE
+            in EObjectType.POLE.name.toUpperCaseVariations() -> EObjectType.POLE
+            in EObjectType.TREE.name.toUpperCaseVariations() -> EObjectType.TREE
+            in EObjectType.VEGETATION.name.toUpperCaseVariations() -> EObjectType.VEGETATION
+            in EObjectType.BARRIER.name.toUpperCaseVariations() -> EObjectType.BARRIER
+            in EObjectType.BUILDING.name.toUpperCaseVariations() -> EObjectType.BUILDING
+            in EObjectType.PARKING_SPACE.name.toUpperCaseVariations() -> EObjectType.PARKING_SPACE
+            in EObjectType.PATCH.name.toUpperCaseVariations() -> EObjectType.PATCH
+            in EObjectType.RAILING.name.toUpperCaseVariations() -> EObjectType.RAILING
+            in EObjectType.TRAFFIC_ISLAND.name.toUpperCaseVariations() -> EObjectType.TRAFFIC_ISLAND
+            in EObjectType.CROSSWALK.name.toUpperCaseVariations() -> EObjectType.CROSSWALK
+            in EObjectType.STREET_LAMP.name.toUpperCaseVariations() -> EObjectType.STREET_LAMP
+            in EObjectType.GANTRY.name.toUpperCaseVariations() -> EObjectType.GANTRY
+            in EObjectType.SOUND_BARRIER.name.toUpperCaseVariations() -> EObjectType.SOUND_BARRIER
+            in EObjectType.ROAD_MARK.name.toUpperCaseVariations() -> EObjectType.ROAD_MARK
+            else -> EObjectType.NONE
+        }
 }

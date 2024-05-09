@@ -27,13 +27,21 @@ import io.rtron.math.geometry.euclidean.twod.point.Vector2D
  */
 data class Pose2D(
     val point: Vector2D,
-    val rotation: Rotation2D
+    val rotation: Rotation2D,
 ) {
-
     // Operators
-    fun fuzzyEquals(o: Pose2D, distanceTolerance: Double, angleTolerance: Double) = this.point.fuzzyEquals(o.point, distanceTolerance) &&
+    fun fuzzyEquals(
+        o: Pose2D,
+        distanceTolerance: Double,
+        angleTolerance: Double,
+    ) = this.point.fuzzyEquals(o.point, distanceTolerance) &&
         this.rotation.fuzzyEquals(o.rotation, angleTolerance)
-    fun fuzzyUnequals(o: Pose2D, distanceTolerance: Double, angleTolerance: Double) = !fuzzyEquals(o, distanceTolerance, angleTolerance)
+
+    fun fuzzyUnequals(
+        o: Pose2D,
+        distanceTolerance: Double,
+        angleTolerance: Double,
+    ) = !fuzzyEquals(o, distanceTolerance, angleTolerance)
 
     companion object {
         val ZERO = Pose2D(Vector2D.ZERO, Rotation2D.ZERO)

@@ -29,13 +29,14 @@ import io.rtron.math.geometry.GeometryException
  * @param surfaceMembers surface members to be composited
  */
 class CompositeSurface3D(
-    private val surfaceMembers: NonEmptyList<AbstractSurface3D>
+    private val surfaceMembers: NonEmptyList<AbstractSurface3D>,
 ) : AbstractSurface3D() {
-
     // Properties and Initializers
     init {
         require(surfaceMembers.isNotEmpty()) { "Composite surface must contain members." }
-        require(surfaceMembers.all { surfaceMembers.first().tolerance == it.tolerance }) { "All surface members must have the same tolerance." }
+        require(
+            surfaceMembers.all { surfaceMembers.first().tolerance == it.tolerance },
+        ) { "All surface members must have the same tolerance." }
     }
 
     override val tolerance: Double get() = surfaceMembers.first().tolerance
@@ -44,8 +45,9 @@ class CompositeSurface3D(
     constructor(surfaceMember: AbstractSurface3D) : this(nonEmptyListOf(surfaceMember))
 
     // Methods
-    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = either {
-        val polygons: List<Polygon3D> = surfaceMembers.map { it.calculatePolygonsGlobalCS().bind() }.flatten()
-        polygons.let { it.toNonEmptyListOrNull()!! }
-    }
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
+        either {
+            val polygons: List<Polygon3D> = surfaceMembers.map { it.calculatePolygonsGlobalCS().bind() }.flatten()
+            polygons.let { it.toNonEmptyListOrNull()!! }
+        }
 }

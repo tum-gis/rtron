@@ -27,7 +27,6 @@ data class RoadSignalsSignalReference(
     var elementId: String = "",
     var elementType: ERoadSignalsSignalReferenceElementType = ERoadSignalsSignalReferenceElementType.SIGNAL,
     var type: Option<String> = None,
-
     var s: Double = Double.NaN,
-    var t: Double = Double.NaN
+    var t: Double = Double.NaN,
 ) : OpendriveElement()

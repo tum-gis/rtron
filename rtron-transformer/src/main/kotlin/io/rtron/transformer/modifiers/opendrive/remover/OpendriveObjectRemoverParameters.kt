@@ -24,9 +24,8 @@ data class OpendriveObjectRemoverParameters(
     /** remove road objects without type */
     val removeRoadObjectsWithoutType: Boolean,
     /** remove road objects of type */
-    val removeRoadObjectsOfTypes: Set<EObjectType>
+    val removeRoadObjectsOfTypes: Set<EObjectType>,
 ) {
-
     companion object {
         val DEFAULT_REMOVE_ROAD_OBJECTS_WITHOUT_TYPE = false
         val DEFAULT_REMOVE_ROAD_OBJECTS_OF_TYPES = emptySet<EObjectType>()

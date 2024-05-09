@@ -22,7 +22,7 @@ import io.rtron.transformer.evaluator.roadspaces.plans.modelingrules.ModelingRul
 import io.rtron.transformer.evaluator.roadspaces.report.RoadspacesEvaluationReport
 
 class RoadspacesEvaluator(
-    val parameters: RoadspacesEvaluatorParameters
+    val parameters: RoadspacesEvaluatorParameters,
 ) {
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}

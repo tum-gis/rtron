@@ -23,5 +23,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadTypeSpeed(
     var max: Double = Double.NaN,
-    var unit: Option<EUnitSpeed> = None
+    var unit: Option<EUnitSpeed> = None,
 ) : OpendriveElement()

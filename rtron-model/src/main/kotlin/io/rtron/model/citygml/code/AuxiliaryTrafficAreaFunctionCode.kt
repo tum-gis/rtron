@@ -37,5 +37,5 @@ enum class AuxiliaryTrafficAreaFunctionCode(val code: Code) {
     NOISE_PROTECTION_WALL(Code("1440")),
     NOISE_GUARD_BAR(Code("1500")),
     TOWPATH(Code("1600")),
-    OTHERS(Code("1700"))
+    OTHERS(Code("1700")),
 }

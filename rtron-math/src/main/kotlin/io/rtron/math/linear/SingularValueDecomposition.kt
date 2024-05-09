@@ -25,9 +25,8 @@ import org.apache.commons.math3.linear.SingularValueDecomposition as CMSingularV
  * @param matrix matrix to be decomposed
  */
 class SingularValueDecomposition(
-    matrix: RealMatrix
+    matrix: RealMatrix,
 ) {
-
     // Properties and Initializers
     private val singularValueDecomposition by lazy { CMSingularValueDecomposition(matrix.toRealMatrixCM()) }
 

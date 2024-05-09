@@ -57,7 +57,7 @@ class SpiralSegment2DTest : FunSpec({
             actualPose.point.y.shouldBe(9.8074617455403796e+00 plusOrMinus DBL_EPSILON_11)
             actualPose.rotation.angle.shouldBe(
                 5.3186972285460032e-01
-                    plusOrMinus DBL_EPSILON_4
+                    plusOrMinus DBL_EPSILON_4,
             )
         }
 
@@ -78,7 +78,12 @@ class SpiralSegment2DTest : FunSpec({
         test("first spiral of the example dataset CrossingComplex8Course") {
             val pose = Pose2D(Vector2D(4.5002666984590900e+02, 5.2071081556728734e+02), Rotation2D(4.7173401120976974e+00))
             val affine = Affine2D.of(pose)
-            val curvatureFunction = LinearFunction.ofSpiralCurvature(-0.0000000000000000e+00, -1.0126582278481013e-01, 4.9620253164556960e+00)
+            val curvatureFunction =
+                LinearFunction.ofSpiralCurvature(
+                    -0.0000000000000000e+00,
+                    -1.0126582278481013e-01,
+                    4.9620253164556960e+00,
+                )
             val curve = SpiralSegment2D(curvatureFunction, DBL_EPSILON_2, AffineSequence2D.of(affine))
             val curveRelativePoint = CurveRelativeVector1D(1.0507568316454000e+01 - 5.5455429999983039e+00)
 
@@ -92,7 +97,12 @@ class SpiralSegment2DTest : FunSpec({
         test("second spiral of the example dataset CrossingComplex8Course") {
             val pose = Pose2D(Vector2D(4.4256271579386976e+02, 5.0863294215453800e+02), Rotation2D(3.3977855734777722e+00))
             val affine = Affine2D.of(pose)
-            val curvatureFunction = LinearFunction.ofSpiralCurvature(-1.0126582278481013e-01, -0.0000000000000000e+00, 4.9620253164556960e+00)
+            val curvatureFunction =
+                LinearFunction.ofSpiralCurvature(
+                    -1.0126582278481013e-01,
+                    -0.0000000000000000e+00,
+                    4.9620253164556960e+00,
+                )
             val curve = SpiralSegment2D(curvatureFunction, DBL_EPSILON_2, AffineSequence2D.of(affine))
             val curveRelativePoint = CurveRelativeVector1D(2.6019182043553606e+01 - 2.1057156727097912e+01)
 
@@ -116,11 +126,22 @@ class SpiralSegment2DTest : FunSpec({
             }
             val fileReader = FileReader(filePath.toFile())
 
-            val records: Iterable<CSVRecord> = CSVFormat.Builder.create().setDelimiter(",").setHeader("s0", "x0", "y0", "hdg0", "curv0", "curv1", "length", "s1", "x1", "y1", "hdg1").setSkipHeaderRecord(true).build().parse(fileReader)
+            val records: Iterable<CSVRecord> =
+                CSVFormat.Builder.create().setDelimiter(
+                    ",",
+                ).setHeader("s0", "x0", "y0", "hdg0", "curv0", "curv1", "length", "s1", "x1", "y1", "hdg1").setSkipHeaderRecord(
+                    true,
+                ).build().parse(fileReader)
             for (record in records) {
-                val pose = Pose2D(Vector2D(record.get("x0").toDouble(), record.get("y0").toDouble()), Rotation2D(record.get("hdg0").toDouble()))
+                val pose =
+                    Pose2D(Vector2D(record.get("x0").toDouble(), record.get("y0").toDouble()), Rotation2D(record.get("hdg0").toDouble()))
                 val affine = Affine2D.of(pose)
-                val curvatureFunction = LinearFunction.ofSpiralCurvature(record.get("curv0").toDouble(), record.get("curv1").toDouble(), record.get("length").toDouble())
+                val curvatureFunction =
+                    LinearFunction.ofSpiralCurvature(
+                        record.get("curv0").toDouble(),
+                        record.get("curv1").toDouble(),
+                        record.get("length").toDouble(),
+                    )
                 val curve = SpiralSegment2D(curvatureFunction, DBL_EPSILON_5, AffineSequence2D.of(affine))
                 val curveRelativePoint = CurveRelativeVector1D(record.get("s1").toDouble() - record.get("s0").toDouble())
 

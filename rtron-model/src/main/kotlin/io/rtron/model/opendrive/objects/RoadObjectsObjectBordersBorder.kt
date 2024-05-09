@@ -22,9 +22,8 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectBordersBorder(
     var cornerReference: List<RoadObjectsObjectMarkingsMarkingCornerReference> = emptyList(),
-
     var outlineId: Int = Int.MIN_VALUE,
     var type: EBorderType = EBorderType.CONCRETE,
     var useCompleteOutline: Option<Boolean> = None,
-    var width: Double = Double.NaN
+    var width: Double = Double.NaN,
 ) : OpendriveElement()

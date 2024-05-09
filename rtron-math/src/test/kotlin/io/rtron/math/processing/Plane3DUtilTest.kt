@@ -72,8 +72,9 @@ class Plane3DUtilTest : FunSpec({
             val expectedNormal = Vector3D(2.0, 3.0, 1.0).normalized()
             val expectedPlane = Plane3D(expectedCentroid, expectedNormal, 0.0)
 
-            val actualBestFittingPlane = listOf(pointA, pointB, pointC, pointD)
-                .calculateBestFittingPlane(DBL_EPSILON_2)
+            val actualBestFittingPlane =
+                listOf(pointA, pointB, pointC, pointD)
+                    .calculateBestFittingPlane(DBL_EPSILON_2)
 
             actualBestFittingPlane.normal.toDoubleArray().zip(expectedPlane.normal.toDoubleArray()).forEach {
                 it.first.shouldBe(it.second plusOrMinus DBL_EPSILON_2)
@@ -90,8 +91,9 @@ class Plane3DUtilTest : FunSpec({
             val expectedCentroid = Vector3D(1.0, 1.0, 1.0)
             val expectedNormal = -Vector3D.X_AXIS
             val expectedPlane = Plane3D(expectedCentroid, expectedNormal, DBL_EPSILON_1)
-            val actualBestFittingPlane = listOf(pointA, pointB, pointC, pointD, pointE)
-                .calculateBestFittingPlane(DBL_EPSILON_1)
+            val actualBestFittingPlane =
+                listOf(pointA, pointB, pointC, pointD, pointE)
+                    .calculateBestFittingPlane(DBL_EPSILON_1)
 
             actualBestFittingPlane shouldBe expectedPlane
         }

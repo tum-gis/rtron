@@ -19,7 +19,6 @@ package io.rtron.model.opendrive.additions.identifier
 import arrow.core.Option
 
 abstract class AbstractOpendriveIdentifier {
-
     abstract fun toIdentifierText(): String
 }
 

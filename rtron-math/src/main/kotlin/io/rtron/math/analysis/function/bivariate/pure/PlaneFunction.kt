@@ -32,9 +32,8 @@ class PlaneFunction(
     val slopeY: Double,
     val intercept: Double,
     override val domainX: Range<Double> = Range.all(),
-    override val domainY: Range<Double> = Range.all()
+    override val domainY: Range<Double> = Range.all(),
 ) : BivariateFunction() {
-
     // Properties and Initializers
     init {
         require(slopeX.isFinite()) { "slopeX must be a finite value." }
@@ -43,7 +42,10 @@ class PlaneFunction(
     }
 
     // Methods
-    override fun valueUnbounded(x: Double, y: Double): Either<Exception, Double> {
+    override fun valueUnbounded(
+        x: Double,
+        y: Double,
+    ): Either<Exception, Double> {
         return Either.Right(intercept + slopeX * x + slopeY * y)
     }
 

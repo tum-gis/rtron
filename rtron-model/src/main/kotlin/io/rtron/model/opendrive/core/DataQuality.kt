@@ -21,5 +21,5 @@ import arrow.core.Option
 
 data class DataQuality(
     var error: Option<DataQualityError> = None,
-    var rawData: Option<DataQualityRawData> = None
+    var rawData: Option<DataQualityRawData> = None,
 )

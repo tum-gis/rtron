@@ -35,9 +35,8 @@ class LineSegment3D(
     val start: Vector3D,
     val end: Vector3D,
     override val tolerance: Double,
-    endBoundType: BoundType = BoundType.CLOSED
+    endBoundType: BoundType = BoundType.CLOSED,
 ) : AbstractCurve3D() {
-
     // Properties and Initializers
     init {
         require(start != end) { "Start and end vector must not be identical." }
@@ -103,14 +102,20 @@ class LineSegment3D(
     }
 
     companion object {
-
         /**
          * Creates a [LineSegment3D], if [start] and [end] [Vector3D] are not fuzzily equal according to the [tolerance].
          *
          */
-        fun of(start: Vector3D, end: Vector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED): Either<IllegalArgumentException, LineSegment3D> =
+        fun of(
+            start: Vector3D,
+            end: Vector3D,
+            tolerance: Double,
+            endBoundType: BoundType = BoundType.CLOSED,
+        ): Either<IllegalArgumentException, LineSegment3D> =
             if (start.fuzzyEquals(end, tolerance)) {
-                Either.Left(IllegalArgumentException("Start and end vector of a line segment must be different according to the given tolerance."))
+                Either.Left(
+                    IllegalArgumentException("Start and end vector of a line segment must be different according to the given tolerance."),
+                )
             } else {
                 Either.Right(LineSegment3D(start, end, tolerance, endBoundType))
             }

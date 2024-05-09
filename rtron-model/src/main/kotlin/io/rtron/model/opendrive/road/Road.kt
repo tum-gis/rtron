@@ -47,23 +47,24 @@ data class Road(
     var signals: Option<RoadSignals> = None,
     var surface: Option<RoadSurface> = None,
     var railroad: Option<RoadRailroad> = None,
-
     var id: String = "",
     var junction: String = "",
     var length: Double = Double.NaN,
     var name: Option<String> = None,
     var rule: Option<ETrafficRule> = None,
-
-    override var additionalId: Option<RoadIdentifier> = None
+    override var additionalId: Option<RoadIdentifier> = None,
 ) : OpendriveElement(), AdditionalRoadIdentifier {
-
     // Methods
 
-    fun getJunctionOption(): Option<String> =
-        if (junction.isNotEmpty() && junction != "-1") Some(junction) else None
+    fun getJunctionOption(): Option<String> = if (junction.isNotEmpty() && junction != "-1") Some(junction) else None
 
     fun getElevationEntries(): Option<NonEmptyList<RoadElevationProfileElevation>> = elevationProfile.map { it.elevationAsNonEmptyList }
-    fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> = lateralProfile.flatMap { it.getSuperelevationEntries() }
+
+    fun getSuperelevationEntries(): Option<NonEmptyList<RoadLateralProfileSuperelevation>> =
+        lateralProfile.flatMap {
+            it.getSuperelevationEntries()
+        }
+
     fun getShapeEntries(): Option<NonEmptyList<RoadLateralProfileShape>> = lateralProfile.flatMap { it.getShapeEntries() }
 
     companion object

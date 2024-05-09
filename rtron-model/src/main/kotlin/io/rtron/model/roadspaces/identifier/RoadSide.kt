@@ -19,11 +19,12 @@ package io.rtron.model.roadspaces.identifier
 enum class RoadSide {
     LEFT,
     CENTER,
-    RIGHT
+    RIGHT,
 }
 
-fun RoadSide.opposite() = when (this) {
-    RoadSide.LEFT -> RoadSide.RIGHT
-    RoadSide.CENTER -> RoadSide.CENTER
-    RoadSide.RIGHT -> RoadSide.LEFT
-}
+fun RoadSide.opposite() =
+    when (this) {
+        RoadSide.LEFT -> RoadSide.RIGHT
+        RoadSide.CENTER -> RoadSide.CENTER
+        RoadSide.RIGHT -> RoadSide.LEFT
+    }

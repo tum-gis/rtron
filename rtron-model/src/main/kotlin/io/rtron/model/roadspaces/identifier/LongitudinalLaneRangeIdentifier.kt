@@ -26,13 +26,13 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  */
 data class LongitudinalLaneRangeIdentifier(
     val fromLaneId: LaneIdentifier,
-    val toLaneId: LaneIdentifier
+    val toLaneId: LaneIdentifier,
 ) : AbstractRoadspacesIdentifier() {
-
     // Properties and Initializers
     init {
         require(fromLaneId != toLaneId) { "Lane identifier and lane identifier of successor must not be the same." }
     }
+
     val hashKey get() = "LongitudinalLaneRange_${fromLaneId.hashKey}_${toLaneId.hashKey}"
 
     // Methods
@@ -41,11 +41,10 @@ data class LongitudinalLaneRangeIdentifier(
     fun isWithinSameRoad() = fromLaneId.toRoadspaceIdentifier() == toLaneId.toRoadspaceIdentifier()
 
     // Conversions
-    override fun toAttributes(prefix: String): AttributeList =
-        fromLaneId.toAttributes("from$prefix") + toLaneId.toAttributes("to$prefix")
+    override fun toAttributes(prefix: String): AttributeList = fromLaneId.toAttributes("from$prefix") + toLaneId.toAttributes("to$prefix")
 
-    override fun toStringMap(): Map<String, String> =
-        fromLaneId.toStringMap() + toLaneId.toStringMap()
+    override fun toStringMap(): Map<String, String> = fromLaneId.toStringMap() + toLaneId.toStringMap()
 
-    override fun toIdentifierText() = "LongitudinalLaneRangeIdentifier(fromLaneId=${fromLaneId.toIdentifierText()}, toLaneId=${toLaneId.toIdentifierText()})"
+    override fun toIdentifierText() =
+        "LongitudinalLaneRangeIdentifier(fromLaneId=${fromLaneId.toIdentifierText()}, toLaneId=${toLaneId.toIdentifierText()})"
 }

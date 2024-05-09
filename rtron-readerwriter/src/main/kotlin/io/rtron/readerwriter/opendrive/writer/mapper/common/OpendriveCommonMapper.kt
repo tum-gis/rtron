@@ -23,10 +23,11 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 abstract class OpendriveCommonMapper {
-
     fun <T> mapNullableToOption(source: T?): Option<T> = Option.fromNullable(source)
 
     fun mapOptionDoubleToNullableDouble(source: Option<Double>): Double? = source.getOrElse { return null }
+
     fun mapOptionStringToNullableString(source: Option<String>): String? = source.getOrElse { return null }
+
     fun mapOptionIntegerToNullableInteger(source: Option<Int>): Int? = source.getOrElse { return null }
 }

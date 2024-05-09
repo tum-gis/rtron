@@ -54,12 +54,13 @@ class Affine3DTest : FunSpec({
         }
 
         test("test translation from 3x4 matrix") {
-            val values = doubleArrayOf(
-                1.0, 0.0, 0.0, 0.0,
-                0.0, 1.0, 0.0, 3.0,
-                0.0, 0.0, 1.0, 2.0,
-                0.0, 0.0, 0.0, 1.0
-            )
+            val values =
+                doubleArrayOf(
+                    1.0, 0.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0, 3.0,
+                    0.0, 0.0, 1.0, 2.0,
+                    0.0, 0.0, 0.0, 1.0,
+                )
             val matrix = RealMatrix(values, 4)
             val affine = Affine3D.of(matrix)
 
@@ -93,14 +94,15 @@ class Affine3DTest : FunSpec({
             val rotation = Rotation3D(heading)
             val affine = Affine3D.of(Affine3D.of(scaling), Affine3D.of(translation), Affine3D.of(rotation))
 
-            val expectedRotationMatrix = RealMatrix(
-                arrayOf(
-                    doubleArrayOf(cos(heading), -sin(heading), 0.0, 0.0),
-                    doubleArrayOf(sin(heading), cos(heading), 0.0, 0.0),
-                    doubleArrayOf(0.0, 0.0, 1.0, 0.0),
-                    doubleArrayOf(0.0, 0.0, 0.0, 1.0)
+            val expectedRotationMatrix =
+                RealMatrix(
+                    arrayOf(
+                        doubleArrayOf(cos(heading), -sin(heading), 0.0, 0.0),
+                        doubleArrayOf(sin(heading), cos(heading), 0.0, 0.0),
+                        doubleArrayOf(0.0, 0.0, 1.0, 0.0),
+                        doubleArrayOf(0.0, 0.0, 0.0, 1.0),
+                    ),
                 )
-            )
 
             val actual = affine.extractRotationAffine().toRealMatrix()
 
@@ -118,12 +120,13 @@ class Affine3DTest : FunSpec({
             val affineA = Affine3D.of(translation)
             val scaling = RealVector.of(2.0, 3.0, 4.0)
             val affineB = Affine3D.of(scaling)
-            val expectedValues = doubleArrayOf(
-                2.0, 0.0, 0.0, 1.0,
-                0.0, 3.0, 0.0, 2.0,
-                0.0, 0.0, 4.0, 3.0,
-                0.0, 0.0, 0.0, 1.0
-            )
+            val expectedValues =
+                doubleArrayOf(
+                    2.0, 0.0, 0.0, 1.0,
+                    0.0, 3.0, 0.0, 2.0,
+                    0.0, 0.0, 4.0, 3.0,
+                    0.0, 0.0, 0.0, 1.0,
+                )
             val expectedMatrix = RealMatrix(expectedValues, 4)
 
             val actualAppended = affineA.append(affineB)
@@ -199,12 +202,13 @@ class Affine3DTest : FunSpec({
         test("test to double array") {
             val translation = Vector3D(1.0, 2.0, 3.0)
             val affine = Affine3D.of(translation)
-            val expectedDoubleArray = doubleArrayOf(
-                1.0, 0.0, 0.0, 1.0,
-                0.0, 1.0, 0.0, 2.0,
-                0.0, 0.0, 1.0, 3.0,
-                0.0, 0.0, 0.0, 1.0
-            )
+            val expectedDoubleArray =
+                doubleArrayOf(
+                    1.0, 0.0, 0.0, 1.0,
+                    0.0, 1.0, 0.0, 2.0,
+                    0.0, 0.0, 1.0, 3.0,
+                    0.0, 0.0, 0.0, 1.0,
+                )
 
             val actualDoubleArray = affine.toDoubleArray()
 

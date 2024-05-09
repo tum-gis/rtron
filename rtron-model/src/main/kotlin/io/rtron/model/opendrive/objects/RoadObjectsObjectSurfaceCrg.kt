@@ -23,5 +23,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 data class RoadObjectsObjectSurfaceCrg(
     var file: Option<String> = None,
     var hideRoadSurfaceCrg: Option<Boolean> = None,
-    var zScale: Option<Double> = None
+    var zScale: Option<Double> = None,
 ) : OpendriveElement()

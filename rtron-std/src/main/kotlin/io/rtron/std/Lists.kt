@@ -26,7 +26,7 @@ enum class MovingWindowShape {
     FULL,
 
     /** Same size of returning list like the base list. */
-    SAME
+    SAME,
 }
 
 /**
@@ -47,14 +47,15 @@ fun <S, T, K> List<S>.moveWindow(
     window: List<T>,
     multiplication: (baseElement: S, otherElement: T) -> K,
     addition: (K, K) -> K,
-    shape: MovingWindowShape = MovingWindowShape.FULL
+    shape: MovingWindowShape = MovingWindowShape.FULL,
 ): List<K> {
     require(this.isNotEmpty()) { "Base list requires elements and thus must not be empty." }
     require(window.isNotEmpty()) { "Other list requires elements and thus must not be empty." }
 
-    val multipliedSubLists = this.fold(emptyList<List<K>>()) { acc, s ->
-        acc + listOf(window.map { multiplication(s, it) })
-    }
+    val multipliedSubLists =
+        this.fold(emptyList<List<K>>()) { acc, s ->
+            acc + listOf(window.map { multiplication(s, it) })
+        }
 
     val rowIndices = window.indices.reversed().toList()
 
@@ -65,14 +66,15 @@ fun <S, T, K> List<S>.moveWindow(
         val relevantRowIndices = rowIndices.drop(rowIndices.size - relevantColIndices.size)
         val indices = relevantColIndices.zip(relevantRowIndices)
         val startValue = multipliedSubLists[indices.first().first][indices.first().second]
-        val resultElement = indices.drop(0).fold(startValue) { sum, pair ->
-            val curRow = multipliedSubLists.getOrNull(pair.first)
-            if (curRow.isNullOrEmpty()) {
-                sum
-            } else {
-                addition(sum, curRow[pair.second])
+        val resultElement =
+            indices.drop(0).fold(startValue) { sum, pair ->
+                val curRow = multipliedSubLists.getOrNull(pair.first)
+                if (curRow.isNullOrEmpty()) {
+                    sum
+                } else {
+                    addition(sum, curRow[pair.second])
+                }
             }
-        }
         acc + listOf(resultElement)
     }
 }
@@ -87,13 +89,15 @@ fun <S, T, K> List<S>.moveWindow(
  * @return an element of the returned list is true, if the multiplication of at least one element of the receiver
  * and [window] list is true
  */
-fun List<Boolean>.moveWindow(window: List<Boolean>, shape: MovingWindowShape = MovingWindowShape.FULL) =
-    this.moveWindow(
-        window,
-        { baseElement, otherElement -> baseElement && otherElement },
-        { a, b -> a || b },
-        shape
-    )
+fun List<Boolean>.moveWindow(
+    window: List<Boolean>,
+    shape: MovingWindowShape = MovingWindowShape.FULL,
+) = this.moveWindow(
+    window,
+    { baseElement, otherElement -> baseElement && otherElement },
+    { a, b -> a || b },
+    shape,
+)
 
 /**
  * Returns a list containing all elements not matching the given [predicate]. The predicate is operated on a sublist
@@ -111,7 +115,10 @@ fun List<Boolean>.moveWindow(window: List<Boolean>, shape: MovingWindowShape = M
  * @param predicate if the [predicate] returns true, the indices are dropped according to the [dropIndices]
  * @return list without elements which match the [predicate]
  */
-fun <T> List<T>.filterWindowed(dropIndices: List<Boolean>, predicate: (List<T>) -> Boolean): List<T> {
+fun <T> List<T>.filterWindowed(
+    dropIndices: List<Boolean>,
+    predicate: (List<T>) -> Boolean,
+): List<T> {
     require(dropIndices.size <= this.size) { "Dropping indices list must be smaller than base list." }
     if (isEmpty()) return emptyList()
 
@@ -129,7 +136,10 @@ fun <T> List<T>.filterWindowed(dropIndices: List<Boolean>, predicate: (List<T>) 
  * @param predicate if the [predicate] returns true, all elements are filtered out
  * @return list without elements which match the [predicate]
  */
-fun <T> List<T>.filterWindowedEnclosing(windowSize: Int, predicate: (List<T>) -> Boolean): List<T> {
+fun <T> List<T>.filterWindowedEnclosing(
+    windowSize: Int,
+    predicate: (List<T>) -> Boolean,
+): List<T> {
     val dropIndices = List(windowSize) { true }
     return this.filterWindowedEnclosing(dropIndices, predicate)
 }
@@ -149,7 +159,10 @@ fun <T> List<T>.filterWindowedEnclosing(windowSize: Int, predicate: (List<T>) ->
  * @param predicate if the [predicate] returns true, the indices are dropped according to the [dropIndices]
  * @return list without elements which match the [predicate]
  */
-fun <T> List<T>.filterWindowedEnclosing(dropIndices: List<Boolean>, predicate: (List<T>) -> Boolean): List<T> {
+fun <T> List<T>.filterWindowedEnclosing(
+    dropIndices: List<Boolean>,
+    predicate: (List<T>) -> Boolean,
+): List<T> {
     require(dropIndices.size <= this.size) { "Dropping indices list must be smaller than base list." }
     if (isEmpty()) return emptyList()
 

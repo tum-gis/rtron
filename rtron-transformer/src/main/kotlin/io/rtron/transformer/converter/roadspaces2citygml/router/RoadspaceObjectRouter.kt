@@ -24,7 +24,6 @@ import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectR
  * Feature router of [RoadspaceObject] (RoadSpace model) to the [CitygmlTargetFeatureType] (CityGML model).
  */
 object RoadspaceObjectRouter {
-
     enum class CitygmlTargetFeatureType {
         BUILDING_BUILDING,
         CITYFURNITURE_CITYFURNITURE,
@@ -32,7 +31,7 @@ object RoadspaceObjectRouter {
         TRANSPORTATION_TRAFFICSPACE,
         TRANSPORTATION_AUXILIARYTRAFFICSPACE,
         TRANSPORTATION_MARKING,
-        VEGETATION_SOLITARYVEGETATIONOBJECT
+        VEGETATION_SOLITARYVEGETATIONOBJECT,
     }
 
     /**

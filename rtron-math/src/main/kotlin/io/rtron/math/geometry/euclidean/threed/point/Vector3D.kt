@@ -46,9 +46,8 @@ data class Vector3D(
     val x: Double,
     val y: Double,
     val z: Double,
-    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
 ) : AbstractPoint3D() {
-
     // Properties and Initializers
     init {
         require(x.isFinite()) { "X value must be finite." }
@@ -66,16 +65,28 @@ data class Vector3D(
 
     // Operators
     operator fun plus(v: Vector3D) = vector3D.add(v.vector3D).toVector3D()
+
     operator fun minus(v: Vector3D) = vector3D.subtract(v.vector3D).toVector3D()
+
     operator fun times(m: Double) = scalarMultiply(m)
+
     operator fun div(m: Double) = scalarDivide(m)
+
     operator fun unaryPlus() = Vector3D(x, y, z)
+
     operator fun unaryMinus() = Vector3D(-x, -y, -z)
 
-    fun fuzzyEquals(o: Vector3D, tolerance: Double) = doubleFuzzyEquals(this.x, o.x, tolerance) &&
+    fun fuzzyEquals(
+        o: Vector3D,
+        tolerance: Double,
+    ) = doubleFuzzyEquals(this.x, o.x, tolerance) &&
         doubleFuzzyEquals(this.y, o.y, tolerance) &&
         doubleFuzzyEquals(this.z, o.z, tolerance)
-    fun fuzzyUnequals(o: Vector3D, tolerance: Double) = !fuzzyEquals(o, tolerance)
+
+    fun fuzzyUnequals(
+        o: Vector3D,
+        tolerance: Double,
+    ) = !fuzzyEquals(o, tolerance)
 
     // Methods
 
@@ -115,10 +126,15 @@ data class Vector3D(
 
     // Conversions
     fun toDoubleArray() = doubleArrayOf(x, y, z)
+
     fun toDoubleList() = nonEmptyListOf(x, y, z)
+
     fun toRealVector() = RealVector(doubleArrayOf(x, y, z))
+
     fun toVector3DCm() = this.vector3D
+
     fun toVector3DJOML() = JOMLVector3D(this.x, this.y, this.z)
+
     fun toVector4DJOML(w: Double = 0.0) = JOMLVector4D(this.x, this.y, this.z, w)
 
     /**
@@ -144,7 +160,11 @@ data class Vector3D(
          * Creates a [Vector3D], if each component is finite. Otherwise it will return a Result.Error.
          *
          */
-        fun of(x: Double, y: Double, z: Double): Either<IllegalArgumentException, Vector3D> =
+        fun of(
+            x: Double,
+            y: Double,
+            z: Double,
+        ): Either<IllegalArgumentException, Vector3D> =
             if (!x.isFinite() || !y.isFinite() || !z.isFinite()) {
                 Either.Left(IllegalArgumentException("Values for x, y, z must be finite."))
             } else {
@@ -159,7 +179,10 @@ data class Vector3D(
  * @param other other list of vectors to be compared
  * @param tolerance allowed tolerance for fuzzy equal evaluation
  */
-fun List<Vector3D>.fuzzyEquals(other: List<Vector3D>, tolerance: Double): Boolean {
+fun List<Vector3D>.fuzzyEquals(
+    other: List<Vector3D>,
+    tolerance: Double,
+): Boolean {
     require(this.hasSameSizeAs(other)) { "Lists must have the same size." }
     return this.zip(other).all { it.first.fuzzyEquals(it.second, tolerance) }
 }

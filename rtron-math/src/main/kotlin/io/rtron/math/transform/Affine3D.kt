@@ -40,9 +40,8 @@ fun JOMLMatrix4dc.toRealMatrix(): RealMatrix {
  * @param matrix internal matrix of adapting library
  */
 class Affine3D(
-    private val matrix: JOMLMatrix4dc
+    private val matrix: JOMLMatrix4dc,
 ) : AbstractAffine() {
-
     // Properties and Initializers
     init {
         require(matrix.isAffine) { "Matrix must be affine." }
@@ -54,6 +53,7 @@ class Affine3D(
 
     // Methods: Transformation
     fun transform(point: Vector3D) = matrix.transformPosition(point.toVector3DJOML()).toVector3D()
+
     fun inverseTransform(point: Vector3D) = matrixInverse.transformPosition(point.toVector3DJOML()).toVector3D()
 
     @JvmName("transformOfListVector3D")
@@ -65,10 +65,9 @@ class Affine3D(
     @JvmName("inverseTransformOfListVector3D")
     fun inverseTransform(points: List<Vector3D>) = points.map { inverseTransform(it) }
 
-    fun transform(polygon: Polygon3D) =
-        Polygon3D(polygon.vertices.map { transform(it) }, polygon.tolerance)
-    fun inverseTransform(polygon: Polygon3D) =
-        Polygon3D(polygon.vertices.map { inverseTransform(it) }, polygon.tolerance)
+    fun transform(polygon: Polygon3D) = Polygon3D(polygon.vertices.map { transform(it) }, polygon.tolerance)
+
+    fun inverseTransform(polygon: Polygon3D) = Polygon3D(polygon.vertices.map { inverseTransform(it) }, polygon.tolerance)
 
     @JvmName("transformOfListPolygon3D")
     fun transform(polygons: List<Polygon3D>) = polygons.map { transform(it) }
@@ -143,8 +142,11 @@ class Affine3D(
 
     // Conversions
     fun toMatrix4JOML() = JOMLMatrix4d(this.matrix)
+
     fun toRealMatrix() = this.matrixTransposed.toRealMatrix()
+
     fun toDoubleArray(): DoubleArray = this.matrixTransposed.get(DoubleArray(16))
+
     fun toDoubleList(): List<Double> = toDoubleArray().toList()
 
     override fun toString(): String {
@@ -185,10 +187,11 @@ class Affine3D(
          * Creates an [Affine3D] transformation matrix from a [rotation].
          */
         fun of(rotation: Rotation3D): Affine3D {
-            val matrix = JOMLMatrix4d()
-                .rotateZ(rotation.heading)
-                .rotateY(rotation.pitch)
-                .rotateX(rotation.roll)
+            val matrix =
+                JOMLMatrix4d()
+                    .rotateZ(rotation.heading)
+                    .rotateY(rotation.pitch)
+                    .rotateX(rotation.roll)
 
             return Affine3D(matrix)
         }
@@ -223,13 +226,18 @@ class Affine3D(
          * @param basisY y-axis of new basis
          * @param basisZ z-axis of new basis
          */
-        fun of(basisX: Vector3D, basisY: Vector3D, basisZ: Vector3D): Affine3D {
-            val matrix = JOMLMatrix4d().set(
-                basisX.toVector4DJOML(),
-                basisY.toVector4DJOML(),
-                basisZ.toVector4DJOML(),
-                Vector3D.ZERO.toVector4DJOML()
-            )!!
+        fun of(
+            basisX: Vector3D,
+            basisY: Vector3D,
+            basisZ: Vector3D,
+        ): Affine3D {
+            val matrix =
+                JOMLMatrix4d().set(
+                    basisX.toVector4DJOML(),
+                    basisY.toVector4DJOML(),
+                    basisZ.toVector4DJOML(),
+                    Vector3D.ZERO.toVector4DJOML(),
+                )!!
             return Affine3D(matrix.invertAffine())
         }
     }

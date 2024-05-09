@@ -23,8 +23,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadType(
     var speed: Option<RoadTypeSpeed> = None,
-
     var country: Option<ECountryCode> = None,
     var s: Double = Double.NaN,
-    var type: ERoadType = ERoadType.UNKNOWN
+    var type: ERoadType = ERoadType.UNKNOWN,
 ) : OpendriveElement()

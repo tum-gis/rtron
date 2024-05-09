@@ -22,10 +22,22 @@ import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
 import io.rtron.model.opendrive.additions.identifier.toIdentifierText
 
-fun DefaultIssue.Companion.of(type: String, info: String, location: AbstractOpendriveIdentifier, incidentSeverity: Severity, wasFixed: Boolean): DefaultIssue {
+fun DefaultIssue.Companion.of(
+    type: String,
+    info: String,
+    location: AbstractOpendriveIdentifier,
+    incidentSeverity: Severity,
+    wasFixed: Boolean,
+): DefaultIssue {
     return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }
 
-fun DefaultIssue.Companion.of(type: String, info: String, location: Option<AbstractOpendriveIdentifier>, incidentSeverity: Severity, wasFixed: Boolean): DefaultIssue {
+fun DefaultIssue.Companion.of(
+    type: String,
+    info: String,
+    location: Option<AbstractOpendriveIdentifier>,
+    incidentSeverity: Severity,
+    wasFixed: Boolean,
+): DefaultIssue {
     return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 }

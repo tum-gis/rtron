@@ -24,42 +24,44 @@ import io.rtron.model.roadspaces.roadspace.road.LaneType
 /**
  * Transforms units of the OpenDRIVE data model to units of the RoadSpaces data model.
  */
-fun EUnitSpeed.toUnitOfMeasure(): UnitOfMeasure = when (this) {
-    EUnitSpeed.METER_PER_SECOND -> UnitOfMeasure.METER_PER_SECOND
-    EUnitSpeed.MILES_PER_HOUR -> UnitOfMeasure.MILES_PER_HOUR
-    EUnitSpeed.KILOMETER_PER_HOUR -> UnitOfMeasure.KILOMETER_PER_HOUR
-}
+fun EUnitSpeed.toUnitOfMeasure(): UnitOfMeasure =
+    when (this) {
+        EUnitSpeed.METER_PER_SECOND -> UnitOfMeasure.METER_PER_SECOND
+        EUnitSpeed.MILES_PER_HOUR -> UnitOfMeasure.MILES_PER_HOUR
+        EUnitSpeed.KILOMETER_PER_HOUR -> UnitOfMeasure.KILOMETER_PER_HOUR
+    }
 
 /**
  * Transforms lane types of the OpenDRIVE data model to the lane types of the RoadSpaces data model.
  */
-fun ELaneType.toLaneType(): LaneType = when (this) {
-    ELaneType.SHOULDER -> LaneType.SHOULDER
-    ELaneType.BORDER -> LaneType.BORDER
-    ELaneType.DRIVING -> LaneType.DRIVING
-    ELaneType.STOP -> LaneType.STOP
-    ELaneType.NONE -> LaneType.NONE
-    ELaneType.RESTRICTED -> LaneType.RESTRICTED
-    ELaneType.PARKING -> LaneType.PARKING
-    ELaneType.MEDIAN -> LaneType.MEDIAN
-    ELaneType.BIKING -> LaneType.BIKING
-    ELaneType.SIDEWALK -> LaneType.SIDEWALK
-    ELaneType.CURB -> LaneType.CURB
-    ELaneType.BIDIRECTIONAL -> LaneType.BIDIRECTIONAL
-    ELaneType.SPECIAL_1 -> LaneType.SPECIAL_1
-    ELaneType.SPECIAL_2 -> LaneType.SPECIAL_2
-    ELaneType.SPECIAL_3 -> LaneType.SPECIAL_3
-    ELaneType.ROAD_WORKS -> LaneType.ROAD_WORKS
-    ELaneType.TRAM -> LaneType.TRAM
-    ELaneType.RAIL -> LaneType.RAIL
-    ELaneType.ENTRY -> LaneType.ENTRY
-    ELaneType.EXIT -> LaneType.EXIT
-    ELaneType.OFF_RAMP -> LaneType.OFF_RAMP
-    ELaneType.ON_RAMP -> LaneType.ON_RAMP
-    ELaneType.CONNECTING_RAMP -> LaneType.CONNECTING_RAMP
-    ELaneType.BUS -> LaneType.BUS
-    ELaneType.TAXI -> LaneType.TAXI
-    ELaneType.HOV -> LaneType.HOV
-    ELaneType.MWY_ENTRY -> LaneType.MWY_ENTRY
-    ELaneType.MWY_EXIT -> LaneType.MWY_EXIT
-}
+fun ELaneType.toLaneType(): LaneType =
+    when (this) {
+        ELaneType.SHOULDER -> LaneType.SHOULDER
+        ELaneType.BORDER -> LaneType.BORDER
+        ELaneType.DRIVING -> LaneType.DRIVING
+        ELaneType.STOP -> LaneType.STOP
+        ELaneType.NONE -> LaneType.NONE
+        ELaneType.RESTRICTED -> LaneType.RESTRICTED
+        ELaneType.PARKING -> LaneType.PARKING
+        ELaneType.MEDIAN -> LaneType.MEDIAN
+        ELaneType.BIKING -> LaneType.BIKING
+        ELaneType.SIDEWALK -> LaneType.SIDEWALK
+        ELaneType.CURB -> LaneType.CURB
+        ELaneType.BIDIRECTIONAL -> LaneType.BIDIRECTIONAL
+        ELaneType.SPECIAL_1 -> LaneType.SPECIAL_1
+        ELaneType.SPECIAL_2 -> LaneType.SPECIAL_2
+        ELaneType.SPECIAL_3 -> LaneType.SPECIAL_3
+        ELaneType.ROAD_WORKS -> LaneType.ROAD_WORKS
+        ELaneType.TRAM -> LaneType.TRAM
+        ELaneType.RAIL -> LaneType.RAIL
+        ELaneType.ENTRY -> LaneType.ENTRY
+        ELaneType.EXIT -> LaneType.EXIT
+        ELaneType.OFF_RAMP -> LaneType.OFF_RAMP
+        ELaneType.ON_RAMP -> LaneType.ON_RAMP
+        ELaneType.CONNECTING_RAMP -> LaneType.CONNECTING_RAMP
+        ELaneType.BUS -> LaneType.BUS
+        ELaneType.TAXI -> LaneType.TAXI
+        ELaneType.HOV -> LaneType.HOV
+        ELaneType.MWY_ENTRY -> LaneType.MWY_ENTRY
+        ELaneType.MWY_EXIT -> LaneType.MWY_EXIT
+    }

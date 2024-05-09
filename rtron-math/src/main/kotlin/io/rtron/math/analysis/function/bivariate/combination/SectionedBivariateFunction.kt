@@ -31,9 +31,8 @@ import io.rtron.math.range.shiftLowerEndpointTo
 class SectionedBivariateFunction(
     private val completeFunction: BivariateFunction,
     sectionX: Range<Double>,
-    sectionY: Range<Double>
+    sectionY: Range<Double>,
 ) : BivariateFunction() {
-
     // Properties and Initializers
     override val domainX =
         if (sectionX.hasLowerBound()) sectionX.shiftLowerEndpointTo(0.0) else completeFunction.domainX
@@ -45,6 +44,8 @@ class SectionedBivariateFunction(
     private val sectionYStart = sectionY.lowerEndpointOrNull() ?: 0.0
 
     // Methods
-    override fun valueUnbounded(x: Double, y: Double) =
-        completeFunction.valueUnbounded(sectionXStart + x, sectionYStart + y)
+    override fun valueUnbounded(
+        x: Double,
+        y: Double,
+    ) = completeFunction.valueUnbounded(sectionXStart + x, sectionYStart + y)
 }

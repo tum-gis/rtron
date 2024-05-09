@@ -38,9 +38,8 @@ import io.rtron.std.noneWithNextEnclosing
 data class Polygon3D(
     val vertices: NonEmptyList<Vector3D>,
     override val tolerance: Double,
-    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
 ) : AbstractSurface3D() {
-
     // Properties and Initializers
     private val numberOfVertices = vertices.size
 
@@ -52,7 +51,14 @@ data class Polygon3D(
 
     init {
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a polygon." }
-        require(vertices.noneWithNextEnclosing { a, b -> a.fuzzyEquals(b, tolerance) }) { "Consecutively following point duplicates found." }
+        require(
+            vertices.noneWithNextEnclosing {
+                    a,
+                    b,
+                ->
+                a.fuzzyEquals(b, tolerance)
+            },
+        ) { "Consecutively following point duplicates found." }
         require(dimensionSpan >= 2) { "The dimension of the span is too low ($dimensionSpan) which might be caused by colinear vertices." }
         require(vertices.isPlanar(tolerance)) { "The vertices of a polygon must be located in a plane." }
     }
@@ -60,36 +66,45 @@ data class Polygon3D(
     // Methods
 
     /** Returns the normal of the polygon. */
-    fun getNormal(): Either<IllegalStateException, Vector3D> =
-        this.vertices.calculateNormal().normalized().let { Either.Right(it) }
+    fun getNormal(): Either<IllegalStateException, Vector3D> = this.vertices.calculateNormal().normalized().let { Either.Right(it) }
 
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
     fun reversed() = Polygon3D(vertices.reversed().toNonEmptyListOrNull()!!, tolerance, affineSequence)
 
-    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> = nonEmptyListOf(this).right()
+    override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
+        nonEmptyListOf(
+            this,
+        ).right()
 
     // Conversions
+
     /** Returns the coordinates of all vertices as a flattened list */
     fun toVertexPositionElementList(): List<Double> = this.vertices.flatMap { it.toDoubleList() }.toList()
 
     companion object {
-        val TETRAGON = of(
-            Vector3D(-1.0, -1.0, 0.0),
-            Vector3D(-1.0, 1.0, 0.0),
-            Vector3D(1.0, 1.0, 0.0),
-            Vector3D(1.0, -1.0, 0.0),
-            tolerance = DEFAULT_TOLERANCE
-        )
+        val TETRAGON =
+            of(
+                Vector3D(-1.0, -1.0, 0.0),
+                Vector3D(-1.0, 1.0, 0.0),
+                Vector3D(1.0, 1.0, 0.0),
+                Vector3D(1.0, -1.0, 0.0),
+                tolerance = DEFAULT_TOLERANCE,
+            )
 
         /**
          * Constructs a polygon based on the [vectors].
          */
-        fun of(vararg vectors: Vector3D, tolerance: Double) = Polygon3D(vectors.toList().toNonEmptyListOrNull()!!, tolerance)
+        fun of(
+            vararg vectors: Vector3D,
+            tolerance: Double,
+        ) = Polygon3D(vectors.toList().toNonEmptyListOrNull()!!, tolerance)
 
         /**
          * Constructs a polygon based on a [Triple] of [vectors].
          */
-        fun of(vectors: Triple<Vector3D, Vector3D, Vector3D>, tolerance: Double) =
-            Polygon3D(vectors.toList().toNonEmptyListOrNull()!!, tolerance)
+        fun of(
+            vectors: Triple<Vector3D, Vector3D, Vector3D>,
+            tolerance: Double,
+        ) = Polygon3D(vectors.toList().toNonEmptyListOrNull()!!, tolerance)
     }
 }

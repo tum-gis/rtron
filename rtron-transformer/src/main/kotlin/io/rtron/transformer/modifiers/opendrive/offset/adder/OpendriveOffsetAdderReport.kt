@@ -20,5 +20,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OpendriveOffsetAdderReport(
-    val parameters: OpendriveOffsetAdderParameters
+    val parameters: OpendriveOffsetAdderParameters,
 )

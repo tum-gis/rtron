@@ -19,5 +19,5 @@ package io.rtron.model.opendrive.junction
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class JunctionSurface(
-    var crg: List<JunctionSurfaceCrg> = emptyList()
+    var crg: List<JunctionSurfaceCrg> = emptyList(),
 ) : OpendriveElement()

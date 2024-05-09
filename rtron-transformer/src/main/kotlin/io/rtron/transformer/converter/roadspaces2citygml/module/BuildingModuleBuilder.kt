@@ -42,7 +42,7 @@ import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
  * Builder for city objects of the CityGML Building module.
  */
 class BuildingModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters,
 ) {
     // Properties and Initializers
     private val relationAdder = RelationAdder(parameters)
@@ -65,13 +65,11 @@ class BuildingModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             buildingFeature.populateLod1Geometry(geometryTransformer)
                 .mapLeft {
-                    issueList += DefaultIssue.of(
-                        "NoSuitableGeometryForBuildingLod1",
-                        it.message,
-                        roadspaceObject.id,
-                        Severity.WARNING,
-                        wasFixed = true
-                    )
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForBuildingLod1",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
                 }
         }
 
@@ -95,58 +93,54 @@ class BuildingModuleBuilder(
     private fun addLod2BuildingInformation(
         id: RoadspaceObjectIdentifier,
         geometryTransformer: GeometryTransformer,
-        dstBuildingFeature: Building
+        dstBuildingFeature: Building,
     ): ContextIssueList<Building> {
         require(geometryTransformer.getSolid().isSome()) { "Solid geometry is required to create an LOD2 building." }
         val issueList = DefaultIssueList()
 
         dstBuildingFeature.populateLod2Geometry(geometryTransformer)
             .onLeft {
-                issueList += DefaultIssue.of(
-                    "NoSuitableGeometryForBuildingLod2",
-                    it.message,
-                    id,
-                    Severity.WARNING,
-                    wasFixed = true
-                )
+                issueList +=
+                    DefaultIssue.of(
+                        "NoSuitableGeometryForBuildingLod2",
+                        it.message, id, Severity.WARNING, wasFixed = true,
+                    )
             }
 
         val roofSurfaceFeature = RoofSurface()
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).onSome {
             roofSurfaceFeature.lod2MultiSurface = it
         }.onNone {
-            issueList += DefaultIssue.of(
-                "NoSuitableGeometryForRoofSurfaceLod2",
-                "No LOD2 MultiSurface for roof feature available.",
-                id,
-                Severity.WARNING,
-                wasFixed = true
-            )
+            issueList +=
+                DefaultIssue.of(
+                    "NoSuitableGeometryForRoofSurfaceLod2",
+                    "No LOD2 MultiSurface for roof feature available.",
+                    id, Severity.WARNING, wasFixed = true,
+                )
         }
         dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
         IdentifierAdder.addIdentifier(
             id.deriveLod2RoofGmlIdentifier(parameters.gmlIdPrefix),
             "RoofSurface",
-            dstCityObject = roofSurfaceFeature
+            dstCityObject = roofSurfaceFeature,
         )
 
         val groundSurfaceFeature = GroundSurface()
         geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).onSome {
             groundSurfaceFeature.lod2MultiSurface = it
         }.onNone {
-            issueList += DefaultIssue.of(
-                "NoSuitableGeometryForGroundSurfaceLod2",
-                "No LOD2 MultiSurface for ground feature available.",
-                id,
-                Severity.WARNING,
-                wasFixed = true
-            )
+            issueList +=
+                DefaultIssue.of(
+                    "NoSuitableGeometryForGroundSurfaceLod2",
+                    "No LOD2 MultiSurface for ground feature available.",
+                    id, Severity.WARNING, wasFixed = true,
+                )
         }
         dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
         IdentifierAdder.addIdentifier(
             id.deriveLod2GroundGmlIdentifier(parameters.gmlIdPrefix),
             "GroundSurface",
-            dstCityObject = groundSurfaceFeature
+            dstCityObject = groundSurfaceFeature,
         )
 
         geometryTransformer.getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE).onSome { wallSurfaceResult ->
@@ -157,17 +151,16 @@ class BuildingModuleBuilder(
                 IdentifierAdder.addIdentifier(
                     id.deriveLod2WallGmlIdentifier(parameters.gmlIdPrefix, index),
                     "WallSurface",
-                    dstCityObject = wallSurfaceFeature
+                    dstCityObject = wallSurfaceFeature,
                 )
             }
         }.onNone {
-            issueList += DefaultIssue.of(
-                "NoSuitableGeometryForWallSurfaceLod2",
-                "No LOD2 MultiSurface for wall feature available.",
-                id,
-                Severity.WARNING,
-                wasFixed = true
-            )
+            issueList +=
+                DefaultIssue.of(
+                    "NoSuitableGeometryForWallSurfaceLod2",
+                    "No LOD2 MultiSurface for wall feature available.",
+                    id, Severity.WARNING, wasFixed = true,
+                )
         }
 
         return ContextIssueList(dstBuildingFeature, issueList)

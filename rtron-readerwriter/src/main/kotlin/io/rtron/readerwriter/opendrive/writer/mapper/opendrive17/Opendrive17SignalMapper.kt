@@ -30,25 +30,35 @@ import org.asam.opendrive17.T_Road_Signals_Signal_PositionRoad
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17ObjectMapper::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17ObjectMapper::class],
+)
 abstract class Opendrive17SignalMapper {
-
     //
     // Signal
     //
     fun mapOptionRoadSignals(source: Option<RoadSignals>): T_Road_Signals? = source.fold({ null }, { mapRoadSignals(it) })
+
     abstract fun mapRoadSignals(source: RoadSignals): T_Road_Signals
 
     abstract fun mapRoadSignalsSignal(source: RoadSignalsSignal): T_Road_Signals_Signal
 
     fun mapOptionECountryCode(source: Option<ECountryCode>): String? = source.fold({ null }, { mapECountryCode(it) })
+
     abstract fun mapECountryCode(source: ECountryCode): String
 
-    fun mapOptionRoadSignalsSignalPositionInertial(source: Option<RoadSignalsSignalPositionInertial>): T_Road_Signals_Signal_PositionInertial? = source
-        .fold({ null }, { mapRoadSignalsSignalPositionInertial(it) })
+    fun mapOptionRoadSignalsSignalPositionInertial(
+        source: Option<RoadSignalsSignalPositionInertial>,
+    ): T_Road_Signals_Signal_PositionInertial? =
+        source
+            .fold({ null }, { mapRoadSignalsSignalPositionInertial(it) })
+
     abstract fun mapRoadSignalsSignalPositionInertial(source: RoadSignalsSignalPositionInertial): T_Road_Signals_Signal_PositionInertial
 
-    fun mapOptionRoadSignalsSignalPositionRoad(source: Option<RoadSignalsSignalPositionRoad>): T_Road_Signals_Signal_PositionRoad? = source
-        .fold({ null }, { mapRoadSignalsSignalPositionRoad(it) })
+    fun mapOptionRoadSignalsSignalPositionRoad(source: Option<RoadSignalsSignalPositionRoad>): T_Road_Signals_Signal_PositionRoad? =
+        source
+            .fold({ null }, { mapRoadSignalsSignalPositionRoad(it) })
+
     abstract fun mapRoadSignalsSignalPositionRoad(source: RoadSignalsSignalPositionRoad): T_Road_Signals_Signal_PositionRoad
 }

@@ -39,15 +39,14 @@ abstract class RoadLanesLaneSectionLRLane(
     open var access: List<RoadLanesLaneSectionLRLaneAccess> = emptyList(),
     open var height: List<RoadLanesLaneSectionLRLaneHeight> = emptyList(),
     open var rule: List<RoadLanesLaneSectionLRLaneRule> = emptyList(),
-
     open var level: Option<Boolean> = None,
     open var type: ELaneType = ELaneType.NONE,
-
-    override var additionalId: Option<LaneIdentifier> = None
+    override var additionalId: Option<LaneIdentifier> = None,
 ) : OpendriveElement(), AdditionalLaneIdentifier {
-
     // Properties
     fun getLaneWidthEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneWidth>> = width.toNonEmptyListOrNone()
+
     fun getLaneHeightEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneHeight>> = height.toNonEmptyListOrNone()
+
     fun getLevelWithDefault() = level.getOrElse { false }
 }

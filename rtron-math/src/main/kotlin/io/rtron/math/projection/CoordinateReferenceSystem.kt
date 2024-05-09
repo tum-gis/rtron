@@ -30,9 +30,8 @@ import org.locationtech.proj4j.CoordinateReferenceSystem as ProjCoordinateRefere
  * @param crs adapted CRS class from PROJ
  */
 class CoordinateReferenceSystem(
-    private val crs: ProjCoordinateReferenceSystem
+    private val crs: ProjCoordinateReferenceSystem,
 ) {
-
     // Properties and Initializers
 
     /** Name of CRS */
@@ -50,7 +49,6 @@ class CoordinateReferenceSystem(
     // Methods
 
     companion object {
-
         private val projCRSFactory = ProjCRSFactory()
 
         /**
@@ -62,11 +60,12 @@ class CoordinateReferenceSystem(
          * Creates a [CoordinateReferenceSystem] based on the provided [crsName].
          */
         fun of(crsName: String): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> {
-            val crs = try {
-                projCRSFactory.createFromName(crsName)
-            } catch (e: Exception) {
-                return CoordinateReferenceSystemException.UnkownEpsgCode(e.toString()).left()
-            }
+            val crs =
+                try {
+                    projCRSFactory.createFromName(crsName)
+                } catch (e: Exception) {
+                    return CoordinateReferenceSystemException.UnkownEpsgCode(e.toString()).left()
+                }
             return when (crs) {
                 null -> CoordinateReferenceSystemException.UnkownEpsgCode("Unknown EPSG code.").left()
                 else -> CoordinateReferenceSystem(crs).right()
@@ -78,14 +77,16 @@ class CoordinateReferenceSystem(
          *
          * @param parameters PROJ.4 projection parameter string
          */
-        fun ofParameters(parameters: String): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> = either {
-            val epsgCode = parametersToEpsgCode(parameters).bind()
-            of(epsgCode).bind()
-        }
+        fun ofParameters(parameters: String): Either<CoordinateReferenceSystemException, CoordinateReferenceSystem> =
+            either {
+                val epsgCode = parametersToEpsgCode(parameters).bind()
+                of(epsgCode).bind()
+            }
 
         private fun parametersToEpsgCode(parameters: String): Either<CoordinateReferenceSystemException.UnkownEpsgCode, Int> {
-            val result = projCRSFactory.readEpsgFromParameters(parameters)
-                ?: return CoordinateReferenceSystemException.UnkownEpsgCode("Cannot derive EPSG code from parameters.").left()
+            val result =
+                projCRSFactory.readEpsgFromParameters(parameters)
+                    ?: return CoordinateReferenceSystemException.UnkownEpsgCode("Cannot derive EPSG code from parameters.").left()
 
             return result.toInt().right()
         }

@@ -40,9 +40,8 @@ data class Circle3D(
     val radius: Double,
     override val tolerance: Double,
     override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
-    private val numberSlices: Int = DEFAULT_NUMBER_SLICES
+    private val numberSlices: Int = DEFAULT_NUMBER_SLICES,
 ) : AbstractSurface3D() {
-
     // Properties and Initializers
     init {
         require(radius.isFinite()) { "Radius value must be finite." }
@@ -52,25 +51,29 @@ data class Circle3D(
 
     // Methods
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> {
-        val polygon = (0 until numberSlices)
-            .map { TWO_PI * it / numberSlices }
-            .map { calculatePoint(it) }
-            .let { it.toNonEmptyListOrNull()!! }
-            .let { Polygon3D(it, tolerance) }
+        val polygon =
+            (0 until numberSlices)
+                .map { TWO_PI * it / numberSlices }
+                .map { calculatePoint(it) }
+                .let { it.toNonEmptyListOrNull()!! }
+                .let { Polygon3D(it, tolerance) }
 
         return nonEmptyListOf(polygon).right()
     }
 
     /** Calculates a point the circle based on the [angle] around the origin. */
-    private fun calculatePoint(angle: Double = 0.0) =
-        Vector3D(radius * cos(angle), radius * sin(angle), 0.0)
+    private fun calculatePoint(angle: Double = 0.0) = Vector3D(radius * cos(angle), radius * sin(angle), 0.0)
 
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 
     companion object {
         private const val DEFAULT_NUMBER_SLICES: Int = 16 // used for tesselation
 
-        fun of(radius: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY): Circle3D {
+        fun of(
+            radius: Option<Double>,
+            tolerance: Double,
+            affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
+        ): Circle3D {
             require(radius.isSome()) { "Radius must be defined." }
 
             return Circle3D(radius.getOrNull()!!, tolerance, affineSequence)

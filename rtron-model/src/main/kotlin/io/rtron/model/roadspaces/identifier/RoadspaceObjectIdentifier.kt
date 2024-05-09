@@ -32,9 +32,8 @@ data class RoadspaceObjectIdentifier(
     val roadspaceObjectId: String,
     val roadspaceObjectRepeatIndex: Option<Int>,
     val roadspaceObjectName: Option<String>,
-    val roadspaceIdentifier: RoadspaceIdentifier
+    val roadspaceIdentifier: RoadspaceIdentifier,
 ) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface by roadspaceIdentifier {
-
     // Properties and Initializers
     val hashKey get() = "RoadspaceObject_${roadspaceObjectId}_${roadspaceObjectRepeatIndex}_${roadspaceIdentifier.roadspaceId}"
 
@@ -52,8 +51,7 @@ data class RoadspaceObjectIdentifier(
         } + roadspaceObjectIdentifier.roadspaceIdentifier.toAttributes(prefix)
     }
 
-    override fun toStringMap(): Map<String, String> =
-        mapOf("roadspaceObjectId" to roadspaceObjectId) + roadspaceIdentifier.toStringMap()
+    override fun toStringMap(): Map<String, String> = mapOf("roadspaceObjectId" to roadspaceObjectId) + roadspaceIdentifier.toStringMap()
 
     // Conversions
     override fun toIdentifierText(): String {

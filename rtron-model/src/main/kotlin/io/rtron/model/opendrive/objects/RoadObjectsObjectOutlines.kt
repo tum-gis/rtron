@@ -21,20 +21,23 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
 data class RoadObjectsObjectOutlines(
-    var outline: List<RoadObjectsObjectOutlinesOutline> = emptyList()
+    var outline: List<RoadObjectsObjectOutlinesOutline> = emptyList(),
 ) : OpendriveElement() {
-
     // Methods
     fun getPolyhedronsDefinedByRoadCorners() = outline.filter { it.isPolyhedronDefinedByRoadCorners() }
+
     fun getPolyhedronsDefinedByLocalCorners() = outline.filter { it.isPolyhedronDefinedByLocalCorners() }
 
     fun getLinearRingsDefinedByRoadCorners() = outline.filter { it.isLinearRingDefinedByRoadCorners() }
+
     fun getLinearRingsDefinedByLocalCorners() = outline.filter { it.isLinearRingDefinedByLocalCorners() }
 
     fun numberOfPolyhedrons() = getPolyhedronsDefinedByRoadCorners().size + getPolyhedronsDefinedByLocalCorners().size
+
     fun numberOfLinearRings() = getLinearRingsDefinedByRoadCorners().size + getLinearRingsDefinedByLocalCorners().size
 
     fun containsPolyhedrons() = numberOfPolyhedrons() > 0
+
     fun containsLinearRings() = numberOfLinearRings() > 0
 
     fun containsGeometries() = containsPolyhedrons() || containsLinearRings()

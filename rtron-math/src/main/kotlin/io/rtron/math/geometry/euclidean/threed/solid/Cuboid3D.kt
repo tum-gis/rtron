@@ -37,9 +37,8 @@ data class Cuboid3D(
     val width: Double,
     val height: Double,
     override val tolerance: Double,
-    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
 ) : AbstractSolid3D() {
-
     // Properties and Initializers
     init {
         require(length.isFinite()) { "Length value must be finite." }
@@ -64,53 +63,59 @@ data class Cuboid3D(
     private val vertexElevatedQuadrantIII = Vector3D(-halfLength, -halfWidth, height)
     private val vertexElevatedQuadrantIV = Vector3D(halfLength, -halfWidth, height)
 
-    private val basePolygon = Polygon3D.of(
-        vertexBaseQuadrantI,
-        vertexBaseQuadrantIV,
-        vertexBaseQuadrantIII,
-        vertexBaseQuadrantII,
-        tolerance = tolerance
-    )
+    private val basePolygon =
+        Polygon3D.of(
+            vertexBaseQuadrantI,
+            vertexBaseQuadrantIV,
+            vertexBaseQuadrantIII,
+            vertexBaseQuadrantII,
+            tolerance = tolerance,
+        )
 
-    private val elevatedPolygon = Polygon3D.of(
-        vertexElevatedQuadrantI,
-        vertexElevatedQuadrantII,
-        vertexElevatedQuadrantIII,
-        vertexElevatedQuadrantIV,
-        tolerance = tolerance
-    )
+    private val elevatedPolygon =
+        Polygon3D.of(
+            vertexElevatedQuadrantI,
+            vertexElevatedQuadrantII,
+            vertexElevatedQuadrantIII,
+            vertexElevatedQuadrantIV,
+            tolerance = tolerance,
+        )
 
-    private val frontPolygon = Polygon3D.of(
-        vertexBaseQuadrantI,
-        vertexElevatedQuadrantI,
-        vertexElevatedQuadrantIV,
-        vertexBaseQuadrantIV,
-        tolerance = tolerance
-    )
+    private val frontPolygon =
+        Polygon3D.of(
+            vertexBaseQuadrantI,
+            vertexElevatedQuadrantI,
+            vertexElevatedQuadrantIV,
+            vertexBaseQuadrantIV,
+            tolerance = tolerance,
+        )
 
-    private val leftPolygon = Polygon3D.of(
-        vertexBaseQuadrantI,
-        vertexBaseQuadrantII,
-        vertexElevatedQuadrantII,
-        vertexElevatedQuadrantI,
-        tolerance = tolerance
-    )
+    private val leftPolygon =
+        Polygon3D.of(
+            vertexBaseQuadrantI,
+            vertexBaseQuadrantII,
+            vertexElevatedQuadrantII,
+            vertexElevatedQuadrantI,
+            tolerance = tolerance,
+        )
 
-    private val backPolygon = Polygon3D.of(
-        vertexBaseQuadrantII,
-        vertexBaseQuadrantIII,
-        vertexElevatedQuadrantIII,
-        vertexElevatedQuadrantII,
-        tolerance = tolerance
-    )
+    private val backPolygon =
+        Polygon3D.of(
+            vertexBaseQuadrantII,
+            vertexBaseQuadrantIII,
+            vertexElevatedQuadrantIII,
+            vertexElevatedQuadrantII,
+            tolerance = tolerance,
+        )
 
-    private val rightPolygon = Polygon3D.of(
-        vertexElevatedQuadrantIV,
-        vertexElevatedQuadrantIII,
-        vertexBaseQuadrantIII,
-        vertexBaseQuadrantIV,
-        tolerance = tolerance
-    )
+    private val rightPolygon =
+        Polygon3D.of(
+            vertexElevatedQuadrantIV,
+            vertexElevatedQuadrantIII,
+            vertexBaseQuadrantIII,
+            vertexBaseQuadrantIV,
+            tolerance = tolerance,
+        )
 
     // Methods
     override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> {
@@ -125,7 +130,13 @@ data class Cuboid3D(
     companion object {
         val UNIT = Cuboid3D(1.0, 1.0, 1.0, DEFAULT_TOLERANCE)
 
-        fun of(length: Option<Double>, width: Option<Double>, height: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY): Cuboid3D {
+        fun of(
+            length: Option<Double>,
+            width: Option<Double>,
+            height: Option<Double>,
+            tolerance: Double,
+            affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
+        ): Cuboid3D {
             require(length.isSome()) { "Length must be defined." }
             require(width.isSome()) { "Width must be defined." }
             require(height.isSome()) { "Height must be defined." }

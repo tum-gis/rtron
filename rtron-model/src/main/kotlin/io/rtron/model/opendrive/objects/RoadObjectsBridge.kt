@@ -22,10 +22,9 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsBridge(
     var validity: List<RoadObjectsObjectLaneValidity> = emptyList(),
-
     var id: String = "",
     var length: Double = Double.NaN,
     var name: Option<String> = None,
     var s: Double = Double.NaN,
-    var type: EBridgeType = EBridgeType.CONCRETE
+    var type: EBridgeType = EBridgeType.CONCRETE,
 ) : OpendriveElement()

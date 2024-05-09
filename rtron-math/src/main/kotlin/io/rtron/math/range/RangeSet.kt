@@ -28,9 +28,8 @@ fun <T : Comparable<*>> GImmutableRangeSet<T>.toRangeSet() = RangeSet(this)
  * @param rangeSet adapted Guava class
  */
 class RangeSet<T : Comparable<*>>(
-    private val rangeSet: GImmutableRangeSet<T>
+    private val rangeSet: GImmutableRangeSet<T>,
 ) {
-
     // Secondary Constructors
 
     constructor(ranges: Set<Range<T>>) :
@@ -111,7 +110,6 @@ class RangeSet<T : Comparable<*>>(
     }
 
     companion object {
-
         /**
          * Creates an empty [RangeSet].
          */

@@ -34,31 +34,47 @@ import org.xmlobjects.gml.model.basictypes.Code
  * Adds relations to and from an object to an [AbstractCityObject] (CityGML model).
  */
 class RelationAdder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters,
 ) {
     // Properties and Initializers
     private val attributesAdder = AttributesAdder(parameters)
 
     // Methods
-    fun addRelatedToRelation(roadspaceObject: RoadspaceObject, dstTrafficSpace: TrafficSpace) {
-        val relationType = "related" + when (RoadspaceObjectRouter.route(roadspaceObject)) {
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> "Building"
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> "Furniture"
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> "OccupiedSpace"
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> return
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> return
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> return
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> "Vegetation"
-        }
+    fun addRelatedToRelation(
+        roadspaceObject: RoadspaceObject,
+        dstTrafficSpace: TrafficSpace,
+    ) {
+        val relationType =
+            "related" +
+                when (RoadspaceObjectRouter.route(roadspaceObject)) {
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> "Building"
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> "Furniture"
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> "OccupiedSpace"
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> return
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> return
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> return
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> "Vegetation"
+                }
 
-        val relation = createCityObjectRelation(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), relationType, roadspaceObject.id)
+        val relation =
+            createCityObjectRelation(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), relationType, roadspaceObject.id)
         dstTrafficSpace.relatedTo.add(relation)
     }
 
-    fun addBelongToRelations(roadspaceObject: RoadspaceObject, dstCityObject: AbstractCityObject) {
-        val relations = roadspaceObject.laneRelations
-            .flatMap { it.getAllLeftRightLaneIdentifiers() }
-            .map { createCityObjectRelation(it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix), "belongsTo", it) }
+    fun addBelongToRelations(
+        roadspaceObject: RoadspaceObject,
+        dstCityObject: AbstractCityObject,
+    ) {
+        val relations =
+            roadspaceObject.laneRelations
+                .flatMap { it.getAllLeftRightLaneIdentifiers() }
+                .map {
+                    createCityObjectRelation(
+                        it.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix),
+                        "belongsTo",
+                        it,
+                    )
+                }
 
         dstCityObject.relatedTo.addAll(relations)
     }
@@ -66,18 +82,27 @@ class RelationAdder(
     /**
      * Adds a lane change relation to the [dstTrafficSpace] object
      */
-    fun addLaneChangeRelation(lane: Lane, direction: RoadSide, dstTrafficSpace: TrafficSpace) {
+    fun addLaneChangeRelation(
+        lane: Lane,
+        direction: RoadSide,
+        dstTrafficSpace: TrafficSpace,
+    ) {
         val gmlId = lane.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix)
-        val relationType = when (direction) {
-            RoadSide.LEFT -> "leftLaneChange"
-            RoadSide.RIGHT -> "rightLaneChange"
-            RoadSide.CENTER -> throw IllegalArgumentException("Direction of a laneChange relation must not be center.")
-        }
+        val relationType =
+            when (direction) {
+                RoadSide.LEFT -> "leftLaneChange"
+                RoadSide.RIGHT -> "rightLaneChange"
+                RoadSide.CENTER -> throw IllegalArgumentException("Direction of a laneChange relation must not be center.")
+            }
         val relation: CityObjectRelationProperty = createCityObjectRelation(gmlId, relationType, lane.id)
         dstTrafficSpace.relatedTo.add(relation)
     }
 
-    private fun createCityObjectRelation(gmlId: String, type: String, id: AbstractRoadspacesIdentifier): CityObjectRelationProperty {
+    private fun createCityObjectRelation(
+        gmlId: String,
+        type: String,
+        id: AbstractRoadspacesIdentifier,
+    ): CityObjectRelationProperty {
         val relation = CityObjectRelation(parameters.xlinkPrefix + gmlId)
         relation.relationType = Code(type)
         attributesAdder.addAttributes(id, relation)

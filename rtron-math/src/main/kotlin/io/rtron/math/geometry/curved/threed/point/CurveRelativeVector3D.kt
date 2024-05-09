@@ -34,9 +34,8 @@ import io.rtron.math.std.fuzzyEquals as doubleFuzzyEquals
 data class CurveRelativeVector3D(
     val curvePosition: Double,
     val lateralOffset: Double = 0.0,
-    val heightOffset: Double = 0.0
+    val heightOffset: Double = 0.0,
 ) : CurveRelativeAbstractGeometry3D() {
-
     // Properties and Initializers
     init {
         require(curvePosition.isFinite()) { "Curve position value must be finite." }
@@ -50,18 +49,24 @@ data class CurveRelativeVector3D(
      * Returns true, if [curvePosition], [lateralOffset] and [heightOffset] are all fuzzily equal with a tolerance
      * of [tolerance].
      */
-    fun fuzzyEquals(o: CurveRelativeVector3D, tolerance: Double) =
-        doubleFuzzyEquals(this.curvePosition, o.curvePosition, tolerance) &&
-            doubleFuzzyEquals(this.lateralOffset, o.lateralOffset, tolerance) &&
-            doubleFuzzyEquals(this.heightOffset, o.heightOffset, tolerance)
+    fun fuzzyEquals(
+        o: CurveRelativeVector3D,
+        tolerance: Double,
+    ) = doubleFuzzyEquals(this.curvePosition, o.curvePosition, tolerance) &&
+        doubleFuzzyEquals(this.lateralOffset, o.lateralOffset, tolerance) &&
+        doubleFuzzyEquals(this.heightOffset, o.heightOffset, tolerance)
 
-    fun fuzzyUnequals(o: CurveRelativeVector3D, tolerance: Double) = !fuzzyEquals(o, tolerance)
+    fun fuzzyUnequals(
+        o: CurveRelativeVector3D,
+        tolerance: Double,
+    ) = !fuzzyEquals(o, tolerance)
 
     // Methods
     fun getCartesianCurveOffset() = Vector3D(0.0, lateralOffset, heightOffset)
 
     // Conversions
     fun toCurveRelative1D() = CurveRelativeVector1D(curvePosition)
+
     fun toCurveRelative2D() = CurveRelativeVector2D(curvePosition, lateralOffset)
 
     companion object {
@@ -71,8 +76,11 @@ data class CurveRelativeVector3D(
          * Creates a [CurveRelativeVector3D] by a [curvePosition], [lateralOffset] and [heightOffset]. If one of the
          * values is not finite, an error is returned.
          */
-        fun of(curvePosition: Double, lateralOffset: Double, heightOffset: Double):
-            Either<IllegalArgumentException, CurveRelativeVector3D> =
+        fun of(
+            curvePosition: Double,
+            lateralOffset: Double,
+            heightOffset: Double,
+        ): Either<IllegalArgumentException, CurveRelativeVector3D> =
             if (!curvePosition.isFinite() || !lateralOffset.isFinite() || !heightOffset.isFinite()) {
                 Either.Left(IllegalArgumentException("CurvePosition, lateralOffset, heightOffset must be finite."))
             } else {

@@ -32,15 +32,15 @@ import kotlin.time.toDuration
 class ProgressBar(
     private val taskName: String,
     private val completion: Int,
-    private var currentStatus: Int = 0
+    private var currentStatus: Int = 0,
 ) {
-
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
     private val startTime = System.currentTimeMillis()
     private var lastPrintUpdateTime: Long = 0
 
     // Methods
+
     /** Increments progress bar by one step. */
     fun step() {
         currentStatus += 1
@@ -72,17 +72,13 @@ class ProgressBar(
 
     private fun getProgressPercent(): Double = 100.0 * (currentStatus.toDouble() / completion.toDouble())
 
-    private fun getElapsedTime(): Duration =
-        (System.currentTimeMillis() - startTime).toDuration(DurationUnit.MILLISECONDS)
+    private fun getElapsedTime(): Duration = (System.currentTimeMillis() - startTime).toDuration(DurationUnit.MILLISECONDS)
 
-    private fun getTotalEstimatedElapsedTime(): Duration =
-        getElapsedTime() * completion.toDouble() / currentStatus.toDouble()
+    private fun getTotalEstimatedElapsedTime(): Duration = getElapsedTime() * completion.toDouble() / currentStatus.toDouble()
 
-    private fun getEstimatedTimeOfArrival(): Duration =
-        getElapsedTime() * ((completion.toDouble() / currentStatus.toDouble()) - 1.0)
+    private fun getEstimatedTimeOfArrival(): Duration = getElapsedTime() * ((completion.toDouble() / currentStatus.toDouble()) - 1.0)
 
     companion object {
-
         /**
          * Starts printing the progress bar after the duration of [PRINT_AFTER].
          */

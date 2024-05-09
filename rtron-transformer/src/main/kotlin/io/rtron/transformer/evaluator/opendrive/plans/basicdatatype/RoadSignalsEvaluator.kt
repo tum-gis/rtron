@@ -30,38 +30,87 @@ import kotlin.math.max
 import kotlin.math.min
 
 object RoadSignalsEvaluator {
-
     // Methods
-    fun evaluate(opendriveModel: OpendriveModel, parameters: OpendriveEvaluatorParameters, issueList: DefaultIssueList): OpendriveModel {
+    fun evaluate(
+        opendriveModel: OpendriveModel,
+        parameters: OpendriveEvaluatorParameters,
+        issueList: DefaultIssueList,
+    ): OpendriveModel {
         var modifiedOpendriveModel = opendriveModel.copy()
 
-        modifiedOpendriveModel = everyRoadSignal.modify(modifiedOpendriveModel) { currentRoadSignal ->
+        modifiedOpendriveModel =
+            everyRoadSignal.modify(modifiedOpendriveModel) { currentRoadSignal ->
 
-            currentRoadSignal.height = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadSignal.height, currentRoadSignal.additionalId, "height", issueList, parameters.numberTolerance)
-            currentRoadSignal.hOffset = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.hOffset, currentRoadSignal.additionalId, "hOffset", issueList)
-            currentRoadSignal.pitch = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.pitch, currentRoadSignal.additionalId, "pitch", issueList)
-            currentRoadSignal.roll = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.roll, currentRoadSignal.additionalId, "roll", issueList)
-            currentRoadSignal.s = BasicDataTypeModifier.modifyToFinitePositiveDouble(currentRoadSignal.s, currentRoadSignal.additionalId, "s", issueList)
-            currentRoadSignal.subtype = BasicDataTypeModifier.modifyToNonBlankString(currentRoadSignal.subtype, currentRoadSignal.additionalId, "subtype", issueList, fallbackValue = "-1")
-            currentRoadSignal.t = BasicDataTypeModifier.modifyToFiniteDouble(currentRoadSignal.t, currentRoadSignal.additionalId, "t", issueList)
-            currentRoadSignal.type = BasicDataTypeModifier.modifyToNonBlankString(currentRoadSignal.type, currentRoadSignal.additionalId, "type", issueList, fallbackValue = "-1")
-            currentRoadSignal.value = BasicDataTypeModifier.modifyToOptionalFiniteDouble(currentRoadSignal.value, currentRoadSignal.additionalId, "value", issueList)
+                currentRoadSignal.height =
+                    BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                        currentRoadSignal.height, currentRoadSignal.additionalId, "height", issueList, parameters.numberTolerance,
+                    )
+                currentRoadSignal.hOffset =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        currentRoadSignal.hOffset, currentRoadSignal.additionalId, "hOffset", issueList,
+                    )
+                currentRoadSignal.pitch =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        currentRoadSignal.pitch, currentRoadSignal.additionalId, "pitch", issueList,
+                    )
+                currentRoadSignal.roll =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        currentRoadSignal.roll, currentRoadSignal.additionalId, "roll", issueList,
+                    )
+                currentRoadSignal.s =
+                    BasicDataTypeModifier.modifyToFinitePositiveDouble(
+                        currentRoadSignal.s, currentRoadSignal.additionalId, "s", issueList,
+                    )
+                currentRoadSignal.subtype =
+                    BasicDataTypeModifier.modifyToNonBlankString(
+                        currentRoadSignal.subtype, currentRoadSignal.additionalId, "subtype", issueList, fallbackValue = "-1",
+                    )
+                currentRoadSignal.t =
+                    BasicDataTypeModifier.modifyToFiniteDouble(
+                        currentRoadSignal.t, currentRoadSignal.additionalId, "t", issueList,
+                    )
+                currentRoadSignal.type =
+                    BasicDataTypeModifier.modifyToNonBlankString(
+                        currentRoadSignal.type, currentRoadSignal.additionalId, "type", issueList, fallbackValue = "-1",
+                    )
+                currentRoadSignal.value =
+                    BasicDataTypeModifier.modifyToOptionalFiniteDouble(
+                        currentRoadSignal.value, currentRoadSignal.additionalId, "value", issueList,
+                    )
 
-            if (currentRoadSignal.value.isSome() && currentRoadSignal.unit.isNone()) {
-                issueList += DefaultIssue.of("UnitAttributeMustBeDefinedWhenValueAttributeIsDefined", "Attribute 'unit' shall be defined, when attribute 'value' is defined.", currentRoadSignal.additionalId, Severity.WARNING, wasFixed = true)
-                currentRoadSignal.unit = EUnit.KILOMETER_PER_HOUR.some()
+                if (currentRoadSignal.value.isSome() && currentRoadSignal.unit.isNone()) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "UnitAttributeMustBeDefinedWhenValueAttributeIsDefined",
+                            "Attribute 'unit' shall be defined, when attribute 'value' is defined.",
+                            currentRoadSignal.additionalId, Severity.WARNING, wasFixed = true,
+                        )
+                    currentRoadSignal.unit = EUnit.KILOMETER_PER_HOUR.some()
+                }
+                currentRoadSignal.width =
+                    BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                        currentRoadSignal.width,
+                        currentRoadSignal.additionalId, "width", issueList, parameters.numberTolerance,
+                    )
+                currentRoadSignal.zOffset =
+                    BasicDataTypeModifier.modifyToFiniteDouble(
+                        currentRoadSignal.zOffset,
+                        currentRoadSignal.additionalId, "zOffset", issueList,
+                    )
+
+                currentRoadSignal.validity.filter { it.fromLane > it.toLane }.forEach { currentValidity ->
+                    issueList +=
+                        DefaultIssue.of(
+                            "LaneValidityElementNotOrdered",
+                            "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.",
+                            currentRoadSignal.additionalId, Severity.ERROR, wasFixed = true,
+                        )
+                    currentValidity.fromLane = min(currentValidity.fromLane, currentValidity.toLane)
+                    currentValidity.toLane = max(currentValidity.fromLane, currentValidity.toLane)
+                }
+
+                currentRoadSignal
             }
-            currentRoadSignal.width = BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(currentRoadSignal.width, currentRoadSignal.additionalId, "width", issueList, parameters.numberTolerance)
-            currentRoadSignal.zOffset = BasicDataTypeModifier.modifyToFiniteDouble(currentRoadSignal.zOffset, currentRoadSignal.additionalId, "zOffset", issueList)
-
-            currentRoadSignal.validity.filter { it.fromLane > it.toLane }.forEach { currentValidity ->
-                issueList += DefaultIssue.of("LaneValidityElementNotOrdered", "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.", currentRoadSignal.additionalId, Severity.ERROR, wasFixed = true)
-                currentValidity.fromLane = min(currentValidity.fromLane, currentValidity.toLane)
-                currentValidity.toLane = max(currentValidity.fromLane, currentValidity.toLane)
-            }
-
-            currentRoadSignal
-        }
 
         return modifiedOpendriveModel
     }

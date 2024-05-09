@@ -28,9 +28,8 @@ import io.rtron.math.transform.AffineSequence3D
 data class Polyhedron3D(
     val polygons: NonEmptyList<Polygon3D>,
     override val tolerance: Double,
-    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
 ) : AbstractSolid3D() {
-
     // Properties and Initializers
     init {
         require(polygons.size >= 4) { "Polyhedron must have at least four polygons." }

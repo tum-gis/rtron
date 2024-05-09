@@ -25,18 +25,20 @@ class DoubleArrayExtensionTest : FunSpec({
     context("TestReshapeByColumnDimension") {
 
         test("test reshape of square matrix") {
-            val expectedMatrix = arrayOf(
-                doubleArrayOf(1.0, 0.0, 0.0, 1.0),
-                doubleArrayOf(0.0, 1.0, 0.0, 2.0),
-                doubleArrayOf(0.0, 0.0, 1.0, 3.0),
-                doubleArrayOf(0.0, 0.0, 0.0, 1.0)
-            )
-            val matrix = doubleArrayOf(
-                1.0, 0.0, 0.0, 1.0,
-                0.0, 1.0, 0.0, 2.0,
-                0.0, 0.0, 1.0, 3.0,
-                0.0, 0.0, 0.0, 1.0
-            )
+            val expectedMatrix =
+                arrayOf(
+                    doubleArrayOf(1.0, 0.0, 0.0, 1.0),
+                    doubleArrayOf(0.0, 1.0, 0.0, 2.0),
+                    doubleArrayOf(0.0, 0.0, 1.0, 3.0),
+                    doubleArrayOf(0.0, 0.0, 0.0, 1.0),
+                )
+            val matrix =
+                doubleArrayOf(
+                    1.0, 0.0, 0.0, 1.0,
+                    0.0, 1.0, 0.0, 2.0,
+                    0.0, 0.0, 1.0, 3.0,
+                    0.0, 0.0, 0.0, 1.0,
+                )
 
             val actualReshapedMatrix = matrix.reshapeByColumnDimension(4)
 
@@ -53,18 +55,20 @@ class DoubleArrayExtensionTest : FunSpec({
         }
 
         test("test reshape of square matrix") {
-            val expectedMatrix = arrayOf(
-                doubleArrayOf(0.0, 0.0, 1.0),
-                doubleArrayOf(1.0, 0.0, 2.0),
-                doubleArrayOf(0.0, 1.0, 3.0),
-                doubleArrayOf(0.0, 0.0, 1.0)
-            )
-            val matrix = doubleArrayOf(
-                0.0, 0.0, 1.0,
-                1.0, 0.0, 2.0,
-                0.0, 1.0, 3.0,
-                0.0, 0.0, 1.0
-            )
+            val expectedMatrix =
+                arrayOf(
+                    doubleArrayOf(0.0, 0.0, 1.0),
+                    doubleArrayOf(1.0, 0.0, 2.0),
+                    doubleArrayOf(0.0, 1.0, 3.0),
+                    doubleArrayOf(0.0, 0.0, 1.0),
+                )
+            val matrix =
+                doubleArrayOf(
+                    0.0, 0.0, 1.0,
+                    1.0, 0.0, 2.0,
+                    0.0, 1.0, 3.0,
+                    0.0, 0.0, 1.0,
+                )
 
             val actualReshapedMatrix = matrix.reshapeByRowDimension(4)
 

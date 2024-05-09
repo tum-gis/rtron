@@ -64,10 +64,10 @@ import io.rtron.model.roadspaces.roadspace.road.Road as RoadspaceRoad
  * Builder for [RoadspaceObject] which correspond to the OpenDRIVE road object class.
  */
 class RoadspaceObjectBuilder(
-    private val parameters: Opendrive2RoadspacesParameters
+    private val parameters: Opendrive2RoadspacesParameters,
 ) {
-
     // Methods
+
     /**
      * Builds up a list of [RoadspaceObject].
      *
@@ -79,7 +79,7 @@ class RoadspaceObjectBuilder(
         roadObjects: OpendriveRoadObjects,
         roadReferenceLine: Curve3D,
         road: RoadspaceRoad,
-        baseAttributes: AttributeList
+        baseAttributes: AttributeList,
     ): ContextIssueList<List<RoadspaceObject>> {
         return roadObjects.roadObject
             .map { buildRoadObject(roadspaceId, it, roadReferenceLine, road, baseAttributes) }
@@ -92,7 +92,7 @@ class RoadspaceObjectBuilder(
         roadObject: OpendriveRoadObject,
         roadReferenceLine: Curve3D,
         road: RoadspaceRoad,
-        baseAttributes: AttributeList
+        baseAttributes: AttributeList,
     ): ContextIssueList<NonEmptyList<RoadspaceObject>> {
         val issueList = DefaultIssueList()
 
@@ -100,45 +100,30 @@ class RoadspaceObjectBuilder(
         val type = getObjectType(roadObject)
 
         // build attributes
-        val attributes = baseAttributes +
-            buildAttributes(roadObject) +
-            buildAttributes(roadObject.curveRelativePosition) +
-            buildAttributes(roadObject.referenceLinePointRelativeRotation)
+        val attributes =
+            baseAttributes +
+                buildAttributes(roadObject) +
+                buildAttributes(roadObject.curveRelativePosition) +
+                buildAttributes(roadObject.referenceLinePointRelativeRotation)
         val laneRelations = buildLaneRelations(roadObject, road)
 
-        val roadObjectsFromRepeat = roadObject.repeat.map { currentRoadObjectRepeat ->
+        val roadObjectsFromRepeat =
+            roadObject.repeat.map { currentRoadObjectRepeat ->
 
-            val repeatIdentifier =
-                currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }
-                    .getOrElse { throw it }
-            val roadspaceObjectId =
-                RoadspaceObjectIdentifier(roadObject.id, repeatIdentifier.repeatIndex.some(), roadObject.name, id)
+                val repeatIdentifier =
+                    currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }
+                        .getOrElse { throw it }
+                val roadspaceObjectId =
+                    RoadspaceObjectIdentifier(roadObject.id, repeatIdentifier.repeatIndex.some(), roadObject.name, id)
 
-            val pointGeometry = buildPointGeometry(currentRoadObjectRepeat, roadReferenceLine)
-            val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
-            val complexGeometry = buildComplexGeometry(
-                roadObject,
-                currentRoadObjectRepeat.some(),
-                roadReferenceLine
-            ).handleIssueList { issueList += it }
-            RoadspaceObject(
-                roadspaceObjectId,
-                type,
-                pointGeometry,
-                boundingBoxGeometry,
-                complexGeometry,
-                laneRelations,
-                attributes
-            )
-        }
-
-        val roadObjects = if (roadObjectsFromRepeat.isEmpty()) {
-            val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, None, roadObject.name, id)
-            val pointGeometry = buildPointGeometry(roadObject, roadReferenceLine)
-            val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
-            val complexGeometry =
-                buildComplexGeometry(roadObject, None, roadReferenceLine).handleIssueList { issueList += it }
-            nonEmptyListOf(
+                val pointGeometry = buildPointGeometry(currentRoadObjectRepeat, roadReferenceLine)
+                val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
+                val complexGeometry =
+                    buildComplexGeometry(
+                        roadObject,
+                        currentRoadObjectRepeat.some(),
+                        roadReferenceLine,
+                    ).handleIssueList { issueList += it }
                 RoadspaceObject(
                     roadspaceObjectId,
                     type,
@@ -146,12 +131,31 @@ class RoadspaceObjectBuilder(
                     boundingBoxGeometry,
                     complexGeometry,
                     laneRelations,
-                    attributes
+                    attributes,
                 )
-            )
-        } else {
-            roadObjectsFromRepeat.toNonEmptyListOrNull()!!
-        }
+            }
+
+        val roadObjects =
+            if (roadObjectsFromRepeat.isEmpty()) {
+                val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, None, roadObject.name, id)
+                val pointGeometry = buildPointGeometry(roadObject, roadReferenceLine)
+                val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
+                val complexGeometry =
+                    buildComplexGeometry(roadObject, None, roadReferenceLine).handleIssueList { issueList += it }
+                nonEmptyListOf(
+                    RoadspaceObject(
+                        roadspaceObjectId,
+                        type,
+                        pointGeometry,
+                        boundingBoxGeometry,
+                        complexGeometry,
+                        laneRelations,
+                        attributes,
+                    ),
+                )
+            } else {
+                roadObjectsFromRepeat.toNonEmptyListOrNull()!!
+            }
 
         // build roadspace object
         return ContextIssueList(roadObjects, issueList)
@@ -179,12 +183,18 @@ class RoadspaceObjectBuilder(
             }
         })
 
-    private fun buildPointGeometry(roadObject: OpendriveRoadObject, roadReferenceLine: Curve3D): Vector3D {
+    private fun buildPointGeometry(
+        roadObject: OpendriveRoadObject,
+        roadReferenceLine: Curve3D,
+    ): Vector3D {
         val curveAffine = roadReferenceLine.calculateAffine(roadObject.curveRelativePosition.toCurveRelative1D())
         return Vector3DBuilder.buildVector3Ds(roadObject, curveAffine)
     }
 
-    private fun buildPointGeometry(roadObjectRepeat: OpendriveRoadObjectRepeat, roadReferenceLine: Curve3D): Vector3D {
+    private fun buildPointGeometry(
+        roadObjectRepeat: OpendriveRoadObjectRepeat,
+        roadReferenceLine: Curve3D,
+    ): Vector3D {
         val curveAffine = roadReferenceLine.calculateAffine(roadObjectRepeat.curveRelativeStartPosition)
         val affineSequence = AffineSequence3D.of(curveAffine)
         return roadObjectRepeat.referenceLinePointRelativePosition.copy(affineSequence = affineSequence)
@@ -192,13 +202,13 @@ class RoadspaceObjectBuilder(
 
     private fun buildBoundingBoxGeometry(
         roadObject: OpendriveRoadObject,
-        roadReferenceLine: Curve3D
+        roadReferenceLine: Curve3D,
     ): Option<AbstractGeometry3D> {
         check(
             roadObject.containsCuboid().toInt() +
                 roadObject.containsCylinder().toInt() +
                 roadObject.containsRectangle().toInt() +
-                roadObject.containsCircle().toInt() <= 1
+                roadObject.containsCircle().toInt() <= 1,
         ) { "Bounding box must only be derived for a single geometry." }
 
         // affine transformation matrix at the curve point of the object
@@ -229,7 +239,7 @@ class RoadspaceObjectBuilder(
     private fun buildComplexGeometry(
         roadObject: OpendriveRoadObject,
         roadObjectRepeat: Option<OpendriveRoadObjectRepeat>,
-        roadReferenceLine: Curve3D
+        roadReferenceLine: Curve3D,
     ): ContextIssueList<Option<AbstractGeometry3D>> {
         val issueList = DefaultIssueList()
 
@@ -238,78 +248,81 @@ class RoadspaceObjectBuilder(
 
         // build up solid geometrical representations
         val geometries = mutableListOf<AbstractGeometry3D>()
-        geometries += Solid3DBuilder.buildPolyhedronsByRoadCorners(
-            roadObject,
-            roadReferenceLine,
-            parameters.numberTolerance
-        ).handleIssueList { issueList += it }
-        geometries += Solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine, parameters.numberTolerance)
-            .handleIssueList { issueList += it }
+        geometries +=
+            Solid3DBuilder.buildPolyhedronsByRoadCorners(
+                roadObject,
+                roadReferenceLine,
+                parameters.numberTolerance,
+            ).handleIssueList { issueList += it }
+        geometries +=
+            Solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine, parameters.numberTolerance)
+                .handleIssueList { issueList += it }
 
         // build up surface geometrical representations
-        geometries += Surface3DBuilder.buildLinearRingsByRoadCorners(
-            roadObject,
-            roadReferenceLine,
-            parameters.numberTolerance
-        ).handleIssueList { issueList += it }
-        geometries += Surface3DBuilder.buildLinearRingsByLocalCorners(
-            roadObject,
-            curveAffine,
-            parameters.numberTolerance
-        ).handleIssueList { issueList += it }
+        geometries +=
+            Surface3DBuilder.buildLinearRingsByRoadCorners(
+                roadObject,
+                roadReferenceLine,
+                parameters.numberTolerance,
+            ).handleIssueList { issueList += it }
+        geometries +=
+            Surface3DBuilder.buildLinearRingsByLocalCorners(
+                roadObject,
+                curveAffine,
+                parameters.numberTolerance,
+            ).handleIssueList { issueList += it }
 
         roadObjectRepeat.onSome { currentRepeat ->
-            geometries += Solid3DBuilder.buildParametricSweep(
-                currentRepeat,
-                roadReferenceLine,
-                parameters.numberTolerance
-            ).toList()
-            geometries += Surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(
-                currentRepeat,
-                roadReferenceLine,
-                parameters.numberTolerance
-            )
-            geometries += Surface3DBuilder.buildParametricBoundedSurfacesByVerticalRepeat(
-                currentRepeat,
-                roadReferenceLine,
-                parameters.numberTolerance
-            )
+            geometries +=
+                Solid3DBuilder.buildParametricSweep(
+                    currentRepeat,
+                    roadReferenceLine,
+                    parameters.numberTolerance,
+                ).toList()
+            geometries +=
+                Surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(
+                    currentRepeat,
+                    roadReferenceLine,
+                    parameters.numberTolerance,
+                )
+            geometries +=
+                Surface3DBuilder.buildParametricBoundedSurfacesByVerticalRepeat(
+                    currentRepeat,
+                    roadReferenceLine,
+                    parameters.numberTolerance,
+                )
 
             if (currentRepeat.containsRepeatedCuboid()) {
-                issueList += DefaultIssue.of(
-                    "RepeatCuboidNotSupported",
-                    "Cuboid geometries in the repeat elements are currently not supported.",
-                    roadObject.additionalId,
-                    Severity.WARNING,
-                    wasFixed = false
-                )
+                issueList +=
+                    DefaultIssue.of(
+                        "RepeatCuboidNotSupported",
+                        "Cuboid geometries in the repeat elements are currently not supported.",
+                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                    )
             }
             if (currentRepeat.containsRepeatCylinder()) {
-                issueList += DefaultIssue.of(
-                    "RepeatCylinderNotSupported",
-                    "Cylinder geometries in the repeat elements are currently not supported.",
-                    roadObject.additionalId,
-                    Severity.WARNING,
-                    wasFixed = false
-                )
+                issueList +=
+                    DefaultIssue.of(
+                        "RepeatCylinderNotSupported",
+                        "Cylinder geometries in the repeat elements are currently not supported.",
+                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                    )
             }
             if (currentRepeat.containsRepeatedRectangle()) {
-                issueList += DefaultIssue.of(
-                    "RepeatRectangleNotSupported",
-                    "Rectangle geometries in the repeat elements are currently not supported.",
-                    roadObject.additionalId,
-                    Severity.WARNING,
-                    wasFixed = false
-                )
+                issueList +=
+                    DefaultIssue.of(
+                        "RepeatRectangleNotSupported",
+                        "Rectangle geometries in the repeat elements are currently not supported.",
+                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                    )
             }
             if (currentRepeat.containsRepeatCircle()) {
-                issueList += DefaultIssue.of(
-                    "RepeatCircleNotSupported",
-                    "Circle geometries in the repeat elements are currently not supported.",
-                    roadObject.additionalId,
-                    Severity.WARNING,
-                    wasFixed = false
-                )
+                issueList +=
+                    DefaultIssue.of(
+                        "RepeatCircleNotSupported",
+                        "Circle geometries in the repeat elements are currently not supported.",
+                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                    )
             }
         }
 
@@ -317,13 +330,12 @@ class RoadspaceObjectBuilder(
         geometries += Curve3DBuilder.buildCurve3D(roadObject, roadReferenceLine, parameters.numberTolerance)
 
         if (geometries.size > 1) {
-            issueList += DefaultIssue.of(
-                "MultipleComplexGeometriesNotSupported",
-                "Conversion of road objects with multiple complex geometries is currently not supported.",
-                roadObject.additionalId,
-                Severity.WARNING,
-                wasFixed = false
-            )
+            issueList +=
+                DefaultIssue.of(
+                    "MultipleComplexGeometriesNotSupported",
+                    "Conversion of road objects with multiple complex geometries is currently not supported.",
+                    roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                )
         }
         val builtGeometry = if (geometries.isEmpty()) None else Some(geometries.first())
         return ContextIssueList(builtGeometry, issueList)
@@ -370,7 +382,7 @@ class RoadspaceObjectBuilder(
         roadSignals: RoadSignals,
         roadReferenceLine: Curve3D,
         road: RoadspaceRoad,
-        baseAttributes: AttributeList
+        baseAttributes: AttributeList,
     ): ContextIssueList<List<RoadspaceObject>> {
         return roadSignals.signal.map { buildRoadSignalsSignal(id, it, roadReferenceLine, road, baseAttributes) }
             .mergeIssueLists()
@@ -381,7 +393,7 @@ class RoadspaceObjectBuilder(
         roadSignal: RoadSignalsSignal,
         roadReferenceLine: Curve3D,
         road: RoadspaceRoad,
-        baseAttributes: AttributeList
+        baseAttributes: AttributeList,
     ): ContextIssueList<RoadspaceObject> {
         val issueList = DefaultIssueList()
 
@@ -391,20 +403,22 @@ class RoadspaceObjectBuilder(
         val complexGeometry =
             buildComplexGeometry(roadSignal, roadReferenceLine).handleIssueList { issueList += it }
         val laneRelations = buildLaneRelations(roadSignal, road)
-        val attributes = baseAttributes +
-            buildAttributes(roadSignal) +
-            buildAttributes(roadSignal.curveRelativePosition) +
-            buildAttributes(roadSignal.referenceLinePointRelativeRotation)
+        val attributes =
+            baseAttributes +
+                buildAttributes(roadSignal) +
+                buildAttributes(roadSignal.curveRelativePosition) +
+                buildAttributes(roadSignal.referenceLinePointRelativeRotation)
 
-        val roadspaceObject = RoadspaceObject(
-            objectId,
-            RoadObjectType.SIGNAL,
-            pointGeometry,
-            None,
-            complexGeometry,
-            laneRelations,
-            attributes
-        )
+        val roadspaceObject =
+            RoadspaceObject(
+                objectId,
+                RoadObjectType.SIGNAL,
+                pointGeometry,
+                None,
+                complexGeometry,
+                laneRelations,
+                attributes,
+            )
         return ContextIssueList(roadspaceObject, issueList)
     }
 
@@ -425,14 +439,17 @@ class RoadspaceObjectBuilder(
             }
         }
 
-    private fun buildPointGeometry(signal: RoadSignalsSignal, roadReferenceLine: Curve3D): Vector3D {
+    private fun buildPointGeometry(
+        signal: RoadSignalsSignal,
+        roadReferenceLine: Curve3D,
+    ): Vector3D {
         val curveAffine = roadReferenceLine.calculateAffine(signal.curveRelativePosition.toCurveRelative1D())
         return Vector3DBuilder.buildVector3Ds(signal, curveAffine)
     }
 
     private fun buildComplexGeometry(
         signal: RoadSignalsSignal,
-        roadReferenceLine: Curve3D
+        roadReferenceLine: Curve3D,
     ): ContextIssueList<Option<AbstractSurface3D>> {
         val issueList = DefaultIssueList()
 
@@ -442,26 +459,24 @@ class RoadspaceObjectBuilder(
         if (signal.containsRectangle()) {
             return ContextIssueList(
                 Surface3DBuilder.buildRectangle(signal, curveAffine, parameters.numberTolerance).some(),
-                issueList
+                issueList,
             )
         }
         if (signal.containsHorizontalLine()) {
-            issueList += DefaultIssue.of(
-                "SignalHorizontalLineNotSupported",
-                "Horizontal line geometry in road signal is currently not supported.",
-                signal.additionalId,
-                Severity.WARNING,
-                wasFixed = false
-            )
+            issueList +=
+                DefaultIssue.of(
+                    "SignalHorizontalLineNotSupported",
+                    "Horizontal line geometry in road signal is currently not supported.",
+                    signal.additionalId, Severity.WARNING, wasFixed = false,
+                )
         }
         if (signal.containsVerticalLine()) {
-            issueList += DefaultIssue.of(
-                "SignalVerticalLineNotSupported",
-                "Vertical line geometry in road signal is currently not supported.",
-                signal.additionalId,
-                Severity.WARNING,
-                wasFixed = false
-            )
+            issueList +=
+                DefaultIssue.of(
+                    "SignalVerticalLineNotSupported",
+                    "Vertical line geometry in road signal is currently not supported.",
+                    signal.additionalId, Severity.WARNING, wasFixed = false,
+                )
         }
 
         return ContextIssueList(None, issueList)
@@ -469,7 +484,7 @@ class RoadspaceObjectBuilder(
 
     private fun buildLaneRelations(
         roadObject: OpendriveRoadObject,
-        road: RoadspaceRoad
+        road: RoadspaceRoad,
     ): List<LateralLaneRangeIdentifier> {
         val laneSection =
             road.getLaneSection(roadObject.curveRelativePosition.toCurveRelative1D()).getOrElse { throw it }
@@ -483,7 +498,7 @@ class RoadspaceObjectBuilder(
 
     private fun buildLaneRelations(
         roadSignal: RoadSignalsSignal,
-        road: RoadspaceRoad
+        road: RoadspaceRoad,
     ): List<LateralLaneRangeIdentifier> {
         val laneSection =
             road.getLaneSection(roadSignal.curveRelativePosition.toCurveRelative1D()).getOrElse { throw it }

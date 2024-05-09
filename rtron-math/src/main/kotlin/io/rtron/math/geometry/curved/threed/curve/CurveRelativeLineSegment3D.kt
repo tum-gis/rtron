@@ -36,9 +36,8 @@ class CurveRelativeLineSegment3D(
     val start: CurveRelativeVector3D,
     val end: CurveRelativeVector3D,
     override val tolerance: Double,
-    val endBoundType: BoundType = BoundType.CLOSED
+    val endBoundType: BoundType = BoundType.CLOSED,
 ) : CurveRelativeAbstractGeometry3D(), Tolerable {
-
     // Properties and Initializers
     init {
         require(start != end) { "Start and end vector must not be identical." }
@@ -46,18 +45,22 @@ class CurveRelativeLineSegment3D(
     }
 
     companion object {
-
         /**
          * Creates a [LineSegment3D], if [start] and [end] [Vector3D] are not fuzzily equal according to the [tolerance].
          *
          */
-        fun of(start: CurveRelativeVector3D, end: CurveRelativeVector3D, tolerance: Double, endBoundType: BoundType = BoundType.CLOSED): Either<IllegalArgumentException, CurveRelativeLineSegment3D> =
+        fun of(
+            start: CurveRelativeVector3D,
+            end: CurveRelativeVector3D,
+            tolerance: Double,
+            endBoundType: BoundType = BoundType.CLOSED,
+        ): Either<IllegalArgumentException, CurveRelativeLineSegment3D> =
             if (start.fuzzyEquals(end, tolerance)) {
                 Either.Left(
                     IllegalArgumentException(
                         "Start and end vector of a line segment must be different " +
-                            "according to the given tolerance."
-                    )
+                            "according to the given tolerance.",
+                    ),
                 )
             } else {
                 Either.Right(CurveRelativeLineSegment3D(start, end, tolerance, endBoundType))

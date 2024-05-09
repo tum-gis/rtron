@@ -33,7 +33,6 @@ import io.rtron.std.isStrictlySortedBy
  * Builder for functions of the OpenDRIVE data model.
  */
 object FunctionBuilder {
-
     // Methods
 
     /**
@@ -48,7 +47,7 @@ object FunctionBuilder {
             superelevation.map { it.s },
             superelevation.map { it.coefficients },
             prependConstant = true,
-            prependConstantValue = 0.0
+            prependConstantValue = 0.0,
         )
     }
 
@@ -58,13 +57,21 @@ object FunctionBuilder {
      * @param roadLateralProfileShape the cross-sectional profile of a road at a certain curve position
      */
     fun buildLateralShape(roadLateralProfileShape: NonEmptyList<RoadLateralProfileShape>): UnivariateFunction {
-        require(roadLateralProfileShape.all { it.s == roadLateralProfileShape.first().s }) { "All lateral profile shape elements must have the same curve position." }
-        require(roadLateralProfileShape.isStrictlySortedBy { it.t }) { "Lateral profile shape entries must be sorted in strict order according to t." }
+        require(
+            roadLateralProfileShape.all {
+                it.s == roadLateralProfileShape.first().s
+            },
+        ) { "All lateral profile shape elements must have the same curve position." }
+        require(
+            roadLateralProfileShape.isStrictlySortedBy {
+                it.t
+            },
+        ) { "Lateral profile shape entries must be sorted in strict order according to t." }
 
         return ConcatenatedFunction.ofPolynomialFunctions(
             roadLateralProfileShape.map { it.t },
             roadLateralProfileShape.map { it.coefficients },
-            prependConstant = true
+            prependConstant = true,
         )
     }
 
@@ -78,7 +85,7 @@ object FunctionBuilder {
             laneOffsets.map { it.s },
             laneOffsets.map { it.coefficients },
             prependConstant = true,
-            prependConstantValue = 0.0
+            prependConstantValue = 0.0,
         )
     }
 
@@ -88,15 +95,20 @@ object FunctionBuilder {
      * @param laneWidthEntries entries containing coefficients for polynomial functions
      * @return function describing the width of a lane
      */
-    fun buildLaneWidth(laneWidthEntries: NonEmptyList<RoadLanesLaneSectionLRLaneWidth>, numberTolerance: Double): UnivariateFunction {
-        require(laneWidthEntries.isStrictlySortedBy { it.sOffset }) { "Width entries of lane must be strictly sorted according to sOffset." }
+    fun buildLaneWidth(
+        laneWidthEntries: NonEmptyList<RoadLanesLaneSectionLRLaneWidth>,
+        numberTolerance: Double,
+    ): UnivariateFunction {
+        require(
+            laneWidthEntries.isStrictlySortedBy { it.sOffset },
+        ) { "Width entries of lane must be strictly sorted according to sOffset." }
         require(laneWidthEntries.head.sOffset < numberTolerance) { "First width entry must start with sOffset=0.0." }
 
         return ConcatenatedFunction.ofPolynomialFunctions(
             laneWidthEntries.map { it.sOffset },
             laneWidthEntries.map { it.coefficients },
             prependConstant = true,
-            prependConstantValue = 0.0
+            prependConstantValue = 0.0,
         )
     }
 
@@ -108,12 +120,15 @@ object FunctionBuilder {
      * @param roadReferenceLine road's height
      * @return function of the object's absolute height
      */
-    fun buildStackedHeightFunctionFromRepeat(repeat: RoadObjectsObjectRepeat, roadReferenceLine: Curve3D):
-        StackedFunction {
-        val heightFunctionSection = SectionedUnivariateFunction(
-            roadReferenceLine.heightFunction,
-            repeat.getRoadReferenceLineParameterSection()
-        )
+    fun buildStackedHeightFunctionFromRepeat(
+        repeat: RoadObjectsObjectRepeat,
+        roadReferenceLine: Curve3D,
+    ): StackedFunction {
+        val heightFunctionSection =
+            SectionedUnivariateFunction(
+                roadReferenceLine.heightFunction,
+                repeat.getRoadReferenceLineParameterSection(),
+            )
         return StackedFunction.ofSum(heightFunctionSection, repeat.getHeightOffsetFunction())
     }
 }

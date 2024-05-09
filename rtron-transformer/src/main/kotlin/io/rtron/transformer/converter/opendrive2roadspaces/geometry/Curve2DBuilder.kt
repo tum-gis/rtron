@@ -48,7 +48,6 @@ import io.rtron.std.isStrictlySortedBy
  * Builder for curves in 2D from the OpenDRIVE data model.
  */
 object Curve2DBuilder {
-
     // Methods
 
     /**
@@ -60,10 +59,16 @@ object Curve2DBuilder {
         planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>,
         numberTolerance: Double,
         distanceTolerance: Double,
-        angleTolerance: Double
+        angleTolerance: Double,
     ): CompositeCurve2D {
-        require(planViewGeometryList.all { it.length > numberTolerance }) { "All plan view geometry elements must have a length greater than zero (above the tolerance threshold)." }
-        require(planViewGeometryList.isStrictlySortedBy { it.s }) { "Plan view geometry elements must be sorted in strict order according to s." }
+        require(
+            planViewGeometryList.all {
+                it.length > numberTolerance
+            },
+        ) { "All plan view geometry elements must have a length greater than zero (above the tolerance threshold)." }
+        require(
+            planViewGeometryList.isStrictlySortedBy { it.s },
+        ) { "Plan view geometry elements must be sorted in strict order according to s." }
 
         val (curveMembers, absoluteDomains, absoluteStarts) = prepareCurveMembers(planViewGeometryList, numberTolerance)
 
@@ -74,21 +79,25 @@ object Curve2DBuilder {
     /**
      * Prepares the list of [RoadPlanViewGeometry] for constructing the composite curve.
      */
-    fun prepareCurveMembers(planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>, numberTolerance: Double):
-        Triple<List<AbstractCurve2D>, List<Range<Double>>, List<Double>> {
+    fun prepareCurveMembers(
+        planViewGeometryList: NonEmptyList<RoadPlanViewGeometry>,
+        numberTolerance: Double,
+    ): Triple<List<AbstractCurve2D>, List<Range<Double>>, List<Double>> {
         // absolute positions for each curve member
         val absoluteStarts: List<Double> = planViewGeometryList.map { it.s }
         // domains for each curve member
-        val absoluteDomains: List<Range<Double>> = absoluteStarts
-            .zipWithNext().map { Range.closedOpen(it.first, it.second) } +
-            Range.closed(absoluteStarts.last(), absoluteStarts.last() + planViewGeometryList.last().length)
+        val absoluteDomains: List<Range<Double>> =
+            absoluteStarts
+                .zipWithNext().map { Range.closedOpen(it.first, it.second) } +
+                Range.closed(absoluteStarts.last(), absoluteStarts.last() + planViewGeometryList.last().length)
         // length derived from absolute values to increase robustness
         val lengths: List<Double> = absoluteDomains.map { it.length }
 
         // construct individual curve members
-        val curveMembers = planViewGeometryList.zip(lengths).dropLast(1)
-            .map { buildPlanViewGeometry(it.first, it.second, BoundType.OPEN, numberTolerance) } +
-            buildPlanViewGeometry(planViewGeometryList.last(), lengths.last(), BoundType.CLOSED, numberTolerance)
+        val curveMembers =
+            planViewGeometryList.zip(lengths).dropLast(1)
+                .map { buildPlanViewGeometry(it.first, it.second, BoundType.OPEN, numberTolerance) } +
+                buildPlanViewGeometry(planViewGeometryList.last(), lengths.last(), BoundType.CLOSED, numberTolerance)
 
         return Triple(curveMembers, absoluteDomains, absoluteStarts)
     }
@@ -104,25 +113,29 @@ object Curve2DBuilder {
         geometry: RoadPlanViewGeometry,
         length: Double,
         endBoundType: BoundType = BoundType.OPEN,
-        numberTolerance: Double
+        numberTolerance: Double,
     ): AbstractCurve2D {
         require(
             fuzzyEquals(
                 geometry.length,
                 length,
-                numberTolerance
-            )
-        ) { "Plan view geometry element (s=${geometry.s}) contains a length value that does not match the start value of the next geometry element." }
+                numberTolerance,
+            ),
+        ) {
+            "Plan view geometry element (s=${geometry.s}) contains a length value that does not match " +
+                "the start value of the next geometry element."
+        }
 
         val startPose = Pose2D(Vector2D(geometry.x, geometry.y), Rotation2D(geometry.hdg))
         val affineSequence = AffineSequence2D(Affine2D.of(startPose))
 
         geometry.spiral.onSome {
-            val curvatureFunction = LinearFunction.ofInclusiveInterceptAndPoint(
-                it.curvStart,
-                length,
-                it.curvEnd
-            )
+            val curvatureFunction =
+                LinearFunction.ofInclusiveInterceptAndPoint(
+                    it.curvStart,
+                    length,
+                    it.curvEnd,
+                )
             return SpiralSegment2D(curvatureFunction, numberTolerance, affineSequence, endBoundType)
         }
 
@@ -132,7 +145,7 @@ object Curve2DBuilder {
                 length,
                 numberTolerance,
                 affineSequence,
-                endBoundType
+                endBoundType,
             )
         }
 
@@ -142,7 +155,7 @@ object Curve2DBuilder {
                 length,
                 numberTolerance,
                 affineSequence,
-                endBoundType
+                endBoundType,
             )
         }
 
@@ -150,18 +163,19 @@ object Curve2DBuilder {
             return if (it.isNormalized()) {
                 val parameterTransformation: (CurveRelativeVector1D) -> CurveRelativeVector1D =
                     { curveRelativePoint -> curveRelativePoint / length }
-                val baseCurve = ParametricCubicCurve2D(
-                    it.coefficientsU,
-                    it.coefficientsV,
-                    1.0,
-                    numberTolerance,
-                    affineSequence,
-                    endBoundType
-                )
+                val baseCurve =
+                    ParametricCubicCurve2D(
+                        it.coefficientsU,
+                        it.coefficientsV,
+                        1.0,
+                        numberTolerance,
+                        affineSequence,
+                        endBoundType,
+                    )
                 ParameterTransformedCurve2D(
                     baseCurve,
                     parameterTransformation,
-                    Range.closedX(0.0, length, endBoundType)
+                    Range.closedX(0.0, length, endBoundType),
                 )
             } else {
                 ParametricCubicCurve2D(
@@ -170,7 +184,7 @@ object Curve2DBuilder {
                     length,
                     numberTolerance,
                     affineSequence,
-                    endBoundType
+                    endBoundType,
                 )
             }
         }
@@ -185,15 +199,18 @@ object Curve2DBuilder {
     fun buildLateralTranslatedCurve(
         repeat: RoadObjectsObjectRepeat,
         roadReferenceLine: Curve3D,
-        numberTolerance: Double
+        numberTolerance: Double,
     ): LateralTranslatedCurve2D {
         val repeatObjectDomain = repeat.getRoadReferenceLineParameterSection()
         require(
             roadReferenceLine.curveXY.domain.fuzzyEncloses(
                 repeatObjectDomain,
-                numberTolerance
-            )
-        ) { "Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (${roadReferenceLine.curveXY.domain}) according to the tolerance." }
+                numberTolerance,
+            ),
+        ) {
+            "Domain of repeat road object ($repeatObjectDomain) is not enclosed by the domain of the reference line (" +
+                "${roadReferenceLine.curveXY.domain}) according to the tolerance."
+        }
 
         val section = SectionedCurve2D(roadReferenceLine.curveXY, repeatObjectDomain)
         return LateralTranslatedCurve2D(section, repeat.getLateralOffsetFunction(), numberTolerance)

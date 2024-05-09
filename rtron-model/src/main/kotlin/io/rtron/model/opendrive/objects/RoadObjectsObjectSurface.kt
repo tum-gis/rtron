@@ -21,5 +21,5 @@ import arrow.core.Option
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectSurface(
-    var crg: Option<RoadObjectsObjectSurfaceCrg> = None
+    var crg: Option<RoadObjectsObjectSurfaceCrg> = None,
 ) : OpendriveElement()

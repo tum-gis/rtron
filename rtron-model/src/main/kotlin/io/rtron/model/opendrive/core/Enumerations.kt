@@ -17,18 +17,28 @@
 package io.rtron.model.opendrive.core
 
 enum class EDataQualityRawDataPostProcessing { RAW, CLEANED, PROCESSED, FUSED }
+
 enum class EDataQualityRawDataSource { SENSOR, CADASTER, CUSTOM }
 
 enum class EUnitDistance { METER, KILOMETER, FEET, MILE }
+
 enum class EUnitSpeed { METER_PER_SECOND, MILES_PER_HOUR, KILOMETER_PER_HOUR }
+
 enum class EUnitMass { KILOGRAM, TON }
+
 enum class EUnitSlope { PERCENT }
 
 enum class EUnit {
-    METER, KILOMETER, FEET, MILE, // EUnitDistance
-    METER_PER_SECOND, MILES_PER_HOUR, KILOMETER_PER_HOUR, // EUnitSpeed
-    KILOGRAM, TON, // EUnitMass
-    PERCENT // EUnit
+    METER,
+    KILOMETER,
+    FEET,
+    MILE, // EUnitDistance
+    METER_PER_SECOND,
+    MILES_PER_HOUR,
+    KILOMETER_PER_HOUR, // EUnitSpeed
+    KILOGRAM,
+    TON, // EUnitMass
+    PERCENT, // EUnit
 }
 
 // see: https://github.com/lukes/ISO-3166-Countries-with-Regional-Codes/blob/master/all/all.csv
@@ -281,5 +291,5 @@ enum class ECountryCode {
     EH, // Western Sahara
     YE, // Yemen
     ZM, // Zambia
-    ZW // Zimbabwe
+    ZW, // Zimbabwe
 }

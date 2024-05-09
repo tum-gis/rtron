@@ -23,10 +23,9 @@ import io.rtron.model.roadspaces.roadspace.road.LaneType
  * Feature router of [Lane] (RoadSpace model) to the [CitygmlTargetFeatureType] (CityGML model).
  */
 object LaneRouter {
-
     enum class CitygmlTargetFeatureType {
         TRANSPORTATION_TRAFFICSPACE,
-        TRANSPORTATION_AUXILIARYTRAFFICSPACE
+        TRANSPORTATION_AUXILIARYTRAFFICSPACE,
     }
 
     /**

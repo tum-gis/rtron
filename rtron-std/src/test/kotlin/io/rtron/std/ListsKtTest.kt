@@ -28,11 +28,12 @@ class ListsKtTest : FunSpec({
             val listB = listOf(true, true, false)
             val expectedList = listOf(false, false, true, true, false, false, false)
 
-            val actualList = listA.moveWindow(
-                listB,
-                { baseElement, otherElement -> baseElement && otherElement },
-                { a, b -> a || b }
-            )
+            val actualList =
+                listA.moveWindow(
+                    listB,
+                    { baseElement, otherElement -> baseElement && otherElement },
+                    { a, b -> a || b },
+                )
 
             actualList shouldBe expectedList
         }
@@ -45,7 +46,7 @@ class ListsKtTest : FunSpec({
                 listA.moveWindow(
                     listB,
                     { baseElement, otherElement -> baseElement && otherElement },
-                    { a, b -> a || b }
+                    { a, b -> a || b },
                 )
             }
         }
@@ -58,7 +59,7 @@ class ListsKtTest : FunSpec({
                 listA.moveWindow(
                     listB,
                     { baseElement, otherElement -> baseElement && otherElement },
-                    { a, b -> a || b }
+                    { a, b -> a || b },
                 )
             }
         }
@@ -68,12 +69,13 @@ class ListsKtTest : FunSpec({
             val listB = listOf(true, true, false)
             val expectedList = listOf(false, false, true, true, false)
 
-            val actualList = listA.moveWindow(
-                listB,
-                { baseElement, otherElement -> baseElement && otherElement },
-                { a, b -> a || b },
-                shape = MovingWindowShape.SAME
-            )
+            val actualList =
+                listA.moveWindow(
+                    listB,
+                    { baseElement, otherElement -> baseElement && otherElement },
+                    { a, b -> a || b },
+                    shape = MovingWindowShape.SAME,
+                )
 
             actualList shouldBe expectedList
         }
@@ -83,11 +85,12 @@ class ListsKtTest : FunSpec({
             val listB = listOf(1.0, 1.0, 0.0)
             val expectedList = listOf(0.0, 2.0, 3.0, 1.0, 0.0, 0.0, 0.0)
 
-            val actualList = listA.moveWindow(
-                listB,
-                { baseElement, otherElement -> baseElement * otherElement },
-                { a, b -> a + b }
-            )
+            val actualList =
+                listA.moveWindow(
+                    listB,
+                    { baseElement, otherElement -> baseElement * otherElement },
+                    { a, b -> a + b },
+                )
 
             actualList shouldBe expectedList
         }

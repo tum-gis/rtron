@@ -30,14 +30,16 @@ sealed class Attribute(val name: String)
  * Attribute with a [name] containing a certain string [value].
  */
 class StringAttribute(name: String, val value: String) : Attribute(name) {
-
     // Properties and Initializers
     init {
         require(value.isNotBlank()) { "String value must not be blank." }
     }
 
     companion object {
-        fun of(name: String, value: String): Option<StringAttribute> =
+        fun of(
+            name: String,
+            value: String,
+        ): Option<StringAttribute> =
             if (value.isEmpty()) {
                 None
             } else {
@@ -55,14 +57,16 @@ class IntAttribute(name: String, val value: Int) : Attribute(name)
  * Attribute with a [name] containing a certain double [value].
  */
 class DoubleAttribute(name: String, val value: Double) : Attribute(name) {
-
     // Properties and Initializers
     init {
         require(value.isFinite()) { "Value must be finite." }
     }
 
     companion object {
-        fun of(name: String, value: Double): Option<DoubleAttribute> =
+        fun of(
+            name: String,
+            value: Double,
+        ): Option<DoubleAttribute> =
             if (!value.isFinite()) {
                 None
             } else {
@@ -82,14 +86,17 @@ class BooleanAttribute(name: String, val value: Boolean) : Attribute(name)
  * @param uom unit of measure of the value
  */
 class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) : Attribute(name) {
-
     // Properties and Initializers
     init {
         require(value.isFinite()) { "Value must be finite." }
     }
 
     companion object {
-        fun of(name: String, value: Double, uom: UnitOfMeasure): Option<MeasureAttribute> =
+        fun of(
+            name: String,
+            value: Double,
+            uom: UnitOfMeasure,
+        ): Option<MeasureAttribute> =
             if (value.isNaN()) {
                 None
             } else {
@@ -104,7 +111,6 @@ class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) 
  * @param name name of the list
  */
 class AttributeList(val attributes: List<Attribute> = emptyList(), name: String = "") : Attribute(name) {
-
     // Operators
     operator fun plus(other: AttributeList): AttributeList {
         require(this.name == other.name) { "Merging of attribute lists requires the same name." }

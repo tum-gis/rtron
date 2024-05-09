@@ -24,13 +24,11 @@ import io.rtron.math.projection.CoordinateReferenceSystem
  */
 data class Header(
     val coordinateReferenceSystem: Option<CoordinateReferenceSystem>,
-
     val name: Option<String>,
     val date: Option<String>,
     val vendor: Option<String>,
-
     val north: Double = Double.NaN,
     val south: Double = Double.NaN,
     val east: Double = Double.NaN,
-    val west: Double = Double.NaN
+    val west: Double = Double.NaN,
 )

@@ -84,15 +84,16 @@ class Polygon3DTest : FunSpec({
         }
 
         test("test planar quadrilateral polygon") {
-            val planarQuadrilateral = Polygon3D(
-                nonEmptyListOf(
-                    Vector3D.ZERO,
-                    Vector3D.X_AXIS,
-                    Vector3D(1.0, 0.0, 1.0),
-                    Vector3D.Z_AXIS
-                ),
-                0.0
-            )
+            val planarQuadrilateral =
+                Polygon3D(
+                    nonEmptyListOf(
+                        Vector3D.ZERO,
+                        Vector3D.X_AXIS,
+                        Vector3D(1.0, 0.0, 1.0),
+                        Vector3D.Z_AXIS,
+                    ),
+                    0.0,
+                )
             val expectedResult = Vector3D(0.0, -1.0, 0.0)
 
             val actualNormal = planarQuadrilateral.getNormal().shouldBeRight()

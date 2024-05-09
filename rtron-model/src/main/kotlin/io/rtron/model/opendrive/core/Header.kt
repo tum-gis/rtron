@@ -24,7 +24,6 @@ import arrow.optics.optics
 data class Header(
     var geoReference: Option<HeaderGeoReference> = None,
     var offset: Option<HeaderOffset> = None,
-
     var date: Option<String> = None,
     var east: Option<Double> = None,
     var name: Option<String> = None,
@@ -34,8 +33,7 @@ data class Header(
     var south: Option<Double> = None,
     var vendor: Option<String> = None,
     var version: Option<String> = None,
-    var west: Option<Double> = None
+    var west: Option<Double> = None,
 ) : OpendriveElement() {
-
     companion object
 }

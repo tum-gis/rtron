@@ -37,9 +37,8 @@ import io.rtron.math.range.fuzzyEncloses
 data class ParameterTransformedCurve2D(
     private val baseCurve: AbstractCurve2D,
     private val transformationFunction: (CurveRelativeVector1D) -> CurveRelativeVector1D,
-    override val domain: Range<Double>
+    override val domain: Range<Double>,
 ) : AbstractCurve2D() {
-
     // Properties and Initializers
 
     init {
@@ -48,13 +47,16 @@ data class ParameterTransformedCurve2D(
 
         val lowerEndpoint = transformationFunction(CurveRelativeVector1D(domain.lowerEndpointOrNull()!!))
         val upperEndpoint = transformationFunction(CurveRelativeVector1D(domain.upperEndpointOrNull()!!))
-        val transformedDomain = Range.range(
-            domain.lowerBoundType(),
-            lowerEndpoint.curvePosition,
-            domain.upperBoundType(),
-            upperEndpoint.curvePosition
-        )
-        require(baseCurve.domain.fuzzyEncloses(transformedDomain, tolerance)) { "The base curve must be defined everywhere where the parameter transformed curve is also defined." }
+        val transformedDomain =
+            Range.range(
+                domain.lowerBoundType(),
+                lowerEndpoint.curvePosition,
+                domain.upperBoundType(),
+                upperEndpoint.curvePosition,
+            )
+        require(baseCurve.domain.fuzzyEncloses(transformedDomain, tolerance)) {
+            "The base curve must be defined everywhere where the parameter transformed curve is also defined."
+        }
     }
 
     override val tolerance: Double get() = baseCurve.tolerance

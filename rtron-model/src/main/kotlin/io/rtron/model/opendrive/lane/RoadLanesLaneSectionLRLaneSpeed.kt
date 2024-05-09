@@ -24,5 +24,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 data class RoadLanesLaneSectionLRLaneSpeed(
     var max: Double = Double.NaN,
     var sOffset: Double = Double.NaN,
-    var unit: Option<EUnitSpeed> = None
+    var unit: Option<EUnitSpeed> = None,
 ) : OpendriveElement()

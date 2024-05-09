@@ -47,7 +47,6 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class])
 abstract class Opendrive17ObjectMapper {
-
     //
     // Road objects
     //
@@ -61,43 +60,64 @@ abstract class Opendrive17ObjectMapper {
     //
     abstract fun mapRoadObjectsObject(source: RoadObjectsObject): T_Road_Objects_Object
 
-    fun mapOptionRoadObjectsObjectParkingSpace(source: Option<RoadObjectsObjectParkingSpace>): T_Road_Objects_Object_ParkingSpace? = source.fold({ null }, { mapRoadObjectsObjectParkingSpace(it) })
+    fun mapOptionRoadObjectsObjectParkingSpace(source: Option<RoadObjectsObjectParkingSpace>): T_Road_Objects_Object_ParkingSpace? =
+        source.fold({
+            null
+        }, { mapRoadObjectsObjectParkingSpace(it) })
+
     abstract fun mapRoadObjectsObjectParkingSpace(source: RoadObjectsObjectParkingSpace): T_Road_Objects_Object_ParkingSpace
 
-    fun mapOptionRoadObjectsObjectMarkings(source: Option<RoadObjectsObjectMarkings>): T_Road_Objects_Object_Markings? = source.fold({ null }, { mapRoadObjectsObjectMarkings(it) })
+    fun mapOptionRoadObjectsObjectMarkings(source: Option<RoadObjectsObjectMarkings>): T_Road_Objects_Object_Markings? =
+        source.fold({
+            null
+        }, { mapRoadObjectsObjectMarkings(it) })
+
     abstract fun mapRoadObjectsObjectMarkings(source: RoadObjectsObjectMarkings): T_Road_Objects_Object_Markings
 
     fun mapOptionEOrientation(source: Option<EOrientation>): String? = source.fold({ null }, { mapEOrientation(it) })
-    fun mapEOrientation(source: EOrientation): String = when (source) {
-        EOrientation.PLUS -> "+"
-        EOrientation.MINUS -> "-"
-        EOrientation.NONE -> "none"
-    }
+
+    fun mapEOrientation(source: EOrientation): String =
+        when (source) {
+            EOrientation.PLUS -> "+"
+            EOrientation.MINUS -> "-"
+            EOrientation.NONE -> "none"
+        }
 
     fun mapOptionFillType(source: Option<EOutlineFillType>): E_OutlineFillType? = source.fold({ null }, { mapFillType(it) })
+
     abstract fun mapFillType(source: EOutlineFillType): E_OutlineFillType
 
     fun mapOptionEObjectType(source: Option<EObjectType>): E_ObjectType? = source.fold({ null }, { mapEObjectType(it) })
+
     abstract fun mapEObjectType(source: EObjectType): E_ObjectType
 
-    fun mapOptionRoadObjectsObjectBorders(source: Option<RoadObjectsObjectBorders>): T_Road_Objects_Object_Borders? = source.fold({ null }, { mapRoadObjectsObjectBorders(it) })
+    fun mapOptionRoadObjectsObjectBorders(source: Option<RoadObjectsObjectBorders>): T_Road_Objects_Object_Borders? =
+        source.fold({
+            null
+        }, { mapRoadObjectsObjectBorders(it) })
+
     abstract fun mapRoadObjectsObjectBorders(source: RoadObjectsObjectBorders): T_Road_Objects_Object_Borders
 
     //
     // Outlines
     //
-    fun mapOptionRoadObjectsObjectOutlines(source: Option<RoadObjectsObjectOutlines>): T_Road_Objects_Object_Outlines? = source.fold({ null }, { mapRoadObjectsObjectOutlines(it) })
+    fun mapOptionRoadObjectsObjectOutlines(source: Option<RoadObjectsObjectOutlines>): T_Road_Objects_Object_Outlines? =
+        source.fold({ null }, { mapRoadObjectsObjectOutlines(it) })
+
     abstract fun mapRoadObjectsObjectOutlines(source: RoadObjectsObjectOutlines): T_Road_Objects_Object_Outlines
 
     fun mapOptionELaneType(source: Option<ELaneType>): E_LaneType? = source.fold({ null }, { mapELaneType(it) })
+
     abstract fun mapELaneType(source: ELaneType): E_LaneType
 
     //
     // Markings
     //
     fun mapOptionESideType(source: Option<ESideType>): E_SideType? = source.fold({ null }, { mapESideType(it) })
+
     abstract fun mapESideType(source: ESideType): E_SideType
 
     fun mapOptionERoadMarkWeight(source: Option<ERoadMarkWeight>): E_RoadMarkWeight? = source.fold({ null }, { mapERoadMarkWeight(it) })
+
     abstract fun mapERoadMarkWeight(source: ERoadMarkWeight): E_RoadMarkWeight
 }

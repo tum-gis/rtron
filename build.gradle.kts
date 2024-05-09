@@ -20,7 +20,7 @@ import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     throw GradleException(
         "This build requires Java ${JavaVersion.VERSION_17}, " +
-            "but version ${JavaVersion.current()} is currently in use."
+            "but version ${JavaVersion.current()} is currently in use.",
     )
 }
 

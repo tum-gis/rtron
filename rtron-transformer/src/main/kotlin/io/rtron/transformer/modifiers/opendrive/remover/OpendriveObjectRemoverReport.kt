@@ -23,5 +23,5 @@ import kotlinx.serialization.Serializable
 data class OpendriveObjectRemoverReport(
     val parameters: OpendriveObjectRemoverParameters,
     var numberOfRemovedRoadObjectsWithoutType: Int = 0,
-    val numberOfRemovedRoadObjectsWithType: MutableMap<EObjectType, Int> = mutableMapOf()
+    val numberOfRemovedRoadObjectsWithType: MutableMap<EObjectType, Int> = mutableMapOf(),
 )

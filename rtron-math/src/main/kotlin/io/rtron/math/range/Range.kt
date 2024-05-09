@@ -29,7 +29,7 @@ fun <T : Comparable<*>> GRange<T>.toRange() = Range(this)
  * @param range adapted guava range class
  */
 class Range<T : Comparable<*>>(
-    private val range: GRange<T>
+    private val range: GRange<T>,
 ) {
     // Operators
 
@@ -166,7 +166,6 @@ class Range<T : Comparable<*>>(
     override fun toString() = "Range($range)"
 
     companion object {
-
         /**
          * Creates a [Range] based on bound type and endpoint values. If bound type is [BoundType.NONE] the
          * respective endpoint value must be null for consistency reasons.
@@ -182,7 +181,7 @@ class Range<T : Comparable<*>>(
             lowerBoundType: BoundType,
             lowerEndpoint: T?,
             upperBoundType: BoundType,
-            upperEndpoint: T?
+            upperEndpoint: T?,
         ): Range<T> {
             // consistency checks
             if (lowerBoundType == BoundType.NONE) {
@@ -214,7 +213,7 @@ class Range<T : Comparable<*>>(
                 lowerEndpoint!!,
                 lowerBoundType.toBoundTypeG()!!,
                 upperEndpoint!!,
-                upperBoundType.toBoundTypeG()!!
+                upperBoundType.toBoundTypeG()!!,
             ).toRange()
         }
 
@@ -231,7 +230,7 @@ class Range<T : Comparable<*>>(
             lowerBoundType: BoundType,
             lowerEndpoint: T,
             upperBoundType: BoundType,
-            upperEndpoint: T
+            upperEndpoint: T,
         ): Range<T> {
             val lowerEndpointNullable: T? = if (lowerBoundType == BoundType.NONE) null else lowerEndpoint
             val upperEndpointNullable: T? = if (upperBoundType == BoundType.NONE) null else upperEndpoint
@@ -240,16 +239,28 @@ class Range<T : Comparable<*>>(
         }
 
         /** Creates a [Range] of the form ([lower], [upper]). */
-        fun <T : Comparable<*>> open(lower: T, upper: T): Range<T> = GRange.open(lower, upper).toRange()
+        fun <T : Comparable<*>> open(
+            lower: T,
+            upper: T,
+        ): Range<T> = GRange.open(lower, upper).toRange()
 
         /** Creates a [Range] of the form [[lower], [upper]]. */
-        fun <T : Comparable<*>> closed(lower: T, upper: T): Range<T> = GRange.closed(lower, upper).toRange()
+        fun <T : Comparable<*>> closed(
+            lower: T,
+            upper: T,
+        ): Range<T> = GRange.closed(lower, upper).toRange()
 
         /** Creates a [Range] of the form ([lower], [upper]]. */
-        fun <T : Comparable<*>> openClosed(lower: T, upper: T): Range<T> = GRange.openClosed(lower, upper).toRange()
+        fun <T : Comparable<*>> openClosed(
+            lower: T,
+            upper: T,
+        ): Range<T> = GRange.openClosed(lower, upper).toRange()
 
         /** Creates a [Range] of the form [[lower], [upper]). */
-        fun <T : Comparable<*>> closedOpen(lower: T, upper: T): Range<T> = GRange.closedOpen(lower, upper).toRange()
+        fun <T : Comparable<*>> closedOpen(
+            lower: T,
+            upper: T,
+        ): Range<T> = GRange.closedOpen(lower, upper).toRange()
 
         /** Creates a [Range] of the form ([endpoint], ∞). */
         fun <T : Comparable<*>> greaterThan(endpoint: T): Range<T> = GRange.greaterThan(endpoint).toRange()
@@ -273,7 +284,10 @@ class Range<T : Comparable<*>>(
          * @param boundType type of bound which must not be [BoundType.NONE]
          * @return created [Range]
          */
-        fun <T : Comparable<*>> downTo(endpoint: T, boundType: BoundType): Range<T> {
+        fun <T : Comparable<*>> downTo(
+            endpoint: T,
+            boundType: BoundType,
+        ): Range<T> {
             require(boundType != BoundType.NONE) { "Provided bound type must not be none." }
             return GRange.downTo(endpoint, boundType.toBoundTypeG()!!).toRange()
         }
@@ -285,7 +299,10 @@ class Range<T : Comparable<*>>(
          * @param boundType type of bound which must not be [BoundType.NONE]
          * @return created [Range]
          */
-        fun <T : Comparable<*>> upTo(endpoint: T, boundType: BoundType): Range<T> {
+        fun <T : Comparable<*>> upTo(
+            endpoint: T,
+            boundType: BoundType,
+        ): Range<T> {
             require(boundType != BoundType.NONE) { "Provided bound type must not be none." }
             return GRange.upTo(endpoint, boundType.toBoundTypeG()!!).toRange()
         }
@@ -298,7 +315,11 @@ class Range<T : Comparable<*>>(
          * @param upperBoundType type of upper bound which must not be [BoundType.NONE]
          * @return created [Range]
          */
-        fun <T : Comparable<*>> closedX(lower: T, upper: T, upperBoundType: BoundType): Range<T> =
+        fun <T : Comparable<*>> closedX(
+            lower: T,
+            upper: T,
+            upperBoundType: BoundType,
+        ): Range<T> =
             when (upperBoundType) {
                 BoundType.CLOSED -> closed(lower, upper)
                 BoundType.OPEN -> closedOpen(lower, upper)

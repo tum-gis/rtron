@@ -33,19 +33,22 @@ import org.asam.opendrive17.T_Junction_Surface
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17ObjectMapper::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17ObjectMapper::class],
+)
 abstract class Opendrive17JunctionMapper {
-
     //
     // Junction
     //
     abstract fun mapJunction(source: Junction): T_Junction
 
-    fun mapOptionJunctionSurface(source: Option<JunctionSurface>): T_Junction_Surface? =
-        source.fold({ null }, { mapJunctionSurface(it) })
+    fun mapOptionJunctionSurface(source: Option<JunctionSurface>): T_Junction_Surface? = source.fold({ null }, { mapJunctionSurface(it) })
+
     abstract fun mapJunctionSurface(source: JunctionSurface): T_Junction_Surface
 
     fun mapOptionEJunctionType(source: Option<EJunctionType>): E_Junction_Type? = source.fold({ null }, { mapEJunctionType(it) })
+
     abstract fun mapEJunctionType(source: EJunctionType): E_Junction_Type
 
     //
@@ -53,14 +56,18 @@ abstract class Opendrive17JunctionMapper {
     //
     fun mapOptionJunctionPredecessorSuccessor(source: Option<JunctionPredecessorSuccessor>): T_Junction_PredecessorSuccessor? =
         source.fold({ null }, { mapJunctionPredecessorSuccessor(it) })
+
     abstract fun mapJunctionPredecessorSuccessor(source: JunctionPredecessorSuccessor): T_Junction_PredecessorSuccessor
 
     fun mapOptionEContactPoint(source: Option<EContactPoint>): E_ContactPoint? = source.fold({ null }, { mapEContactPoint(it) })
-    fun mapEContactPoint(source: EContactPoint): E_ContactPoint = when (source) {
-        EContactPoint.START -> E_ContactPoint.START
-        EContactPoint.END -> E_ContactPoint.END
-    }
+
+    fun mapEContactPoint(source: EContactPoint): E_ContactPoint =
+        when (source) {
+            EContactPoint.START -> E_ContactPoint.START
+            EContactPoint.END -> E_ContactPoint.END
+        }
 
     fun mapOptionConnectionType(source: Option<EConnectionType>): E_Connection_Type? = source.fold({ null }, { mapConnectionType(it) })
+
     abstract fun mapConnectionType(source: EConnectionType): E_Connection_Type
 }

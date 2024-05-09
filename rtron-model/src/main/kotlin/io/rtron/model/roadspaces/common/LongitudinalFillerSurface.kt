@@ -24,16 +24,21 @@ import io.rtron.model.roadspaces.identifier.LongitudinalLaneRangeIdentifier
  */
 data class LongitudinalFillerSurface(
     val id: LongitudinalLaneRangeIdentifier,
-    val surface: AbstractSurface3D
+    val surface: AbstractSurface3D,
 ) {
-
     companion object {
-        fun ofWithinRoad(id: LongitudinalLaneRangeIdentifier, surface: AbstractSurface3D): LongitudinalFillerSurface {
+        fun ofWithinRoad(
+            id: LongitudinalLaneRangeIdentifier,
+            surface: AbstractSurface3D,
+        ): LongitudinalFillerSurface {
             require(id.isWithinSameRoad()) { "Lane identifiers must be located within the same road." }
             return LongitudinalFillerSurface(id, surface)
         }
 
-        fun ofBetweenRoad(id: LongitudinalLaneRangeIdentifier, surface: AbstractSurface3D): LongitudinalFillerSurface {
+        fun ofBetweenRoad(
+            id: LongitudinalLaneRangeIdentifier,
+            surface: AbstractSurface3D,
+        ): LongitudinalFillerSurface {
             require(!id.isWithinSameRoad()) { "Lane identifiers must not be located within the same road." }
             return LongitudinalFillerSurface(id, surface)
         }

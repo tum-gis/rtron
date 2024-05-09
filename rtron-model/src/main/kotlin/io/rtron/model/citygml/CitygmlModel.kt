@@ -32,5 +32,5 @@ import org.xmlobjects.gml.model.feature.BoundingShape
 class CitygmlModel(
     val name: Option<String>,
     val boundingShape: BoundingShape,
-    val cityObjects: List<AbstractCityObject>
+    val cityObjects: List<AbstractCityObject>,
 ) : AbstractModel()

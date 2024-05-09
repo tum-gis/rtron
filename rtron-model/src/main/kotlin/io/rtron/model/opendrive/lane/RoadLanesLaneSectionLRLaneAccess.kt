@@ -21,5 +21,5 @@ import io.rtron.model.opendrive.core.OpendriveElement
 data class RoadLanesLaneSectionLRLaneAccess(
     var restriction: EAccessRestrictionType = EAccessRestrictionType.NONE,
     var rule: ERoadLanesLaneSectionLRLaneAccessRule = ERoadLanesLaneSectionLRLaneAccessRule.ALLOW,
-    var sOffset: Double = Double.NaN
+    var sOffset: Double = Double.NaN,
 ) : OpendriveElement()

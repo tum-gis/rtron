@@ -45,12 +45,14 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14LaneMapper::class, Opendrive14ObjectMapper::class, Opendrive14SignalMapper::class],
+    uses = [
+        OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14LaneMapper::class, Opendrive14ObjectMapper::class,
+        Opendrive14SignalMapper::class,
+    ],
     imports = [Option::class],
-    injectionStrategy = InjectionStrategy.CONSTRUCTOR
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR,
 )
 abstract class Opendrive14RoadMapper {
-
     private val logger = KotlinLogging.logger {}
 
     //
@@ -59,21 +61,27 @@ abstract class Opendrive14RoadMapper {
     abstract fun mapRoadLink(source: OpenDRIVE.Road.Link): RoadLink
 
     abstract fun mapRoadLinkPredecessor(source: OpenDRIVE.Road.Link.Predecessor): RoadLinkPredecessorSuccessor
+
     abstract fun mapRoadLinkSuccessor(source: OpenDRIVE.Road.Link.Successor): RoadLinkPredecessorSuccessor
 
     //
     // Plan View
     //
     abstract fun mapPlanViewGeometryLine(source: OpenDRIVE.Road.PlanView.Geometry.Line): RoadPlanViewGeometryLine
+
     abstract fun mapPlanViewGeometrySpiral(source: OpenDRIVE.Road.PlanView.Geometry.Spiral): RoadPlanViewGeometrySpiral
+
     abstract fun mapPlanViewGeometryArc(source: OpenDRIVE.Road.PlanView.Geometry.Arc): RoadPlanViewGeometryArc
+
     abstract fun mapPlanViewGeometryPoly3(source: OpenDRIVE.Road.PlanView.Geometry.Poly3): RoadPlanViewGeometryPoly3
+
     abstract fun mapPlanViewGeometryParamPoly3(source: OpenDRIVE.Road.PlanView.Geometry.ParamPoly3): RoadPlanViewGeometryParamPoly3
 
     //
     // Profiles
     //
     abstract fun mapElevationProfile(source: OpenDRIVE.Road.ElevationProfile): RoadElevationProfile
+
     abstract fun mapLateralProfile(source: OpenDRIVE.Road.LateralProfile): RoadLateralProfile
 
     @BeforeMapping
@@ -90,15 +98,22 @@ abstract class Opendrive14RoadMapper {
     // Other Road Attributes
     //
     abstract fun mapRoadTypeSpeed(source: OpenDRIVE.Road.Type.Speed): RoadTypeSpeed
+
     abstract fun mapRoadSurface(source: OpenDRIVE.Road.Surface): RoadSurface
+
     abstract fun mapRoadRailroad(source: OpenDRIVE.Road.Railroad): RoadRailroad
 
     //
     // Enumerations
     //
     fun mapContactPointToOption(source: ContactPoint?): Option<EContactPoint> = source?.let { mapContactPoint(it).some() } ?: None
+
     abstract fun mapContactPoint(source: ContactPoint): EContactPoint
 
-    fun mapERoadLinkElementTypeToOption(source: ElementType?): Option<ERoadLinkElementType> = source?.let { mapERoadLinkElementType(it).some() } ?: None
+    fun mapERoadLinkElementTypeToOption(source: ElementType?): Option<ERoadLinkElementType> =
+        source?.let {
+            mapERoadLinkElementType(it).some()
+        } ?: None
+
     abstract fun mapERoadLinkElementType(source: ElementType): ERoadLinkElementType
 }

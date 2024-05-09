@@ -32,9 +32,8 @@ annotation class ExperimentalDateTime
  */
 @ExperimentalDateTime
 class DateTime(
-    private val localDateTime: LocalDateTime
+    private val localDateTime: LocalDateTime,
 ) {
-
     // Properties and Initializers
 
     companion object {

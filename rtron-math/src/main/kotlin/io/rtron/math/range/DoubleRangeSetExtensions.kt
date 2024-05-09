@@ -22,5 +22,4 @@ fun RangeSet.Companion.ofNonIntersectingRanges(ranges: Set<Range<Double>>): Rang
     return rangeSets.unionRangeSets()
 }
 
-fun RangeSet.Companion.ofNonIntersectingRanges(vararg ranges: Range<Double>): RangeSet<Double> =
-    ofNonIntersectingRanges(ranges.toSet())
+fun RangeSet.Companion.ofNonIntersectingRanges(vararg ranges: Range<Double>): RangeSet<Double> = ofNonIntersectingRanges(ranges.toSet())

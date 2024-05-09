@@ -37,10 +37,9 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive16JunctionMapper {
-
     private val logger = KotlinLogging.logger {}
 
     fun mapJunctionSurfaceToOption(source: T_Junction_Surface?): Option<JunctionSurface> =
@@ -50,6 +49,7 @@ abstract class Opendrive16JunctionMapper {
 
     fun mapJunctionPredecessorSuccessorToOption(source: T_Junction_PredecessorSuccessor?): Option<JunctionPredecessorSuccessor> =
         source?.let { mapJunctionPredecessorSuccessor(it).some() } ?: None
+
     abstract fun mapJunctionPredecessorSuccessor(source: T_Junction_PredecessorSuccessor): JunctionPredecessorSuccessor
 
     //
@@ -57,28 +57,30 @@ abstract class Opendrive16JunctionMapper {
     //
     fun mapJunctionTypeToOptionEJunctionType(source: E_Junction_Type?): Option<EJunctionType> =
         source?.let { mapJunctionType(it).some() } ?: None
+
     abstract fun mapJunctionType(source: E_Junction_Type): EJunctionType
 
     // This is an error in the schema of version 1.6, which is fixed by this mapping (enum attributes are the same)
     fun mapJunctionTypeToOptionEConnectionType(source: E_Junction_Type?): Option<EConnectionType> =
         source?.let { mapConnectionType(it).some() } ?: None
+
     abstract fun mapConnectionType(source: E_Junction_Type): EConnectionType
 
-    fun mapContactPointToOption(source: String?): Option<EContactPoint> =
-        source?.let { mapContactPoint(it).some() } ?: None
+    fun mapContactPointToOption(source: String?): Option<EContactPoint> = source?.let { mapContactPoint(it).some() } ?: None
 
-    fun mapContactPoint(source: String): EContactPoint = when (source.uppercase()) {
-        in EContactPoint.START.name.toUpperCaseVariations() -> EContactPoint.START
-        in EContactPoint.END.name.toUpperCaseVariations() -> EContactPoint.END
-        else -> EContactPoint.START
-    }
+    fun mapContactPoint(source: String): EContactPoint =
+        when (source.uppercase()) {
+            in EContactPoint.START.name.toUpperCaseVariations() -> EContactPoint.START
+            in EContactPoint.END.name.toUpperCaseVariations() -> EContactPoint.END
+            else -> EContactPoint.START
+        }
 
-    fun mapElementDirToOption(source: String?): Option<EElementDir> =
-        source?.let { mapElementDir(it).some() } ?: None
+    fun mapElementDirToOption(source: String?): Option<EElementDir> = source?.let { mapElementDir(it).some() } ?: None
 
-    fun mapElementDir(source: String): EElementDir = when (source.uppercase()) {
-        in "+" -> EElementDir.PLUS
-        in "-" -> EElementDir.MINUS
-        else -> EElementDir.PLUS
-    }
+    fun mapElementDir(source: String): EElementDir =
+        when (source.uppercase()) {
+            in "+" -> EElementDir.PLUS
+            in "-" -> EElementDir.MINUS
+            else -> EElementDir.PLUS
+        }
 }

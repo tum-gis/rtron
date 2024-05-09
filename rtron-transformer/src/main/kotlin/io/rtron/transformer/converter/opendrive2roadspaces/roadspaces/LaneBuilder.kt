@@ -58,7 +58,7 @@ import io.rtron.transformer.issues.opendrive.of
  * Builder for [Lane] objects of the RoadSpaces data model.
  */
 class LaneBuilder(
-    private val parameters: Opendrive2RoadspacesParameters
+    private val parameters: Opendrive2RoadspacesParameters,
 ) {
     // Methods
 
@@ -70,14 +70,21 @@ class LaneBuilder(
      * @param lrLane lane object of the OpenDRIVE data model
      * @param baseAttributes attributes attached to the transformed [Lane] object
      */
-    fun buildLane(id: LaneIdentifier, curvePositionDomain: Range<Double>, lrLane: RoadLanesLaneSectionLRLane, baseAttributes: AttributeList): ContextIssueList<Lane> {
+    fun buildLane(
+        id: LaneIdentifier,
+        curvePositionDomain: Range<Double>,
+        lrLane: RoadLanesLaneSectionLRLane,
+        baseAttributes: AttributeList,
+    ): ContextIssueList<Lane> {
         val issueList = DefaultIssueList()
 
         // build lane geometry
-        val width = lrLane.getLaneWidthEntries()
-            .fold({ LinearFunction.X_AXIS }, { FunctionBuilder.buildLaneWidth(it, parameters.numberTolerance) })
-        val laneHeightOffsets = lrLane.getLaneHeightEntries()
-            .fold({ LaneHeightOffset(LinearFunction.X_AXIS, LinearFunction.X_AXIS) }, { buildLaneHeightOffset(it) })
+        val width =
+            lrLane.getLaneWidthEntries()
+                .fold({ LinearFunction.X_AXIS }, { FunctionBuilder.buildLaneWidth(it, parameters.numberTolerance) })
+        val laneHeightOffsets =
+            lrLane.getLaneHeightEntries()
+                .fold({ LaneHeightOffset(LinearFunction.X_AXIS, LinearFunction.X_AXIS) }, { buildLaneHeightOffset(it) })
 
         // build road markings
         val roadMarkings: List<RoadMarking> =
@@ -97,10 +104,11 @@ class LaneBuilder(
         val attributes = baseAttributes + buildAttributes(lrLane)
 
         // build up lane object
-        val lane = Lane(
-            id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, lrLane.getLevelWithDefault(), roadMarkings,
-            predecessors, successors, type, laneMaterial, attributes
-        )
+        val lane =
+            Lane(
+                id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, lrLane.getLevelWithDefault(), roadMarkings,
+                predecessors, successors, type, laneMaterial, attributes,
+            )
         return ContextIssueList(lane, issueList)
     }
 
@@ -116,7 +124,7 @@ class LaneBuilder(
         id: LaneSectionIdentifier,
         curvePositionDomain: Range<Double>,
         centerLane: RoadLanesLaneSectionCenterLane,
-        baseAttributes: AttributeList
+        baseAttributes: AttributeList,
     ): ContextIssueList<CenterLane> {
         require(centerLane.id == 0) { "Center lane must have id 0, but has ${centerLane.id}." }
 
@@ -153,17 +161,19 @@ class LaneBuilder(
         require(laneHeights.isStrictlySortedBy { it.sOffset }) { "Height entries must be sorted in strict order according to sOffset." }
         require(laneHeights.all { it.inner.isFinite() && it.outer.isFinite() }) { "Inner and outer values must be finite." }
 
-        val inner = ConcatenatedFunction.ofLinearFunctions(
-            laneHeights.map { it.sOffset },
-            laneHeights.map { it.inner },
-            prependConstant = true
-        )
+        val inner =
+            ConcatenatedFunction.ofLinearFunctions(
+                laneHeights.map { it.sOffset },
+                laneHeights.map { it.inner },
+                prependConstant = true,
+            )
 
-        val outer = ConcatenatedFunction.ofLinearFunctions(
-            laneHeights.map { it.sOffset },
-            laneHeights.map { it.outer },
-            prependConstant = true
-        )
+        val outer =
+            ConcatenatedFunction.ofLinearFunctions(
+                laneHeights.map { it.sOffset },
+                laneHeights.map { it.outer },
+                prependConstant = true,
+            )
 
         return LaneHeightOffset(inner, outer)
     }
@@ -176,32 +186,36 @@ class LaneBuilder(
      */
     private fun buildRoadMarkings(
         curvePositionDomain: Range<Double>,
-        roadMark: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMark>
+        roadMark: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMark>,
     ): ContextIssueList<List<RoadMarking>> {
         require(curvePositionDomain.hasUpperBound()) { "curvePositionDomain must have an upper bound." }
-        val roadMarkId = roadMark.head.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }.getOrElse { throw it }
+        val roadMarkId =
+            roadMark.head.additionalId.toEither {
+                IllegalStateException("Additional outline ID must be available.")
+            }.getOrElse { throw it }
         val issueList = DefaultIssueList()
 
         val curvePositionDomainEnd = curvePositionDomain.upperEndpointOrNull()!!
-        val adjustedSrcRoadMark = roadMark
-            .filter { it.sOffset in curvePositionDomain }
-            .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, parameters.numberTolerance) }
+        val adjustedSrcRoadMark =
+            roadMark
+                .filter { it.sOffset in curvePositionDomain }
+                .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, parameters.numberTolerance) }
         if (adjustedSrcRoadMark.size < roadMark.size) {
-            issueList += DefaultIssue.of(
-                "RoadMarkEntriesNotLocatedWithinSRange",
-                "Road mark entries have been removed, as the sOffset is not located within " +
-                    "the local curve position domain ($curvePositionDomain) of the lane section.",
-                roadMarkId,
-                Severity.WARNING,
-                wasFixed = true
-            )
+            issueList +=
+                DefaultIssue.of(
+                    "RoadMarkEntriesNotLocatedWithinSRange",
+                    "Road mark entries have been removed, as the sOffset is not located within " +
+                        "the local curve position domain ($curvePositionDomain) of the lane section.",
+                    roadMarkId, Severity.WARNING, wasFixed = true,
+                )
         }
 
         if (adjustedSrcRoadMark.isEmpty()) return ContextIssueList(emptyList(), issueList)
 
-        val roadMarkings = adjustedSrcRoadMark.zipWithNext()
-            .map { buildRoadMarking(it.first, it.second.sOffset.some()) } +
-            listOf(buildRoadMarking(adjustedSrcRoadMark.last()))
+        val roadMarkings =
+            adjustedSrcRoadMark.zipWithNext()
+                .map { buildRoadMarking(it.first, it.second.sOffset.some()) } +
+                listOf(buildRoadMarking(adjustedSrcRoadMark.last()))
 
         return ContextIssueList(roadMarkings, issueList)
     }
@@ -212,28 +226,33 @@ class LaneBuilder(
      * @param roadMark road mark entry of the OpenDRIVE data model
      * @param domainEndpoint upper domain endpoint for the domain of the road mark
      */
-    private fun buildRoadMarking(roadMark: RoadLanesLaneSectionLCRLaneRoadMark, domainEndpoint: Option<Double> = None): RoadMarking {
+    private fun buildRoadMarking(
+        roadMark: RoadLanesLaneSectionLCRLaneRoadMark,
+        domainEndpoint: Option<Double> = None,
+    ): RoadMarking {
         val domain = domainEndpoint.fold({ Range.atLeast(roadMark.sOffset) }, { Range.closed(roadMark.sOffset, it) })
         require(domain.length > parameters.numberTolerance) { "Length of road marking must be above zero and the tolerance threshold." }
 
         val width = roadMark.width.fold({ ConstantFunction.ZERO }, { ConstantFunction(it, domain) })
 
-        val attributes = attributes("${parameters.attributesPrefix}roadMarking") {
-            attribute("_curvePositionStart", roadMark.sOffset)
-            attribute("_width", roadMark.width)
-            attribute("_type", roadMark.typeAttribute.toString())
-            attribute("_weight", roadMark.weight.map { it.toString() })
-            attribute("_laneChange", roadMark.laneChange.map { it.toString() })
-            attribute("_color", roadMark.color.toString())
-            attribute("_material", roadMark.material)
-        }
+        val attributes =
+            attributes("${parameters.attributesPrefix}roadMarking") {
+                attribute("_curvePositionStart", roadMark.sOffset)
+                attribute("_width", roadMark.width)
+                attribute("_type", roadMark.typeAttribute.toString())
+                attribute("_weight", roadMark.weight.map { it.toString() })
+                attribute("_laneChange", roadMark.laneChange.map { it.toString() })
+                attribute("_color", roadMark.color.toString())
+                attribute("_material", roadMark.material)
+            }
 
-        val laneChange = when (roadMark.laneChange.getOrElse { ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH }) {
-            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.INCREASE -> LaneChange.INCREASE
-            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.DECREASE -> LaneChange.DECREASE
-            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH -> LaneChange.BOTH
-            ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE -> LaneChange.NONE
-        }
+        val laneChange =
+            when (roadMark.laneChange.getOrElse { ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH }) {
+                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.INCREASE -> LaneChange.INCREASE
+                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.DECREASE -> LaneChange.DECREASE
+                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH -> LaneChange.BOTH
+                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE -> LaneChange.NONE
+            }
 
         return RoadMarking(width, laneChange, attributes)
     }
@@ -250,10 +269,10 @@ class LaneBuilder(
 
         // return none, if different entries
         if (laneMaterials.any {
-            !fuzzyEquals(it.friction, firstEntry.friction, parameters.numberTolerance) ||
-                !fuzzyEquals(it.roughness, firstEntry.roughness, parameters.numberTolerance) ||
-                it.surface != firstEntry.surface
-        }
+                !fuzzyEquals(it.friction, firstEntry.friction, parameters.numberTolerance) ||
+                    !fuzzyEquals(it.roughness, firstEntry.roughness, parameters.numberTolerance) ||
+                    it.surface != firstEntry.surface
+            }
         ) {
             return None
         }

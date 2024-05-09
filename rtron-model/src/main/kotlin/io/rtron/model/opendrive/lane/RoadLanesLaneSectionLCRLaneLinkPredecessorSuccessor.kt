@@ -19,5 +19,5 @@ package io.rtron.model.opendrive.lane
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor(
-    var id: Int = Int.MIN_VALUE
+    var id: Int = Int.MIN_VALUE,
 ) : OpendriveElement()

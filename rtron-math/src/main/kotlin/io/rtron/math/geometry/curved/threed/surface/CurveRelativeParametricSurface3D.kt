@@ -34,24 +34,29 @@ import io.rtron.math.range.fuzzyEncloses
  */
 class CurveRelativeParametricSurface3D(
     private val baseCurve: Curve3D,
-    private val heightFunction: BivariateFunction = PlaneFunction.ZERO
+    private val heightFunction: BivariateFunction = PlaneFunction.ZERO,
 ) : AbstractCurveRelativeSurface3D() {
-
     // Properties and Initializers
     override val tolerance: Double get() = baseCurve.tolerance
     override val domain get() = baseCurve.domain
 
     init {
-        require(heightFunction.domainX.fuzzyEncloses(baseCurve.domain, tolerance)) { "The height function must be defined everywhere where the referenceLine is also defined." }
+        require(heightFunction.domainX.fuzzyEncloses(baseCurve.domain, tolerance)) {
+            "The height function must be defined everywhere where the referenceLine is also defined."
+        }
         require(length > tolerance) { "Length must be greater than zero as well as the tolerance threshold." }
     }
 
     // Methods
-    override fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector2D, addHeightOffset: Double): Vector3D {
+    override fun calculatePointGlobalCSUnbounded(
+        curveRelativePoint: CurveRelativeVector2D,
+        addHeightOffset: Double,
+    ): Vector3D {
         val affine = baseCurve.calculateAffine(curveRelativePoint.toCurveRelative1D())
-        val surfaceHeight = heightFunction
-            .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)
-            .getOrElse { throw it }
+        val surfaceHeight =
+            heightFunction
+                .valueInFuzzy(curveRelativePoint.curvePosition, curveRelativePoint.lateralOffset, tolerance)
+                .getOrElse { throw it }
         val offset = Vector3D(0.0, curveRelativePoint.lateralOffset, surfaceHeight + addHeightOffset)
 
         return affine.transform(offset)

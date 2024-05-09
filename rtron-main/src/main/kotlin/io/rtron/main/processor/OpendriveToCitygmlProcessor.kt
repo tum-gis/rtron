@@ -41,18 +41,20 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.div
 
 class OpendriveToCitygmlProcessor(
-    private val parameters: OpendriveToCitygmlParameters
+    private val parameters: OpendriveToCitygmlParameters,
 ) {
-
     // Methods
 
-    fun process(inputPath: Path, outputPath: Path) {
+    fun process(
+        inputPath: Path,
+        outputPath: Path,
+    ) {
         val logger = KotlinLogging.logger {}
 
         processAllFiles(
             inputDirectoryPath = inputPath,
             withFilenameEndings = OpendriveReader.supportedFilenameEndings,
-            outputDirectoryPath = outputPath
+            outputDirectoryPath = outputPath,
         ) {
             val outputSubDirectoryPath = outputDirectoryPath / "citygml_${parameters.getCitygmlWriteVersion()}"
             outputSubDirectoryPath.createDirectories()
@@ -66,23 +68,32 @@ class OpendriveToCitygmlProcessor(
             (outputSubDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // validate schema of OpenDRIVE model
-            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn { it.message }; return@processAllFiles }
+            val opendriveSchemaValidatorReport =
+                OpendriveValidator.validateFromFile(inputFilePath).getOrElse {
+                    logger.warn { it.message }
+                    return@processAllFiles
+                }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted()) {
                 return@processAllFiles
             }
             // read of OpenDRIVE model
-            val opendriveModel = OpendriveReader.readFromFile(inputFilePath)
-                .getOrElse { logger.warn { it.message }; return@processAllFiles }
+            val opendriveModel =
+                OpendriveReader.readFromFile(inputFilePath)
+                    .getOrElse {
+                        logger.warn { it.message }
+                        return@processAllFiles
+                    }
 
             // evaluate OpenDRIVE model
             val opendriveEvaluator = OpendriveEvaluator(parameters.deriveOpendriveEvaluatorParameters())
             val opendriveEvaluatorResult = opendriveEvaluator.evaluate(opendriveModel)
             opendriveEvaluatorResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_EVALUATOR_REPORT_PATH)
-            val modifiedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
-                logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
-                return@processAllFiles
-            }
+            val modifiedOpendriveModel =
+                opendriveEvaluatorResult.first.handleEmpty {
+                    logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
+                    return@processAllFiles
+                }
 
             // offset OpenDRIVE model
             val opendriveOffsetAdder = OpendriveOffsetAdder(parameters.deriveOpendriveOffsetAdderParameters())
@@ -98,10 +109,11 @@ class OpendriveToCitygmlProcessor(
             val opendriveCropper = OpendriveCropper(parameters.deriveOpendriveCropperParameters())
             val opendriveCroppedResult = opendriveCropper.modify(opendriveOffsetResolvedResult.first)
             opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_CROP_REPORT_PATH)
-            val opendriveCropped = opendriveCroppedResult.first.handleEmpty {
-                logger.warn { "OpendriveCropper: ${opendriveCroppedResult.second.message}" }
-                return@processAllFiles
-            }
+            val opendriveCropped =
+                opendriveCroppedResult.first.handleEmpty {
+                    logger.warn { "OpendriveCropper: ${opendriveCroppedResult.second.message}" }
+                    return@processAllFiles
+                }
 
             // remove objects from OpenDRIVE model
             val opendriveObjectRemover = OpendriveObjectRemover(parameters.deriveOpendriveObjectRemoverParameters())
@@ -116,10 +128,11 @@ class OpendriveToCitygmlProcessor(
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
             val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveRemovedObjectResult.first)
             roadspacesModelResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
-            val roadspacesModel = roadspacesModelResult.first.handleEmpty {
-                logger.warn { "Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}" }
-                return@processAllFiles
-            }
+            val roadspacesModel =
+                roadspacesModelResult.first.handleEmpty {
+                    logger.warn { "Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}" }
+                    return@processAllFiles
+                }
 
             // evaluate Roadspaces model
             val roadspacesEvaluator = RoadspacesEvaluator(parameters.deriveRoadspacesEvaluatorParameters())
@@ -135,7 +148,7 @@ class OpendriveToCitygmlProcessor(
             CitygmlWriter.writeToFile(
                 citygmlModelResult.first,
                 parameters.getCitygmlWriteVersion(),
-                outputSubDirectoryPath / ("citygml_model.gml" + parameters.compressionFormat.toFileExtension())
+                outputSubDirectoryPath / ("citygml_model.gml" + parameters.compressionFormat.toFileExtension()),
             )
         }
     }

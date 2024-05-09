@@ -22,11 +22,10 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadObjectsObjectReference(
     var validity: List<RoadObjectsObjectLaneValidity> = emptyList(),
-
     var id: String = "",
     var orientation: EOrientation = EOrientation.NONE,
     var s: Double = Double.NaN,
     var t: Double = Double.NaN,
     var validLength: Option<Double> = None,
-    var zOffset: Option<Double> = None
+    var zOffset: Option<Double> = None,
 ) : OpendriveElement()

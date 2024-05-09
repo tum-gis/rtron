@@ -35,9 +35,8 @@ data class Connection(
     val id: ConnectionIdentifier,
     val incomingRoadspaceContactPointId: RoadspaceContactPointIdentifier,
     val connectingRoadspaceContactPointId: RoadspaceContactPointIdentifier,
-    val laneLinks: Map<LaneIdentifier, LaneIdentifier>
+    val laneLinks: Map<LaneIdentifier, LaneIdentifier>,
 ) {
-
     // Properties and Initializers
     init {
         require(laneLinks.isNotEmpty()) { "Lane links must not be empty." }

@@ -39,7 +39,7 @@ import org.xmlobjects.gml.model.measures.Length
  * Builder for city objects of the CityGML Vegetation module.
  */
 class VegetationModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters,
 ) {
     // Properties and Initializers
     private val relationAdder = RelationAdder(parameters)
@@ -63,13 +63,11 @@ class VegetationModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             solitaryVegetationObjectFeature.populateLod1Geometry(geometryTransformer)
                 .mapLeft {
-                    issueList += DefaultIssue.of(
-                        "NoSuitableGeometryForSolitaryVegetationObjectLod1",
-                        it.message,
-                        roadspaceObject.id,
-                        Severity.WARNING,
-                        wasFixed = true
-                    )
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForSolitaryVegetationObjectLod1",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
                 }
 
             addAttributes(solitaryVegetationObjectFeature, geometryTransformer).getOrElse { throw it }
@@ -79,20 +77,18 @@ class VegetationModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             solitaryVegetationObjectFeature.populateLod2Geometry(geometryTransformer)
                 .mapLeft {
-                    issueList += DefaultIssue.of(
-                        "NoSuitableGeometryForSolitaryVegetationObjectLod2",
-                        it.message,
-                        roadspaceObject.id,
-                        Severity.WARNING,
-                        wasFixed = true
-                    )
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForSolitaryVegetationObjectLod2",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
                 }
         }
 
         // semantics
         IdentifierAdder.addIdentifier(
             roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix),
-            solitaryVegetationObjectFeature
+            solitaryVegetationObjectFeature,
         )
         relationAdder.addBelongToRelations(roadspaceObject, solitaryVegetationObjectFeature)
         attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
@@ -102,18 +98,19 @@ class VegetationModuleBuilder(
 
     private fun addAttributes(
         solitaryVegetationObjectFeature: SolitaryVegetationObject,
-        geometryTransformer: GeometryTransformer
-    ): Either<Exception, Unit> = either {
-        geometryTransformer.diameter.onSome {
-            solitaryVegetationObjectFeature.trunkDiameter = Length(it)
-            solitaryVegetationObjectFeature.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
-        }
+        geometryTransformer: GeometryTransformer,
+    ): Either<Exception, Unit> =
+        either {
+            geometryTransformer.diameter.onSome {
+                solitaryVegetationObjectFeature.trunkDiameter = Length(it)
+                solitaryVegetationObjectFeature.trunkDiameter.uom = UnitOfMeasure.METER.toGmlString()
+            }
 
-        geometryTransformer.height.onSome {
-            solitaryVegetationObjectFeature.height = Length(it)
-            solitaryVegetationObjectFeature.height.uom = UnitOfMeasure.METER.toGmlString()
-        }
+            geometryTransformer.height.onSome {
+                solitaryVegetationObjectFeature.height = Length(it)
+                solitaryVegetationObjectFeature.height.uom = UnitOfMeasure.METER.toGmlString()
+            }
 
-        Unit
-    }
+            Unit
+        }
 }

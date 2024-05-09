@@ -30,7 +30,6 @@ import org.apache.commons.csv.CSVPrinter as CMCSVPrinter
  * @param header header of the csv file
  */
 class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
-
     // Properties and Initializers
     init {
         filePath.parent.createDirectories()
@@ -38,12 +37,14 @@ class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
 
     private val writer = Files.newBufferedWriter(filePath)
     private val csvPrinter: CMCSVPrinter
+
     init {
         val csvFormat = Builder.create().setHeader(*header.toTypedArray()).build()
         csvPrinter = CMCSVPrinter(writer, csvFormat)
     }
 
     // Methods
+
     /**
      * Prints the given [values] as a single record.
      *

@@ -35,7 +35,6 @@ import io.rtron.math.range.length
  * Abstract class for all geometric curve objects in 2D.
  */
 abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, Tolerable {
-
     // Properties
 
     /** length of the curve */
@@ -79,7 +78,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates for which the orientation is to be calculated
      * @return orientation tangential to this curve
      */
-    fun calculateRotationLocalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Rotation2D> {
+    fun calculateRotationLocalCS(
+        curveRelativePoint: CurveRelativeVector1D,
+    ): Either<GeometryException.ValueNotContainedInDomain, Rotation2D> {
         if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
         }
@@ -125,7 +126,9 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates for which the orientation is to be calculated
      * @return orientation tangential to this curve
      */
-    fun calculateRotationGlobalCS(curveRelativePoint: CurveRelativeVector1D): Either<GeometryException.ValueNotContainedInDomain, Rotation2D> {
+    fun calculateRotationGlobalCS(
+        curveRelativePoint: CurveRelativeVector1D,
+    ): Either<GeometryException.ValueNotContainedInDomain, Rotation2D> {
         if (!domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
             return GeometryException.ValueNotContainedInDomain(curveRelativePoint.curvePosition).left()
         }

@@ -19,5 +19,5 @@ package io.rtron.model.roadspaces.roadspace.road
 data class LaneMaterial(
     var friction: Double = Double.NaN,
     var roughness: Double = Double.NaN,
-    var surface: String = ""
+    var surface: String = "",
 )

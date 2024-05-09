@@ -22,8 +22,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class Controller(
     var control: List<ControllerControl> = emptyList(),
-
     var id: String = "",
     var name: Option<String> = None,
-    var sequence: Option<Int> = None
+    var sequence: Option<Int> = None,
 ) : OpendriveElement()

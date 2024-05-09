@@ -24,9 +24,11 @@ import org.mapstruct.NullValueCheckStrategy
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14LaneMapper::class, Opendrive14ObjectMapper::class, Opendrive14RoadMapper::class, Opendrive14SignalMapper::class, Opendrive14JunctionMapper::class]
+    uses = [
+        OpendriveCommonMapper::class, Opendrive14CoreMapper::class, Opendrive14LaneMapper::class, Opendrive14ObjectMapper::class,
+        Opendrive14RoadMapper::class, Opendrive14SignalMapper::class, Opendrive14JunctionMapper::class,
+    ],
 )
 abstract class Opendrive14Mapper {
-
     abstract fun mapModel(model: OpenDRIVE): OpendriveModel
 }

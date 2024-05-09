@@ -48,22 +48,24 @@ import org.mapstruct.ValueMapping
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class, Opendrive14CoreMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive14LaneMapper {
-
     //
     // Lane Section
     //
     abstract fun mapRoadLanesLaneSection(source: OpenDRIVE.Road.Lanes.LaneSection): RoadLanesLaneSection
 
     abstract fun mapRoadLanesLaneSectionLeft(source: OpenDRIVE.Road.Lanes.LaneSection.Left): RoadLanesLaneSectionLeft
+
     abstract fun mapRoadLanesLaneSectionRight(source: OpenDRIVE.Road.Lanes.LaneSection.Right): RoadLanesLaneSectionRight
 
     //
     // Lane
     //
-    fun mapRoadLanesLaneSectionCenterLanes(source: CenterLane?): List<RoadLanesLaneSectionCenterLane> = source?.let { listOf(mapRoadLanesLaneSectionCenterLane(it)) } ?: emptyList()
+    fun mapRoadLanesLaneSectionCenterLanes(source: CenterLane?): List<RoadLanesLaneSectionCenterLane> =
+        source?.let { listOf(mapRoadLanesLaneSectionCenterLane(it)) } ?: emptyList()
+
     abstract fun mapRoadLanesLaneSectionCenterLane(source: CenterLane): RoadLanesLaneSectionCenterLane
 
     //
@@ -73,42 +75,54 @@ abstract class Opendrive14LaneMapper {
 
     fun mapCenterLaneLinkPredecessor(source: CenterLane.Link.Predecessor?): List<RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor> =
         source?.let { listOf(mapPredecessor(it)) } ?: emptyList()
+
     abstract fun mapPredecessor(source: CenterLane.Link.Predecessor): RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
 
     fun mapCenterLaneLinkSuccessor(source: CenterLane.Link.Successor?): List<RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor> =
         source?.let { listOf(mapSuccessor(it)) } ?: emptyList()
+
     abstract fun mapSuccessor(source: CenterLane.Link.Successor): RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
 
     abstract fun mapLaneLink(source: Lane.Link): RoadLanesLaneSectionLCRLaneLink
 
     fun mapLaneLinkPredecessor(source: Lane.Link.Predecessor?): List<RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor> =
         source?.let { listOf(mapPredecessor(it)) } ?: emptyList()
+
     abstract fun mapPredecessor(source: Lane.Link.Predecessor): RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
 
     fun mapLaneLinkSuccessor(source: Lane.Link.Successor?): List<RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor> =
         source?.let { listOf(mapSuccessor(it)) } ?: emptyList()
+
     abstract fun mapSuccessor(source: Lane.Link.Successor): RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
 
     //
     // Road Mark
     //
     abstract fun mapLaneRoadMarkType(source: Lane.RoadMark.Type): RoadLanesLaneSectionLCRLaneRoadMarkType
+
     abstract fun mapCenterLaneRoadMarkType(source: CenterLane.RoadMark.Type): RoadLanesLaneSectionLCRLaneRoadMarkType
 
     fun mapRoadMarkWeightToOption(source: Weight?): Option<ERoadMarkWeight> = source?.let { mapRoadMarkWeight(it).some() } ?: None
+
     abstract fun mapRoadMarkWeight(source: Weight): ERoadMarkWeight
 
-    fun mapLaneChangeToOption(source: LaneChange?): Option<ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange> = source?.let { mapLaneChange(it).some() } ?: None
+    fun mapLaneChangeToOption(source: LaneChange?): Option<ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange> =
+        source?.let {
+            mapLaneChange(it).some()
+        } ?: None
+
     abstract fun mapLaneChange(source: LaneChange): ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
 
     //
     // Enumerations
     //
     fun mapSingleSideToOption(source: SingleSide?): Option<Boolean> = source?.let { mapSingleSide(it).some() } ?: None
-    fun mapSingleSide(source: SingleSide): Boolean = when (source) {
-        SingleSide.TRUE -> true
-        SingleSide.FALSE -> false
-    }
+
+    fun mapSingleSide(source: SingleSide): Boolean =
+        when (source) {
+            SingleSide.TRUE -> true
+            SingleSide.FALSE -> false
+        }
 
     @ValueMapping(source = "AUTONOMOUS___TRAFFIC", target = "AUTONOMOUS_TRAFFIC")
     abstract fun map(source: Restriction): EAccessRestrictionType

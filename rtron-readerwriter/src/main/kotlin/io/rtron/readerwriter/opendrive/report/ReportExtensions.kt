@@ -21,12 +21,13 @@ import jakarta.xml.bind.ValidationEvent
 
 fun ValidationEvent.toIssue(): SchemaValidationIssue {
     val text = this.message ?: ""
-    val severity = when (this.severity) {
-        ValidationEvent.WARNING -> Severity.WARNING
-        ValidationEvent.ERROR -> Severity.ERROR
-        ValidationEvent.FATAL_ERROR -> Severity.FATAL_ERROR
-        else -> Severity.WARNING
-    }
+    val severity =
+        when (this.severity) {
+            ValidationEvent.WARNING -> Severity.WARNING
+            ValidationEvent.ERROR -> Severity.ERROR
+            ValidationEvent.FATAL_ERROR -> Severity.FATAL_ERROR
+            else -> Severity.WARNING
+        }
 
     val lineNumber = this.locator.lineNumber
     val columnNumber = this.locator.columnNumber

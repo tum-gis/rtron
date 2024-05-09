@@ -31,10 +31,9 @@ import org.mapstruct.NullValueCheckStrategy
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
     uses = [OpendriveCommonMapper::class],
-    imports = [Option::class]
+    imports = [Option::class],
 )
 abstract class Opendrive14CoreMapper {
-
     //
     // Header
     //
@@ -50,29 +49,33 @@ abstract class Opendrive14CoreMapper {
     // Enumerations
     //
     fun mapUnitToOptionEUnitSpeed(source: Unit?): Option<EUnitSpeed> = source?.let { mapUnit(it).some() } ?: None
-    fun mapUnit(source: Unit): EUnitSpeed = when (source) {
-        Unit.M___S -> EUnitSpeed.METER_PER_SECOND
-        Unit.MPH -> EUnitSpeed.MILES_PER_HOUR
-        Unit.KM___H -> EUnitSpeed.KILOMETER_PER_HOUR
-        else -> EUnitSpeed.KILOMETER_PER_HOUR
-    }
+
+    fun mapUnit(source: Unit): EUnitSpeed =
+        when (source) {
+            Unit.M___S -> EUnitSpeed.METER_PER_SECOND
+            Unit.MPH -> EUnitSpeed.MILES_PER_HOUR
+            Unit.KM___H -> EUnitSpeed.KILOMETER_PER_HOUR
+            else -> EUnitSpeed.KILOMETER_PER_HOUR
+        }
 
     fun mapUnitToOptionEUnit(source: Unit?): Option<EUnit> = source?.let { mapUnitToEUnit(it).some() } ?: None
-    fun mapUnitToEUnit(source: Unit): EUnit = when (source) {
-        Unit.M -> EUnit.METER
-        Unit.KM -> EUnit.KILOMETER
-        Unit.FT -> EUnit.FEET
-        Unit.MILE -> EUnit.MILE
 
-        Unit.M___S -> EUnit.METER_PER_SECOND
-        Unit.MPH -> EUnit.MILES_PER_HOUR
-        Unit.KM___H -> EUnit.KILOMETER_PER_HOUR
+    fun mapUnitToEUnit(source: Unit): EUnit =
+        when (source) {
+            Unit.M -> EUnit.METER
+            Unit.KM -> EUnit.KILOMETER
+            Unit.FT -> EUnit.FEET
+            Unit.MILE -> EUnit.MILE
 
-        Unit.KG -> EUnit.KILOGRAM
-        Unit.T -> EUnit.TON
+            Unit.M___S -> EUnit.METER_PER_SECOND
+            Unit.MPH -> EUnit.MILES_PER_HOUR
+            Unit.KM___H -> EUnit.KILOMETER_PER_HOUR
 
-        Unit.PERCENT -> EUnit.PERCENT
-    }
+            Unit.KG -> EUnit.KILOGRAM
+            Unit.T -> EUnit.TON
+
+            Unit.PERCENT -> EUnit.PERCENT
+        }
 
     fun mapDynamicToBoolean(source: Dynamic): Boolean = source == Dynamic.YES
 }

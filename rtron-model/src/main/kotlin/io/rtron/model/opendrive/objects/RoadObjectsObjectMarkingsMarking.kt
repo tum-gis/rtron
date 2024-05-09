@@ -32,5 +32,5 @@ data class RoadObjectsObjectMarkingsMarking(
     var stopOffset: Double = Double.NaN,
     var weight: Option<ERoadMarkWeight> = None,
     var width: Option<Double> = None,
-    var zOffset: Option<Double> = None
+    var zOffset: Option<Double> = None,
 ) : OpendriveElement()

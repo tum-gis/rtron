@@ -28,7 +28,6 @@ import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.LaneType
 
 object CodeAdder {
-
     // Methods
 
     /**
@@ -136,7 +135,9 @@ object CodeAdder {
             LaneType.MWY_EXIT -> listOf(TrafficAreaUsageCode.CAR)
         }
 
-    fun mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(laneMaterial: LaneMaterial): Option<TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode> =
+    fun mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(
+        laneMaterial: LaneMaterial,
+    ): Option<TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode> =
         when (laneMaterial.surface.uppercase()) {
             in "ASPHALT" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.ASPHALT.some()
             in "GRASS" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.GRASS.some()

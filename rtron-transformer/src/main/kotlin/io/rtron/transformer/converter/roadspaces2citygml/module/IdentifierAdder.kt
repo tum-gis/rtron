@@ -24,16 +24,22 @@ import org.xmlobjects.gml.model.basictypes.Code
  * Adds object identifiers from the RoadSpaces model to an [AbstractCityObject] (CityGML model).
  */
 object IdentifierAdder {
-
     // Methods
 
     /** Adds the [gmlId] to the [dstCityObject]. */
-    fun addIdentifier(gmlId: String, dstCityObject: AbstractCityObject) {
+    fun addIdentifier(
+        gmlId: String,
+        dstCityObject: AbstractCityObject,
+    ) {
         dstCityObject.id = gmlId
     }
 
     /** Adds the [gmlId] and optionally the [name] to the [dstCityObject]. */
-    fun addIdentifier(gmlId: String, name: Option<String>, dstCityObject: AbstractCityObject) {
+    fun addIdentifier(
+        gmlId: String,
+        name: Option<String>,
+        dstCityObject: AbstractCityObject,
+    ) {
         dstCityObject.id = gmlId
         name.onSome {
             dstCityObject.names = listOf(Code(it))
@@ -41,7 +47,11 @@ object IdentifierAdder {
     }
 
     /** Adds the [gmlId] and the [name] to the [dstCityObject]. */
-    fun addIdentifier(gmlId: String, name: String, dstCityObject: AbstractCityObject) {
+    fun addIdentifier(
+        gmlId: String,
+        name: String,
+        dstCityObject: AbstractCityObject,
+    ) {
         dstCityObject.id = gmlId
         dstCityObject.names = listOf(Code(name))
     }

@@ -62,9 +62,10 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
     }
 
     everyLaneSection.modify(this) { currentLaneSection ->
-        val currentLaneSectionId = currentLaneSection.additionalId
-            .toEither { IllegalStateException("Additional ID not available.") }
-            .getOrElse { throw it }
+        val currentLaneSectionId =
+            currentLaneSection.additionalId
+                .toEither { IllegalStateException("Additional ID not available.") }
+                .getOrElse { throw it }
 
         currentLaneSection.center.lane.forEach { currentLane ->
             currentLane.additionalId = LaneIdentifier(currentLane.id, currentLaneSectionId).some()
@@ -86,9 +87,10 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
     }
 
     everyRoadLanesLaneSectionCenterLane.modify(this) { currentCenterLane ->
-        val currentLaneId = currentCenterLane.additionalId
-            .toEither { IllegalStateException("Additional ID not available.") }
-            .getOrElse { throw it }
+        val currentLaneId =
+            currentCenterLane.additionalId
+                .toEither { IllegalStateException("Additional ID not available.") }
+                .getOrElse { throw it }
 
         currentCenterLane.roadMark.forEachIndexed { index, currentRoadMark ->
             currentRoadMark.additionalId = LaneRoadMarkIdentifier(index, currentLaneId).some()
@@ -98,9 +100,10 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
     }
 
     everyRoadLanesLaneSectionLeftLane.modify(this) { currentLeftLane ->
-        val currentLaneId = currentLeftLane.additionalId
-            .toEither { IllegalStateException("Additional ID not available.") }
-            .getOrElse { throw it }
+        val currentLaneId =
+            currentLeftLane.additionalId
+                .toEither { IllegalStateException("Additional ID not available.") }
+                .getOrElse { throw it }
 
         currentLeftLane.roadMark.forEachIndexed { index, currentRoadMark ->
             currentRoadMark.additionalId = LaneRoadMarkIdentifier(index, currentLaneId).some()
@@ -110,9 +113,10 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
     }
 
     everyRoadLanesLaneSectionRightLane.modify(this) { currentRightLane ->
-        val currentLaneId = currentRightLane.additionalId
-            .toEither { IllegalStateException("Additional ID not available.") }
-            .getOrElse { throw it }
+        val currentLaneId =
+            currentRightLane.additionalId
+                .toEither { IllegalStateException("Additional ID not available.") }
+                .getOrElse { throw it }
 
         currentRightLane.roadMark.forEachIndexed { index, currentRoadMark ->
             currentRoadMark.additionalId = LaneRoadMarkIdentifier(index, currentLaneId).some()
@@ -133,9 +137,10 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
     }
 
     everyRoadObject.modify(this) { currentRoadObject ->
-        val currentRoadObjectId = currentRoadObject.additionalId
-            .toEither { IllegalStateException("Additional ID not available.") }
-            .getOrElse { throw it }
+        val currentRoadObjectId =
+            currentRoadObject.additionalId
+                .toEither { IllegalStateException("Additional ID not available.") }
+                .getOrElse { throw it }
 
         currentRoadObject.outlines.onSome { currentRoadObjectOutlines ->
 

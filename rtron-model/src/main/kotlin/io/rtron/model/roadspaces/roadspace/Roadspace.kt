@@ -31,5 +31,5 @@ data class Roadspace(
     val referenceLine: Curve3D,
     val road: Road,
     val roadspaceObjects: List<RoadspaceObject> = emptyList(),
-    val attributes: AttributeList = AttributeList()
+    val attributes: AttributeList = AttributeList(),
 )

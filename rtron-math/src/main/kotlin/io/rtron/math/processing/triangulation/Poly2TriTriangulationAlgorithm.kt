@@ -36,15 +36,18 @@ import org.poly2tri.geometry.polygon.PolygonPoint as P2TPolygonPoint
  * Adapts the triangulation algorithm of [Poly2Tri](https://github.com/orbisgis/poly2tri.java).
  */
 class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
+    override fun triangulate(
+        vertices: NonEmptyList<Vector3D>,
+        tolerance: Double,
+    ): Either<TriangulatorException, List<Polygon3D>> =
+        either {
+            val polygon = P2TPolygon(vertices.toList().map { P2TPolygonPoint(it.x, it.y, it.z) })
 
-    override fun triangulate(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<TriangulatorException, List<Polygon3D>> = either {
-        val polygon = P2TPolygon(vertices.toList().map { P2TPolygonPoint(it.x, it.y, it.z) })
+            poly2TriTriangulation(polygon).bind()
+            val triangles = polygonBackConversion(polygon, tolerance).bind()
 
-        poly2TriTriangulation(polygon).bind()
-        val triangles = polygonBackConversion(polygon, tolerance).bind()
-
-        adjustOrientation(vertices, triangles)
-    }
+            adjustOrientation(vertices, triangles)
+        }
 
     /**
      * Performs the Poly2Tri triangulation, which runs on the mutable [polygon].
@@ -65,19 +68,23 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
     /**
      * Converts the Poly2Tri triangulation results back to a list of [Polygon3D].
      */
-    private fun polygonBackConversion(polygon: P2TPolygon, tolerance: Double):
-        Either<TriangulatorException, List<Polygon3D>> {
-        val triangles = polygon.triangles.map { delaunayTriangle ->
+    private fun polygonBackConversion(
+        polygon: P2TPolygon,
+        tolerance: Double,
+    ): Either<TriangulatorException, List<Polygon3D>> {
+        val triangles =
+            polygon.triangles.map { delaunayTriangle ->
 
-            val triangulatedVertices: NonEmptyList<Vector3D> = delaunayTriangle.points
-                .map { point -> Vector3D(point.x, point.y, point.z) }
-                .let { it.toNonEmptyListOrNull()!! }
+                val triangulatedVertices: NonEmptyList<Vector3D> =
+                    delaunayTriangle.points
+                        .map { point -> Vector3D(point.x, point.y, point.z) }
+                        .let { it.toNonEmptyListOrNull()!! }
 
-            if (triangulatedVertices.isColinear(tolerance)) {
-                return TriangulatorException.ColinearVertices().left()
+                if (triangulatedVertices.isColinear(tolerance)) {
+                    return TriangulatorException.ColinearVertices().left()
+                }
+                return@map Polygon3D(triangulatedVertices, tolerance)
             }
-            return@map Polygon3D(triangulatedVertices, tolerance)
-        }
 
         return Either.Right(triangles)
     }
@@ -91,7 +98,10 @@ class Poly2TriTriangulationAlgorithm : TriangulationAlgorithm() {
      * @param triangles triangles for which the orientation is to be adjusted
      * @return triangles with adjusted orientation
      */
-    private fun adjustOrientation(originalVertices: List<Vector3D>, triangles: List<Polygon3D>): List<Polygon3D> {
+    private fun adjustOrientation(
+        originalVertices: List<Vector3D>,
+        triangles: List<Polygon3D>,
+    ): List<Polygon3D> {
         val referenceNormal = originalVertices.calculateNormal()
         return triangles.map {
             val triangleNormal = it.vertices.calculateNormal()

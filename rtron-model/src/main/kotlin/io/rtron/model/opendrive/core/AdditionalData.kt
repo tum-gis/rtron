@@ -22,5 +22,5 @@ import arrow.core.Option
 data class AdditionalData(
     var userData: List<UserData> = emptyList(),
     var include: List<Include> = emptyList(),
-    var dataQuality: Option<DataQuality> = None
+    var dataQuality: Option<DataQuality> = None,
 )

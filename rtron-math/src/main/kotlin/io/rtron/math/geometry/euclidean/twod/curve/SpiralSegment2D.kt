@@ -39,9 +39,8 @@ class SpiralSegment2D(
     private val curvatureFunction: LinearFunction,
     override val tolerance: Double,
     override val affineSequence: AffineSequence2D = AffineSequence2D.EMPTY,
-    endBoundType: BoundType = BoundType.OPEN
+    endBoundType: BoundType = BoundType.OPEN,
 ) : AbstractCurve2D() {
-
     // Properties and Initializers
 
     private val lowerDomainEndpoint =
@@ -52,7 +51,9 @@ class SpiralSegment2D(
         Range.closedX(lowerDomainEndpoint, upperDomainEndpoint, endBoundType)
 
     init {
-        require(lowerDomainEndpoint == 0.0) { "Lower endpoint of domain must be zero (for moving the spiral segment, the affine sequence is preferred)." }
+        require(lowerDomainEndpoint == 0.0) {
+            "Lower endpoint of domain must be zero (for moving the spiral segment, the affine sequence is preferred)."
+        }
         require(length.isFinite()) { "Length value must be finite." }
         require(length > tolerance) { "Length value must be greater than zero and the tolerance threshold." }
         require(curvatureFunction.slope.isFinite()) { "Curvature slope must be finite." }
@@ -80,5 +81,8 @@ class SpiralSegment2D(
     }
 }
 
-fun LinearFunction.Companion.ofSpiralCurvature(curvatureStart: Double, curvatureEnd: Double, length: Double): LinearFunction =
-    ofInclusiveInterceptAndPoint(curvatureStart, length, curvatureEnd)
+fun LinearFunction.Companion.ofSpiralCurvature(
+    curvatureStart: Double,
+    curvatureEnd: Double,
+    length: Double,
+): LinearFunction = ofInclusiveInterceptAndPoint(curvatureStart, length, curvatureEnd)

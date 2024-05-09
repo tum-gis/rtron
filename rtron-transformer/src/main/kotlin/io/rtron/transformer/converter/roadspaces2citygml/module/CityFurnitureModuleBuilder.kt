@@ -34,7 +34,7 @@ import org.citygml4j.core.model.cityfurniture.CityFurniture
  * Builder for city objects of the CityGML CityFurniture module.
  */
 class CityFurnitureModuleBuilder(
-    private val parameters: Roadspaces2CitygmlParameters
+    private val parameters: Roadspaces2CitygmlParameters,
 ) {
     // Properties and Initializers
     private val relationAdder = RelationAdder(parameters)
@@ -56,13 +56,11 @@ class CityFurnitureModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
             cityFurnitureFeature.populateLod1Geometry(geometryTransformer)
                 .mapLeft {
-                    issueList += DefaultIssue.of(
-                        "NoSuitableGeometryForCityFurnitureLod1",
-                        it.message,
-                        roadspaceObject.id,
-                        Severity.WARNING,
-                        wasFixed = true
-                    )
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForCityFurnitureLod1",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
                 }
         }
 
@@ -70,13 +68,11 @@ class CityFurnitureModuleBuilder(
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             cityFurnitureFeature.populateLod2Geometry(geometryTransformer)
                 .onLeft {
-                    issueList += DefaultIssue.of(
-                        "NoSuitableGeometryForCityFurnitureLod2",
-                        it.message,
-                        roadspaceObject.id,
-                        Severity.WARNING,
-                        wasFixed = true
-                    )
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForCityFurnitureLod2",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
                 }
         }
 
@@ -84,7 +80,7 @@ class CityFurnitureModuleBuilder(
         IdentifierAdder.addIdentifier(
             roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix),
             roadspaceObject.name,
-            cityFurnitureFeature
+            cityFurnitureFeature,
         )
         relationAdder.addBelongToRelations(roadspaceObject, cityFurnitureFeature)
         attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)

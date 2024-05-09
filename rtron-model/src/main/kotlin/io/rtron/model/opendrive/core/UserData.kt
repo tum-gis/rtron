@@ -22,5 +22,5 @@ import arrow.core.Option
 data class UserData(
     // TODO: sequence
     var code: String = "",
-    var value: Option<String> = None
+    var value: Option<String> = None,
 )

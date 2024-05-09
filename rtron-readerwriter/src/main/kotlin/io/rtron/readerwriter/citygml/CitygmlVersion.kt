@@ -21,11 +21,12 @@ import org.citygml4j.core.model.CityGMLVersion as GmlCitygmlVersion
 enum class CitygmlVersion {
     V1_0,
     V2_0,
-    V3_0
+    V3_0,
 }
 
-fun CitygmlVersion.toGmlCitygml(): GmlCitygmlVersion = when (this) {
-    CitygmlVersion.V1_0 -> GmlCitygmlVersion.v1_0
-    CitygmlVersion.V2_0 -> GmlCitygmlVersion.v2_0
-    CitygmlVersion.V3_0 -> GmlCitygmlVersion.v3_0
-}
+fun CitygmlVersion.toGmlCitygml(): GmlCitygmlVersion =
+    when (this) {
+        CitygmlVersion.V1_0 -> GmlCitygmlVersion.v1_0
+        CitygmlVersion.V2_0 -> GmlCitygmlVersion.v2_0
+        CitygmlVersion.V3_0 -> GmlCitygmlVersion.v3_0
+    }

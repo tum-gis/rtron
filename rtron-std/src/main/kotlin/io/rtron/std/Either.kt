@@ -57,6 +57,9 @@ inline fun <A, B> Iterable<Either<A, B>>.handleLeftAndFilter(block: (Either.Left
     fold(emptyList()) { acc, result ->
         when (result) {
             is Either.Right -> acc + result.value
-            is Either.Left -> { block(result); acc }
+            is Either.Left -> {
+                block(result)
+                acc
+            }
         }
     }

@@ -29,26 +29,28 @@ data class RoadLanesLaneSection(
     var left: Option<RoadLanesLaneSectionLeft> = None,
     var center: RoadLanesLaneSectionCenter = RoadLanesLaneSectionCenter(),
     var right: Option<RoadLanesLaneSectionRight> = None,
-
     var s: Double = Double.NaN,
     var singleSide: Option<Boolean> = None,
-
-    override var additionalId: Option<LaneSectionIdentifier> = None
+    override var additionalId: Option<LaneSectionIdentifier> = None,
 ) : OpendriveElement(), AdditionalLaneSectionIdentifier {
-
     // Properties and Initializers
     val laneSectionStart get() = CurveRelativeVector1D(s)
 
     // Methods
     fun getNumberOfLeftLanes() = left.fold({ 0 }, { it.getNumberOfLanes() })
+
     fun getNumberOfRightLanes() = right.fold({ 0 }, { it.getNumberOfLanes() })
 
     fun getNumberOfLeftRightLanes() = getNumberOfLeftLanes() + getNumberOfRightLanes()
+
     fun getNumberOfLanes() = center.getNumberOfLanes() + getNumberOfLeftRightLanes()
 
     fun getCenterLane() = center.lane.first()
+
     fun getLeftLanes(): Map<Int, RoadLanesLaneSectionLRLane> = left.fold({ emptyMap() }, { it.getLanes() })
+
     fun getRightLanes(): Map<Int, RoadLanesLaneSectionLRLane> = right.fold({ emptyMap() }, { it.getLanes() })
+
     fun getLeftRightLanes(): Map<Int, RoadLanesLaneSectionLRLane> = getLeftLanes() + getRightLanes()
 
     companion object

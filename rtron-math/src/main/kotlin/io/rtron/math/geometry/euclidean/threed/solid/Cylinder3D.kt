@@ -41,9 +41,8 @@ data class Cylinder3D(
     val height: Double,
     override val tolerance: Double,
     override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
-    private val numberSlices: Int = DEFAULT_NUMBER_SLICES
+    private val numberSlices: Int = DEFAULT_NUMBER_SLICES,
 ) : AbstractSolid3D() {
-
     // Properties and Initializers
     init {
         require(radius.isFinite()) { "Radius value must be finite." }
@@ -64,17 +63,18 @@ data class Cylinder3D(
         val topPolygonVertices = circleVertices.map { it.toVector3D(z = height) }.let { it.toNonEmptyListOrNull()!! }
         val topPolygon = Polygon3D(topPolygonVertices, tolerance)
 
-        val sidePolygons = circleVertices
-            .zipWithNextEnclosing()
-            .map {
-                Polygon3D.of(
-                    it.first.toVector3D(0.0),
-                    it.second.toVector3D(0.0),
-                    it.second.toVector3D(height),
-                    it.first.toVector3D(height),
-                    tolerance = tolerance
-                )
-            }
+        val sidePolygons =
+            circleVertices
+                .zipWithNextEnclosing()
+                .map {
+                    Polygon3D.of(
+                        it.first.toVector3D(0.0),
+                        it.second.toVector3D(0.0),
+                        it.second.toVector3D(height),
+                        it.first.toVector3D(height),
+                        tolerance = tolerance,
+                    )
+                }
 
         return nonEmptyListOf(basePolygon, topPolygon) + sidePolygons
     }
@@ -97,7 +97,13 @@ data class Cylinder3D(
     companion object {
         const val DEFAULT_NUMBER_SLICES: Int = 16 // used for tesselation
 
-        fun of(radius: Option<Double>, height: Option<Double>, tolerance: Double, affineSequence: AffineSequence3D = AffineSequence3D.EMPTY, numberSlices: Int = DEFAULT_NUMBER_SLICES): Cylinder3D {
+        fun of(
+            radius: Option<Double>,
+            height: Option<Double>,
+            tolerance: Double,
+            affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
+            numberSlices: Int = DEFAULT_NUMBER_SLICES,
+        ): Cylinder3D {
             require(radius.isSome()) { "Radius must be defined." }
             require(height.isSome()) { "Height must be defined." }
             return Cylinder3D(radius.getOrNull()!!, height.getOrNull()!!, tolerance, affineSequence, numberSlices)

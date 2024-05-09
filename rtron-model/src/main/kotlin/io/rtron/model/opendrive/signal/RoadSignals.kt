@@ -22,8 +22,7 @@ import io.rtron.model.opendrive.core.OpendriveElement
 @optics
 data class RoadSignals(
     var signal: List<RoadSignalsSignal> = emptyList(),
-    var signalReference: List<RoadSignalsSignalReference> = emptyList()
+    var signalReference: List<RoadSignalsSignalReference> = emptyList(),
 ) : OpendriveElement() {
-
     companion object
 }

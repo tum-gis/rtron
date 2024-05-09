@@ -44,9 +44,8 @@ import io.rtron.std.noneWithNextEnclosing
 data class LinearRing3D(
     val vertices: NonEmptyList<Vector3D>,
     override val tolerance: Double,
-    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY
+    override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
 ) : AbstractSurface3D(), Tolerable {
-
     // Properties and Initializers
     private val numberOfVertices = vertices.size
 
@@ -58,8 +57,18 @@ data class LinearRing3D(
 
     init {
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a linear ring." }
-        require(vertices.noneWithNextEnclosing { a, b -> a.fuzzyEquals(b, tolerance) }) { "Consecutively following point duplicates found." }
-        require(dimensionSpan >= 2) { "The dimension of the span is too low ($dimensionSpan), which might be caused by colinear vertices (all vertices located on a line)." }
+        require(
+            vertices.noneWithNextEnclosing {
+                    a,
+                    b,
+                ->
+                a.fuzzyEquals(b, tolerance)
+            },
+        ) { "Consecutively following point duplicates found." }
+        require(dimensionSpan >= 2) {
+            "The dimension of the span is too low ($dimensionSpan), which might be " +
+                "caused by colinear vertices (all vertices located on a line)."
+        }
     }
 
     // Methods
@@ -80,7 +89,10 @@ data class LinearRing3D(
         /**
          * Creates a linear ring based on the provided [vertices].
          */
-        fun of(vertices: NonEmptyList<Vector3D>, tolerance: Double): Either<GeometryException.NotEnoughVertices, LinearRing3D> {
+        fun of(
+            vertices: NonEmptyList<Vector3D>,
+            tolerance: Double,
+        ): Either<GeometryException.NotEnoughVertices, LinearRing3D> {
             // val vertices = vertices.toList().toNonEmptyListOrNull()!!
             val verticesAdjusted: List<Vector3D> = vertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) }
             if (verticesAdjusted.size < 3) {
@@ -97,16 +109,21 @@ data class LinearRing3D(
          * @param leftVertices left vertices for the linear rings construction
          * @param rightVertices right vertices for the linear rings construction
          */
-        fun of(leftVertices: List<Vector3D>, rightVertices: List<Vector3D>, tolerance: Double): NonEmptyList<LinearRing3D> {
+        fun of(
+            leftVertices: List<Vector3D>,
+            rightVertices: List<Vector3D>,
+            tolerance: Double,
+        ): NonEmptyList<LinearRing3D> {
             require(leftVertices.size >= 2) { "At least two left vertices required." }
             require(rightVertices.size >= 2) { "At least two right vertices required." }
 
             data class VertexPair(val left: Vector3D, val right: Vector3D)
             val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
-            val linearRingVertices = vertexPairs.zipWithNext()
-                .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
-                .let { it.toNonEmptyListOrNull()!! }
+            val linearRingVertices =
+                vertexPairs.zipWithNext()
+                    .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
+                    .let { it.toNonEmptyListOrNull()!! }
 
             return linearRingVertices.map { LinearRing3D(it, tolerance) }
         }
@@ -119,29 +136,35 @@ data class LinearRing3D(
          * @param leftVertices left vertices for the linear rings construction
          * @param rightVertices right vertices for the linear rings construction
          */
-        fun ofWithDuplicatesRemoval(leftVertices: NonEmptyList<Vector3D>, rightVertices: NonEmptyList<Vector3D>, tolerance: Double):
-            Either<GeometryException.NotEnoughValidLinearRings, NonEmptyList<LinearRing3D>> = either {
-            require(leftVertices.size >= 2) { "At least two left vertices required." }
-            require(rightVertices.size >= 2) { "At least two right vertices required." }
+        fun ofWithDuplicatesRemoval(
+            leftVertices: NonEmptyList<Vector3D>,
+            rightVertices: NonEmptyList<Vector3D>,
+            tolerance: Double,
+        ): Either<GeometryException.NotEnoughValidLinearRings, NonEmptyList<LinearRing3D>> =
+            either {
+                require(leftVertices.size >= 2) { "At least two left vertices required." }
+                require(rightVertices.size >= 2) { "At least two right vertices required." }
 
-            data class VertexPair(val left: Vector3D, val right: Vector3D)
-            val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
+                data class VertexPair(val left: Vector3D, val right: Vector3D)
+                val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
-            val linearRings: List<LinearRing3D> = vertexPairs
-                .asSequence()
-                .zipWithNext()
-                .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
-                .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
-                .filter { it.distinct().count() >= 3 }
-                .filter { !it.isColinear(tolerance) }
-                .map { it.toNonEmptyListOrNull()!! }
-                .map { LinearRing3D(it, tolerance) }
-                .toList()
+                val linearRings: List<LinearRing3D> =
+                    vertexPairs
+                        .asSequence()
+                        .zipWithNext()
+                        .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
+                        .map { currentVertices -> currentVertices.filterWithNextEnclosing { a, b -> a.fuzzyUnequals(b, tolerance) } }
+                        .filter { it.distinct().count() >= 3 }
+                        .filter { !it.isColinear(tolerance) }
+                        .map { it.toNonEmptyListOrNull()!! }
+                        .map { LinearRing3D(it, tolerance) }
+                        .toList()
 
-            val nonEmptyLinearRingsList = linearRings.toNonEmptyListOrNone()
-                .toEither { GeometryException.NotEnoughValidLinearRings("") }
-                .bind()
-            nonEmptyLinearRingsList
-        }
+                val nonEmptyLinearRingsList =
+                    linearRings.toNonEmptyListOrNone()
+                        .toEither { GeometryException.NotEnoughValidLinearRings("") }
+                        .bind()
+                nonEmptyLinearRingsList
+            }
     }
 }

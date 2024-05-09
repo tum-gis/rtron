@@ -24,15 +24,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 class SchemaValidationReport(
     val opendriveVersion: OpendriveVersion,
-
     val validationIssues: IssueList<SchemaValidationIssue> = IssueList(),
-
     val completedSuccessfully: Boolean = true,
-    val validationAbortIssue: String = ""
+    val validationAbortIssue: String = "",
 ) {
-
     fun validationProcessAborted() = !completedSuccessfully
 
-    fun containsFatalErrorIssues(): Boolean =
-        validationIssues.getIssues().any { it.severity == Severity.FATAL_ERROR }
+    fun containsFatalErrorIssues(): Boolean = validationIssues.getIssues().any { it.severity == Severity.FATAL_ERROR }
 }

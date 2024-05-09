@@ -102,8 +102,10 @@ inline fun <T> Iterable<T>.filterToSorting(predicate: (first: T, second: T) -> B
  * @param step the number of elements to move on
  * @return the sequence of sublists
  */
-fun <T> Sequence<T>.windowedEnclosing(size: Int, step: Int = 1): Sequence<List<T>> =
-    (this + this.take(size - 1)).windowed(size, step)
+fun <T> Sequence<T>.windowedEnclosing(
+    size: Int,
+    step: Int = 1,
+): Sequence<List<T>> = (this + this.take(size - 1)).windowed(size, step)
 
 /**
  * Returns true, if all lists have the same number of elements.

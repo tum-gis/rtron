@@ -21,14 +21,14 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
 data class RoadLanesLaneSectionCenter(
-    var lane: List<RoadLanesLaneSectionCenterLane> = emptyList()
+    var lane: List<RoadLanesLaneSectionCenterLane> = emptyList(),
 ) : OpendriveElement() {
-
     // Methods
     fun getIndividualCenterLane(): RoadLanesLaneSectionCenterLane {
         check(lane.size == 1) { "Must contain exactly one center lane element." }
         return lane.first()
     }
+
     fun getNumberOfLanes() = lane.size
 
     companion object

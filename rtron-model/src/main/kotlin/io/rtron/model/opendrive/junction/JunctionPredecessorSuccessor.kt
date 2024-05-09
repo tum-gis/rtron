@@ -22,5 +22,5 @@ data class JunctionPredecessorSuccessor(
     var elementDir: EElementDir = EElementDir.PLUS,
     var elementId: String = "",
     var elementS: Double = Double.NaN,
-    var elementType: String = ""
+    var elementType: String = "",
 ) : OpendriveElement()

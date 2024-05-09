@@ -37,32 +37,42 @@ import kotlin.io.path.Path
 import kotlin.io.path.div
 
 class ValidateOpendriveProcessor(
-    private val parameters: ValidateOpendriveParameters
+    private val parameters: ValidateOpendriveParameters,
 ) {
-
     // Methods
 
-    fun process(inputPath: Path, outputPath: Path) {
+    fun process(
+        inputPath: Path,
+        outputPath: Path,
+    ) {
         val logger = KotlinLogging.logger {}
 
         processAllFiles(
             inputDirectoryPath = inputPath,
             withFilenameEndings = OpendriveReader.supportedFilenameEndings,
-            outputDirectoryPath = outputPath
+            outputDirectoryPath = outputPath,
         ) {
             // write the parameters as yaml file
             val parametersText = Yaml.default.encodeToString(ValidateOpendriveParameters.serializer(), parameters)
             (outputDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // validate schema of OpenDRIVE model
-            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn { it.message }; return@processAllFiles }
+            val opendriveSchemaValidatorReport =
+                OpendriveValidator.validateFromFile(inputFilePath).getOrElse {
+                    logger.warn { it.message }
+                    return@processAllFiles
+                }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted()) {
                 return@processAllFiles
             }
             // read of OpenDRIVE model
-            val opendriveModel = OpendriveReader.readFromFile(inputFilePath)
-                .getOrElse { logger.warn { it.message }; return@processAllFiles }
+            val opendriveModel =
+                OpendriveReader.readFromFile(inputFilePath)
+                    .getOrElse {
+                        logger.warn { it.message }
+                        return@processAllFiles
+                    }
 
             // evaluate OpenDRIVE model
             val opendriveEvaluator = OpendriveEvaluator(parameters.deriveOpendriveEvaluatorParameters())
@@ -72,10 +82,11 @@ class ValidateOpendriveProcessor(
                 logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
                 return@processAllFiles
             }
-            val modifiedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
-                logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
-                return@processAllFiles
-            }
+            val modifiedOpendriveModel =
+                opendriveEvaluatorResult.first.handleEmpty {
+                    logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
+                    return@processAllFiles
+                }
 
             // write modified OpenDRIVE model
             if (parameters.writeOpendriveFile) {
@@ -87,10 +98,11 @@ class ValidateOpendriveProcessor(
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
             val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel)
             roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
-            val roadspacesModel = roadspacesModelResult.first.handleEmpty {
-                logger.warn { roadspacesModelResult.second.conversion.getTextSummary() }
-                return@processAllFiles
-            }
+            val roadspacesModel =
+                roadspacesModelResult.first.handleEmpty {
+                    logger.warn { roadspacesModelResult.second.conversion.getTextSummary() }
+                    return@processAllFiles
+                }
 
             // evaluate Roadspaces model
             val roadspacesEvaluator = RoadspacesEvaluator(parameters.deriveRoadspacesEvaluatorParameters())

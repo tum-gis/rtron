@@ -21,7 +21,7 @@ import io.rtron.model.roadspaces.identifier.RoadspaceIdentifierInterface
 
 enum class ContactPoint(val relativeIndex: Int) {
     START(0),
-    END(-1)
+    END(-1),
 }
 
 /**
@@ -32,9 +32,8 @@ enum class ContactPoint(val relativeIndex: Int) {
  */
 data class RoadspaceContactPointIdentifier(
     val roadspaceContactPoint: ContactPoint,
-    val roadspaceIdentifier: RoadspaceIdentifier
+    val roadspaceIdentifier: RoadspaceIdentifier,
 ) : RoadspaceIdentifierInterface by roadspaceIdentifier {
-
     // Conversions
     override fun toString(): String {
         return "RoadspaceObjectIdentifier(roadspaceContactPoint=$roadspaceContactPoint, roadspaceId=$roadspaceId)"

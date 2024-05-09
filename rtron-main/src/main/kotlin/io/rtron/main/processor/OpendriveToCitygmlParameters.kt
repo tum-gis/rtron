@@ -33,15 +33,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OpendriveToCitygmlParameters(
     val convertToCitygml2: Boolean = false,
-
     val skipRoadShapeRemoval: Boolean = OpendriveEvaluatorParameters.DEFAULT_SKIP_ROAD_SHAPE_REMOVAL,
-
     val tolerance: Double = Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE,
     val planViewGeometryDistanceTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE,
-    val planViewGeometryDistanceWarningTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
-    val planViewGeometryAngleTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
-    val planViewGeometryAngleWarningTolerance: Double = OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
-
+    val planViewGeometryDistanceWarningTolerance: Double =
+        OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_WARNING_TOLERANCE,
+    val planViewGeometryAngleTolerance: Double =
+        OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
+    val planViewGeometryAngleWarningTolerance: Double =
+        OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
     val crsEpsg: Int = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
     val offsetX: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X,
     val offsetY: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y,
@@ -49,14 +49,12 @@ data class OpendriveToCitygmlParameters(
     val cropPolygonX: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_X,
     val cropPolygonY: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_Y,
     val removeRoadObjectsOfTypes: Set<EObjectType> = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_OF_TYPES,
-
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
     val circleSlices: Int = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
     val generateRandomGeometryIds: Boolean = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
     val transformAdditionalRoadLines: Boolean = Roadspaces2CitygmlParameters.DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES,
-
-    val compressionFormat: CompressionFormat = CompressionFormat.NONE
+    val compressionFormat: CompressionFormat = CompressionFormat.NONE,
 ) {
     // Methods
     fun isValid(): Either<List<String>, Unit> {
@@ -80,63 +78,69 @@ data class OpendriveToCitygmlParameters(
 
     fun getCitygmlWriteVersion(): CitygmlVersion = if (convertToCitygml2) CitygmlVersion.V2_0 else CitygmlVersion.V3_0
 
-    fun deriveOpendriveEvaluatorParameters() = OpendriveEvaluatorParameters(
-        skipRoadShapeRemoval = skipRoadShapeRemoval,
-        numberTolerance = tolerance,
-        planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
-        planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
-        planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
-        planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance
-    )
+    fun deriveOpendriveEvaluatorParameters() =
+        OpendriveEvaluatorParameters(
+            skipRoadShapeRemoval = skipRoadShapeRemoval,
+            numberTolerance = tolerance,
+            planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+            planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
+            planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+            planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
+        )
 
-    fun deriveOpendriveObjectRemoverParameters() = OpendriveObjectRemoverParameters(
-        removeRoadObjectsWithoutType = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_WITHOUT_TYPE,
-        removeRoadObjectsOfTypes = removeRoadObjectsOfTypes
-    )
+    fun deriveOpendriveObjectRemoverParameters() =
+        OpendriveObjectRemoverParameters(
+            removeRoadObjectsWithoutType = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_WITHOUT_TYPE,
+            removeRoadObjectsOfTypes = removeRoadObjectsOfTypes,
+        )
 
-    fun deriveOpendriveOffsetAdderParameters() = OpendriveOffsetAdderParameters(
-        offsetX = offsetX,
-        offsetY = offsetY,
-        offsetZ = offsetZ,
-        offsetHeading = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_HEADING
-    )
+    fun deriveOpendriveOffsetAdderParameters() =
+        OpendriveOffsetAdderParameters(
+            offsetX = offsetX,
+            offsetY = offsetY,
+            offsetZ = offsetZ,
+            offsetHeading = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_HEADING,
+        )
 
-    fun deriveOpendriveCropperParameters() = OpendriveCropperParameters(
-        numberTolerance = tolerance,
-        cropPolygonX = cropPolygonX,
-        cropPolygonY = cropPolygonY
-    )
+    fun deriveOpendriveCropperParameters() =
+        OpendriveCropperParameters(
+            numberTolerance = tolerance,
+            cropPolygonX = cropPolygonX,
+            cropPolygonY = cropPolygonY,
+        )
 
-    fun deriveOpendrive2RoadspacesParameters() = Opendrive2RoadspacesParameters(
-        concurrentProcessing = false,
+    fun deriveOpendrive2RoadspacesParameters() =
+        Opendrive2RoadspacesParameters(
+            concurrentProcessing = false,
+            numberTolerance = tolerance,
+            planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+            planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+            attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
+            deriveCrsEpsgAutomatically = true,
+            crsEpsg = crsEpsg,
+            extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
+        )
 
-        numberTolerance = tolerance,
-        planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
-        planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
-        attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
-        deriveCrsEpsgAutomatically = true,
-        crsEpsg = crsEpsg,
-        extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES
-    )
+    fun deriveRoadspacesEvaluatorParameters() =
+        RoadspacesEvaluatorParameters(
+            numberTolerance = tolerance,
+            laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE,
+        )
 
-    fun deriveRoadspacesEvaluatorParameters() = RoadspacesEvaluatorParameters(
-        numberTolerance = tolerance,
-        laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE
-    )
-
-    fun deriveRoadspaces2CitygmlParameters() = Roadspaces2CitygmlParameters(
-        concurrentProcessing = false,
-        gmlIdPrefix = Roadspaces2CitygmlParameters.DEFAULT_GML_ID_PREFIX,
-        xlinkPrefix = Roadspaces2CitygmlParameters.DEFAULT_XLINK_PREFIX,
-        identifierAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
-        geometryAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
-        flattenGenericAttributeSets = Roadspaces2CitygmlParameters.DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
-        discretizationStepSize = discretizationStepSize,
-        sweepDiscretizationStepSize = sweepDiscretizationStepSize,
-        circleSlices = circleSlices,
-        generateRandomGeometryIds = generateRandomGeometryIds,
-        transformAdditionalRoadLines = transformAdditionalRoadLines,
-        generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
-        mappingBackwardsCompatibility = convertToCitygml2
-    )
+    fun deriveRoadspaces2CitygmlParameters() =
+        Roadspaces2CitygmlParameters(
+            concurrentProcessing = false,
+            gmlIdPrefix = Roadspaces2CitygmlParameters.DEFAULT_GML_ID_PREFIX,
+            xlinkPrefix = Roadspaces2CitygmlParameters.DEFAULT_XLINK_PREFIX,
+            identifierAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
+            geometryAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
+            flattenGenericAttributeSets = Roadspaces2CitygmlParameters.DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
+            discretizationStepSize = discretizationStepSize,
+            sweepDiscretizationStepSize = sweepDiscretizationStepSize,
+            circleSlices = circleSlices,
+            generateRandomGeometryIds = generateRandomGeometryIds,
+            transformAdditionalRoadLines = transformAdditionalRoadLines,
+            generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
+            mappingBackwardsCompatibility = convertToCitygml2,
+        )
 }

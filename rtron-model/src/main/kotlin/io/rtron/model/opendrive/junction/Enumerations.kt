@@ -17,10 +17,17 @@
 package io.rtron.model.opendrive.junction
 
 enum class EConnectionType { DEFAULT, VIRTUAL }
+
 enum class EContactPoint { START, END }
+
 enum class EElementDir { PLUS, MINUS }
+
 enum class EJunctionSurfaceCRGMode { GLOBAL }
+
 enum class EJunctionType { DEFAULT, VIRTUAL, DIRECT }
+
 enum class EJunctionGroupType { ROUNDABOUT, UNKNOWN }
+
 enum class ERoadSurfaceCrgMode { ATTACHED, ATTACHED0, GENUINE, GLOBAL }
+
 enum class ERoadSurfaceCrgPurpose { ELEVATION, FRICTION }

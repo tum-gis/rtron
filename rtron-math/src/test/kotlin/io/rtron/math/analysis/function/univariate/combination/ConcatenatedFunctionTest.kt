@@ -87,10 +87,11 @@ class ConcatenatedFunctionTest : FunSpec({
 
         test("concatenated function with absolute start at 0") {
             val starts = nonEmptyListOf(0.0, 5.0)
-            val coefficients = nonEmptyListOf(
-                doubleArrayOf(2.0, 3.0, 4.0, 1.0),
-                doubleArrayOf(1.0, 2.0, 3.0, 4.0)
-            )
+            val coefficients =
+                nonEmptyListOf(
+                    doubleArrayOf(2.0, 3.0, 4.0, 1.0),
+                    doubleArrayOf(1.0, 2.0, 3.0, 4.0),
+                )
             val concatenatedFunction =
                 ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients)
 
@@ -111,10 +112,11 @@ class ConcatenatedFunctionTest : FunSpec({
 
         test("concatenated function with absolute start at -2") {
             val starts = nonEmptyListOf(-2.0, 3.0)
-            val coefficients = nonEmptyListOf(
-                doubleArrayOf(2.0, 3.0, 4.0, 1.0),
-                doubleArrayOf(1.0, 2.0, 3.0, 4.0)
-            )
+            val coefficients =
+                nonEmptyListOf(
+                    doubleArrayOf(2.0, 3.0, 4.0, 1.0),
+                    doubleArrayOf(1.0, 2.0, 3.0, 4.0),
+                )
             val concatenatedFunction =
                 ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients)
 
@@ -135,10 +137,11 @@ class ConcatenatedFunctionTest : FunSpec({
 
         test("concatenated function with absolute start at 2") {
             val starts = nonEmptyListOf(2.0, 7.0)
-            val coefficients = nonEmptyListOf(
-                doubleArrayOf(2.0, 3.0, 4.0, 1.0),
-                doubleArrayOf(1.0, 2.0, 3.0, 4.0)
-            )
+            val coefficients =
+                nonEmptyListOf(
+                    doubleArrayOf(2.0, 3.0, 4.0, 1.0),
+                    doubleArrayOf(1.0, 2.0, 3.0, 4.0),
+                )
             val concatenatedFunction =
                 ConcatenatedFunction.ofPolynomialFunctions(starts, coefficients)
 

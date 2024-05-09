@@ -37,81 +37,103 @@ import java.nio.file.Path
 import kotlin.io.path.isRegularFile
 
 object OpendriveReader {
-
     // Properties and Initializers
     private val logger = KotlinLogging.logger {}
 
     // Methods
-    fun readFromFile(filePath: Path): Either<OpendriveReaderException, OpendriveModel> = either {
-        if (!filePath.isRegularFile()) {
-            OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
-        }
-        if (!supportedFilenameEndings.any { filePath.fileName.toString().endsWith(it) }) {
-            OpendriveReaderException.FileEndingNotSupported(filePath).left().bind<OpendriveReaderException>()
-        }
-
-        val fileInputStreamForVersion = filePath.inputStreamFromDirectOrCompressedFile()
-        val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(fileInputStreamForVersion).bind()
-        fileInputStreamForVersion.close()
-
-        val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
-        val opendriveModelResult = readFromStream(opendriveVersion, fileInputStream)
-        fileInputStream.close()
-
-        val opendriveModel = opendriveModelResult.bind()
-        logger.info { "Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
-        opendriveModel
-    }
-    fun readFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, OpendriveModel> =
+    fun readFromFile(filePath: Path): Either<OpendriveReaderException, OpendriveModel> =
         either {
-            val unmarshallerOpendriveVersion = when (opendriveVersion) {
-                OpendriveVersion.V0_7 -> OpendriveVersion.V1_4
-                OpendriveVersion.V1_1 -> OpendriveVersion.V1_4
-                OpendriveVersion.V1_2 -> OpendriveVersion.V1_4
-                OpendriveVersion.V1_3 -> OpendriveVersion.V1_4
-                OpendriveVersion.V1_4 -> OpendriveVersion.V1_4
-                OpendriveVersion.V1_5 -> OpendriveVersion.V1_4
-                OpendriveVersion.V1_6 -> OpendriveVersion.V1_6
-                OpendriveVersion.V1_7 -> OpendriveVersion.V1_6
+            if (!filePath.isRegularFile()) {
+                OpendriveReaderException.FileNotFound(filePath).left().bind<OpendriveReaderException>()
             }
+            if (!supportedFilenameEndings.any { filePath.fileName.toString().endsWith(it) }) {
+                OpendriveReaderException.FileEndingNotSupported(filePath).left().bind<OpendriveReaderException>()
+            }
+
+            val fileInputStreamForVersion = filePath.inputStreamFromDirectOrCompressedFile()
+            val opendriveVersion = OpendriveVersionUtils.getOpendriveVersion(fileInputStreamForVersion).bind()
+            fileInputStreamForVersion.close()
+
+            val fileInputStream = filePath.inputStreamFromDirectOrCompressedFile()
+            val opendriveModelResult = readFromStream(opendriveVersion, fileInputStream)
+            fileInputStream.close()
+
+            val opendriveModel = opendriveModelResult.bind()
+            logger.info { "Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
+            opendriveModel
+        }
+
+    fun readFromStream(
+        opendriveVersion: OpendriveVersion,
+        inputStream: InputStream,
+    ): Either<OpendriveReaderException, OpendriveModel> =
+        either {
+            val unmarshallerOpendriveVersion =
+                when (opendriveVersion) {
+                    OpendriveVersion.V0_7 -> OpendriveVersion.V1_4
+                    OpendriveVersion.V1_1 -> OpendriveVersion.V1_4
+                    OpendriveVersion.V1_2 -> OpendriveVersion.V1_4
+                    OpendriveVersion.V1_3 -> OpendriveVersion.V1_4
+                    OpendriveVersion.V1_4 -> OpendriveVersion.V1_4
+                    OpendriveVersion.V1_5 -> OpendriveVersion.V1_4
+                    OpendriveVersion.V1_6 -> OpendriveVersion.V1_6
+                    OpendriveVersion.V1_7 -> OpendriveVersion.V1_6
+                }
             if (opendriveVersion != unmarshallerOpendriveVersion) {
-                logger.warn { "No dedicated reader available for OpenDRIVE $opendriveVersion. Using reader for OpenDRIVE $unmarshallerOpendriveVersion as fallback." }
+                logger.warn {
+                    "No dedicated reader available for OpenDRIVE $opendriveVersion. " +
+                        "Using reader for OpenDRIVE $unmarshallerOpendriveVersion as fallback."
+                }
             }
 
             val unmarshaller = OpendriveUnmarshaller.of(unmarshallerOpendriveVersion).bind()
             val opendriveVersionSpecificModel = unmarshaller.jaxbUnmarshaller.unmarshal(inputStream)
 
-            val opendriveModel = when (unmarshallerOpendriveVersion) {
-                OpendriveVersion.V1_4 -> {
-                    val converter = Mappers.getMapper(Opendrive14Mapper::class.java)
-                    converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive14.OpenDRIVE)
+            val opendriveModel =
+                when (unmarshallerOpendriveVersion) {
+                    OpendriveVersion.V1_4 -> {
+                        val converter = Mappers.getMapper(Opendrive14Mapper::class.java)
+                        converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive14.OpenDRIVE)
+                    }
+                    OpendriveVersion.V1_6 -> {
+                        val converter = Mappers.getMapper(Opendrive16Mapper::class.java)
+                        converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive16.OpenDRIVE)
+                    }
+                    else -> throw IllegalStateException("Mapper must be implemented")
                 }
-                OpendriveVersion.V1_6 -> {
-                    val converter = Mappers.getMapper(Opendrive16Mapper::class.java)
-                    converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive16.OpenDRIVE)
-                }
-                else -> throw IllegalStateException("Mapper must be implemented")
-            }
             opendriveModel.updateAdditionalIdentifiers()
             opendriveModel
         }
 
-    val supportedFilenameEndings: Set<String> = setOf(
-        ".xodr",
-        ".xodr.${CompressedFileExtension.ZIP.extension}",
-        ".xodr.${CompressedFileExtension.GZ.extension}",
-        ".xodr.${CompressedFileExtension.ZST.extension}"
-    )
+    val supportedFilenameEndings: Set<String> =
+        setOf(
+            ".xodr",
+            ".xodr.${CompressedFileExtension.ZIP.extension}",
+            ".xodr.${CompressedFileExtension.GZ.extension}",
+            ".xodr.${CompressedFileExtension.ZST.extension}",
+        )
 }
 
 sealed class OpendriveReaderException(message: String) : BaseException(message) {
     data class FileNotFound(val path: Path) : OpendriveReaderException("File not found at $path")
+
     data class FileEndingNotSupported(val path: Path) : OpendriveReaderException("File not found at $path")
+
     data class MalformedXmlDocument(val reason: String) : OpendriveReaderException("OpenDRIVE file cannot be parsed: $reason")
-    data class HeaderElementNotFound(val reason: String) : OpendriveReaderException("Header element of OpenDRIVE dataset not found: $reason")
+
+    data class HeaderElementNotFound(val reason: String) : OpendriveReaderException(
+        "Header element of OpenDRIVE dataset not found: $reason",
+    )
+
     data class VersionNotIdentifiable(val reason: String) : OpendriveReaderException("Version of OpenDRIVE dataset not deducible: $reason")
 
-    data class NoDedicatedUnmarshallerAvailable(val version: OpendriveVersion) : OpendriveReaderException("No dedicated unmarshaller available for $version")
+    data class NoDedicatedUnmarshallerAvailable(val version: OpendriveVersion) : OpendriveReaderException(
+        "No dedicated unmarshaller available for $version",
+    )
+
     data class FatalSchemaValidationError(val reason: String) : OpendriveReaderException("Fatal error during schema validation: $reason")
-    data class NumberFormatException(val reason: String) : OpendriveReaderException("Invalid formatting of a number in the dataset: $reason")
+
+    data class NumberFormatException(val reason: String) : OpendriveReaderException(
+        "Invalid formatting of a number in the dataset: $reason",
+    )
 }

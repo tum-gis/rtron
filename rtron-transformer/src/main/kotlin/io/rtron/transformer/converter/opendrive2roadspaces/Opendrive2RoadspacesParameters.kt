@@ -38,9 +38,8 @@ data class Opendrive2RoadspacesParameters(
     /** [EPSG code](https://en.wikipedia.org/wiki/EPSG_Geodetic_Parameter_Dataset) of the coordinate reference system (obligatory for working with GIS applications) */
     val crsEpsg: Int,
     /** linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown) */
-    val extrapolateLateralRoadShapes: Boolean
+    val extrapolateLateralRoadShapes: Boolean,
 ) {
-
     companion object {
         const val DEFAULT_NUMBER_TOLERANCE = 1E-7
         const val DEFAULT_PLAN_VIEW_GEOMETRY_DISTANCE_TOLERANCE = 1E0

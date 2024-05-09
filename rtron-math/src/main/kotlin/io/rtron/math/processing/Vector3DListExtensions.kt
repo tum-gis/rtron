@@ -51,11 +51,12 @@ fun Triple<Vector3D, Vector3D, Vector3D>.isColinear(tolerance: Double): Boolean 
     val distanceFirstThird = first.distance(third)
 
     if (distanceFirstSecond < tolerance || distanceFirstThird < tolerance) return true
-    val line = if (distanceFirstSecond < distanceFirstThird) {
-        Line3D(first, third, tolerance)
-    } else {
-        Line3D(first, second, tolerance)
-    }
+    val line =
+        if (distanceFirstSecond < distanceFirstThird) {
+            Line3D(first, third, tolerance)
+        } else {
+            Line3D(first, second, tolerance)
+        }
     val point = if (distanceFirstSecond < distanceFirstThird) second else third
 
     return line.distance(point) < tolerance
@@ -103,16 +104,20 @@ fun List<Vector3D>.calculateBestFittingPlane(tolerance: Double): Plane3D {
  * @param tolerance tolerated distance between points and the plane
  * @param dynamicToleranceAdjustment increases the tolerance when numbers are greater
  */
-fun List<Vector3D>.isPlanar(tolerance: Double, dynamicToleranceAdjustment: Boolean = true): Boolean {
+fun List<Vector3D>.isPlanar(
+    tolerance: Double,
+    dynamicToleranceAdjustment: Boolean = true,
+): Boolean {
     require(size >= 3) { "Planarity check requires the provision of at least three points." }
 
-    val adjustedTolerance = if (dynamicToleranceAdjustment) {
-        val u = Math.ulp(this.flatMap { it.toDoubleList() }.maxOf(::abs))
-        val dynamicFactor = u / DBL_EPSILON
-        tolerance * dynamicFactor
-    } else {
-        tolerance
-    }
+    val adjustedTolerance =
+        if (dynamicToleranceAdjustment) {
+            val u = Math.ulp(this.flatMap { it.toDoubleList() }.maxOf(::abs))
+            val dynamicFactor = u / DBL_EPSILON
+            tolerance * dynamicFactor
+        } else {
+            tolerance
+        }
 
     val bestFittingPlane = this.calculateBestFittingPlane(tolerance)
     return this.all { bestFittingPlane.getOffset(it) <= adjustedTolerance }
@@ -131,8 +136,7 @@ fun List<Vector3D>.calculateNormal(): Vector3D =
  * Calculates the centroid of a list of [Vector3D].
  * See the wikipedia article of [Centroid](https://en.wikipedia.org/wiki/Centroid).
  */
-fun List<Vector3D>.calculateCentroid(): Vector3D =
-    this.reduce { sum, point -> sum + point }.div(this.size.toDouble())
+fun List<Vector3D>.calculateCentroid(): Vector3D = this.reduce { sum, point -> sum + point }.div(this.size.toDouble())
 
 /**
  * Conversion to a string of coordinates.

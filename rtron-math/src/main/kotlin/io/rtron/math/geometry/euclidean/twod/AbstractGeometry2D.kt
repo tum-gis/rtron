@@ -23,7 +23,6 @@ import io.rtron.math.transform.AffineSequence2D
  * Abstract class for all geometric objects in 2D.
  */
 abstract class AbstractGeometry2D : AbstractGeometry() {
-
     /**
      * List of affine transformation matrices to move and rotate the geometric object.
      */

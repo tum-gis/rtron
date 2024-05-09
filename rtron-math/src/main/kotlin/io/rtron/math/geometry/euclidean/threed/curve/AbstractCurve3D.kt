@@ -38,7 +38,6 @@ import io.rtron.math.range.length
  * Abstract class for all geometric curve objects in 3D.
  */
 abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, Tolerable {
-
     // Properties
 
     /** Length of the curve */
@@ -117,23 +116,29 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
      * @param includeEndPoint true, if the endpoint shall be included
      * @return list of points on this curve
      */
-    fun calculatePointListGlobalCS(step: Double, includeEndPoint: Boolean = true):
-        Either<GeometryException.ValueNotContainedInDomain, NonEmptyList<Vector3D>> = either {
-        domain.arrange(step, includeEndPoint, tolerance)
-            .map(::CurveRelativeVector1D)
-            .map { calculatePointGlobalCS(it).bind() }
-            .let { it.toNonEmptyListOrNull()!! }
-    }
+    fun calculatePointListGlobalCS(
+        step: Double,
+        includeEndPoint: Boolean = true,
+    ): Either<GeometryException.ValueNotContainedInDomain, NonEmptyList<Vector3D>> =
+        either {
+            domain.arrange(step, includeEndPoint, tolerance)
+                .map(::CurveRelativeVector1D)
+                .map { calculatePointGlobalCS(it).bind() }
+                .let { it.toNonEmptyListOrNull()!! }
+        }
 
     /**
      * Returns a discretized curve as a [LineString3D].
      *
      * @param step step size between the points
      */
-    fun calculateLineStringGlobalCS(step: Double): Either<GeometryException, LineString3D> = either {
-        val point = calculatePointListGlobalCS(step, true).bind()
-        LineString3D.of(point, tolerance).bind()
-    }
+    fun calculateLineStringGlobalCS(step: Double): Either<GeometryException, LineString3D> =
+        either {
+            val point = calculatePointListGlobalCS(step, true).bind()
+            LineString3D.of(point, tolerance).bind()
+        }
 
-    override fun accept(visitor: Geometry3DVisitor) { visitor.visit(this) }
+    override fun accept(visitor: Geometry3DVisitor) {
+        visitor.visit(this)
+    }
 }

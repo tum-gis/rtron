@@ -113,11 +113,12 @@ class SequencesKtTest : FunSpec({
             val pair5 = Pair(3, "b")
             val pair6 = Pair(1, "b")
             val startList = listOf(pair1, pair2, pair3, pair4, pair5, pair6)
-            val expectedZips = listOf(
-                listOf(pair6, pair1, pair2),
-                listOf(pair3),
-                listOf(pair4, pair5)
-            )
+            val expectedZips =
+                listOf(
+                    listOf(pair6, pair1, pair2),
+                    listOf(pair3),
+                    listOf(pair4, pair5),
+                )
 
             val actualZips = startList.zipWithConsecutivesEnclosing { it.first }
 

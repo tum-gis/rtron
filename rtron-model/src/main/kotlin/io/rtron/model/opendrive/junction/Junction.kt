@@ -33,7 +33,6 @@ data class Junction(
     var priority: List<JunctionPriority> = emptyList(),
     var controller: List<JunctionController> = emptyList(),
     var surface: Option<JunctionSurface> = None,
-
     var id: String = "",
     var mainRoad: Option<String> = None,
     var name: Option<String> = None,
@@ -41,10 +40,8 @@ data class Junction(
     var sEnd: Option<Double> = None,
     var sStart: Option<Double> = None,
     var type: Option<EJunctionType> = None,
-
-    override var additionalId: Option<JunctionIdentifier> = None
+    override var additionalId: Option<JunctionIdentifier> = None,
 ) : OpendriveElement(), AdditionalJunctionIdentifier {
-
     // Properties and Initializers
     val connectionAsNonEmptyList: NonEmptyList<JunctionConnection>
         get() = connection.toNonEmptyListOrNull()!!
@@ -54,7 +51,9 @@ data class Junction(
 
     // Methods
     fun getConnectingRoadIds(): Set<String> = connection.flatMap { it.incomingRoad.toList() }.toSet()
+
     fun getIncomingRoadIds(): Set<String> = connection.flatMap { it.incomingRoad.toList() }.toSet()
+
     fun getNumberOfIncomingRoads(): Int = getIncomingRoadIds().size
 
     companion object

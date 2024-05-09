@@ -20,7 +20,6 @@ import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLanesLaneSectionLCRLaneRoadMarkType(
     var line: List<RoadLanesLaneSectionLCRLaneRoadMarkTypeLine> = emptyList(),
-
     var name: String = "",
-    var width: Double = Double.NaN
+    var width: Double = Double.NaN,
 ) : OpendriveElement()

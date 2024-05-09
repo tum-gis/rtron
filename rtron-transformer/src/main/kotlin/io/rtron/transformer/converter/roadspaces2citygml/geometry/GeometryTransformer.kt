@@ -69,9 +69,8 @@ import org.xmlobjects.gml.model.geometry.primitives.SurfaceProperty
  * @param parameters parameters for the geometry transformation, such as discretization step sizes
  */
 class GeometryTransformer(
-    val parameters: Roadspaces2CitygmlParameters
+    val parameters: Roadspaces2CitygmlParameters,
 ) : Geometry3DVisitor {
-
     // Properties and Initializers
     private var polygonsOfSolidResult: Option<NonEmptyList<Polygon3D>> = None
     private var polygonsOfSurfaceResult: Option<Either<GeometryException.BoundaryRepresentationGenerationError, List<Polygon3D>>> =
@@ -94,11 +93,12 @@ class GeometryTransformer(
     fun getSolid(): Option<SolidProperty> {
         val polygonsOfSolid = polygonsOfSolidResult.handleEmpty { return None }
 
-        val gmlPolygons = polygonsOfSolid.map {
-            val polygonGml = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) polygonGml.id = generateRandomUUID(parameters.gmlIdPrefix)
-            SurfaceProperty(polygonGml)
-        }
+        val gmlPolygons =
+            polygonsOfSolid.map {
+                val polygonGml = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
+                if (parameters.generateRandomGeometryIds) polygonGml.id = generateRandomUUID(parameters.gmlIdPrefix)
+                SurfaceProperty(polygonGml)
+            }
 
         val solid = Solid(Shell(gmlPolygons))
         if (parameters.generateRandomGeometryIds) solid.id = generateRandomUUID(parameters.gmlIdPrefix)
@@ -136,10 +136,11 @@ class GeometryTransformer(
     fun getPoint(): Option<PointProperty> {
         val point = pointResult.handleEmpty { return None }
 
-        val gmlPoint = Point().apply {
-            pos = createDirectPosition(point)
-            if (parameters.generateRandomGeometryIds) id = generateRandomUUID(parameters.gmlIdPrefix)
-        }
+        val gmlPoint =
+            Point().apply {
+                pos = createDirectPosition(point)
+                if (parameters.generateRandomGeometryIds) id = generateRandomUUID(parameters.gmlIdPrefix)
+            }
         return PointProperty(gmlPoint).some()
     }
 
@@ -170,7 +171,7 @@ class GeometryTransformer(
         TOP,
         SIDE,
         BASE,
-        NONE
+        NONE,
     }
 
     /**
@@ -193,7 +194,9 @@ class GeometryTransformer(
      * @param solidFaceSelection list of [FaceType] to be cutout of a solid geometry
      * @return cutout of a solid geometry or a [MultiSurfaceProperty]
      */
-    fun getSolidCutoutOrSurface(vararg solidFaceSelection: FaceType): Option<Either<GeometryException.BoundaryRepresentationGenerationError, MultiSurfaceProperty>> {
+    fun getSolidCutoutOrSurface(
+        vararg solidFaceSelection: FaceType,
+    ): Option<Either<GeometryException.BoundaryRepresentationGenerationError, MultiSurfaceProperty>> {
         getSolidCutout(*solidFaceSelection).onSome {
             return it.right().some()
         }
@@ -276,8 +279,9 @@ class GeometryTransformer(
     }
 
     override fun visit(parametricSweep3D: ParametricSweep3D) {
-        val adjustedParametricSweep = parametricSweep3D
-            .copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
+        val adjustedParametricSweep =
+            parametricSweep3D
+                .copy(discretizationStepSize = parameters.sweepDiscretizationStepSize)
         visit(adjustedParametricSweep as AbstractSolid3D)
     }
 
@@ -286,11 +290,12 @@ class GeometryTransformer(
     }
 
     private fun polygonsToMultiSurfaceProperty(polygons: NonEmptyList<Polygon3D>): MultiSurfaceProperty {
-        val surfaceProperties = polygons.map {
-            val gmlPolygon = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
-            if (parameters.generateRandomGeometryIds) gmlPolygon.id = generateRandomUUID(parameters.gmlIdPrefix)
-            SurfaceProperty(gmlPolygon)
-        }
+        val surfaceProperties =
+            polygons.map {
+                val gmlPolygon = geometryFactory.createPolygon(it.toVertexPositionElementList(), DIMENSION)!!
+                if (parameters.generateRandomGeometryIds) gmlPolygon.id = generateRandomUUID(parameters.gmlIdPrefix)
+                SurfaceProperty(gmlPolygon)
+            }
 
         val multiSurface = MultiSurface(surfaceProperties)
         if (parameters.generateRandomGeometryIds) multiSurface.id = generateRandomUUID(parameters.gmlIdPrefix)
@@ -304,11 +309,17 @@ class GeometryTransformer(
         private val geometryFactory = GeometryFactory.newInstance()
         private const val DIMENSION = 3
 
-        fun of(point: AbstractPoint3D, parameters: Roadspaces2CitygmlParameters): GeometryTransformer {
+        fun of(
+            point: AbstractPoint3D,
+            parameters: Roadspaces2CitygmlParameters,
+        ): GeometryTransformer {
             return GeometryTransformer(parameters).also { point.accept(it) }
         }
 
-        fun of(point: AbstractGeometry3D, parameters: Roadspaces2CitygmlParameters): GeometryTransformer {
+        fun of(
+            point: AbstractGeometry3D,
+            parameters: Roadspaces2CitygmlParameters,
+        ): GeometryTransformer {
             return GeometryTransformer(parameters).also { point.accept(it) }
         }
     }
