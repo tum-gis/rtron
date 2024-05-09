@@ -16,6 +16,7 @@
 
 package io.rtron.math.geometry.euclidean.twod.curve
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.doubles.plusOrMinus
@@ -33,7 +34,6 @@ import io.rtron.math.std.DBL_EPSILON_6
 import io.rtron.math.std.DBL_EPSILON_8
 import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
-import mu.KotlinLogging
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import java.io.FileReader

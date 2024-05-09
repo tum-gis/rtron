@@ -16,7 +16,7 @@
 
 package io.rtron.io.logging
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -59,10 +59,10 @@ class ProgressBar(
     private fun printUpdate() {
         val elapsedTime = getElapsedTime()
         if (elapsedTime > PRINT_AFTER && (getElapsedTimeSinceLastUpdate() > PRINT_AT_LEAST || isCompleted())) {
-            logger.info(
+            logger.info {
                 "$taskName $currentStatus/$completion ${getProgressPercent().roundToInt()}% " +
                     "[ET $elapsedTime, ETA ${getEstimatedTimeOfArrival()}]"
-            )
+            }
             lastPrintUpdateTime = System.currentTimeMillis()
         }
     }

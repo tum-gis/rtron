@@ -19,6 +19,7 @@ package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.model.opendrive.junction.EConnectionType
 import io.rtron.model.opendrive.junction.EContactPoint
 import io.rtron.model.opendrive.junction.EElementDir
@@ -27,7 +28,6 @@ import io.rtron.model.opendrive.junction.JunctionPredecessorSuccessor
 import io.rtron.model.opendrive.junction.JunctionSurface
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
 import io.rtron.readerwriter.opendrive.reader.mapper.common.toUpperCaseVariations
-import mu.KotlinLogging
 import org.asam.opendrive16.E_Junction_Type
 import org.asam.opendrive16.T_Junction_PredecessorSuccessor
 import org.asam.opendrive16.T_Junction_Surface

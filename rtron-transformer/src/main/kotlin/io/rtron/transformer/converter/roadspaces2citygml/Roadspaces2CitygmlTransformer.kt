@@ -20,6 +20,7 @@ import arrow.core.Option
 import arrow.core.flattenOption
 import arrow.core.getOrElse
 import arrow.core.toOption
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.issues.ContextIssueList
 import io.rtron.io.issues.DefaultIssueList
 import io.rtron.io.issues.mergeIssueLists
@@ -40,7 +41,6 @@ import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTraff
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.transportation.Road
 import org.citygml4j.core.model.transportation.TrafficSpaceProperty
@@ -76,7 +76,7 @@ class Roadspaces2CitygmlTransformer(
         val report = Roadspaces2CitygmlReport(parameters)
 
         // transformation of each road space
-        logger.info("Parameters: $parameters.")
+        logger.info { "Parameters: $parameters." }
         val abstractCityObjects =
             if (parameters.concurrentProcessing) {
                 transformRoadspacesConcurrently(roadspacesModel).handleIssueList { report.conversion += it }
@@ -87,7 +87,7 @@ class Roadspaces2CitygmlTransformer(
         // create CityGML model
         val boundingShape =
             calculateBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
-        logger.info("Completed transformation with ${report.getTextSummary()}.")
+        logger.info { "Completed transformation with ${report.getTextSummary()}." }
         val citygmlModel = CitygmlModel(roadspacesModel.header.name, boundingShape, abstractCityObjects)
         return citygmlModel to report
     }

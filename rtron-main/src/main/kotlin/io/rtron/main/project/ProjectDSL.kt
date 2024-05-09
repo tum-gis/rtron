@@ -16,8 +16,8 @@
 
 package io.rtron.main.project
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.files.walk
-import mu.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
@@ -39,15 +39,15 @@ fun processAllFiles(inputDirectoryPath: Path, withFilenameEndings: Set<String>, 
     val logger = KotlinLogging.logger {}
 
     if (!inputDirectoryPath.isDirectory()) {
-        logger.error("Provided directory does not exist: $inputDirectoryPath")
+        logger.error { "Provided directory does not exist: $inputDirectoryPath" }
         return
     }
     if (withFilenameEndings.isEmpty()) {
-        logger.error("No extensions have been provided.")
+        logger.error { "No extensions have been provided." }
         return
     }
     if (outputDirectoryPath.isRegularFile()) {
-        logger.error("Output directory must not be a file: $outputDirectoryPath")
+        logger.error { "Output directory must not be a file: $outputDirectoryPath" }
         return
     }
 
@@ -60,7 +60,7 @@ fun processAllFiles(inputDirectoryPath: Path, withFilenameEndings: Set<String>, 
         .sorted()
 
     if (inputFilePaths.isEmpty()) {
-        logger.error("No files have been found with $withFilenameEndings as extension in input directory: $outputDirectoryPath")
+        logger.error { "No files have been found with $withFilenameEndings as extension in input directory: $outputDirectoryPath" }
         return
     }
 
@@ -70,13 +70,13 @@ fun processAllFiles(inputDirectoryPath: Path, withFilenameEndings: Set<String>, 
         val inputFileRelativePath = inputDirectoryPath.relativize(currentPath)
         val projectOutputDirectoryPath = outputDirectoryPath.resolve(inputFileRelativePath)
 
-        logger.info("Starting project (${index + 1}/$totalNumber): $inputFileRelativePath")
+        logger.info { "Starting project (${index + 1}/$totalNumber): $inputFileRelativePath" }
 
         val timeElapsed = measureTime {
             val project = Project(currentPath, projectOutputDirectoryPath)
             project.apply(process)
         }
 
-        logger.info("Completed project after $timeElapsed." + System.lineSeparator())
+        logger.info { "Completed project after $timeElapsed." + System.lineSeparator() }
     }
 }

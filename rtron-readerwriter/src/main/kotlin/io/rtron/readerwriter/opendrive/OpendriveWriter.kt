@@ -18,12 +18,12 @@ package io.rtron.readerwriter.opendrive
 
 import arrow.core.Either
 import arrow.core.raise.either
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.io.files.outputStreamDirectOrCompressed
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.writer.OpendriveMarshaller
 import io.rtron.std.BaseException
-import mu.KotlinLogging
 import java.io.OutputStream
 import java.nio.file.Path
 
@@ -39,7 +39,7 @@ object OpendriveWriter {
         writeToStream(model, outputStream)
         outputStream.close()
 
-        logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+        logger.info { "Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
     }
 
     fun writeToStream(model: OpendriveModel, outputStream: OutputStream) {

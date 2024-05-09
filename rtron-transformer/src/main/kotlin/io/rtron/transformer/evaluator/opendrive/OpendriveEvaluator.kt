@@ -19,6 +19,7 @@ package io.rtron.transformer.evaluator.opendrive
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.issues.containsFatalErrors
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
@@ -26,7 +27,6 @@ import io.rtron.transformer.evaluator.opendrive.plans.basicdatatype.BasicDataTyp
 import io.rtron.transformer.evaluator.opendrive.plans.conversionrequirements.ConversionRequirementsEvaluator
 import io.rtron.transformer.evaluator.opendrive.plans.modelingrules.ModelingRulesEvaluator
 import io.rtron.transformer.evaluator.opendrive.report.OpendriveEvaluationReport
-import mu.KotlinLogging
 
 class OpendriveEvaluator(
     val parameters: OpendriveEvaluatorParameters
@@ -41,7 +41,7 @@ class OpendriveEvaluator(
     // Methods
 
     fun evaluate(opendriveModel: OpendriveModel): Pair<Option<OpendriveModel>, OpendriveEvaluationReport> {
-        logger.info("Parameters: $parameters.")
+        logger.info { "Parameters: $parameters." }
 
         opendriveModel.updateAdditionalIdentifiers()
         var modifiedOpendriveModel = opendriveModel.copy()

@@ -27,7 +27,7 @@ object DependencyVersions {
     const val mockk = "1.13.10"
 
     // logging libraries
-    const val kotlinLogging = "3.0.5"
+    const val kotlinLogging = "6.0.9"
     const val slf4jSimple = "2.0.13"
 
     // object creation libraries
@@ -75,7 +75,7 @@ object Dependencies {
     const val mockk = "io.mockk:mockk:${DependencyVersions.mockk}"
 
     // logging libraries
-    const val kotlinLogging = "io.github.microutils:kotlin-logging:${DependencyVersions.kotlinLogging}"
+    const val kotlinLogging = "io.github.oshai:kotlin-logging-jvm:${DependencyVersions.kotlinLogging}"
     const val slf4jSimple = "org.slf4j:slf4j-simple:${DependencyVersions.slf4jSimple}"
 
     // object creation libraries

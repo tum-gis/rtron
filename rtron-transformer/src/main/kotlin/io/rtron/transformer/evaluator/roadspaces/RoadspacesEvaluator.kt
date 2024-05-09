@@ -16,10 +16,10 @@
 
 package io.rtron.transformer.evaluator.roadspaces
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.transformer.evaluator.roadspaces.plans.modelingrules.ModelingRulesEvaluator
 import io.rtron.transformer.evaluator.roadspaces.report.RoadspacesEvaluationReport
-import mu.KotlinLogging
 
 class RoadspacesEvaluator(
     val parameters: RoadspacesEvaluatorParameters
@@ -32,7 +32,7 @@ class RoadspacesEvaluator(
     // Methods
 
     fun evaluate(roadspacesModel: RoadspacesModel): Pair<RoadspacesModel, RoadspacesEvaluationReport> {
-        logger.info("Parameters: $parameters.")
+        logger.info { "Parameters: $parameters." }
 
         val report = RoadspacesEvaluationReport(parameters)
 

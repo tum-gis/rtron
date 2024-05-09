@@ -18,6 +18,7 @@ package io.rtron.transformer.converter.opendrive2roadspaces
 
 import arrow.core.Option
 import arrow.core.some
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.issues.ContextIssueList
 import io.rtron.io.issues.mergeIssueLists
 import io.rtron.io.logging.ProgressBar
@@ -34,7 +35,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 
 /**
  * Transformer from OpenDRIVE data model to the RoadSpaces data model.
@@ -61,7 +61,7 @@ class Opendrive2RoadspacesTransformer(
      * @return transformed RoadSpaces model as output
      */
     fun transform(opendriveModel: OpendriveModel): Pair<Option<RoadspacesModel>, Opendrive2RoadspacesReport> {
-        logger.info("Parameters: $parameters.")
+        logger.info { "Parameters: $parameters." }
         opendriveModel.updateAdditionalIdentifiers()
         val report = Opendrive2RoadspacesReport(parameters)
 
@@ -85,7 +85,7 @@ class Opendrive2RoadspacesTransformer(
 
         val roadspacesModel = RoadspacesModel(header, roadspaces, junctions)
 
-        logger.info("Completed transformation with ${report.getTextSummary()}.")
+        logger.info { "Completed transformation with ${report.getTextSummary()}." }
         return roadspacesModel.some() to report
     }
 

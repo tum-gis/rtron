@@ -19,6 +19,7 @@ package io.rtron.readerwriter.opendrive
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.raise.either
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.files.CompressedFileExtension
 import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
@@ -30,7 +31,6 @@ import io.rtron.readerwriter.opendrive.reader.mapper.opendrive16.Opendrive16Mapp
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import io.rtron.readerwriter.opendrive.version.OpendriveVersionUtils
 import io.rtron.std.BaseException
-import mu.KotlinLogging
 import org.mapstruct.factory.Mappers
 import java.io.InputStream
 import java.nio.file.Path
@@ -59,7 +59,7 @@ object OpendriveReader {
         fileInputStream.close()
 
         val opendriveModel = opendriveModelResult.bind()
-        logger.info("Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+        logger.info { "Completed read-in of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
         opendriveModel
     }
     fun readFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, OpendriveModel> =
@@ -75,7 +75,7 @@ object OpendriveReader {
                 OpendriveVersion.V1_7 -> OpendriveVersion.V1_6
             }
             if (opendriveVersion != unmarshallerOpendriveVersion) {
-                logger.warn("No dedicated reader available for OpenDRIVE $opendriveVersion. Using reader for OpenDRIVE $unmarshallerOpendriveVersion as fallback.")
+                logger.warn { "No dedicated reader available for OpenDRIVE $opendriveVersion. Using reader for OpenDRIVE $unmarshallerOpendriveVersion as fallback." }
             }
 
             val unmarshaller = OpendriveUnmarshaller.of(unmarshallerOpendriveVersion).bind()

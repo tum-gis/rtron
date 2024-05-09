@@ -19,13 +19,13 @@ package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.model.opendrive.core.AdditionalData
 import io.rtron.model.opendrive.core.EUnit
 import io.rtron.model.opendrive.core.EUnitSpeed
 import io.rtron.model.opendrive.core.HeaderGeoReference
 import io.rtron.model.opendrive.core.HeaderOffset
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
-import mu.KotlinLogging
 import org.asam.opendrive16.E_UnitDistance
 import org.asam.opendrive16.E_UnitMass
 import org.asam.opendrive16.E_UnitSlope

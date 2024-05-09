@@ -18,6 +18,7 @@ package io.rtron.main.processor
 
 import arrow.core.getOrElse
 import com.charleskorn.kaml.Yaml
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.issues.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
@@ -34,7 +35,6 @@ import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropper
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdder
 import io.rtron.transformer.modifiers.opendrive.offset.resolver.OpendriveOffsetResolver
 import io.rtron.transformer.modifiers.opendrive.remover.OpendriveObjectRemover
-import mu.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
@@ -58,7 +58,7 @@ class OpendriveToCitygmlProcessor(
             outputSubDirectoryPath.createDirectories()
             // check if parameters are valid
             parameters.isValid().onLeft { issues ->
-                issues.forEach { logger.warn("Parameters are not valid: $it") }
+                issues.forEach { logger.warn { "Parameters are not valid: $it" } }
                 return@processAllFiles
             }
             // write the parameters as yaml file
@@ -66,21 +66,21 @@ class OpendriveToCitygmlProcessor(
             (outputSubDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // validate schema of OpenDRIVE model
-            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
+            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn { it.message }; return@processAllFiles }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted()) {
                 return@processAllFiles
             }
             // read of OpenDRIVE model
             val opendriveModel = OpendriveReader.readFromFile(inputFilePath)
-                .getOrElse { logger.warn(it.message); return@processAllFiles }
+                .getOrElse { logger.warn { it.message }; return@processAllFiles }
 
             // evaluate OpenDRIVE model
             val opendriveEvaluator = OpendriveEvaluator(parameters.deriveOpendriveEvaluatorParameters())
             val opendriveEvaluatorResult = opendriveEvaluator.evaluate(opendriveModel)
             opendriveEvaluatorResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_EVALUATOR_REPORT_PATH)
             val modifiedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
-                logger.warn(opendriveEvaluatorResult.second.getTextSummary())
+                logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
                 return@processAllFiles
             }
 
@@ -99,7 +99,7 @@ class OpendriveToCitygmlProcessor(
             val opendriveCroppedResult = opendriveCropper.modify(opendriveOffsetResolvedResult.first)
             opendriveCroppedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_CROP_REPORT_PATH)
             val opendriveCropped = opendriveCroppedResult.first.handleEmpty {
-                logger.warn("OpendriveCropper: ${opendriveCroppedResult.second.message}")
+                logger.warn { "OpendriveCropper: ${opendriveCroppedResult.second.message}" }
                 return@processAllFiles
             }
 
@@ -117,7 +117,7 @@ class OpendriveToCitygmlProcessor(
             val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveRemovedObjectResult.first)
             roadspacesModelResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
-                logger.warn("Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}")
+                logger.warn { "Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}" }
                 return@processAllFiles
             }
 

@@ -16,10 +16,10 @@
 
 package io.rtron.readerwriter.citygml
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.files.getFileSizeToDisplay
 import io.rtron.io.files.outputStreamDirectOrCompressed
 import io.rtron.model.citygml.CitygmlModel
-import mu.KotlinLogging
 import org.citygml4j.xml.CityGMLContext
 import org.citygml4j.xml.module.citygml.CoreModule
 import java.io.OutputStream
@@ -40,7 +40,7 @@ object CitygmlWriter {
         writeToStream(model, version, outputStream)
         outputStream.close()
 
-        logger.info("Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()}).")
+        logger.info { "Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
     }
 
     fun writeToStream(model: CitygmlModel, version: CitygmlVersion, outputStream: OutputStream) {

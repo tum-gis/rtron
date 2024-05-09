@@ -19,6 +19,7 @@ package io.rtron.readerwriter.opendrive.reader.mapper.opendrive14
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.model.opendrive.junction.EContactPoint
 import io.rtron.model.opendrive.railroad.RoadRailroad
 import io.rtron.model.opendrive.road.ERoadLinkElementType
@@ -34,7 +35,6 @@ import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometryParamPoly3
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometryPoly3
 import io.rtron.model.opendrive.road.planview.RoadPlanViewGeometrySpiral
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
-import mu.KotlinLogging
 import org.asam.opendrive14.ContactPoint
 import org.asam.opendrive14.ElementType
 import org.asam.opendrive14.OpenDRIVE
@@ -82,7 +82,7 @@ abstract class Opendrive14RoadMapper {
 
         // TODO: reporting
         if (source.crossfall != null && source.crossfall.isNotEmpty()) {
-            logger.info("Since crossfall is not in the OpenDRIVE standard from version 1.6, it is not supported.")
+            logger.info { "Since crossfall is not in the OpenDRIVE standard from version 1.6, it is not supported." }
         }
     }
 

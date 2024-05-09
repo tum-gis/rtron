@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.raise.either
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.files.inputStreamFromDirectOrCompressedFile
 import io.rtron.io.issues.IssueList
 import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
@@ -27,7 +28,6 @@ import io.rtron.readerwriter.opendrive.report.SchemaValidationIssue
 import io.rtron.readerwriter.opendrive.report.SchemaValidationReport
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import io.rtron.readerwriter.opendrive.version.OpendriveVersionUtils
-import mu.KotlinLogging
 import java.io.InputStream
 import java.nio.file.Path
 
@@ -49,13 +49,17 @@ object OpendriveValidator {
     fun validateFromStream(opendriveVersion: OpendriveVersion, inputStream: InputStream): Either<OpendriveReaderException, SchemaValidationReport> = either {
         val issueList = runValidation(opendriveVersion, inputStream)
             .getOrElse {
-                logger.warn("Schema validation was aborted due the following error: ${it.message}")
-                return@either SchemaValidationReport(opendriveVersion, completedSuccessfully = false, validationAbortIssue = it.message)
+                logger.warn { "Schema validation was aborted due the following error: ${it.message}" }
+                return@either SchemaValidationReport(
+                    opendriveVersion,
+                    completedSuccessfully = false,
+                    validationAbortIssue = it.message
+                )
             }
         if (!issueList.isEmpty()) {
-            logger.warn("Schema validation for OpenDRIVE $opendriveVersion found ${issueList.size} incidents.")
+            logger.warn { "Schema validation for OpenDRIVE $opendriveVersion found ${issueList.size} incidents." }
         } else {
-            logger.info("Schema validation report for OpenDRIVE $opendriveVersion: Everything ok.")
+            logger.info { "Schema validation report for OpenDRIVE $opendriveVersion: Everything ok." }
         }
 
         SchemaValidationReport(opendriveVersion, issueList)

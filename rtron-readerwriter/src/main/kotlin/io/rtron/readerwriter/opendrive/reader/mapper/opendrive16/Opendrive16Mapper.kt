@@ -16,9 +16,9 @@
 
 package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
-import mu.KotlinLogging
 import org.asam.opendrive16.OpenDRIVE
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy

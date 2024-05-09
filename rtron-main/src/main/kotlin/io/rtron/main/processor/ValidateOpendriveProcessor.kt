@@ -18,6 +18,7 @@ package io.rtron.main.processor
 
 import arrow.core.getOrElse
 import com.charleskorn.kaml.Yaml
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.issues.getTextSummary
 import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.main.project.processAllFiles
@@ -31,7 +32,6 @@ import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesT
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluator
 import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluator
-import mu.KotlinLogging
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.div
@@ -55,25 +55,25 @@ class ValidateOpendriveProcessor(
             (outputDirectoryPath / PARAMETERS_PATH).toFile().writeText(parametersText)
 
             // validate schema of OpenDRIVE model
-            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn(it.message); return@processAllFiles }
+            val opendriveSchemaValidatorReport = OpendriveValidator.validateFromFile(inputFilePath).getOrElse { logger.warn { it.message }; return@processAllFiles }
             opendriveSchemaValidatorReport.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH)
             if (opendriveSchemaValidatorReport.validationProcessAborted()) {
                 return@processAllFiles
             }
             // read of OpenDRIVE model
             val opendriveModel = OpendriveReader.readFromFile(inputFilePath)
-                .getOrElse { logger.warn(it.message); return@processAllFiles }
+                .getOrElse { logger.warn { it.message }; return@processAllFiles }
 
             // evaluate OpenDRIVE model
             val opendriveEvaluator = OpendriveEvaluator(parameters.deriveOpendriveEvaluatorParameters())
             val opendriveEvaluatorResult = opendriveEvaluator.evaluate(opendriveModel)
             opendriveEvaluatorResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_EVALUATOR_REPORT_PATH)
             if (opendriveEvaluatorResult.second.containsFatalErrors()) {
-                logger.warn(opendriveEvaluatorResult.second.getTextSummary())
+                logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
                 return@processAllFiles
             }
             val modifiedOpendriveModel = opendriveEvaluatorResult.first.handleEmpty {
-                logger.warn(opendriveEvaluatorResult.second.getTextSummary())
+                logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
                 return@processAllFiles
             }
 
@@ -88,7 +88,7 @@ class ValidateOpendriveProcessor(
             val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel)
             roadspacesModelResult.second.serializeToJsonFile(outputDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
             val roadspacesModel = roadspacesModelResult.first.handleEmpty {
-                logger.warn(roadspacesModelResult.second.conversion.getTextSummary())
+                logger.warn { roadspacesModelResult.second.conversion.getTextSummary() }
                 return@processAllFiles
             }
 
