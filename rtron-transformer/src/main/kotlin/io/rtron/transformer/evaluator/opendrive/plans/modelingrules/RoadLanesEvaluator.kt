@@ -54,24 +54,42 @@ object RoadLanesEvaluator {
             currentRoad
         }
 
+        // handle roads with lane sections containing no or multiple center lanes
         everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
             if (currentLaneSection.center.getNumberOfLanes() != 1) {
                 issueList +=
                     DefaultIssue.of(
                         "LaneSectionContainsNoCenterLane",
-                        "Lane section contains no center lane.",
-                        currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                        "Lane section contains no or multiple center lanes. Complete road will be removed.",
+                        currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = true,
                     )
             }
 
+            currentLaneSection
+        }
+        modifiedOpendriveModel.road =
+            modifiedOpendriveModel.road.filter { currentRoad ->
+                currentRoad.lanes.laneSection.all { it.center.getNumberOfLanes() == 1 }
+            }
+
+        // handle roads with lane sections containing neither a left nor a right lane
+        everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
             if (currentLaneSection.getNumberOfLeftRightLanes() == 0) {
                 issueList +=
                     DefaultIssue.of(
                         "LaneSectionContainsNoLeftOrRightLane",
-                        "Lane section contains neither a left nor a right lane.",
-                        currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                        "Lane section contains neither a left nor a right lane. Complete road will be removed.",
+                        currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = true,
                     )
             }
+            currentLaneSection
+        }
+        modifiedOpendriveModel.road =
+            modifiedOpendriveModel.road.filter { currentRoad ->
+                currentRoad.lanes.laneSection.all { it.getNumberOfLeftRightLanes() >= 1 }
+            }
+
+        everyLaneSection.modify(modifiedOpendriveModel) { currentLaneSection ->
 
             currentLaneSection.left.onSome { currentLaneSectionLeft ->
                 val leftLaneIds = currentLaneSectionLeft.lane.map { it.id }
@@ -124,8 +142,7 @@ object RoadLanesEvaluator {
             everyRoadLanesLaneSectionCenterLane.modify(modifiedOpendriveModel) { currentCenterLane ->
                 currentCenterLane.roadMark =
                     filterToNonZeroLengthRoadMarks(
-                        currentCenterLane.roadMark,
-                        currentCenterLane.additionalId, parameters, issueList,
+                        currentCenterLane.roadMark, currentCenterLane.additionalId, parameters, issueList,
                     )
                 currentCenterLane
             }
@@ -133,8 +150,7 @@ object RoadLanesEvaluator {
             everyRoadLanesLaneSectionLeftLane.modify(modifiedOpendriveModel) { currentLeftLane ->
                 currentLeftLane.roadMark =
                     filterToNonZeroLengthRoadMarks(
-                        currentLeftLane.roadMark, currentLeftLane.additionalId,
-                        parameters, issueList,
+                        currentLeftLane.roadMark, currentLeftLane.additionalId, parameters, issueList,
                     )
                 currentLeftLane
             }
@@ -142,8 +158,7 @@ object RoadLanesEvaluator {
             everyRoadLanesLaneSectionRightLane.modify(modifiedOpendriveModel) { currentRightLane ->
                 currentRightLane.roadMark =
                     filterToNonZeroLengthRoadMarks(
-                        currentRightLane.roadMark, currentRightLane.additionalId,
-                        parameters, issueList,
+                        currentRightLane.roadMark, currentRightLane.additionalId, parameters, issueList,
                     )
                 currentRightLane
             }
