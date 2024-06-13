@@ -141,7 +141,7 @@ object CodeAdder {
         when (laneMaterial.surface.uppercase()) {
             in "ASPHALT" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.ASPHALT.some()
             in "GRASS" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.GRASS.some()
-            in "SPEC_CONCRETE_3D" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.GRASS.some()
+            in "SPEC_CONCRETE_3D" -> TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode.CONCRETE.some()
             else -> None
         }
 
