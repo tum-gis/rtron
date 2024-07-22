@@ -18,16 +18,16 @@
 object DependencyVersions {
     // standard libraries
     const val kotlin = "1.9.24"
-    const val coroutines = "1.8.0"
+    const val coroutines = "1.8.1"
     const val arrow = "1.2.4"
 
     // testing libraries
-    const val kotest = "5.8.1"
+    const val kotest = "5.9.1"
     const val kotestExtensionArrow = "1.4.0"
-    const val mockk = "1.13.10"
+    const val mockk = "1.13.12"
 
     // logging libraries
-    const val kotlinLogging = "6.0.9"
+    const val kotlinLogging = "7.0.0"
     const val slf4jSimple = "2.0.13"
 
     // object creation libraries
@@ -45,20 +45,20 @@ object DependencyVersions {
     const val mordant = "1.2.1"
     const val commonsIO = "2.16.1"
     const val commonsCSV = "1.11.0"
-    const val commonsLang = "3.14.0"
-    const val commonsCompress = "1.26.1"
-    const val zstdJni = "1.5.6-3"
+    const val commonsLang = "3.15.0"
+    const val commonsCompress = "1.26.2"
+    const val zstdJni = "1.5.6-4"
     const val emojiJava = "5.1.1"
 
     // math libraries
-    const val guava = "33.2.0-jre"
+    const val guava = "33.2.1-jre"
     const val commonsMath = "3.6.1"
-    const val joml = "1.10.5"
+    const val joml = "1.10.7"
     const val poly2tri = "0.1.2"
 
     // geo libraries
     const val proj4 = "1.3.0"
-    const val citygml4j = "3.2.0"
+    const val citygml4j = "3.2.1"
 }
 
 object Dependencies {
