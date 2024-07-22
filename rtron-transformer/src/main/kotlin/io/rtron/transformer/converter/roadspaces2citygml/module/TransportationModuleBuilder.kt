@@ -30,6 +30,7 @@ import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
@@ -112,7 +113,12 @@ class TransportationModuleBuilder(
         relatedObjects.forEach { relationAdder.addRelatedToRelation(it, trafficSpaceFeature) }
         // TODO: consider left-hand traffic (LHT)
         trafficSpaceFeature.trafficDirection =
-            if (lane.id.isForward()) TrafficDirectionValue.FORWARDS else TrafficDirectionValue.BACKWARDS
+            when {
+                lane.type == LaneType.BIDIRECTIONAL -> TrafficDirectionValue.BOTH
+                lane.id.isForward() -> TrafficDirectionValue.FORWARDS
+                else -> TrafficDirectionValue.BACKWARDS
+            }
+
         // geometry
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
         trafficSpaceFeature.populateLod2Geometry(centerLineGeometryTransformer)
