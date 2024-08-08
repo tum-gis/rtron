@@ -17,3 +17,9 @@ fun List<Vector2D>.isClockwiseOrdered(): Boolean {
  * Returns true, if the list of [Vector2D] has an anti-clockwise order.
  */
 fun List<Vector2D>.isCounterClockwiseOrdered(): Boolean = !this.isClockwiseOrdered()
+
+/**
+ * Calculates the centroid of a list of [Vector2D].
+ * See the wikipedia article of [Centroid](https://en.wikipedia.org/wiki/Centroid).
+ */
+fun List<Vector2D>.calculateCentroid(): Vector2D = this.reduce { sum, point -> sum + point }.div(this.size.toDouble())

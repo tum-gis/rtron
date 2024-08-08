@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-object Project {
-    const val name = "rtron"
-    const val group = "io.rtron"
-    const val version = "1.3.0"
-}
+package io.rtron.transformer.modifiers.opendrive.reprojector
 
-object ProjectComponents {
-    // user interface layer
-    const val main = ":rtron-main"
+import kotlinx.serialization.Serializable
 
-    // model transformation layer
-    const val model = ":rtron-model"
-    const val readerWriter = ":rtron-readerwriter"
-    const val transformer = ":rtron-transformer"
-
-    // utility layer
-    const val math = ":rtron-math"
-    const val standard = ":rtron-std"
-    const val inputOutput = ":rtron-io"
-}
+@Serializable
+data class OpendriveReprojectorReport(
+    val parameters: OpendriveReprojectorParameters,
+    var message: String = "",
+    var maximumDeviation: Double = 0.0,
+)

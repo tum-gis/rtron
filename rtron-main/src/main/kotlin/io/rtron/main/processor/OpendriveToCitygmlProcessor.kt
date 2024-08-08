@@ -35,6 +35,7 @@ import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropper
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdder
 import io.rtron.transformer.modifiers.opendrive.offset.resolver.OpendriveOffsetResolver
 import io.rtron.transformer.modifiers.opendrive.remover.OpendriveObjectRemover
+import io.rtron.transformer.modifiers.opendrive.reprojector.OpendriveReprojector
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
@@ -95,9 +96,19 @@ class OpendriveToCitygmlProcessor(
                     return@processAllFiles
                 }
 
+            // reproject OpenDRIVE model
+            val opendriveReprojector = OpendriveReprojector(parameters.deriveOpendriveReprojectorParameters())
+            val opendriveReprojectorResult = opendriveReprojector.modify(modifiedOpendriveModel)
+            opendriveReprojectorResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_REPROJECTOR_REPORT_PATH)
+            val opendriveReprojected =
+                opendriveReprojectorResult.first.handleEmpty {
+                    logger.warn { "OpendriveReprojector: ${opendriveReprojectorResult.second.message}" }
+                    return@processAllFiles
+                }
+
             // offset OpenDRIVE model
             val opendriveOffsetAdder = OpendriveOffsetAdder(parameters.deriveOpendriveOffsetAdderParameters())
-            val opendriveOffsetAddedResult = opendriveOffsetAdder.modify(modifiedOpendriveModel)
+            val opendriveOffsetAddedResult = opendriveOffsetAdder.modify(opendriveReprojected)
             opendriveOffsetAddedResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_OFFSET_ADDER_REPORT_PATH)
 
             // resolve the offset
@@ -158,12 +169,13 @@ class OpendriveToCitygmlProcessor(
         val REPORTS_PATH = Path("reports")
         val OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH = REPORTS_PATH / Path("01_opendrive_schema_validator_report.json")
         val OPENDRIVE_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("02_opendrive_evaluator_report.json")
-        val OPENDRIVE_OFFSET_ADDER_REPORT_PATH = REPORTS_PATH / Path("03_opendrive_offset_adder_report.json")
-        val OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH = REPORTS_PATH / Path("04_opendrive_offset_resolver_report.json")
-        val OPENDRIVE_CROP_REPORT_PATH = REPORTS_PATH / Path("05_opendrive_crop_report.json")
-        val OPENDRIVE_OBJECT_REMOVER_REPORT_PATH = REPORTS_PATH / Path("06_opendrive_object_remover_report.json")
-        val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("07_opendrive_to_roadspaces_report.json")
-        val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("08_roadspaces_evaluator_report.json")
-        val ROADSPACES_TO_CITYGML_REPORT_PATH = REPORTS_PATH / Path("09_roadspaces_to_citygml_report.json")
+        val OPENDRIVE_REPROJECTOR_REPORT_PATH = REPORTS_PATH / Path("03_opendrive_reprojector_report.json")
+        val OPENDRIVE_OFFSET_ADDER_REPORT_PATH = REPORTS_PATH / Path("04_opendrive_offset_adder_report.json")
+        val OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH = REPORTS_PATH / Path("05_opendrive_offset_resolver_report.json")
+        val OPENDRIVE_CROP_REPORT_PATH = REPORTS_PATH / Path("06_opendrive_crop_report.json")
+        val OPENDRIVE_OBJECT_REMOVER_REPORT_PATH = REPORTS_PATH / Path("07_opendrive_object_remover_report.json")
+        val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = REPORTS_PATH / Path("08_opendrive_to_roadspaces_report.json")
+        val ROADSPACES_EVALUATOR_REPORT_PATH = REPORTS_PATH / Path("09_roadspaces_evaluator_report.json")
+        val ROADSPACES_TO_CITYGML_REPORT_PATH = REPORTS_PATH / Path("10_roadspaces_to_citygml_report.json")
     }
 }

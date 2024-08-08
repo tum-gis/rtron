@@ -81,6 +81,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(
         help = "warning angle tolerance between two geometry elements in the plan view",
     ).double()
         .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
+    private val reprojectModel by option(help = "reproject the geometries into a different geospatial coordinate reference system").flag()
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
     private val addOffset by option(help = "offset values by which the model is translated along the x, y, and z axis").double().triple()
@@ -125,6 +126,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(
                     planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
                     planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
                     planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
+                    reprojectModel = reprojectModel,
                     crsEpsg = crsEpsg,
                     offsetX = addOffset.first,
                     offsetY = addOffset.second,

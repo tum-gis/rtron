@@ -22,5 +22,7 @@ dependencies {
     implementation(Dependencies.slf4jSimple)
 
     // geo libraries
+    implementation(Dependencies.proj4)
+    implementation(Dependencies.proj4Epsg)
     implementation(Dependencies.citygml4jXml)
 }

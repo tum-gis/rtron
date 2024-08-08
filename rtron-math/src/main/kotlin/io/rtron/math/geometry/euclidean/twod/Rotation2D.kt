@@ -100,6 +100,8 @@ class Rotation2D(
         roll: Double = 0.0,
     ) = Rotation3D(angle, pitch, roll)
 
+    override fun toString(): String = "Rotation2D(angle=$angle)"
+
     companion object {
         val ZERO = Rotation2D(0.0)
 

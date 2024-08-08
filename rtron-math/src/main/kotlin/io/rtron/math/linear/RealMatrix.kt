@@ -17,6 +17,7 @@
 package io.rtron.math.linear
 
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.math.std.reshapeByColumnDimension
 import org.apache.commons.math3.linear.Array2DRowRealMatrix
 import org.apache.commons.math3.linear.MatrixUtils
@@ -194,6 +195,14 @@ class RealMatrix(
 
             return RealMatrix(matrixValues.toTypedArray())
         }
+
+        /**
+         * Creates a [RealMatrix] from a list of 3D vectors
+         *
+         * @param vectors list of 3D vectors whereby each vector will be represented as a row
+         */
+        @JvmName("ofListVector2D")
+        fun of(vectors: List<Vector2D>): RealMatrix = RealMatrix(vectors.map { it.toRealVector() })
 
         /**
          * Creates a [RealMatrix] from a list of 3D vectors

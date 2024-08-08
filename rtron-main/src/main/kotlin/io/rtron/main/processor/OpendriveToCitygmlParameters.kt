@@ -28,6 +28,7 @@ import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluatorParameters
 import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropperParameters
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
 import io.rtron.transformer.modifiers.opendrive.remover.OpendriveObjectRemoverParameters
+import io.rtron.transformer.modifiers.opendrive.reprojector.OpendriveReprojectorParameters
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -42,6 +43,7 @@ data class OpendriveToCitygmlParameters(
         OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_TOLERANCE,
     val planViewGeometryAngleWarningTolerance: Double =
         OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE,
+    val reprojectModel: Boolean = OpendriveReprojectorParameters.DEFAULT_REPROJECT_MODEL,
     val crsEpsg: Int = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
     val offsetX: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X,
     val offsetY: Double = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y,
@@ -100,6 +102,13 @@ data class OpendriveToCitygmlParameters(
             offsetY = offsetY,
             offsetZ = offsetZ,
             offsetHeading = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_HEADING,
+        )
+
+    fun deriveOpendriveReprojectorParameters() =
+        OpendriveReprojectorParameters(
+            reprojectModel = reprojectModel,
+            targetCrsEpsg = crsEpsg,
+            deviationWarningTolerance = OpendriveReprojectorParameters.DEFAULT_DEVIATION_WARNING_TOLERANCE,
         )
 
     fun deriveOpendriveCropperParameters() =

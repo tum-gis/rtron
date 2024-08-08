@@ -149,6 +149,23 @@ class Affine2D(
         }
 
         /**
+         * Creates an [Affine2D] transformation matrix from a [matrix] with column and row dimension of 2.
+         */
+        fun of(matrix: RealMatrix): Affine2D {
+            require(matrix.columnDimension == 2) { "Wrong column dimension ${matrix.columnDimension}." }
+            require(matrix.rowDimension == 2) { "Wrong row dimension ${matrix.rowDimension}." }
+            require(matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0] > 0.0) {
+                "Determinant must be greater than zero, since it must not be reflection."
+            }
+            val jomlMatrix = JOMLMatrix3d()
+            jomlMatrix.m00 = matrix[0][0]
+            jomlMatrix.m01 = matrix[1][0]
+            jomlMatrix.m10 = matrix[0][1]
+            jomlMatrix.m11 = matrix[1][1]
+            return Affine2D(jomlMatrix)
+        }
+
+        /**
          * Creates an [Affine2D] transformation matrix from a [rotation].
          */
         fun of(rotation: Rotation2D): Affine2D {

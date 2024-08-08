@@ -19,6 +19,9 @@ package io.rtron.model.opendrive.road.planview
 import arrow.core.None
 import arrow.core.Option
 import arrow.optics.optics
+import io.rtron.math.geometry.euclidean.twod.Pose2D
+import io.rtron.math.geometry.euclidean.twod.Rotation2D
+import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 import io.rtron.model.opendrive.core.OpendriveElement
 
 @optics
@@ -35,4 +38,6 @@ data class RoadPlanViewGeometry(
     var y: Double = Double.NaN,
 ) : OpendriveElement() {
     companion object
+
+    fun getPose(): Pose2D = Pose2D(Vector2D(x, y), Rotation2D(hdg))
 }

@@ -18,6 +18,7 @@ package io.rtron.math.geometry.euclidean.twod.point
 
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
+import io.rtron.math.linear.RealVector
 import io.rtron.math.std.fuzzyEquals as doubleFuzzyEquals
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D as CMVector2D
 import org.joml.Vector2d as JOMLVector2D
@@ -108,6 +109,8 @@ data class Vector2D(
     fun toVector2DCm() = this.vector2D
 
     fun toVector2DJOML() = JOMLVector2D(this.x, this.y)
+
+    fun toRealVector() = RealVector(doubleArrayOf(this.x, this.y))
 
     companion object {
         val ZERO = Vector2D(0.0, 0.0)
