@@ -20,6 +20,7 @@ import io.rtron.io.issues.DefaultIssue
 import io.rtron.io.issues.DefaultIssueList
 import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.OpendriveModel
+import io.rtron.model.opendrive.additions.optics.everyHeaderGeoReference
 import io.rtron.model.opendrive.additions.optics.everyHeaderOffset
 import io.rtron.model.opendrive.header
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
@@ -124,6 +125,24 @@ object CoreEvaluator {
                     )
 
                 currentHeaderOffset
+            }
+
+        modifiedOpendriveModel =
+            everyHeaderGeoReference.modify(modifiedOpendriveModel) { currentHeaderGeoReference ->
+
+                val contentTrimmed = currentHeaderGeoReference.content.trim()
+                if (currentHeaderGeoReference.content.length > contentTrimmed.length) {
+                    issueList +=
+                        DefaultIssue(
+                            "GeoReferenceContainsLeadingAndTrailingWhitespace",
+                            "GeoReference element contains leading and trailing whitespace.",
+                            "GeoReference of header element",
+                            Severity.WARNING, wasFixed = true,
+                        )
+                    currentHeaderGeoReference.content = currentHeaderGeoReference.content.trim()
+                }
+
+                currentHeaderGeoReference
             }
 
         return modifiedOpendriveModel

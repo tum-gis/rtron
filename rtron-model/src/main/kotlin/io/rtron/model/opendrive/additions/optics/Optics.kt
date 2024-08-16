@@ -20,6 +20,7 @@ import arrow.optics.PPrism
 import arrow.optics.Traversal
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.core.Header
+import io.rtron.model.opendrive.core.geoReference
 import io.rtron.model.opendrive.core.offset
 import io.rtron.model.opendrive.header
 import io.rtron.model.opendrive.junction
@@ -57,6 +58,7 @@ import io.rtron.model.opendrive.signal.RoadSignals
 import io.rtron.model.opendrive.signal.signal
 
 val everyHeaderOffset = OpendriveModel.header compose Header.offset compose PPrism.some()
+val everyHeaderGeoReference = OpendriveModel.header compose Header.geoReference compose PPrism.some()
 
 // road
 val everyRoad = OpendriveModel.road compose Traversal.list()

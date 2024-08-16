@@ -53,6 +53,23 @@ object RoadObjectsEvaluator {
                             )
                     }
                     currentRoadObjects.roadObject = roadObjectsFiltered
+
+                    val roadObjectsFilteredRepeat =
+                        currentRoadObjects.roadObject.filter { currentRoadObject ->
+                            currentRoadObject.repeat.isEmpty() ||
+                                currentRoadObject.repeat.all { it.s + it.length <= currentRoad.length + parameters.numberTolerance }
+                        }
+                    if (currentRoadObjects.roadObject.size > roadObjectsFilteredRepeat.size) {
+                        issueList +=
+                            DefaultIssue.of(
+                                "RoadObjectRepeatPositionNotInSValueRange",
+                                "Road object repeats (number of objects affected: ${currentRoadObjects.roadObject.size -
+                                    roadObjectsFiltered.size}) were removed since they were positioned outside the " +
+                                    "defined length of the road.",
+                                currentRoad.additionalId, Severity.ERROR, wasFixed = true,
+                            )
+                    }
+                    currentRoadObjects.roadObject = roadObjectsFilteredRepeat
                 }
 
                 currentRoad
