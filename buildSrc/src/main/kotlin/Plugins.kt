@@ -21,8 +21,8 @@ object PluginVersions {
     const val xjc = "1.6"
     const val versionChecker = "0.51.0"
     const val dokka = "1.9.20"
-    const val serialization = "1.9.24"
-    const val ksp = "1.9.24-1.0.20"
+    const val serialization = "2.0.20"
+    const val ksp = "2.0.20-1.0.25"
 }
 
 object Plugins {

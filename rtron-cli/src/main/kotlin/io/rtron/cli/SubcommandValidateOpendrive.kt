@@ -19,6 +19,7 @@ package io.rtron.cli
 import arrow.core.toOption
 import com.charleskorn.kaml.Yaml
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
@@ -35,10 +36,10 @@ import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 
 class SubcommandValidateOpendrive : CliktCommand(
     name = "validate-opendrive",
-    help = "Validate OpenDRIVE datasets.",
-    printHelpOnEmptyArgs = true,
 ) {
     // Properties and Initializers
+    override val printHelpOnEmptyArgs = true
+
     private val parametersPath by option(
         help = "Path to a YAML file containing the parameters of the process.",
     ).path(mustExist = true)
@@ -81,6 +82,8 @@ class SubcommandValidateOpendrive : CliktCommand(
         .default(CompressionFormat.NONE)
 
     // Methods
+    override fun help(context: Context) = "Validate OpenDRIVE datasets"
+
     override fun run() {
         val parameters =
             parametersPath.toOption().fold({

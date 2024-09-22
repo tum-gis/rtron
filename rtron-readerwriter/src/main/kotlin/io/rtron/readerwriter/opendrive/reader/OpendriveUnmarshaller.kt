@@ -26,6 +26,13 @@ import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Unmarshaller
 import javax.xml.XMLConstants
 import javax.xml.validation.SchemaFactory
+import org.asam.opendrive11.OpenDRIVE as Opendrive11
+import org.asam.opendrive12.OpenDRIVE as Opendrive12
+import org.asam.opendrive13.OpenDRIVE as Opendrive13
+import org.asam.opendrive14.OpenDRIVE as Opendrive14
+import org.asam.opendrive15.OpenDRIVE as Opendrive15
+import org.asam.opendrive16.OpenDRIVE as Opendrive16
+import org.asam.opendrive17.OpenDRIVE as Opendrive17
 
 class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
     // Properties and Initializers
@@ -50,13 +57,13 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
     companion object {
         private val OPENDRIVE_MODEL_CLASSES: Map<OpendriveVersion, Class<out Any>> =
             mapOf(
-                OpendriveVersion.V1_1 to org.asam.opendrive11.OpenDRIVE::class.java,
-                OpendriveVersion.V1_2 to org.asam.opendrive12.OpenDRIVE::class.java,
-                OpendriveVersion.V1_3 to org.asam.opendrive13.OpenDRIVE::class.java,
-                OpendriveVersion.V1_4 to org.asam.opendrive14.OpenDRIVE::class.java,
-                OpendriveVersion.V1_5 to org.asam.opendrive15.OpenDRIVE::class.java,
-                OpendriveVersion.V1_6 to org.asam.opendrive16.OpenDRIVE::class.java,
-                OpendriveVersion.V1_7 to org.asam.opendrive17.OpenDRIVE::class.java,
+                OpendriveVersion.V1_1 to Opendrive11::class.java,
+                OpendriveVersion.V1_2 to Opendrive12::class.java,
+                OpendriveVersion.V1_3 to Opendrive13::class.java,
+                OpendriveVersion.V1_4 to Opendrive14::class.java,
+                OpendriveVersion.V1_5 to Opendrive15::class.java,
+                OpendriveVersion.V1_6 to Opendrive16::class.java,
+                OpendriveVersion.V1_7 to Opendrive17::class.java,
             )
         private val OPENDRIVE_SCHEMA_LOCATIONS: Map<OpendriveVersion, String> =
             mapOf(

@@ -24,6 +24,7 @@ import jakarta.xml.bind.Marshaller
 import org.mapstruct.factory.Mappers
 import java.io.OutputStream
 import kotlin.io.path.div
+import org.asam.opendrive17.OpenDRIVE as Opendrive17
 
 class OpendriveMarshaller {
     // Properties and Initializers
@@ -31,7 +32,7 @@ class OpendriveMarshaller {
     private val jaxbMarshaller: Marshaller
 
     init {
-        val jaxbContext = JAXBContext.newInstance(org.asam.opendrive17.OpenDRIVE::class.java)
+        val jaxbContext = JAXBContext.newInstance(Opendrive17::class.java)
         jaxbMarshaller = jaxbContext.createMarshaller()
 
         jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)

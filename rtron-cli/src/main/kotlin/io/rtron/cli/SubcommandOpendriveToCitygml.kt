@@ -19,6 +19,7 @@ package io.rtron.cli
 import arrow.core.toOption
 import com.charleskorn.kaml.Yaml
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
@@ -42,10 +43,10 @@ import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdde
 
 class SubcommandOpendriveToCitygml : CliktCommand(
     name = "opendrive-to-citygml",
-    help = "Transform OpenDRIVE datasets to CityGML.",
-    printHelpOnEmptyArgs = true,
 ) {
     // Properties and Initializers
+    override val printHelpOnEmptyArgs = true
+
     private val parametersPath by option(
         help = "Path to a YAML file containing the parameters of the process.",
     ).path(mustExist = true)
@@ -114,6 +115,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(
         .default(CompressionFormat.NONE)
 
     // Methods
+    override fun help(context: Context) = "Transform OpenDRIVE datasets to CityGML"
 
     override fun run() {
         val parameters =
