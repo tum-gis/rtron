@@ -17,6 +17,7 @@
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
 import arrow.core.None
+import arrow.core.Some
 import arrow.core.flattenOption
 import io.rtron.io.issues.DefaultIssue
 import io.rtron.io.issues.DefaultIssueList
@@ -25,6 +26,7 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyJunction
 import io.rtron.model.opendrive.junction.EJunctionType
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
+import io.rtron.transformer.evaluator.opendrive.modifiers.JunctionModifier
 import io.rtron.transformer.issues.opendrive.of
 
 object JunctionEvaluator {
@@ -110,6 +112,18 @@ object JunctionEvaluator {
 
                 currentJunction
             }
+
+        val junctionsFiltered = modifiedOpendriveModel.junction.filter { it.connection.isEmpty() }
+        junctionsFiltered.map { it.additionalId }.flattenOption().forEach { currentId ->
+            modifiedOpendriveModel = JunctionModifier.removeJunction(modifiedOpendriveModel, currentId)
+
+            issueList +=
+                DefaultIssue.of(
+                    "JunctionWithoutConnections",
+                    "Junction contains no valid connections and thus was removed.",
+                    Some(currentId), Severity.ERROR, wasFixed = true,
+                )
+        }
 
         return modifiedOpendriveModel
     }
