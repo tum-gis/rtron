@@ -19,8 +19,7 @@ package io.rtron.io.issues
 import kotlinx.serialization.Serializable
 
 @Serializable
-@JvmInline
-value class IssueList<T>(private val issues: MutableList<T> = mutableListOf()) {
+data class IssueList<T>(private val issues: MutableList<T> = mutableListOf()) {
     // Properties
     val size: Int
         get() = issues.size

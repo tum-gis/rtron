@@ -17,12 +17,12 @@
 
 object PluginVersions {
     const val shadowjar = "8.1.1"
-    const val ktlint = "12.1.1"
+    const val ktlint = "12.1.2"
     const val xjc = "1.6"
     const val versionChecker = "0.51.0"
-    const val dokka = "1.9.20"
-    const val serialization = "2.0.20"
-    const val ksp = "2.0.20-1.0.25"
+    const val dokka = "2.0.0"
+    const val serialization = "2.1.0"
+    const val ksp = "2.1.0-1.0.29"
 }
 
 object Plugins {
