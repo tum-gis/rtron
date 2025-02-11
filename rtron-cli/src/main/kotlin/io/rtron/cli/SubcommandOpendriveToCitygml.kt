@@ -112,7 +112,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(
     private val compressionFormat: CompressionFormat by option(
         help = "compress the output files with the respective compression format",
     ).enum<CompressionFormat>()
-        .default(CompressionFormat.NONE)
+        .default(CompressionFormat.GZ)
 
     // Methods
     override fun help(context: Context) = "Transform OpenDRIVE datasets to CityGML"
