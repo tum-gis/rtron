@@ -31,6 +31,7 @@ enum class EAccessRestrictionType {
     MOTORCYCLE,
     NONE,
     TRUCKS,
+    HOV,
 }
 
 enum class ELaneType {
@@ -43,6 +44,7 @@ enum class ELaneType {
     PARKING,
     MEDIAN,
     BIKING,
+    SHARED,
     SIDEWALK,
     CURB,
     EXIT,
@@ -62,13 +64,15 @@ enum class ELaneType {
     HOV,
     MWY_ENTRY,
     MWY_EXIT,
+    WALKING,
+    SLIP_LANE,
 }
 
 enum class ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange { INCREASE, DECREASE, BOTH, NONE }
 
 enum class ERoadLanesLaneSectionLRLaneAccessRule { ALLOW, DENY }
 
-enum class ERoadMarkColor { STANDARD, BLUE, GREEN, RED, WHITE, YELLOW, ORANGE }
+enum class ERoadMarkColor { STANDARD, BLUE, GREEN, RED, WHITE, YELLOW, BLACK, ORANGE, VIOLET }
 
 enum class ERoadMarkRule { NO_PASSING, CAUTION, NONE }
 

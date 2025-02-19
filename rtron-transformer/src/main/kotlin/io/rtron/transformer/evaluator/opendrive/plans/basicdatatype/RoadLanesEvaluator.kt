@@ -77,16 +77,6 @@ object RoadLanesEvaluator {
                     }
                 }
 
-                if (currentLaneSection.center.lane.isEmpty()) {
-                    issueList +=
-                        DefaultIssue.of(
-                            "NoLanesInLaneSection",
-                            "Lane section does not contain lanes.",
-                            currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false,
-                        )
-                    currentLaneSection.center.lane += RoadLanesLaneSectionCenterLane()
-                }
-
                 currentLaneSection
             }
 

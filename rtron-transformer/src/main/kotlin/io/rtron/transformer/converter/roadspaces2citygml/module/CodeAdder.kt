@@ -40,6 +40,12 @@ object CodeAdder {
             LaneType.STOP -> emptyList()
             LaneType.SHOULDER -> emptyList()
             LaneType.BIKING -> listOf(TrafficAreaFunctionCode.CYCLEPATH)
+            LaneType.SHARED ->
+                listOf(
+                    TrafficAreaFunctionCode.DRIVING_LANE,
+                    TrafficAreaFunctionCode.FOOTPATH,
+                    TrafficAreaFunctionCode.CYCLEPATH,
+                )
             LaneType.SIDEWALK -> listOf(TrafficAreaFunctionCode.FOOTPATH)
             LaneType.BORDER -> emptyList()
             LaneType.RESTRICTED -> emptyList()
@@ -63,6 +69,8 @@ object CodeAdder {
             LaneType.HOV -> emptyList()
             LaneType.MWY_ENTRY -> listOf(TrafficAreaFunctionCode.MOTORWAY_ENTRY, TrafficAreaFunctionCode.DRIVING_LANE)
             LaneType.MWY_EXIT -> listOf(TrafficAreaFunctionCode.MOTORWAY_EXIT, TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.WALKING -> listOf(TrafficAreaFunctionCode.FOOTPATH)
+            LaneType.SLIP_LANE -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
         }
 
     /**
@@ -75,6 +83,7 @@ object CodeAdder {
             LaneType.STOP -> emptyList()
             LaneType.SHOULDER -> emptyList()
             LaneType.BIKING -> emptyList()
+            LaneType.SHARED -> emptyList()
             LaneType.SIDEWALK -> emptyList()
             LaneType.BORDER -> emptyList()
             LaneType.RESTRICTED -> emptyList()
@@ -98,6 +107,8 @@ object CodeAdder {
             LaneType.HOV -> emptyList()
             LaneType.MWY_ENTRY -> emptyList()
             LaneType.MWY_EXIT -> emptyList()
+            LaneType.WALKING -> emptyList()
+            LaneType.SLIP_LANE -> emptyList()
         }
 
     /**
@@ -110,6 +121,7 @@ object CodeAdder {
             LaneType.STOP -> emptyList()
             LaneType.SHOULDER -> emptyList()
             LaneType.BIKING -> listOf(TrafficAreaUsageCode.BICYCLE)
+            LaneType.SHARED -> listOf(TrafficAreaUsageCode.CAR, TrafficAreaUsageCode.BICYCLE, TrafficAreaUsageCode.PEDESTRIAN)
             LaneType.SIDEWALK -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
             LaneType.BORDER -> emptyList()
             LaneType.RESTRICTED -> emptyList()
@@ -133,6 +145,8 @@ object CodeAdder {
             LaneType.HOV -> emptyList()
             LaneType.MWY_ENTRY -> listOf(TrafficAreaUsageCode.CAR)
             LaneType.MWY_EXIT -> listOf(TrafficAreaUsageCode.CAR)
+            LaneType.WALKING -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
+            LaneType.SLIP_LANE -> listOf(TrafficAreaUsageCode.CAR)
         }
 
     fun mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(
@@ -163,6 +177,7 @@ object CodeAdder {
             RoadObjectType.GANTRY -> emptyList()
             RoadObjectType.SOUND_BARRIER -> emptyList()
             RoadObjectType.ROAD_MARK -> emptyList()
+            RoadObjectType.ROAD_SURFACE -> emptyList()
             RoadObjectType.SIGNAL -> emptyList()
         }
 
@@ -184,6 +199,7 @@ object CodeAdder {
             RoadObjectType.GANTRY -> emptyList()
             RoadObjectType.SOUND_BARRIER -> emptyList()
             RoadObjectType.ROAD_MARK -> emptyList()
+            RoadObjectType.ROAD_SURFACE -> emptyList()
             RoadObjectType.SIGNAL -> emptyList()
         }
 
@@ -205,6 +221,7 @@ object CodeAdder {
             RoadObjectType.GANTRY -> emptyList()
             RoadObjectType.SOUND_BARRIER -> emptyList()
             RoadObjectType.ROAD_MARK -> emptyList()
+            RoadObjectType.ROAD_SURFACE -> emptyList()
             RoadObjectType.SIGNAL -> emptyList()
         }
 }

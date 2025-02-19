@@ -220,7 +220,7 @@ ASAM OpenDRIVE roads may be roads in the real road network or artificial road ne
                     <xs:element maxOccurs="1" minOccurs="0" name="crossSectionSurface" type="t_road_lateralProfile_crossSectionSurface"/>
                     <xs:group maxOccurs="unbounded" minOccurs="0" ref="g_additionalData"/>
                 </xs:sequence>
-                <!--<xs:assert test="not(exists(crossSectionSurface)) or (not(exists(superelevation)) and not(exists(shape)))"/>-->
+                <xs:assert test="not(exists(crossSectionSurface)) or (not(exists(superelevation)) and not(exists(shape)))"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

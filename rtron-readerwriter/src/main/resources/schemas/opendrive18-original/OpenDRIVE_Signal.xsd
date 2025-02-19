@@ -526,7 +526,7 @@ Free text, depending on application</xs:documentation>
                         <xs:documentation>z-offset of signal's origin relative to the elevation of the road reference line</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <!--<xs:assert test="not(@type = 'multiBoard') or (@type = 'multiBoard' and @dynamic = true() and count(./vmsBoard) gt 0 and count(./staticBoard) gt 0)"/>-->
+                <xs:assert test="not(@type = 'multiBoard') or (@type = 'multiBoard' and @dynamic = true() and count(./vmsBoard) gt 0 and count(./staticBoard) gt 0)"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

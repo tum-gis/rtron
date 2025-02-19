@@ -74,6 +74,7 @@ object RoadspaceObjectRouter {
             RoadObjectType.GANTRY -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.SOUND_BARRIER -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.ROAD_MARK -> CitygmlTargetFeatureType.TRANSPORTATION_MARKING
+            RoadObjectType.ROAD_SURFACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             RoadObjectType.SIGNAL -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
         }
     }

@@ -29,6 +29,7 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneLink
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneLinkPredecessorSuccessor
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkType
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneAccessRestriction
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeft
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRight
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
@@ -112,6 +113,18 @@ abstract class Opendrive14LaneMapper {
         } ?: None
 
     abstract fun mapLaneChange(source: LaneChange): ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
+
+    //
+    // Access
+    //
+    fun mapLaneAccessRestrictionTypeToList(source: Restriction): List<RoadLanesLaneSectionLRLaneAccessRestriction> =
+        listOf(mapLaneAccessRestrictionTypeToClass(source))
+
+    fun mapLaneAccessRestrictionTypeToClass(source: Restriction): RoadLanesLaneSectionLRLaneAccessRestriction =
+        RoadLanesLaneSectionLRLaneAccessRestriction(type = mapLaneAccessRestrictionType(source))
+
+    @ValueMapping(source = "AUTONOMOUS___TRAFFIC", target = "AUTONOMOUS_TRAFFIC")
+    abstract fun mapLaneAccessRestrictionType(source: Restriction): EAccessRestrictionType
 
     //
     // Enumerations

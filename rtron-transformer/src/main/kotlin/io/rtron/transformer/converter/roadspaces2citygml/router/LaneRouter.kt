@@ -38,6 +38,7 @@ object LaneRouter {
             LaneType.STOP -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.SHOULDER -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.BIKING -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
+            LaneType.SHARED -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.SIDEWALK -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.BORDER -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.RESTRICTED -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
@@ -61,5 +62,7 @@ object LaneRouter {
             LaneType.HOV -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.MWY_ENTRY -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.MWY_EXIT -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
+            LaneType.WALKING -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
+            LaneType.SLIP_LANE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
         }
 }

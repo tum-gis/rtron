@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
+package io.rtron.readerwriter.opendrive.reader.mapper.opendrive18
 
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
-import io.github.oshai.kotlinlogging.KotlinLogging
-import io.rtron.model.opendrive.lane.EAccessRestrictionType
 import io.rtron.model.opendrive.lane.ELaneType
 import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
 import io.rtron.model.opendrive.lane.ERoadMarkColor
@@ -36,51 +34,41 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkExplicit
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkType
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkTypeLine
-import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneAccessRestriction
-import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneBorder
-import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneWidth
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeft
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeftLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRight
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRightLane
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
-import org.asam.opendrive16.E_AccessRestrictionType
-import org.asam.opendrive16.E_LaneType
-import org.asam.opendrive16.E_RoadMarkColor
-import org.asam.opendrive16.E_RoadMarkRule
-import org.asam.opendrive16.E_RoadMarkType
-import org.asam.opendrive16.E_RoadMarkWeight
-import org.asam.opendrive16.E_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_LaneChange
-import org.asam.opendrive16.T_Bool
-import org.asam.opendrive16.T_Road_Lanes
-import org.asam.opendrive16.T_Road_Lanes_LaneSection
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Center
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Center_Lane
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Lcr_Lane_Link
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Explicit
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type_Line
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Left
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Left_Lane
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Lr_Lane_Border
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Lr_Lane_Width
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Right
-import org.asam.opendrive16.T_Road_Lanes_LaneSection_Right_Lane
-import org.mapstruct.AfterMapping
+import org.asam.opendrive18.E_LaneType
+import org.asam.opendrive18.E_RoadMarkColor
+import org.asam.opendrive18.E_RoadMarkRule
+import org.asam.opendrive18.E_RoadMarkType
+import org.asam.opendrive18.E_RoadMarkWeight
+import org.asam.opendrive18.E_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_LaneChange
+import org.asam.opendrive18.T_Bool
+import org.asam.opendrive18.T_Road_Lanes
+import org.asam.opendrive18.T_Road_Lanes_LaneSection
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Center
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Center_Lane
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Lcr_Lane_Link
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Explicit
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Type_Line
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Left
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Left_Lane
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Right
+import org.asam.opendrive18.T_Road_Lanes_LaneSection_Right_Lane
 import org.mapstruct.Mapper
-import org.mapstruct.MappingTarget
 import org.mapstruct.NullValueCheckStrategy
 import org.mapstruct.ValueMapping
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class],
+    uses = [OpendriveCommonMapper::class, Opendrive18CoreMapper::class],
     imports = [Option::class],
 )
-abstract class Opendrive16LaneMapper {
-    private val logger = KotlinLogging.logger {}
-
+abstract class Opendrive18LaneMapper {
     abstract fun mapRoadLanes(sources: T_Road_Lanes): RoadLanes
 
     //
@@ -97,57 +85,18 @@ abstract class Opendrive16LaneMapper {
 
     abstract fun mapRoadLanesLaneSectionRight(source: T_Road_Lanes_LaneSection_Right): RoadLanesLaneSectionRight
 
-    fun mapRoadLanesLaneSectionCenterLane(source: List<T_Road_Lanes_LaneSection_Center_Lane>): RoadLanesLaneSectionCenterLane {
-        // TODO: reporting
-        if (source.size != 1) {
-            logger.info { "Center lane must have exactly one lane." }
-        }
-
-        return mapRoadLanesLaneSectionCenterLane(source.first())
-    }
-
     abstract fun mapRoadLanesLaneSectionCenterLane(source: T_Road_Lanes_LaneSection_Center_Lane): RoadLanesLaneSectionCenterLane
 
     abstract fun mapRoadLanesLaneSectionLeftLane(source: T_Road_Lanes_LaneSection_Left_Lane): RoadLanesLaneSectionLeftLane
 
-    @AfterMapping
-    open fun afterMappingRoadLanesLaneSectionLeftLane(
-        source: T_Road_Lanes_LaneSection_Left_Lane,
-        @MappingTarget target: RoadLanesLaneSectionLeftLane,
-    ) {
-        target.border =
-            source.borderOrWidth
-                .filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Border::class.java)
-                .map { mapLrLaneBorder(it) }
-        target.width =
-            source.borderOrWidth
-                .filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Width::class.java)
-                .map { mapLrLaneWidth(it) }
-    }
-
     abstract fun mapRoadLanesLaneSectionRightLane(source: T_Road_Lanes_LaneSection_Right_Lane): RoadLanesLaneSectionRightLane
-
-    @AfterMapping
-    open fun afterMappingRoadLanesLaneSectionRightLane(
-        source: T_Road_Lanes_LaneSection_Right_Lane,
-        @MappingTarget target: RoadLanesLaneSectionRightLane,
-    ) {
-        target.border =
-            source.borderOrWidth
-                .filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Border::class.java)
-                .map { mapLrLaneBorder(it) }
-        target.width =
-            source.borderOrWidth
-                .filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Width::class.java)
-                .map { mapLrLaneWidth(it) }
-    }
 
     //
     // Lane Border and Width
     //
-    abstract fun mapLrLaneWidth(source: T_Road_Lanes_LaneSection_Lr_Lane_Width): RoadLanesLaneSectionLRLaneWidth
+    // abstract fun mapLrLaneWidth(source: T_Road_Lanes_LaneSection_Lr_Lane_Width): RoadLanesLaneSectionLRLaneWidth
 
-    abstract fun mapLrLaneBorder(source: T_Road_Lanes_LaneSection_Lr_Lane_Border): RoadLanesLaneSectionLRLaneBorder
+    // abstract fun mapLrLaneBorder(source: T_Road_Lanes_LaneSection_Lr_Lane_Border): RoadLanesLaneSectionLRLaneBorder
 
     //
     // Lane Link
@@ -168,17 +117,6 @@ abstract class Opendrive16LaneMapper {
     abstract fun mapLaneRoadMarkExplicit(
         source: T_Road_Lanes_LaneSection_Lcr_Lane_RoadMark_Explicit,
     ): RoadLanesLaneSectionLCRLaneRoadMarkExplicit
-
-    //
-    // Access
-    //
-    fun mapLaneAccessRestrictionTypeToList(source: E_AccessRestrictionType): List<RoadLanesLaneSectionLRLaneAccessRestriction> =
-        listOf(mapLaneAccessRestrictionTypeToClass(source))
-
-    fun mapLaneAccessRestrictionTypeToClass(source: E_AccessRestrictionType): RoadLanesLaneSectionLRLaneAccessRestriction =
-        RoadLanesLaneSectionLRLaneAccessRestriction(type = mapLaneAccessRestrictionType(source))
-
-    abstract fun mapLaneAccessRestrictionType(source: E_AccessRestrictionType): EAccessRestrictionType
 
     //
     // Enumerations

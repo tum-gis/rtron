@@ -45,6 +45,7 @@ fun ELaneType.toLaneType(): LaneType =
         ELaneType.PARKING -> LaneType.PARKING
         ELaneType.MEDIAN -> LaneType.MEDIAN
         ELaneType.BIKING -> LaneType.BIKING
+        ELaneType.SHARED -> LaneType.SHARED
         ELaneType.SIDEWALK -> LaneType.SIDEWALK
         ELaneType.CURB -> LaneType.CURB
         ELaneType.BIDIRECTIONAL -> LaneType.BIDIRECTIONAL
@@ -64,4 +65,6 @@ fun ELaneType.toLaneType(): LaneType =
         ELaneType.HOV -> LaneType.HOV
         ELaneType.MWY_ENTRY -> LaneType.MWY_ENTRY
         ELaneType.MWY_EXIT -> LaneType.MWY_EXIT
+        ELaneType.WALKING -> LaneType.WALKING
+        ELaneType.SLIP_LANE -> LaneType.SLIP_LANE
     }

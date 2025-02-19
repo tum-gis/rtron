@@ -67,9 +67,7 @@ fun OpendriveModel.updateAdditionalIdentifiers() {
                 .toEither { IllegalStateException("Additional ID not available.") }
                 .getOrElse { throw it }
 
-        currentLaneSection.center.lane.forEach { currentLane ->
-            currentLane.additionalId = LaneIdentifier(currentLane.id, currentLaneSectionId).some()
-        }
+        currentLaneSection.center.lane.additionalId = LaneIdentifier(currentLaneSection.center.lane.id, currentLaneSectionId).some()
 
         currentLaneSection.left.onSome { currentLeft ->
             currentLeft.lane.forEach { currentLane ->

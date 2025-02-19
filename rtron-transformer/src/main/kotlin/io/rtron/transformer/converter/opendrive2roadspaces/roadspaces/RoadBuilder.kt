@@ -103,7 +103,6 @@ class RoadBuilder(
         laneSection: RoadLanesLaneSection,
         baseAttributes: AttributeList,
     ): ContextIssueList<LaneSection> {
-        require(laneSection.center.lane.size == 1) { "Lane section ($laneSectionIdentifier) must contain exactly one center lane." }
         require(laneSection.getNumberOfLeftLanes() + laneSection.getNumberOfRightLanes() >= 1) {
             "Lane section ($laneSectionIdentifier) must contain at least one left or right lane."
         }

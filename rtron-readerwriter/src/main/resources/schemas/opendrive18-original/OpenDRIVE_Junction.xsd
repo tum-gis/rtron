@@ -146,8 +146,8 @@ See www.asam.net/license.html for further details.
             <xs:extension base="_OpenDriveElement">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="1" name="segment" type="t_junction_boundary_segment">
-                        <!--<xs:alternative test="@type='lane'" type="t_junction_boundary_segment_lane"/>
-                        <xs:alternative test="@type='joint'" type="t_junction_boundary_segment_joint"/>-->
+                        <xs:alternative test="@type='lane'" type="t_junction_boundary_segment_lane"/>
+                        <xs:alternative test="@type='joint'" type="t_junction_boundary_segment_joint"/>
                     </xs:element>
                     <xs:group maxOccurs="unbounded" minOccurs="0" ref="g_additionalData"/>
                 </xs:sequence>
@@ -259,7 +259,7 @@ See www.asam.net/license.html for further details.
                         <xs:documentation>Common junctions are of type "default". If the attribute is not specified, the junction type is "default". This attribute is mandatory for all other junction types.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <!--<xs:assert test="count(connection/@id) = count(distinct-values(connection/@id))"/>-->
+                <xs:assert test="count(connection/@id) = count(distinct-values(connection/@id))"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -510,7 +510,7 @@ See www.asam.net/license.html for further details.
                         <xs:documentation>Common junctions are of type "default". If the attribute is not specified, the junction type is "default". This attribute is mandatory for all other junction types.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <!--<xs:assert test="count(connection/@id) = count(distinct-values(connection/@id))"/>-->
+                <xs:assert test="count(connection/@id) = count(distinct-values(connection/@id))"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -650,8 +650,8 @@ See www.asam.net/license.html for further details.
             <xs:extension base="t_junction">
                 <xs:sequence>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="connection" type="t_junction_connection">
-                        <!--<xs:alternative test="@type='virtual'" type="t_junction_connection_virtual"/>
-                        <xs:alternative type="t_junction_connection_virtual_default"/>-->
+                        <xs:alternative test="@type='virtual'" type="t_junction_connection_virtual"/>
+                        <xs:alternative type="t_junction_connection_virtual_default"/>
                     </xs:element>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="crossPath" type="t_junction_crossPath"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="priority" type="t_junction_priority"/>
@@ -686,7 +686,7 @@ See www.asam.net/license.html for further details.
                         <xs:documentation>Common junctions are of type "default". If the attribute is not specified, the junction type is "default". This attribute is mandatory for all other junction types.</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <!--<xs:assert test="count(connection/@id) = count(distinct-values(connection/@id))"/>-->
+                <xs:assert test="count(connection/@id) = count(distinct-values(connection/@id))"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

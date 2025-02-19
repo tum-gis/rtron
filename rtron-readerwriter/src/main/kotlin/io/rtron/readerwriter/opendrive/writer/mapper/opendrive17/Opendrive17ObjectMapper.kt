@@ -17,8 +17,6 @@
 package io.rtron.readerwriter.opendrive.writer.mapper.opendrive17
 
 import arrow.core.Option
-import io.rtron.model.opendrive.lane.ELaneType
-import io.rtron.model.opendrive.lane.ERoadMarkWeight
 import io.rtron.model.opendrive.objects.EObjectType
 import io.rtron.model.opendrive.objects.EOrientation
 import io.rtron.model.opendrive.objects.EOutlineFillType
@@ -30,10 +28,8 @@ import io.rtron.model.opendrive.objects.RoadObjectsObjectMarkings
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlines
 import io.rtron.model.opendrive.objects.RoadObjectsObjectParkingSpace
 import io.rtron.readerwriter.opendrive.writer.mapper.common.OpendriveCommonMapper
-import org.asam.opendrive17.E_LaneType
 import org.asam.opendrive17.E_ObjectType
 import org.asam.opendrive17.E_OutlineFillType
-import org.asam.opendrive17.E_RoadMarkWeight
 import org.asam.opendrive17.E_SideType
 import org.asam.opendrive17.T_Road_Objects
 import org.asam.opendrive17.T_Road_Objects_Object
@@ -43,9 +39,14 @@ import org.asam.opendrive17.T_Road_Objects_Object_Outlines
 import org.asam.opendrive17.T_Road_Objects_Object_ParkingSpace
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.MappingConstants
 import org.mapstruct.NullValueCheckStrategy
+import org.mapstruct.ValueMapping
 
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class])
+@Mapper(
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+    uses = [OpendriveCommonMapper::class, Opendrive17CoreMapper::class, Opendrive17LaneMapper::class],
+)
 abstract class Opendrive17ObjectMapper {
     //
     // Road objects
@@ -85,10 +86,12 @@ abstract class Opendrive17ObjectMapper {
 
     fun mapOptionFillType(source: Option<EOutlineFillType>): E_OutlineFillType? = source.fold({ null }, { mapFillType(it) })
 
+    @ValueMapping(source = "PAINT", target = MappingConstants.NULL)
     abstract fun mapFillType(source: EOutlineFillType): E_OutlineFillType
 
     fun mapOptionEObjectType(source: Option<EObjectType>): E_ObjectType? = source.fold({ null }, { mapEObjectType(it) })
 
+    @ValueMapping(source = "ROAD_SURFACE", target = MappingConstants.NULL)
     abstract fun mapEObjectType(source: EObjectType): E_ObjectType
 
     fun mapOptionRoadObjectsObjectBorders(source: Option<RoadObjectsObjectBorders>): T_Road_Objects_Object_Borders? =
@@ -106,18 +109,10 @@ abstract class Opendrive17ObjectMapper {
 
     abstract fun mapRoadObjectsObjectOutlines(source: RoadObjectsObjectOutlines): T_Road_Objects_Object_Outlines
 
-    fun mapOptionELaneType(source: Option<ELaneType>): E_LaneType? = source.fold({ null }, { mapELaneType(it) })
-
-    abstract fun mapELaneType(source: ELaneType): E_LaneType
-
     //
     // Markings
     //
     fun mapOptionESideType(source: Option<ESideType>): E_SideType? = source.fold({ null }, { mapESideType(it) })
 
     abstract fun mapESideType(source: ESideType): E_SideType
-
-    fun mapOptionERoadMarkWeight(source: Option<ERoadMarkWeight>): E_RoadMarkWeight? = source.fold({ null }, { mapERoadMarkWeight(it) })
-
-    abstract fun mapERoadMarkWeight(source: ERoadMarkWeight): E_RoadMarkWeight
 }

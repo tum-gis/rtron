@@ -40,6 +40,7 @@ enum class EObjectType {
     GANTRY,
     SOUND_BARRIER,
     ROAD_MARK,
+    ROAD_SURFACE,
 }
 // deprecated: CAR, VAN, BUS, TRAILER, BIKE, MOTORBIKE, TRAM, TRAIN, PEDESTRIAN, WIND
 
@@ -60,7 +61,7 @@ fun EOrientation.toRotation2D() =
         else -> Rotation2D(0.0)
     }
 
-enum class EOutlineFillType { GRASS, CONCRETE, COBBLE, ASPHALT, PAVEMENT, GRAVEL, SOIL }
+enum class EOutlineFillType { GRASS, CONCRETE, COBBLE, ASPHALT, PAVEMENT, GRAVEL, SOIL, PAINT }
 
 enum class ERoadObjectsObjectParkingSpaceAccess { ALL, CAR, WOMEN, HANDICAPPED, BUS, TRUCK, ELECTRIC, RESIDENTS }
 

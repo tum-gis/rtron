@@ -32,6 +32,7 @@ import org.asam.opendrive17.T_Junction_PredecessorSuccessor
 import org.asam.opendrive17.T_Junction_Surface
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
+import org.mapstruct.ValueMapping
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
@@ -49,6 +50,7 @@ abstract class Opendrive17JunctionMapper {
 
     fun mapOptionEJunctionType(source: Option<EJunctionType>): E_Junction_Type? = source.fold({ null }, { mapEJunctionType(it) })
 
+    @ValueMapping(source = "CROSSING", target = "DEFAULT")
     abstract fun mapEJunctionType(source: EJunctionType): E_Junction_Type
 
     //

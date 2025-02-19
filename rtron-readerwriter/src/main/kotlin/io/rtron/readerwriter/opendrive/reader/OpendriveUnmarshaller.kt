@@ -33,6 +33,7 @@ import org.asam.opendrive14.OpenDRIVE as Opendrive14
 import org.asam.opendrive15.OpenDRIVE as Opendrive15
 import org.asam.opendrive16.OpenDRIVE as Opendrive16
 import org.asam.opendrive17.OpenDRIVE as Opendrive17
+import org.asam.opendrive18.OpenDRIVE as Opendrive18
 
 class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
     // Properties and Initializers
@@ -64,6 +65,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
                 OpendriveVersion.V1_5 to Opendrive15::class.java,
                 OpendriveVersion.V1_6 to Opendrive16::class.java,
                 OpendriveVersion.V1_7 to Opendrive17::class.java,
+                OpendriveVersion.V1_8 to Opendrive18::class.java,
             )
         private val OPENDRIVE_SCHEMA_LOCATIONS: Map<OpendriveVersion, String> =
             mapOf(
@@ -74,6 +76,7 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
                 OpendriveVersion.V1_5 to "schemas/opendrive15/OpenDRIVE_1.5M.xsd",
                 OpendriveVersion.V1_6 to "schemas/opendrive16/opendrive_16_core.xsd",
                 OpendriveVersion.V1_7 to "schemas/opendrive17/opendrive_17_core.xsd",
+                OpendriveVersion.V1_8 to "schemas/opendrive18/OpenDRIVE_Core.xsd",
             )
 
         init {

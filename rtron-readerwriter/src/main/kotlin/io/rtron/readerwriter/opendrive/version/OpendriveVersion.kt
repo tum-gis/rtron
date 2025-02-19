@@ -66,6 +66,8 @@ enum class OpendriveVersion(val rev: Pair<Int, Int>) {
      * OpenDRIVE version 1.7.0 released on the 03 Aug 2021 by ASAM e.V.
      */
     V1_7(Pair(1, 7)),
+
+    V1_8(Pair(1, 8)),
     ;
 
     // Methods

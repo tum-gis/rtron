@@ -140,10 +140,9 @@ class LaneBuilder(
             }
 
         val type = centerLane.type.toLaneType()
-        val laneMaterial = buildLaneMaterial(centerLane.material)
         val attributes = baseAttributes + buildAttributes(centerLane)
 
-        val lane = CenterLane(laneIdentifier, centerLane.getLevelWithDefault(), roadMarkings, type, laneMaterial, attributes)
+        val lane = CenterLane(laneIdentifier, centerLane.getLevelWithDefault(), roadMarkings, type, attributes)
         return ContextIssueList(lane, issueList)
     }
 
@@ -280,6 +279,36 @@ class LaneBuilder(
         val laneMaterial = LaneMaterial(firstEntry.friction, firstEntry.roughness, firstEntry.surface)
         return Some(laneMaterial)
     }
+
+    private fun buildAttributes(centerLane: RoadLanesLaneSectionCenterLane) =
+        attributes("${parameters.attributesPrefix}lane_") {
+            attribute("type", centerLane.type.toString())
+            centerLane.level.onSome {
+                attribute("level", it)
+            }
+
+            centerLane.link.onSome {
+                attributes("predecessor_lane") {
+                    it.predecessor.forEachIndexed { i, element ->
+                        attribute("_$i", element.id)
+                    }
+                }
+
+                attributes("successor_lane") {
+                    it.successor.forEachIndexed { i, element ->
+                        attribute("_$i", element.id)
+                    }
+                }
+            }
+
+            attributes("heightOffset") {
+                centerLane.height.forEachIndexed { i, element ->
+                    attribute("_curvePositionStart_$i", element.sOffset)
+                    attribute("_inner_$i", element.inner)
+                    attribute("_outer_$i", element.outer)
+                }
+            }
+        }
 
     private fun buildAttributes(leftRightLane: RoadLanesLaneSectionLRLane) =
         attributes("${parameters.attributesPrefix}lane_") {

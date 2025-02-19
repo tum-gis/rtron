@@ -45,7 +45,7 @@ data class RoadLanesLaneSection(
 
     fun getNumberOfLanes() = center.getNumberOfLanes() + getNumberOfLeftRightLanes()
 
-    fun getCenterLane() = center.lane.first()
+    fun getCenterLane() = center.lane
 
     fun getLeftLanes(): Map<Int, RoadLanesLaneSectionLRLane> = left.fold({ emptyMap() }, { it.getLanes() })
 

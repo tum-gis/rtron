@@ -17,6 +17,9 @@
 package io.rtron.readerwriter.opendrive.writer.mapper.opendrive17
 
 import arrow.core.Option
+import arrow.core.firstOrNone
+import io.rtron.model.opendrive.lane.EAccessRestrictionType
+import io.rtron.model.opendrive.lane.ELaneType
 import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
 import io.rtron.model.opendrive.lane.ERoadMarkColor
 import io.rtron.model.opendrive.lane.ERoadMarkRule
@@ -27,6 +30,7 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneLink
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkExplicit
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkType
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneAccessRestriction
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneBorder
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneWidth
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeft
@@ -34,6 +38,8 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeftLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRight
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRightLane
 import io.rtron.readerwriter.opendrive.writer.mapper.common.OpendriveCommonMapper
+import org.asam.opendrive17.E_AccessRestrictionType
+import org.asam.opendrive17.E_LaneType
 import org.asam.opendrive17.E_RoadMarkColor
 import org.asam.opendrive17.E_RoadMarkRule
 import org.asam.opendrive17.E_RoadMarkType
@@ -53,6 +59,7 @@ import org.asam.opendrive17.T_Road_Lanes_LaneSection_Right_Lane
 import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.MappingConstants
 import org.mapstruct.MappingTarget
 import org.mapstruct.NullValueCheckStrategy
 import org.mapstruct.ValueMapping
@@ -81,16 +88,10 @@ abstract class Opendrive17LaneMapper {
     //
     // Lane
     //
-    @Mapping(source = "width", target = "borderOrWidth")
-    abstract fun mapRoadLanesLaneSectionCenterLane(source: RoadLanesLaneSectionCenterLane): T_Road_Lanes_LaneSection_Center_Lane
+    fun mapRoadLanesLaneSectionCenterLaneToList(source: RoadLanesLaneSectionCenterLane): List<T_Road_Lanes_LaneSection_Center_Lane> =
+        listOf(mapRoadLanesLaneSectionCenterLane(source))
 
-    @AfterMapping
-    fun afterRoadLanesLaneSectionCenterLane(
-        source: RoadLanesLaneSectionCenterLane,
-        @MappingTarget target: T_Road_Lanes_LaneSection_Center_Lane,
-    ) {
-        target.borderOrWidth += source.border.map { mapRoadLanesLaneSectionLRLaneBorder(it) }
-    }
+    abstract fun mapRoadLanesLaneSectionCenterLane(source: RoadLanesLaneSectionCenterLane): T_Road_Lanes_LaneSection_Center_Lane
 
     @Mapping(source = "width", target = "borderOrWidth")
     abstract fun mapRoadLanesLaneSectionLeftLane(source: RoadLanesLaneSectionLeftLane): T_Road_Lanes_LaneSection_Left_Lane
@@ -169,5 +170,28 @@ abstract class Opendrive17LaneMapper {
 
     fun mapOptionRoadMarkColor(source: Option<ERoadMarkColor>): E_RoadMarkColor? = source.fold({ null }, { mapRoadMarkColor(it) })
 
+    @ValueMapping(source = "BLACK", target = MappingConstants.NULL)
+    @ValueMapping(source = "VIOLET", target = MappingConstants.NULL)
     abstract fun mapRoadMarkColor(source: ERoadMarkColor): E_RoadMarkColor
+
+    //
+    // Access
+    //
+
+    fun mapLaneAccessRestriction(source: List<RoadLanesLaneSectionLRLaneAccessRestriction>): E_AccessRestrictionType =
+        source.firstOrNone().fold({ E_AccessRestrictionType.NONE }, { mapLaneRestrictionType(it.type) })
+
+    @ValueMapping(source = "HOV", target = "NONE")
+    abstract fun mapLaneRestrictionType(source: EAccessRestrictionType): E_AccessRestrictionType
+
+    //
+    // Enumerations
+    //
+
+    fun mapOptionELaneType(source: Option<ELaneType>): E_LaneType? = source.fold({ null }, { mapELaneType(it) })
+
+    @ValueMapping(source = "SHARED", target = MappingConstants.NULL)
+    @ValueMapping(source = "WALKING", target = MappingConstants.NULL)
+    @ValueMapping(source = "SLIP_LANE", target = MappingConstants.NULL)
+    abstract fun mapELaneType(source: ELaneType): E_LaneType
 }

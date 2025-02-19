@@ -82,7 +82,7 @@ val everyRoadLanesLaneSectionRightLane =
         RoadLanesLaneSectionRight.lane compose Traversal.list()
 val everyRoadLanesLaneSectionCenterLane =
     everyLaneSection compose RoadLanesLaneSection.center compose
-        RoadLanesLaneSectionCenter.lane compose Traversal.list()
+        RoadLanesLaneSectionCenter.lane
 
 // junction
 val everyJunction = OpendriveModel.junction compose Traversal.list()

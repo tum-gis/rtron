@@ -22,6 +22,7 @@ enum class LaneType {
     STOP,
     SHOULDER,
     BIKING,
+    SHARED,
     SIDEWALK,
     BORDER,
     RESTRICTED,
@@ -45,4 +46,6 @@ enum class LaneType {
     HOV,
     MWY_ENTRY,
     MWY_EXIT,
+    WALKING,
+    SLIP_LANE,
 }

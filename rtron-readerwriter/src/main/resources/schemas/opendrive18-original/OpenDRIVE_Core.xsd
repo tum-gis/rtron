@@ -23,12 +23,12 @@ See www.asam.net/license.html for further details.
                 <xs:element maxOccurs="1" minOccurs="1" name="header" type="t_header"/>
                 <xs:element maxOccurs="unbounded" minOccurs="1" name="road" type="t_road"/>
                 <xs:element maxOccurs="unbounded" minOccurs="0" name="controller" type="t_controller"/>
-                <!--<xs:element maxOccurs="unbounded" minOccurs="0" name="junction" type="t_junction">
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="junction" type="t_junction">
                     <xs:alternative test="@type='virtual'" type="t_junction_virtual"/>
                     <xs:alternative test="@type='direct'" type="t_junction_direct"/>
                     <xs:alternative test="@type='crossing'" type="t_junction_crossing"/>
                     <xs:alternative type="t_junction_common"/>
-                </xs:element>-->
+                </xs:element>
                 <xs:element maxOccurs="unbounded" minOccurs="0" name="junctionGroup" type="t_junctionGroup"/>
                 <xs:element maxOccurs="unbounded" minOccurs="0" name="station" type="t_station"/>
                 <xs:group maxOccurs="unbounded" minOccurs="0" ref="g_additionalData"/>

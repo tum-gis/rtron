@@ -394,7 +394,7 @@ There are two ways to describe the bounding box of objects.
                         <xs:documentation>z-offset of object's origin relative to the elevation of the road reference line</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <!--<xs:assert test="not(@radius or @width or @length) or (@radius and not(@width or @length)) or  (@width and @length and not(@radius))"/>
+                <xs:assert test="not(@radius or @width or @length) or (@radius and not(@width or @length)) or  (@width and @length and not(@radius))"/>
                 <xs:assert test="if (@type = 'barrier') then (not(@radius) and not(marking) and not(border) and not(material) and not(surface) and not(parkingSpace) and not(skeleton) and (not(repeat/@distance) or repeat/@distance = 0)) else true()"/>
                 <xs:assert test="if (@type = 'building') then (not(marking) and not(border) and not(material) and not(surface) and not(parkingSpace) and not(skeleton) and (not(repeat/@distance) or repeat/@distance &gt; 0)) else true()"/>
                 <xs:assert test="if (@type = 'crosswalk') then (not(skeleton) and not(border) and not(parkingSpace) and not(@radius) and (not(repeat/@distance) or repeat/@distance != 0)) else true()"/>
@@ -406,7 +406,7 @@ There are two ways to describe the bounding box of objects.
                 <xs:assert test="if (@type = 'roadSurface') then (not(skeleton) and not(border) and not(parkingSpace) and not(marking) and (not(repeat/@distance) or repeat/@distance &gt; 0)) else true()"/>
                 <xs:assert test="if (@type = 'trafficIsland') then (not(skeleton) and not(surface) and not(parkingSpace)) else true()"/>
                 <xs:assert test="if (@type = 'tree') then (not(material) and not(surface) and not(border) and not(parkingSpace) and not(marking) and (not(repeat/@distance) or repeat/@distance &gt; 0)) else true()"/>
-                <xs:assert test="if (@type = 'vegetation') then (not(skeleton) and not(material) and not(surface) and not(border) and not(parkingSpace) and not(marking) and (not(repeat/@distance) or repeat/@distance &gt; 0)) else true()"/>-->
+                <xs:assert test="if (@type = 'vegetation') then (not(skeleton) and not(material) and not(surface) and not(border) and not(parkingSpace) and not(marking) and (not(repeat/@distance) or repeat/@distance &gt; 0)) else true()"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -454,7 +454,7 @@ Different border types are available.</xs:documentation>
                         <xs:documentation>Border width</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <!--<xs:assert test="if (@useCompleteOutline) then not(cornerReference) else count(cornerReference) gt 1"/>-->
+                <xs:assert test="if (@useCompleteOutline) then not(cornerReference) else count(cornerReference) gt 1"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -526,7 +526,7 @@ Different border types are available.</xs:documentation>
                         <xs:documentation>Height of road mark above the road, i.e. thickness of the road mark</xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <!--<xs:assert test="if (@side) then not(cornerReference) else count(cornerReference) gt 1"/>-->
+                <xs:assert test="if (@side) then not(cornerReference) else count(cornerReference) gt 1"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

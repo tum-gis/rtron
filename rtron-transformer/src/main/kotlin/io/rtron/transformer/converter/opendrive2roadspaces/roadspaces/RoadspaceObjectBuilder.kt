@@ -180,6 +180,7 @@ class RoadspaceObjectBuilder(
                 EObjectType.GANTRY -> RoadObjectType.GANTRY
                 EObjectType.SOUND_BARRIER -> RoadObjectType.SOUND_BARRIER
                 EObjectType.ROAD_MARK -> RoadObjectType.ROAD_MARK
+                EObjectType.ROAD_SURFACE -> RoadObjectType.ROAD_SURFACE
             }
         })
 

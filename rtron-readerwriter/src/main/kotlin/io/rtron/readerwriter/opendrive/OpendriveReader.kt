@@ -28,6 +28,7 @@ import io.rtron.model.opendrive.additions.extensions.updateAdditionalIdentifiers
 import io.rtron.readerwriter.opendrive.reader.OpendriveUnmarshaller
 import io.rtron.readerwriter.opendrive.reader.mapper.opendrive14.Opendrive14Mapper
 import io.rtron.readerwriter.opendrive.reader.mapper.opendrive16.Opendrive16Mapper
+import io.rtron.readerwriter.opendrive.reader.mapper.opendrive17.Opendrive18Mapper
 import io.rtron.readerwriter.opendrive.version.OpendriveVersion
 import io.rtron.readerwriter.opendrive.version.OpendriveVersionUtils
 import io.rtron.std.BaseException
@@ -78,6 +79,7 @@ object OpendriveReader {
                     OpendriveVersion.V1_5 -> OpendriveVersion.V1_4
                     OpendriveVersion.V1_6 -> OpendriveVersion.V1_6
                     OpendriveVersion.V1_7 -> OpendriveVersion.V1_6
+                    OpendriveVersion.V1_8 -> OpendriveVersion.V1_8
                 }
             if (opendriveVersion != unmarshallerOpendriveVersion) {
                 logger.warn {
@@ -98,6 +100,10 @@ object OpendriveReader {
                     OpendriveVersion.V1_6 -> {
                         val converter = Mappers.getMapper(Opendrive16Mapper::class.java)
                         converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive16.OpenDRIVE)
+                    }
+                    OpendriveVersion.V1_8 -> {
+                        val converter = Mappers.getMapper(Opendrive18Mapper::class.java)
+                        converter.mapModel(opendriveVersionSpecificModel as org.asam.opendrive18.OpenDRIVE)
                     }
                     else -> throw IllegalStateException("Mapper must be implemented")
                 }

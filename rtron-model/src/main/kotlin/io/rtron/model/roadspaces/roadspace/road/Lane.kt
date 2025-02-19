@@ -88,7 +88,6 @@ data class CenterLane(
     val level: Boolean = false,
     val roadMarkings: List<RoadMarking> = emptyList(),
     val type: LaneType = LaneType.NONE,
-    val laneMaterial: Option<LaneMaterial>,
     val attributes: AttributeList = AttributeList.EMPTY,
 ) {
     // Properties and Initializers

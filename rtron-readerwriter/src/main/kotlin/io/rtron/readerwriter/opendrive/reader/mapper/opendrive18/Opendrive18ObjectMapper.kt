@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.readerwriter.opendrive.reader.mapper.opendrive16
+package io.rtron.readerwriter.opendrive.reader.mapper.opendrive18
 
 import arrow.core.None
 import arrow.core.Option
@@ -30,17 +30,19 @@ import io.rtron.model.opendrive.objects.RoadObjectsObjectMarkings
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlines
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlinesOutline
 import io.rtron.model.opendrive.objects.RoadObjectsObjectParkingSpace
+import io.rtron.model.opendrive.objects.RoadObjectsObjectSurface
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
-import org.asam.opendrive16.E_ObjectType
-import org.asam.opendrive16.E_OutlineFillType
-import org.asam.opendrive16.E_SideType
-import org.asam.opendrive16.T_Road_Objects
-import org.asam.opendrive16.T_Road_Objects_Object
-import org.asam.opendrive16.T_Road_Objects_Object_Borders
-import org.asam.opendrive16.T_Road_Objects_Object_Markings
-import org.asam.opendrive16.T_Road_Objects_Object_Outlines
-import org.asam.opendrive16.T_Road_Objects_Object_Outlines_Outline
-import org.asam.opendrive16.T_Road_Objects_Object_ParkingSpace
+import org.asam.opendrive18.E_ObjectType
+import org.asam.opendrive18.E_OutlineFillType
+import org.asam.opendrive18.E_SideType
+import org.asam.opendrive18.T_Road_Objects
+import org.asam.opendrive18.T_Road_Objects_Object
+import org.asam.opendrive18.T_Road_Objects_Object_Borders
+import org.asam.opendrive18.T_Road_Objects_Object_Markings
+import org.asam.opendrive18.T_Road_Objects_Object_Outlines
+import org.asam.opendrive18.T_Road_Objects_Object_Outlines_Outline
+import org.asam.opendrive18.T_Road_Objects_Object_ParkingSpace
+import org.asam.opendrive18.T_Road_Objects_Object_Surface
 import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
@@ -50,10 +52,12 @@ import org.mapstruct.ValueMapping
 
 @Mapper(
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
-    uses = [OpendriveCommonMapper::class, Opendrive16CoreMapper::class, Opendrive16LaneMapper::class],
+    uses = [
+        OpendriveCommonMapper::class, Opendrive18CoreMapper::class, Opendrive18LaneMapper::class,
+    ],
     imports = [Option::class],
 )
-abstract class Opendrive16ObjectMapper {
+abstract class Opendrive18ObjectMapper {
     //
     // Road Objects
     //
@@ -78,6 +82,8 @@ abstract class Opendrive16ObjectMapper {
                 ).some()
         }
     }
+
+    abstract fun mapRoadObjectSurface(source: T_Road_Objects_Object_Surface): RoadObjectsObjectSurface
 
     //
     // Outline

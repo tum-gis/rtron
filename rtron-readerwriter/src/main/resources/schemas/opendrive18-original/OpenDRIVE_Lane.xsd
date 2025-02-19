@@ -347,7 +347,7 @@ Lanes contain a series of lane section elements that define the characteristics 
                     <xs:element maxOccurs="unbounded" minOccurs="1" name="laneSection" type="t_road_lanes_laneSection"/>
                     <xs:group maxOccurs="unbounded" minOccurs="0" ref="g_additionalData"/>
                 </xs:sequence>
-                <!--<xs:assert test="if (count(laneOffset) &gt; 0) then count(laneSection//border) = 0 else true()"/>-->
+                <xs:assert test="if (count(laneOffset) &gt; 0) then count(laneSection//border) = 0 else true()"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>

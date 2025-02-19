@@ -33,5 +33,6 @@ enum class RoadObjectType {
     GANTRY,
     SOUND_BARRIER,
     ROAD_MARK,
+    ROAD_SURFACE,
     SIGNAL,
 }
