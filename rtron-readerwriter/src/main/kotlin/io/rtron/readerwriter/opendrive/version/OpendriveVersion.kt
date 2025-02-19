@@ -58,7 +58,7 @@ enum class OpendriveVersion(val rev: Pair<Int, Int>) {
     V1_5(Pair(1, 5)),
 
     /**
-     * OpenDRIVE version 1.6.1 released on the 04 March 2021 by ASAM e.V.
+     * OpenDRIVE version 1.6.1 released on the 04 Mar 2021 by ASAM e.V.
      */
     V1_6(Pair(1, 6)),
 

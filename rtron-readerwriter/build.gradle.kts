@@ -90,6 +90,13 @@ xjcGeneration {
             bindingFile = "src/main/resources/schemas/opendrive17.xjb"
             javaPackageName = "org.asam.opendrive17"
         }
+
+        /*create("opendrive18") {
+            schemaDir = "opendrive18/"
+            schemaRootDir = "$projectDir/src/main/resources/schemas/"
+            bindingFile = "src/main/resources/schemas/opendrive18.xjb"
+            javaPackageName = "org.asam.opendrive18"
+        }*/
     }
 }
 
