@@ -22,4 +22,4 @@ import org.citygml4j.core.model.core.TransformationMatrix4x4 as GmlTransformatio
 /**
  * Converts a [GmlTransformationMatrix4x4] object from an affine matrix.
  */
-fun Affine3D.toGmlTransformationMatrix4x4(): GmlTransformationMatrix4x4 = GmlTransformationMatrix4x4.ofRowMajorList(toDoubleList())
+fun Affine3D.toGmlTransformationMatrix4x4(): GmlTransformationMatrix4x4 = GmlTransformationMatrix4x4.ofRowMajor(toDoubleList())
