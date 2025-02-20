@@ -29,6 +29,9 @@ See www.asam.net/license.html for further details.
                     <xs:alternative test="@type='crossing'" type="t_junction_crossing"/>
                     <xs:alternative type="t_junction_common"/>
                 </xs:element>-->
+                <!-- TODO: generalize: for non-common junction types-->
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="junction" type="t_junction_common"/>
+
                 <xs:element maxOccurs="unbounded" minOccurs="0" name="junctionGroup" type="t_junctionGroup"/>
                 <xs:element maxOccurs="unbounded" minOccurs="0" name="station" type="t_station"/>
                 <xs:group maxOccurs="unbounded" minOccurs="0" ref="g_additionalData"/>

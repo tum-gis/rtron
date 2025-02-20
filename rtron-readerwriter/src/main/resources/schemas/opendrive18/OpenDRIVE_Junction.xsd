@@ -145,10 +145,11 @@ See www.asam.net/license.html for further details.
         <xs:complexContent>
             <xs:extension base="_OpenDriveElement">
                 <xs:sequence>
+                    <!-- TODO: enable
                     <xs:element maxOccurs="unbounded" minOccurs="1" name="segment" type="t_junction_boundary_segment">
-                        <!--<xs:alternative test="@type='lane'" type="t_junction_boundary_segment_lane"/>
-                        <xs:alternative test="@type='joint'" type="t_junction_boundary_segment_joint"/>-->
-                    </xs:element>
+                        <xs:alternative test="@type='lane'" type="t_junction_boundary_segment_lane"/>
+                        <xs:alternative test="@type='joint'" type="t_junction_boundary_segment_joint"/>
+                    </xs:element>-->
                     <xs:group maxOccurs="unbounded" minOccurs="0" ref="g_additionalData"/>
                 </xs:sequence>
             </xs:extension>
@@ -649,10 +650,12 @@ See www.asam.net/license.html for further details.
         <xs:complexContent>
             <xs:extension base="t_junction">
                 <xs:sequence>
+                    <!-- TODO: enable
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="connection" type="t_junction_connection">
-                        <!--<xs:alternative test="@type='virtual'" type="t_junction_connection_virtual"/>
-                        <xs:alternative type="t_junction_connection_virtual_default"/>-->
-                    </xs:element>
+                        <xs:alternative test="@type='virtual'" type="t_junction_connection_virtual"/>
+                        <xs:alternative type="t_junction_connection_virtual_default"/>
+                    </xs:element>-->
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="connection" type="t_junction_connection" />
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="crossPath" type="t_junction_crossPath"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="priority" type="t_junction_priority"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="controller" type="t_junction_controller"/>

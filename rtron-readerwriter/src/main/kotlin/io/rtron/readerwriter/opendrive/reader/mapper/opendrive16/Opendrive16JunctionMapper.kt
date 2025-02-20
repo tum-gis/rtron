@@ -25,7 +25,7 @@ import io.rtron.model.opendrive.junction.EContactPoint
 import io.rtron.model.opendrive.junction.EElementDir
 import io.rtron.model.opendrive.junction.EJunctionType
 import io.rtron.model.opendrive.junction.JunctionPredecessorSuccessor
-import io.rtron.model.opendrive.junction.JunctionSurface
+import io.rtron.model.opendrive.road.RoadSurface
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
 import io.rtron.readerwriter.opendrive.reader.mapper.common.toUpperCaseVariations
 import org.asam.opendrive16.E_Junction_Type
@@ -42,10 +42,9 @@ import org.mapstruct.NullValueCheckStrategy
 abstract class Opendrive16JunctionMapper {
     private val logger = KotlinLogging.logger {}
 
-    fun mapJunctionSurfaceToOption(source: T_Junction_Surface?): Option<JunctionSurface> =
-        source?.let { mapJunctionSurface(it).some() } ?: None
+    fun mapJunctionSurfaceToOption(source: T_Junction_Surface?): Option<RoadSurface> = source?.let { mapJunctionSurface(it).some() } ?: None
 
-    abstract fun mapJunctionSurface(source: T_Junction_Surface): JunctionSurface
+    abstract fun mapJunctionSurface(source: T_Junction_Surface): RoadSurface
 
     fun mapJunctionPredecessorSuccessorToOption(source: T_Junction_PredecessorSuccessor?): Option<JunctionPredecessorSuccessor> =
         source?.let { mapJunctionPredecessorSuccessor(it).some() } ?: None

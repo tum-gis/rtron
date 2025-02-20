@@ -23,10 +23,12 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.model.opendrive.junction.EContactPoint
 import io.rtron.model.opendrive.junction.EElementDir
 import io.rtron.model.opendrive.junction.EJunctionType
+import io.rtron.model.opendrive.junction.JunctionConnection
 import io.rtron.model.opendrive.junction.JunctionPredecessorSuccessor
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
 import io.rtron.readerwriter.opendrive.reader.mapper.common.toUpperCaseVariations
 import org.asam.opendrive18.E_Junction_Type
+import org.asam.opendrive18.T_Junction_Connection_Direct
 import org.asam.opendrive18.T_Junction_PredecessorSuccessor
 import org.mapstruct.Mapper
 import org.mapstruct.NullValueCheckStrategy
@@ -43,6 +45,11 @@ abstract class Opendrive18JunctionMapper {
         source?.let { mapJunctionPredecessorSuccessor(it).some() } ?: None
 
     abstract fun mapJunctionPredecessorSuccessor(source: T_Junction_PredecessorSuccessor): JunctionPredecessorSuccessor
+
+    //
+    // Connection
+    //
+    abstract fun mapJunctionConnection(source: T_Junction_Connection_Direct): JunctionConnection
 
     //
     // Enumerations

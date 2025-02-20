@@ -26,13 +26,14 @@ import io.rtron.model.opendrive.additions.identifier.AdditionalJunctionIdentifie
 import io.rtron.model.opendrive.additions.identifier.JunctionIdentifier
 import io.rtron.model.opendrive.core.OpendriveElement
 import io.rtron.model.opendrive.objects.EOrientation
+import io.rtron.model.opendrive.road.RoadSurface
 
 @optics
 data class Junction(
     var connection: List<JunctionConnection> = emptyList(),
     var priority: List<JunctionPriority> = emptyList(),
     var controller: List<JunctionController> = emptyList(),
-    var surface: Option<JunctionSurface> = None,
+    var surface: Option<RoadSurface> = None,
     var id: String = "",
     var mainRoad: Option<String> = None,
     var name: Option<String> = None,
