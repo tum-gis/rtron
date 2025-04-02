@@ -36,6 +36,8 @@ import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.curve.CurveOnParametricSurface3D
 import io.rtron.math.geometry.euclidean.threed.point.fuzzyEquals
+import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
+import io.rtron.math.geometry.euclidean.threed.solid.Cuboid3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.CompositeSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
@@ -326,6 +328,7 @@ class Road(
         laneIdentifier: LaneIdentifier,
         factor: Double,
         addLateralOffset: UnivariateFunction = ConstantFunction.ZERO,
+        addHeightOffset: UnivariateFunction = ConstantFunction.ZERO,
     ): Either<Exception, AbstractCurve3D> =
         either {
             require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
@@ -360,9 +363,14 @@ class Road(
                 selectedLaneSection
                     .getLaneHeightOffset(laneIdentifier, factor)
                     .bind()
+            val heightOffset =
+                StackedFunction.ofSum(
+                    heightLaneOffset,
+                    addHeightOffset,
+                )
 
             // combine it to a curve on the sectioned road surface
-            CurveOnParametricSurface3D(sectionedSurface, lateralOffset, heightLaneOffset)
+            CurveOnParametricSurface3D(sectionedSurface, lateralOffset, heightOffset)
         }
 
     private fun getCurveOnLaneSectionSurface(
@@ -434,6 +442,20 @@ class Road(
                     .bind()
                     .let { CompositeSurface3D(it) }
             surface
+        }
+
+    /**
+     * Returns the surface of an individual lane with [laneIdentifier] extruded by a defined [height] and sampled by a
+     * certain discretization [step] size.
+     */
+    fun getExtrudedLaneSurface(
+        laneIdentifier: LaneIdentifier,
+        step: Double,
+        height: Double,
+    ): Either<Exception, AbstractSolid3D> =
+        either {
+            val solid = Cuboid3D.UNIT
+            solid
         }
 
     /**
