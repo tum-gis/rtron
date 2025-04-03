@@ -39,7 +39,7 @@ class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
     private val csvPrinter: CMCSVPrinter
 
     init {
-        val csvFormat = Builder.create().setHeader(*header.toTypedArray()).build()
+        val csvFormat = Builder.create().setHeader(*header.toTypedArray()).get()
         csvPrinter = CMCSVPrinter(writer, csvFormat)
     }
 

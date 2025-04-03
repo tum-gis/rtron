@@ -47,16 +47,6 @@ allprojects {
         apply(plugin = "signing")
     }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = "17"
-        }
-    }
-
     repositories {
         mavenCentral()
         maven(url = MavenSources.sonatypeSnapshot)
