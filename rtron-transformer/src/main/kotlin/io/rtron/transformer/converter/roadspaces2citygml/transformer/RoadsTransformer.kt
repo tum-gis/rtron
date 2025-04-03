@@ -230,6 +230,16 @@ class RoadsTransformer(
                         )
                     return issueList
                 }
+        val extrudedSurface =
+            road.getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = 2.0)
+                .getOrElse {
+                    issueList +=
+                        DefaultIssue.of(
+                            "ExtrudedLaneSurfaceNotConstructable", "${it.message} Ignoring lane.", id,
+                            Severity.WARNING, wasFixed = true,
+                        )
+                    return issueList
+                }
         val centerLine =
             road.getCurveOnLane(id, 0.5)
                 .getOrElse {
@@ -255,7 +265,7 @@ class RoadsTransformer(
             when (LaneRouter.route(lane)) {
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
                     transportationModuleBuilder.addTrafficSpaceFeature(
-                        lane, surface, centerLine, lateralFillerSurface,
+                        lane, surface, extrudedSurface, centerLine, lateralFillerSurface,
                         longitudinalFillerSurfaces, relatedObjects, dstTransportationSpace,
                     )
                 }

@@ -25,6 +25,8 @@ import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.raise.either
 import arrow.core.right
+import arrow.core.toNonEmptyListOrNull
+import arrow.optics.copy
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.SectionedUnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
@@ -37,11 +39,12 @@ import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.curve.CurveOnParametricSurface3D
 import io.rtron.math.geometry.euclidean.threed.point.fuzzyEquals
 import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
-import io.rtron.math.geometry.euclidean.threed.solid.Cuboid3D
+import io.rtron.math.geometry.euclidean.threed.solid.Polyhedron3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.CompositeSurface3D
 import io.rtron.math.geometry.euclidean.threed.surface.LinearRing3D
 import io.rtron.math.geometry.toIllegalStateException
+import io.rtron.math.processing.triangulation.Triangulator
 import io.rtron.math.range.BoundType
 import io.rtron.math.range.Range
 import io.rtron.math.range.fuzzyContains
@@ -57,6 +60,7 @@ import io.rtron.model.roadspaces.roadspace.ContactPoint
 import io.rtron.model.roadspaces.roadspace.RoadspaceContactPointIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.std.getValueEither
+import io.rtron.std.handleLeftAndFilter
 import io.rtron.std.isSortedBy
 
 /**
@@ -255,7 +259,7 @@ class Road(
      *
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
-    fun getAllLeftLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
+    fun getAllLeftLaneBoundaries(): List<Pair<LaneIdentifier, CurveOnParametricSurface3D>> =
         getAllLeftRightLaneIdentifiers().map { id ->
             val curve = getLeftLaneBoundary(id).getOrElse { throw it }
             Pair(id, curve)
@@ -266,7 +270,7 @@ class Road(
      *
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
-    fun getAllRightLaneBoundaries(): List<Pair<LaneIdentifier, AbstractCurve3D>> =
+    fun getAllRightLaneBoundaries(): List<Pair<LaneIdentifier, CurveOnParametricSurface3D>> =
         getAllLeftRightLaneIdentifiers().map { id ->
             val curve = getRightLaneBoundary(id).getOrElse { throw it }
             Pair(id, curve)
@@ -279,14 +283,14 @@ class Road(
      * lane boundary is returned; if the factor is 0.5, the center line of the lane is returned
      * @return a triple of the lane identifier, the curve geometry and the lane's id attribute list
      */
-    fun getAllCurvesOnLanes(factor: Double): List<Pair<LaneIdentifier, AbstractCurve3D>> =
+    fun getAllCurvesOnLanes(factor: Double): List<Pair<LaneIdentifier, CurveOnParametricSurface3D>> =
         getAllLeftRightLaneIdentifiers().map { id ->
             val curve = getCurveOnLane(id, factor).getOrElse { throw it }
             Pair(id, curve)
         }
 
     /** Returns the left boundary of an individual lane with [laneIdentifier]. */
-    fun getLeftLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> =
+    fun getLeftLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, CurveOnParametricSurface3D> =
         if (laneIdentifier.isLeft()) {
             getOuterLaneBoundary(laneIdentifier)
         } else {
@@ -294,7 +298,7 @@ class Road(
         }
 
     /** Returns the right boundary of an individual lane with [laneIdentifier]. */
-    fun getRightLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> =
+    fun getRightLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, CurveOnParametricSurface3D> =
         if (laneIdentifier.isLeft()) {
             getInnerLaneBoundary(laneIdentifier)
         } else {
@@ -302,10 +306,12 @@ class Road(
         }
 
     /** Returns the inner lane boundary of an individual lane with [laneIdentifier]. */
-    fun getInnerLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> = getCurveOnLane(laneIdentifier, 0.0)
+    fun getInnerLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, CurveOnParametricSurface3D> =
+        getCurveOnLane(laneIdentifier, 0.0)
 
     /** Returns the outer lane boundary of an individual lane with [laneIdentifier]. */
-    fun getOuterLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, AbstractCurve3D> = getCurveOnLane(laneIdentifier, 1.0)
+    fun getOuterLaneBoundary(laneIdentifier: LaneIdentifier): Either<Exception, CurveOnParametricSurface3D> =
+        getCurveOnLane(laneIdentifier, 1.0)
 
     /** Returns the curve of the center lane with [laneSectionIdentifier]. */
     fun getCurveOfCenterLane(laneSectionIdentifier: LaneSectionIdentifier): Either<Exception, AbstractCurve3D> =
@@ -329,7 +335,7 @@ class Road(
         factor: Double,
         addLateralOffset: UnivariateFunction = ConstantFunction.ZERO,
         addHeightOffset: UnivariateFunction = ConstantFunction.ZERO,
-    ): Either<Exception, AbstractCurve3D> =
+    ): Either<Exception, CurveOnParametricSurface3D> =
         either {
             require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
@@ -454,8 +460,68 @@ class Road(
         height: Double,
     ): Either<Exception, AbstractSolid3D> =
         either {
-            val solid = Cuboid3D.UNIT
-            solid
+            val lowerLeftBoundary: CurveOnParametricSurface3D =
+                getLeftLaneBoundary(laneIdentifier)
+                    .getOrElse { throw it }
+            val lowerRightBoundary =
+                getRightLaneBoundary(laneIdentifier)
+                    .getOrElse { throw it }
+            val upperLeftBoundary =
+                lowerLeftBoundary.copy(
+                    heightOffsetFunction = StackedFunction.ofSum(lowerLeftBoundary.heightOffsetFunction, ConstantFunction(height)),
+                )
+            val upperRightBoundary =
+                lowerRightBoundary.copy(
+                    heightOffsetFunction = StackedFunction.ofSum(lowerRightBoundary.heightOffsetFunction, ConstantFunction(height)),
+                )
+
+            val lowerLeftBoundarySampled =
+                lowerLeftBoundary.calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .getOrElse { throw it }
+            val lowerRightBoundarySampled =
+                lowerRightBoundary.calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .getOrElse { throw it }
+            val upperLeftBoundarySampled =
+                upperLeftBoundary.calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .getOrElse { throw it }
+            val upperRightBoundarySampled =
+                upperRightBoundary.calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .getOrElse { throw it }
+
+            val baseFace =
+                LinearRing3D.ofWithDuplicatesRemoval(lowerRightBoundarySampled, lowerLeftBoundarySampled, geometricalTolerance)
+                    .mapLeft { IllegalStateException(it.message) }
+                    .bind()
+            // .let { CompositeSurface3D(it) }
+            val topFace =
+                LinearRing3D.ofWithDuplicatesRemoval(upperLeftBoundarySampled, upperRightBoundarySampled, geometricalTolerance)
+                    .mapLeft { IllegalStateException(it.message) }
+                    .bind()
+            // .let { CompositeSurface3D(it) }
+            val leftFace =
+                LinearRing3D.ofWithDuplicatesRemoval(lowerLeftBoundarySampled, upperLeftBoundarySampled, geometricalTolerance)
+                    .mapLeft { IllegalStateException(it.message) }
+                    .bind()
+            val rightFace =
+                LinearRing3D.ofWithDuplicatesRemoval(lowerRightBoundarySampled, upperRightBoundarySampled, geometricalTolerance)
+                    .mapLeft { IllegalStateException(it.message) }
+                    .bind()
+
+            // triangulate faces
+            val triangulatedFaces =
+                (baseFace + topFace + leftFace + rightFace) // sideFaces
+                    .map { currentFace -> Triangulator.triangulate(currentFace, geometricalTolerance) }
+                    .handleLeftAndFilter { throw IllegalStateException(it.value.message) }
+                    .flatten()
+                    .let { it.toNonEmptyListOrNull()!! }
+
+            val polyhedron = Polyhedron3D(triangulatedFaces, geometricalTolerance)
+
+            polyhedron
         }
 
     /**

@@ -23,6 +23,7 @@ import io.rtron.io.issues.DefaultIssueList
 import io.rtron.io.issues.Severity
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
+import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.model.roadspaces.common.LateralFillerSurface
 import io.rtron.model.roadspaces.common.LongitudinalFillerSurface
@@ -93,6 +94,7 @@ class TransportationModuleBuilder(
     fun addTrafficSpaceFeature(
         lane: Lane,
         surface: AbstractSurface3D,
+        extrudedSurface: AbstractSolid3D,
         centerLine: AbstractCurve3D,
         lateralFillerSurface: Option<LateralFillerSurface>,
         longitudinalFillerSurfaces: List<LongitudinalFillerSurface>,
@@ -122,6 +124,9 @@ class TransportationModuleBuilder(
         // geometry
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
         trafficSpaceFeature.populateLod2Geometry(centerLineGeometryTransformer)
+
+        val extrudedSurfaceGeometryTransformer = GeometryTransformer(parameters).also { extrudedSurface.accept(it) }
+        trafficSpaceFeature.populateLod2Geometry(extrudedSurfaceGeometryTransformer)
 
         // traffic area feature
         val trafficAreaFeature = createTrafficAreaFeature(lane.id, surface).handleIssueList { issueList += it }

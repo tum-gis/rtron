@@ -38,9 +38,9 @@ import io.rtron.math.range.intersectingRange
  * @param heightOffsetFunction height offset to the curve of the [baseSurface]
  */
 data class CurveOnParametricSurface3D(
-    private val baseSurface: AbstractCurveRelativeSurface3D,
-    private val lateralOffsetFunction: UnivariateFunction,
-    private val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS,
+    val baseSurface: AbstractCurveRelativeSurface3D,
+    val lateralOffsetFunction: UnivariateFunction,
+    val heightOffsetFunction: UnivariateFunction = LinearFunction.X_AXIS,
 ) : AbstractCurve3D() {
     // Properties and Initializers
     override val tolerance: Double get() = baseSurface.tolerance
