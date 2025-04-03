@@ -31,6 +31,7 @@ import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
+import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.model.roadspaces.roadspace.road.Road
 import io.rtron.std.handleLeftAndFilter
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
@@ -220,6 +221,15 @@ class RoadsTransformer(
                         )
                     return issueList
                 }
+        val trafficSpaceHeight =
+            when (lane.type) {
+                LaneType.BIKING -> 2.5
+                LaneType.BORDER -> 2.5
+                LaneType.SIDEWALK -> 2.5
+                LaneType.WALKING -> 2.5
+                else -> 4.5
+            }
+
         val surface =
             road.getLaneSurface(id, parameters.discretizationStepSize)
                 .getOrElse {
@@ -231,7 +241,7 @@ class RoadsTransformer(
                     return issueList
                 }
         val extrudedSurface =
-            road.getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = 2.0)
+            road.getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = trafficSpaceHeight)
                 .getOrElse {
                     issueList +=
                         DefaultIssue.of(
@@ -272,7 +282,7 @@ class RoadsTransformer(
 
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
                     transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(
-                        lane, surface, centerLine, lateralFillerSurface,
+                        lane, surface, extrudedSurface, centerLine, lateralFillerSurface,
                         longitudinalFillerSurfaces, dstTransportationSpace,
                     )
                 }

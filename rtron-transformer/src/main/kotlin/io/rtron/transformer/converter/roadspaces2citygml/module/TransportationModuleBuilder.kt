@@ -189,6 +189,7 @@ class TransportationModuleBuilder(
     fun addAuxiliaryTrafficSpaceFeature(
         lane: Lane,
         surface: AbstractSurface3D,
+        extrudedSurface: AbstractSolid3D,
         centerLine: AbstractCurve3D,
         lateralFillerSurface: Option<LateralFillerSurface>,
         longitudinalFillerSurfaces: List<LongitudinalFillerSurface>,
@@ -208,6 +209,9 @@ class TransportationModuleBuilder(
         // geometry
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
         auxiliaryTrafficSpaceFeature.populateLod2Geometry(centerLineGeometryTransformer)
+
+        val extrudedSurfaceGeometryTransformer = GeometryTransformer(parameters).also { extrudedSurface.accept(it) }
+        auxiliaryTrafficSpaceFeature.populateLod2Geometry(extrudedSurfaceGeometryTransformer)
 
         // auxiliary traffic area feature
         val auxiliaryTrafficAreaFeature =

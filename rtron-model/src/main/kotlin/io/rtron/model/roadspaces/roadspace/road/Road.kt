@@ -23,6 +23,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.left
+import arrow.core.nonEmptyListOf
 import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
@@ -496,24 +497,44 @@ class Road(
                 LinearRing3D.ofWithDuplicatesRemoval(lowerRightBoundarySampled, lowerLeftBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
-            // .let { CompositeSurface3D(it) }
             val topFace =
                 LinearRing3D.ofWithDuplicatesRemoval(upperLeftBoundarySampled, upperRightBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
-            // .let { CompositeSurface3D(it) }
             val leftFace =
                 LinearRing3D.ofWithDuplicatesRemoval(lowerLeftBoundarySampled, upperLeftBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
             val rightFace =
-                LinearRing3D.ofWithDuplicatesRemoval(lowerRightBoundarySampled, upperRightBoundarySampled, geometricalTolerance)
+                LinearRing3D.ofWithDuplicatesRemoval(upperRightBoundarySampled, lowerRightBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
+                    .bind()
+            val frontFace =
+                LinearRing3D.of(
+                    nonEmptyListOf(
+                        lowerLeftBoundarySampled.first(),
+                        lowerRightBoundarySampled.first(),
+                        upperRightBoundarySampled.first(),
+                        upperLeftBoundarySampled.first(),
+                    ),
+                    geometricalTolerance,
+                ).mapLeft { IllegalStateException(it.message) }
+                    .bind()
+            val endFace =
+                LinearRing3D.of(
+                    nonEmptyListOf(
+                        lowerLeftBoundarySampled.last(),
+                        upperLeftBoundarySampled.last(),
+                        upperRightBoundarySampled.last(),
+                        lowerRightBoundarySampled.last(),
+                    ),
+                    geometricalTolerance,
+                ).mapLeft { IllegalStateException(it.message) }
                     .bind()
 
             // triangulate faces
             val triangulatedFaces =
-                (baseFace + topFace + leftFace + rightFace) // sideFaces
+                (baseFace + topFace + leftFace + rightFace + frontFace + endFace)
                     .map { currentFace -> Triangulator.triangulate(currentFace, geometricalTolerance) }
                     .handleLeftAndFilter { throw IllegalStateException(it.value.message) }
                     .flatten()
