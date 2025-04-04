@@ -37,6 +37,7 @@ import org.citygml4j.core.model.construction.GroundSurface
 import org.citygml4j.core.model.construction.RoofSurface
 import org.citygml4j.core.model.construction.WallSurface
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
+import org.citygml4j.core.model.core.SpaceType
 
 /**
  * Builder for city objects of the CityGML Building module.
@@ -55,6 +56,7 @@ class BuildingModuleBuilder(
         val buildingFeature = Building()
 
         // geometry
+        buildingFeature.spaceType = SpaceType.CLOSED
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         buildingFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
         pointGeometryTransformer.rotation.onSome {

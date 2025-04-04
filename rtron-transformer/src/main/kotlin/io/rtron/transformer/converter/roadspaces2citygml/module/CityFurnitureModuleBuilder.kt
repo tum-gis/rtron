@@ -20,6 +20,7 @@ import io.rtron.io.issues.ContextIssueList
 import io.rtron.io.issues.DefaultIssue
 import io.rtron.io.issues.DefaultIssueList
 import io.rtron.io.issues.Severity
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
@@ -29,6 +30,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Ge
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.issues.roadspaces.of
 import org.citygml4j.core.model.cityfurniture.CityFurniture
+import org.citygml4j.core.model.core.SpaceType
 
 /**
  * Builder for city objects of the CityGML CityFurniture module.
@@ -46,6 +48,8 @@ class CityFurnitureModuleBuilder(
         val issueList = DefaultIssueList()
 
         // geometry
+        cityFurnitureFeature.spaceType = deriveSpaceType(roadspaceObject.type)
+
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         cityFurnitureFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
         pointGeometryTransformer.rotation.onSome {
@@ -87,4 +91,14 @@ class CityFurnitureModuleBuilder(
 
         return ContextIssueList(cityFurnitureFeature, issueList)
     }
+
+    private fun deriveSpaceType(roadObjectType: RoadObjectType): SpaceType =
+        when (roadObjectType) {
+            RoadObjectType.OBSTACLE -> SpaceType.CLOSED
+            RoadObjectType.POLE -> SpaceType.CLOSED
+            RoadObjectType.BARRIER -> SpaceType.CLOSED
+            RoadObjectType.GANTRY -> SpaceType.CLOSED
+            RoadObjectType.SIGNAL -> SpaceType.CLOSED
+            else -> throw IllegalStateException("$roadObjectType not mapped to CityFurniture")
+        }
 }

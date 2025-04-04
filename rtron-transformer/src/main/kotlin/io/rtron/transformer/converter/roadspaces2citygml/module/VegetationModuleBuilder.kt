@@ -32,6 +32,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1Im
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.issues.roadspaces.of
+import org.citygml4j.core.model.core.SpaceType
 import org.citygml4j.core.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 
@@ -53,6 +54,8 @@ class VegetationModuleBuilder(
         val solitaryVegetationObjectFeature = SolitaryVegetationObject()
 
         // geometry
+        solitaryVegetationObjectFeature.spaceType = SpaceType.CLOSED
+
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         solitaryVegetationObjectFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
         pointGeometryTransformer.rotation.onSome {

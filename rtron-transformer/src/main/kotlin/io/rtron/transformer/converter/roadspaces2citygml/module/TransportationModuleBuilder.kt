@@ -45,6 +45,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTraff
 import io.rtron.transformer.issues.roadspaces.of
 import org.citygml4j.core.model.core.AbstractSpaceBoundaryProperty
 import org.citygml4j.core.model.core.AbstractThematicSurface
+import org.citygml4j.core.model.core.SpaceType
 import org.citygml4j.core.model.transportation.AbstractTransportationSpace
 import org.citygml4j.core.model.transportation.AuxiliaryTrafficArea
 import org.citygml4j.core.model.transportation.AuxiliaryTrafficSpace
@@ -448,12 +449,14 @@ class TransportationModuleBuilder(
     private fun createTrafficSpaceFeature(granularity: TransportationGranularityValue): TrafficSpace {
         val trafficSpaceFeature = TrafficSpace()
         trafficSpaceFeature.granularity = granularity.toGmlGranularityValue()
+        trafficSpaceFeature.spaceType = SpaceType.OPEN
         return trafficSpaceFeature
     }
 
     private fun createAuxiliaryTrafficSpaceFeature(granularity: TransportationGranularityValue): AuxiliaryTrafficSpace {
         val auxiliaryTrafficSpaceFeature = AuxiliaryTrafficSpace()
         auxiliaryTrafficSpaceFeature.granularity = granularity.toGmlGranularityValue()
+        auxiliaryTrafficSpaceFeature.spaceType = SpaceType.OPEN
         return auxiliaryTrafficSpaceFeature
     }
 
