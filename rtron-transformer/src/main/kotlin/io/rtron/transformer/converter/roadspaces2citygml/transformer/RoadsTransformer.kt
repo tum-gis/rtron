@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.transformer
 
+import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
 import arrow.core.getOrElse
@@ -220,6 +221,7 @@ class RoadsTransformer(
                         )
                     return issueList
                 }
+
         val surface =
             road.getLaneSurface(id, parameters.discretizationStepSize)
                 .getOrElse {
@@ -230,6 +232,28 @@ class RoadsTransformer(
                         )
                     return issueList
                 }
+        val extrudedSurface =
+            if (parameters.generateLaneSurfaceExtrusions) {
+                val trafficSpaceHeight =
+                    parameters.laneSurfaceExtrusionHeightPerLaneType.getOrElse(
+                        lane.type,
+                    ) { parameters.laneSurfaceExtrusionHeight }
+
+                val extrudedSurface =
+                    road.getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = trafficSpaceHeight)
+                        .getOrElse {
+                            issueList +=
+                                DefaultIssue.of(
+                                    "ExtrudedLaneSurfaceNotConstructable", "${it.message} Ignoring lane.", id,
+                                    Severity.WARNING, wasFixed = true,
+                                )
+                            return issueList
+                        }
+                Some(extrudedSurface)
+            } else {
+                None
+            }
+
         val centerLine =
             road.getCurveOnLane(id, 0.5)
                 .getOrElse {
@@ -255,14 +279,14 @@ class RoadsTransformer(
             when (LaneRouter.route(lane)) {
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
                     transportationModuleBuilder.addTrafficSpaceFeature(
-                        lane, surface, centerLine, lateralFillerSurface,
+                        lane, surface, extrudedSurface, centerLine, lateralFillerSurface,
                         longitudinalFillerSurfaces, relatedObjects, dstTransportationSpace,
                     )
                 }
 
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
                     transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(
-                        lane, surface, centerLine, lateralFillerSurface,
+                        lane, surface, extrudedSurface, centerLine, lateralFillerSurface,
                         longitudinalFillerSurfaces, dstTransportationSpace,
                     )
                 }

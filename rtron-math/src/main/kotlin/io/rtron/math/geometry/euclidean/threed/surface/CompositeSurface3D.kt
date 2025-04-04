@@ -47,7 +47,7 @@ class CompositeSurface3D(
     // Methods
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
         either {
-            val polygons: List<Polygon3D> = surfaceMembers.map { it.calculatePolygonsGlobalCS().bind() }.flatten()
+            val polygons: List<Polygon3D> = surfaceMembers.flatMap { it.calculatePolygonsGlobalCS().bind() }
             polygons.let { it.toNonEmptyListOrNull()!! }
         }
 }

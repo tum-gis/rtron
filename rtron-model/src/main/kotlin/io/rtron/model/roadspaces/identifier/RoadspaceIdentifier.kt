@@ -31,7 +31,6 @@ interface RoadspaceIdentifierInterface {
  * Identifier of a road space containing essential meta information.
  *
  * @param roadspaceId id of the road space
- * @param modelIdentifier identifier of the model
  */
 data class RoadspaceIdentifier(
     override val roadspaceId: String,

@@ -98,6 +98,9 @@ data class LinearRing3D(
             if (verticesAdjusted.size < 3) {
                 return GeometryException.NotEnoughVertices("").left()
             }
+            if (verticesAdjusted.isColinear(tolerance)) {
+                return GeometryException.NotEnoughVertices("").left()
+            }
 
             return LinearRing3D(verticesAdjusted.toNonEmptyListOrNull()!!, tolerance).right()
         }

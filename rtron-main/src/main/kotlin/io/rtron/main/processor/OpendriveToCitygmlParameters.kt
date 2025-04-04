@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import io.rtron.model.opendrive.objects.EObjectType
+import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
@@ -56,6 +57,10 @@ data class OpendriveToCitygmlParameters(
     val circleSlices: Int = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
     val generateRandomGeometryIds: Boolean = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
     val transformAdditionalRoadLines: Boolean = Roadspaces2CitygmlParameters.DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES,
+    val generateLaneSurfaceExtrusions: Boolean = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LANE_SURFACE_EXTRUSIONS,
+    val laneSurfaceExtrusionHeight: Double = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT,
+    val laneSurfaceExtrusionHeightPerLaneType: Map<LaneType, Double> =
+        Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE,
     val compressionFormat: CompressionFormat = CompressionFormat.NONE,
 ) {
     // Methods
@@ -150,6 +155,9 @@ data class OpendriveToCitygmlParameters(
             generateRandomGeometryIds = generateRandomGeometryIds,
             transformAdditionalRoadLines = transformAdditionalRoadLines,
             generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
+            generateLaneSurfaceExtrusions = generateLaneSurfaceExtrusions,
+            laneSurfaceExtrusionHeight = laneSurfaceExtrusionHeight,
+            laneSurfaceExtrusionHeightPerLaneType = laneSurfaceExtrusionHeightPerLaneType,
             mappingBackwardsCompatibility = convertToCitygml2,
         )
 }

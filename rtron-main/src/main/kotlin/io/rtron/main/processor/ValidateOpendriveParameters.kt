@@ -80,6 +80,9 @@ data class ValidateOpendriveParameters(
             generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
             transformAdditionalRoadLines = true,
             generateLongitudinalFillerSurfaces = false,
+            generateLaneSurfaceExtrusions = false,
+            laneSurfaceExtrusionHeight = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT,
+            laneSurfaceExtrusionHeightPerLaneType = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE,
             mappingBackwardsCompatibility = true,
         )
 
@@ -97,6 +100,9 @@ data class ValidateOpendriveParameters(
             generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
             transformAdditionalRoadLines = true,
             generateLongitudinalFillerSurfaces = false,
+            generateLaneSurfaceExtrusions = false,
+            laneSurfaceExtrusionHeight = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT,
+            laneSurfaceExtrusionHeightPerLaneType = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE,
             mappingBackwardsCompatibility = false,
         )
 }

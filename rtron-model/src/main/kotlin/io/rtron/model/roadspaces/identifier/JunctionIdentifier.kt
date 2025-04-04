@@ -30,7 +30,6 @@ interface JunctionIdentifierInterface {
  * Identifier of a [Junction].
  *
  * @param junctionId id of the junction
- * @param modelIdentifier identifier of the model
  */
 data class JunctionIdentifier(
     override val junctionId: String,

@@ -51,7 +51,6 @@ class RoadspaceBuilder(
     /**
      * Builds a [Roadspace] of the RoadSpaces data model from the OpenDRIVE road.
      *
-     * @param modelId identifier of the actual model
      * @param road source OpenDRIVE model
      * @return transformed [Roadspace]
      */
