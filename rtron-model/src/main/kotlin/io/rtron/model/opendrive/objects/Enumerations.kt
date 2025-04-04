@@ -32,13 +32,9 @@ enum class EObjectType {
     BARRIER,
     BUILDING,
     PARKING_SPACE,
-    PATCH,
-    RAILING,
     TRAFFIC_ISLAND,
     CROSSWALK,
-    STREET_LAMP,
     GANTRY,
-    SOUND_BARRIER,
     ROAD_MARK,
     ROAD_SURFACE,
 }

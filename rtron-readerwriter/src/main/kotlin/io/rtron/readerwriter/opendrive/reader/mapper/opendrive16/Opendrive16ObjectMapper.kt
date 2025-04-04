@@ -108,6 +108,10 @@ abstract class Opendrive16ObjectMapper {
     fun mapObjectTypeToOption(source: E_ObjectType?): Option<EObjectType> = source?.let { mapObjectType(it).some() } ?: None
 
     @ValueMapping(source = "CAR", target = "NONE")
+    @ValueMapping(source = "PATCH", target = "ROAD_SURFACE")
+    @ValueMapping(source = "RAILING", target = "BARRIER")
+    @ValueMapping(source = "STREET_LAMP", target = "POLE")
+    @ValueMapping(source = "SOUND_BARRIER", target = "BARRIER")
     @ValueMapping(source = "VAN", target = "NONE")
     @ValueMapping(source = "BUS", target = "NONE")
     @ValueMapping(source = "TRAILER", target = "NONE")
@@ -116,6 +120,6 @@ abstract class Opendrive16ObjectMapper {
     @ValueMapping(source = "TRAM", target = "NONE")
     @ValueMapping(source = "TRAIN", target = "NONE")
     @ValueMapping(source = "PEDESTRIAN", target = "NONE")
-    @ValueMapping(source = "WIND", target = "NONE")
+    @ValueMapping(source = "WIND", target = "POLE")
     abstract fun mapObjectType(source: E_ObjectType): EObjectType
 }

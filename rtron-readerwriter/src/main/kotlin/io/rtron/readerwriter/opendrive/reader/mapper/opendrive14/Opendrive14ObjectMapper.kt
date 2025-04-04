@@ -82,14 +82,15 @@ abstract class Opendrive14ObjectMapper {
             in EObjectType.BARRIER.name.toUpperCaseVariations() -> EObjectType.BARRIER
             in EObjectType.BUILDING.name.toUpperCaseVariations() -> EObjectType.BUILDING
             in EObjectType.PARKING_SPACE.name.toUpperCaseVariations() -> EObjectType.PARKING_SPACE
-            in EObjectType.PATCH.name.toUpperCaseVariations() -> EObjectType.PATCH
-            in EObjectType.RAILING.name.toUpperCaseVariations() -> EObjectType.RAILING
+            in "patch" -> EObjectType.ROAD_SURFACE
+            in "railing" -> EObjectType.BARRIER
             in EObjectType.TRAFFIC_ISLAND.name.toUpperCaseVariations() -> EObjectType.TRAFFIC_ISLAND
             in EObjectType.CROSSWALK.name.toUpperCaseVariations() -> EObjectType.CROSSWALK
-            in EObjectType.STREET_LAMP.name.toUpperCaseVariations() -> EObjectType.STREET_LAMP
+            in "streetLamp" -> EObjectType.POLE
             in EObjectType.GANTRY.name.toUpperCaseVariations() -> EObjectType.GANTRY
-            in EObjectType.SOUND_BARRIER.name.toUpperCaseVariations() -> EObjectType.SOUND_BARRIER
+            in "soundBarrier" -> EObjectType.BARRIER
             in EObjectType.ROAD_MARK.name.toUpperCaseVariations() -> EObjectType.ROAD_MARK
+            in "wind" -> EObjectType.POLE
             else -> EObjectType.NONE
         }
 }

@@ -66,13 +66,9 @@ object RoadspaceObjectRouter {
             RoadObjectType.BARRIER -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.BUILDING -> CitygmlTargetFeatureType.BUILDING_BUILDING
             RoadObjectType.PARKING_SPACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            RoadObjectType.PATCH -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            RoadObjectType.RAILING -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.TRAFFIC_ISLAND -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             RoadObjectType.CROSSWALK -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            RoadObjectType.STREET_LAMP -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.GANTRY -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            RoadObjectType.SOUND_BARRIER -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.ROAD_MARK -> CitygmlTargetFeatureType.TRANSPORTATION_MARKING
             RoadObjectType.ROAD_SURFACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             RoadObjectType.SIGNAL -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE

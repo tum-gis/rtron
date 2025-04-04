@@ -172,13 +172,9 @@ class RoadspaceObjectBuilder(
                 EObjectType.BARRIER -> RoadObjectType.BARRIER
                 EObjectType.BUILDING -> RoadObjectType.BUILDING
                 EObjectType.PARKING_SPACE -> RoadObjectType.PARKING_SPACE
-                EObjectType.PATCH -> RoadObjectType.PATCH
-                EObjectType.RAILING -> RoadObjectType.RAILING
                 EObjectType.TRAFFIC_ISLAND -> RoadObjectType.TRAFFIC_ISLAND
                 EObjectType.CROSSWALK -> RoadObjectType.CROSSWALK
-                EObjectType.STREET_LAMP -> RoadObjectType.STREET_LAMP
                 EObjectType.GANTRY -> RoadObjectType.GANTRY
-                EObjectType.SOUND_BARRIER -> RoadObjectType.SOUND_BARRIER
                 EObjectType.ROAD_MARK -> RoadObjectType.ROAD_MARK
                 EObjectType.ROAD_SURFACE -> RoadObjectType.ROAD_SURFACE
             }
