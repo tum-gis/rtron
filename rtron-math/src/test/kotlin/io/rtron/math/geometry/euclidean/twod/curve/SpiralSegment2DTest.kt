@@ -131,7 +131,7 @@ class SpiralSegment2DTest : FunSpec({
                     ",",
                 ).setHeader("s0", "x0", "y0", "hdg0", "curv0", "curv1", "length", "s1", "x1", "y1", "hdg1").setSkipHeaderRecord(
                     true,
-                ).build().parse(fileReader)
+                ).get().parse(fileReader)
             for (record in records) {
                 val pose =
                     Pose2D(Vector2D(record.get("x0").toDouble(), record.get("y0").toDouble()), Rotation2D(record.get("hdg0").toDouble()))

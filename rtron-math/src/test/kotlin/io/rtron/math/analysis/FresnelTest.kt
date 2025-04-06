@@ -45,7 +45,7 @@ class FresnelTest : FunSpec({
             val records: Iterable<CSVRecord> =
                 CSVFormat.Builder.create().setDelimiter(
                     ",",
-                ).setHeader("l", "x", "y").setSkipHeaderRecord(true).build().parse(fileReader)
+                ).setHeader("l", "x", "y").setSkipHeaderRecord(true).get().parse(fileReader)
             for (record in records) {
                 val l: Double = record.get("l").toDouble()
                 val x: Double = record.get("x").toDouble()
