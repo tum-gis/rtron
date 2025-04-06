@@ -20,6 +20,7 @@ import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import io.rtron.model.opendrive.objects.EObjectType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.readerwriter.citygml.CitygmlVersion
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
@@ -52,6 +53,10 @@ data class OpendriveToCitygmlParameters(
     val cropPolygonX: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_X,
     val cropPolygonY: List<Double> = OpendriveCropperParameters.DEFAULT_CROP_POLYGON_Y,
     val removeRoadObjectsOfTypes: Set<EObjectType> = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_OF_TYPES,
+    val generateRoadObjectTopSurfaceExtrusions: Boolean =
+        Opendrive2RoadspacesParameters.DEFAULT_GENERATE_ROAD_OBJECT_TOP_SURFACE_EXTRUSIONS,
+    val roadObjectTopSurfaceExtrusionHeightPerObjectType: Map<RoadObjectType, Double> =
+        Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE,
     val discretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE,
     val sweepDiscretizationStepSize: Double = Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE,
     val circleSlices: Int = Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES,
@@ -132,7 +137,10 @@ data class OpendriveToCitygmlParameters(
             attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
             deriveCrsEpsgAutomatically = true,
             crsEpsg = crsEpsg,
-            extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
+            extrapolateLateralRoadShapes =
+                Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
+            generateRoadObjectTopSurfaceExtrusions = generateRoadObjectTopSurfaceExtrusions,
+            roadObjectTopSurfaceExtrusionHeightPerObjectType = roadObjectTopSurfaceExtrusionHeightPerObjectType,
         )
 
     fun deriveRoadspacesEvaluatorParameters() =

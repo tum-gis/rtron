@@ -92,7 +92,6 @@ object RoadObjectsEvaluator {
                     val targetTypes: Option<Pair<EObjectType, Option<RoadObjectSubType>>> =
                         when (name) {
                             "bench" -> Some(EObjectType.BARRIER to None)
-                            "bus" -> Some(EObjectType.BUILDING to RoadObjectBuildingSubType.BUS_STOP.some())
                             "busStop" -> Some(EObjectType.BUILDING to RoadObjectBuildingSubType.BUS_STOP.some())
                             "controllerBox" -> Some(EObjectType.OBSTACLE to RoadObjectObstacleSubType.DISTRIBUTION_BOX.some())
                             "crossWalk" -> Some(EObjectType.CROSSWALK to None)

@@ -78,8 +78,7 @@ class SubcommandValidateOpendrive : CliktCommand(
 
     private val compressionFormat: CompressionFormat by option(
         help = "Compress the output files with the respective compression format",
-    ).enum<CompressionFormat>()
-        .default(CompressionFormat.NONE)
+    ).enum<CompressionFormat>().default(CompressionFormat.NONE)
 
     // Methods
     override fun help(context: Context) = "Validate OpenDRIVE datasets"

@@ -131,7 +131,7 @@ object Solid3DBuilder {
     ): Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> {
         require(outline.isPolyhedronDefinedByRoadCorners()) { "Outline does not contain a polyhedron represented by road corners." }
         require(
-            outline.cornerLocal.all {
+            outline.cornerRoad.all {
                 it.height == 0.0 || numberTolerance <= it.height
             },
         ) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
@@ -144,6 +144,69 @@ object Solid3DBuilder {
 
         val verticalOutlineElements =
             outline.cornerRoad
+                .map { buildVerticalOutlineElement(it, referenceLine, numberTolerance) }
+                .let { it.toNonEmptyListOrNull()!! }
+
+        return Polyhedron3DFactory.buildFromVerticalOutlineElements(outlineId, verticalOutlineElements, numberTolerance)
+    }
+
+    /**
+     * Builds a list of polyhedrons from OpenDRIVE road objects defined by extruded top road corner outlines.
+     *
+     * @param roadObject road object of OpenDRIVE
+     * @param roadReferenceLine road reference line for transforming curve relative coordinates
+     * @param extrusionHeight height by which the top road corners are to be extruded
+     * @return list of polyhedrons
+     */
+    fun buildPolyhedronsByExtrudedTopRoadCorners(
+        roadObject: RoadObjectsObject,
+        roadReferenceLine: Curve3D,
+        extrusionHeight: Double,
+        numberTolerance: Double,
+    ): ContextIssueList<List<Polyhedron3D>> {
+        val issueList = DefaultIssueList()
+
+        val (builderExceptions, polyhedronsWithContext) =
+            (roadObject.getLinearRingsDefinedByRoadCorners() + roadObject.getPolyhedronsDefinedByRoadCorners())
+                .map { buildPolyhedronByExtrudedTopRoadCorners(it, roadReferenceLine, extrusionHeight, numberTolerance) }
+                .separateEither()
+
+        issueList +=
+            builderExceptions.map {
+                DefaultIssue.of(
+                    "PolyhedronNotConstructableFromRoadCornerOutlines", it.message, it.location,
+                    Severity.WARNING, wasFixed = true,
+                )
+            }.mergeToReport()
+        val polyhedrons = polyhedronsWithContext.handleIssueList { issueList += it.issueList }
+
+        return ContextIssueList(polyhedrons, issueList)
+    }
+
+    /**
+     * Builds a polyhedron from an OpenDRIVE road object defined by extruded top road corner outlines.
+     */
+    private fun buildPolyhedronByExtrudedTopRoadCorners(
+        outline: RoadObjectsObjectOutlinesOutline,
+        referenceLine: Curve3D,
+        extrusionHeight: Double,
+        numberTolerance: Double,
+    ): Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> {
+        require(
+            outline.cornerRoad.all {
+                it.height == 0.0 || numberTolerance <= it.height
+            },
+        ) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
+        val outlineId =
+            outline.additionalId.toEither {
+                IllegalStateException(
+                    "Additional outline ID must be available.",
+                )
+            }.getOrElse { throw it }
+
+        val verticalOutlineElements =
+            outline.cornerRoad
+                .map { it.copy(dz = it.dz + it.height, height = it.dz + it.height + extrusionHeight) }
                 .map { buildVerticalOutlineElement(it, referenceLine, numberTolerance) }
                 .let { it.toNonEmptyListOrNull()!! }
 
@@ -235,6 +298,85 @@ object Solid3DBuilder {
 
             val verticalOutlineElements =
                 outline.cornerLocal
+                    .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.getBasePoint(), it.getHeadPoint(), None, numberTolerance) }
+                    .handleIssueList { issueList += it.issueList }
+                    .let { it.toNonEmptyListOrNull()!! }
+
+            val polyhedronWithContextIssueList =
+                Polyhedron3DFactory.buildFromVerticalOutlineElements(
+                    outlineId,
+                    verticalOutlineElements,
+                    numberTolerance,
+                ).bind()
+            polyhedronWithContextIssueList
+        }
+
+    /**
+     * Builds a list of polyhedrons from OpenDRIVE road objects defined by extruded top local corner outlines.
+     *
+     * @param roadObject road object of OpenDRIVE
+     * @param curveAffine affine transformation matrix from the curve
+     * @param extrusionHeight height by which the top local corners are to be extruded
+     * @return list of polyhedrons
+     */
+    fun buildPolyhedronsByExtrudedTopLocalCorners(
+        roadObject: RoadObjectsObject,
+        curveAffine: Affine3D,
+        extrusionHeight: Double,
+        numberTolerance: Double,
+    ): ContextIssueList<List<Polyhedron3D>> {
+        val issueList = DefaultIssueList()
+        val objectAffine = Affine3D.of(roadObject.referenceLinePointRelativePose)
+        val affineSequence = AffineSequence3D.of(curveAffine, objectAffine)
+
+        val (builderExceptions, polyhedronsWithContext) =
+            (roadObject.getLinearRingsDefinedByLocalCorners() + roadObject.getPolyhedronsDefinedByLocalCorners())
+                .map { buildPolyhedronByExtrudedTopLocalCorners(it, extrusionHeight, numberTolerance) }
+                .separateEither()
+
+        issueList +=
+            builderExceptions
+                .map {
+                    DefaultIssue.of(
+                        "PolyhedronNotConstructableFromLocalCornerOutlines", it.message, it.location,
+                        Severity.WARNING, wasFixed = true,
+                    )
+                }
+                .mergeToReport()
+        val polyhedrons =
+            polyhedronsWithContext
+                .handleIssueList { issueList += it.issueList }
+                .map { it.copy(affineSequence = affineSequence) }
+
+        return ContextIssueList(polyhedrons, issueList)
+    }
+
+    /**
+     * Builds a single polyhedron from an OpenDRIVE road object defined by extruded top local corner outlines.
+     */
+    private fun buildPolyhedronByExtrudedTopLocalCorners(
+        outline: RoadObjectsObjectOutlinesOutline,
+        extrusionHeight: Double,
+        numberTolerance: Double,
+    ): Either<GeometryBuilderException, ContextIssueList<Polyhedron3D>> =
+        either {
+            require(
+                outline.cornerLocal.all {
+                    it.height == 0.0 || numberTolerance <= it.height
+                },
+            ) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
+            val outlineId =
+                outline.additionalId.toEither {
+                    IllegalStateException(
+                        "Additional outline ID must be available.",
+                    )
+                }.getOrElse { throw it }
+
+            val issueList = DefaultIssueList()
+
+            val verticalOutlineElements =
+                outline.cornerLocal
+                    .map { it.copy(z = it.z + it.height, height = extrusionHeight) }
                     .map { Polyhedron3DFactory.VerticalOutlineElement.of(it.getBasePoint(), it.getHeadPoint(), None, numberTolerance) }
                     .handleIssueList { issueList += it.issueList }
                     .let { it.toNonEmptyListOrNull()!! }

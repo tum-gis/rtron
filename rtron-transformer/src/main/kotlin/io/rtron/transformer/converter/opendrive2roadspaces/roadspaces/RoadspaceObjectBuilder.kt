@@ -22,6 +22,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.flatten
 import arrow.core.getOrElse
+import arrow.core.getOrNone
 import arrow.core.nonEmptyListOf
 import arrow.core.some
 import arrow.core.toNonEmptyListOrNull
@@ -35,6 +36,7 @@ import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.math.geometry.euclidean.threed.curve.Curve3D
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
+import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
 import io.rtron.math.geometry.euclidean.threed.surface.AbstractSurface3D
 import io.rtron.math.range.Range
 import io.rtron.math.transform.AffineSequence3D
@@ -120,6 +122,12 @@ class RoadspaceObjectBuilder(
                 buildAttributes(roadObject.referenceLinePointRelativeRotation)
         val laneRelations = buildLaneRelations(roadObject, road)
 
+        val extrusionHeight: Option<Double> =
+            if (parameters.generateRoadObjectTopSurfaceExtrusions) {
+                parameters.roadObjectTopSurfaceExtrusionHeightPerObjectType.getOrNone(type)
+            } else {
+                None
+            }
         val roadObjectsFromRepeat =
             roadObject.repeat.map { currentRoadObjectRepeat ->
 
@@ -144,6 +152,7 @@ class RoadspaceObjectBuilder(
                     pointGeometry,
                     boundingBoxGeometry,
                     complexGeometry,
+                    None,
                     laneRelations,
                     attributes,
                 )
@@ -156,6 +165,12 @@ class RoadspaceObjectBuilder(
                 val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
                 val complexGeometry =
                     buildComplexGeometry(roadObject, None, roadReferenceLine).handleIssueList { issueList += it }
+                val extrudedTopSurfaceGeometry =
+                    extrusionHeight.flatMap { height ->
+                        buildExtrudedTopSurfaceGeometry(roadObject, None, roadReferenceLine, height)
+                            .handleIssueList { issueList += it }
+                    }
+
                 nonEmptyListOf(
                     RoadspaceObject(
                         roadspaceObjectId,
@@ -164,6 +179,7 @@ class RoadspaceObjectBuilder(
                         pointGeometry,
                         boundingBoxGeometry,
                         complexGeometry,
+                        extrudedTopSurfaceGeometry,
                         laneRelations,
                         attributes,
                     ),
@@ -376,6 +392,49 @@ class RoadspaceObjectBuilder(
         return ContextIssueList(builtGeometry, issueList)
     }
 
+    /**
+     * Reads in the OpenDRIVE road object geometries and builds up an [AbstractSolid3D] by extruding the top surface.
+     *
+     * @param roadObject road object source model
+     * @param roadObjectRepeat considered repeat element for building complex geometries like parametric sweeps
+     */
+    private fun buildExtrudedTopSurfaceGeometry(
+        roadObject: OpendriveRoadObject,
+        roadObjectRepeat: Option<OpendriveRoadObjectRepeat>,
+        roadReferenceLine: Curve3D,
+        extrusionHeight: Double,
+    ): ContextIssueList<Option<AbstractSolid3D>> {
+        val issueList = DefaultIssueList()
+
+        // affine transformation matrix at the curve point of the object
+        val curveAffine = roadReferenceLine.calculateAffine(roadObject.curveRelativePosition.toCurveRelative1D())
+
+        // build up solid geometrical representations
+        val geometries = mutableListOf<AbstractSolid3D>()
+        geometries +=
+            Solid3DBuilder.buildPolyhedronsByExtrudedTopRoadCorners(
+                roadObject,
+                roadReferenceLine,
+                extrusionHeight,
+                parameters.numberTolerance,
+            ).handleIssueList { issueList += it }
+        geometries +=
+            Solid3DBuilder.buildPolyhedronsByExtrudedTopLocalCorners(roadObject, curveAffine, extrusionHeight, parameters.numberTolerance)
+                .handleIssueList { issueList += it }
+
+        if (roadObjectRepeat.isSome()) {
+            issueList +=
+                DefaultIssue.of(
+                    "RepeatNotSupportedForExtrudedTopSurface",
+                    "Derivation of extruded top surfaces from repeat elements are currently not supported.",
+                    roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                )
+        }
+
+        val builtGeometry = if (geometries.isEmpty()) None else Some(geometries.first())
+        return ContextIssueList(builtGeometry, issueList)
+    }
+
     private fun buildAttributes(roadObject: OpendriveRoadObject) =
         attributes("${parameters.attributesPrefix}roadObject_") {
             roadObject.name.onSome {
@@ -452,6 +511,7 @@ class RoadspaceObjectBuilder(
                 pointGeometry,
                 None,
                 complexGeometry,
+                None,
                 laneRelations,
                 attributes,
             )

@@ -69,7 +69,7 @@ data class Roadspaces2CitygmlParameters(
         const val DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX = "identifier_"
         const val DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX = "geometry_"
         const val DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS = true
-        const val DEFAULT_DISCRETIZATION_STEP_SIZE = 0.7
+        const val DEFAULT_DISCRETIZATION_STEP_SIZE = 0.5
         const val DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE = ParametricSweep3D.DEFAULT_STEP_SIZE
         const val DEFAULT_CIRCLE_SLICES = Cylinder3D.DEFAULT_NUMBER_SLICES
         const val DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS = false

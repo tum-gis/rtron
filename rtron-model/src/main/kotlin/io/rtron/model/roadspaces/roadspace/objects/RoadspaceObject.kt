@@ -20,6 +20,7 @@ import arrow.core.None
 import arrow.core.Option
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.point.AbstractPoint3D
+import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
@@ -39,6 +40,7 @@ data class RoadspaceObject(
     val pointGeometry: AbstractPoint3D,
     val boundingBoxGeometry: Option<AbstractGeometry3D>,
     val complexGeometry: Option<AbstractGeometry3D>,
+    val extrudedTopSurfaceGeometry: Option<AbstractSolid3D>,
     val laneRelations: List<LateralLaneRangeIdentifier>,
     val attributes: AttributeList,
 ) {

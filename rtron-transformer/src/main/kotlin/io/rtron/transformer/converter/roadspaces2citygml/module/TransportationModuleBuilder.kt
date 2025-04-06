@@ -321,6 +321,18 @@ class TransportationModuleBuilder(
             trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficAreaFeature))
         }
 
+        roadspaceObject.extrudedTopSurfaceGeometry.onSome { currentExtrudedTopSurfaceGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
+            trafficSpaceFeature.populateLod2Geometry(geometryTransformer)
+                .onLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForTrafficSpaceLod2",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
+                }
+        }
+
         // populate transportation space
         val trafficSpaceProperty = TrafficSpaceProperty(trafficSpaceFeature)
         dstTransportationSpace.trafficSpaces.add(trafficSpaceProperty)
@@ -374,6 +386,18 @@ class TransportationModuleBuilder(
                 }
 
             auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficAreaFeature))
+        }
+
+        roadspaceObject.extrudedTopSurfaceGeometry.onSome { currentExtrudedTopSurfaceGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
+            auxiliaryTrafficSpaceFeature.populateLod2Geometry(geometryTransformer)
+                .onLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForAuxiliaryTrafficSpaceLod2",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
+                }
         }
 
         // populate transportation space

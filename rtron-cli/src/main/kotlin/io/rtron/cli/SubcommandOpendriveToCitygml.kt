@@ -37,6 +37,7 @@ import io.rtron.main.processor.CompressionFormat
 import io.rtron.main.processor.OpendriveToCitygmlParameters
 import io.rtron.main.processor.OpendriveToCitygmlProcessor
 import io.rtron.model.opendrive.objects.EObjectType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
@@ -97,6 +98,31 @@ class SubcommandOpendriveToCitygml : CliktCommand(
         )
     private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset").double().pair().multiple()
     private val removeRoadObjectOfType by option(help = "Remove road object of a specific type").enum<EObjectType>().multiple().unique()
+    private val skipRoadObjectTopSurfaceExtrusions by option(
+        help = "Skip extruding the top surfaces of road objects for traffic space solids",
+    ).flag()
+    private val roadObjectTopSurfaceExtrusionHeightPerObjectType: Map<RoadObjectType, Double> by option(
+        help = "Comma-separated list of enum=value pairs, e.g. PARKING_SPACE=4.5,CROSSWALK=2.5",
+    ).convert { input ->
+        val resultMap = Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE.toMutableMap()
+
+        input.split(",").forEach { entry ->
+            if (entry.isNotBlank()) {
+                val (key, value) = entry.split("=")
+                val roadObjectType =
+                    try {
+                        RoadObjectType.valueOf(key.uppercase())
+                    } catch (e: IllegalArgumentException) {
+                        fail("Invalid OpenDRIVE road object type: $key")
+                    }
+                val doubleValue =
+                    value.toDoubleOrNull()
+                        ?: fail("Invalid value for $key: $value is not a number")
+                resultMap[roadObjectType] = doubleValue
+            }
+        }
+        resultMap.toMap()
+    }.default(Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE)
 
     private val discretizationStepSize by option(help = "Distance between each discretization step for curves and surfaces").double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
@@ -167,6 +193,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(
                     cropPolygonX = cropPolygon.map { it.first },
                     cropPolygonY = cropPolygon.map { it.second },
                     removeRoadObjectsOfTypes = removeRoadObjectOfType,
+                    generateRoadObjectTopSurfaceExtrusions = !skipRoadObjectTopSurfaceExtrusions,
+                    roadObjectTopSurfaceExtrusionHeightPerObjectType = roadObjectTopSurfaceExtrusionHeightPerObjectType,
                     discretizationStepSize = discretizationStepSize,
                     sweepDiscretizationStepSize = sweepDiscretizationStepSize,
                     circleSlices = circleSlices,

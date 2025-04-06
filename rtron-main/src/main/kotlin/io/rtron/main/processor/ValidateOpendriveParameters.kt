@@ -58,6 +58,9 @@ data class ValidateOpendriveParameters(
             deriveCrsEpsgAutomatically = false,
             crsEpsg = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
             extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
+            generateRoadObjectTopSurfaceExtrusions = false,
+            roadObjectTopSurfaceExtrusionHeightPerObjectType =
+                Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE,
         )
 
     fun deriveRoadspacesEvaluatorParameters() =
