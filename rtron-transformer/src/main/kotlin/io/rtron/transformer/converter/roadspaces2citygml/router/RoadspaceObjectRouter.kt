@@ -16,6 +16,8 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.router
 
+import arrow.core.some
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectBuildingSubType
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter.CitygmlTargetFeatureType
@@ -37,34 +39,20 @@ object RoadspaceObjectRouter {
     /**
      * Returns the feature type [CitygmlTargetFeatureType] onto which [roadspaceObject] shall be mapped.
      */
-    fun route(roadspaceObject: RoadspaceObject): CitygmlTargetFeatureType {
-        roadspaceObject.name.onSome {
-            when (it) {
-                "bench" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "bus" -> return CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-                "controllerBox" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "crossWalk" -> return CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-                "fence" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "noParkingArea" -> return CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-                "railing" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "raisedMedian" -> return CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-                "trafficIsland" -> return CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-                "trafficLight" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "trafficSign" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "tree" -> return CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
-                "unknown" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                "wall" -> return CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            }
-        }
-
-        return when (roadspaceObject.type) {
+    fun route(roadspaceObject: RoadspaceObject): CitygmlTargetFeatureType =
+        when (roadspaceObject.type) {
             RoadObjectType.NONE -> CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE
             RoadObjectType.OBSTACLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.POLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.TREE -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
             RoadObjectType.VEGETATION -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
             RoadObjectType.BARRIER -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            RoadObjectType.BUILDING -> CitygmlTargetFeatureType.BUILDING_BUILDING
+            RoadObjectType.BUILDING -> {
+                when (roadspaceObject.subType) {
+                    RoadObjectBuildingSubType.BUS_STOP.some() -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
+                    else -> CitygmlTargetFeatureType.BUILDING_BUILDING
+                }
+            }
             RoadObjectType.PARKING_SPACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             RoadObjectType.TRAFFIC_ISLAND -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             RoadObjectType.CROSSWALK -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
@@ -73,5 +61,4 @@ object RoadspaceObjectRouter {
             RoadObjectType.ROAD_SURFACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             RoadObjectType.SIGNAL -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
         }
-    }
 }

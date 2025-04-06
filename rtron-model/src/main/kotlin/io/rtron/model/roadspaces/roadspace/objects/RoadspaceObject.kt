@@ -16,6 +16,7 @@
 
 package io.rtron.model.roadspaces.roadspace.objects
 
+import arrow.core.None
 import arrow.core.Option
 import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.point.AbstractPoint3D
@@ -34,6 +35,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 data class RoadspaceObject(
     val id: RoadspaceObjectIdentifier,
     val type: RoadObjectType = RoadObjectType.NONE,
+    val subType: Option<RoadObjectSubType> = None,
     val pointGeometry: AbstractPoint3D,
     val boundingBoxGeometry: Option<AbstractGeometry3D>,
     val complexGeometry: Option<AbstractGeometry3D>,

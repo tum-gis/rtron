@@ -46,7 +46,20 @@ import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectBarrierSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectBuildingSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectCrosswalkSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectGantrySubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectObstacleSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectParkingSpaceSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectPoleSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectRoadMarkSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectRoadSurfaceSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectTrafficIslandSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectTreeSubType
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectVegetationSubType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.std.toInt
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
@@ -97,7 +110,7 @@ class RoadspaceObjectBuilder(
         val issueList = DefaultIssueList()
 
         // get general object type and geometry representation
-        val type = getObjectType(roadObject)
+        val (type, subType) = getObjectType(roadObject)
 
         // build attributes
         val attributes =
@@ -127,6 +140,7 @@ class RoadspaceObjectBuilder(
                 RoadspaceObject(
                     roadspaceObjectId,
                     type,
+                    subType,
                     pointGeometry,
                     boundingBoxGeometry,
                     complexGeometry,
@@ -146,6 +160,7 @@ class RoadspaceObjectBuilder(
                     RoadspaceObject(
                         roadspaceObjectId,
                         type,
+                        subType,
                         pointGeometry,
                         boundingBoxGeometry,
                         complexGeometry,
@@ -161,24 +176,47 @@ class RoadspaceObjectBuilder(
         return ContextIssueList(roadObjects, issueList)
     }
 
-    private fun getObjectType(roadObject: OpendriveRoadObject): RoadObjectType =
-        roadObject.type.fold({ RoadObjectType.NONE }, {
-            when (it) {
-                EObjectType.NONE -> RoadObjectType.NONE
-                EObjectType.OBSTACLE -> RoadObjectType.OBSTACLE
-                EObjectType.POLE -> RoadObjectType.POLE
-                EObjectType.TREE -> RoadObjectType.TREE
-                EObjectType.VEGETATION -> RoadObjectType.VEGETATION
-                EObjectType.BARRIER -> RoadObjectType.BARRIER
-                EObjectType.BUILDING -> RoadObjectType.BUILDING
-                EObjectType.PARKING_SPACE -> RoadObjectType.PARKING_SPACE
-                EObjectType.TRAFFIC_ISLAND -> RoadObjectType.TRAFFIC_ISLAND
-                EObjectType.CROSSWALK -> RoadObjectType.CROSSWALK
-                EObjectType.GANTRY -> RoadObjectType.GANTRY
-                EObjectType.ROAD_MARK -> RoadObjectType.ROAD_MARK
-                EObjectType.ROAD_SURFACE -> RoadObjectType.ROAD_SURFACE
+    private fun getObjectType(roadObject: OpendriveRoadObject): Pair<RoadObjectType, Option<RoadObjectSubType>> {
+        val type =
+            roadObject.type.fold({ RoadObjectType.NONE }, {
+                when (it) {
+                    EObjectType.NONE -> RoadObjectType.NONE
+                    EObjectType.OBSTACLE -> RoadObjectType.OBSTACLE
+                    EObjectType.POLE -> RoadObjectType.POLE
+                    EObjectType.TREE -> RoadObjectType.TREE
+                    EObjectType.VEGETATION -> RoadObjectType.VEGETATION
+                    EObjectType.BARRIER -> RoadObjectType.BARRIER
+                    EObjectType.BUILDING -> RoadObjectType.BUILDING
+                    EObjectType.PARKING_SPACE -> RoadObjectType.PARKING_SPACE
+                    EObjectType.TRAFFIC_ISLAND -> RoadObjectType.TRAFFIC_ISLAND
+                    EObjectType.CROSSWALK -> RoadObjectType.CROSSWALK
+                    EObjectType.GANTRY -> RoadObjectType.GANTRY
+                    EObjectType.ROAD_MARK -> RoadObjectType.ROAD_MARK
+                    EObjectType.ROAD_SURFACE -> RoadObjectType.ROAD_SURFACE
+                }
+            })
+
+        val roadObjectSubType = roadObject.subtype.fold({ return type to None }, { it })
+        val subType: Option<RoadObjectSubType> =
+            when (type) {
+                RoadObjectType.NONE -> None
+                RoadObjectType.OBSTACLE -> RoadObjectSubType.fromIdentifier<RoadObjectObstacleSubType>(roadObjectSubType)
+                RoadObjectType.POLE -> RoadObjectSubType.fromIdentifier<RoadObjectPoleSubType>(roadObjectSubType)
+                RoadObjectType.TREE -> RoadObjectSubType.fromIdentifier<RoadObjectTreeSubType>(roadObjectSubType)
+                RoadObjectType.VEGETATION -> RoadObjectSubType.fromIdentifier<RoadObjectVegetationSubType>(roadObjectSubType)
+                RoadObjectType.BARRIER -> RoadObjectSubType.fromIdentifier<RoadObjectBarrierSubType>(roadObjectSubType)
+                RoadObjectType.BUILDING -> RoadObjectSubType.fromIdentifier<RoadObjectBuildingSubType>(roadObjectSubType)
+                RoadObjectType.PARKING_SPACE -> RoadObjectSubType.fromIdentifier<RoadObjectParkingSpaceSubType>(roadObjectSubType)
+                RoadObjectType.TRAFFIC_ISLAND -> RoadObjectSubType.fromIdentifier<RoadObjectTrafficIslandSubType>(roadObjectSubType)
+                RoadObjectType.CROSSWALK -> RoadObjectSubType.fromIdentifier<RoadObjectCrosswalkSubType>(roadObjectSubType)
+                RoadObjectType.GANTRY -> RoadObjectSubType.fromIdentifier<RoadObjectGantrySubType>(roadObjectSubType)
+                RoadObjectType.ROAD_MARK -> RoadObjectSubType.fromIdentifier<RoadObjectRoadMarkSubType>(roadObjectSubType)
+                RoadObjectType.ROAD_SURFACE -> RoadObjectSubType.fromIdentifier<RoadObjectRoadSurfaceSubType>(roadObjectSubType)
+                RoadObjectType.SIGNAL -> None
             }
-        })
+
+        return type to subType
+    }
 
     private fun buildPointGeometry(
         roadObject: OpendriveRoadObject,
@@ -410,6 +448,7 @@ class RoadspaceObjectBuilder(
             RoadspaceObject(
                 objectId,
                 RoadObjectType.SIGNAL,
+                None,
                 pointGeometry,
                 None,
                 complexGeometry,

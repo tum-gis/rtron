@@ -16,10 +16,14 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
+import arrow.core.Option
+import arrow.core.some
 import io.rtron.io.issues.ContextIssueList
 import io.rtron.io.issues.DefaultIssue
 import io.rtron.io.issues.DefaultIssueList
 import io.rtron.io.issues.Severity
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectBuildingSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectSubType
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
@@ -48,7 +52,7 @@ class CityFurnitureModuleBuilder(
         val issueList = DefaultIssueList()
 
         // geometry
-        cityFurnitureFeature.spaceType = deriveSpaceType(roadspaceObject.type)
+        cityFurnitureFeature.spaceType = deriveSpaceType(roadspaceObject.type, roadspaceObject.subType)
 
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
         cityFurnitureFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
@@ -92,13 +96,23 @@ class CityFurnitureModuleBuilder(
         return ContextIssueList(cityFurnitureFeature, issueList)
     }
 
-    private fun deriveSpaceType(roadObjectType: RoadObjectType): SpaceType =
+    private fun deriveSpaceType(
+        roadObjectType: RoadObjectType,
+        roadObjectSubType: Option<RoadObjectSubType>,
+    ): SpaceType =
         when (roadObjectType) {
             RoadObjectType.OBSTACLE -> SpaceType.CLOSED
             RoadObjectType.POLE -> SpaceType.CLOSED
             RoadObjectType.BARRIER -> SpaceType.CLOSED
             RoadObjectType.GANTRY -> SpaceType.CLOSED
             RoadObjectType.SIGNAL -> SpaceType.CLOSED
-            else -> throw IllegalStateException("$roadObjectType not mapped to CityFurniture")
+            RoadObjectType.BUILDING ->
+                when (roadObjectSubType) {
+                    RoadObjectBuildingSubType.BUS_STOP.some() -> SpaceType.SEMI_OPEN
+                    else -> throw IllegalStateException(
+                        "$roadObjectType and $roadObjectSubType cannot not be mapped to CityFurniture",
+                    )
+                }
+            else -> throw IllegalStateException("$roadObjectType and $roadObjectSubType cannot not be mapped to CityFurniture")
         }
 }
