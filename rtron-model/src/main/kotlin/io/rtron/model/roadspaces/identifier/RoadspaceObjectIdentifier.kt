@@ -20,6 +20,7 @@ import arrow.core.Option
 import arrow.core.getOrElse
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 
 /**
  * Identifier of a lane section containing essential meta information.
@@ -32,10 +33,13 @@ data class RoadspaceObjectIdentifier(
     val roadspaceObjectId: String,
     val roadspaceObjectRepeatIndex: Option<Int>,
     val roadspaceObjectName: Option<String>,
+    val roadspaceObjectType: RoadObjectType,
     val roadspaceIdentifier: RoadspaceIdentifier,
 ) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface by roadspaceIdentifier {
     // Properties and Initializers
-    val hashKey get() = "RoadspaceObject_${roadspaceObjectId}_${roadspaceObjectRepeatIndex}_${roadspaceIdentifier.roadspaceId}"
+    val hashKey get() =
+        "RoadspaceObject_${roadspaceObjectType}_${roadspaceObjectId}_" +
+            "${roadspaceObjectRepeatIndex}_${roadspaceIdentifier.roadspaceId}"
 
     // Conversions
     override fun toAttributes(prefix: String): AttributeList {

@@ -135,7 +135,7 @@ class RoadspaceObjectBuilder(
                     currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }
                         .getOrElse { throw it }
                 val roadspaceObjectId =
-                    RoadspaceObjectIdentifier(roadObject.id, repeatIdentifier.repeatIndex.some(), roadObject.name, id)
+                    RoadspaceObjectIdentifier(roadObject.id, repeatIdentifier.repeatIndex.some(), roadObject.name, type, id)
 
                 val pointGeometry = buildPointGeometry(currentRoadObjectRepeat, roadReferenceLine)
                 val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
@@ -160,7 +160,7 @@ class RoadspaceObjectBuilder(
 
         val roadObjects =
             if (roadObjectsFromRepeat.isEmpty()) {
-                val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, None, roadObject.name, id)
+                val roadspaceObjectId = RoadspaceObjectIdentifier(roadObject.id, None, roadObject.name, type, id)
                 val pointGeometry = buildPointGeometry(roadObject, roadReferenceLine)
                 val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
                 val complexGeometry =
@@ -491,7 +491,7 @@ class RoadspaceObjectBuilder(
     ): ContextIssueList<RoadspaceObject> {
         val issueList = DefaultIssueList()
 
-        val objectId = RoadspaceObjectIdentifier(roadSignal.id, None, roadSignal.name, id)
+        val objectId = RoadspaceObjectIdentifier(roadSignal.id, None, roadSignal.name, RoadObjectType.SIGNAL, id)
 
         val pointGeometry = buildPointGeometry(roadSignal, roadReferenceLine)
         val complexGeometry =
