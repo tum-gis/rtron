@@ -23,7 +23,12 @@ import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller
 import org.mapstruct.factory.Mappers
 import java.io.OutputStream
-import kotlin.io.path.div
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.Transformer
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMResult
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 import org.asam.opendrive17.OpenDRIVE as Opendrive17
 
 class OpendriveMarshaller {
@@ -35,7 +40,7 @@ class OpendriveMarshaller {
         val jaxbContext = JAXBContext.newInstance(Opendrive17::class.java)
         jaxbMarshaller = jaxbContext.createMarshaller()
 
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+        // jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
     }
 
     // Methods
@@ -50,6 +55,14 @@ class OpendriveMarshaller {
 
         opendrive17Model.header.revMajor = supportedVersion.rev.first
         opendrive17Model.header.revMinor = supportedVersion.rev.second
-        jaxbMarshaller.marshal(opendrive17Model, outputStream)
+
+        val domResult = DOMResult()
+        jaxbMarshaller.marshal(opendrive17Model, domResult)
+
+        // see: https://stackoverflow.com/a/48201559
+        val transformer: Transformer = TransformerFactory.newInstance().newTransformer()
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+        transformer.transform(DOMSource(domResult.node), StreamResult(outputStream))
     }
 }
