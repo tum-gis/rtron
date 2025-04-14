@@ -29,13 +29,17 @@ import io.rtron.model.opendrive.junction.connection
 import io.rtron.model.opendrive.lane.RoadLanes
 import io.rtron.model.opendrive.lane.RoadLanesLaneSection
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenter
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeft
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeftLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRight
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRightLane
 import io.rtron.model.opendrive.lane.center
 import io.rtron.model.opendrive.lane.lane
 import io.rtron.model.opendrive.lane.laneSection
 import io.rtron.model.opendrive.lane.left
 import io.rtron.model.opendrive.lane.right
+import io.rtron.model.opendrive.lane.roadMark
 import io.rtron.model.opendrive.objects.RoadObjects
 import io.rtron.model.opendrive.objects.RoadObjectsObject
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlines
@@ -83,6 +87,17 @@ val everyRoadLanesLaneSectionRightLane =
 val everyRoadLanesLaneSectionCenterLane =
     everyLaneSection compose RoadLanesLaneSection.center compose
         RoadLanesLaneSectionCenter.lane
+
+// road marks
+val everyRoadLanesLaneSectionLeftLaneRoadMark =
+    everyRoadLanesLaneSectionLeftLane compose
+        RoadLanesLaneSectionLeftLane.roadMark compose Traversal.list()
+val everyRoadLanesLaneSectionRightLaneRoadMark =
+    everyRoadLanesLaneSectionRightLane compose
+        RoadLanesLaneSectionRightLane.roadMark compose Traversal.list()
+val everyRoadLanesLaneSectionCenterLaneRoadMark =
+    everyRoadLanesLaneSectionCenterLane compose
+        RoadLanesLaneSectionCenterLane.roadMark compose Traversal.list()
 
 // junction
 val everyJunction = OpendriveModel.junction compose Traversal.list()

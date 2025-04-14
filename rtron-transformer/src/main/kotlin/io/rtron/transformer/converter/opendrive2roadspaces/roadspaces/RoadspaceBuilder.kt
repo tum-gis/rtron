@@ -54,7 +54,10 @@ class RoadspaceBuilder(
      * @param road source OpenDRIVE model
      * @return transformed [Roadspace]
      */
-    fun buildRoadspace(road: OpendriveRoad): ContextIssueList<Roadspace> {
+    fun buildRoadspace(
+        road: OpendriveRoad,
+        roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
+    ): ContextIssueList<Roadspace> {
         val issueList = DefaultIssueList()
         val roadspaceId = RoadspaceIdentifier(road.id)
 
@@ -91,7 +94,7 @@ class RoadspaceBuilder(
         // build up the road containing only lane sections, lanes (no roadside objects)
         val roadspaceRoad =
             roadBuilder
-                .buildRoad(roadspaceId, road, roadSurface, roadSurfaceWithoutTorsion, attributes)
+                .buildRoad(roadspaceId, road, roadSurface, roadSurfaceWithoutTorsion, attributes, roadMarkRepresentationRegistry)
                 .handleIssueList { issueList += it }
 
         // build up the road space objects (OpenDRIVE: road objects & signals)

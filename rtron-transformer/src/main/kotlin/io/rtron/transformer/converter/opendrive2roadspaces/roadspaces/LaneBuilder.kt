@@ -20,23 +20,15 @@ import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.getOrElse
-import arrow.core.some
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.io.issues.ContextIssueList
-import io.rtron.io.issues.DefaultIssue
 import io.rtron.io.issues.DefaultIssueList
-import io.rtron.io.issues.Severity
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFunction
-import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
-import io.rtron.math.range.length
 import io.rtron.math.std.fuzzyEquals
-import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
-import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneHeight
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneMaterial
@@ -46,13 +38,11 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.CenterLane
 import io.rtron.model.roadspaces.roadspace.road.Lane
-import io.rtron.model.roadspaces.roadspace.road.LaneChange
 import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.isStrictlySortedBy
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
-import io.rtron.transformer.issues.opendrive.of
 
 /**
  * Builder for [Lane] objects of the RoadSpaces data model.
@@ -60,6 +50,9 @@ import io.rtron.transformer.issues.opendrive.of
 class LaneBuilder(
     private val parameters: Opendrive2RoadspacesParameters,
 ) {
+    // Properties and Initializers
+    private val roadMarkingBuilder = RoadMarkingBuilder(parameters)
+
     // Methods
 
     /**
@@ -75,6 +68,7 @@ class LaneBuilder(
         curvePositionDomain: Range<Double>,
         lrLane: RoadLanesLaneSectionLRLane,
         baseAttributes: AttributeList,
+        roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
     ): ContextIssueList<Lane> {
         val issueList = DefaultIssueList()
 
@@ -91,7 +85,11 @@ class LaneBuilder(
             if (lrLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
-                buildRoadMarkings(curvePositionDomain, lrLane.roadMark.toNonEmptyListOrNull()!!).handleIssueList { issueList += it }
+                roadMarkingBuilder.buildRoadMarkings(
+                    curvePositionDomain,
+                    lrLane.roadMark.toNonEmptyListOrNull()!!,
+                    roadMarkRepresentationRegistry,
+                ).handleIssueList { issueList += it }
             }
 
         // lane topology
@@ -125,6 +123,7 @@ class LaneBuilder(
         curvePositionDomain: Range<Double>,
         centerLane: RoadLanesLaneSectionCenterLane,
         baseAttributes: AttributeList,
+        roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
     ): ContextIssueList<CenterLane> {
         require(centerLane.id == 0) { "Center lane must have id 0, but has ${centerLane.id}." }
 
@@ -135,7 +134,11 @@ class LaneBuilder(
             if (centerLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
-                buildRoadMarkings(curvePositionDomain, centerLane.roadMark.toNonEmptyListOrNull()!!)
+                roadMarkingBuilder.buildRoadMarkings(
+                    curvePositionDomain,
+                    centerLane.roadMark.toNonEmptyListOrNull()!!,
+                    roadMarkRepresentationRegistry,
+                )
                     .handleIssueList { issueList += it }
             }
 
@@ -175,85 +178,6 @@ class LaneBuilder(
             )
 
         return LaneHeightOffset(inner, outer)
-    }
-
-    /**
-     * Builds a list of road markings ([roadMark]).
-     *
-     * @param curvePositionDomain curve position domain (relative to the lane section) where the road markings is defined
-     * @param roadMark road marking entries of the OpenDRIVE data model
-     */
-    private fun buildRoadMarkings(
-        curvePositionDomain: Range<Double>,
-        roadMark: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMark>,
-    ): ContextIssueList<List<RoadMarking>> {
-        require(curvePositionDomain.hasUpperBound()) { "curvePositionDomain must have an upper bound." }
-        val roadMarkId =
-            roadMark.head.additionalId.toEither {
-                IllegalStateException("Additional outline ID must be available.")
-            }.getOrElse { throw it }
-        val issueList = DefaultIssueList()
-
-        val curvePositionDomainEnd = curvePositionDomain.upperEndpointOrNull()!!
-        val adjustedSrcRoadMark =
-            roadMark
-                .filter { it.sOffset in curvePositionDomain }
-                .filter { !fuzzyEquals(it.sOffset, curvePositionDomainEnd, parameters.numberTolerance) }
-        if (adjustedSrcRoadMark.size < roadMark.size) {
-            issueList +=
-                DefaultIssue.of(
-                    "RoadMarkEntriesNotLocatedWithinSRange",
-                    "Road mark entries have been removed, as the sOffset is not located within " +
-                        "the local curve position domain ($curvePositionDomain) of the lane section.",
-                    roadMarkId, Severity.WARNING, wasFixed = true,
-                )
-        }
-
-        if (adjustedSrcRoadMark.isEmpty()) return ContextIssueList(emptyList(), issueList)
-
-        val roadMarkings =
-            adjustedSrcRoadMark.zipWithNext()
-                .map { buildRoadMarking(it.first, it.second.sOffset.some()) } +
-                listOf(buildRoadMarking(adjustedSrcRoadMark.last()))
-
-        return ContextIssueList(roadMarkings, issueList)
-    }
-
-    /**
-     * Builds an individual road marking [roadMark].
-     *
-     * @param roadMark road mark entry of the OpenDRIVE data model
-     * @param domainEndpoint upper domain endpoint for the domain of the road mark
-     */
-    private fun buildRoadMarking(
-        roadMark: RoadLanesLaneSectionLCRLaneRoadMark,
-        domainEndpoint: Option<Double> = None,
-    ): RoadMarking {
-        val domain = domainEndpoint.fold({ Range.atLeast(roadMark.sOffset) }, { Range.closed(roadMark.sOffset, it) })
-        require(domain.length > parameters.numberTolerance) { "Length of road marking must be above zero and the tolerance threshold." }
-
-        val width = roadMark.width.fold({ ConstantFunction.ZERO }, { ConstantFunction(it, domain) })
-
-        val attributes =
-            attributes("${parameters.attributesPrefix}roadMarking") {
-                attribute("_curvePositionStart", roadMark.sOffset)
-                attribute("_width", roadMark.width)
-                attribute("_type", roadMark.typeAttribute.toString())
-                attribute("_weight", roadMark.weight.map { it.toString() })
-                attribute("_laneChange", roadMark.laneChange.map { it.toString() })
-                attribute("_color", roadMark.color.toString())
-                attribute("_material", roadMark.material)
-            }
-
-        val laneChange =
-            when (roadMark.laneChange.getOrElse { ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH }) {
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.INCREASE -> LaneChange.INCREASE
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.DECREASE -> LaneChange.DECREASE
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH -> LaneChange.BOTH
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE -> LaneChange.NONE
-            }
-
-        return RoadMarking(width, laneChange, attributes)
     }
 
     private fun buildLaneMaterial(laneMaterials: List<RoadLanesLaneSectionLRLaneMaterial>): Option<LaneMaterial> {

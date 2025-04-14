@@ -67,6 +67,7 @@ class RoadBuilder(
         roadSurface: CurveRelativeParametricSurface3D,
         roadSurfaceWithoutTorsion: CurveRelativeParametricSurface3D,
         baseAttributes: AttributeList,
+        roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
     ): ContextIssueList<Road> {
         require(
             road.lanes.getLaneSectionLengths(road.length).all {
@@ -84,6 +85,7 @@ class RoadBuilder(
                         currentLaneSection.first,
                         currentLaneSection.second,
                         baseAttributes,
+                        roadMarkRepresentationRegistry,
                     ).handleIssueList { issueList += it }
                 }
                 .let { it.toNonEmptyListOrNull()!! }
@@ -102,6 +104,7 @@ class RoadBuilder(
         curvePositionDomain: Range<Double>,
         laneSection: RoadLanesLaneSection,
         baseAttributes: AttributeList,
+        roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
     ): ContextIssueList<LaneSection> {
         require(laneSection.getNumberOfLeftLanes() + laneSection.getNumberOfRightLanes() >= 1) {
             "Lane section ($laneSectionIdentifier) must contain at least one left or right lane."
@@ -117,7 +120,13 @@ class RoadBuilder(
                 .map { (currentLaneId, currentSrcLane) ->
                     val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
                     val attributes = baseAttributes + laneSectionAttributes
-                    laneBuilder.buildLane(laneIdentifier, localCurvePositionDomain, currentSrcLane, attributes)
+                    laneBuilder.buildLane(
+                        laneIdentifier,
+                        localCurvePositionDomain,
+                        currentSrcLane,
+                        attributes,
+                        roadMarkRepresentationRegistry,
+                    )
                         .handleIssueList { issueList += it }
                 }
 
@@ -127,6 +136,7 @@ class RoadBuilder(
                 localCurvePositionDomain,
                 laneSection.center.getIndividualCenterLane(),
                 baseAttributes,
+                roadMarkRepresentationRegistry,
             ).handleIssueList { issueList += it }
 
         val roadspaceLaneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)

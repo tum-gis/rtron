@@ -38,6 +38,8 @@ data class ConstantFunction(
     // Operators
     infix fun timesValue(other: Double): ConstantFunction = copy(value = this.value * other)
 
+    infix fun plusValue(other: Double): ConstantFunction = copy(value = this.value + other)
+
     // Methods
     override fun valueUnbounded(x: Double): Either<IllegalArgumentException, Double> = Either.Right(value)
 

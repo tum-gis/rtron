@@ -30,6 +30,7 @@ import io.rtron.model.roadspaces.roadspace.Roadspace
 import io.rtron.transformer.converter.opendrive2roadspaces.header.HeaderBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.junction.JunctionBuilder
 import io.rtron.transformer.converter.opendrive2roadspaces.report.Opendrive2RoadspacesReport
+import io.rtron.transformer.converter.opendrive2roadspaces.roadspaces.RoadMarkRepresentationRegistry
 import io.rtron.transformer.converter.opendrive2roadspaces.roadspaces.RoadspaceBuilder
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -68,12 +69,13 @@ class Opendrive2RoadspacesTransformer(
         val header = headerBuilder.buildHeader(opendriveModel.header).handleIssueList { report.conversion += it }
 
         // transformation of each road
+        val roadMarkRepresentationRegistry = RoadMarkRepresentationRegistry.fromHighestOccurrence(opendriveModel)
         val progressBar = ProgressBar("Transforming roads", opendriveModel.road.size)
         val roadspacesWithContextReports =
             if (parameters.concurrentProcessing) {
-                transformRoadspacesConcurrently(opendriveModel, progressBar)
+                transformRoadspacesConcurrently(opendriveModel, roadMarkRepresentationRegistry, progressBar)
             } else {
-                transformRoadspacesSequentially(opendriveModel, progressBar)
+                transformRoadspacesSequentially(opendriveModel, roadMarkRepresentationRegistry, progressBar)
             }
 
         val roadspaces = roadspacesWithContextReports.mergeIssueLists().handleIssueList { report.conversion += it }
@@ -91,21 +93,23 @@ class Opendrive2RoadspacesTransformer(
 
     private fun transformRoadspacesSequentially(
         opendriveModel: OpendriveModel,
+        roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
         progressBar: ProgressBar,
     ): List<ContextIssueList<Roadspace>> =
         opendriveModel.roadAsNonEmptyList.map {
-            roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
+            roadspaceBuilder.buildRoadspace(it, roadMarkRepresentationRegistry).also { progressBar.step() }
         }
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun transformRoadspacesConcurrently(
         opendriveModel: OpendriveModel,
+        roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
         progressBar: ProgressBar,
     ): List<ContextIssueList<Roadspace>> {
         val roadspacesDeferred =
             opendriveModel.roadAsNonEmptyList.map {
                 GlobalScope.async {
-                    roadspaceBuilder.buildRoadspace(it).also { progressBar.step() }
+                    roadspaceBuilder.buildRoadspace(it, roadMarkRepresentationRegistry).also { progressBar.step() }
                 }
             }
         return runBlocking { roadspacesDeferred.map { it.await() } }

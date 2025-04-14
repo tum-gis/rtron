@@ -16,8 +16,11 @@
 
 package io.rtron.model.opendrive.lane
 
+import arrow.core.NonEmptyList
 import arrow.core.None
 import arrow.core.Option
+import arrow.core.flatten
+import arrow.core.toNonEmptyListOrNone
 import arrow.optics.optics
 import io.rtron.model.opendrive.additions.identifier.AdditionalLaneRoadMarkIdentifier
 import io.rtron.model.opendrive.additions.identifier.LaneRoadMarkIdentifier
@@ -38,5 +41,16 @@ data class RoadLanesLaneSectionLCRLaneRoadMark(
     var width: Option<Double> = None,
     override var additionalId: Option<LaneRoadMarkIdentifier> = None,
 ) : OpendriveElement(), AdditionalLaneRoadMarkIdentifier {
+    // Methods
+    fun containsTypeLines() = type.isSome { it.line.isNotEmpty() }
+
+    fun containsExplicitLines() = explicit.isSome { it.line.isNotEmpty() }
+
+    fun getTypeLines(): Option<NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkTypeLine>> =
+        type.map { it.line.toNonEmptyListOrNone() }.flatten()
+
+    fun getExplicitLines(): Option<NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine>> =
+        explicit.map { it.line.toNonEmptyListOrNone() }.flatten()
+
     companion object
 }

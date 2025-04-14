@@ -27,7 +27,6 @@ import arrow.core.nonEmptyListOf
 import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.toNonEmptyListOrNull
-import arrow.optics.copy
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.SectionedUnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.StackedFunction
@@ -646,19 +645,24 @@ class Road(
         roadMarking: RoadMarking,
         step: Double,
     ): AbstractGeometry3D {
-        if (roadMarking.width.value < geometricalTolerance) {
+        require(roadMarking.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
+        if (roadMarking.width.isNone()) {
             return getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level)
                 .getOrElse { throw it }
         }
 
-        val leftOffsetFunction = roadMarking.width timesValue 0.5
+        val leftOffsetFunction =
+            roadMarking.getLeftOffsetFunction()
+                .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val leftRoadMarkingBoundary =
             getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, leftOffsetFunction)
                 .getOrElse { throw it }
                 .calculatePointListGlobalCS(step)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
-        val rightOffsetFunction = roadMarking.width timesValue -0.5
+        val rightOffsetFunction =
+            roadMarking.getRightOffsetFunction()
+                .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val rightRoadMarkingBoundary =
             getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, rightOffsetFunction)
                 .getOrElse { throw it }
@@ -711,27 +715,24 @@ class Road(
         roadMarking: RoadMarking,
         step: Double,
     ): Either<Exception, AbstractGeometry3D> {
-        if (roadMarking.width.domain.length < geometricalTolerance) {
-            return Either.Left(
-                IllegalStateException(
-                    "${laneIdentifier.toIdentifierText()}: Road marking's length is zero (or below tolerance threshold) and " +
-                        "thus no surface can be constructed.",
-                ),
-            )
+        require(roadMarking.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
+
+        if (roadMarking.width.isNone()) {
+            return getCurveOnLane(laneIdentifier, 1.0, roadMarking.lateralOffsetFunction)
         }
 
-        if (roadMarking.width.value < geometricalTolerance) {
-            return getCurveOnLane(laneIdentifier, 1.0, roadMarking.width)
-        }
-
-        val leftOffsetFunction = roadMarking.width timesValue 0.5
+        val leftOffsetFunction =
+            roadMarking.getLeftOffsetFunction()
+                .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val leftRoadMarkBoundary =
             getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
                 .getOrElse { throw it }
                 .calculatePointListGlobalCS(step)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
-        val rightOffsetFunction = roadMarking.width timesValue -0.5
+        val rightOffsetFunction =
+            roadMarking.getRightOffsetFunction()
+                .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val rightRoadMarkBoundary =
             getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
                 .getOrElse { throw it }

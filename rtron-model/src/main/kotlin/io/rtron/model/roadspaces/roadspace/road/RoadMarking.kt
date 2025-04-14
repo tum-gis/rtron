@@ -16,7 +16,12 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.getOrElse
+import arrow.core.some
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
+import io.rtron.math.range.Range
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
 /**
@@ -26,12 +31,32 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * @param attributes further information attributes
  */
 data class RoadMarking(
-    val width: ConstantFunction,
+    val domain: Range<Double>,
+    val width: Option<Double>,
+    val lateralOffset: Option<Double>,
     val laneChange: LaneChange,
     val attributes: AttributeList,
 ) {
     // Properties and Initializers
     init {
-        require(width.domain.isNotEmpty()) { "The domain of the road marking's width must not be empty." }
+        require(domain.isNotEmpty()) { "The domain of the road marking's width must not be empty." }
+    }
+
+    val widthFunction get(): Option<ConstantFunction> = width.map { ConstantFunction(it, domain) }
+
+    val lateralOffsetFunctionOptional get(): Option<ConstantFunction> = lateralOffset.map { ConstantFunction(it, domain) }
+
+    val lateralOffsetFunction get(): ConstantFunction = ConstantFunction(lateralOffset.getOrElse { 0.0 }, domain)
+
+    // Methods
+
+    fun getLeftOffsetFunction(): Option<ConstantFunction> {
+        val offsetValue = width.map { 0.5 * it }.getOrElse { return None } + lateralOffset.getOrElse { 0.0 }
+        return ConstantFunction(offsetValue, domain).some()
+    }
+
+    fun getRightOffsetFunction(): Option<ConstantFunction> {
+        val offsetValue = width.map { -0.5 * it }.getOrElse { return None } + lateralOffset.getOrElse { 0.0 }
+        return ConstantFunction(offsetValue, domain).some()
     }
 }

@@ -16,8 +16,14 @@
 
 package io.rtron.model.opendrive.lane
 
+import arrow.core.NonEmptyList
+import arrow.core.Option
+import arrow.core.toNonEmptyListOrNone
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLanesLaneSectionLCRLaneRoadMarkExplicit(
     var line: List<RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine> = emptyList(),
-) : OpendriveElement()
+) : OpendriveElement() {
+    // Methods
+    fun getLineEntries(): Option<NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine>> = line.toNonEmptyListOrNone()
+}

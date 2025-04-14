@@ -23,9 +23,13 @@ import io.rtron.io.issues.Severity
 import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.model.opendrive.additions.optics.everyLaneSection
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionCenterLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionCenterLaneRoadMark
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLaneRoadMark
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLane
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.modifiers.BasicDataTypeModifier
@@ -80,6 +84,7 @@ object RoadLanesEvaluator {
                 currentLaneSection
             }
 
+        // lanes
         modifiedOpendriveModel =
             everyRoadLanesLaneSectionCenterLane.modify(modifiedOpendriveModel) { currentCenterLane ->
                 issueList += evaluateNonFatalViolations(currentCenterLane, parameters)
@@ -96,6 +101,25 @@ object RoadLanesEvaluator {
             everyRoadLanesLaneSectionRightLane.modify(modifiedOpendriveModel) { currentRightLane ->
                 issueList += evaluateNonFatalViolations(currentRightLane, parameters)
                 currentRightLane
+            }
+
+        // road marks
+        modifiedOpendriveModel =
+            everyRoadLanesLaneSectionCenterLaneRoadMark.modify(modifiedOpendriveModel) { currentRoadMark ->
+                issueList += evaluateNonFatalViolations(currentRoadMark, parameters)
+                currentRoadMark
+            }
+
+        modifiedOpendriveModel =
+            everyRoadLanesLaneSectionLeftLaneRoadMark.modify(modifiedOpendriveModel) { currentRoadMark ->
+                issueList += evaluateNonFatalViolations(currentRoadMark, parameters)
+                currentRoadMark
+            }
+
+        modifiedOpendriveModel =
+            everyRoadLanesLaneSectionRightLaneRoadMark.modify(modifiedOpendriveModel) { currentRoadMark ->
+                issueList += evaluateNonFatalViolations(currentRoadMark, parameters)
+                currentRoadMark
             }
 
         return modifiedOpendriveModel
@@ -211,6 +235,25 @@ object RoadLanesEvaluator {
                 lane.additionalId,
                 "roadMark",
                 issueList,
+            )
+
+        return issueList
+    }
+
+    private fun evaluateNonFatalViolations(
+        roadMark: RoadLanesLaneSectionLCRLaneRoadMark,
+        parameters: OpendriveEvaluatorParameters,
+    ): DefaultIssueList {
+        val issueList = DefaultIssueList()
+
+        roadMark.width =
+            BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                roadMark.width, roadMark.additionalId, "width", issueList, parameters.numberTolerance,
+            )
+
+        roadMark.height =
+            BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                roadMark.height, roadMark.additionalId, "height", issueList, parameters.numberTolerance,
             )
 
         return issueList

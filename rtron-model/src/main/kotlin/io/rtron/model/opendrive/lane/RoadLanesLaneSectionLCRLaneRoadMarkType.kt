@@ -16,10 +16,16 @@
 
 package io.rtron.model.opendrive.lane
 
+import arrow.core.NonEmptyList
+import arrow.core.Option
+import arrow.core.toNonEmptyListOrNone
 import io.rtron.model.opendrive.core.OpendriveElement
 
 data class RoadLanesLaneSectionLCRLaneRoadMarkType(
     var line: List<RoadLanesLaneSectionLCRLaneRoadMarkTypeLine> = emptyList(),
     var name: String = "",
     var width: Double = Double.NaN,
-) : OpendriveElement()
+) : OpendriveElement() {
+    // Methods
+    fun getLineEntries(): Option<NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkTypeLine>> = line.toNonEmptyListOrNone()
+}
