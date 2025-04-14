@@ -37,7 +37,6 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkExplicit
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkTypeLine
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
-import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneChange
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
