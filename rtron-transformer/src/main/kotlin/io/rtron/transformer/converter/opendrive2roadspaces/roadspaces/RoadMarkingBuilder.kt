@@ -21,6 +21,7 @@ import arrow.core.None
 import arrow.core.Some
 import arrow.core.flattenOption
 import arrow.core.getOrElse
+import arrow.core.some
 import arrow.core.toNonEmptyListOrNone
 import io.rtron.io.issues.ContextIssueList
 import io.rtron.io.issues.DefaultIssue
@@ -230,6 +231,56 @@ class RoadMarkingBuilder(
 
     private fun buildRoadMarkings(
         roadMarkingCurvePositionStart: Double,
+        typeLines: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkTypeLine>,
+        domain: Range<Double>,
+        laneChange: LaneChange,
+        generalAttributeList: AttributeList,
+    ): List<RoadMarking> {
+        require(domain.hasUpperBound()) { "Domain must have an upper bound." }
+
+        return typeLines.withIndex()
+            .flatMap { (currentIndex, currentTypeLine) ->
+                val typeLineAttributes =
+                    attributes("${parameters.attributesPrefix}roadMarking_typeLine_") {
+                        attribute("index", currentIndex)
+                        attribute("width", currentTypeLine.width)
+                    }
+                val currentTypeLineCurvePositionStart = roadMarkingCurvePositionStart + currentTypeLine.sOffset
+                val lateralOffset =
+                    if (currentTypeLine.tOffset < parameters.numberTolerance) None else Some(currentTypeLine.tOffset)
+
+                val step = currentTypeLine.length + currentTypeLine.space
+                (0..floor((domain.upperEndpointOrNull()!! - currentTypeLineCurvePositionStart) / step).toInt())
+                    .map { currentRegularIndex ->
+                        val start = currentTypeLineCurvePositionStart + currentRegularIndex * step
+                        val end =
+                            if (start + currentTypeLine.length < domain.upperEndpointOrNull()!!) {
+                                start + currentTypeLine.length
+                            } else {
+                                domain.upperEndpointOrNull()!!
+                            }
+                        if (end - start < parameters.numberTolerance) return@map None
+
+                        val attributes =
+                            attributes("${parameters.attributesPrefix}roadMarking_typeLine_regular_") {
+                                attribute("index", currentIndex)
+                                attribute("curvePositionStart", start)
+                                attribute("curvePositionEnd", end)
+                            }
+
+                        RoadMarking(
+                            Range.closed(start, end),
+                            currentTypeLine.width,
+                            lateralOffset,
+                            laneChange,
+                            generalAttributeList + typeLineAttributes + attributes,
+                        ).some()
+                    }.flattenOption()
+            }
+    }
+
+    private fun buildRoadMarkings(
+        roadMarkingCurvePositionStart: Double,
         explicitLines: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine>,
         laneChange: LaneChange,
         generalAttributeList: AttributeList,
@@ -252,52 +303,4 @@ class RoadMarkingBuilder(
                 )
             RoadMarking(currentEntryDomain, currentExplicitLine.width, lateralOffset, laneChange, generalAttributeList + attributes)
         }.toNonEmptyListOrNone().getOrElse { throw IllegalArgumentException("Explicit road markings must contain at least one entry.") }
-
-    private fun buildRoadMarkings(
-        roadMarkingCurvePositionStart: Double,
-        typeLines: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkTypeLine>,
-        domain: Range<Double>,
-        laneChange: LaneChange,
-        generalAttributeList: AttributeList,
-    ): List<RoadMarking> {
-        require(domain.hasUpperBound()) { "Domain must have an upper bound." }
-
-        return typeLines.withIndex().flatMap { (currentIndex, currentTypeLine) ->
-            val typeLineAttributes =
-                attributes("${parameters.attributesPrefix}roadMarking_typeLine_") {
-                    attribute("index", currentIndex)
-                    attribute("width", currentTypeLine.width)
-                }
-            val currentTypeLineCurvePositionStart = roadMarkingCurvePositionStart + currentTypeLine.sOffset
-            val lateralOffset =
-                if (currentTypeLine.tOffset < parameters.numberTolerance) None else Some(currentTypeLine.tOffset)
-
-            val step = currentTypeLine.length + currentTypeLine.space
-            (0..floor((domain.upperEndpointOrNull()!! - currentTypeLineCurvePositionStart) / step).toInt())
-                .map { currentRegularIndex ->
-                    val start = currentTypeLineCurvePositionStart + currentRegularIndex * step
-                    val end =
-                        if (start + currentTypeLine.length < domain.upperEndpointOrNull()!!) {
-                            start + currentTypeLine.length
-                        } else {
-                            domain.upperEndpointOrNull()!!
-                        }
-
-                    val attributes =
-                        attributes("${parameters.attributesPrefix}roadMarking_typeLine_regular_") {
-                            attribute("index", currentIndex)
-                            attribute("curvePositionStart", start)
-                            attribute("curvePositionEnd", end)
-                        }
-
-                    RoadMarking(
-                        Range.closed(start, end),
-                        currentTypeLine.width,
-                        lateralOffset,
-                        laneChange,
-                        generalAttributeList + typeLineAttributes + attributes,
-                    )
-                }
-        }
-    }
 }
