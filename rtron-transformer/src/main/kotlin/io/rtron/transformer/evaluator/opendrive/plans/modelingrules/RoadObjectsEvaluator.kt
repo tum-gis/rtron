@@ -101,6 +101,7 @@ object RoadObjectsEvaluator {
                             "trafficIsland" -> Some(EObjectType.TRAFFIC_ISLAND to RoadObjectTrafficIslandSubType.ISLAND.some())
                             "trafficLight" -> Some(EObjectType.POLE to RoadObjectPoleSubType.TRAFFIC_LIGHT.some())
                             "trafficSign" -> Some(EObjectType.POLE to RoadObjectPoleSubType.TRAFFIC_SIGN.some())
+                            "streetLamp" -> Some(EObjectType.POLE to RoadObjectPoleSubType.STREET_LAMP.some())
                             "tree" -> Some(EObjectType.TREE to None)
                             "wall" -> Some(EObjectType.BARRIER to RoadObjectBarrierSubType.WALL.some())
                             "unknown" -> Some(EObjectType.NONE to None)
