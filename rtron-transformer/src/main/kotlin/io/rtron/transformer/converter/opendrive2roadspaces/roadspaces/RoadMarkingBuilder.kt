@@ -90,7 +90,7 @@ class RoadMarkRepresentationRegistry(
                         .map { it.left }.flattenOption()
                         .flatMap { it.lane }.flatMap { it.roadMark } +
                     laneSections
-                        .map { it.left }.flattenOption()
+                        .map { it.right }.flattenOption()
                         .flatMap { it.lane }.flatMap { it.roadMark }
 
             val highestRepresentationPerMarkingType =
