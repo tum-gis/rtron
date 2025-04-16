@@ -74,7 +74,7 @@ object RoadObjectsEvaluator {
                             DefaultIssue.of(
                                 "RoadObjectRepeatPositionNotInSValueRange",
                                 "Road object repeats (number of objects affected: ${currentRoadObjects.roadObject.size -
-                                    roadObjectsFiltered.size}) were removed since they were positioned outside the " +
+                                    roadObjectsFilteredRepeat.size}) were removed since they were positioned outside the " +
                                     "defined length of the road.",
                                 currentRoad.additionalId, Severity.ERROR, wasFixed = true,
                             )

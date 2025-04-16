@@ -136,7 +136,6 @@ class OpendriveToCitygmlProcessor(
             OpendriveWriter.writeToFile(opendriveRemovedObjectResult.first, opendriveFilePath)
 
             // transform OpenDRIVE model to Roadspaces model
-
             val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(parameters.deriveOpendrive2RoadspacesParameters())
             val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(opendriveRemovedObjectResult.first)
             roadspacesModelResult.second.serializeToJsonFile(outputSubDirectoryPath / OPENDRIVE_TO_ROADSPACES_REPORT_PATH)
