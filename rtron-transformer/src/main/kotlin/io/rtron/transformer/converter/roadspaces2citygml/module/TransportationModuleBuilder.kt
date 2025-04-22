@@ -35,6 +35,7 @@ import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1MultiSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceFromSolidCutoutOrSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
@@ -449,6 +450,17 @@ class TransportationModuleBuilder(
         val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
 
         // geometry
+        roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
+            markingFeature.populateLod1MultiSurface(geometryTransformer)
+                .onLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForMarkingLod1",
+                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                        )
+                }
+        }
         roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
