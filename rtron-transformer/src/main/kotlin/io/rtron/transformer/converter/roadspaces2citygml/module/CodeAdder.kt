@@ -205,7 +205,7 @@ object CodeAdder {
             RoadObjectType.BARRIER -> emptyList()
             RoadObjectType.BUILDING -> emptyList()
             RoadObjectType.PARKING_SPACE -> listOf(TrafficAreaUsageCode.CAR)
-            RoadObjectType.TRAFFIC_ISLAND -> emptyList()
+            RoadObjectType.TRAFFIC_ISLAND -> listOf(TrafficAreaUsageCode.PEDESTRIAN, TrafficAreaUsageCode.BICYCLE)
             RoadObjectType.CROSSWALK -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
             RoadObjectType.GANTRY -> emptyList()
             RoadObjectType.ROAD_MARK -> emptyList()
