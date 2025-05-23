@@ -25,8 +25,6 @@ import io.rtron.model.opendrive.additions.optics.everyRoad
 class OpendriveApplier(
     val parameters: OpendriveApplierParameters,
 ) {
-    // Properties and Initializers
-
     // Methods
     fun modify(
         opendriveModel: OpendriveModel,
@@ -34,10 +32,16 @@ class OpendriveApplier(
     ): Pair<OpendriveModel, OpendriveApplierReport> {
         val report = OpendriveApplierReport(parameters)
 
+        report.numberOfRoads = opendriveModel.road.size
+
         everyRoad.modify(opendriveModel) { currentRoad ->
 
             rules.roads.getOrNone(currentRoad.id).onSome { currentRoadRule ->
-                currentRoadRule.name.toOption().onSome { currentRoad.name = it.some() }
+                currentRoadRule.name.toOption().onSome {
+                    currentRoad.name = it.some()
+                    report.numberOfRoadNamesChanged++
+                    report.roadNamesAdded.add(it)
+                }
             }
 
             currentRoad

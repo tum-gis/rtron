@@ -92,9 +92,9 @@ class SubcommandOpendriveToCitygml : CliktCommand(
         help = "Path to the output directory into which the transformed CityGML models are written",
     ).path()
 
-    private val rulesApplierPath by option(
-        help = "Path to the output directory into which the transformed CityGML models are written",
-    ).path()
+    private val applyRulesPath by option(
+        help = "Path to the a JSON file containing a list of rules for modifying the OpenDRIVE dataset",
+    ).path(mustExist = true)
 
     private val skipRoadShapeRemoval by option(
         help = "Skip the removal of the road shape, if a lateral lane offset exists (not compliant to standard)",
@@ -355,7 +355,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(
                 }
 
             // apply predefined rules
-            rulesApplierPath.toOption().onSome {
+            applyRulesPath.toOption().onSome {
                 processStep++
                 val opendriveApplierRules: OpendriveApplierRules = Json.decodeFromString<OpendriveApplierRules>(it.readText())
                 val opendriveApplier = OpendriveApplier(deriveOpendriveApplierParameters())

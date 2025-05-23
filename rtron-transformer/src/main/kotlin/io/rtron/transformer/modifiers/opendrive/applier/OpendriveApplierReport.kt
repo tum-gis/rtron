@@ -21,4 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class OpendriveApplierReport(
     val parameters: OpendriveApplierParameters,
+    var numberOfRoads: Int = 0,
+    var numberOfRoadNamesChanged: Int = 0,
+    var roadNamesAdded: HashSet<String> = hashSetOf(),
 )
