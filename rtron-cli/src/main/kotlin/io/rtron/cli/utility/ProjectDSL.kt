@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rtron.main.project
+package io.rtron.cli.utility
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.io.files.walk

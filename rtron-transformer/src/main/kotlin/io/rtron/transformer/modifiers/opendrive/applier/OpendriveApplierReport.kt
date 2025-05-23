@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package io.rtron.main.project
+package io.rtron.transformer.modifiers.opendrive.applier
 
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
+import kotlinx.serialization.Serializable
 
-data class Project(
-    val inputFilePath: Path,
-    val outputDirectoryPath: Path,
-) {
-    // Properties and Initializers
-    init {
-        outputDirectoryPath.createDirectories()
-    }
-}
+@Serializable
+data class OpendriveApplierReport(
+    val parameters: OpendriveApplierParameters,
+)

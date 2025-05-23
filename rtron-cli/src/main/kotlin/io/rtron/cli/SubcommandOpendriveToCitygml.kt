@@ -16,8 +16,11 @@
 
 package io.rtron.cli
 
+import arrow.core.Either
+import arrow.core.getOrElse
+import arrow.core.left
+import arrow.core.right
 import arrow.core.toOption
-import com.charleskorn.kaml.Yaml
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
@@ -33,31 +36,63 @@ import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.path
-import io.rtron.main.processor.CompressionFormat
-import io.rtron.main.processor.OpendriveToCitygmlParameters
-import io.rtron.main.processor.OpendriveToCitygmlProcessor
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.rtron.cli.utility.CompressionFormat
+import io.rtron.cli.utility.processAllFiles
+import io.rtron.cli.utility.toFileExtension
+import io.rtron.io.issues.getTextSummary
+import io.rtron.io.serialization.serializeToJsonFile
 import io.rtron.model.opendrive.objects.EObjectType
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
 import io.rtron.model.roadspaces.roadspace.road.LaneType
+import io.rtron.readerwriter.citygml.CitygmlVersion
+import io.rtron.readerwriter.citygml.CitygmlWriter
+import io.rtron.readerwriter.opendrive.OpendriveReader
+import io.rtron.readerwriter.opendrive.OpendriveValidator
+import io.rtron.readerwriter.opendrive.OpendriveWriter
+import io.rtron.std.handleEmpty
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
+import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
+import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlTransformer
+import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluator
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
+import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluator
+import io.rtron.transformer.evaluator.roadspaces.RoadspacesEvaluatorParameters
+import io.rtron.transformer.modifiers.opendrive.applier.OpendriveApplier
+import io.rtron.transformer.modifiers.opendrive.applier.OpendriveApplierParameters
+import io.rtron.transformer.modifiers.opendrive.applier.OpendriveApplierRules
+import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropper
+import io.rtron.transformer.modifiers.opendrive.cropper.OpendriveCropperParameters
+import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdder
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
+import io.rtron.transformer.modifiers.opendrive.offset.resolver.OpendriveOffsetResolver
+import io.rtron.transformer.modifiers.opendrive.remover.OpendriveObjectRemover
+import io.rtron.transformer.modifiers.opendrive.remover.OpendriveObjectRemoverParameters
+import io.rtron.transformer.modifiers.opendrive.reprojector.OpendriveReprojector
+import io.rtron.transformer.modifiers.opendrive.reprojector.OpendriveReprojectorParameters
+import kotlinx.serialization.json.Json
+import kotlin.io.path.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.div
+import kotlin.io.path.readText
 
 class SubcommandOpendriveToCitygml : CliktCommand(
     name = "opendrive-to-citygml",
 ) {
     // Properties and Initializers
-    override val printHelpOnEmptyArgs = true
+    val logger = KotlinLogging.logger {}
 
-    private val parametersPath by option(
-        help = "Path to a YAML file containing the parameters of the process.",
-    ).path(mustExist = true)
+    override val printHelpOnEmptyArgs = true
 
     private val inputPath by argument(
         help = "Path to the directory containing OpenDRIVE datasets",
     ).path(mustExist = true)
     private val outputPath by argument(
+        help = "Path to the output directory into which the transformed CityGML models are written",
+    ).path()
+
+    private val rulesApplierPath by option(
         help = "Path to the output directory into which the transformed CityGML models are written",
     ).path()
 
@@ -89,13 +124,7 @@ class SubcommandOpendriveToCitygml : CliktCommand(
     private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
     private val addOffset by option(help = "Offset values by which the model is translated along the x, y, and z axis").double().triple()
-        .default(
-            Triple(
-                OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X,
-                OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y,
-                OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z,
-            ),
-        )
+
     private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset").double().pair().multiple()
     private val removeRoadObjectOfType by option(help = "Remove road object of a specific type").enum<EObjectType>().multiple().unique()
     private val skipRoadObjectTopSurfaceExtrusions by option(
@@ -174,44 +203,286 @@ class SubcommandOpendriveToCitygml : CliktCommand(
     // Methods
     override fun help(context: Context) = "Transform OpenDRIVE datasets to CityGML"
 
+    fun isValid(): Either<List<String>, Unit> {
+        val issues = mutableListOf<String>()
+        if (cropPolygon.isNotEmpty() && cropPolygon.size < 3) {
+            issues += "cropPolygon must be empty or have at least three values for representing a triangle"
+        }
+
+        return if (issues.isEmpty()) {
+            Unit.right()
+        } else {
+            issues.left()
+        }
+    }
+
+    fun getCitygmlWriteVersion(): CitygmlVersion = if (convertToCitygml2) CitygmlVersion.V2_0 else CitygmlVersion.V3_0
+
+    fun deriveOpendriveEvaluatorParameters() =
+        OpendriveEvaluatorParameters(
+            skipRoadShapeRemoval = skipRoadShapeRemoval,
+            numberTolerance = tolerance,
+            planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+            planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
+            planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+            planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
+        )
+
+    fun deriveOpendriveObjectRemoverParameters() =
+        OpendriveObjectRemoverParameters(
+            removeRoadObjectsWithoutType = OpendriveObjectRemoverParameters.DEFAULT_REMOVE_ROAD_OBJECTS_WITHOUT_TYPE,
+            removeRoadObjectsOfTypes = removeRoadObjectOfType,
+        )
+
+    fun deriveOpendriveApplierParameters() =
+        OpendriveApplierParameters(
+            fillEmptyRoadNameWithIds = OpendriveApplierParameters.DEFAULT_FILL_EMPTY_ROAD_NAMES_WITH_ID,
+        )
+
+    fun deriveOpendriveOffsetAdderParameters() =
+        OpendriveOffsetAdderParameters(
+            offsetX = addOffset.toOption().fold({ OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X }, { it.first }),
+            offsetY = addOffset.toOption().fold({ OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Y }, { it.second }),
+            offsetZ = addOffset.toOption().fold({ OpendriveOffsetAdderParameters.DEFAULT_OFFSET_Z }, { it.third }),
+            offsetHeading = OpendriveOffsetAdderParameters.DEFAULT_OFFSET_HEADING,
+        )
+
+    fun deriveOpendriveReprojectorParameters() =
+        OpendriveReprojectorParameters(
+            reprojectModel = reprojectModel,
+            targetCrsEpsg = crsEpsg,
+            deviationWarningTolerance = OpendriveReprojectorParameters.DEFAULT_DEVIATION_WARNING_TOLERANCE,
+        )
+
+    fun deriveOpendriveCropperParameters() =
+        OpendriveCropperParameters(
+            numberTolerance = tolerance,
+            cropPolygonX = cropPolygon.map { it.first },
+            cropPolygonY = cropPolygon.map { it.second },
+        )
+
+    fun deriveOpendrive2RoadspacesParameters() =
+        Opendrive2RoadspacesParameters(
+            concurrentProcessing = false,
+            numberTolerance = tolerance,
+            planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
+            planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
+            attributesPrefix = Opendrive2RoadspacesParameters.DEFAULT_ATTRIBUTES_PREFIX,
+            deriveCrsEpsgAutomatically = true,
+            crsEpsg = crsEpsg,
+            extrapolateLateralRoadShapes =
+                Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
+            generateRoadObjectTopSurfaceExtrusions = !skipRoadObjectTopSurfaceExtrusions,
+            roadObjectTopSurfaceExtrusionHeightPerObjectType = roadObjectTopSurfaceExtrusionHeightPerObjectType,
+        )
+
+    fun deriveRoadspacesEvaluatorParameters() =
+        RoadspacesEvaluatorParameters(
+            numberTolerance = tolerance,
+            laneTransitionDistanceTolerance = RoadspacesEvaluatorParameters.DEFAULT_LANE_TRANSITION_DISTANCE_TOLERANCE,
+        )
+
+    fun deriveRoadspaces2CitygmlParameters() =
+        Roadspaces2CitygmlParameters(
+            concurrentProcessing = false,
+            gmlIdPrefix = Roadspaces2CitygmlParameters.DEFAULT_GML_ID_PREFIX,
+            xlinkPrefix = Roadspaces2CitygmlParameters.DEFAULT_XLINK_PREFIX,
+            identifierAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
+            geometryAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
+            flattenGenericAttributeSets = Roadspaces2CitygmlParameters.DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
+            discretizationStepSize = discretizationStepSize,
+            sweepDiscretizationStepSize = sweepDiscretizationStepSize,
+            circleSlices = circleSlices,
+            generateRandomGeometryIds = generateRandomGeometryIds,
+            transformAdditionalRoadLines = transformAdditionalRoadLines,
+            generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
+            generateLaneSurfaceExtrusions = !skipLaneSurfaceExtrusions,
+            laneSurfaceExtrusionHeight = laneSurfaceExtrusionHeight,
+            laneSurfaceExtrusionHeightPerLaneType = laneSurfaceExtrusionHeightPerLaneType,
+            mappingBackwardsCompatibility = convertToCitygml2,
+        )
+
     override fun run() {
-        val parameters =
-            parametersPath.toOption().fold({
-                OpendriveToCitygmlParameters(
-                    convertToCitygml2 = convertToCitygml2,
-                    skipRoadShapeRemoval = skipRoadShapeRemoval,
-                    tolerance = tolerance,
-                    planViewGeometryDistanceTolerance = planViewGeometryDistanceTolerance,
-                    planViewGeometryDistanceWarningTolerance = planViewGeometryDistanceWarningTolerance,
-                    planViewGeometryAngleTolerance = planViewGeometryAngleTolerance,
-                    planViewGeometryAngleWarningTolerance = planViewGeometryAngleWarningTolerance,
-                    reprojectModel = reprojectModel,
-                    crsEpsg = crsEpsg,
-                    offsetX = addOffset.first,
-                    offsetY = addOffset.second,
-                    offsetZ = addOffset.third,
-                    cropPolygonX = cropPolygon.map { it.first },
-                    cropPolygonY = cropPolygon.map { it.second },
-                    removeRoadObjectsOfTypes = removeRoadObjectOfType,
-                    generateRoadObjectTopSurfaceExtrusions = !skipRoadObjectTopSurfaceExtrusions,
-                    roadObjectTopSurfaceExtrusionHeightPerObjectType = roadObjectTopSurfaceExtrusionHeightPerObjectType,
-                    discretizationStepSize = discretizationStepSize,
-                    sweepDiscretizationStepSize = sweepDiscretizationStepSize,
-                    circleSlices = circleSlices,
-                    generateRandomGeometryIds = generateRandomGeometryIds,
-                    transformAdditionalRoadLines = transformAdditionalRoadLines,
-                    generateLaneSurfaceExtrusions = !skipLaneSurfaceExtrusions,
-                    laneSurfaceExtrusionHeight = laneSurfaceExtrusionHeight,
-                    laneSurfaceExtrusionHeightPerLaneType = laneSurfaceExtrusionHeightPerLaneType,
-                    compressionFormat = compressionFormat,
+        isValid().onLeft { issues ->
+            issues.forEach { logger.warn { "Parameters are not valid: $it" } }
+            return
+        }
+
+        processAllFiles(
+            inputDirectoryPath = inputPath,
+            withFilenameEndings = OpendriveReader.supportedFilenameEndings,
+            outputDirectoryPath = outputPath,
+        ) {
+            val outputSubDirectoryPath = outputDirectoryPath / "citygml_${getCitygmlWriteVersion()}"
+            outputSubDirectoryPath.createDirectories()
+            var processStep = 1
+
+            // validate schema of OpenDRIVE model
+            val opendriveSchemaValidatorReport =
+                OpendriveValidator.validateFromFile(inputFilePath).getOrElse {
+                    logger.warn { it.message }
+                    return@processAllFiles
+                }
+            opendriveSchemaValidatorReport.serializeToJsonFile(
+                outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH),
+            )
+            if (opendriveSchemaValidatorReport.validationProcessAborted()) {
+                return@processAllFiles
+            }
+
+            // read of OpenDRIVE model
+            val opendriveModel =
+                OpendriveReader.readFromFile(inputFilePath)
+                    .getOrElse {
+                        logger.warn { it.message }
+                        return@processAllFiles
+                    }
+
+            // evaluate OpenDRIVE model
+            processStep++
+            val opendriveEvaluator =
+                OpendriveEvaluator(
+                    deriveOpendriveEvaluatorParameters(),
                 )
-            }, { parametersFilePath ->
-                val parametersText = parametersFilePath.toFile().readText()
+            val opendriveEvaluatorResult = opendriveEvaluator.evaluate(opendriveModel)
+            opendriveEvaluatorResult.second.serializeToJsonFile(
+                outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_EVALUATOR_REPORT_PATH),
+            )
+            var modifiedOpendriveModel =
+                opendriveEvaluatorResult.first.handleEmpty {
+                    logger.warn { opendriveEvaluatorResult.second.getTextSummary() }
+                    return@processAllFiles
+                }
 
-                Yaml.default.decodeFromString(OpendriveToCitygmlParameters.serializer(), parametersText)
-            })
+            // apply predefined rules
+            rulesApplierPath.toOption().onSome {
+                processStep++
+                val opendriveApplierRules: OpendriveApplierRules = Json.decodeFromString<OpendriveApplierRules>(it.readText())
+                val opendriveApplier = OpendriveApplier(deriveOpendriveApplierParameters())
+                val opendriveApplierResult = opendriveApplier.modify(modifiedOpendriveModel, opendriveApplierRules)
+                opendriveApplierResult.second.serializeToJsonFile(
+                    outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_APPLIER_REPORT_PATH),
+                )
+                modifiedOpendriveModel = opendriveApplierResult.first
+            }
 
-        val processor = OpendriveToCitygmlProcessor(parameters)
-        processor.process(inputPath, outputPath)
+            // reproject OpenDRIVE model
+            if (reprojectModel) {
+                processStep++
+                val opendriveReprojector = OpendriveReprojector(deriveOpendriveReprojectorParameters())
+                val opendriveReprojectorResult = opendriveReprojector.modify(modifiedOpendriveModel)
+                opendriveReprojectorResult.second.serializeToJsonFile(
+                    outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_REPROJECTOR_REPORT_PATH),
+                )
+                modifiedOpendriveModel =
+                    opendriveReprojectorResult.first.handleEmpty {
+                        logger.warn { "OpendriveReprojector: ${opendriveReprojectorResult.second.message}" }
+                        return@processAllFiles
+                    }
+            }
+
+            // offset OpenDRIVE model
+            if (addOffset.toOption().isSome()) {
+                processStep++
+                val opendriveOffsetAdder = OpendriveOffsetAdder(deriveOpendriveOffsetAdderParameters())
+                val opendriveOffsetAddedResult = opendriveOffsetAdder.modify(modifiedOpendriveModel)
+                opendriveOffsetAddedResult.second.serializeToJsonFile(
+                    outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_OFFSET_ADDER_REPORT_PATH),
+                )
+                modifiedOpendriveModel = opendriveOffsetAddedResult.first
+            }
+
+            // resolve the offset
+            if (modifiedOpendriveModel.header.offset.isSome()) {
+                processStep++
+                val opendriveOffsetResolver = OpendriveOffsetResolver()
+                val opendriveOffsetResolvedResult = opendriveOffsetResolver.modify(modifiedOpendriveModel)
+                opendriveOffsetResolvedResult.second.serializeToJsonFile(
+                    outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH),
+                )
+                modifiedOpendriveModel = opendriveOffsetResolvedResult.first
+            }
+
+            // crop the OpenDRIVE model
+            if (cropPolygon.isNotEmpty()) {
+                processStep++
+                val opendriveCropper = OpendriveCropper(deriveOpendriveCropperParameters())
+                val opendriveCroppedResult = opendriveCropper.modify(modifiedOpendriveModel)
+                opendriveCroppedResult.second.serializeToJsonFile(
+                    outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_CROP_REPORT_PATH),
+                )
+                modifiedOpendriveModel =
+                    opendriveCroppedResult.first.handleEmpty {
+                        logger.warn { "OpendriveCropper: ${opendriveCroppedResult.second.message}" }
+                        return@processAllFiles
+                    }
+            }
+
+            // remove objects from OpenDRIVE model
+            if (removeRoadObjectOfType.isNotEmpty()) {
+                processStep++
+                val opendriveObjectRemover = OpendriveObjectRemover(deriveOpendriveObjectRemoverParameters())
+                val opendriveRemovedObjectResult = opendriveObjectRemover.modify(modifiedOpendriveModel)
+                opendriveRemovedObjectResult.second.serializeToJsonFile(
+                    outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_OBJECT_REMOVER_REPORT_PATH),
+                )
+                modifiedOpendriveModel = opendriveRemovedObjectResult.first
+            }
+
+            // write the modified OpenDRIVE model
+            val opendriveFilePath = outputSubDirectoryPath / ("opendrive.xodr" + compressionFormat.toFileExtension())
+            OpendriveWriter.writeToFile(modifiedOpendriveModel, opendriveFilePath)
+
+            // transform OpenDRIVE model to Roadspaces model
+            processStep++
+            val opendrive2RoadspacesTransformer = Opendrive2RoadspacesTransformer(deriveOpendrive2RoadspacesParameters())
+            val roadspacesModelResult = opendrive2RoadspacesTransformer.transform(modifiedOpendriveModel)
+            roadspacesModelResult.second.serializeToJsonFile(
+                outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + OPENDRIVE_TO_ROADSPACES_REPORT_PATH),
+            )
+            val roadspacesModel =
+                roadspacesModelResult.first.handleEmpty {
+                    logger.warn { "Opendrive2RoadspacesTransformer: ${roadspacesModelResult.second.conversion.getTextSummary()}" }
+                    return@processAllFiles
+                }
+
+            // evaluate Roadspaces model
+            processStep++
+            val roadspacesEvaluator = RoadspacesEvaluator(deriveRoadspacesEvaluatorParameters())
+            val roadspacesEvaluatorResults = roadspacesEvaluator.evaluate(roadspacesModel)
+            roadspacesEvaluatorResults.second.serializeToJsonFile(
+                outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + ROADSPACES_EVALUATOR_REPORT_PATH),
+            )
+
+            // transform Roadspaces model to OpenDRIVE model
+            processStep++
+            val roadpaces2CitygmlTransformer = Roadspaces2CitygmlTransformer(deriveRoadspaces2CitygmlParameters())
+            val citygmlModelResult = roadpaces2CitygmlTransformer.transform(roadspacesModel)
+            citygmlModelResult.second.serializeToJsonFile(
+                outputSubDirectoryPath / REPORTS_PATH / (processStep.toString() + ROADSPACES_TO_CITYGML_REPORT_PATH),
+            )
+
+            // write CityGML model
+            CitygmlWriter.writeToFile(
+                citygmlModelResult.first,
+                getCitygmlWriteVersion(),
+                outputSubDirectoryPath / ("citygml_model.gml" + compressionFormat.toFileExtension()),
+            )
+        }
+    }
+
+    companion object {
+        val REPORTS_PATH = Path("reports")
+        val OPENDRIVE_SCHEMA_VALIDATOR_REPORT_PATH = "_opendrive_schema_validator_report.json"
+        val OPENDRIVE_EVALUATOR_REPORT_PATH = "_opendrive_evaluator_report.json"
+        val OPENDRIVE_APPLIER_REPORT_PATH = "_opendrive_applier_report.json"
+        val OPENDRIVE_REPROJECTOR_REPORT_PATH = "_opendrive_reprojector_report.json"
+        val OPENDRIVE_OFFSET_ADDER_REPORT_PATH = "_opendrive_offset_adder_report.json"
+        val OPENDRIVE_OFFSET_RESOLVER_REPORT_PATH = "_opendrive_offset_resolver_report.json"
+        val OPENDRIVE_CROP_REPORT_PATH = "_opendrive_crop_report.json"
+        val OPENDRIVE_OBJECT_REMOVER_REPORT_PATH = "_opendrive_object_remover_report.json"
+        val OPENDRIVE_TO_ROADSPACES_REPORT_PATH = "_opendrive_to_roadspaces_report.json"
+        val ROADSPACES_EVALUATOR_REPORT_PATH = "_roadspaces_evaluator_report.json"
+        val ROADSPACES_TO_CITYGML_REPORT_PATH = "_roadspaces_to_citygml_report.json"
     }
 }
