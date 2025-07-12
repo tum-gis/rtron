@@ -74,7 +74,8 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
         require(RangeSet(absoluteDomains.toSet()).numberOfDisconnectedRanges() == 1) { "Absolute domains must be connected." }
 
         require(
-            members.zip(absoluteStarts)
+            members
+                .zip(absoluteStarts)
                 .map { it.first.domain.shift(it.second) }
                 .zip(absoluteDomains)
                 .all { it.first.fuzzyEncloses(it.second, tolerance) },
@@ -91,7 +92,10 @@ class ConcatenationContainer<T : DefinableDomain<Double>>(
      * @param localParameter parameter translated into a member local parameter
      * @param member corresponding local class
      */
-    data class LocalRequest<T>(val localParameter: Double, val member: T)
+    data class LocalRequest<T>(
+        val localParameter: Double,
+        val member: T,
+    )
 
     /**
      * Returns the selected member and the locally translated parameter.

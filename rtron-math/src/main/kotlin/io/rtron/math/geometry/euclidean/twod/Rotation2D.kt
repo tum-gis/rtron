@@ -85,9 +85,7 @@ class Rotation2D(
         return true
     }
 
-    override fun hashCode(): Int {
-        return angle.hashCode()
-    }
+    override fun hashCode(): Int = angle.hashCode()
 
     // Conversions
 

@@ -34,9 +34,10 @@ import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesP
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 
-class SubcommandValidateOpendrive : CliktCommand(
-    name = "validate-opendrive",
-) {
+class SubcommandValidateOpendrive :
+    CliktCommand(
+        name = "validate-opendrive",
+    ) {
     // Properties and Initializers
     override val printHelpOnEmptyArgs = true
 
@@ -51,7 +52,8 @@ class SubcommandValidateOpendrive : CliktCommand(
         help = "Path to the output directory into which the reports are written",
     ).path()
 
-    private val tolerance by option(help = "Allowed tolerance when comparing double values").double()
+    private val tolerance by option(help = "Allowed tolerance when comparing double values")
+        .double()
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
     private val planViewGeometryDistanceTolerance by option(
         help = "Allowed distance tolerance between two geometry elements in the plan view",
@@ -70,7 +72,8 @@ class SubcommandValidateOpendrive : CliktCommand(
     ).double()
         .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
 
-    private val discretizationStepSize by option(help = "Distance between each discretization step for curves and surfaces").double()
+    private val discretizationStepSize by option(help = "Distance between each discretization step for curves and surfaces")
+        .double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
 
     private val skipOpendriveExport by option(help = "Skip the export of the adjusted OpenDRIVE dataset").flag()

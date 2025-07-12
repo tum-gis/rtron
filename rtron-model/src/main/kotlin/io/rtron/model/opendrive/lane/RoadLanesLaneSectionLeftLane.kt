@@ -37,6 +37,7 @@ data class RoadLanesLaneSectionLeftLane(
     override var level: Option<Boolean> = None,
     override var type: ELaneType = ELaneType.NONE,
     override var additionalId: Option<LaneIdentifier> = None,
-) : RoadLanesLaneSectionLRLane(), AdditionalLaneIdentifier {
+) : RoadLanesLaneSectionLRLane(),
+    AdditionalLaneIdentifier {
     companion object
 }

@@ -77,14 +77,10 @@ data class PolynomialFunction(
         return true
     }
 
-    override fun hashCode(): Int {
-        return coefficients.contentHashCode()
-    }
+    override fun hashCode(): Int = coefficients.contentHashCode()
 
     // Conversions
-    override fun toString(): String {
-        return "PolynomialFunction(polynomialFunction=$polynomialFunction)"
-    }
+    override fun toString(): String = "PolynomialFunction(polynomialFunction=$polynomialFunction)"
 
     companion object {
         /**

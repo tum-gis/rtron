@@ -95,12 +95,11 @@ class RoadspaceObjectBuilder(
         roadReferenceLine: Curve3D,
         road: RoadspaceRoad,
         baseAttributes: AttributeList,
-    ): ContextIssueList<List<RoadspaceObject>> {
-        return roadObjects.roadObject
+    ): ContextIssueList<List<RoadspaceObject>> =
+        roadObjects.roadObject
             .map { buildRoadObject(roadspaceId, it, roadReferenceLine, road, baseAttributes) }
             .mergeIssueLists()
             .map { it.flatten() }
-    }
 
     private fun buildRoadObject(
         id: RoadspaceIdentifier,
@@ -132,7 +131,8 @@ class RoadspaceObjectBuilder(
             roadObject.repeat.map { currentRoadObjectRepeat ->
 
                 val repeatIdentifier =
-                    currentRoadObjectRepeat.additionalId.toEither { IllegalStateException("Additional outline ID must be available.") }
+                    currentRoadObjectRepeat.additionalId
+                        .toEither { IllegalStateException("Additional outline ID must be available.") }
                         .getOrElse { throw it }
                 val roadspaceObjectId =
                     RoadspaceObjectIdentifier(roadObject.id, repeatIdentifier.repeatIndex.some(), roadObject.name, type, id)
@@ -300,36 +300,41 @@ class RoadspaceObjectBuilder(
         // build up solid geometrical representations
         val geometries = mutableListOf<AbstractGeometry3D>()
         geometries +=
-            Solid3DBuilder.buildPolyhedronsByRoadCorners(
-                roadObject,
-                roadReferenceLine,
-                parameters.numberTolerance,
-            ).handleIssueList { issueList += it }
+            Solid3DBuilder
+                .buildPolyhedronsByRoadCorners(
+                    roadObject,
+                    roadReferenceLine,
+                    parameters.numberTolerance,
+                ).handleIssueList { issueList += it }
         geometries +=
-            Solid3DBuilder.buildPolyhedronsByLocalCorners(roadObject, curveAffine, parameters.numberTolerance)
+            Solid3DBuilder
+                .buildPolyhedronsByLocalCorners(roadObject, curveAffine, parameters.numberTolerance)
                 .handleIssueList { issueList += it }
 
         // build up surface geometrical representations
         geometries +=
-            Surface3DBuilder.buildLinearRingsByRoadCorners(
-                roadObject,
-                roadReferenceLine,
-                parameters.numberTolerance,
-            ).handleIssueList { issueList += it }
+            Surface3DBuilder
+                .buildLinearRingsByRoadCorners(
+                    roadObject,
+                    roadReferenceLine,
+                    parameters.numberTolerance,
+                ).handleIssueList { issueList += it }
         geometries +=
-            Surface3DBuilder.buildLinearRingsByLocalCorners(
-                roadObject,
-                curveAffine,
-                parameters.numberTolerance,
-            ).handleIssueList { issueList += it }
+            Surface3DBuilder
+                .buildLinearRingsByLocalCorners(
+                    roadObject,
+                    curveAffine,
+                    parameters.numberTolerance,
+                ).handleIssueList { issueList += it }
 
         roadObjectRepeat.onSome { currentRepeat ->
             geometries +=
-                Solid3DBuilder.buildParametricSweep(
-                    currentRepeat,
-                    roadReferenceLine,
-                    parameters.numberTolerance,
-                ).toList()
+                Solid3DBuilder
+                    .buildParametricSweep(
+                        currentRepeat,
+                        roadReferenceLine,
+                        parameters.numberTolerance,
+                    ).toList()
             geometries +=
                 Surface3DBuilder.buildParametricBoundedSurfacesByHorizontalRepeat(
                     currentRepeat,
@@ -348,7 +353,9 @@ class RoadspaceObjectBuilder(
                     DefaultIssue.of(
                         "RepeatCuboidNotSupported",
                         "Cuboid geometries in the repeat elements are currently not supported.",
-                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                        roadObject.additionalId,
+                        Severity.WARNING,
+                        wasFixed = false,
                     )
             }
             if (currentRepeat.containsRepeatCylinder()) {
@@ -356,7 +363,9 @@ class RoadspaceObjectBuilder(
                     DefaultIssue.of(
                         "RepeatCylinderNotSupported",
                         "Cylinder geometries in the repeat elements are currently not supported.",
-                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                        roadObject.additionalId,
+                        Severity.WARNING,
+                        wasFixed = false,
                     )
             }
             if (currentRepeat.containsRepeatedRectangle()) {
@@ -364,7 +373,9 @@ class RoadspaceObjectBuilder(
                     DefaultIssue.of(
                         "RepeatRectangleNotSupported",
                         "Rectangle geometries in the repeat elements are currently not supported.",
-                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                        roadObject.additionalId,
+                        Severity.WARNING,
+                        wasFixed = false,
                     )
             }
             if (currentRepeat.containsRepeatCircle()) {
@@ -372,7 +383,9 @@ class RoadspaceObjectBuilder(
                     DefaultIssue.of(
                         "RepeatCircleNotSupported",
                         "Circle geometries in the repeat elements are currently not supported.",
-                        roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                        roadObject.additionalId,
+                        Severity.WARNING,
+                        wasFixed = false,
                     )
             }
         }
@@ -385,7 +398,9 @@ class RoadspaceObjectBuilder(
                 DefaultIssue.of(
                     "MultipleComplexGeometriesNotSupported",
                     "Conversion of road objects with multiple complex geometries is currently not supported.",
-                    roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                    roadObject.additionalId,
+                    Severity.WARNING,
+                    wasFixed = false,
                 )
         }
         val builtGeometry = if (geometries.isEmpty()) None else Some(geometries.first())
@@ -412,14 +427,16 @@ class RoadspaceObjectBuilder(
         // build up solid geometrical representations
         val geometries = mutableListOf<AbstractSolid3D>()
         geometries +=
-            Solid3DBuilder.buildPolyhedronsByExtrudedTopRoadCorners(
-                roadObject,
-                roadReferenceLine,
-                extrusionHeight,
-                parameters.numberTolerance,
-            ).handleIssueList { issueList += it }
+            Solid3DBuilder
+                .buildPolyhedronsByExtrudedTopRoadCorners(
+                    roadObject,
+                    roadReferenceLine,
+                    extrusionHeight,
+                    parameters.numberTolerance,
+                ).handleIssueList { issueList += it }
         geometries +=
-            Solid3DBuilder.buildPolyhedronsByExtrudedTopLocalCorners(roadObject, curveAffine, extrusionHeight, parameters.numberTolerance)
+            Solid3DBuilder
+                .buildPolyhedronsByExtrudedTopLocalCorners(roadObject, curveAffine, extrusionHeight, parameters.numberTolerance)
                 .handleIssueList { issueList += it }
 
         if (roadObjectRepeat.isSome()) {
@@ -427,7 +444,9 @@ class RoadspaceObjectBuilder(
                 DefaultIssue.of(
                     "RepeatNotSupportedForExtrudedTopSurface",
                     "Derivation of extruded top surfaces from repeat elements are currently not supported.",
-                    roadObject.additionalId, Severity.WARNING, wasFixed = false,
+                    roadObject.additionalId,
+                    Severity.WARNING,
+                    wasFixed = false,
                 )
         }
 
@@ -477,10 +496,10 @@ class RoadspaceObjectBuilder(
         roadReferenceLine: Curve3D,
         road: RoadspaceRoad,
         baseAttributes: AttributeList,
-    ): ContextIssueList<List<RoadspaceObject>> {
-        return roadSignals.signal.map { buildRoadSignalsSignal(id, it, roadReferenceLine, road, baseAttributes) }
+    ): ContextIssueList<List<RoadspaceObject>> =
+        roadSignals.signal
+            .map { buildRoadSignalsSignal(id, it, roadReferenceLine, road, baseAttributes) }
             .mergeIssueLists()
-    }
 
     private fun buildRoadSignalsSignal(
         id: RoadspaceIdentifier,
@@ -563,7 +582,9 @@ class RoadspaceObjectBuilder(
                 DefaultIssue.of(
                     "SignalHorizontalLineNotSupported",
                     "Horizontal line geometry in road signal is currently not supported.",
-                    signal.additionalId, Severity.WARNING, wasFixed = false,
+                    signal.additionalId,
+                    Severity.WARNING,
+                    wasFixed = false,
                 )
         }
         if (signal.containsVerticalLine()) {
@@ -571,7 +592,9 @@ class RoadspaceObjectBuilder(
                 DefaultIssue.of(
                     "SignalVerticalLineNotSupported",
                     "Vertical line geometry in road signal is currently not supported.",
-                    signal.additionalId, Severity.WARNING, wasFixed = false,
+                    signal.additionalId,
+                    Severity.WARNING,
+                    wasFixed = false,
                 )
         }
 

@@ -35,7 +35,8 @@ data class RoadspaceObjectIdentifier(
     val roadspaceObjectName: Option<String>,
     val roadspaceObjectType: RoadObjectType,
     val roadspaceIdentifier: RoadspaceIdentifier,
-) : AbstractRoadspacesIdentifier(), RoadspaceIdentifierInterface by roadspaceIdentifier {
+) : AbstractRoadspacesIdentifier(),
+    RoadspaceIdentifierInterface by roadspaceIdentifier {
     // Properties and Initializers
     val hashKey get() =
         "RoadspaceObject_${roadspaceObjectType}_${roadspaceObjectId}_" +

@@ -18,7 +18,9 @@ package io.rtron.model.citygml.code
 
 import org.xmlobjects.gml.model.basictypes.Code
 
-enum class AuxiliaryTrafficAreaFunctionCode(val code: Code) {
+enum class AuxiliaryTrafficAreaFunctionCode(
+    val code: Code,
+) {
     SOFT_SHOULDER(Code("1000")),
     HARD_SHOULDER(Code("1010")),
     GREEN_AREA(Code("1020")),

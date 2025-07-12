@@ -109,10 +109,10 @@ class Roadspaces2CitygmlTransformer(
             roadspacesModel
                 .getAllRoadspaces()
                 .map {
-                    roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects)
+                    roadObjectTransformer
+                        .transformRoadspaceObjects(it.roadspaceObjects)
                         .also { roadspaceObjectsProgressBar.step() }
-                }
-                .mergeIssueLists()
+                }.mergeIssueLists()
                 .handleIssueList { issueList += it }
                 .flatten()
 
@@ -120,9 +120,13 @@ class Roadspaces2CitygmlTransformer(
             if (parameters.transformAdditionalRoadLines) {
                 val additionalRoadLinesProgressBar =
                     ProgressBar("Transforming additional road lines", roadspacesModel.numberOfRoadspaces)
-                roadspacesModel.getAllRoadspaces().map {
-                    roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
-                }.mergeIssueLists().handleIssueList { issueList += it }.flatten()
+                roadspacesModel
+                    .getAllRoadspaces()
+                    .map {
+                        roadLanesTransformer.transformAdditionalRoadLines(it).also { additionalRoadLinesProgressBar.step() }
+                    }.mergeIssueLists()
+                    .handleIssueList { issueList += it }
+                    .flatten()
             } else {
                 emptyList()
             }
@@ -151,7 +155,8 @@ class Roadspaces2CitygmlTransformer(
         val roadspaceObjectsDeferred =
             roadspacesModel.getAllRoadspaces().map {
                 GlobalScope.async {
-                    roadObjectTransformer.transformRoadspaceObjects(it.roadspaceObjects)
+                    roadObjectTransformer
+                        .transformRoadspaceObjects(it.roadspaceObjects)
                         .also { roadspaceObjectsProgressBar.step() }
                 }
             }
@@ -171,15 +176,17 @@ class Roadspaces2CitygmlTransformer(
 
         val roadFeatures =
             runBlocking {
-                roadFeaturesDeferred.map { currentRoadFeature ->
-                    currentRoadFeature.await().handleIssueList { issueList += it }
-                }.flattenOption()
+                roadFeaturesDeferred
+                    .map { currentRoadFeature ->
+                        currentRoadFeature.await().handleIssueList { issueList += it }
+                    }.flattenOption()
             }
         val roadspaceObjects =
             runBlocking {
-                roadspaceObjectsDeferred.map { currentRoadSpaceObject ->
-                    currentRoadSpaceObject.await().handleIssueList { issueList += it }
-                }.flatten()
+                roadspaceObjectsDeferred
+                    .map { currentRoadSpaceObject ->
+                        currentRoadSpaceObject.await().handleIssueList { issueList += it }
+                    }.flatten()
             }
         val additionalRoadLines =
             runBlocking {
@@ -199,9 +206,13 @@ class Roadspaces2CitygmlTransformer(
     ) {
         val trafficSpaceProperties =
             dstTransportationSpaces.flatMap { it.trafficSpaces } +
-                dstTransportationSpaces.flatMap { it.sections }.filter { it.isSetObject }
+                dstTransportationSpaces
+                    .flatMap { it.sections }
+                    .filter { it.isSetObject }
                     .flatMap { it.`object`.trafficSpaces } +
-                dstTransportationSpaces.flatMap { it.intersections }.filter { it.isSetObject }
+                dstTransportationSpaces
+                    .flatMap { it.intersections }
+                    .filter { it.isSetObject }
                     .flatMap { it.`object`.trafficSpaces }
         // TODO: trace the traffic space created without id
         val trafficSpacePropertyMap: Map<String, TrafficSpaceProperty> =

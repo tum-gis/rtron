@@ -37,7 +37,10 @@ import io.rtron.math.range.length
 /**
  * Abstract class for all geometric curve objects in 3D.
  */
-abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, Tolerable {
+abstract class AbstractCurve3D :
+    AbstractGeometry3D(),
+    DefinableDomain<Double>,
+    Tolerable {
     // Properties
 
     /** Length of the curve */
@@ -121,7 +124,8 @@ abstract class AbstractCurve3D : AbstractGeometry3D(), DefinableDomain<Double>, 
         includeEndPoint: Boolean = true,
     ): Either<GeometryException.ValueNotContainedInDomain, NonEmptyList<Vector3D>> =
         either {
-            domain.arrange(step, includeEndPoint, tolerance)
+            domain
+                .arrange(step, includeEndPoint, tolerance)
                 .map(::CurveRelativeVector1D)
                 .map { calculatePointGlobalCS(it).bind() }
                 .let { it.toNonEmptyListOrNull()!! }

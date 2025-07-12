@@ -53,7 +53,5 @@ data class RoadspaceObject(
     fun isRelatedToLane(laneIdentifier: LaneIdentifier) = laneRelations.any { it.contains(laneIdentifier) }
 
     // Conversions
-    override fun toString(): String {
-        return "RoadObject(attributes=$attributes, complexGeometry=$complexGeometry)"
-    }
+    override fun toString(): String = "RoadObject(attributes=$attributes, complexGeometry=$complexGeometry)"
 }

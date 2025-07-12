@@ -16,6 +16,10 @@
 
 package io.rtron.math.projection
 
-sealed class CoordinateReferenceSystemException(val message: String) {
-    data class UnkownEpsgCode(val reason: String) : CoordinateReferenceSystemException("Unkown EPSG code: ")
+sealed class CoordinateReferenceSystemException(
+    val message: String,
+) {
+    data class UnkownEpsgCode(
+        val reason: String,
+    ) : CoordinateReferenceSystemException("Unkown EPSG code: ")
 }

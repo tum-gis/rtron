@@ -20,62 +20,63 @@ import arrow.core.Either
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
-class CoordinateReferenceSystemTest : FunSpec({
+class CoordinateReferenceSystemTest :
+    FunSpec({
 
-    context("TestProperties") {
+        context("TestProperties") {
 
-        test("build crs 4326 from epsg name") {
-            val crsName = "EPSG:4326"
+            test("build crs 4326 from epsg name") {
+                val crsName = "EPSG:4326"
 
-            val actualCrsResult = CoordinateReferenceSystem.of(crsName)
+                val actualCrsResult = CoordinateReferenceSystem.of(crsName)
 
-            require(actualCrsResult is Either.Right)
-            actualCrsResult.value.name shouldBe crsName
+                require(actualCrsResult is Either.Right)
+                actualCrsResult.value.name shouldBe crsName
+            }
+
+            test("build crs 32632 from epsg name") {
+                val crsName = "EPSG:32632"
+
+                val actualCrsResult = CoordinateReferenceSystem.of(crsName)
+
+                require(actualCrsResult is Either.Right)
+                actualCrsResult.value.name shouldBe crsName
+            }
+
+            test("extract epsg code 4326") {
+                val crsName = "EPSG:4326"
+
+                val actualCrsResult = CoordinateReferenceSystem.of(crsName)
+
+                require(actualCrsResult is Either.Right)
+                actualCrsResult.value.epsgCode shouldBe 4326
+            }
+
+            test("extract epsg code 32632") {
+                val crsName = "EPSG:32632"
+
+                val actualCrsResult = CoordinateReferenceSystem.of(crsName)
+
+                require(actualCrsResult is Either.Right)
+                actualCrsResult.value.epsgCode shouldBe 32632
+            }
+
+            test("build crs 32632 from parameters") {
+                val parameters = "+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs"
+
+                val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
+
+                require(actualCrsResult is Either.Right)
+                actualCrsResult.value.epsgCode shouldBe 32632
+            }
+
+            test("build crs 4326 from parameters") {
+                val parameters = "+proj=longlat +datum=WGS84 +no_defs"
+
+                val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
+
+                require(actualCrsResult is Either.Right)
+                actualCrsResult.value.epsgCode shouldBe 4326
+            }
         }
-
-        test("build crs 32632 from epsg name") {
-            val crsName = "EPSG:32632"
-
-            val actualCrsResult = CoordinateReferenceSystem.of(crsName)
-
-            require(actualCrsResult is Either.Right)
-            actualCrsResult.value.name shouldBe crsName
-        }
-
-        test("extract epsg code 4326") {
-            val crsName = "EPSG:4326"
-
-            val actualCrsResult = CoordinateReferenceSystem.of(crsName)
-
-            require(actualCrsResult is Either.Right)
-            actualCrsResult.value.epsgCode shouldBe 4326
-        }
-
-        test("extract epsg code 32632") {
-            val crsName = "EPSG:32632"
-
-            val actualCrsResult = CoordinateReferenceSystem.of(crsName)
-
-            require(actualCrsResult is Either.Right)
-            actualCrsResult.value.epsgCode shouldBe 32632
-        }
-
-        test("build crs 32632 from parameters") {
-            val parameters = "+proj=utm +zone=32 +datum=WGS84 +units=m +no_defs"
-
-            val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
-
-            require(actualCrsResult is Either.Right)
-            actualCrsResult.value.epsgCode shouldBe 32632
-        }
-
-        test("build crs 4326 from parameters") {
-            val parameters = "+proj=longlat +datum=WGS84 +no_defs"
-
-            val actualCrsResult = CoordinateReferenceSystem.ofParameters(parameters)
-
-            require(actualCrsResult is Either.Right)
-            actualCrsResult.value.epsgCode shouldBe 4326
-        }
-    }
-})
+    })

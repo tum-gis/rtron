@@ -46,8 +46,10 @@ object RoadLanesEvaluator {
                 issueList +=
                     DefaultIssue.of(
                         "LaneSectionLengthBelowTolerance",
-                        "Lane sections has a length of zero or below the tolerance.", currentRoad.additionalId,
-                        Severity.FATAL_ERROR, wasFixed = false,
+                        "Lane sections has a length of zero or below the tolerance.",
+                        currentRoad.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
 
@@ -61,7 +63,9 @@ object RoadLanesEvaluator {
                     DefaultIssue.of(
                         "LaneSectionContainsNoCenterLane",
                         "Lane section contains no or multiple center lanes. Complete road will be removed.",
-                        currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                        currentLaneSection.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true,
                     )
             }
 
@@ -79,7 +83,9 @@ object RoadLanesEvaluator {
                     DefaultIssue.of(
                         "LaneSectionContainsNoLeftOrRightLane",
                         "Lane section contains neither a left nor a right lane. Complete road will be removed.",
-                        currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                        currentLaneSection.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true,
                     )
             }
             currentLaneSection
@@ -100,7 +106,9 @@ object RoadLanesEvaluator {
                         DefaultIssue.of(
                             "LaneIdDuplicatesWithinLeftLaneSection",
                             "Lane ids are not unique within the left lane section.",
-                            currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                            currentLaneSection.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = false,
                         )
                 }
                 if (!leftLaneIds.containsAll(expectedIds)) {
@@ -108,7 +116,9 @@ object RoadLanesEvaluator {
                         DefaultIssue.of(
                             "NonConsecutiveLaneIdsWithinLeftLaneSection",
                             "Lane numbering shall be consecutive without any gaps.",
-                            currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                            currentLaneSection.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = false,
                         )
                 }
             }
@@ -122,7 +132,9 @@ object RoadLanesEvaluator {
                         DefaultIssue.of(
                             "LaneIdDuplicatesWithinRightLaneSection",
                             "Lane ids are not unique within the right lane section.",
-                            currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                            currentLaneSection.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = false,
                         )
                 }
                 if (!rightLaneIds.containsAll(expectedIds)) {
@@ -130,7 +142,9 @@ object RoadLanesEvaluator {
                         DefaultIssue.of(
                             "NonConsecutiveLaneIdsWithinRightLaneSection",
                             "Lane numbering shall be consecutive without any gaps.",
-                            currentLaneSection.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                            currentLaneSection.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = false,
                         )
                 }
             }
@@ -142,7 +156,10 @@ object RoadLanesEvaluator {
             everyRoadLanesLaneSectionCenterLane.modify(modifiedOpendriveModel) { currentCenterLane ->
                 currentCenterLane.roadMark =
                     filterToNonZeroLengthRoadMarks(
-                        currentCenterLane.roadMark, currentCenterLane.additionalId, parameters, issueList,
+                        currentCenterLane.roadMark,
+                        currentCenterLane.additionalId,
+                        parameters,
+                        issueList,
                     )
                 currentCenterLane
             }
@@ -150,7 +167,10 @@ object RoadLanesEvaluator {
             everyRoadLanesLaneSectionLeftLane.modify(modifiedOpendriveModel) { currentLeftLane ->
                 currentLeftLane.roadMark =
                     filterToNonZeroLengthRoadMarks(
-                        currentLeftLane.roadMark, currentLeftLane.additionalId, parameters, issueList,
+                        currentLeftLane.roadMark,
+                        currentLeftLane.additionalId,
+                        parameters,
+                        issueList,
                     )
                 currentLeftLane
             }
@@ -158,7 +178,10 @@ object RoadLanesEvaluator {
             everyRoadLanesLaneSectionRightLane.modify(modifiedOpendriveModel) { currentRightLane ->
                 currentRightLane.roadMark =
                     filterToNonZeroLengthRoadMarks(
-                        currentRightLane.roadMark, currentRightLane.additionalId, parameters, issueList,
+                        currentRightLane.roadMark,
+                        currentRightLane.additionalId,
+                        parameters,
+                        issueList,
                     )
                 currentRightLane
             }
@@ -175,14 +198,20 @@ object RoadLanesEvaluator {
         if (roadMarks.isEmpty()) return emptyList()
 
         val roadMarksFiltered: List<RoadLanesLaneSectionLCRLaneRoadMark> =
-            roadMarks.zipWithNext().map {
-                it.first to it.second.sOffset - it.first.sOffset
-            }.filter { it.second >= parameters.numberTolerance }.map { it.first } + roadMarks.last()
+            roadMarks
+                .zipWithNext()
+                .map {
+                    it.first to it.second.sOffset - it.first.sOffset
+                }.filter { it.second >= parameters.numberTolerance }
+                .map { it.first } + roadMarks.last()
         if (roadMarksFiltered.size < roadMarks.size) {
             issueList +=
                 DefaultIssue.of(
                     "RoadMarkWithLengthBelowThreshold",
-                    "Center lane contains roadMarks with length zero (or below threshold).", location, Severity.ERROR, wasFixed = true,
+                    "Center lane contains roadMarks with length zero (or below threshold).",
+                    location,
+                    Severity.ERROR,
+                    wasFixed = true,
                 )
         }
 

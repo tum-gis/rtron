@@ -20,85 +20,89 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 
-class SingularValueDecompositionTest : FunSpec({
-    context("TestRank") {
+class SingularValueDecompositionTest :
+    FunSpec({
+        context("TestRank") {
 
-        test("matrix of two orthogonal vectors should have rank 2") {
-            val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
-            val matrix = RealMatrix(matrixValues)
-            val singularValueDecomposition = SingularValueDecomposition(matrix)
+            test("matrix of two orthogonal vectors should have rank 2") {
+                val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
+                val matrix = RealMatrix(matrixValues)
+                val singularValueDecomposition = SingularValueDecomposition(matrix)
 
-            val actualRank = singularValueDecomposition.rank
+                val actualRank = singularValueDecomposition.rank
 
-            actualRank shouldBe 2
+                actualRank shouldBe 2
+            }
+
+            test("matrix with two colinear vectors should have rank 1") {
+                val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(3.0, 0.0))
+                val matrix = RealMatrix(matrixValues)
+                val singularValueDecomposition = SingularValueDecomposition(matrix)
+
+                val actualRank = singularValueDecomposition.rank
+
+                actualRank shouldBe 1
+            }
+
+            test("matrix of two zero vectors should have rank 0") {
+                val matrixValues = arrayOf(doubleArrayOf(0.0, 0.0), doubleArrayOf(0.0, 0.0))
+                val matrix = RealMatrix(matrixValues)
+                val singularValueDecomposition = SingularValueDecomposition(matrix)
+
+                val actualRank = singularValueDecomposition.rank
+
+                actualRank shouldBe 0
+            }
         }
 
-        test("matrix with two colinear vectors should have rank 1") {
-            val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(3.0, 0.0))
-            val matrix = RealMatrix(matrixValues)
-            val singularValueDecomposition = SingularValueDecomposition(matrix)
+        context("TestMatrixUCalculation") {
 
-            val actualRank = singularValueDecomposition.rank
+            test("decomposition of 2x2 matrix") {
+                val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
+                val matrix = RealMatrix(matrixValues)
+                val singularValueDecomposition = SingularValueDecomposition(matrix)
+                val expectedMatrixU = RealMatrix(doubleArrayOf(0.6, 0.8, 0.8, -0.6), 2)
 
-            actualRank shouldBe 1
+                val actualMatrixU = singularValueDecomposition.matrixU
+
+                actualMatrixU.dimension shouldBe expectedMatrixU.dimension
+                actualMatrixU.entriesFlattened
+                    .zip(expectedMatrixU.entriesFlattened)
+                    .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
+            }
         }
 
-        test("matrix of two zero vectors should have rank 0") {
-            val matrixValues = arrayOf(doubleArrayOf(0.0, 0.0), doubleArrayOf(0.0, 0.0))
-            val matrix = RealMatrix(matrixValues)
-            val singularValueDecomposition = SingularValueDecomposition(matrix)
+        context("TestMatrixSCalculation") {
 
-            val actualRank = singularValueDecomposition.rank
+            test("decomposition of 2x2 matrix") {
+                val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
+                val matrix = RealMatrix(matrixValues)
+                val singularValueDecomposition = SingularValueDecomposition(matrix)
+                val expectedMatrixS = RealMatrix(doubleArrayOf(20.0, 0.0, 0.0, 5.0), 2)
 
-            actualRank shouldBe 0
+                val actualMatrixS = singularValueDecomposition.matrixS
+
+                actualMatrixS.dimension shouldBe expectedMatrixS.dimension
+                actualMatrixS.entriesFlattened
+                    .zip(expectedMatrixS.entriesFlattened)
+                    .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
+            }
         }
-    }
 
-    context("TestMatrixUCalculation") {
+        context("TestMatrixVCalculation") {
 
-        test("decomposition of 2x2 matrix") {
-            val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
-            val matrix = RealMatrix(matrixValues)
-            val singularValueDecomposition = SingularValueDecomposition(matrix)
-            val expectedMatrixU = RealMatrix(doubleArrayOf(0.6, 0.8, 0.8, -0.6), 2)
+            test("decomposition of 2x2 matrix") {
+                val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
+                val matrix = RealMatrix(matrixValues)
+                val singularValueDecomposition = SingularValueDecomposition(matrix)
+                val expectedMatrixV = RealMatrix(doubleArrayOf(0.6, 0.8, -0.8, 0.6), 2)
 
-            val actualMatrixU = singularValueDecomposition.matrixU
+                val actualMatrixVT = singularValueDecomposition.matrixVT
 
-            actualMatrixU.dimension shouldBe expectedMatrixU.dimension
-            actualMatrixU.entriesFlattened.zip(expectedMatrixU.entriesFlattened)
-                .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
+                actualMatrixVT.dimension shouldBe expectedMatrixV.dimension
+                actualMatrixVT.entriesFlattened
+                    .zip(expectedMatrixV.entriesFlattened)
+                    .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
+            }
         }
-    }
-
-    context("TestMatrixSCalculation") {
-
-        test("decomposition of 2x2 matrix") {
-            val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
-            val matrix = RealMatrix(matrixValues)
-            val singularValueDecomposition = SingularValueDecomposition(matrix)
-            val expectedMatrixS = RealMatrix(doubleArrayOf(20.0, 0.0, 0.0, 5.0), 2)
-
-            val actualMatrixS = singularValueDecomposition.matrixS
-
-            actualMatrixS.dimension shouldBe expectedMatrixS.dimension
-            actualMatrixS.entriesFlattened.zip(expectedMatrixS.entriesFlattened)
-                .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
-        }
-    }
-
-    context("TestMatrixVCalculation") {
-
-        test("decomposition of 2x2 matrix") {
-            val matrixValues = arrayOf(doubleArrayOf(4.0, 12.0), doubleArrayOf(12.0, 11.0))
-            val matrix = RealMatrix(matrixValues)
-            val singularValueDecomposition = SingularValueDecomposition(matrix)
-            val expectedMatrixV = RealMatrix(doubleArrayOf(0.6, 0.8, -0.8, 0.6), 2)
-
-            val actualMatrixVT = singularValueDecomposition.matrixVT
-
-            actualMatrixVT.dimension shouldBe expectedMatrixV.dimension
-            actualMatrixVT.entriesFlattened.zip(expectedMatrixV.entriesFlattened)
-                .forEach { it.first.shouldBe(it.second plusOrMinus 0.01) }
-        }
-    }
-})
+    })

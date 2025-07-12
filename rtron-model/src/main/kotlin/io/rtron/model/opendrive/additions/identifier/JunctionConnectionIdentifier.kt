@@ -22,8 +22,12 @@ interface JunctionConnectionIdentifierInterface {
     val connectionId: String
 }
 
-data class JunctionConnectionIdentifier(override val connectionId: String, val junctionIdentifier: JunctionIdentifier) :
-    AbstractOpendriveIdentifier(), JunctionConnectionIdentifierInterface, JunctionIdentifierInterface by junctionIdentifier {
+data class JunctionConnectionIdentifier(
+    override val connectionId: String,
+    val junctionIdentifier: JunctionIdentifier,
+) : AbstractOpendriveIdentifier(),
+    JunctionConnectionIdentifierInterface,
+    JunctionIdentifierInterface by junctionIdentifier {
     // Conversions
     override fun toIdentifierText() =
         "Connection: connectionId=$connectionId, " +

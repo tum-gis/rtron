@@ -16,25 +16,34 @@
 
 package io.rtron.math.geometry
 
-sealed class GeometryException(val message: String, val exceptionIdentifier: String) {
+sealed class GeometryException(
+    val message: String,
+    val exceptionIdentifier: String,
+) {
     data class BoundaryRepresentationGenerationError(
         val reason: String,
     ) : GeometryException("Cannot generate bounding representation: $reason.", "BoundaryRepresentationGenerationError")
 
-    data class NotEnoughValidLinearRings(val suffix: String = "") : GeometryException(
-        "Not enough valid linear rings could be constructed$suffix.",
-        "NotEnoughValidLinearRings",
-    )
+    data class NotEnoughValidLinearRings(
+        val suffix: String = "",
+    ) : GeometryException(
+            "Not enough valid linear rings could be constructed$suffix.",
+            "NotEnoughValidLinearRings",
+        )
 
-    data class NotEnoughVertices(val suffix: String = "") : GeometryException(
-        "Not enough valid linear rings could be constructed$suffix.",
-        "NotEnoughVertices",
-    )
+    data class NotEnoughVertices(
+        val suffix: String = "",
+    ) : GeometryException(
+            "Not enough valid linear rings could be constructed$suffix.",
+            "NotEnoughVertices",
+        )
 
-    data class ValueNotContainedInDomain(val value: Double) : GeometryException(
-        "Value ($value) not contained in domain of geometry.",
-        "ValueNotContainedInDomain",
-    )
+    data class ValueNotContainedInDomain(
+        val value: Double,
+    ) : GeometryException(
+            "Value ($value) not contained in domain of geometry.",
+            "ValueNotContainedInDomain",
+        )
 }
 
 fun GeometryException.toIllegalStateException(): IllegalStateException = IllegalStateException(message)

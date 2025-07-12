@@ -35,7 +35,9 @@ interface LaneSectionIdentifierInterface : RoadspaceIdentifierInterface {
 data class LaneSectionIdentifier(
     override val laneSectionId: Int,
     val roadspaceIdentifier: RoadspaceIdentifier,
-) : AbstractRoadspacesIdentifier(), LaneSectionIdentifierInterface, RoadspaceIdentifierInterface by roadspaceIdentifier {
+) : AbstractRoadspacesIdentifier(),
+    LaneSectionIdentifierInterface,
+    RoadspaceIdentifierInterface by roadspaceIdentifier {
     // Properties and Initializers
     init {
         require(laneSectionId >= 0) { "Lane section id must be non-negative." }
@@ -59,7 +61,5 @@ data class LaneSectionIdentifier(
 
     override fun toStringMap(): Map<String, String> = mapOf("laneSectionId" to laneSectionId.toString()) + roadspaceIdentifier.toStringMap()
 
-    override fun toIdentifierText(): String {
-        return "LaneSectionIdentifier(laneSectionId=$laneSectionId, roadSpaceId=$roadspaceId)"
-    }
+    override fun toIdentifierText(): String = "LaneSectionIdentifier(laneSectionId=$laneSectionId, roadSpaceId=$roadspaceId)"
 }

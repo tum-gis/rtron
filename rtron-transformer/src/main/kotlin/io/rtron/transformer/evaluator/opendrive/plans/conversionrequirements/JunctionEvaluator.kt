@@ -44,7 +44,9 @@ object JunctionEvaluator {
                         DefaultIssue.of(
                             "DefaultJunctionWithoutIncomingRoad",
                             "Junction of type default has no connection with an incoming road.",
-                            currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                            currentJunction.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = false,
                         )
                 }
 
@@ -55,7 +57,9 @@ object JunctionEvaluator {
                         DefaultIssue.of(
                             "DefaultJunctionWithoutConnectingRoad",
                             "Junction of type default has no connection with a connecting road.",
-                            currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                            currentJunction.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = false,
                         )
                 }
 

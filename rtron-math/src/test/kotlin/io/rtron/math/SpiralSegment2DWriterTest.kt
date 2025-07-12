@@ -44,7 +44,13 @@ object SpiralSegment2DWriterTest {
         for (currentPosition in curvatureRange.domain.arrange(0.1, false, 0.0)) {
             val ret = spiralSegment.calculatePoseGlobalCS(CurveRelativeVector1D(currentPosition))
             require(ret is Either.Right)
-            csvPrinter.printRecord(currentPosition.toString(), ret.value.point.x.toString(), ret.value.point.y.toString())
+            csvPrinter.printRecord(
+                currentPosition.toString(),
+                ret.value.point.x
+                    .toString(),
+                ret.value.point.y
+                    .toString(),
+            )
         }
 
         csvPrinter.flush()

@@ -64,12 +64,16 @@ class VegetationModuleBuilder(
 
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
-            solitaryVegetationObjectFeature.populateLod1Geometry(geometryTransformer)
+            solitaryVegetationObjectFeature
+                .populateLod1Geometry(geometryTransformer)
                 .mapLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForSolitaryVegetationObjectLod1",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
 
@@ -78,12 +82,16 @@ class VegetationModuleBuilder(
 
         roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
-            solitaryVegetationObjectFeature.populateLod2Geometry(geometryTransformer)
+            solitaryVegetationObjectFeature
+                .populateLod2Geometry(geometryTransformer)
                 .mapLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForSolitaryVegetationObjectLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }

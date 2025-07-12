@@ -22,8 +22,12 @@ interface LaneIdentifierInterface {
     val laneId: Int
 }
 
-data class LaneIdentifier(override val laneId: Int, val laneSectionIdentifier: LaneSectionIdentifier) :
-    AbstractOpendriveIdentifier(), LaneIdentifierInterface, RoadLaneSectionIdentifierInterface by laneSectionIdentifier {
+data class LaneIdentifier(
+    override val laneId: Int,
+    val laneSectionIdentifier: LaneSectionIdentifier,
+) : AbstractOpendriveIdentifier(),
+    LaneIdentifierInterface,
+    RoadLaneSectionIdentifierInterface by laneSectionIdentifier {
     // Conversions
     override fun toIdentifierText() =
         "Lane: laneId=$laneId, " +

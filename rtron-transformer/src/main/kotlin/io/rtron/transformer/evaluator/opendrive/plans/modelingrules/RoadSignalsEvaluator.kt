@@ -46,7 +46,9 @@ object RoadSignalsEvaluator {
                                 "Road signals (number of objects affected: ${currentRoadSignals.signal.size -
                                     signalsFiltered.size}) were removed since they were positioned outside the defined " +
                                     "length of the road.",
-                                currentRoad.additionalId, Severity.ERROR, wasFixed = true,
+                                currentRoad.additionalId,
+                                Severity.ERROR,
+                                wasFixed = true,
                             )
                     }
                     currentRoadSignals.signal = signalsFiltered

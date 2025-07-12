@@ -31,59 +31,60 @@ import io.rtron.math.transform.Affine2D
 import io.rtron.math.transform.AffineSequence2D
 import kotlin.math.sqrt
 
-class ParametricCubicCurve2DTest : FunSpec({
-    context("TestPoseCalculation") {
+class ParametricCubicCurve2DTest :
+    FunSpec({
+        context("TestPoseCalculation") {
 
-        test("simple quadratic curve") {
-            val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
-            val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0)
-            val curveRelativePoint = CurveRelativeVector1D(2.0)
+            test("simple quadratic curve") {
+                val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
+                val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
+                val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0)
+                val curveRelativePoint = CurveRelativeVector1D(2.0)
 
-            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+                val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
 
-            actualPose.point shouldBe Vector2D(2.0, 4.0)
+                actualPose.point shouldBe Vector2D(2.0, 4.0)
+            }
+
+            test("simple linear curve") {
+                val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
+                val coefficientY = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
+                val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(QUARTER_PI))
+                val affineSequence = AffineSequence2D.of(affine)
+                val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
+                val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
+
+                val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+
+                actualPose.point.x.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+                actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            }
+
+            test("simple quadratic negative curve") {
+                val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
+                val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
+                val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(PI))
+                val affineSequence = AffineSequence2D.of(affine)
+                val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
+                val curveRelativePoint = CurveRelativeVector1D(2.0)
+
+                val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+
+                actualPose.point.x.shouldBe(-2.0 plusOrMinus DBL_EPSILON_2)
+                actualPose.point.y.shouldBe(-4.0 plusOrMinus DBL_EPSILON_2)
+            }
+
+            test("quadratic curve") {
+                val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
+                val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
+                val length = 1.479
+                val curveRelativePoint = CurveRelativeVector1D(length)
+                val curve = ParametricCubicCurve2D(coefficientX, coefficientY, length, 0.0)
+
+                val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+
+                actualPose.point.x.shouldBe(length plusOrMinus DBL_EPSILON)
+                actualPose.point.y.shouldBe(length * length plusOrMinus DBL_EPSILON)
+            }
         }
-
-        test("simple linear curve") {
-            val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
-            val coefficientY = doubleArrayOf(0.0, 0.0, 0.0, 0.0)
-            val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(QUARTER_PI))
-            val affineSequence = AffineSequence2D.of(affine)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
-
-            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
-
-            actualPose.point.x.shouldBe(1.0 plusOrMinus DBL_EPSILON)
-            actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
-        }
-
-        test("simple quadratic negative curve") {
-            val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
-            val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
-            val affine = Affine2D.of(Vector2D.ZERO, Rotation2D(PI))
-            val affineSequence = AffineSequence2D.of(affine)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, 10.0, 0.0, affineSequence)
-            val curveRelativePoint = CurveRelativeVector1D(2.0)
-
-            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
-
-            actualPose.point.x.shouldBe(-2.0 plusOrMinus DBL_EPSILON_2)
-            actualPose.point.y.shouldBe(-4.0 plusOrMinus DBL_EPSILON_2)
-        }
-
-        test("quadratic curve") {
-            val coefficientX = doubleArrayOf(0.0, 1.0, 0.0, 0.0)
-            val coefficientY = doubleArrayOf(0.0, 0.0, 1.0, 0.0)
-            val length = 1.479
-            val curveRelativePoint = CurveRelativeVector1D(length)
-            val curve = ParametricCubicCurve2D(coefficientX, coefficientY, length, 0.0)
-
-            val actualPose = curve.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
-
-            actualPose.point.x.shouldBe(length plusOrMinus DBL_EPSILON)
-            actualPose.point.y.shouldBe(length * length plusOrMinus DBL_EPSILON)
-        }
-    }
-})
+    })

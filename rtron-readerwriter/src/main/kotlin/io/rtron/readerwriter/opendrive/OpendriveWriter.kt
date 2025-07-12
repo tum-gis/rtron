@@ -54,4 +54,6 @@ object OpendriveWriter {
     }
 }
 
-sealed class OpendriveWriterException(message: String) : BaseException(message)
+sealed class OpendriveWriterException(
+    message: String,
+) : BaseException(message)

@@ -106,17 +106,22 @@ object Surface3DBuilder {
         val issueList = DefaultIssueList()
 
         val (builderExceptions, linearRingsWithContext) =
-            roadObject.getLinearRingsDefinedByRoadCorners()
+            roadObject
+                .getLinearRingsDefinedByRoadCorners()
                 .map { buildLinearRingByRoadCorners(it, referenceLine, numberTolerance) }
                 .separateEither()
 
         issueList +=
-            builderExceptions.map {
-                DefaultIssue.of(
-                    "LinearRingNotConstructableFromRoadCornerOutlines", it.message, it.location,
-                    Severity.WARNING, wasFixed = true,
-                )
-            }.mergeToReport()
+            builderExceptions
+                .map {
+                    DefaultIssue.of(
+                        "LinearRingNotConstructableFromRoadCornerOutlines",
+                        it.message,
+                        it.location,
+                        Severity.WARNING,
+                        wasFixed = true,
+                    )
+                }.mergeToReport()
         val linearRings = linearRingsWithContext.handleIssueList { issueList += it.issueList }
 
         return ContextIssueList(linearRings, issueList)
@@ -133,11 +138,12 @@ object Surface3DBuilder {
         require(outline.isLinearRingDefinedByRoadCorners()) { "Outline does not contain a linear ring represented by road corners." }
         require(outline.cornerRoad.all { it.height == 0.0 }) { "All cornerRoad elements must have a zero height." }
         val outlineId =
-            outline.additionalId.toEither {
-                IllegalStateException(
-                    "Additional outline ID must be available.",
-                )
-            }.getOrElse { throw it }
+            outline.additionalId
+                .toEither {
+                    IllegalStateException(
+                        "Additional outline ID must be available.",
+                    )
+                }.getOrElse { throw it }
 
         val vertices =
             outline.cornerRoad
@@ -182,11 +188,13 @@ object Surface3DBuilder {
             builderExceptions
                 .map {
                     DefaultIssue.of(
-                        "LinearRingNotConstructableFromLocalCornerOutlines", it.message, it.location,
-                        Severity.WARNING, wasFixed = true,
+                        "LinearRingNotConstructableFromLocalCornerOutlines",
+                        it.message,
+                        it.location,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
-                }
-                .mergeToReport()
+                }.mergeToReport()
         val linearRings =
             linearRingsWithContext
                 .handleIssueList { issueList += it.issueList }
@@ -203,11 +211,12 @@ object Surface3DBuilder {
         numberTolerance: Double,
     ): Either<GeometryBuilderException, ContextIssueList<LinearRing3D>> {
         val outlineId =
-            outline.additionalId.toEither {
-                IllegalStateException(
-                    "Additional outline ID must be available.",
-                )
-            }.getOrElse { throw it }
+            outline.additionalId
+                .toEither {
+                    IllegalStateException(
+                        "Additional outline ID must be available.",
+                    )
+                }.getOrElse { throw it }
 
         val vertices =
             outline.cornerLocal

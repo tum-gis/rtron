@@ -145,9 +145,7 @@ class RealMatrix(
         return scalarMultiply(1.0 / this[rowIndex][columnIndex])
     }
 
-    override fun hashCode(): Int {
-        return matrix.hashCode()
-    }
+    override fun hashCode(): Int = matrix.hashCode()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -169,9 +167,7 @@ class RealMatrix(
     /** Conversion to adapted Real Matrix class from Apache Commons Math. */
     fun toRealMatrixCM(): CMRealMatrix = matrix
 
-    override fun toString(): String {
-        return "Matrix(_matrix=$matrix)"
-    }
+    override fun toString(): String = "Matrix(_matrix=$matrix)"
 
     companion object {
         /**
@@ -188,9 +184,10 @@ class RealMatrix(
             val matrixValues =
                 (0 until rowDimension).fold(emptyList<DoubleArray>()) { acc, currentRowIndex ->
                     acc +
-                        columnVectors.map {
-                            it[currentRowIndex]
-                        }.toDoubleArray()
+                        columnVectors
+                            .map {
+                                it[currentRowIndex]
+                            }.toDoubleArray()
                 }
 
             return RealMatrix(matrixValues.toTypedArray())

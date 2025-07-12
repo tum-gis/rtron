@@ -31,7 +31,8 @@ import kotlin.math.min
 data class LateralLaneRangeIdentifier(
     val laneIdRange: Range<Int>,
     val laneSectionIdentifier: LaneSectionIdentifier,
-) : AbstractRoadspacesIdentifier(), LaneSectionIdentifierInterface by laneSectionIdentifier {
+) : AbstractRoadspacesIdentifier(),
+    LaneSectionIdentifierInterface by laneSectionIdentifier {
     // Properties and Initializers
     init {
         require(laneIdRange.hasLowerBound()) { "laneIdRange must have a lower bound." }
@@ -50,9 +51,10 @@ data class LateralLaneRangeIdentifier(
 
     /** Returns all lane identifiers contained in this range. */
     fun getAllLeftRightLaneIdentifiers(): List<LaneIdentifier> =
-        (laneIdRange.lowerEndpointOrNull()!!..laneIdRange.upperEndpointOrNull()!!).filter {
-            it != 0
-        }.map { LaneIdentifier(it, this.laneSectionIdentifier) }
+        (laneIdRange.lowerEndpointOrNull()!!..laneIdRange.upperEndpointOrNull()!!)
+            .filter {
+                it != 0
+            }.map { LaneIdentifier(it, this.laneSectionIdentifier) }
 
     /** Returns true, if the [laneIdentifier] is contained in this range. */
     fun contains(laneIdentifier: LaneIdentifier) =

@@ -81,7 +81,8 @@ class RoadspaceBuilder(
 
         // build up road's surface geometries
         val lateralProfileRoadShape =
-            road.getShapeEntries()
+            road
+                .getShapeEntries()
                 .fold({ PlaneFunction.ZERO }, { buildLateralRoadShape(roadspaceId, it) })
 
         val roadSurface =
@@ -100,12 +101,14 @@ class RoadspaceBuilder(
         // build up the road space objects (OpenDRIVE: road objects & signals)
         val roadspaceObjectsFromRoadObjects =
             road.objects.fold({ emptyList() }, { roadObjects ->
-                roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, roadspaceRoad, attributes)
+                roadObjectBuilder
+                    .buildRoadspaceObjects(roadspaceId, roadObjects, roadReferenceLine, roadspaceRoad, attributes)
                     .handleIssueList { issueList += it }
             })
         val roadspaceObjectsFromRoadSignals: List<RoadspaceObject> =
             road.signals.fold({ emptyList() }, { roadSignals ->
-                roadObjectBuilder.buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, roadspaceRoad, attributes)
+                roadObjectBuilder
+                    .buildRoadspaceObjects(roadspaceId, roadSignals, roadReferenceLine, roadspaceRoad, attributes)
                     .handleIssueList { issueList += it }
             })
 

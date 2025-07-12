@@ -40,16 +40,22 @@ object JunctionEvaluator {
             if (currentJunction.connection.isEmpty()) {
                 issueList +=
                     DefaultIssue.of(
-                        "EmptyList", "List for attribute 'connection' is empty, but it has to contain at least one element.",
-                        currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                        "EmptyList",
+                        "List for attribute 'connection' is empty, but it has to contain at least one element.",
+                        currentJunction.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
 
             if (currentJunction.id.isBlank()) {
                 issueList +=
                     DefaultIssue.of(
-                        "MissingValue", "Missing value for attribute 'ID'.", currentJunction.additionalId,
-                        Severity.FATAL_ERROR, wasFixed = false,
+                        "MissingValue",
+                        "Missing value for attribute 'ID'.",
+                        currentJunction.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
 
@@ -61,8 +67,11 @@ object JunctionEvaluator {
             if (currentJunctionConnection.id.isBlank()) {
                 issueList +=
                     DefaultIssue.of(
-                        "MissingValue", "Missing value for attribute 'ID'.", currentJunctionConnection.additionalId,
-                        Severity.FATAL_ERROR, wasFixed = false,
+                        "MissingValue",
+                        "Missing value for attribute 'ID'.",
+                        currentJunctionConnection.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
 
@@ -73,20 +82,32 @@ object JunctionEvaluator {
             everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
                 currentJunction.mainRoad =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        currentJunction.mainRoad, currentJunction.additionalId, "mainRoad", issueList,
+                        currentJunction.mainRoad,
+                        currentJunction.additionalId,
+                        "mainRoad",
+                        issueList,
                     )
                 currentJunction.name =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        currentJunction.name, currentJunction.additionalId, "name", issueList,
+                        currentJunction.name,
+                        currentJunction.additionalId,
+                        "name",
+                        issueList,
                     )
 
                 currentJunction.sEnd =
                     BasicDataTypeModifier.modifyToOptionalFiniteDouble(
-                        currentJunction.sEnd, currentJunction.additionalId, "sEnd", issueList,
+                        currentJunction.sEnd,
+                        currentJunction.additionalId,
+                        "sEnd",
+                        issueList,
                     )
                 currentJunction.sStart =
                     BasicDataTypeModifier.modifyToOptionalFiniteDouble(
-                        currentJunction.sStart, currentJunction.additionalId, "sStart", issueList,
+                        currentJunction.sStart,
+                        currentJunction.additionalId,
+                        "sStart",
+                        issueList,
                     )
 
                 currentJunction
@@ -97,17 +118,24 @@ object JunctionEvaluator {
 
                 currentJunctionConnection.connectingRoad =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        currentJunctionConnection.connectingRoad, currentJunctionConnection.additionalId, "connectingRoad",
+                        currentJunctionConnection.connectingRoad,
+                        currentJunctionConnection.additionalId,
+                        "connectingRoad",
                         issueList,
                     )
                 currentJunctionConnection.incomingRoad =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        currentJunctionConnection.incomingRoad, currentJunctionConnection.additionalId, "incomingRoad",
+                        currentJunctionConnection.incomingRoad,
+                        currentJunctionConnection.additionalId,
+                        "incomingRoad",
                         issueList,
                     )
                 currentJunctionConnection.linkedRoad =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        currentJunctionConnection.linkedRoad, currentJunctionConnection.additionalId, "linkedRoad", issueList,
+                        currentJunctionConnection.linkedRoad,
+                        currentJunctionConnection.additionalId,
+                        "linkedRoad",
+                        issueList,
                     )
 
                 currentJunctionConnection

@@ -44,9 +44,10 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.modifiers.opendrive.offset.adder.OpendriveOffsetAdderParameters
 
-class SubcommandOpendriveToCitygml : CliktCommand(
-    name = "opendrive-to-citygml",
-) {
+class SubcommandOpendriveToCitygml :
+    CliktCommand(
+        name = "opendrive-to-citygml",
+    ) {
     // Properties and Initializers
     override val printHelpOnEmptyArgs = true
 
@@ -67,7 +68,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(
 
     private val convertToCitygml2 by option(help = "Convert to CityGML 2.0 (otherwise CityGML 3.0)").flag()
 
-    private val tolerance by option(help = "Allowed tolerance when comparing double values").double()
+    private val tolerance by option(help = "Allowed tolerance when comparing double values")
+        .double()
         .default(Opendrive2RoadspacesParameters.DEFAULT_NUMBER_TOLERANCE)
     private val planViewGeometryDistanceTolerance by option(
         help = "Allowed distance tolerance between two geometry elements in the plan view",
@@ -86,9 +88,12 @@ class SubcommandOpendriveToCitygml : CliktCommand(
     ).double()
         .default(OpendriveEvaluatorParameters.DEFAULT_PLAN_VIEW_GEOMETRY_ANGLE_WARNING_TOLERANCE)
     private val reprojectModel by option(help = "Reproject the geometries into a different geospatial coordinate reference system").flag()
-    private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets").int()
+    private val crsEpsg by option(help = "EPSG code of the coordinate reference system used in the OpenDRIVE datasets")
+        .int()
         .default(Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG)
-    private val addOffset by option(help = "Offset values by which the model is translated along the x, y, and z axis").double().triple()
+    private val addOffset by option(help = "Offset values by which the model is translated along the x, y, and z axis")
+        .double()
+        .triple()
         .default(
             Triple(
                 OpendriveOffsetAdderParameters.DEFAULT_OFFSET_X,
@@ -124,13 +129,15 @@ class SubcommandOpendriveToCitygml : CliktCommand(
         resultMap.toMap()
     }.default(Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE)
 
-    private val discretizationStepSize by option(help = "Distance between each discretization step for curves and surfaces").double()
+    private val discretizationStepSize by option(help = "Distance between each discretization step for curves and surfaces")
+        .double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
     private val sweepDiscretizationStepSize by option(
         help = "Distance between each discretization step for solid geometries of ParametricSweep3D",
     ).double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE)
-    private val circleSlices by option(help = "Number of discretization points for a circle or cylinder").int()
+    private val circleSlices by option(help = "Number of discretization points for a circle or cylinder")
+        .int()
         .default(Roadspaces2CitygmlParameters.DEFAULT_CIRCLE_SLICES)
     private val generateRandomGeometryIds by option(help = "True, if random ids shall be generated for the gml geometries").flag()
     private val transformAdditionalRoadLines by option(
@@ -140,7 +147,8 @@ class SubcommandOpendriveToCitygml : CliktCommand(
     private val skipLaneSurfaceExtrusions by option(
         help = "Skip extruding lane surfaces for traffic space solids",
     ).flag()
-    private val laneSurfaceExtrusionHeight by option(help = "Default extrusion height for traffic space solids (in meters)").double()
+    private val laneSurfaceExtrusionHeight by option(help = "Default extrusion height for traffic space solids (in meters)")
+        .double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT)
 
     private val laneSurfaceExtrusionHeightPerLaneType: Map<LaneType, Double> by option(

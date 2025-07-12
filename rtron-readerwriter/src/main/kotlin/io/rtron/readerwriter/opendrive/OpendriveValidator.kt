@@ -81,10 +81,14 @@ object OpendriveValidator {
                 unmarshaller.jaxbUnmarshaller.unmarshal(inputStream)
             } catch (e: NumberFormatException) {
                 val invalidFormattedNumber = e.message.toString()
-                OpendriveReaderException.NumberFormatException(reason = invalidFormattedNumber).left()
+                OpendriveReaderException
+                    .NumberFormatException(reason = invalidFormattedNumber)
+                    .left()
                     .bind<OpendriveReaderException.NumberFormatException>()
             } catch (e: Exception) {
-                OpendriveReaderException.FatalSchemaValidationError(reason = e.toString()).left()
+                OpendriveReaderException
+                    .FatalSchemaValidationError(reason = e.toString())
+                    .left()
                     .bind<OpendriveReaderException.FatalSchemaValidationError>()
             }
 

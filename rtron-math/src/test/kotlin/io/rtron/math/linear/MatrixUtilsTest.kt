@@ -19,18 +19,19 @@ package io.rtron.math.linear
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
-class MatrixUtilsTest : FunSpec({
-    context("TestAppendColumn") {
+class MatrixUtilsTest :
+    FunSpec({
+        context("TestAppendColumn") {
 
-        test("append column with two elements") {
-            val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
-            val matrix = RealMatrix(matrixValues)
-            val column = doubleArrayOf(2.0, 1.0)
+            test("append column with two elements") {
+                val matrixValues = arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, 4.0))
+                val matrix = RealMatrix(matrixValues)
+                val column = doubleArrayOf(2.0, 1.0)
 
-            val actualAppendedMatrix = matrix.appendColumn(column)
+                val actualAppendedMatrix = matrix.appendColumn(column)
 
-            actualAppendedMatrix.getRow(0) shouldBe doubleArrayOf(1.0, 0.0, 2.0)
-            actualAppendedMatrix.getRow(1) shouldBe doubleArrayOf(0.0, 4.0, 1.0)
+                actualAppendedMatrix.getRow(0) shouldBe doubleArrayOf(1.0, 0.0, 2.0)
+                actualAppendedMatrix.getRow(1) shouldBe doubleArrayOf(0.0, 4.0, 1.0)
+            }
         }
-    }
-})
+    })

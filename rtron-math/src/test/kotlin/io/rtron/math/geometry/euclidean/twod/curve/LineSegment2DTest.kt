@@ -27,83 +27,84 @@ import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.QUARTER_PI
 import kotlin.math.sqrt
 
-class LineSegment2DTest : FunSpec({
-    context("TestLengthCalculation") {
+class LineSegment2DTest :
+    FunSpec({
+        context("TestLengthCalculation") {
 
-        test("length of line segment on axis") {
-            val pointA = Vector2D(0.0, 0.0)
-            val pointB = Vector2D(7.0, 0.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
+            test("length of line segment on axis") {
+                val pointA = Vector2D(0.0, 0.0)
+                val pointB = Vector2D(7.0, 0.0)
+                val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            lineSegment.length.shouldBe(7.0 plusOrMinus DBL_EPSILON)
+                lineSegment.length.shouldBe(7.0 plusOrMinus DBL_EPSILON)
+            }
+
+            test("length of diagonal line segment") {
+                val pointA = Vector2D(3.0, 0.0)
+                val pointB = Vector2D(0.0, 4.0)
+                val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
+
+                lineSegment.length.shouldBe(5.0 plusOrMinus DBL_EPSILON)
+            }
         }
 
-        test("length of diagonal line segment") {
-            val pointA = Vector2D(3.0, 0.0)
-            val pointB = Vector2D(0.0, 4.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
+        context("TestPoseAngleCalculation") {
 
-            lineSegment.length.shouldBe(5.0 plusOrMinus DBL_EPSILON)
-        }
-    }
+            test("angle of line segment on axis") {
+                val pointA = Vector2D(0.0, 0.0)
+                val pointB = Vector2D(0.0, 1.0)
+                val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-    context("TestPoseAngleCalculation") {
+                val actualPose = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-        test("angle of line segment on axis") {
-            val pointA = Vector2D(0.0, 0.0)
-            val pointB = Vector2D(0.0, 1.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
+                actualPose.rotation.angle shouldBe HALF_PI
+            }
 
-            val actualPose = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
+            test("angle of diagonal line segment") {
+                val pointA = Vector2D(0.0, 0.0)
+                val pointB = Vector2D(1.0, 1.0)
+                val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
 
-            actualPose.rotation.angle shouldBe HALF_PI
-        }
+                val actualPose = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
 
-        test("angle of diagonal line segment") {
-            val pointA = Vector2D(0.0, 0.0)
-            val pointB = Vector2D(1.0, 1.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
-
-            val actualPose = lineSegment.calculatePoseGlobalCS(CurveRelativeVector1D.ZERO).shouldBeRight()
-
-            actualPose.rotation.angle shouldBe QUARTER_PI
-        }
-    }
-
-    context("TestPosePointCalculation") {
-
-        test("point on line segment on axis") {
-            val pointA = Vector2D(0.0, 0.0)
-            val pointB = Vector2D(10.0, 0.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
-            val curveRelativePoint = CurveRelativeVector1D(5.0)
-
-            val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
-
-            actualPose.point shouldBe Vector2D(5.0, 0.0)
+                actualPose.rotation.angle shouldBe QUARTER_PI
+            }
         }
 
-        test("point on diagonal line segment on axis") {
-            val pointA = Vector2D(0.0, 0.0)
-            val pointB = Vector2D(1.0, 1.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
-            val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
+        context("TestPosePointCalculation") {
 
-            val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+            test("point on line segment on axis") {
+                val pointA = Vector2D(0.0, 0.0)
+                val pointB = Vector2D(10.0, 0.0)
+                val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
+                val curveRelativePoint = CurveRelativeVector1D(5.0)
 
-            actualPose.point.x.shouldBe(1.0 plusOrMinus DBL_EPSILON)
-            actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+                val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+
+                actualPose.point shouldBe Vector2D(5.0, 0.0)
+            }
+
+            test("point on diagonal line segment on axis") {
+                val pointA = Vector2D(0.0, 0.0)
+                val pointB = Vector2D(1.0, 1.0)
+                val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
+                val curveRelativePoint = CurveRelativeVector1D(sqrt(2.0))
+
+                val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+
+                actualPose.point.x.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+                actualPose.point.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+            }
+
+            test("point on diagonal line segment on axis 2") {
+                val pointA = Vector2D(-1.0, 0.0)
+                val pointB = Vector2D(0.0, 0.0)
+                val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
+                val curveRelativePoint = CurveRelativeVector1D(1.0)
+
+                val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
+
+                actualPose.point shouldBe Vector2D(0.0, 0.0)
+            }
         }
-
-        test("point on diagonal line segment on axis 2") {
-            val pointA = Vector2D(-1.0, 0.0)
-            val pointB = Vector2D(0.0, 0.0)
-            val lineSegment = LineSegment2D.of(pointA, pointB, 0.0)
-            val curveRelativePoint = CurveRelativeVector1D(1.0)
-
-            val actualPose = lineSegment.calculatePoseGlobalCS(curveRelativePoint).shouldBeRight()
-
-            actualPose.point shouldBe Vector2D(0.0, 0.0)
-        }
-    }
-})
+    })

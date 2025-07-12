@@ -127,7 +127,9 @@ object RoadObjectsEvaluator {
                         DefaultIssue.of(
                             "LaneValidityElementNotOrdered",
                             "The value of the @fromLane attribute shall be lower than or equal to the value of the @toLane attribute.",
-                            currentRoadObject.additionalId, Severity.ERROR, wasFixed = true,
+                            currentRoadObject.additionalId,
+                            Severity.ERROR,
+                            wasFixed = true,
                         )
                     currentValidity.fromLane = min(currentValidity.fromLane, currentValidity.toLane)
                     currentValidity.toLane = max(currentValidity.fromLane, currentValidity.toLane)
@@ -138,7 +140,9 @@ object RoadObjectsEvaluator {
                         DefaultIssue(
                             "EmptyValueForOptionalAttribute",
                             "Attribute 'outlines' is set with an empty value even though the attribute itself is optional.",
-                            "Header element", Severity.WARNING, wasFixed = true,
+                            "Header element",
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     currentRoadObject.outlines = None
                 }
@@ -151,7 +155,9 @@ object RoadObjectsEvaluator {
                             "UnexpectedValues",
                             "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not " +
                                 "have a finite s, tStart, zOffsetStart value.",
-                            currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                            currentRoadObject.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = true,
                         )
                     // issueList += OpendriveException.UnexpectedValues("s, tStart, zOffsetStart",
                     // "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a
@@ -178,7 +184,9 @@ object RoadObjectsEvaluator {
                             "UnexpectedValues",
                             "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries " +
                                 "which do not have a finite s, t and dz value.",
-                            currentOutlineElement.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                            currentOutlineElement.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = true,
                         )
 
                     currentOutlineElement.cornerRoad = cornerRoadElementsFiltered
@@ -188,8 +196,11 @@ object RoadObjectsEvaluator {
                     if (!currentCornerRoad.height.isFinite() || currentCornerRoad.height < 0.0) {
                         issueList +=
                             DefaultIssue.of(
-                                "UnexpectedValue", "Unexpected value for attribute 'height'",
-                                currentOutlineElement.additionalId, Severity.WARNING, wasFixed = true,
+                                "UnexpectedValue",
+                                "Unexpected value for attribute 'height'",
+                                currentOutlineElement.additionalId,
+                                Severity.WARNING,
+                                wasFixed = true,
                             )
                         currentCornerRoad.height = 0.0
                     }
@@ -211,7 +222,9 @@ object RoadObjectsEvaluator {
                             "UnexpectedValues",
                             "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries " +
                                 "which do not have a finite s, t and dz value.",
-                            currentOutlineElement.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                            currentOutlineElement.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = true,
                         )
 
                     currentOutlineElement.cornerLocal = cornerLocalElementsFiltered
@@ -221,8 +234,11 @@ object RoadObjectsEvaluator {
                     if (!currentCornerLocal.height.isFinite() || currentCornerLocal.height < 0.0) {
                         issueList +=
                             DefaultIssue.of(
-                                "UnexpectedValue", "Unexpected value for attribute 'height'",
-                                currentOutlineElement.additionalId, Severity.WARNING, wasFixed = true,
+                                "UnexpectedValue",
+                                "Unexpected value for attribute 'height'",
+                                currentOutlineElement.additionalId,
+                                Severity.WARNING,
+                                wasFixed = true,
                             )
                         currentCornerLocal.height = 0.0
                     }
@@ -243,62 +259,98 @@ object RoadObjectsEvaluator {
 
                 currentRepeatElement.distance =
                     BasicDataTypeModifier.modifyToFinitePositiveDouble(
-                        currentRepeatElement.distance, currentRepeatElement.additionalId, "distance", issueList,
+                        currentRepeatElement.distance,
+                        currentRepeatElement.additionalId,
+                        "distance",
+                        issueList,
                     )
                 currentRepeatElement.heightEnd =
                     BasicDataTypeModifier.modifyToFinitePositiveDouble(
-                        currentRepeatElement.heightEnd, currentRepeatElement.additionalId, "heightEnd", issueList,
+                        currentRepeatElement.heightEnd,
+                        currentRepeatElement.additionalId,
+                        "heightEnd",
+                        issueList,
                     )
                 currentRepeatElement.heightStart =
                     BasicDataTypeModifier.modifyToFinitePositiveDouble(
-                        currentRepeatElement.heightStart, currentRepeatElement.additionalId, "heightStart", issueList,
+                        currentRepeatElement.heightStart,
+                        currentRepeatElement.additionalId,
+                        "heightStart",
+                        issueList,
                     )
                 currentRepeatElement.length =
                     BasicDataTypeModifier.modifyToFinitePositiveDouble(
-                        currentRepeatElement.length, currentRepeatElement.additionalId, "length", issueList,
+                        currentRepeatElement.length,
+                        currentRepeatElement.additionalId,
+                        "length",
+                        issueList,
                     )
                 currentRepeatElement.lengthEnd =
                     BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                        currentRepeatElement.lengthEnd, currentRepeatElement.additionalId, "lengthEnd", issueList,
+                        currentRepeatElement.lengthEnd,
+                        currentRepeatElement.additionalId,
+                        "lengthEnd",
+                        issueList,
                         parameters.numberTolerance,
                     )
                 currentRepeatElement.lengthStart =
                     BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                        currentRepeatElement.lengthStart, currentRepeatElement.additionalId, "lengthStart", issueList,
+                        currentRepeatElement.lengthStart,
+                        currentRepeatElement.additionalId,
+                        "lengthStart",
+                        issueList,
                         parameters.numberTolerance,
                     )
                 currentRepeatElement.radiusEnd =
                     BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                        currentRepeatElement.radiusEnd, currentRepeatElement.additionalId, "radiusEnd", issueList,
+                        currentRepeatElement.radiusEnd,
+                        currentRepeatElement.additionalId,
+                        "radiusEnd",
+                        issueList,
                         parameters.numberTolerance,
                     )
                 currentRepeatElement.radiusStart =
                     BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                        currentRepeatElement.radiusStart, currentRepeatElement.additionalId, "radiusStart", issueList,
+                        currentRepeatElement.radiusStart,
+                        currentRepeatElement.additionalId,
+                        "radiusStart",
+                        issueList,
                         parameters.numberTolerance,
                     )
 
                 if (!currentRepeatElement.tEnd.isFinite()) {
                     issueList +=
                         DefaultIssue.of(
-                            "UnexpectedValue", "Unexpected value for attribute 'tEnd'",
-                            currentRepeatElement.additionalId, Severity.WARNING, wasFixed = true,
+                            "UnexpectedValue",
+                            "Unexpected value for attribute 'tEnd'",
+                            currentRepeatElement.additionalId,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     currentRepeatElement.tEnd = currentRepeatElement.tStart
                 }
                 currentRepeatElement.widthEnd =
                     BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                        currentRepeatElement.widthEnd, currentRepeatElement.additionalId, "widthEnd", issueList,
+                        currentRepeatElement.widthEnd,
+                        currentRepeatElement.additionalId,
+                        "widthEnd",
+                        issueList,
                         parameters.numberTolerance,
                     )
                 currentRepeatElement.widthStart =
                     BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                        currentRepeatElement.widthStart, currentRepeatElement.additionalId, "widthStart", issueList,
+                        currentRepeatElement.widthStart,
+                        currentRepeatElement.additionalId,
+                        "widthStart",
+                        issueList,
                         parameters.numberTolerance,
                     )
                 currentRepeatElement.zOffsetEnd =
                     BasicDataTypeModifier.modifyToFiniteDouble(
-                        currentRepeatElement.zOffsetEnd, currentRepeatElement.additionalId, "zOffsetEnd", issueList,
+                        currentRepeatElement.zOffsetEnd,
+                        currentRepeatElement.additionalId,
+                        "zOffsetEnd",
+                        issueList,
                     )
 
                 currentRepeatElement

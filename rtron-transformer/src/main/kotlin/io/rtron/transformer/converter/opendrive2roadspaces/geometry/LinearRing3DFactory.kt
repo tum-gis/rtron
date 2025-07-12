@@ -64,7 +64,10 @@ object LinearRing3DFactory {
                 issueList +=
                     DefaultIssue.of(
                         "OutlineContainsConsecutivelyFollowingElementDuplicates",
-                        "Ignoring at least one consecutively following point duplicate.", outlineId, Severity.WARNING, wasFixed = true,
+                        "Ignoring at least one consecutively following point duplicate.",
+                        outlineId,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
@@ -75,7 +78,9 @@ object LinearRing3DFactory {
                     DefaultIssue.of(
                         "OutlineContainsConsecutivelyFollowingSideDuplicates",
                         "Ignoring at least one consecutively following side duplicate of the form (…, A, B, A,…).",
-                        outlineId, Severity.WARNING, wasFixed = true,
+                        outlineId,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
@@ -87,7 +92,10 @@ object LinearRing3DFactory {
                 issueList +=
                     DefaultIssue.of(
                         "OutlineContainsLinearlyRedundantVertices",
-                        "Ignoring at least one vertex due to linear redundancy.", outlineId, Severity.WARNING, wasFixed = true,
+                        "Ignoring at least one vertex due to linear redundancy.",
+                        outlineId,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
@@ -104,7 +112,9 @@ object LinearRing3DFactory {
                         DefaultIssue.of(
                             "IncorrectOutlineOrientation",
                             "Outline elements are ordered clockwise but should be ordered counter-clockwise.",
-                            outlineId, Severity.ERROR, wasFixed = true,
+                            outlineId,
+                            Severity.ERROR,
+                            wasFixed = true,
                         )
                     preparedVertices.reversed()
                 } else {

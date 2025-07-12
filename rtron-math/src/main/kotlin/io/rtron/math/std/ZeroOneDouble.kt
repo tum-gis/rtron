@@ -19,7 +19,9 @@ package io.rtron.math.std
 /**
  * Double number with values between zero and one inclusive.
  */
-class ZeroOneDouble(val value: Double) {
+class ZeroOneDouble(
+    val value: Double,
+) {
     // Properties and Initializers
     init {
         require(0 <= value) { "Value must be greater equals zero." }

@@ -57,9 +57,8 @@ class LineSegment2D(
     private val segment2D = CMSegment2D(Vector2D.ZERO.toVector2DCm(), endPoint.toVector2DCm(), line)
 
     // Methods
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-        return Vector2D(curveRelativePoint.curvePosition, 0.0)
-    }
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D =
+        Vector2D(curveRelativePoint.curvePosition, 0.0)
 
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D) = Rotation2D.ZERO
 

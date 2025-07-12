@@ -83,9 +83,7 @@ class Rotation3D(
             else -> throw IllegalArgumentException("Unknown axis.")
         }
 
-    override fun toString(): String {
-        return "Rotation3D(heading='$heading' pitch='$pitch' roll='$roll')"
-    }
+    override fun toString(): String = "Rotation3D(heading='$heading' pitch='$pitch' roll='$roll')"
 
     companion object {
         private val ROTATION_ORDER = RotationOrder.ZYX

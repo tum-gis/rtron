@@ -23,17 +23,18 @@ import io.rtron.math.analysis.function.bivariate.combination.SectionedBivariateF
 import io.rtron.math.analysis.function.bivariate.pure.PlaneFunction
 import io.rtron.math.range.Range
 
-class SectionedBivariateFunctionTest : FunSpec({
-    context("TestCreation") {
+class SectionedBivariateFunctionTest :
+    FunSpec({
+        context("TestCreation") {
 
-        test("shifting with bivariate function of complete range should not throw an error") {
-            val planeFunction = PlaneFunction(1.0, 1.0, 0.0, Range.all(), Range.all())
-            val sectionedPlane = SectionedBivariateFunction(planeFunction, Range.closed(1.0, 3.0), Range.all())
+            test("shifting with bivariate function of complete range should not throw an error") {
+                val planeFunction = PlaneFunction(1.0, 1.0, 0.0, Range.all(), Range.all())
+                val sectionedPlane = SectionedBivariateFunction(planeFunction, Range.closed(1.0, 3.0), Range.all())
 
-            val actualResult = sectionedPlane.value(0.0, 0.0)
+                val actualResult = sectionedPlane.value(0.0, 0.0)
 
-            require(actualResult is Either.Right)
-            actualResult.value shouldBe 1.0
+                require(actualResult is Either.Right)
+                actualResult.value shouldBe 1.0
+            }
         }
-    }
-})
+    })

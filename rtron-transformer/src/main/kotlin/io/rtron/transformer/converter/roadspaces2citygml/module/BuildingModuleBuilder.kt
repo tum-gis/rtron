@@ -65,12 +65,16 @@ class BuildingModuleBuilder(
 
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
-            buildingFeature.populateLod1Geometry(geometryTransformer)
+            buildingFeature
+                .populateLod1Geometry(geometryTransformer)
                 .mapLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForBuildingLod1",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
@@ -100,26 +104,34 @@ class BuildingModuleBuilder(
         require(geometryTransformer.getSolid().isSome()) { "Solid geometry is required to create an LOD2 building." }
         val issueList = DefaultIssueList()
 
-        dstBuildingFeature.populateLod2Geometry(geometryTransformer)
+        dstBuildingFeature
+            .populateLod2Geometry(geometryTransformer)
             .onLeft {
                 issueList +=
                     DefaultIssue.of(
                         "NoSuitableGeometryForBuildingLod2",
-                        it.message, id, Severity.WARNING, wasFixed = true,
+                        it.message,
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
         val roofSurfaceFeature = RoofSurface()
-        geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.TOP).onSome {
-            roofSurfaceFeature.lod2MultiSurface = it
-        }.onNone {
-            issueList +=
-                DefaultIssue.of(
-                    "NoSuitableGeometryForRoofSurfaceLod2",
-                    "No LOD2 MultiSurface for roof feature available.",
-                    id, Severity.WARNING, wasFixed = true,
-                )
-        }
+        geometryTransformer
+            .getSolidCutout(GeometryTransformer.FaceType.TOP)
+            .onSome {
+                roofSurfaceFeature.lod2MultiSurface = it
+            }.onNone {
+                issueList +=
+                    DefaultIssue.of(
+                        "NoSuitableGeometryForRoofSurfaceLod2",
+                        "No LOD2 MultiSurface for roof feature available.",
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
+                    )
+            }
         dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(roofSurfaceFeature))
         IdentifierAdder.addIdentifier(
             id.deriveLod2RoofGmlIdentifier(parameters.gmlIdPrefix),
@@ -128,16 +140,20 @@ class BuildingModuleBuilder(
         )
 
         val groundSurfaceFeature = GroundSurface()
-        geometryTransformer.getSolidCutout(GeometryTransformer.FaceType.BASE).onSome {
-            groundSurfaceFeature.lod2MultiSurface = it
-        }.onNone {
-            issueList +=
-                DefaultIssue.of(
-                    "NoSuitableGeometryForGroundSurfaceLod2",
-                    "No LOD2 MultiSurface for ground feature available.",
-                    id, Severity.WARNING, wasFixed = true,
-                )
-        }
+        geometryTransformer
+            .getSolidCutout(GeometryTransformer.FaceType.BASE)
+            .onSome {
+                groundSurfaceFeature.lod2MultiSurface = it
+            }.onNone {
+                issueList +=
+                    DefaultIssue.of(
+                        "NoSuitableGeometryForGroundSurfaceLod2",
+                        "No LOD2 MultiSurface for ground feature available.",
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
+                    )
+            }
         dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(groundSurfaceFeature))
         IdentifierAdder.addIdentifier(
             id.deriveLod2GroundGmlIdentifier(parameters.gmlIdPrefix),
@@ -145,25 +161,29 @@ class BuildingModuleBuilder(
             dstCityObject = groundSurfaceFeature,
         )
 
-        geometryTransformer.getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE).onSome { wallSurfaceResult ->
-            wallSurfaceResult.forEachIndexed { index, multiSurfaceProperty ->
-                val wallSurfaceFeature = WallSurface()
-                wallSurfaceFeature.lod2MultiSurface = multiSurfaceProperty
-                dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(wallSurfaceFeature))
-                IdentifierAdder.addIdentifier(
-                    id.deriveLod2WallGmlIdentifier(parameters.gmlIdPrefix, index),
-                    "WallSurface",
-                    dstCityObject = wallSurfaceFeature,
-                )
+        geometryTransformer
+            .getIndividualSolidCutouts(GeometryTransformer.FaceType.SIDE)
+            .onSome { wallSurfaceResult ->
+                wallSurfaceResult.forEachIndexed { index, multiSurfaceProperty ->
+                    val wallSurfaceFeature = WallSurface()
+                    wallSurfaceFeature.lod2MultiSurface = multiSurfaceProperty
+                    dstBuildingFeature.addBoundary(AbstractSpaceBoundaryProperty(wallSurfaceFeature))
+                    IdentifierAdder.addIdentifier(
+                        id.deriveLod2WallGmlIdentifier(parameters.gmlIdPrefix, index),
+                        "WallSurface",
+                        dstCityObject = wallSurfaceFeature,
+                    )
+                }
+            }.onNone {
+                issueList +=
+                    DefaultIssue.of(
+                        "NoSuitableGeometryForWallSurfaceLod2",
+                        "No LOD2 MultiSurface for wall feature available.",
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
+                    )
             }
-        }.onNone {
-            issueList +=
-                DefaultIssue.of(
-                    "NoSuitableGeometryForWallSurfaceLod2",
-                    "No LOD2 MultiSurface for wall feature available.",
-                    id, Severity.WARNING, wasFixed = true,
-                )
-        }
 
         return ContextIssueList(dstBuildingFeature, issueList)
     }

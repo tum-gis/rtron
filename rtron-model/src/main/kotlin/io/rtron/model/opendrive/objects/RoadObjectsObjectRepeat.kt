@@ -45,7 +45,8 @@ data class RoadObjectsObjectRepeat(
     var zOffsetEnd: Double = Double.NaN,
     var zOffsetStart: Double = Double.NaN,
     override var additionalId: Option<RoadObjectRepeatIdentifier> = None,
-) : OpendriveElement(), AdditionalRoadObjectRepeatIdentifier {
+) : OpendriveElement(),
+    AdditionalRoadObjectRepeatIdentifier {
     // Properties and Initializers
     val curveRelativeStartPosition get() = CurveRelativeVector1D(s)
 
@@ -92,42 +93,52 @@ data class RoadObjectsObjectRepeat(
     fun containsParametricSweep() =
         isContinuous() &&
             isLengthNonZero() &&
-            isObjectWidthNonZero() && isObjectHeightNonZero()
+            isObjectWidthNonZero() &&
+            isObjectHeightNonZero()
 
     fun containsCurve() =
         isContinuous() &&
             isLengthNonZero() &&
-            isObjectWidthZero() && isObjectHeightZero()
+            isObjectWidthZero() &&
+            isObjectHeightZero()
 
     fun containsHorizontalParametricBoundedSurface() =
         isContinuous() &&
             isLengthNonZero() &&
-            isObjectWidthNonZero() && isObjectHeightZero()
+            isObjectWidthNonZero() &&
+            isObjectHeightZero()
 
     fun containsVerticalParametricBoundedSurface() =
         isContinuous() &&
             isLengthNonZero() &&
-            isObjectWidthZero() && isObjectHeightNonZero()
+            isObjectWidthZero() &&
+            isObjectHeightNonZero()
 
     fun containsRepeatedCuboid() =
         isDiscrete() &&
             isLengthNonZero() &&
-            isObjectHeightNonZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
+            isObjectHeightNonZero() &&
+            isObjectLengthNonZero() &&
+            isObjectWidthNonZero()
 
     fun containsRepeatedRectangle() =
         isDiscrete() &&
             isLengthNonZero() &&
-            isObjectHeightZero() && isObjectLengthNonZero() && isObjectWidthNonZero()
+            isObjectHeightZero() &&
+            isObjectLengthNonZero() &&
+            isObjectWidthNonZero()
 
     fun containsRepeatCylinder() =
         isDiscrete() &&
             isLengthNonZero() &&
-            isObjectHeightNonZero() && isObjectRadiusNonZero()
+            isObjectHeightNonZero() &&
+            isObjectRadiusNonZero()
 
     fun containsRepeatCircle() =
         isDiscrete() &&
             isLengthNonZero() &&
-            isObjectHeightNonZero() && isObjectRadiusNonZero()
+            isObjectHeightNonZero() &&
+            isObjectRadiusNonZero()
 
     companion object
 }

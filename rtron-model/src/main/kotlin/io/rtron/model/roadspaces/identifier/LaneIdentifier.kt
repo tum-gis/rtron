@@ -30,7 +30,8 @@ import kotlin.math.abs
 data class LaneIdentifier(
     val laneId: Int,
     val laneSectionIdentifier: LaneSectionIdentifier,
-) : AbstractRoadspacesIdentifier(), LaneSectionIdentifierInterface by laneSectionIdentifier {
+) : AbstractRoadspacesIdentifier(),
+    LaneSectionIdentifierInterface by laneSectionIdentifier {
     // Properties and Initializers
     val hashKey get() = "Lane_${laneId}_${laneSectionIdentifier.laneSectionId}_${laneSectionIdentifier.roadspaceIdentifier.roadspaceId}"
 

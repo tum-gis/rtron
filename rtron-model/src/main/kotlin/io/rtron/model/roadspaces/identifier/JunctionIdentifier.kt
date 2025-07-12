@@ -33,7 +33,8 @@ interface JunctionIdentifierInterface {
  */
 data class JunctionIdentifier(
     override val junctionId: String,
-) : AbstractRoadspacesIdentifier(), JunctionIdentifierInterface {
+) : AbstractRoadspacesIdentifier(),
+    JunctionIdentifierInterface {
     // Properties and Initializers
     val hashKey get() = "Junction_$junctionId"
 
@@ -47,7 +48,5 @@ data class JunctionIdentifier(
 
     override fun toStringMap(): Map<String, String> = mapOf("junctionId" to junctionId)
 
-    override fun toIdentifierText(): String {
-        return "JunctionIdentifier(junctionId=$junctionId)"
-    }
+    override fun toIdentifierText(): String = "JunctionIdentifier(junctionId=$junctionId)"
 }

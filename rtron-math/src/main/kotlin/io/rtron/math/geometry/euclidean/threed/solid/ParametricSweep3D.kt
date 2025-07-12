@@ -55,7 +55,9 @@ data class ParametricSweep3D(
     val objectWidthFunction: LinearFunction,
     override val tolerance: Double,
     private val discretizationStepSize: Double,
-) : AbstractSolid3D(), DefinableDomain<Double>, Tolerable {
+) : AbstractSolid3D(),
+    DefinableDomain<Double>,
+    Tolerable {
     // Properties and Initializers
     init {
         require(absoluteHeight.domain.fuzzyEncloses(referenceCurveXY.domain, tolerance)) {
@@ -108,7 +110,8 @@ data class ParametricSweep3D(
     /** lower left curve of the sweep as a list of points */
     private val lowerLeftVertices by lazy {
         val vertices =
-            lowerLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
+            lowerLeftCurve
+                .calculatePointListGlobalCS(discretizationStepSize)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
@@ -117,7 +120,8 @@ data class ParametricSweep3D(
     /** lower right curve of the sweep as a list of points */
     private val lowerRightVertices by lazy {
         val vertices =
-            lowerRightCurve.calculatePointListGlobalCS(discretizationStepSize)
+            lowerRightCurve
+                .calculatePointListGlobalCS(discretizationStepSize)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
@@ -126,7 +130,8 @@ data class ParametricSweep3D(
     /** upper left curve of the sweep as a list of points */
     private val upperLeftVertices by lazy {
         val vertices =
-            upperLeftCurve.calculatePointListGlobalCS(discretizationStepSize)
+            upperLeftCurve
+                .calculatePointListGlobalCS(discretizationStepSize)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
@@ -135,7 +140,8 @@ data class ParametricSweep3D(
     /** upper right curve of the sweep as a list of points */
     private val upperRightVertices by lazy {
         val vertices =
-            upperRightCurve.calculatePointListGlobalCS(discretizationStepSize)
+            upperRightCurve
+                .calculatePointListGlobalCS(discretizationStepSize)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
@@ -160,29 +166,31 @@ data class ParametricSweep3D(
         val startPolygons =
             run {
                 val linearRing =
-                    LinearRing3D.of(
-                        nonEmptyListOf(
-                            upperLeftVertices.first(),
-                            upperRightVertices.first(),
-                            lowerRightVertices.first(),
-                            lowerLeftVertices.first(),
-                        ),
-                        tolerance = tolerance,
-                    ).getOrElse { return@run emptyList() }
+                    LinearRing3D
+                        .of(
+                            nonEmptyListOf(
+                                upperLeftVertices.first(),
+                                upperRightVertices.first(),
+                                lowerRightVertices.first(),
+                                lowerLeftVertices.first(),
+                            ),
+                            tolerance = tolerance,
+                        ).getOrElse { return@run emptyList() }
                 linearRing.calculatePolygonsGlobalCS().getOrElse { emptyList() }
             }
         val endPolygons =
             run {
                 val linearRing =
-                    LinearRing3D.of(
-                        nonEmptyListOf(
-                            upperLeftVertices.last(),
-                            lowerLeftVertices.last(),
-                            lowerRightVertices.last(),
-                            upperRightVertices.last(),
-                        ),
-                        tolerance = tolerance,
-                    ).getOrElse { return@run emptyList() }
+                    LinearRing3D
+                        .of(
+                            nonEmptyListOf(
+                                upperLeftVertices.last(),
+                                lowerLeftVertices.last(),
+                                lowerRightVertices.last(),
+                                upperRightVertices.last(),
+                            ),
+                            tolerance = tolerance,
+                        ).getOrElse { return@run emptyList() }
                 linearRing.calculatePolygonsGlobalCS().getOrElse { emptyList() }
             }
 
@@ -198,7 +206,8 @@ data class ParametricSweep3D(
         rightVertices: NonEmptyList<Vector3D>,
     ): Either<GeometryException, List<Polygon3D>> =
         either {
-            LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
+            LinearRing3D
+                .ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
                 .bind()
                 .map { it.calculatePolygonsGlobalCS().bind() }
                 .flatten()

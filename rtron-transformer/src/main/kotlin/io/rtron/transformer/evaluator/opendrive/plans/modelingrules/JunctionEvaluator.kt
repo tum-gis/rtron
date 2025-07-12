@@ -62,7 +62,9 @@ object JunctionEvaluator {
                             "JunctionConnectionWithoutLaneLinks",
                             "Junction connections (number of connections: ${currentJunction.connection.size -
                                 junctionConnectionsFiltered.size}) were removed since they did not contain any laneLinks.",
-                            currentJunction.additionalId, Severity.ERROR, wasFixed = true,
+                            currentJunction.additionalId,
+                            Severity.ERROR,
+                            wasFixed = true,
                         )
                 }
                 currentJunction.connection = junctionConnectionsFiltered
@@ -74,7 +76,9 @@ object JunctionEvaluator {
                             DefaultIssue.of(
                                 "InvalidJunctionAttribute",
                                 "Attribute 'mainRoad' shall only be specified for virtual junctions",
-                                currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                                currentJunction.additionalId,
+                                Severity.FATAL_ERROR,
+                                wasFixed = true,
                             )
                         currentJunction.mainRoad = None
                     }
@@ -84,7 +88,9 @@ object JunctionEvaluator {
                             DefaultIssue.of(
                                 "InvalidJunctionAttribute",
                                 "Attribute 'orientation' shall only be specified for virtual junctions",
-                                currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                                currentJunction.additionalId,
+                                Severity.FATAL_ERROR,
+                                wasFixed = true,
                             )
                         currentJunction.orientation = None
                     }
@@ -94,7 +100,9 @@ object JunctionEvaluator {
                             DefaultIssue.of(
                                 "InvalidJunctionAttribute",
                                 "Attribute 'sStart' shall only be specified for virtual junctions",
-                                currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                                currentJunction.additionalId,
+                                Severity.FATAL_ERROR,
+                                wasFixed = true,
                             )
                         currentJunction.sStart = None
                     }
@@ -104,7 +112,9 @@ object JunctionEvaluator {
                             DefaultIssue.of(
                                 "InvalidJunctionAttribute",
                                 "Attribute 'sEnd' shall only be specified for virtual junctions",
-                                currentJunction.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                                currentJunction.additionalId,
+                                Severity.FATAL_ERROR,
+                                wasFixed = true,
                             )
                         currentJunction.sEnd = None
                     }
@@ -121,7 +131,9 @@ object JunctionEvaluator {
                 DefaultIssue.of(
                     "JunctionWithoutConnections",
                     "Junction contains no valid connections and thus was removed.",
-                    Some(currentId), Severity.ERROR, wasFixed = true,
+                    Some(currentId),
+                    Severity.ERROR,
+                    wasFixed = true,
                 )
         }
 
@@ -144,23 +156,33 @@ object JunctionEvaluator {
                 // Each connecting road shall be represented by exactly one <connection> element. A connecting road may
                 // contain as many lanes as required.
                 val connectingRoadIdsRepresentedByMultipleConnections =
-                    currentJunction.connection.map {
-                        it.connectingRoad
-                    }.flattenOption().groupingBy { it }.eachCount().filter { it.value > 1 }
+                    currentJunction.connection
+                        .map {
+                            it.connectingRoad
+                        }.flattenOption()
+                        .groupingBy { it }
+                        .eachCount()
+                        .filter { it.value > 1 }
                 if (connectingRoadIdsRepresentedByMultipleConnections.isNotEmpty()) {
                     issueList +=
                         DefaultIssue.of(
                             "MultipleConnectionsRepresentingSameConnectionRoad",
                             "Junctions contains multiple connections representing the same connecting road (affected " +
                                 "connecting roads: ${connectingRoadIdsRepresentedByMultipleConnections.keys.joinToString()} )",
-                            currentJunction.additionalId, Severity.ERROR, wasFixed = false,
+                            currentJunction.additionalId,
+                            Severity.ERROR,
+                            wasFixed = false,
                         )
                 }
 
                 // Junctions shall only be used when roads cannot be linked directly. They clarify ambiguities for the linking.
                 // Ambiguities are caused when a road has two or more possible predecessor or successor roads.
                 // see: https://github.com/tum-gis/rtron/issues/24
-                data class ConnectionRoadIds(val connectingRoadId: String, val predecessorRoadId: String, val successorRoadId: String)
+                data class ConnectionRoadIds(
+                    val connectingRoadId: String,
+                    val predecessorRoadId: String,
+                    val successorRoadId: String,
+                )
                 val junctionConnectionRoadIds =
                     currentJunction.connection
                         .map { it.connectingRoad }
@@ -171,11 +193,17 @@ object JunctionEvaluator {
                             ConnectionRoadIds(
                                 connectingRoadId = it.id,
                                 predecessorRoadId =
-                                    it.link.flatMap { it.predecessor }.flatMap { it.getRoadPredecessorSuccessor() }
-                                        .getOrNull()!!.first,
+                                    it.link
+                                        .flatMap { it.predecessor }
+                                        .flatMap { it.getRoadPredecessorSuccessor() }
+                                        .getOrNull()!!
+                                        .first,
                                 successorRoadId =
-                                    it.link.flatMap { it.successor }.flatMap { it.getRoadPredecessorSuccessor() }
-                                        .getOrNull()!!.first,
+                                    it.link
+                                        .flatMap { it.successor }
+                                        .flatMap { it.getRoadPredecessorSuccessor() }
+                                        .getOrNull()!!
+                                        .first,
                             )
                         }
                 val predecessorSuccessorRoadIds = junctionConnectionRoadIds.flatMap { listOf(it.predecessorRoadId, it.successorRoadId) }
@@ -185,7 +213,9 @@ object JunctionEvaluator {
                             "InvalidJunctionUsage",
                             "Junction shall not be used, since all roads can be " +
                                 "directly linked without ambiguities. The connecting roads do not share a predecessor or successor road.",
-                            currentJunction.additionalId, Severity.ERROR, wasFixed = false,
+                            currentJunction.additionalId,
+                            Severity.ERROR,
+                            wasFixed = false,
                         )
                 }
 

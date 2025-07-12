@@ -29,7 +29,10 @@ import org.apache.commons.csv.CSVPrinter as CMCSVPrinter
  * @param filePath path to the file to be written
  * @param header header of the csv file
  */
-class CSVPrinter(filePath: Path, header: List<String>) : Flushable {
+class CSVPrinter(
+    filePath: Path,
+    header: List<String>,
+) : Flushable {
     // Properties and Initializers
     init {
         filePath.parent.createDirectories()

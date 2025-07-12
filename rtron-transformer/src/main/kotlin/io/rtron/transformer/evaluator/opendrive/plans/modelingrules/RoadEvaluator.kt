@@ -44,7 +44,9 @@ object RoadEvaluator {
                         "PlanViewGeometrySValueExceedsRoadLength",
                         "Road contains geometry elements in the plan view, where s exceeds the total length of the road " +
                             "(${currentRoad.length}).",
-                        currentRoad.additionalId, Severity.WARNING, wasFixed = false,
+                        currentRoad.additionalId,
+                        Severity.WARNING,
+                        wasFixed = false,
                     )
             }
 
@@ -61,7 +63,9 @@ object RoadEvaluator {
                             "PlanViewGeometryElementZeroLength",
                             "Plan view contains geometry elements with a length of zero (below tolerance threshold), " +
                                 "which are removed.",
-                            currentRoad.additionalId, Severity.WARNING, wasFixed = true,
+                            currentRoad.additionalId,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     currentRoad.planView.geometry =
                         currentRoad.planView.geometry.filter { it.length > parameters.numberTolerance }
@@ -77,7 +81,9 @@ object RoadEvaluator {
                         DefaultIssue.of(
                             "RoadWithoutValidPlanViewGeometryElement",
                             "Road does not contain any valid geometry element in the planView.",
-                            currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                            currentRoad.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = false,
                         )
                 }
                 currentRoad.planView.geometry.isNotEmpty()
@@ -102,15 +108,23 @@ object RoadEvaluator {
                                 "PlanViewGeometryElementLengthNotMatchingNextElement",
                                 "Length attribute (length=${it.first.length}) of the geometry element (s=${it.first.s}) " +
                                     "does not match the start position (s=${it.second.s}) of the next geometry element.",
-                                currentRoad.additionalId, Severity.WARNING, wasFixed = true,
+                                currentRoad.additionalId,
+                                Severity.WARNING,
+                                wasFixed = true,
                             )
                         it.first.length = actualLength
                     }
                 }
 
                 if (!fuzzyEquals(
-                        currentRoad.planView.geometry.last().s + currentRoad.planView.geometry.last().length,
-                        currentRoad.length, parameters.numberTolerance,
+                        currentRoad.planView.geometry
+                            .last()
+                            .s +
+                            currentRoad.planView.geometry
+                                .last()
+                                .length,
+                        currentRoad.length,
+                        parameters.numberTolerance,
                     )
                 ) {
                     issueList +=
@@ -119,9 +133,16 @@ object RoadEvaluator {
                             "Length attribute (length=${currentRoad.planView.geometry.last().length}) of the last geometry " +
                                 "element (s=${currentRoad.planView.geometry.last().s}) does not match the total road length " +
                                 "(length=${currentRoad.length}).",
-                            currentRoad.additionalId, Severity.WARNING, wasFixed = true,
+                            currentRoad.additionalId,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
-                    currentRoad.planView.geometry.last().length = currentRoad.length - currentRoad.planView.geometry.last().s
+                    currentRoad.planView.geometry
+                        .last()
+                        .length = currentRoad.length -
+                        currentRoad.planView.geometry
+                            .last()
+                            .s
                 }
 
                 // check gaps and kinks of reference line curve
@@ -143,7 +164,9 @@ object RoadEvaluator {
                                 "Geometry elements contain a gap " +
                                     "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean " +
                                     "distance of $distance above the tolerance of ${parameters.planViewGeometryDistanceTolerance}.",
-                                location, Severity.FATAL_ERROR, wasFixed = false,
+                                location,
+                                Severity.FATAL_ERROR,
+                                wasFixed = false,
                             )
                     } else if (distance > parameters.planViewGeometryDistanceWarningTolerance) {
                         issueList +=
@@ -153,7 +176,9 @@ object RoadEvaluator {
                                     "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an euclidean " +
                                     "distance of $distance above the warning tolerance " +
                                     "of ${parameters.planViewGeometryDistanceWarningTolerance}.",
-                                location, Severity.WARNING, wasFixed = false,
+                                location,
+                                Severity.WARNING,
+                                wasFixed = false,
                             )
                     }
 
@@ -165,7 +190,9 @@ object RoadEvaluator {
                                 "Geometry elements contain a kink " +
                                     "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
                                     "of $angleDifference above the tolerance of ${parameters.planViewGeometryAngleTolerance}.",
-                                location, Severity.FATAL_ERROR, wasFixed = false,
+                                location,
+                                Severity.FATAL_ERROR,
+                                wasFixed = false,
                             )
                     } else if (angleDifference > parameters.planViewGeometryAngleWarningTolerance) {
                         issueList +=
@@ -175,7 +202,9 @@ object RoadEvaluator {
                                     "from ${frontCurveMemberEndPose.point} to ${backCurveMemberStartPose.point} with an angle difference " +
                                     "of $angleDifference above the warning tolerance of " +
                                     "${parameters.planViewGeometryAngleWarningTolerance}.",
-                                location, Severity.WARNING, wasFixed = false,
+                                location,
+                                Severity.WARNING,
+                                wasFixed = false,
                             )
                     }
                 }
@@ -192,7 +221,9 @@ object RoadEvaluator {
                             DefaultIssue(
                                 "RoadBelongsToNonExistingJunction",
                                 "Road belongs to a junction (id=${currentRoad.junction}) that does not exist.",
-                                currentRoad.id, Severity.ERROR, wasFixed = true,
+                                currentRoad.id,
+                                Severity.ERROR,
+                                wasFixed = true,
                             )
                         currentRoad.junction = ""
                     }
@@ -200,7 +231,8 @@ object RoadEvaluator {
 
                 currentRoad.link.onSome { currentLink ->
                     if (currentLink.predecessor.isSome { currentPredecessor ->
-                            currentPredecessor.getJunctionPredecessorSuccessor()
+                            currentPredecessor
+                                .getJunctionPredecessorSuccessor()
                                 .isSome { !junctionIdentifiers.contains(it) }
                         }
                     ) {
@@ -213,7 +245,9 @@ object RoadEvaluator {
                                         { it.elementId },
                                     )
                                 }) that does not exist.",
-                                currentRoad.id, Severity.ERROR, wasFixed = true,
+                                currentRoad.id,
+                                Severity.ERROR,
+                                wasFixed = true,
                             )
                         currentLink.predecessor = None
                     }
@@ -230,7 +264,9 @@ object RoadEvaluator {
                                         { it.elementId },
                                     )
                                 }) that does not exist.",
-                                currentRoad.id, Severity.ERROR, wasFixed = true,
+                                currentRoad.id,
+                                Severity.ERROR,
+                                wasFixed = true,
                             )
                         currentLink.successor = None
                     }

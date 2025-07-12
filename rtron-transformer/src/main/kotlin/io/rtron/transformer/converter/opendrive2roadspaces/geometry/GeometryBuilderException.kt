@@ -18,19 +18,27 @@ package io.rtron.transformer.converter.opendrive2roadspaces.geometry
 
 import io.rtron.model.opendrive.additions.identifier.AbstractOpendriveIdentifier
 
-sealed class GeometryBuilderException(val message: String, open val location: AbstractOpendriveIdentifier) {
-    data class NotEnoughValidOutlineElementsForPolyhedron(override val location: AbstractOpendriveIdentifier) :
-        GeometryBuilderException("A polyhedron requires at least three valid outline elements.", location)
+sealed class GeometryBuilderException(
+    val message: String,
+    open val location: AbstractOpendriveIdentifier,
+) {
+    data class NotEnoughValidOutlineElementsForPolyhedron(
+        override val location: AbstractOpendriveIdentifier,
+    ) : GeometryBuilderException("A polyhedron requires at least three valid outline elements.", location)
 
-    data class ColinearOutlineElementsForPolyhedron(override val location: AbstractOpendriveIdentifier) :
-        GeometryBuilderException(
+    data class ColinearOutlineElementsForPolyhedron(
+        override val location: AbstractOpendriveIdentifier,
+    ) : GeometryBuilderException(
             "A polyhedron requires at least three valid outline elements, which are not colinear (located on a line).",
             location,
         )
 
-    data class TriangulationException(val reason: String, override val location: AbstractOpendriveIdentifier) :
-        GeometryBuilderException("Triangulation algorithm failed: $reason", location)
+    data class TriangulationException(
+        val reason: String,
+        override val location: AbstractOpendriveIdentifier,
+    ) : GeometryBuilderException("Triangulation algorithm failed: $reason", location)
 
-    data class NotEnoughValidOutlineElementsForLinearRing(override val location: AbstractOpendriveIdentifier) :
-        GeometryBuilderException("A linear ring requires at least three valid vertices.", location)
+    data class NotEnoughValidOutlineElementsForLinearRing(
+        override val location: AbstractOpendriveIdentifier,
+    ) : GeometryBuilderException("A linear ring requires at least three valid vertices.", location)
 }

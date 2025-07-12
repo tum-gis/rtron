@@ -136,9 +136,7 @@ class Affine3D(
         return true
     }
 
-    override fun hashCode(): Int {
-        return matrix.hashCode()
-    }
+    override fun hashCode(): Int = matrix.hashCode()
 
     // Conversions
     fun toMatrix4JOML() = JOMLMatrix4d(this.matrix)
@@ -149,9 +147,7 @@ class Affine3D(
 
     fun toDoubleList(): List<Double> = toDoubleArray().toList()
 
-    override fun toString(): String {
-        return "Affine3D(_matrix=$matrix)"
-    }
+    override fun toString(): String = "Affine3D(_matrix=$matrix)"
 
     companion object {
         val UNIT = Affine3D(JOMLMatrix4d())
@@ -200,9 +196,7 @@ class Affine3D(
          * Creates an [Affine3D] transformation matrix from a list of sequentially applied affine
          * transformation matrices.
          */
-        fun of(affineList: List<Affine3D>): Affine3D {
-            return affineList.fold(UNIT) { acc, affine -> acc.append(affine) }
-        }
+        fun of(affineList: List<Affine3D>): Affine3D = affineList.fold(UNIT) { acc, affine -> acc.append(affine) }
 
         /**
          * Creates an [Affine3D] transformation matrix from a list of sequentially applied affine

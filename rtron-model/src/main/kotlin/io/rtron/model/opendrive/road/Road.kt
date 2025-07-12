@@ -53,7 +53,8 @@ data class Road(
     var name: Option<String> = None,
     var rule: Option<ETrafficRule> = None,
     override var additionalId: Option<RoadIdentifier> = None,
-) : OpendriveElement(), AdditionalRoadIdentifier {
+) : OpendriveElement(),
+    AdditionalRoadIdentifier {
     // Methods
 
     fun getJunctionOption(): Option<String> = if (junction.isNotEmpty() && junction != "-1") Some(junction) else None

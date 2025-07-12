@@ -54,7 +54,8 @@ data class LateralTranslatedCurve2D(
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
         val curveAffine =
-            baseCurve.calculatePoseGlobalCSUnbounded(curveRelativePoint)
+            baseCurve
+                .calculatePoseGlobalCSUnbounded(curveRelativePoint)
                 .let { Affine2D.of(it) }
 
         val translation = calculateTranslation(curveRelativePoint).getOrElse { throw it }.lateralOffset
@@ -65,7 +66,8 @@ data class LateralTranslatedCurve2D(
     override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
         val curveRotation = baseCurve.calculateRotationGlobalCSUnbounded(curveRelativePoint)
         val lateralTranslationSlope =
-            lateralTranslationFunction.slopeInFuzzy(curveRelativePoint.curvePosition, tolerance)
+            lateralTranslationFunction
+                .slopeInFuzzy(curveRelativePoint.curvePosition, tolerance)
                 .getOrElse { throw it }
         val lateralTranslationRotation = Rotation2D(lateralTranslationSlope)
         return curveRotation + lateralTranslationRotation

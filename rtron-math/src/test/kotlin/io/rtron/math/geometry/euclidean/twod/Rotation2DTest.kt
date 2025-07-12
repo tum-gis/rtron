@@ -24,70 +24,71 @@ import io.rtron.math.std.DBL_EPSILON_2
 import io.rtron.math.std.DBL_EPSILON_4
 import io.rtron.math.std.TWO_PI
 
-class Rotation2DTest : FunSpec({
-    context("TestFuzzyEquals") {
+class Rotation2DTest :
+    FunSpec({
+        context("TestFuzzyEquals") {
 
-        test("two rotations with same angle are fuzzily equal") {
-            val rotationA = Rotation2D(1.3)
-            val rotationB = Rotation2D(1.3)
+            test("two rotations with same angle are fuzzily equal") {
+                val rotationA = Rotation2D(1.3)
+                val rotationB = Rotation2D(1.3)
 
-            val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_1)
+                val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_1)
 
-            actualEquality.shouldBeTrue()
+                actualEquality.shouldBeTrue()
+            }
+
+            test("two rotations with different angle are not fuzzily equal") {
+                val rotationA = Rotation2D(1.3)
+                val rotationB = Rotation2D(1.4)
+
+                val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_1)
+
+                actualEquality.shouldBeFalse()
+            }
+
+            test("two rotations at zero radians and two pi minus epsilon radians are fuzzily equal") {
+                val rotationA = Rotation2D.ZERO
+                val rotationB = Rotation2D(TWO_PI - DBL_EPSILON_2)
+
+                val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
+
+                actualEquality.shouldBeTrue()
+            }
+
+            test("two rotations at zero radians and two pi plus epsilon radians are fuzzily equal") {
+                val rotationA = Rotation2D.ZERO
+                val rotationB = Rotation2D(TWO_PI + DBL_EPSILON_2)
+
+                val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
+
+                actualEquality.shouldBeTrue()
+            }
+
+            test("two rotations at two pi minus epsilon radians and zero radians are fuzzily equal") {
+                val rotationA = Rotation2D(TWO_PI - DBL_EPSILON_2)
+                val rotationB = Rotation2D.ZERO
+
+                val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
+
+                actualEquality.shouldBeTrue()
+            }
+
+            test("two rotations at two pi plus epsilon radians and zero radians are fuzzily equal") {
+                val rotationA = Rotation2D(TWO_PI + DBL_EPSILON_2)
+                val rotationB = Rotation2D.ZERO
+
+                val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
+
+                actualEquality.shouldBeTrue()
+            }
+
+            test("two rotations at two pi plus larger epsilon radians and zero radians are not fuzzily equal") {
+                val rotationA = Rotation2D(TWO_PI + DBL_EPSILON_4)
+                val rotationB = Rotation2D.ZERO
+
+                val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
+
+                actualEquality.shouldBeFalse()
+            }
         }
-
-        test("two rotations with different angle are not fuzzily equal") {
-            val rotationA = Rotation2D(1.3)
-            val rotationB = Rotation2D(1.4)
-
-            val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_1)
-
-            actualEquality.shouldBeFalse()
-        }
-
-        test("two rotations at zero radians and two pi minus epsilon radians are fuzzily equal") {
-            val rotationA = Rotation2D.ZERO
-            val rotationB = Rotation2D(TWO_PI - DBL_EPSILON_2)
-
-            val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
-
-            actualEquality.shouldBeTrue()
-        }
-
-        test("two rotations at zero radians and two pi plus epsilon radians are fuzzily equal") {
-            val rotationA = Rotation2D.ZERO
-            val rotationB = Rotation2D(TWO_PI + DBL_EPSILON_2)
-
-            val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
-
-            actualEquality.shouldBeTrue()
-        }
-
-        test("two rotations at two pi minus epsilon radians and zero radians are fuzzily equal") {
-            val rotationA = Rotation2D(TWO_PI - DBL_EPSILON_2)
-            val rotationB = Rotation2D.ZERO
-
-            val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
-
-            actualEquality.shouldBeTrue()
-        }
-
-        test("two rotations at two pi plus epsilon radians and zero radians are fuzzily equal") {
-            val rotationA = Rotation2D(TWO_PI + DBL_EPSILON_2)
-            val rotationB = Rotation2D.ZERO
-
-            val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
-
-            actualEquality.shouldBeTrue()
-        }
-
-        test("two rotations at two pi plus larger epsilon radians and zero radians are not fuzzily equal") {
-            val rotationA = Rotation2D(TWO_PI + DBL_EPSILON_4)
-            val rotationB = Rotation2D.ZERO
-
-            val actualEquality = rotationA.fuzzyEquals(rotationB, DBL_EPSILON_2)
-
-            actualEquality.shouldBeFalse()
-        }
-    }
-})
+    })

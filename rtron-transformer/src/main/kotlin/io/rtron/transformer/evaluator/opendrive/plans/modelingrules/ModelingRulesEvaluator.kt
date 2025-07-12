@@ -22,7 +22,9 @@ import io.rtron.model.opendrive.OpendriveModel
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.evaluator.opendrive.plans.AbstractOpendriveEvaluator
 
-class ModelingRulesEvaluator(val parameters: OpendriveEvaluatorParameters) : AbstractOpendriveEvaluator() {
+class ModelingRulesEvaluator(
+    val parameters: OpendriveEvaluatorParameters,
+) : AbstractOpendriveEvaluator() {
     // Methods
     override fun evaluate(opendriveModel: OpendriveModel): ContextIssueList<OpendriveModel> {
         val issueList = DefaultIssueList()

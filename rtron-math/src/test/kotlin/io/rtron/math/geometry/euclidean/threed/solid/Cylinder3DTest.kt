@@ -21,15 +21,16 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.transform.AffineSequence3D
 
-class Cylinder3DTest : FunSpec({
-    context("PolygonsGeneration") {
+class Cylinder3DTest :
+    FunSpec({
+        context("PolygonsGeneration") {
 
-        test("polygons start at level zero") {
-            val cylinder = Cylinder3D(0.5, 1.0, DBL_EPSILON_1, AffineSequence3D.EMPTY)
+            test("polygons start at level zero") {
+                val cylinder = Cylinder3D(0.5, 1.0, DBL_EPSILON_1, AffineSequence3D.EMPTY)
 
-            val actualPolygons = cylinder.calculatePolygonsGlobalCS()
+                val actualPolygons = cylinder.calculatePolygonsGlobalCS()
 
-            actualPolygons.any { polygon -> polygon.vertices.any { it.z == 0.0 } }.shouldBeTrue()
+                actualPolygons.any { polygon -> polygon.vertices.any { it.z == 0.0 } }.shouldBeTrue()
+            }
         }
-    }
-})
+    })

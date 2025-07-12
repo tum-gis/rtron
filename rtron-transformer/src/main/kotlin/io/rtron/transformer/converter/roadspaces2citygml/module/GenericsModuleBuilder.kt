@@ -66,24 +66,32 @@ class GenericsModuleBuilder(
 
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
-            genericOccupiedSpaceFeature.populateLod1Geometry(geometryTransformer)
+            genericOccupiedSpaceFeature
+                .populateLod1Geometry(geometryTransformer)
                 .mapLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForGenericOccupiedSpaceLod1",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
 
         roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
-            genericOccupiedSpaceFeature.populateLod2Geometry(geometryTransformer)
+            genericOccupiedSpaceFeature
+                .populateLod2Geometry(geometryTransformer)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForGenericOccupiedSpaceLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
@@ -222,12 +230,16 @@ class GenericsModuleBuilder(
             GeometryTransformer(parameters)
                 .also { abstractGeometry.accept(it) }
         // geometry
-        genericLogicalSpaceFeature.populateLod2Geometry(geometryTransformer)
+        genericLogicalSpaceFeature
+            .populateLod2Geometry(geometryTransformer)
             .onLeft {
                 issueList +=
                     DefaultIssue.of(
                         "NoSuitableGeometryForLogicalOccupiedSpaceFeatureLod2",
-                        it.message, id, Severity.WARNING, wasFixed = true,
+                        it.message,
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 

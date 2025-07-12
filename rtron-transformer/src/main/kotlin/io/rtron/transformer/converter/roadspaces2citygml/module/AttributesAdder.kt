@@ -131,7 +131,9 @@ class AttributesAdder(
         dstRelation: CityObjectRelation,
     ) {
         dstRelation.genericAttributes = dstRelation.genericAttributes +
-            id.toAttributes(parameters.identifierAttributesPrefix).attributes
+            id
+                .toAttributes(parameters.identifierAttributesPrefix)
+                .attributes
                 .flatMap { convertAttribute(it) }
                 .map { AbstractGenericAttributeProperty(it) }
     }

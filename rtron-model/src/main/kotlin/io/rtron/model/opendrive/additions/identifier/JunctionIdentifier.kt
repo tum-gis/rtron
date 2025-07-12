@@ -22,7 +22,10 @@ interface JunctionIdentifierInterface {
     val junctionId: String
 }
 
-data class JunctionIdentifier(override val junctionId: String) : AbstractOpendriveIdentifier(), JunctionIdentifierInterface {
+data class JunctionIdentifier(
+    override val junctionId: String,
+) : AbstractOpendriveIdentifier(),
+    JunctionIdentifierInterface {
     // Conversions
     override fun toIdentifierText() = "Junction: junctionId=$junctionId"
 }

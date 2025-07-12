@@ -76,9 +76,7 @@ class ConcatenatedFunction(
         return true
     }
 
-    override fun hashCode(): Int {
-        return container.hashCode()
-    }
+    override fun hashCode(): Int = container.hashCode()
 
     companion object {
         /**
@@ -112,7 +110,8 @@ class ConcatenatedFunction(
             // prepare linear functions
             val preparedStarts = starts.dropLast(1)
             val preparedLinearFunctions =
-                slopes.zip(intercepts)
+                slopes
+                    .zip(intercepts)
                     .map { LinearFunction(it.first, it.second) }
             val preparedAbsoluteDomains =
                 starts

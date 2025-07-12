@@ -22,73 +22,74 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 
-class RangeSetTest : FunSpec({
+class RangeSetTest :
+    FunSpec({
 
-    context("TestContains") {
+        context("TestContains") {
 
-        test("contains primitive value") {
-            val rangeA = Range.closedOpen(1.0, 1.3)
-            val rangeB = Range.closedOpen(10.0, 12.0)
-            val rangeC = Range.closed(1.3, 2.0)
-            val rangeSet = RangeSet.of(rangeA, rangeB, rangeC)
+            test("contains primitive value") {
+                val rangeA = Range.closedOpen(1.0, 1.3)
+                val rangeB = Range.closedOpen(10.0, 12.0)
+                val rangeC = Range.closed(1.3, 2.0)
+                val rangeSet = RangeSet.of(rangeA, rangeB, rangeC)
 
-            rangeSet.contains(1.3).shouldBeTrue()
-        }
-    }
-
-    context("TestUnion") {
-
-        test("simple union of two disconnected range sets") {
-            val rangeA = Range.closedOpen(1.0, 1.3)
-            val rangeB = Range.closed(1.4, 2.0)
-            val rangeSetA = RangeSet.of(rangeA)
-            val rangeSetB = RangeSet.of(rangeB)
-
-            val actualUnion = rangeSetA.union(rangeSetB)
-
-            actualUnion.asRanges().shouldContainExactlyInAnyOrder(rangeA, rangeB)
+                rangeSet.contains(1.3).shouldBeTrue()
+            }
         }
 
-        test("simple union of two connected range sets") {
-            val rangeA = Range.closedOpen(1.0, 1.3)
-            val rangeB = Range.closed(1.3, 2.0)
-            val rangeSetA = RangeSet.of(rangeA)
-            val rangeSetB = RangeSet.of(rangeB)
-            val expectedRange = Range.closed(1.0, 2.0)
+        context("TestUnion") {
 
-            val actualUnion = rangeSetA.union(rangeSetB)
+            test("simple union of two disconnected range sets") {
+                val rangeA = Range.closedOpen(1.0, 1.3)
+                val rangeB = Range.closed(1.4, 2.0)
+                val rangeSetA = RangeSet.of(rangeA)
+                val rangeSetB = RangeSet.of(rangeB)
 
-            actualUnion.asRanges().shouldContainExactly(expectedRange)
-        }
-    }
+                val actualUnion = rangeSetA.union(rangeSetB)
 
-    context("TestIntersection") {
+                actualUnion.asRanges().shouldContainExactlyInAnyOrder(rangeA, rangeB)
+            }
 
-        test("two disconnected range sets do not intersect") {
-            val rangeA = Range.closedOpen(1.0, 1.3)
-            val rangeB = Range.closed(1.4, 2.0)
-            val rangeSetA = RangeSet.of(rangeA)
-            val rangeSetB = RangeSet.of(rangeB)
+            test("simple union of two connected range sets") {
+                val rangeA = Range.closedOpen(1.0, 1.3)
+                val rangeB = Range.closed(1.3, 2.0)
+                val rangeSetA = RangeSet.of(rangeA)
+                val rangeSetB = RangeSet.of(rangeB)
+                val expectedRange = Range.closed(1.0, 2.0)
 
-            rangeSetA.intersects(rangeSetB).shouldBeFalse()
-        }
+                val actualUnion = rangeSetA.union(rangeSetB)
 
-        test("two connected range sets do not intersect") {
-            val rangeA = Range.closedOpen(1.0, 1.3)
-            val rangeB = Range.closed(1.3, 2.0)
-            val rangeSetA = RangeSet.of(rangeA)
-            val rangeSetB = RangeSet.of(rangeB)
-
-            rangeSetA.intersects(rangeSetB).shouldBeFalse()
+                actualUnion.asRanges().shouldContainExactly(expectedRange)
+            }
         }
 
-        test("two connected and closed range sets do intersect") {
-            val rangeA = Range.closed(1.0, 1.3)
-            val rangeB = Range.closed(1.3, 2.0)
-            val rangeSetA = RangeSet.of(rangeA)
-            val rangeSetB = RangeSet.of(rangeB)
+        context("TestIntersection") {
 
-            rangeSetA.intersects(rangeSetB).shouldBeTrue()
+            test("two disconnected range sets do not intersect") {
+                val rangeA = Range.closedOpen(1.0, 1.3)
+                val rangeB = Range.closed(1.4, 2.0)
+                val rangeSetA = RangeSet.of(rangeA)
+                val rangeSetB = RangeSet.of(rangeB)
+
+                rangeSetA.intersects(rangeSetB).shouldBeFalse()
+            }
+
+            test("two connected range sets do not intersect") {
+                val rangeA = Range.closedOpen(1.0, 1.3)
+                val rangeB = Range.closed(1.3, 2.0)
+                val rangeSetA = RangeSet.of(rangeA)
+                val rangeSetB = RangeSet.of(rangeB)
+
+                rangeSetA.intersects(rangeSetB).shouldBeFalse()
+            }
+
+            test("two connected and closed range sets do intersect") {
+                val rangeA = Range.closed(1.0, 1.3)
+                val rangeB = Range.closed(1.3, 2.0)
+                val rangeSetA = RangeSet.of(rangeA)
+                val rangeSetB = RangeSet.of(rangeB)
+
+                rangeSetA.intersects(rangeSetB).shouldBeTrue()
+            }
         }
-    }
-})
+    })

@@ -30,13 +30,14 @@ sealed interface RoadObjectSubType {
     val identifier: String
 
     companion object {
-        inline fun <reified T> fromIdentifier(identifier: String): Option<T> where T : RoadObjectSubType, T : Enum<T> {
-            return enumValues<T>().find { it.identifier == identifier }.toOption()
-        }
+        inline fun <reified T> fromIdentifier(identifier: String): Option<T> where T : RoadObjectSubType, T : Enum<T> =
+            enumValues<T>().find { it.identifier == identifier }.toOption()
     }
 }
 
-enum class RoadObjectBarrierSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectBarrierSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** common hedge made out of vegetation and bushes without gaps */
     HEDGE("hedge"),
 
@@ -59,7 +60,9 @@ enum class RoadObjectBarrierSubType(override val identifier: String) : RoadObjec
     NOISE_PROTECTIONS("noiseProtections"),
 }
 
-enum class RoadObjectBuildingSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectBuildingSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** regular building like a house or office */
     BUILDING("building"),
 
@@ -70,7 +73,9 @@ enum class RoadObjectBuildingSubType(override val identifier: String) : RoadObje
     TOLL_BOOTH("tollBooth"),
 }
 
-enum class RoadObjectCrosswalkSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectCrosswalkSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** pedestrian crosswalk without zebra markings */
     PEDESTRIAN("pedestrian"),
 
@@ -84,7 +89,9 @@ enum class RoadObjectCrosswalkSubType(override val identifier: String) : RoadObj
     VIRTUAL("virtual"),
 }
 
-enum class RoadObjectGantrySubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectGantrySubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** has poles on either side of lanes and an overhead construction between them */
     GANTRY("gantry"),
 
@@ -92,7 +99,9 @@ enum class RoadObjectGantrySubType(override val identifier: String) : RoadObject
     GANTRY_HALF("gantryHalf"),
 }
 
-enum class RoadObjectObstacleSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectObstacleSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     ADVERTISING_COLUMN("advertisingColumn"),
     ART("art"),
     SEATING("seating"),
@@ -124,7 +133,9 @@ enum class RoadObjectObstacleSubType(override val identifier: String) : RoadObje
     FENCE("fence"),
 }
 
-enum class RoadObjectParkingSpaceSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectParkingSpaceSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** typically outdoors, no limit to the top */
     OPEN_SPACE("openSpace"),
 
@@ -132,7 +143,9 @@ enum class RoadObjectParkingSpaceSubType(override val identifier: String) : Road
     CLOSED_SPACE("closedSpace"),
 }
 
-enum class RoadObjectPoleSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectPoleSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     EMERGENCY_CALL_BOX("emergencyCallBox"),
     PERMANENT_DELINEATOR("permanentDelineator"),
     BOLLARD("bollard"),
@@ -151,7 +164,9 @@ enum class RoadObjectPoleSubType(override val identifier: String) : RoadObjectSu
     WIND_TURBINE("windTurbine"),
 }
 
-enum class RoadObjectRoadMarkSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectRoadMarkSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     ARROW_LEFT("arrowLeft"),
     ARROW_LEFT_LEFT("arrowLeftLeft"),
     ARROW_LEFT_RIGHT("arrowLeftRight"),
@@ -179,7 +194,9 @@ enum class RoadObjectRoadMarkSubType(override val identifier: String) : RoadObje
     AREA("area"),
 }
 
-enum class RoadObjectRoadSurfaceSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectRoadSurfaceSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** mostly metal cover to access sewerage tunnels */
     MANHOLE("manhole"),
 
@@ -196,12 +213,16 @@ enum class RoadObjectRoadSurfaceSubType(override val identifier: String) : RoadO
     DRAIN_GUTTER("drainGutter"),
 }
 
-enum class RoadObjectTrafficIslandSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectTrafficIslandSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** typical traffic island with some curbstone, road mark */
     ISLAND("island"),
 }
 
-enum class RoadObjectTreeSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectTreeSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** needle tree */
     NEEDLE("needle"),
 
@@ -212,7 +233,9 @@ enum class RoadObjectTreeSubType(override val identifier: String) : RoadObjectSu
     PALM("palm"),
 }
 
-enum class RoadObjectVegetationSubType(override val identifier: String) : RoadObjectSubType {
+enum class RoadObjectVegetationSubType(
+    override val identifier: String,
+) : RoadObjectSubType {
     /** a single bush */
     BUSH("bush"),
 

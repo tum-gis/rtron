@@ -60,10 +60,12 @@ data class CurveOnParametricSurface3D(
     // Methods
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
         val lateralOffset =
-            lateralOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
+            lateralOffsetFunction
+                .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
                 .getOrElse { throw it }
         val heightOffset =
-            heightOffsetFunction.valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
+            heightOffsetFunction
+                .valueInFuzzy(curveRelativePoint.curvePosition, tolerance)
                 .getOrElse { throw it }
 
         val curveRelativePoint2D = curveRelativePoint.toCurveRelative2D(lateralOffset)

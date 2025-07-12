@@ -23,7 +23,9 @@ import io.rtron.math.range.Tolerable
 /**
  * Abstract class for all geometric surface objects in 2D.
  */
-abstract class AbstractSurface2D : AbstractGeometry2D(), Tolerable {
+abstract class AbstractSurface2D :
+    AbstractGeometry2D(),
+    Tolerable {
     /**
      * Returns true, if [point] is located within the surface.
      */

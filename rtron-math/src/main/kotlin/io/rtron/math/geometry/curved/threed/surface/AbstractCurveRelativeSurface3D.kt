@@ -30,7 +30,9 @@ import io.rtron.math.range.length
 /**
  * Abstract class for all geometric surface objects in an curve relative coordinate system in 3D.
  */
-abstract class AbstractCurveRelativeSurface3D : DefinableDomain<Double>, Tolerable {
+abstract class AbstractCurveRelativeSurface3D :
+    DefinableDomain<Double>,
+    Tolerable {
     // Properties and Initializers
 
     /** length of the surface along the curve */

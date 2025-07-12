@@ -24,18 +24,19 @@ import io.rtron.math.geometry.euclidean.twod.Pose2D
 import io.rtron.math.geometry.euclidean.twod.Rotation2D
 import io.rtron.math.geometry.euclidean.twod.point.Vector2D
 
-class Pose3DTest : FunSpec({
-    context("TestConversionToPose2D") {
+class Pose3DTest :
+    FunSpec({
+        context("TestConversionToPose2D") {
 
-        test("conversion to pose2D within x-z-plane ") {
-            val point = Vector3D(1.0, 2.0, 3.0)
-            val rotation = Rotation3D(1.0, 2.0, 3.0)
-            val pose3D = Pose3D(point, rotation)
-            val expectedPose2D = Pose2D(Vector2D(1.0, 3.0), Rotation2D(2.0))
+            test("conversion to pose2D within x-z-plane ") {
+                val point = Vector3D(1.0, 2.0, 3.0)
+                val rotation = Rotation3D(1.0, 2.0, 3.0)
+                val pose3D = Pose3D(point, rotation)
+                val expectedPose2D = Pose2D(Vector2D(1.0, 3.0), Rotation2D(2.0))
 
-            val actualPose2D = pose3D.toPose2D(Vector3D.Y_AXIS)
+                val actualPose2D = pose3D.toPose2D(Vector3D.Y_AXIS)
 
-            actualPose2D shouldBe expectedPose2D
+                actualPose2D shouldBe expectedPose2D
+            }
         }
-    }
-})
+    })

@@ -33,9 +33,7 @@ data class Pose3D(
     // Conversions
     fun toPose2D(dropAxis: Vector3D = Vector3D.Z_AXIS) = Pose2D(point.toVector2D(dropAxis), rotation.toRotation2D(dropAxis))
 
-    override fun toString(): String {
-        return "Pose3D(position=$point, rotation=$rotation)"
-    }
+    override fun toString(): String = "Pose3D(position=$point, rotation=$rotation)"
 
     companion object {
         val ZERO = Pose3D(Vector3D.ZERO, Rotation3D.ZERO)

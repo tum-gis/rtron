@@ -16,7 +16,9 @@
 
 package io.rtron.std
 
-open class BaseException(val message: String) {
+open class BaseException(
+    val message: String,
+) {
     // Properties and Initializers
     init {
         require(message.isNotBlank()) { "Message must not be blank." }

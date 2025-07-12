@@ -57,7 +57,9 @@ class HeaderBuilder(
                     "AutomaticCrsEpsgCodeDerivationFailed",
                     "EPSG code of the coordinate reference system cannot be derived automatically from the OpenDRIVE header element; " +
                         "add the code explicitly as a command line argument if correct georeferencing is required.",
-                    "Header element", Severity.WARNING, wasFixed = false,
+                    "Header element",
+                    Severity.WARNING,
+                    wasFixed = false,
                 )
         }
 

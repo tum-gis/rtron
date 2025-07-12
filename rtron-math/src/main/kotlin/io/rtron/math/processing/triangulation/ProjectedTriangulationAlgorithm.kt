@@ -44,7 +44,8 @@ class ProjectedTriangulationAlgorithm(
             val projectedVertices = projectVertices(vertices, tolerance)
             val projectedPolygonsTriangulated =
                 triangulationAlgorithm
-                    .triangulate(projectedVertices, tolerance).bind()
+                    .triangulate(projectedVertices, tolerance)
+                    .bind()
 
             projectedPolygonsTriangulated.map { constructPolygon(it, projectedVertices, vertices, tolerance).bind() }
         }

@@ -43,7 +43,8 @@ object BasicDataTypeModifier {
                     "The list entries of the attribute '$attributeName' are not sorted in strictly ascending order. " +
                         "$numberOfIgnoredElements elements are removed to adhere to strictly ascending order.",
                     location,
-                    Severity.WARNING, true,
+                    Severity.WARNING,
+                    true,
                 )
         }
 
@@ -56,9 +57,7 @@ object BasicDataTypeModifier {
         location: Option<AbstractOpendriveIdentifier>,
         attributeName: String,
         issueList: DefaultIssueList,
-    ): List<T> {
-        return filterToStrictlySorted(elementList, selector, location.toIdentifierText(), attributeName, issueList)
-    }
+    ): List<T> = filterToStrictlySorted(elementList, selector, location.toIdentifierText(), attributeName, issueList)
 
     fun <T, K : Comparable<K>> filterToSorted(
         elementList: List<T>,
@@ -76,7 +75,8 @@ object BasicDataTypeModifier {
                     "The list entries of the attribute '$attributeName' are not sorted in ascending order. " +
                         "$numberOfIgnoredElements elements are removed to adhere to ascending order.",
                     location,
-                    Severity.WARNING, true,
+                    Severity.WARNING,
+                    true,
                 )
         }
 
@@ -89,9 +89,7 @@ object BasicDataTypeModifier {
         location: Option<AbstractOpendriveIdentifier>,
         attributeName: String,
         issueList: DefaultIssueList,
-    ): List<T> {
-        return filterToSorted(elementList, selector, location.toIdentifierText(), attributeName, issueList)
-    }
+    ): List<T> = filterToSorted(elementList, selector, location.toIdentifierText(), attributeName, issueList)
 
     fun modifyToNonBlankString(
         element: String,
@@ -105,7 +103,9 @@ object BasicDataTypeModifier {
                 DefaultIssue(
                     "BlankStringAttributeValue",
                     "The value of the attribute '$attributeName' is blank. The attribute is set to '$fallbackValue'.",
-                    location.toIdentifierText(), Severity.WARNING, wasFixed = true,
+                    location.toIdentifierText(),
+                    Severity.WARNING,
+                    wasFixed = true,
                 )
             return fallbackValue
         }
@@ -131,7 +131,9 @@ object BasicDataTypeModifier {
                 DefaultIssue(
                     "BlankStringAttributeValueForOptionalAttribute",
                     "The value of the attribute '$attributeName' is blank. The attribute is unset as it is optional.",
-                    location, Severity.WARNING, wasFixed = true,
+                    location,
+                    Severity.WARNING,
+                    wasFixed = true,
                 )
             return None
         }
@@ -157,7 +159,9 @@ object BasicDataTypeModifier {
                 DefaultIssue(
                     "NonFiniteDoubleAttributeValue",
                     "The value of the attribute '$attributeName' is not finite. The attribute is unset as it is optional.",
-                    location, Severity.WARNING, wasFixed = true,
+                    location,
+                    Severity.WARNING,
+                    wasFixed = true,
                 )
             return None
         }
@@ -178,7 +182,9 @@ object BasicDataTypeModifier {
                     "NonFinitePositiveDoubleAttributeValue",
                     "The value of the attribute '$attributeName' is not finite or not positive (applied tolerance: $tolerance). " +
                         "The attribute is unset as it is optional.",
-                    location.toIdentifierText(), Severity.WARNING, wasFixed = true,
+                    location.toIdentifierText(),
+                    Severity.WARNING,
+                    wasFixed = true,
                 )
             return None
         }
@@ -198,7 +204,9 @@ object BasicDataTypeModifier {
                     "NonFinitePositiveDoubleAttributeValue",
                     "The value of the attribute '$attributeName' is not finite or not positive (applied tolerance: 0.0). " +
                         "The attribute value is set to 0.0.",
-                    location.toIdentifierText(), Severity.WARNING, wasFixed = true,
+                    location.toIdentifierText(),
+                    Severity.WARNING,
+                    wasFixed = true,
                 )
             return 0.0
         }
@@ -225,7 +233,9 @@ object BasicDataTypeModifier {
                     "NonFiniteAttributeValue",
                     "The value of the attribute '$attributeName' is not finite. " +
                         "The attribute value is set to 0.0.",
-                    location, Severity.WARNING, wasFixed = true,
+                    location,
+                    Severity.WARNING,
+                    wasFixed = true,
                 )
             return 0.0
         }

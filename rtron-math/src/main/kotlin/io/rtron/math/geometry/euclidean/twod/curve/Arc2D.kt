@@ -89,12 +89,9 @@ class Arc2D(
         return center + offsetToCenterVector
     }
 
-    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
-        return Rotation2D(curveRelativePoint.curvePosition * curvature)
-    }
+    override fun calculateRotationLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D =
+        Rotation2D(curveRelativePoint.curvePosition * curvature)
 
     // Conversions
-    override fun toString(): String {
-        return "Arc2D(curvature=$curvature, domain=$domain, length=$length)"
-    }
+    override fun toString(): String = "Arc2D(curvature=$curvature, domain=$domain, length=$length)"
 }

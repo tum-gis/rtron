@@ -88,14 +88,17 @@ object Curve2DBuilder {
         // domains for each curve member
         val absoluteDomains: List<Range<Double>> =
             absoluteStarts
-                .zipWithNext().map { Range.closedOpen(it.first, it.second) } +
+                .zipWithNext()
+                .map { Range.closedOpen(it.first, it.second) } +
                 Range.closed(absoluteStarts.last(), absoluteStarts.last() + planViewGeometryList.last().length)
         // length derived from absolute values to increase robustness
         val lengths: List<Double> = absoluteDomains.map { it.length }
 
         // construct individual curve members
         val curveMembers =
-            planViewGeometryList.zip(lengths).dropLast(1)
+            planViewGeometryList
+                .zip(lengths)
+                .dropLast(1)
                 .map { buildPlanViewGeometry(it.first, it.second, BoundType.OPEN, numberTolerance) } +
                 buildPlanViewGeometry(planViewGeometryList.last(), lengths.last(), BoundType.CLOSED, numberTolerance)
 

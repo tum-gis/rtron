@@ -53,8 +53,8 @@ data class Polygon3D(
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a polygon." }
         require(
             vertices.noneWithNextEnclosing {
-                    a,
-                    b,
+                a,
+                b,
                 ->
                 a.fuzzyEquals(b, tolerance)
             },
@@ -66,7 +66,11 @@ data class Polygon3D(
     // Methods
 
     /** Returns the normal of the polygon. */
-    fun getNormal(): Either<IllegalStateException, Vector3D> = this.vertices.calculateNormal().normalized().let { Either.Right(it) }
+    fun getNormal(): Either<IllegalStateException, Vector3D> =
+        this.vertices
+            .calculateNormal()
+            .normalized()
+            .let { Either.Right(it) }
 
     /** Returns a new polygon with an opposite facing by reversing the vertices order */
     fun reversed() = Polygon3D(vertices.reversed().toNonEmptyListOrNull()!!, tolerance, affineSequence)

@@ -19,21 +19,22 @@ package io.rtron.std
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
-class SetsKtTest : FunSpec({
-    context("TestCombinations") {
+class SetsKtTest :
+    FunSpec({
+        context("TestCombinations") {
 
-        test("test basic combination generation") {
-            val startSet = setOf("a", "b", "c")
-            val expectedCombinations =
-                setOf(
-                    setOf("a", "b"),
-                    setOf("a", "c"),
-                    setOf("b", "c"),
-                )
+            test("test basic combination generation") {
+                val startSet = setOf("a", "b", "c")
+                val expectedCombinations =
+                    setOf(
+                        setOf("a", "b"),
+                        setOf("a", "c"),
+                        setOf("b", "c"),
+                    )
 
-            val actualCombinations = startSet.combinations(2)
+                val actualCombinations = startSet.combinations(2)
 
-            actualCombinations shouldBe expectedCombinations
+                actualCombinations shouldBe expectedCombinations
+            }
         }
-    }
-})
+    })

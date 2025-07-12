@@ -63,7 +63,9 @@ object RoadLanesEvaluator {
                             DefaultIssue.of(
                                 "EmptyValueForOptionalAttribute",
                                 "Attribute 'left' is set with an empty value even though the attribute itself is optional.",
-                                currentLaneSection.additionalId, Severity.WARNING, wasFixed = true,
+                                currentLaneSection.additionalId,
+                                Severity.WARNING,
+                                wasFixed = true,
                             )
                         currentLaneSection.left = None
                     }
@@ -75,7 +77,9 @@ object RoadLanesEvaluator {
                             DefaultIssue.of(
                                 "EmptyValueForOptionalAttribute",
                                 "Attribute 'right' is set with an empty value even though the attribute itself is optional.",
-                                currentLaneSection.additionalId, Severity.WARNING, wasFixed = true,
+                                currentLaneSection.additionalId,
+                                Severity.WARNING,
+                                wasFixed = true,
                             )
                         currentLaneSection.right = None
                     }
@@ -146,7 +150,9 @@ object RoadLanesEvaluator {
                         "LaneWidthEntriesNotDefinedFromStart",
                         "The width of the lane shall be defined for the full length of the lane section starting with a " +
                             "<width> element for s=0. The first available element is copied and positioned at s=0.",
-                        lane.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                        lane.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = true,
                     )
                 val firstEntry = it.head.copy().apply { sOffset = 0.0 }
                 lane.width = listOf(firstEntry) + lane.width
@@ -170,7 +176,9 @@ object RoadLanesEvaluator {
                     "UnexpectedValues",
                     "Ignoring ${lane.width.size - widthEntriesFilteredBySOffsetFinite.size} width entries where sOffset is " +
                         "not-finite and positive.",
-                    lane.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                    lane.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = true,
                 )
             lane.width = widthEntriesFilteredBySOffsetFinite
         }
@@ -183,7 +191,9 @@ object RoadLanesEvaluator {
                     "UnexpectedValues",
                     "Ignoring ${lane.width.size - widthEntriesFilteredByCoefficientsFinite.size} width entries where " +
                         "coefficients \"a, b, c, d\", are not finite.",
-                    lane.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                    lane.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = true,
                 )
             lane.width = widthEntriesFilteredByCoefficientsFinite
         }
@@ -205,7 +215,9 @@ object RoadLanesEvaluator {
                     "UnexpectedValues",
                     "Ignoring ${lane.height.size - heightEntriesFilteredByCoefficientsFinite.size} height entries where inner or " +
                         "outer is not finite.",
-                    lane.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                    lane.additionalId,
+                    Severity.FATAL_ERROR,
+                    wasFixed = true,
                 )
             lane.height = heightEntriesFilteredByCoefficientsFinite
         }
@@ -248,12 +260,20 @@ object RoadLanesEvaluator {
 
         roadMark.width =
             BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                roadMark.width, roadMark.additionalId, "width", issueList, parameters.numberTolerance,
+                roadMark.width,
+                roadMark.additionalId,
+                "width",
+                issueList,
+                parameters.numberTolerance,
             )
 
         roadMark.height =
             BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
-                roadMark.height, roadMark.additionalId, "height", issueList, parameters.numberTolerance,
+                roadMark.height,
+                roadMark.additionalId,
+                "height",
+                issueList,
+                parameters.numberTolerance,
             )
 
         return issueList

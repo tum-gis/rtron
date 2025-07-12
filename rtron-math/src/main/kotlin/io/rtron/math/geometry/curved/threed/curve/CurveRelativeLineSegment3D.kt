@@ -37,7 +37,8 @@ class CurveRelativeLineSegment3D(
     val end: CurveRelativeVector3D,
     override val tolerance: Double,
     val endBoundType: BoundType = BoundType.CLOSED,
-) : CurveRelativeAbstractGeometry3D(), Tolerable {
+) : CurveRelativeAbstractGeometry3D(),
+    Tolerable {
     // Properties and Initializers
     init {
         require(start != end) { "Start and end vector must not be identical." }

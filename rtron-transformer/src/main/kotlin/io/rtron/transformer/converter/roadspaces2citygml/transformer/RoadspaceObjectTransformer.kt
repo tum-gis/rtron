@@ -50,12 +50,11 @@ class RoadspaceObjectTransformer(
     /**
      * Transforms a list of [roadspaceObjects] (RoadSpaces model) to the [AbstractCityObject] (CityGML model).
      */
-    fun transformRoadspaceObjects(roadspaceObjects: List<RoadspaceObject>): ContextIssueList<List<AbstractCityObject>> {
-        return roadspaceObjects
+    fun transformRoadspaceObjects(roadspaceObjects: List<RoadspaceObject>): ContextIssueList<List<AbstractCityObject>> =
+        roadspaceObjects
             .map { transformSingleRoadspaceObject(it) }
             .mergeIssueLists()
             .map { it.flattenOption() }
-    }
 
     /**
      * Creates a city object (CityGML model) from the [RoadspaceObject] and it's geometry.
@@ -70,32 +69,36 @@ class RoadspaceObjectTransformer(
         val cityObjects: Option<AbstractCityObject> =
             when (RoadspaceObjectRouter.route(roadspaceObject)) {
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING ->
-                    buildingModuleBuilder.createBuildingFeature(
-                        roadspaceObject,
-                    ).handleIssueList {
-                        issueList += it
-                    }.some()
+                    buildingModuleBuilder
+                        .createBuildingFeature(
+                            roadspaceObject,
+                        ).handleIssueList {
+                            issueList += it
+                        }.some()
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE ->
-                    cityFurnitureModuleBuilder.createCityFurnitureFeature(
-                        roadspaceObject,
-                    ).handleIssueList {
-                        issueList += it
-                    }.some()
+                    cityFurnitureModuleBuilder
+                        .createCityFurnitureFeature(
+                            roadspaceObject,
+                        ).handleIssueList {
+                            issueList += it
+                        }.some()
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE ->
-                    genericsModuleBuilder.createGenericOccupiedSpaceFeature(
-                        roadspaceObject,
-                    ).handleIssueList {
-                        issueList += it
-                    }.some()
+                    genericsModuleBuilder
+                        .createGenericOccupiedSpaceFeature(
+                            roadspaceObject,
+                        ).handleIssueList {
+                            issueList += it
+                        }.some()
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> None
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> None
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> None
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT ->
-                    vegetationModuleBuilder.createSolitaryVegetationObjectFeature(
-                        roadspaceObject,
-                    ).handleIssueList {
-                        issueList += it
-                    }.some()
+                    vegetationModuleBuilder
+                        .createSolitaryVegetationObjectFeature(
+                            roadspaceObject,
+                        ).handleIssueList {
+                            issueList += it
+                        }.some()
             }
 
         return ContextIssueList(cityObjects, issueList)

@@ -18,7 +18,9 @@ package io.rtron.model.citygml.code
 
 import org.xmlobjects.gml.model.basictypes.Code
 
-enum class TrafficAreaFunctionCode(val code: Code) {
+enum class TrafficAreaFunctionCode(
+    val code: Code,
+) {
     DRIVING_LANE(Code("1")),
     FOOTPATH(Code("2")),
     CYCLEPATH(Code("3")),
@@ -59,7 +61,9 @@ enum class TrafficAreaFunctionCode(val code: Code) {
     UNKNOWN(Code("9999")),
 }
 
-enum class TrafficAreaUsageCode(val code: Code) {
+enum class TrafficAreaUsageCode(
+    val code: Code,
+) {
     PEDESTRIAN(Code("1")),
     CAR(Code("2")),
     TRUCK(Code("3")),
@@ -77,7 +81,9 @@ enum class TrafficAreaUsageCode(val code: Code) {
     UNKNOWN(Code("9999")),
 }
 
-enum class TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(val code: Code) {
+enum class TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(
+    val code: Code,
+) {
     ASPHALT(Code("1")),
     CONCRETE(Code("2")),
     PAVEMENT(Code("3")),

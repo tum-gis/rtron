@@ -186,7 +186,9 @@ object Polyhedron3DFactory {
                         DefaultIssue(
                             "",
                             "Height of outline element must be above tolerance.",
-                            "", Severity.WARNING, true,
+                            "",
+                            Severity.WARNING,
+                            true,
                         )
                 }
 
@@ -236,7 +238,8 @@ object Polyhedron3DFactory {
             ): ContextIssueList<VerticalOutlineElement> {
                 require(elements.isNotEmpty()) { "List of elements must not be empty." }
                 require(
-                    elements.drop(1)
+                    elements
+                        .drop(1)
                         .all { it.basePoint == elements.first().basePoint },
                 ) { "All elements must have the same base point." }
                 val issueList = DefaultIssueList()
@@ -250,7 +253,9 @@ object Polyhedron3DFactory {
                         DefaultIssue(
                             "OutlineContainsConsecutivelyFollowingElementDuplicates",
                             "Contains more than two consecutively following outline element duplicates.",
-                            "", Severity.WARNING, wasFixed = false,
+                            "",
+                            Severity.WARNING,
+                            wasFixed = false,
                         )
                 }
 
@@ -300,8 +305,8 @@ object Polyhedron3DFactory {
             // remove consecutively following line segment duplicates
             val elementsWithoutDuplicates =
                 verticalOutlineElements.filterWithNextEnclosing {
-                        a,
-                        b,
+                    a,
+                    b,
                     ->
                     a.basePoint.fuzzyUnequals(b.basePoint, tolerance)
                 }
@@ -310,15 +315,19 @@ object Polyhedron3DFactory {
                     DefaultIssue.of(
                         "OutlineContainsConsecutivelyFollowingLineSegmentDuplicates",
                         "Ignoring at least one consecutively following line segment duplicate.",
-                        outlineId, Severity.WARNING, wasFixed = true,
+                        outlineId,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
             // if there are not enough points to construct a polyhedron
             if (elementsWithoutDuplicates.size < 3) {
-                GeometryBuilderException.NotEnoughValidOutlineElementsForPolyhedron(
-                    outlineId,
-                ).left().bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
+                GeometryBuilderException
+                    .NotEnoughValidOutlineElementsForPolyhedron(
+                        outlineId,
+                    ).left()
+                    .bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
             }
 
             // remove consecutively following side duplicates of the form (…, A, B, A, …)
@@ -330,23 +339,29 @@ object Polyhedron3DFactory {
                     DefaultIssue.of(
                         "OutlineContainsConsecutivelyFollowingSideDuplicates",
                         "Ignoring consecutively following side duplicates of the form (…, A, B, A, …).",
-                        outlineId, Severity.WARNING, wasFixed = true,
+                        outlineId,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
             // if the base points of the outline element are located on a line (or point)
             val innerBaseEdges =
-                cleanedElements.map { it.basePoint }.filterIndexed {
+                cleanedElements
+                    .map { it.basePoint }
+                    .filterIndexed {
                         index,
                         _,
-                    ->
-                    index != 0
-                }.map { it - cleanedElements.first().basePoint }
+                        ->
+                        index != 0
+                    }.map { it - cleanedElements.first().basePoint }
             val dimensionOfSpan = innerBaseEdges.map { it.toRealVector() }.dimensionOfSpan()
             if (dimensionOfSpan < 2) {
-                GeometryBuilderException.ColinearOutlineElementsForPolyhedron(
-                    outlineId,
-                ).left().bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
+                GeometryBuilderException
+                    .ColinearOutlineElementsForPolyhedron(
+                        outlineId,
+                    ).left()
+                    .bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
             }
 
             // if the outline elements are ordered clockwise yielding a wrong polygon orientation
@@ -357,7 +372,9 @@ object Polyhedron3DFactory {
                         DefaultIssue.of(
                             "IncorrectOutlineOrientation",
                             "Outline elements are ordered clockwise but should be ordered counter-clockwise.",
-                            outlineId, Severity.ERROR, wasFixed = true,
+                            outlineId,
+                            Severity.ERROR,
+                            wasFixed = true,
                         )
                     cleanedElements.reversed()
                 } else {

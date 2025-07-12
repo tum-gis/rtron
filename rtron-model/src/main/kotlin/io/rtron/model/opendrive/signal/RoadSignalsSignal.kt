@@ -60,7 +60,8 @@ data class RoadSignalsSignal(
     var width: Option<Double> = None,
     var zOffset: Double = Double.NaN,
     override var additionalId: Option<RoadSignalIdentifier> = None,
-) : OpendriveElement(), AdditionalRoadSignalIdentifier {
+) : OpendriveElement(),
+    AdditionalRoadSignalIdentifier {
     // Properties and Initializers
     val curveRelativePosition get() = CurveRelativeVector3D(s, t, zOffset)
 

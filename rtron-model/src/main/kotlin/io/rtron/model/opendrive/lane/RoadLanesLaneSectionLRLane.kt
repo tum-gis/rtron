@@ -42,7 +42,8 @@ abstract class RoadLanesLaneSectionLRLane(
     open var level: Option<Boolean> = None,
     open var type: ELaneType = ELaneType.NONE,
     override var additionalId: Option<LaneIdentifier> = None,
-) : OpendriveElement(), AdditionalLaneIdentifier {
+) : OpendriveElement(),
+    AdditionalLaneIdentifier {
     // Properties
     fun getLaneWidthEntries(): Option<NonEmptyList<RoadLanesLaneSectionLRLaneWidth>> = width.toNonEmptyListOrNone()
 

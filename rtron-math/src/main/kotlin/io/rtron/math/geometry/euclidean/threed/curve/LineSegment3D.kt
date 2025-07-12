@@ -75,9 +75,8 @@ class LineSegment3D(
         return point.distance(projectedPoint)
     }
 
-    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
-        return start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
-    }
+    override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D =
+        start + (end - start).scalarMultiply(curveRelativePoint.curvePosition / length)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

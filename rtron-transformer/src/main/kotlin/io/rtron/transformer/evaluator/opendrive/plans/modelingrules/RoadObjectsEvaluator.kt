@@ -59,7 +59,9 @@ object RoadObjectsEvaluator {
                                 "Road object (number of objects affected: ${currentRoadObjects.roadObject.size -
                                     roadObjectsFiltered.size}) were removed since they were positioned outside the " +
                                     "defined length of the road.",
-                                currentRoad.additionalId, Severity.ERROR, wasFixed = true,
+                                currentRoad.additionalId,
+                                Severity.ERROR,
+                                wasFixed = true,
                             )
                     }
                     currentRoadObjects.roadObject = roadObjectsFiltered
@@ -76,7 +78,9 @@ object RoadObjectsEvaluator {
                                 "Road object repeats (number of objects affected: ${currentRoadObjects.roadObject.size -
                                     roadObjectsFilteredRepeat.size}) were removed since they were positioned outside the " +
                                     "defined length of the road.",
-                                currentRoad.additionalId, Severity.ERROR, wasFixed = true,
+                                currentRoad.additionalId,
+                                Severity.ERROR,
+                                wasFixed = true,
                             )
                     }
                     currentRoadObjects.roadObject = roadObjectsFilteredRepeat
@@ -115,7 +119,9 @@ object RoadObjectsEvaluator {
                                     "WrongRoadObjectType",
                                     "Based on the road object's name ($name) the type ${currentTargetType.name} is expected, " +
                                         "but the type was (${currentRoadObject.type}).",
-                                    currentRoadObject.additionalId, Severity.ERROR, wasFixed = true,
+                                    currentRoadObject.additionalId,
+                                    Severity.ERROR,
+                                    wasFixed = true,
                                 )
                             currentRoadObject.type = currentTargetType.some()
                         }
@@ -126,7 +132,9 @@ object RoadObjectsEvaluator {
                                     "WrongRoadObjectSubType",
                                     "Based on the road object's name ($name) the subtype $currentTargetSubType is expected, " +
                                         "but the type was (${currentRoadObject.subtype}).",
-                                    currentRoadObject.additionalId, Severity.ERROR, wasFixed = true,
+                                    currentRoadObject.additionalId,
+                                    Severity.ERROR,
+                                    wasFixed = true,
                                 )
                             currentRoadObject.subtype = currentTargetSubType.map { it.identifier }
                         }
@@ -138,12 +146,18 @@ object RoadObjectsEvaluator {
                     val outlineElementsWithoutId = currentOutlinesElement.outline.filter { it.id.isNone() }
 
                     if (outlineElementsWithoutId.isNotEmpty()) {
-                        val startId: Int = currentOutlinesElement.outline.map { it.id }.flattenOption().maxOrNull() ?: 0
+                        val startId: Int =
+                            currentOutlinesElement.outline
+                                .map { it.id }
+                                .flattenOption()
+                                .maxOrNull() ?: 0
                         issueList +=
                             DefaultIssue.of(
                                 "MissingValue",
                                 "Missing value for attribute 'id'.",
-                                currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                                currentRoadObject.additionalId,
+                                Severity.FATAL_ERROR,
+                                wasFixed = true,
                             )
                         outlineElementsWithoutId.forEachIndexed { index, outlineElement ->
                             outlineElement.id = Some(startId + index)
@@ -158,7 +172,9 @@ object RoadObjectsEvaluator {
                                 "SimultaneousDefinitionCornerRoadCornerLocal",
                                 "An <outline> element shall be followed by one or more <cornerRoad> elements or by one or more " +
                                     "<cornerLocal> element. Since both are defined, the <cornerLocal> elements are removed.",
-                                currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                                currentRoadObject.additionalId,
+                                Severity.FATAL_ERROR,
+                                wasFixed = true,
                             )
                         currentRoadObjectOutline.outline.forEach { it.cornerLocal = emptyList() }
                     }
@@ -171,7 +187,9 @@ object RoadObjectsEvaluator {
                         DefaultIssue.of(
                             "RepeatElementHasZeroLength",
                             "A repeat element should have a length higher than zero and tolerance.",
-                            currentRoadObject.additionalId, Severity.FATAL_ERROR, wasFixed = true,
+                            currentRoadObject.additionalId,
+                            Severity.FATAL_ERROR,
+                            wasFixed = true,
                         )
                     currentRoadObject.repeat = repeatElementsFiltered
                 }

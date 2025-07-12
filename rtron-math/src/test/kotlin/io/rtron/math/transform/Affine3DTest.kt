@@ -29,190 +29,227 @@ import kotlin.math.cos
 import kotlin.math.sin
 import org.joml.Matrix4d as JOMLMatrix4d
 
-class Affine3DTest : FunSpec({
+class Affine3DTest :
+    FunSpec({
 
-    context("TestCreation") {
+        context("TestCreation") {
 
-        test("last entry must be 1 when creating a translation") {
-            val translation = Vector3D(1.0, 2.0, 3.0)
-            val affine = Affine3D.of(translation)
+            test("last entry must be 1 when creating a translation") {
+                val translation = Vector3D(1.0, 2.0, 3.0)
+                val affine = Affine3D.of(translation)
 
-            val actual = affine.toRealMatrix()[3][3]
+                val actual = affine.toRealMatrix()[3][3]
 
-            actual shouldBe 1.0
-        }
-    }
-
-    context("TestDecomposition") {
-
-        test("test translation from 3x3 matrix") {
-            val affine = Affine3D(JOMLMatrix4d())
-
-            val actual = affine.extractTranslation()
-
-            actual shouldBe Vector3D(0.0, 0.0, 0.0)
-        }
-
-        test("test translation from 3x4 matrix") {
-            val values =
-                doubleArrayOf(
-                    1.0, 0.0, 0.0, 0.0,
-                    0.0, 1.0, 0.0, 3.0,
-                    0.0, 0.0, 1.0, 2.0,
-                    0.0, 0.0, 0.0, 1.0,
-                )
-            val matrix = RealMatrix(values, 4)
-            val affine = Affine3D.of(matrix)
-
-            val actual = affine.extractTranslation()
-
-            actual shouldBe Vector3D(0.0, 3.0, 2.0)
-        }
-
-        test("test translation") {
-            val translation = Vector3D(1.0, 2.0, 3.0)
-            val affine = Affine3D.of(translation)
-
-            val actual = affine.extractTranslation()
-
-            actual shouldBe translation
-        }
-
-        test("test scale") {
-            val scaling = RealVector(doubleArrayOf(3.0, 2.0, 1.0))
-            val affine = Affine3D.of(scaling)
-
-            val actual = affine.extractScaling()
-
-            actual shouldBe scaling
-        }
-
-        test("test rotation") {
-            val scaling = RealVector(doubleArrayOf(3.0, 2.0, 1.0))
-            val translation = Vector3D(3.0, 2.0, 1.0)
-            val heading = HALF_PI
-            val rotation = Rotation3D(heading)
-            val affine = Affine3D.of(Affine3D.of(scaling), Affine3D.of(translation), Affine3D.of(rotation))
-
-            val expectedRotationMatrix =
-                RealMatrix(
-                    arrayOf(
-                        doubleArrayOf(cos(heading), -sin(heading), 0.0, 0.0),
-                        doubleArrayOf(sin(heading), cos(heading), 0.0, 0.0),
-                        doubleArrayOf(0.0, 0.0, 1.0, 0.0),
-                        doubleArrayOf(0.0, 0.0, 0.0, 1.0),
-                    ),
-                )
-
-            val actual = affine.extractRotationAffine().toRealMatrix()
-
-            actual.dimension shouldBe expectedRotationMatrix.dimension
-            expectedRotationMatrix.toDoubleArray().zip(actual.toDoubleArray()).forEach {
-                it.first.shouldBe(it.second plusOrMinus DBL_EPSILON)
+                actual shouldBe 1.0
             }
         }
-    }
 
-    context("TestAffineMultiplication") {
+        context("TestDecomposition") {
 
-        test("test appending") {
-            val translation = Vector3D(1.0, 2.0, 3.0)
-            val affineA = Affine3D.of(translation)
-            val scaling = RealVector.of(2.0, 3.0, 4.0)
-            val affineB = Affine3D.of(scaling)
-            val expectedValues =
-                doubleArrayOf(
-                    2.0, 0.0, 0.0, 1.0,
-                    0.0, 3.0, 0.0, 2.0,
-                    0.0, 0.0, 4.0, 3.0,
-                    0.0, 0.0, 0.0, 1.0,
-                )
-            val expectedMatrix = RealMatrix(expectedValues, 4)
+            test("test translation from 3x3 matrix") {
+                val affine = Affine3D(JOMLMatrix4d())
 
-            val actualAppended = affineA.append(affineB)
-            val actualMatrix = actualAppended.toRealMatrix()
+                val actual = affine.extractTranslation()
 
-            actualMatrix.dimension shouldBe expectedMatrix.dimension
-            expectedMatrix.toDoubleArray() shouldBe actualMatrix.toDoubleArray()
+                actual shouldBe Vector3D(0.0, 0.0, 0.0)
+            }
+
+            test("test translation from 3x4 matrix") {
+                val values =
+                    doubleArrayOf(
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        3.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        2.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                    )
+                val matrix = RealMatrix(values, 4)
+                val affine = Affine3D.of(matrix)
+
+                val actual = affine.extractTranslation()
+
+                actual shouldBe Vector3D(0.0, 3.0, 2.0)
+            }
+
+            test("test translation") {
+                val translation = Vector3D(1.0, 2.0, 3.0)
+                val affine = Affine3D.of(translation)
+
+                val actual = affine.extractTranslation()
+
+                actual shouldBe translation
+            }
+
+            test("test scale") {
+                val scaling = RealVector(doubleArrayOf(3.0, 2.0, 1.0))
+                val affine = Affine3D.of(scaling)
+
+                val actual = affine.extractScaling()
+
+                actual shouldBe scaling
+            }
+
+            test("test rotation") {
+                val scaling = RealVector(doubleArrayOf(3.0, 2.0, 1.0))
+                val translation = Vector3D(3.0, 2.0, 1.0)
+                val heading = HALF_PI
+                val rotation = Rotation3D(heading)
+                val affine = Affine3D.of(Affine3D.of(scaling), Affine3D.of(translation), Affine3D.of(rotation))
+
+                val expectedRotationMatrix =
+                    RealMatrix(
+                        arrayOf(
+                            doubleArrayOf(cos(heading), -sin(heading), 0.0, 0.0),
+                            doubleArrayOf(sin(heading), cos(heading), 0.0, 0.0),
+                            doubleArrayOf(0.0, 0.0, 1.0, 0.0),
+                            doubleArrayOf(0.0, 0.0, 0.0, 1.0),
+                        ),
+                    )
+
+                val actual = affine.extractRotationAffine().toRealMatrix()
+
+                actual.dimension shouldBe expectedRotationMatrix.dimension
+                expectedRotationMatrix.toDoubleArray().zip(actual.toDoubleArray()).forEach {
+                    it.first.shouldBe(it.second plusOrMinus DBL_EPSILON)
+                }
+            }
         }
-    }
 
-    context("TestTransforms") {
+        context("TestAffineMultiplication") {
 
-        test("test translation") {
-            val translation = Vector3D(1.0, 2.0, 3.0)
-            val affine = Affine3D.of(translation)
+            test("test appending") {
+                val translation = Vector3D(1.0, 2.0, 3.0)
+                val affineA = Affine3D.of(translation)
+                val scaling = RealVector.of(2.0, 3.0, 4.0)
+                val affineB = Affine3D.of(scaling)
+                val expectedValues =
+                    doubleArrayOf(
+                        2.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        3.0,
+                        0.0,
+                        2.0,
+                        0.0,
+                        0.0,
+                        4.0,
+                        3.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                    )
+                val expectedMatrix = RealMatrix(expectedValues, 4)
 
-            val actualTranslated = affine.transform(Vector3D.ZERO)
+                val actualAppended = affineA.append(affineB)
+                val actualMatrix = actualAppended.toRealMatrix()
 
-            actualTranslated shouldBe translation
+                actualMatrix.dimension shouldBe expectedMatrix.dimension
+                expectedMatrix.toDoubleArray() shouldBe actualMatrix.toDoubleArray()
+            }
         }
 
-        test("test inverse translation") {
-            val translation = Vector3D(1.0, 2.0, 3.0)
-            val affine = Affine3D.of(translation)
+        context("TestTransforms") {
 
-            val actualTranslated = affine.inverseTransform(Vector3D.ZERO)
+            test("test translation") {
+                val translation = Vector3D(1.0, 2.0, 3.0)
+                val affine = Affine3D.of(translation)
 
-            actualTranslated shouldBe -translation
-        }
-    }
+                val actualTranslated = affine.transform(Vector3D.ZERO)
 
-    context("TestRotations") {
+                actualTranslated shouldBe translation
+            }
 
-        test("test heading rotation") {
-            val rotation = Rotation3D(HALF_PI, 0.0, 0.0)
-            val affine = Affine3D.of(rotation)
+            test("test inverse translation") {
+                val translation = Vector3D(1.0, 2.0, 3.0)
+                val affine = Affine3D.of(translation)
 
-            val actualRotated = affine.transform(Vector3D.X_AXIS)
+                val actualTranslated = affine.inverseTransform(Vector3D.ZERO)
 
-            actualRotated.x.shouldBe(0.0 plusOrMinus DBL_EPSILON)
-            actualRotated.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
-            actualRotated.z.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+                actualTranslated shouldBe -translation
+            }
         }
 
-        test("test pitch rotation") {
-            val rotation = Rotation3D(0.0, HALF_PI, 0.0)
-            val affine = Affine3D.of(rotation)
+        context("TestRotations") {
 
-            val actualRotated = affine.transform(Vector3D.X_AXIS)
+            test("test heading rotation") {
+                val rotation = Rotation3D(HALF_PI, 0.0, 0.0)
+                val affine = Affine3D.of(rotation)
 
-            actualRotated.x.shouldBe(0.0 plusOrMinus DBL_EPSILON)
-            actualRotated.y.shouldBe(0.0 plusOrMinus DBL_EPSILON)
-            actualRotated.z.shouldBe(-1.0 plusOrMinus DBL_EPSILON)
+                val actualRotated = affine.transform(Vector3D.X_AXIS)
+
+                actualRotated.x.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+                actualRotated.y.shouldBe(1.0 plusOrMinus DBL_EPSILON)
+                actualRotated.z.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+            }
+
+            test("test pitch rotation") {
+                val rotation = Rotation3D(0.0, HALF_PI, 0.0)
+                val affine = Affine3D.of(rotation)
+
+                val actualRotated = affine.transform(Vector3D.X_AXIS)
+
+                actualRotated.x.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+                actualRotated.y.shouldBe(0.0 plusOrMinus DBL_EPSILON)
+                actualRotated.z.shouldBe(-1.0 plusOrMinus DBL_EPSILON)
+            }
+
+            test("test rotation based on new standard basis") {
+                val basisX = Vector3D(-1.0, 1.0, 0.0)
+                val basisY = Vector3D(-1.0, 0.0, 1.0)
+                val basisZ = Vector3D(1.0, 1.0, 1.0)
+                val affine = Affine3D.of(basisX, basisY, basisZ)
+                val expected = Vector3D(-1.0 / 3.0, -1.0 / 3.0, 1.0 / 3.0)
+
+                val actualRotated = affine.transform(Vector3D.X_AXIS)
+
+                actualRotated.x.shouldBe(expected.x plusOrMinus DBL_EPSILON)
+                actualRotated.y.shouldBe(expected.y plusOrMinus DBL_EPSILON)
+                actualRotated.z.shouldBe(expected.z plusOrMinus DBL_EPSILON)
+            }
         }
 
-        test("test rotation based on new standard basis") {
-            val basisX = Vector3D(-1.0, 1.0, 0.0)
-            val basisY = Vector3D(-1.0, 0.0, 1.0)
-            val basisZ = Vector3D(1.0, 1.0, 1.0)
-            val affine = Affine3D.of(basisX, basisY, basisZ)
-            val expected = Vector3D(-1.0 / 3.0, -1.0 / 3.0, 1.0 / 3.0)
+        context("TestConversions") {
 
-            val actualRotated = affine.transform(Vector3D.X_AXIS)
+            test("test to double array") {
+                val translation = Vector3D(1.0, 2.0, 3.0)
+                val affine = Affine3D.of(translation)
+                val expectedDoubleArray =
+                    doubleArrayOf(
+                        1.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        2.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        3.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                    )
 
-            actualRotated.x.shouldBe(expected.x plusOrMinus DBL_EPSILON)
-            actualRotated.y.shouldBe(expected.y plusOrMinus DBL_EPSILON)
-            actualRotated.z.shouldBe(expected.z plusOrMinus DBL_EPSILON)
+                val actualDoubleArray = affine.toDoubleArray()
+
+                expectedDoubleArray shouldBe actualDoubleArray
+            }
         }
-    }
-
-    context("TestConversions") {
-
-        test("test to double array") {
-            val translation = Vector3D(1.0, 2.0, 3.0)
-            val affine = Affine3D.of(translation)
-            val expectedDoubleArray =
-                doubleArrayOf(
-                    1.0, 0.0, 0.0, 1.0,
-                    0.0, 1.0, 0.0, 2.0,
-                    0.0, 0.0, 1.0, 3.0,
-                    0.0, 0.0, 0.0, 1.0,
-                )
-
-            val actualDoubleArray = affine.toDoubleArray()
-
-            expectedDoubleArray shouldBe actualDoubleArray
-        }
-    }
-})
+    })

@@ -92,7 +92,11 @@ class RangeSet<T : Comparable<*>>(
     /**
      * Returns all ranges individually.
      */
-    fun asRanges(): Set<Range<T>> = this.rangeSet.asRanges().map { it.toRange() }.toSet()
+    fun asRanges(): Set<Range<T>> =
+        this.rangeSet
+            .asRanges()
+            .map { it.toRange() }
+            .toSet()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -105,9 +109,7 @@ class RangeSet<T : Comparable<*>>(
         return true
     }
 
-    override fun hashCode(): Int {
-        return this.rangeSet.hashCode()
-    }
+    override fun hashCode(): Int = this.rangeSet.hashCode()
 
     companion object {
         /**

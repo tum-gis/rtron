@@ -33,4 +33,5 @@ data class JunctionConnection(
     var linkedRoad: Option<String> = None,
     var type: Option<EConnectionType> = None,
     override var additionalId: Option<JunctionConnectionIdentifier> = None,
-) : OpendriveElement(), AdditionalJunctionConnectionIdentifier
+) : OpendriveElement(),
+    AdditionalJunctionConnectionIdentifier

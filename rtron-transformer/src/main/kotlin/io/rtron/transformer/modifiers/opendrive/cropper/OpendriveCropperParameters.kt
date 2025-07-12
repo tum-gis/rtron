@@ -42,7 +42,8 @@ data class OpendriveCropperParameters(
     // Methods
     fun getPolygon(): Option<Polygon2D> {
         val vertices =
-            cropPolygonX.zip(cropPolygonY)
+            cropPolygonX
+                .zip(cropPolygonY)
                 .map { Vector2D(it.first, it.second) }
                 .toNonEmptyListOrNull()
                 .toOption()

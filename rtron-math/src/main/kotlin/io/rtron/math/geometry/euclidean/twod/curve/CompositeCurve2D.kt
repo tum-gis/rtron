@@ -63,9 +63,7 @@ data class CompositeCurve2D(
     }
 
     // Conversions
-    override fun toString(): String {
-        return "CompositeCurve2D(curveMembers=$curveMembers)"
-    }
+    override fun toString(): String = "CompositeCurve2D(curveMembers=$curveMembers)"
 
     companion object {
         fun of(

@@ -69,7 +69,9 @@ class OpendriveReprojector(
             try {
                 crsFactory.createFromParameters(
                     "source",
-                    modifiedOpendriveModel.header.geoReference.getOrNull()!!.content,
+                    modifiedOpendriveModel.header.geoReference
+                        .getOrNull()!!
+                        .content,
                 )
             } catch (e: Exception) {
                 report.message = "Source CRS could not be identified: " + e.message.toOption().getOrElse { "" }

@@ -74,10 +74,12 @@ class LaneBuilder(
 
         // build lane geometry
         val width =
-            lrLane.getLaneWidthEntries()
+            lrLane
+                .getLaneWidthEntries()
                 .fold({ LinearFunction.X_AXIS }, { FunctionBuilder.buildLaneWidth(it, parameters.numberTolerance) })
         val laneHeightOffsets =
-            lrLane.getLaneHeightEntries()
+            lrLane
+                .getLaneHeightEntries()
                 .fold({ LaneHeightOffset(LinearFunction.X_AXIS, LinearFunction.X_AXIS) }, { buildLaneHeightOffset(it) })
 
         // build road markings
@@ -85,11 +87,12 @@ class LaneBuilder(
             if (lrLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
-                roadMarkingBuilder.buildRoadMarkings(
-                    curvePositionDomain,
-                    lrLane.roadMark.toNonEmptyListOrNull()!!,
-                    roadMarkRepresentationRegistry,
-                ).handleIssueList { issueList += it }
+                roadMarkingBuilder
+                    .buildRoadMarkings(
+                        curvePositionDomain,
+                        lrLane.roadMark.toNonEmptyListOrNull()!!,
+                        roadMarkRepresentationRegistry,
+                    ).handleIssueList { issueList += it }
             }
 
         // lane topology
@@ -104,8 +107,17 @@ class LaneBuilder(
         // build up lane object
         val lane =
             Lane(
-                id, width, laneHeightOffsets.inner, laneHeightOffsets.outer, lrLane.getLevelWithDefault(), roadMarkings,
-                predecessors, successors, type, laneMaterial, attributes,
+                id,
+                width,
+                laneHeightOffsets.inner,
+                laneHeightOffsets.outer,
+                lrLane.getLevelWithDefault(),
+                roadMarkings,
+                predecessors,
+                successors,
+                type,
+                laneMaterial,
+                attributes,
             )
         return ContextIssueList(lane, issueList)
     }
@@ -134,12 +146,12 @@ class LaneBuilder(
             if (centerLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
-                roadMarkingBuilder.buildRoadMarkings(
-                    curvePositionDomain,
-                    centerLane.roadMark.toNonEmptyListOrNull()!!,
-                    roadMarkRepresentationRegistry,
-                )
-                    .handleIssueList { issueList += it }
+                roadMarkingBuilder
+                    .buildRoadMarkings(
+                        curvePositionDomain,
+                        centerLane.roadMark.toNonEmptyListOrNull()!!,
+                        roadMarkRepresentationRegistry,
+                    ).handleIssueList { issueList += it }
             }
 
         val type = centerLane.type.toLaneType()
@@ -152,7 +164,10 @@ class LaneBuilder(
     /**
      * Small helper class containing the height offset functions of the inner and outer lane boundary.
      */
-    private data class LaneHeightOffset(val inner: UnivariateFunction, val outer: UnivariateFunction)
+    private data class LaneHeightOffset(
+        val inner: UnivariateFunction,
+        val outer: UnivariateFunction,
+    )
 
     /**
      * Builds up the height offset function for the inner and outer lane boundary.
@@ -268,11 +283,12 @@ class LaneBuilder(
                 leftRightLane.speed.forEachIndexed { i, element ->
                     attribute("_curvePositionStart_$i", element.sOffset)
 
-                    element.unit.onSome {
-                        attribute("_max_$i", element.max, it.toUnitOfMeasure())
-                    }.onNone {
-                        attribute("_max_$i", element.max)
-                    }
+                    element.unit
+                        .onSome {
+                            attribute("_max_$i", element.max, it.toUnitOfMeasure())
+                        }.onNone {
+                            attribute("_max_$i", element.max)
+                        }
                 }
             }
 

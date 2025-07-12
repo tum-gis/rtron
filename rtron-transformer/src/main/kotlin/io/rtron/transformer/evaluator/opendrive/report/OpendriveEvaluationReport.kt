@@ -39,5 +39,6 @@ data class OpendriveEvaluationReport(
 
     fun containsFatalErrors(): Boolean =
         basicDataTypePlan.containsFatalErrors() ||
-            modelingRulesPlan.containsFatalErrors() || conversionRequirementsPlan.containsFatalErrors()
+            modelingRulesPlan.containsFatalErrors() ||
+            conversionRequirementsPlan.containsFatalErrors()
 }

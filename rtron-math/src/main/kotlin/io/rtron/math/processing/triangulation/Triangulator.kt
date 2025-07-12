@@ -46,11 +46,14 @@ object Triangulator {
 
         // run triangulation algorithms until one succeeds
         val standardResult =
-            standardTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
+            standardTriangulationAlgorithm
+                .triangulateChecked(linearRing.vertices, tolerance)
                 .onRight { return it.right() }
-        fallbackTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
+        fallbackTriangulationAlgorithm
+            .triangulateChecked(linearRing.vertices, tolerance)
             .onRight { return it.right() }
-        fanTriangulationAlgorithm.triangulateChecked(linearRing.vertices, tolerance)
+        fanTriangulationAlgorithm
+            .triangulateChecked(linearRing.vertices, tolerance)
             .onRight { return it.right() }
 
         return standardResult

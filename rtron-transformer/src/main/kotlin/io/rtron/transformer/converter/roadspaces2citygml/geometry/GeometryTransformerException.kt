@@ -18,16 +18,22 @@ package io.rtron.transformer.converter.roadspaces2citygml.geometry
 
 import io.rtron.math.geometry.GeometryException
 
-sealed class GeometryTransformerException(val message: String) {
+sealed class GeometryTransformerException(
+    val message: String,
+) {
     data class NoSelectedPolygonsAvailable(
         val reason: String = "",
     ) : GeometryTransformerException("No MultiSurface geometry available. $reason")
 
-    data class NoSuiteableSourceGeometry(val targetGeometry: String) : GeometryTransformerException(
-        "No suitable source geometry found for populating the $targetGeometry",
-    )
+    data class NoSuiteableSourceGeometry(
+        val targetGeometry: String,
+    ) : GeometryTransformerException(
+            "No suitable source geometry found for populating the $targetGeometry",
+        )
 
-    data class GeometryGenerationException(val reason: String) : GeometryTransformerException("Error when generating the geometry. $reason")
+    data class GeometryGenerationException(
+        val reason: String,
+    ) : GeometryTransformerException("Error when generating the geometry. $reason")
 }
 
 fun GeometryException.toGeometryGenerationException() = GeometryTransformerException.GeometryGenerationException(message)

@@ -96,13 +96,15 @@ data class LaneSection(
     ): Either<Exception, UnivariateFunction> =
         either {
             val selectedLanes =
-                (1..abs(laneId)).toList()
+                (1..abs(laneId))
+                    .toList()
                     .map { sign(laneId) * it }
                     .map { getLane(it).bind() }
 
             val currentLane = selectedLanes.last()
             val innerLaneBoundaryOffset =
-                selectedLanes.dropLast(1)
+                selectedLanes
+                    .dropLast(1)
                     .map { it.width }
                     .let { if (it.isEmpty()) LinearFunction.X_AXIS else StackedFunction.ofSum(it) }
 

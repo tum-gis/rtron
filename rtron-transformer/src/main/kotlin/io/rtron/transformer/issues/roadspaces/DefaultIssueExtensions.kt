@@ -28,9 +28,7 @@ fun DefaultIssue.Companion.of(
     location: AbstractRoadspacesIdentifier,
     incidentSeverity: Severity,
     wasFixed: Boolean,
-): DefaultIssue {
-    return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
-}
+): DefaultIssue = DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
 
 fun DefaultIssue.Companion.of(
     type: String,
@@ -38,6 +36,4 @@ fun DefaultIssue.Companion.of(
     location: Option<AbstractRoadspacesIdentifier>,
     incidentSeverity: Severity,
     wasFixed: Boolean,
-): DefaultIssue {
-    return DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)
-}
+): DefaultIssue = DefaultIssue(type, info, location.toIdentifierText(), incidentSeverity, wasFixed)

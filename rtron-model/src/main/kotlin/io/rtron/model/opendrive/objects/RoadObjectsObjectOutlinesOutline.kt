@@ -34,7 +34,8 @@ data class RoadObjectsObjectOutlinesOutline(
     var laneType: Option<ELaneType> = None,
     var outer: Option<Boolean> = None,
     override var additionalId: Option<RoadObjectOutlineIdentifier> = None,
-) : OpendriveElement(), AdditionalRoadObjectOutlineIdentifier {
+) : OpendriveElement(),
+    AdditionalRoadObjectOutlineIdentifier {
     // Methods
     fun isPolyhedronUniquelyDefined() =
         (isPolyhedronDefinedByRoadCorners() && !isPolyhedronDefinedByLocalCorners()) ||

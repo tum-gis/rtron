@@ -37,8 +37,8 @@ data class Polygon2D(
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a polygon." }
         require(
             vertices.noneWithNextEnclosing {
-                    a,
-                    b,
+                a,
+                b,
                 ->
                 a.fuzzyEquals(b, tolerance)
             },
@@ -56,7 +56,5 @@ data class Polygon2D(
     }
 
     // Methods
-    override fun contains(point: Vector2D): Boolean {
-        return awtPath.contains(point.x, point.y)
-    }
+    override fun contains(point: Vector2D): Boolean = awtPath.contains(point.x, point.y)
 }

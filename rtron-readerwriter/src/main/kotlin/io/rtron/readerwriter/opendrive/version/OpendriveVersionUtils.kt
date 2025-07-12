@@ -28,7 +28,8 @@ object OpendriveVersionUtils {
     fun getOpendriveVersion(filePath: InputStream): Either<OpendriveReaderException, OpendriveVersion> =
         either {
             val xmlDoc: Document =
-                Either.catch { DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(filePath) }
+                Either
+                    .catch { DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(filePath) }
                     .mapLeft { OpendriveReaderException.MalformedXmlDocument(it.message ?: "") }
                     .bind()
 
@@ -41,12 +42,26 @@ object OpendriveVersionUtils {
             }
 
             val revMajor =
-                Either.catch { header.item(0).attributes.getNamedItem("revMajor").nodeValue.toInt() }
-                    .mapLeft { OpendriveReaderException.VersionNotIdentifiable("Major version is not identifiable") }
+                Either
+                    .catch {
+                        header
+                            .item(0)
+                            .attributes
+                            .getNamedItem("revMajor")
+                            .nodeValue
+                            .toInt()
+                    }.mapLeft { OpendriveReaderException.VersionNotIdentifiable("Major version is not identifiable") }
                     .bind()
             val revMinor =
-                Either.catch { header.item(0).attributes.getNamedItem("revMinor").nodeValue.toInt() }
-                    .mapLeft { OpendriveReaderException.VersionNotIdentifiable("Minor version is not identifiable") }
+                Either
+                    .catch {
+                        header
+                            .item(0)
+                            .attributes
+                            .getNamedItem("revMinor")
+                            .nodeValue
+                            .toInt()
+                    }.mapLeft { OpendriveReaderException.VersionNotIdentifiable("Minor version is not identifiable") }
                     .bind()
 
             OpendriveVersion.ofRevision(revMajor, revMinor).mapLeft { OpendriveReaderException.VersionNotIdentifiable(it.message) }.bind()

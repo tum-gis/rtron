@@ -141,7 +141,8 @@ class TransportationModuleBuilder(
         )
         trafficAreaFeature.usages = CodeAdder.mapToTrafficAreaUsageCodes(lane.type).map { it.code }
         trafficAreaFeature.functions = CodeAdder.mapToTrafficAreaFunctionCodes(lane.type).map { it.code }
-        lane.laneMaterial.flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
+        lane.laneMaterial
+            .flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
             .onSome { trafficAreaFeature.surfaceMaterial = it.code }
         attributesAdder.addAttributes(lane, trafficAreaFeature)
         trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficAreaFeature))
@@ -230,7 +231,8 @@ class TransportationModuleBuilder(
         )
         auxiliaryTrafficAreaFeature.functions =
             CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(lane.type).map { it.code }
-        lane.laneMaterial.flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
+        lane.laneMaterial
+            .flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
             .onSome { auxiliaryTrafficAreaFeature.surfaceMaterial = it.code }
         attributesAdder.addAttributes(lane, auxiliaryTrafficAreaFeature)
         auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficAreaFeature))
@@ -310,12 +312,16 @@ class TransportationModuleBuilder(
             // geometry
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
-            trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
+            trafficAreaFeature
+                .populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForTrafficAreaLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
 
@@ -324,12 +330,16 @@ class TransportationModuleBuilder(
 
         roadspaceObject.extrudedTopSurfaceGeometry.onSome { currentExtrudedTopSurfaceGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
-            trafficSpaceFeature.populateLod2Geometry(geometryTransformer)
+            trafficSpaceFeature
+                .populateLod2Geometry(geometryTransformer)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForTrafficSpaceLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
@@ -374,15 +384,18 @@ class TransportationModuleBuilder(
             // geometry
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
             val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
-            auxiliaryTrafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(
-                geometryTransformer,
-                solidFaceSelection,
-            )
-                .onLeft {
+            auxiliaryTrafficAreaFeature
+                .populateLod2MultiSurfaceFromSolidCutoutOrSurface(
+                    geometryTransformer,
+                    solidFaceSelection,
+                ).onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForAuxiliaryTrafficAreaLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
 
@@ -391,12 +404,16 @@ class TransportationModuleBuilder(
 
         roadspaceObject.extrudedTopSurfaceGeometry.onSome { currentExtrudedTopSurfaceGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
-            auxiliaryTrafficSpaceFeature.populateLod2Geometry(geometryTransformer)
+            auxiliaryTrafficSpaceFeature
+                .populateLod2Geometry(geometryTransformer)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForAuxiliaryTrafficSpaceLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
@@ -420,12 +437,16 @@ class TransportationModuleBuilder(
 
         // geometry
         val geometryTransformer = GeometryTransformer(parameters).also { geometry.accept(it) }
-        markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
+        markingFeature
+            .populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
             .onLeft {
                 issueList +=
                     DefaultIssue.of(
                         "NoSuitableGeometryForMarkingLod2",
-                        it.message, id, Severity.WARNING, wasFixed = true,
+                        it.message,
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
@@ -452,23 +473,31 @@ class TransportationModuleBuilder(
         // geometry
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
-            markingFeature.populateLod1MultiSurface(geometryTransformer)
+            markingFeature
+                .populateLod1MultiSurface(geometryTransformer)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForMarkingLod1",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
         roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
-            markingFeature.populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
+            markingFeature
+                .populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForMarkingLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
@@ -507,12 +536,16 @@ class TransportationModuleBuilder(
             GeometryTransformer(parameters)
                 .also { abstractGeometry.accept(it) }
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
-        trafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
+        trafficAreaFeature
+            .populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
             .onLeft {
                 issueList +=
                     DefaultIssue.of(
                         "NoSuitableGeometryForTrafficAreaLod2",
-                        it.message, id, Severity.WARNING, wasFixed = true,
+                        it.message,
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 
@@ -531,15 +564,18 @@ class TransportationModuleBuilder(
                 .also { abstractGeometry.accept(it) }
 
         val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
-        auxiliaryTrafficAreaFeature.populateLod2MultiSurfaceFromSolidCutoutOrSurface(
-            geometryTransformer,
-            solidFaceSelection,
-        )
-            .onLeft {
+        auxiliaryTrafficAreaFeature
+            .populateLod2MultiSurfaceFromSolidCutoutOrSurface(
+                geometryTransformer,
+                solidFaceSelection,
+            ).onLeft {
                 issueList +=
                     DefaultIssue.of(
                         "NoSuitableGeometryForAuxiliaryTrafficAreaLod2",
-                        it.message, id, Severity.WARNING, wasFixed = true,
+                        it.message,
+                        id,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
             }
 

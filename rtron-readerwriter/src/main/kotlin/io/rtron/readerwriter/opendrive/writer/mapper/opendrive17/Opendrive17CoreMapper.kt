@@ -44,11 +44,10 @@ abstract class Opendrive17CoreMapper {
 
     fun mapOptionGeoReference(source: Option<HeaderGeoReference>): T_Header_GeoReference? = source.fold({ null }, { mapGeoReference(it) })
 
-    fun mapGeoReference(source: HeaderGeoReference): T_Header_GeoReference {
-        return T_Header_GeoReference().apply {
+    fun mapGeoReference(source: HeaderGeoReference): T_Header_GeoReference =
+        T_Header_GeoReference().apply {
             content.add("![CDATA[${source.content}]]") // TODO
         }
-    }
 
     fun mapOptionHeaderOffset(source: Option<HeaderOffset>): T_Header_Offset? = source.fold({ null }, { mapHeaderOffset(it) })
 

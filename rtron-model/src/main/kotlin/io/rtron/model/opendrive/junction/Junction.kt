@@ -42,7 +42,8 @@ data class Junction(
     var sStart: Option<Double> = None,
     var type: Option<EJunctionType> = None,
     override var additionalId: Option<JunctionIdentifier> = None,
-) : OpendriveElement(), AdditionalJunctionIdentifier {
+) : OpendriveElement(),
+    AdditionalJunctionIdentifier {
     // Properties and Initializers
     val connectionAsNonEmptyList: NonEmptyList<JunctionConnection>
         get() = connection.toNonEmptyListOrNull()!!

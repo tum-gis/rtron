@@ -120,14 +120,15 @@ class GeometryTransformer(
     fun getMultiCurve(): Option<Either<GeometryException, MultiCurveProperty>> {
         val lineString = multiCurveResult.handleEmpty { return None }
 
-        return lineString.map {
-            val coordinatesList = it.vertices.flatMap { it.toDoubleList() }
-            val gmlLineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
-            val curveProperty = CurveProperty(gmlLineString)
-            val multiCurve = MultiCurve(listOf(curveProperty))
+        return lineString
+            .map {
+                val coordinatesList = it.vertices.flatMap { it.toDoubleList() }
+                val gmlLineString = geometryFactory.createLineString(coordinatesList, DIMENSION)!!
+                val curveProperty = CurveProperty(gmlLineString)
+                val multiCurve = MultiCurve(listOf(curveProperty))
 
-            MultiCurveProperty(multiCurve)
-        }.some()
+                MultiCurveProperty(multiCurve)
+            }.some()
     }
 
     /**
@@ -286,7 +287,11 @@ class GeometryTransformer(
     }
 
     override fun visit(abstractGeometry3D: AbstractGeometry3D) {
-        this.rotation = abstractGeometry3D.affineSequence.solve().extractRotation().some()
+        this.rotation =
+            abstractGeometry3D.affineSequence
+                .solve()
+                .extractRotation()
+                .some()
     }
 
     private fun polygonsToMultiSurfaceProperty(polygons: NonEmptyList<Polygon3D>): MultiSurfaceProperty {
@@ -312,15 +317,11 @@ class GeometryTransformer(
         fun of(
             point: AbstractPoint3D,
             parameters: Roadspaces2CitygmlParameters,
-        ): GeometryTransformer {
-            return GeometryTransformer(parameters).also { point.accept(it) }
-        }
+        ): GeometryTransformer = GeometryTransformer(parameters).also { point.accept(it) }
 
         fun of(
             point: AbstractGeometry3D,
             parameters: Roadspaces2CitygmlParameters,
-        ): GeometryTransformer {
-            return GeometryTransformer(parameters).also { point.accept(it) }
-        }
+        ): GeometryTransformer = GeometryTransformer(parameters).also { point.accept(it) }
     }
 }

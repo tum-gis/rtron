@@ -46,8 +46,8 @@ class LineString3D(
         require(vertices.size >= 2) { "Must at least contain two vertices." }
         require(
             vertices.noneWithNext {
-                    a,
-                    b,
+                a,
+                b,
                 ->
                 a.fuzzyEquals(b, tolerance)
             },
@@ -68,7 +68,8 @@ class LineString3D(
 
     override fun calculatePointLocalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector3D {
         val localMember =
-            container.fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
+            container
+                .fuzzySelectMember(curveRelativePoint.curvePosition, tolerance)
                 .getOrElse { throw it }
         val localPoint = CurveRelativeVector1D(localMember.localParameter)
 

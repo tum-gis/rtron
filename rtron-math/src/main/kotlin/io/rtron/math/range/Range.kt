@@ -153,9 +153,7 @@ class Range<T : Comparable<*>>(
         return true
     }
 
-    override fun hashCode(): Int {
-        return range.hashCode()
-    }
+    override fun hashCode(): Int = range.hashCode()
 
     // Conversions
 
@@ -209,12 +207,13 @@ class Range<T : Comparable<*>>(
                 return GRange.upTo(upperEndpoint!!, upperBoundType.toBoundTypeG()!!).toRange()
             }
 
-            return GRange.range(
-                lowerEndpoint!!,
-                lowerBoundType.toBoundTypeG()!!,
-                upperEndpoint!!,
-                upperBoundType.toBoundTypeG()!!,
-            ).toRange()
+            return GRange
+                .range(
+                    lowerEndpoint!!,
+                    lowerBoundType.toBoundTypeG()!!,
+                    upperEndpoint!!,
+                    upperBoundType.toBoundTypeG()!!,
+                ).toRange()
         }
 
         /**

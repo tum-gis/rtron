@@ -20,31 +20,32 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 
-class IterableKtTest : FunSpec({
-    context("TestIsSorted") {
+class IterableKtTest :
+    FunSpec({
+        context("TestIsSorted") {
 
-        test("isSorted() returns true if integer list is sorted ascending") {
-            val sortedList = listOf(1, 7, 7, 12, 13)
+            test("isSorted() returns true if integer list is sorted ascending") {
+                val sortedList = listOf(1, 7, 7, 12, 13)
 
-            sortedList.isSorted().shouldBeTrue()
+                sortedList.isSorted().shouldBeTrue()
+            }
+
+            test("isSorted() returns false if integer list is not sorted ascending") {
+                val sortedList = listOf(1, 7, 3, 12, 13)
+
+                sortedList.isSorted().shouldBeFalse()
+            }
+
+            test("isSortedDescending() returns true if integer list is sorted descending") {
+                val sortedList = listOf(13, 7, 7, 1, -1)
+
+                sortedList.isSortedDescending().shouldBeTrue()
+            }
+
+            test("isSortedDescending() returns false if integer list is not sorted descending") {
+                val sortedList = listOf(13, 7, 7, 1, -1, 0)
+
+                sortedList.isSortedDescending().shouldBeFalse()
+            }
         }
-
-        test("isSorted() returns false if integer list is not sorted ascending") {
-            val sortedList = listOf(1, 7, 3, 12, 13)
-
-            sortedList.isSorted().shouldBeFalse()
-        }
-
-        test("isSortedDescending() returns true if integer list is sorted descending") {
-            val sortedList = listOf(13, 7, 7, 1, -1)
-
-            sortedList.isSortedDescending().shouldBeTrue()
-        }
-
-        test("isSortedDescending() returns false if integer list is not sorted descending") {
-            val sortedList = listOf(13, 7, 7, 1, -1, 0)
-
-            sortedList.isSortedDescending().shouldBeFalse()
-        }
-    }
-})
+    })

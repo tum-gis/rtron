@@ -68,7 +68,8 @@ class ValidateOpendriveProcessor(
             }
             // read of OpenDRIVE model
             val opendriveModel =
-                OpendriveReader.readFromFile(inputFilePath)
+                OpendriveReader
+                    .readFromFile(inputFilePath)
                     .getOrElse {
                         logger.warn { it.message }
                         return@processAllFiles

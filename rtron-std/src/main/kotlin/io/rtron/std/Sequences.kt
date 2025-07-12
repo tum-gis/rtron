@@ -24,13 +24,12 @@ package io.rtron.std
  * @return list of all pairs of two adjacent elements (with last and first element pair), whereby the returned list is
  * empty if the receiver contains less than two elements
  */
-fun <T> Iterable<T>.zipWithNextEnclosing(): List<Pair<T, T>> {
-    return if (this.count() >= 2) {
+fun <T> Iterable<T>.zipWithNextEnclosing(): List<Pair<T, T>> =
+    if (this.count() >= 2) {
         zipWithNext { a, b -> a to b } + Pair(last(), first())
     } else {
         zipWithNext { a, b -> a to b }
     }
-}
 
 /**
  * Zips consecutive elements of the original list by the key returned by the given [keySelector] function
@@ -41,8 +40,8 @@ fun <T> Iterable<T>.zipWithNextEnclosing(): List<Pair<T, T>> {
  * @return list of all zipped elements (also represented as list), whereas the returned nested lists preserve
  * the iteration order
  */
-fun <T, K> Iterable<T>.zipWithConsecutives(keySelector: (T) -> K): List<List<T>> {
-    return this.fold(listOf<MutableList<T>>()) { acc, element ->
+fun <T, K> Iterable<T>.zipWithConsecutives(keySelector: (T) -> K): List<List<T>> =
+    this.fold(listOf<MutableList<T>>()) { acc, element ->
         if (acc.isNotEmpty() && acc.last().isNotEmpty() && keySelector(acc.last().first()) == keySelector(element)) {
             acc.last().add(element)
             acc
@@ -50,7 +49,6 @@ fun <T, K> Iterable<T>.zipWithConsecutives(keySelector: (T) -> K): List<List<T>>
             acc + listOf(mutableListOf(element))
         }
     }
-}
 
 /**
  * Zips consecutive elements of the original list by the key returned by the given [keySelector] function

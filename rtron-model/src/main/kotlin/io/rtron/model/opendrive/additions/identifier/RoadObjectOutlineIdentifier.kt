@@ -22,8 +22,12 @@ interface RoadObjectOutlineIdentifierInterface {
     val outlineId: Int
 }
 
-data class RoadObjectOutlineIdentifier(override val outlineId: Int, val roadObjectIdentifier: RoadObjectIdentifier) :
-    AbstractOpendriveIdentifier(), RoadObjectOutlineIdentifierInterface, RoadIdentifierInterface by roadObjectIdentifier {
+data class RoadObjectOutlineIdentifier(
+    override val outlineId: Int,
+    val roadObjectIdentifier: RoadObjectIdentifier,
+) : AbstractOpendriveIdentifier(),
+    RoadObjectOutlineIdentifierInterface,
+    RoadIdentifierInterface by roadObjectIdentifier {
     // Conversions
     override fun toIdentifierText() =
         "Road object outline: outlineId=$outlineId, " +

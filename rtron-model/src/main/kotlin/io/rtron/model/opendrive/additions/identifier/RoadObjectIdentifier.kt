@@ -22,8 +22,12 @@ interface RoadObjectIdentifierInterface {
     val roadObjectId: String
 }
 
-data class RoadObjectIdentifier(override val roadObjectId: String, val roadIdentifier: RoadIdentifier) :
-    AbstractOpendriveIdentifier(), RoadObjectIdentifierInterface, RoadIdentifierInterface by roadIdentifier {
+data class RoadObjectIdentifier(
+    override val roadObjectId: String,
+    val roadIdentifier: RoadIdentifier,
+) : AbstractOpendriveIdentifier(),
+    RoadObjectIdentifierInterface,
+    RoadIdentifierInterface by roadIdentifier {
     // Conversions
     override fun toIdentifierText() = "Road object: roadObjectId=$roadObjectId, roadId=$roadId"
 }

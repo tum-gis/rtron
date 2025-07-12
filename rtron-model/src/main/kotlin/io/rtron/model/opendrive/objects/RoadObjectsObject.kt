@@ -59,7 +59,8 @@ data class RoadObjectsObject(
     var width: Option<Double> = None,
     var zOffset: Double = 0.0,
     override var additionalId: Option<RoadObjectIdentifier> = None,
-) : OpendriveElement(), AdditionalRoadObjectIdentifier {
+) : OpendriveElement(),
+    AdditionalRoadObjectIdentifier {
     // Validation Properties
 
     val heightValidated: Option<Double>

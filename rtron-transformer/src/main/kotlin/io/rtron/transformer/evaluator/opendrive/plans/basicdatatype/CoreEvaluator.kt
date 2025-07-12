@@ -38,18 +38,28 @@ object CoreEvaluator {
         if (modifiedOpendriveModel.road.isEmpty()) {
             issueList +=
                 DefaultIssue(
-                    "NoRoadsContained", "Document does not contain any roads.", "",
-                    Severity.FATAL_ERROR, wasFixed = false,
+                    "NoRoadsContained",
+                    "Document does not contain any roads.",
+                    "",
+                    Severity.FATAL_ERROR,
+                    wasFixed = false,
                 )
         }
 
-        val duplicateRoadIds = modifiedOpendriveModel.road.map { it.id }.groupingBy { it }.eachCount().filter { it.value > 1 }
+        val duplicateRoadIds =
+            modifiedOpendriveModel.road
+                .map { it.id }
+                .groupingBy { it }
+                .eachCount()
+                .filter { it.value > 1 }
         if (duplicateRoadIds.isNotEmpty()) {
             issueList +=
                 DefaultIssue(
                     "DuplicateRoadIds",
-                    "Multiple road elements are using the same ID (affected IDs: ${duplicateRoadIds.keys.joinToString()}).", "",
-                    Severity.FATAL_ERROR, wasFixed = false,
+                    "Multiple road elements are using the same ID (affected IDs: ${duplicateRoadIds.keys.joinToString()}).",
+                    "",
+                    Severity.FATAL_ERROR,
+                    wasFixed = false,
                 )
         }
 
@@ -57,14 +67,22 @@ object CoreEvaluator {
             if (header.revMajor < 0) {
                 issueList +=
                     DefaultIssue(
-                        "UnkownOpendriveMajorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false,
+                        "UnkownOpendriveMajorVersionNumber",
+                        "",
+                        "Header element",
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
 
             if (header.revMinor < 0) {
                 issueList +=
                     DefaultIssue(
-                        "UnkownOpendriveMinorVersionNumber", "", "Header element", Severity.FATAL_ERROR, wasFixed = false,
+                        "UnkownOpendriveMinorVersionNumber",
+                        "",
+                        "Header element",
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
         }
@@ -73,32 +91,53 @@ object CoreEvaluator {
             OpendriveModel.header.modify(modifiedOpendriveModel) { header ->
                 header.name =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        header.name, "Header element", "name", issueList,
+                        header.name,
+                        "Header element",
+                        "name",
+                        issueList,
                     )
                 header.date =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        header.date, "Header element", "date", issueList,
+                        header.date,
+                        "Header element",
+                        "date",
+                        issueList,
                     )
                 header.vendor =
                     BasicDataTypeModifier.modifyToOptionalString(
-                        header.vendor, "Header element", "vendor", issueList,
+                        header.vendor,
+                        "Header element",
+                        "vendor",
+                        issueList,
                     )
 
                 header.east =
                     BasicDataTypeModifier.modifyToOptionalFiniteDouble(
-                        header.east, "Header element", "east", issueList,
+                        header.east,
+                        "Header element",
+                        "east",
+                        issueList,
                     )
                 header.north =
                     BasicDataTypeModifier.modifyToOptionalFiniteDouble(
-                        header.north, "Header element", "north", issueList,
+                        header.north,
+                        "Header element",
+                        "north",
+                        issueList,
                     )
                 header.south =
                     BasicDataTypeModifier.modifyToOptionalFiniteDouble(
-                        header.south, "Header element", "south", issueList,
+                        header.south,
+                        "Header element",
+                        "south",
+                        issueList,
                     )
                 header.west =
                     BasicDataTypeModifier.modifyToOptionalFiniteDouble(
-                        header.south, "Header element", "west", issueList,
+                        header.south,
+                        "Header element",
+                        "west",
+                        issueList,
                     )
 
                 header
@@ -109,19 +148,31 @@ object CoreEvaluator {
 
                 currentHeaderOffset.x =
                     BasicDataTypeModifier.modifyToFiniteDouble(
-                        currentHeaderOffset.x, "Header element", "x", issueList,
+                        currentHeaderOffset.x,
+                        "Header element",
+                        "x",
+                        issueList,
                     )
                 currentHeaderOffset.y =
                     BasicDataTypeModifier.modifyToFiniteDouble(
-                        currentHeaderOffset.y, "Header element", "y", issueList,
+                        currentHeaderOffset.y,
+                        "Header element",
+                        "y",
+                        issueList,
                     )
                 currentHeaderOffset.z =
                     BasicDataTypeModifier.modifyToFiniteDouble(
-                        currentHeaderOffset.z, "Header element", "z", issueList,
+                        currentHeaderOffset.z,
+                        "Header element",
+                        "z",
+                        issueList,
                     )
                 currentHeaderOffset.hdg =
                     BasicDataTypeModifier.modifyToFiniteDouble(
-                        currentHeaderOffset.hdg, "Header element", "hdg", issueList,
+                        currentHeaderOffset.hdg,
+                        "Header element",
+                        "hdg",
+                        issueList,
                     )
 
                 currentHeaderOffset
@@ -137,7 +188,8 @@ object CoreEvaluator {
                             "GeoReferenceContainsLeadingAndTrailingWhitespace",
                             "GeoReference element contains leading and trailing whitespace.",
                             "GeoReference of header element",
-                            Severity.WARNING, wasFixed = true,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     currentHeaderGeoReference.content = currentHeaderGeoReference.content.trim()
                 }

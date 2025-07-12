@@ -22,62 +22,63 @@ import io.rtron.math.std.HALF_PI
 import io.rtron.math.std.PI
 import kotlin.math.sqrt
 
-class Vector2DTest : FunSpec({
+class Vector2DTest :
+    FunSpec({
 
-    fun scalarMultiply() {
-        val actualValue = Vector2D(1.0, 1.0).scalarMultiply(4.0)
+        fun scalarMultiply() {
+            val actualValue = Vector2D(1.0, 1.0).scalarMultiply(4.0)
 
-        actualValue shouldBe Vector2D(4.0, 4.0)
-    }
-
-    context("TestDistanceCalculation") {
-
-        test("even value distance between two point") {
-            val pointA = Vector2D(0.0, 0.0)
-            val pointB = Vector2D(3.0, 0.0)
-
-            val actualDistance = pointA.distance(pointB)
-
-            actualDistance shouldBe 3.0
+            actualValue shouldBe Vector2D(4.0, 4.0)
         }
 
-        test("uneven value distance between two point") {
-            val pointA = Vector2D(0.0, 0.0)
-            val pointB = Vector2D(1.0, 1.0)
+        context("TestDistanceCalculation") {
 
-            val actualDistance = pointA.distance(pointB)
+            test("even value distance between two point") {
+                val pointA = Vector2D(0.0, 0.0)
+                val pointB = Vector2D(3.0, 0.0)
 
-            actualDistance shouldBe sqrt(2.0)
-        }
-    }
+                val actualDistance = pointA.distance(pointB)
 
-    context("TestAngleCalculation") {
+                actualDistance shouldBe 3.0
+            }
 
-        test("half pi angle between to axes") {
-            val pointA = Vector2D.X_AXIS
-            val pointB = Vector2D.Y_AXIS
+            test("uneven value distance between two point") {
+                val pointA = Vector2D(0.0, 0.0)
+                val pointB = Vector2D(1.0, 1.0)
 
-            val actualAngle = pointA.angle(pointB).toAngleRadians()
+                val actualDistance = pointA.distance(pointB)
 
-            actualAngle shouldBe HALF_PI
-        }
-
-        test("uneven radians angle") {
-            val pointA = Vector2D.X_AXIS
-            val pointB = Vector2D(1.0, -1.0)
-
-            val actualAngle = pointA.angle(pointB).toAngleRadians()
-
-            actualAngle shouldBe 1.75 * PI
+                actualDistance shouldBe sqrt(2.0)
+            }
         }
 
-        test("-half pi degree angle axes") {
-            val pointA = Vector2D.X_AXIS
-            val pointB = Vector2D(0.0, -1.0)
+        context("TestAngleCalculation") {
 
-            val actualAngle = pointA.angle(pointB).toAngleRadians()
+            test("half pi angle between to axes") {
+                val pointA = Vector2D.X_AXIS
+                val pointB = Vector2D.Y_AXIS
 
-            actualAngle shouldBe 1.5 * PI
+                val actualAngle = pointA.angle(pointB).toAngleRadians()
+
+                actualAngle shouldBe HALF_PI
+            }
+
+            test("uneven radians angle") {
+                val pointA = Vector2D.X_AXIS
+                val pointB = Vector2D(1.0, -1.0)
+
+                val actualAngle = pointA.angle(pointB).toAngleRadians()
+
+                actualAngle shouldBe 1.75 * PI
+            }
+
+            test("-half pi degree angle axes") {
+                val pointA = Vector2D.X_AXIS
+                val pointB = Vector2D(0.0, -1.0)
+
+                val actualAngle = pointA.angle(pointB).toAngleRadians()
+
+                actualAngle shouldBe 1.5 * PI
+            }
         }
-    }
-})
+    })

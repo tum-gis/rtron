@@ -43,16 +43,22 @@ object RoadEvaluator {
             if (currentRoad.planView.geometry.isEmpty()) {
                 issueList +=
                     DefaultIssue.of(
-                        "NoPlanViewGeometryElements", "Plan view of road does not contain any geometry elements.",
-                        currentRoad.additionalId, Severity.FATAL_ERROR, wasFixed = false,
+                        "NoPlanViewGeometryElements",
+                        "Plan view of road does not contain any geometry elements.",
+                        currentRoad.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
 
             if (currentRoad.lanes.laneSection.isEmpty()) {
                 issueList +=
                     DefaultIssue.of(
-                        "NoLaneSections", "Road does not contain any lane sections.", currentRoad.additionalId,
-                        Severity.FATAL_ERROR, wasFixed = false,
+                        "NoLaneSections",
+                        "Road does not contain any lane sections.",
+                        currentRoad.additionalId,
+                        Severity.FATAL_ERROR,
+                        wasFixed = false,
                     )
             }
 

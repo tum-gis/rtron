@@ -72,10 +72,11 @@ abstract class Opendrive16ObjectMapper {
         source.outline.toOption().onSome { sourceOutline ->
             val outline = mapRoadObjectsObjectOutlinesOutline(sourceOutline)
             target.outlines =
-                target.outlines.fold(
-                    { RoadObjectsObjectOutlines(outline = listOf(outline)) },
-                    { RoadObjectsObjectOutlines(outline = it.outline + outline) },
-                ).some()
+                target.outlines
+                    .fold(
+                        { RoadObjectsObjectOutlines(outline = listOf(outline)) },
+                        { RoadObjectsObjectOutlines(outline = it.outline + outline) },
+                    ).some()
         }
     }
 

@@ -62,24 +62,32 @@ class CityFurnitureModuleBuilder(
 
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
-            cityFurnitureFeature.populateLod1Geometry(geometryTransformer)
+            cityFurnitureFeature
+                .populateLod1Geometry(geometryTransformer)
                 .mapLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForCityFurnitureLod1",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }
 
         roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
-            cityFurnitureFeature.populateLod2Geometry(geometryTransformer)
+            cityFurnitureFeature
+                .populateLod2Geometry(geometryTransformer)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
                             "NoSuitableGeometryForCityFurnitureLod2",
-                            it.message, roadspaceObject.id, Severity.WARNING, wasFixed = true,
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                 }
         }

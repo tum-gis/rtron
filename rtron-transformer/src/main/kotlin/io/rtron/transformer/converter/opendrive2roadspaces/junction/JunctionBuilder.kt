@@ -57,7 +57,8 @@ class JunctionBuilder(
         check(roadspaces.count { it.id == incomingRoadspaceId } == 1) { "Incoming roadspace with $incomingRoadspaceId does not exist." }
         val incomingRoadspace = roadspaces.find { it.id == incomingRoadspaceId }!!
         val incomingRoadspaceContactPointId =
-            incomingRoadspace.road.getRoadspaceContactPointToJunction(id)
+            incomingRoadspace.road
+                .getRoadspaceContactPointToJunction(id)
                 .handleEmpty { throw Exception("Incoming roadspace with $incomingRoadspaceId must be connected to junction ($id).") }
 
         check(

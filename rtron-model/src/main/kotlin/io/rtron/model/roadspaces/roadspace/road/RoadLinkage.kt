@@ -51,7 +51,8 @@ data class RoadLinkage(
     /** Returns a list of [RoadspaceIdentifier] of roadspaces which is referred to (predecessor and/or successor).  */
     fun getAllUsedRoadspaceIds(): List<RoadspaceIdentifier> =
         (predecessorRoadspaceContactPointId.toList() + successorRoadspaceContactPointId.toList())
-            .map { it.roadspaceIdentifier }.distinct()
+            .map { it.roadspaceIdentifier }
+            .distinct()
 
     /** Returns a list of [JunctionIdentifier] of junctions which is referred to (belongs to, predecessor, successor).  */
     fun getAllUsedJunctionIds(): List<JunctionIdentifier> =

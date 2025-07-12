@@ -45,7 +45,8 @@ data class LinearRing3D(
     val vertices: NonEmptyList<Vector3D>,
     override val tolerance: Double,
     override val affineSequence: AffineSequence3D = AffineSequence3D.EMPTY,
-) : AbstractSurface3D(), Tolerable {
+) : AbstractSurface3D(),
+    Tolerable {
     // Properties and Initializers
     private val numberOfVertices = vertices.size
 
@@ -59,8 +60,8 @@ data class LinearRing3D(
         require(numberOfVertices >= 3) { "Not enough vertices provided for constructing a linear ring." }
         require(
             vertices.noneWithNextEnclosing {
-                    a,
-                    b,
+                a,
+                b,
                 ->
                 a.fuzzyEquals(b, tolerance)
             },
@@ -77,7 +78,8 @@ data class LinearRing3D(
     fun isPlanar() = vertices.isPlanar(tolerance)
 
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
-        Triangulator.triangulate(this, tolerance)
+        Triangulator
+            .triangulate(this, tolerance)
             .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
             .map { it.toNonEmptyListOrNull()!! }
 
@@ -120,11 +122,15 @@ data class LinearRing3D(
             require(leftVertices.size >= 2) { "At least two left vertices required." }
             require(rightVertices.size >= 2) { "At least two right vertices required." }
 
-            data class VertexPair(val left: Vector3D, val right: Vector3D)
+            data class VertexPair(
+                val left: Vector3D,
+                val right: Vector3D,
+            )
             val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
             val linearRingVertices =
-                vertexPairs.zipWithNext()
+                vertexPairs
+                    .zipWithNext()
                     .map { nonEmptyListOf(it.first.right, it.second.right, it.second.left, it.first.left) }
                     .let { it.toNonEmptyListOrNull()!! }
 
@@ -148,7 +154,10 @@ data class LinearRing3D(
                 require(leftVertices.size >= 2) { "At least two left vertices required." }
                 require(rightVertices.size >= 2) { "At least two right vertices required." }
 
-                data class VertexPair(val left: Vector3D, val right: Vector3D)
+                data class VertexPair(
+                    val left: Vector3D,
+                    val right: Vector3D,
+                )
                 val vertexPairs = leftVertices.zip(rightVertices).map { VertexPair(it.first, it.second) }
 
                 val linearRings: List<LinearRing3D> =
@@ -164,7 +173,8 @@ data class LinearRing3D(
                         .toList()
 
                 val nonEmptyLinearRingsList =
-                    linearRings.toNonEmptyListOrNone()
+                    linearRings
+                        .toNonEmptyListOrNone()
                         .toEither { GeometryException.NotEnoughValidLinearRings("") }
                         .bind()
                 nonEmptyLinearRingsList

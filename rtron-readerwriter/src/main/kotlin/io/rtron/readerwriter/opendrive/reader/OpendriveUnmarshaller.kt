@@ -35,7 +35,9 @@ import org.asam.opendrive16.OpenDRIVE as Opendrive16
 import org.asam.opendrive17.OpenDRIVE as Opendrive17
 import org.asam.opendrive18.OpenDRIVE as Opendrive18
 
-class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
+class OpendriveUnmarshaller(
+    val opendriveVersion: OpendriveVersion,
+) {
     // Properties and Initializers
     val jaxbUnmarshaller: Unmarshaller
     val validationEventHandler = OpendriveValidationEventHandler()
@@ -87,12 +89,11 @@ class OpendriveUnmarshaller(val opendriveVersion: OpendriveVersion) {
 
         val SUPPORTED_SCHEMA_VERSIONS: Set<OpendriveVersion> = OPENDRIVE_MODEL_CLASSES.keys
 
-        fun of(version: OpendriveVersion): Either<OpendriveReaderException.NoDedicatedUnmarshallerAvailable, OpendriveUnmarshaller> {
-            return if (version in SUPPORTED_SCHEMA_VERSIONS) {
+        fun of(version: OpendriveVersion): Either<OpendriveReaderException.NoDedicatedUnmarshallerAvailable, OpendriveUnmarshaller> =
+            if (version in SUPPORTED_SCHEMA_VERSIONS) {
                 OpendriveUnmarshaller(version).right()
             } else {
                 OpendriveReaderException.NoDedicatedUnmarshallerAvailable(version).left()
             }
-        }
     }
 }

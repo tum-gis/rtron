@@ -40,7 +40,8 @@ data class RoadLanesLaneSectionLCRLaneRoadMark(
     var weight: Option<ERoadMarkWeight> = None,
     var width: Option<Double> = None,
     override var additionalId: Option<LaneRoadMarkIdentifier> = None,
-) : OpendriveElement(), AdditionalLaneRoadMarkIdentifier {
+) : OpendriveElement(),
+    AdditionalLaneRoadMarkIdentifier {
     // Methods
     fun containsTypeLines() = type.isSome { it.line.isNotEmpty() }
 

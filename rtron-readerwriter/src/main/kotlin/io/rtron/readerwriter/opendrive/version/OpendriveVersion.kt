@@ -26,7 +26,9 @@ import io.rtron.std.getValueEither
  * ASAM: https://www.asam.net/standards/detail/opendrive
  * Wikipedia: https://en.wikipedia.org/wiki/OpenDRIVE_(specification)
  */
-enum class OpendriveVersion(val rev: Pair<Int, Int>) {
+enum class OpendriveVersion(
+    val rev: Pair<Int, Int>,
+) {
     /**
      * OpenDRIVE version 0.7 released 2005 by VIRES Simulationstechnologie GmbH.
      */
@@ -82,7 +84,9 @@ enum class OpendriveVersion(val rev: Pair<Int, Int>) {
         ): Either<UnknownOpendriveVersion, OpendriveVersion> =
             map.getValueEither(Pair(revMajor, revMinor)).mapLeft { UnknownOpendriveVersion(it.message) }
 
-        data class UnknownOpendriveVersion(val message: String)
+        data class UnknownOpendriveVersion(
+            val message: String,
+        )
         // : OpendriveReaderException("Version of OpenDRIVE dataset not deducible: $reason")
     }
 }

@@ -86,9 +86,7 @@ class RealVector(
         return true
     }
 
-    override fun hashCode(): Int {
-        return entries.contentHashCode()
-    }
+    override fun hashCode(): Int = entries.contentHashCode()
 
     // Conversions
 

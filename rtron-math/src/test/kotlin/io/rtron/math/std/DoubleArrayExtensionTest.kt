@@ -20,59 +20,80 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
-class DoubleArrayExtensionTest : FunSpec({
+class DoubleArrayExtensionTest :
+    FunSpec({
 
-    context("TestReshapeByColumnDimension") {
+        context("TestReshapeByColumnDimension") {
 
-        test("test reshape of square matrix") {
-            val expectedMatrix =
-                arrayOf(
-                    doubleArrayOf(1.0, 0.0, 0.0, 1.0),
-                    doubleArrayOf(0.0, 1.0, 0.0, 2.0),
-                    doubleArrayOf(0.0, 0.0, 1.0, 3.0),
-                    doubleArrayOf(0.0, 0.0, 0.0, 1.0),
-                )
-            val matrix =
-                doubleArrayOf(
-                    1.0, 0.0, 0.0, 1.0,
-                    0.0, 1.0, 0.0, 2.0,
-                    0.0, 0.0, 1.0, 3.0,
-                    0.0, 0.0, 0.0, 1.0,
-                )
+            test("test reshape of square matrix") {
+                val expectedMatrix =
+                    arrayOf(
+                        doubleArrayOf(1.0, 0.0, 0.0, 1.0),
+                        doubleArrayOf(0.0, 1.0, 0.0, 2.0),
+                        doubleArrayOf(0.0, 0.0, 1.0, 3.0),
+                        doubleArrayOf(0.0, 0.0, 0.0, 1.0),
+                    )
+                val matrix =
+                    doubleArrayOf(
+                        1.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        1.0,
+                        0.0,
+                        2.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                        3.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                    )
 
-            val actualReshapedMatrix = matrix.reshapeByColumnDimension(4)
+                val actualReshapedMatrix = matrix.reshapeByColumnDimension(4)
 
-            actualReshapedMatrix shouldBe expectedMatrix
+                actualReshapedMatrix shouldBe expectedMatrix
+            }
         }
-    }
 
-    context("TestReshapeByRowDimension") {
+        context("TestReshapeByRowDimension") {
 
-        test("test fail for wrong dimension") {
-            val values = doubleArrayOf(2.0, 1.0, 2.0, 1.0)
+            test("test fail for wrong dimension") {
+                val values = doubleArrayOf(2.0, 1.0, 2.0, 1.0)
 
-            shouldThrow<IllegalArgumentException> { values.reshapeByRowDimension(5) }
+                shouldThrow<IllegalArgumentException> { values.reshapeByRowDimension(5) }
+            }
+
+            test("test reshape of square matrix") {
+                val expectedMatrix =
+                    arrayOf(
+                        doubleArrayOf(0.0, 0.0, 1.0),
+                        doubleArrayOf(1.0, 0.0, 2.0),
+                        doubleArrayOf(0.0, 1.0, 3.0),
+                        doubleArrayOf(0.0, 0.0, 1.0),
+                    )
+                val matrix =
+                    doubleArrayOf(
+                        0.0,
+                        0.0,
+                        1.0,
+                        1.0,
+                        0.0,
+                        2.0,
+                        0.0,
+                        1.0,
+                        3.0,
+                        0.0,
+                        0.0,
+                        1.0,
+                    )
+
+                val actualReshapedMatrix = matrix.reshapeByRowDimension(4)
+
+                actualReshapedMatrix shouldBe expectedMatrix
+            }
         }
-
-        test("test reshape of square matrix") {
-            val expectedMatrix =
-                arrayOf(
-                    doubleArrayOf(0.0, 0.0, 1.0),
-                    doubleArrayOf(1.0, 0.0, 2.0),
-                    doubleArrayOf(0.0, 1.0, 3.0),
-                    doubleArrayOf(0.0, 0.0, 1.0),
-                )
-            val matrix =
-                doubleArrayOf(
-                    0.0, 0.0, 1.0,
-                    1.0, 0.0, 2.0,
-                    0.0, 1.0, 3.0,
-                    0.0, 0.0, 1.0,
-                )
-
-            val actualReshapedMatrix = matrix.reshapeByRowDimension(4)
-
-            actualReshapedMatrix shouldBe expectedMatrix
-        }
-    }
-})
+    })

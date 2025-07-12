@@ -25,77 +25,78 @@ import io.rtron.math.geometry.euclidean.threed.surface.Plane3D
 import io.rtron.math.std.DBL_EPSILON_1
 import io.rtron.math.std.DBL_EPSILON_2
 
-class Plane3DUtilTest : FunSpec({
-    context("TestBestFittingPlaneCalculation") {
+class Plane3DUtilTest :
+    FunSpec({
+        context("TestBestFittingPlaneCalculation") {
 
-        test("normal for clockwise point in XY-plane") {
-            val pointA = -Vector3D.X_AXIS
-            val pointB = Vector3D.Y_AXIS
-            val pointC = Vector3D.X_AXIS
-            val expectedNormal = -Vector3D.Z_AXIS
+            test("normal for clockwise point in XY-plane") {
+                val pointA = -Vector3D.X_AXIS
+                val pointB = Vector3D.Y_AXIS
+                val pointC = Vector3D.X_AXIS
+                val expectedNormal = -Vector3D.Z_AXIS
 
-            val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
+                val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
 
-            actualBestFittingPlane.normal shouldBe expectedNormal
-        }
-
-        test("normal for counter clockwise point in XY-plane") {
-            val pointA = Vector3D.X_AXIS
-            val pointB = Vector3D.Y_AXIS
-            val pointC = -Vector3D.X_AXIS
-            val expectedNormal = -Vector3D.Z_AXIS
-
-            val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
-
-            actualBestFittingPlane.normal shouldBe expectedNormal
-        }
-
-        test("plane fitting with three points") {
-            val pointA = Vector3D(1.0, 0.0, 0.0)
-            val pointB = Vector3D(1.0, 3.0, 0.0)
-            val pointC = Vector3D(1.0, 0.0, 3.0)
-            val expectedCentroid = Vector3D(1.0, 1.0, 1.0)
-            val expectedNormal = -Vector3D.X_AXIS
-            val expectedPlane = Plane3D(expectedCentroid, expectedNormal, DBL_EPSILON_1)
-
-            val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
-
-            actualBestFittingPlane shouldBe expectedPlane
-        }
-
-        test("plane fitting with multiple points") {
-            val pointA = Vector3D(4.0, 1.0, -3.0)
-            val pointB = Vector3D(2.0, 2.0, -2.0)
-            val pointC = Vector3D(1.0, 1.0, 3.0)
-            val pointD = Vector3D(1.0, -1.0, 9.0)
-            val expectedCentroid = Vector3D(1.0, 1.0, 3.0)
-            val expectedNormal = Vector3D(2.0, 3.0, 1.0).normalized()
-            val expectedPlane = Plane3D(expectedCentroid, expectedNormal, 0.0)
-
-            val actualBestFittingPlane =
-                listOf(pointA, pointB, pointC, pointD)
-                    .calculateBestFittingPlane(DBL_EPSILON_2)
-
-            actualBestFittingPlane.normal.toDoubleArray().zip(expectedPlane.normal.toDoubleArray()).forEach {
-                it.first.shouldBe(it.second plusOrMinus DBL_EPSILON_2)
+                actualBestFittingPlane.normal shouldBe expectedNormal
             }
-            actualBestFittingPlane.isSimilarTo(expectedPlane).shouldBeTrue()
-        }
 
-        test("plane fitting with five points not in the same plane") {
-            val pointA = Vector3D(1.0, 0.0, 0.0)
-            val pointB = Vector3D(1.0, 3.0, 0.0)
-            val pointC = Vector3D(1.0, 0.0, 3.0)
-            val pointD = Vector3D(0.0, 1.0, 1.0)
-            val pointE = Vector3D(2.0, 1.0, 1.0)
-            val expectedCentroid = Vector3D(1.0, 1.0, 1.0)
-            val expectedNormal = -Vector3D.X_AXIS
-            val expectedPlane = Plane3D(expectedCentroid, expectedNormal, DBL_EPSILON_1)
-            val actualBestFittingPlane =
-                listOf(pointA, pointB, pointC, pointD, pointE)
-                    .calculateBestFittingPlane(DBL_EPSILON_1)
+            test("normal for counter clockwise point in XY-plane") {
+                val pointA = Vector3D.X_AXIS
+                val pointB = Vector3D.Y_AXIS
+                val pointC = -Vector3D.X_AXIS
+                val expectedNormal = -Vector3D.Z_AXIS
 
-            actualBestFittingPlane shouldBe expectedPlane
+                val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
+
+                actualBestFittingPlane.normal shouldBe expectedNormal
+            }
+
+            test("plane fitting with three points") {
+                val pointA = Vector3D(1.0, 0.0, 0.0)
+                val pointB = Vector3D(1.0, 3.0, 0.0)
+                val pointC = Vector3D(1.0, 0.0, 3.0)
+                val expectedCentroid = Vector3D(1.0, 1.0, 1.0)
+                val expectedNormal = -Vector3D.X_AXIS
+                val expectedPlane = Plane3D(expectedCentroid, expectedNormal, DBL_EPSILON_1)
+
+                val actualBestFittingPlane = listOf(pointA, pointB, pointC).calculateBestFittingPlane(DBL_EPSILON_1)
+
+                actualBestFittingPlane shouldBe expectedPlane
+            }
+
+            test("plane fitting with multiple points") {
+                val pointA = Vector3D(4.0, 1.0, -3.0)
+                val pointB = Vector3D(2.0, 2.0, -2.0)
+                val pointC = Vector3D(1.0, 1.0, 3.0)
+                val pointD = Vector3D(1.0, -1.0, 9.0)
+                val expectedCentroid = Vector3D(1.0, 1.0, 3.0)
+                val expectedNormal = Vector3D(2.0, 3.0, 1.0).normalized()
+                val expectedPlane = Plane3D(expectedCentroid, expectedNormal, 0.0)
+
+                val actualBestFittingPlane =
+                    listOf(pointA, pointB, pointC, pointD)
+                        .calculateBestFittingPlane(DBL_EPSILON_2)
+
+                actualBestFittingPlane.normal.toDoubleArray().zip(expectedPlane.normal.toDoubleArray()).forEach {
+                    it.first.shouldBe(it.second plusOrMinus DBL_EPSILON_2)
+                }
+                actualBestFittingPlane.isSimilarTo(expectedPlane).shouldBeTrue()
+            }
+
+            test("plane fitting with five points not in the same plane") {
+                val pointA = Vector3D(1.0, 0.0, 0.0)
+                val pointB = Vector3D(1.0, 3.0, 0.0)
+                val pointC = Vector3D(1.0, 0.0, 3.0)
+                val pointD = Vector3D(0.0, 1.0, 1.0)
+                val pointE = Vector3D(2.0, 1.0, 1.0)
+                val expectedCentroid = Vector3D(1.0, 1.0, 1.0)
+                val expectedNormal = -Vector3D.X_AXIS
+                val expectedPlane = Plane3D(expectedCentroid, expectedNormal, DBL_EPSILON_1)
+                val actualBestFittingPlane =
+                    listOf(pointA, pointB, pointC, pointD, pointE)
+                        .calculateBestFittingPlane(DBL_EPSILON_1)
+
+                actualBestFittingPlane shouldBe expectedPlane
+            }
         }
-    }
-})
+    })

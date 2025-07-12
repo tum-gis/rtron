@@ -35,136 +35,142 @@ import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
 
-class Spiral2DTest : FunSpec({
-    context("TestPointCalculation") {
+class Spiral2DTest :
+    FunSpec({
+        context("TestPointCalculation") {
 
-        test("return (0,0) at l=0") {
-            val spiral = Spiral2D(1.0)
+            test("return (0,0) at l=0") {
+                val spiral = Spiral2D(1.0)
 
-            val actualPoint = spiral.calculatePoint(0.0)
+                val actualPoint = spiral.calculatePoint(0.0)
 
-            actualPoint shouldBe Vector2D.ZERO
-        }
-
-        test("return asymptotic point at l=+infinity") {
-            val asymptoticPoint = Vector2D(0.5, 0.5)
-            val spiral = Spiral2D(PI)
-
-            val actualPoint = spiral.calculatePoint(Double.POSITIVE_INFINITY)
-
-            actualPoint.x.shouldBe(asymptoticPoint.x plusOrMinus DBL_EPSILON_1)
-            actualPoint.y.shouldBe(asymptoticPoint.y plusOrMinus DBL_EPSILON_1)
-        }
-
-        test("return asymptotic point at l=-infinity") {
-            val asymptoticPoint = Vector2D(-0.5, -0.5)
-            val spiral = Spiral2D(PI)
-
-            val actualPoint = spiral.calculatePoint(Double.NEGATIVE_INFINITY)
-
-            actualPoint.x.shouldBe(asymptoticPoint.x plusOrMinus DBL_EPSILON_1)
-            actualPoint.y.shouldBe(asymptoticPoint.y plusOrMinus DBL_EPSILON_1)
-        }
-    }
-
-    context("TestRotationCalculation") {
-
-        test("return 0 at l=0") {
-            val spiral = Spiral2D(1.0)
-
-            val actualRotation = spiral.calculateRotation(0.0)
-
-            actualRotation.toAngleRadians() shouldBe 0.0
-        }
-    }
-
-    context("TestDatasetCalculation") {
-
-        val logger = KotlinLogging.logger {}
-
-        test("test point and rotation calculation against csv sample dataset") {
-            val filePath = Path("src/test/cpp/spiral/build/sampled_spiral.csv").absolute()
-            if (!filePath.exists()) {
-                logger.warn { "Dataset does not exist at $filePath, skipping test" }
-                return@test
+                actualPoint shouldBe Vector2D.ZERO
             }
-            val fileReader = FileReader(filePath.toFile())
 
-            val records: Iterable<CSVRecord> =
-                CSVFormat.Builder.create().setDelimiter(
-                    ",",
-                ).setHeader("cDot", "s", "x", "y", "t").setSkipHeaderRecord(true).get().parse(fileReader)
-            for (record in records) {
-                val cDot: Double = record.get("cDot").toDouble()
-                val s: Double = record.get("s").toDouble()
-                val x: Double = record.get("x").toDouble()
-                val y: Double = record.get("y").toDouble()
-                val t: Double = record.get("t").toDouble()
-                // println("$l $x $y")
+            test("return asymptotic point at l=+infinity") {
+                val asymptoticPoint = Vector2D(0.5, 0.5)
+                val spiral = Spiral2D(PI)
 
-                val spiral = Spiral2D(cDot)
-                val actualPoint = spiral.calculatePoint(s)
-                val actualRotation = spiral.calculateRotation(s)
+                val actualPoint = spiral.calculatePoint(Double.POSITIVE_INFINITY)
 
-                if (abs(actualPoint.x - x) > DBL_EPSILON_1 || abs(actualPoint.y - y) > DBL_EPSILON_1) {
-                    println("test")
+                actualPoint.x.shouldBe(asymptoticPoint.x plusOrMinus DBL_EPSILON_1)
+                actualPoint.y.shouldBe(asymptoticPoint.y plusOrMinus DBL_EPSILON_1)
+            }
+
+            test("return asymptotic point at l=-infinity") {
+                val asymptoticPoint = Vector2D(-0.5, -0.5)
+                val spiral = Spiral2D(PI)
+
+                val actualPoint = spiral.calculatePoint(Double.NEGATIVE_INFINITY)
+
+                actualPoint.x.shouldBe(asymptoticPoint.x plusOrMinus DBL_EPSILON_1)
+                actualPoint.y.shouldBe(asymptoticPoint.y plusOrMinus DBL_EPSILON_1)
+            }
+        }
+
+        context("TestRotationCalculation") {
+
+            test("return 0 at l=0") {
+                val spiral = Spiral2D(1.0)
+
+                val actualRotation = spiral.calculateRotation(0.0)
+
+                actualRotation.toAngleRadians() shouldBe 0.0
+            }
+        }
+
+        context("TestDatasetCalculation") {
+
+            val logger = KotlinLogging.logger {}
+
+            test("test point and rotation calculation against csv sample dataset") {
+                val filePath = Path("src/test/cpp/spiral/build/sampled_spiral.csv").absolute()
+                if (!filePath.exists()) {
+                    logger.warn { "Dataset does not exist at $filePath, skipping test" }
+                    return@test
                 }
-                actualPoint.x.shouldBe(x plusOrMinus DBL_EPSILON_3)
-                actualPoint.y.shouldBe(y plusOrMinus DBL_EPSILON_3)
-                actualRotation.angle.shouldBe(Rotation2D(t).angle plusOrMinus DBL_EPSILON_1)
+                val fileReader = FileReader(filePath.toFile())
+
+                val records: Iterable<CSVRecord> =
+                    CSVFormat.Builder
+                        .create()
+                        .setDelimiter(
+                            ",",
+                        ).setHeader("cDot", "s", "x", "y", "t")
+                        .setSkipHeaderRecord(true)
+                        .get()
+                        .parse(fileReader)
+                for (record in records) {
+                    val cDot: Double = record.get("cDot").toDouble()
+                    val s: Double = record.get("s").toDouble()
+                    val x: Double = record.get("x").toDouble()
+                    val y: Double = record.get("y").toDouble()
+                    val t: Double = record.get("t").toDouble()
+                    // println("$l $x $y")
+
+                    val spiral = Spiral2D(cDot)
+                    val actualPoint = spiral.calculatePoint(s)
+                    val actualRotation = spiral.calculateRotation(s)
+
+                    if (abs(actualPoint.x - x) > DBL_EPSILON_1 || abs(actualPoint.y - y) > DBL_EPSILON_1) {
+                        println("test")
+                    }
+                    actualPoint.x.shouldBe(x plusOrMinus DBL_EPSILON_3)
+                    actualPoint.y.shouldBe(y plusOrMinus DBL_EPSILON_3)
+                    actualRotation.angle.shouldBe(Rotation2D(t).angle plusOrMinus DBL_EPSILON_1)
+                }
+            }
+
+            test("test point calculation against sample value 1") {
+                val spiral = Spiral2D(-0.067773987108739761)
+
+                val actualPoint = spiral.calculatePoint(-5330.827396000006)
+
+                actualPoint.x.shouldBe(-3.401537830619735 plusOrMinus DBL_EPSILON)
+                actualPoint.y.shouldBe(3.403385667520832 plusOrMinus DBL_EPSILON)
+            }
+
+            test("test rotation calculation against sample value 1") {
+                val spiral = Spiral2D(-0.067773987108739761)
+
+                val actualPoint = spiral.calculateRotation(-5330.827396000006)
+
+                actualPoint.angle.shouldBe(Rotation2D(-962991.11906995473).angle plusOrMinus DBL_EPSILON)
+            }
+
+            test("test point calculation against sample value 2") {
+                val spiral = Spiral2D(0.011823698552189441)
+
+                val actualPoint = spiral.calculatePoint(38679.185313200163)
+
+                actualPoint.x.shouldBe(8.1518659286823159 plusOrMinus DBL_EPSILON)
+                actualPoint.y.shouldBe(8.1487837011384663 plusOrMinus DBL_EPSILON)
+            }
+
+            test("test rotation calculation against sample value 2") {
+                val spiral = Spiral2D(0.011823698552189441)
+
+                val actualPoint = spiral.calculateRotation(38679.185313200163)
+
+                actualPoint.angle.shouldBe(Rotation2D(8844595.7788996678).angle plusOrMinus DBL_EPSILON)
+            }
+
+            test("test point calculation against sample value 3") {
+                val spiral = Spiral2D(-0.051693646571178295)
+
+                val actualPoint = spiral.calculatePoint(6884.6109795996472)
+
+                // this higher offset is caused by accumulated floating point errors
+                actualPoint.x.shouldBe(3.9006399958644153 plusOrMinus DBL_EPSILON_2)
+                actualPoint.y.shouldBe(-3.8974453107566154 plusOrMinus DBL_EPSILON_2)
+            }
+
+            test("test rotation calculation against sample value 3") {
+                val spiral = Spiral2D(-0.051693646571178295)
+
+                val actualPoint = spiral.calculateRotation(6884.6109795996472)
+
+                actualPoint.angle.shouldBe(Rotation2D(-1225084.3271085601).angle plusOrMinus DBL_EPSILON)
             }
         }
-
-        test("test point calculation against sample value 1") {
-            val spiral = Spiral2D(-0.067773987108739761)
-
-            val actualPoint = spiral.calculatePoint(-5330.827396000006)
-
-            actualPoint.x.shouldBe(-3.401537830619735 plusOrMinus DBL_EPSILON)
-            actualPoint.y.shouldBe(3.403385667520832 plusOrMinus DBL_EPSILON)
-        }
-
-        test("test rotation calculation against sample value 1") {
-            val spiral = Spiral2D(-0.067773987108739761)
-
-            val actualPoint = spiral.calculateRotation(-5330.827396000006)
-
-            actualPoint.angle.shouldBe(Rotation2D(-962991.11906995473).angle plusOrMinus DBL_EPSILON)
-        }
-
-        test("test point calculation against sample value 2") {
-            val spiral = Spiral2D(0.011823698552189441)
-
-            val actualPoint = spiral.calculatePoint(38679.185313200163)
-
-            actualPoint.x.shouldBe(8.1518659286823159 plusOrMinus DBL_EPSILON)
-            actualPoint.y.shouldBe(8.1487837011384663 plusOrMinus DBL_EPSILON)
-        }
-
-        test("test rotation calculation against sample value 2") {
-            val spiral = Spiral2D(0.011823698552189441)
-
-            val actualPoint = spiral.calculateRotation(38679.185313200163)
-
-            actualPoint.angle.shouldBe(Rotation2D(8844595.7788996678).angle plusOrMinus DBL_EPSILON)
-        }
-
-        test("test point calculation against sample value 3") {
-            val spiral = Spiral2D(-0.051693646571178295)
-
-            val actualPoint = spiral.calculatePoint(6884.6109795996472)
-
-            // this higher offset is caused by accumulated floating point errors
-            actualPoint.x.shouldBe(3.9006399958644153 plusOrMinus DBL_EPSILON_2)
-            actualPoint.y.shouldBe(-3.8974453107566154 plusOrMinus DBL_EPSILON_2)
-        }
-
-        test("test rotation calculation against sample value 3") {
-            val spiral = Spiral2D(-0.051693646571178295)
-
-            val actualPoint = spiral.calculateRotation(6884.6109795996472)
-
-            actualPoint.angle.shouldBe(Rotation2D(-1225084.3271085601).angle plusOrMinus DBL_EPSILON)
-        }
-    }
-})
+    })

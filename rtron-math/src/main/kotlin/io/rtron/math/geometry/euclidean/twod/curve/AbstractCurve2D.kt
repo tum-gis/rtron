@@ -34,7 +34,10 @@ import io.rtron.math.range.length
 /**
  * Abstract class for all geometric curve objects in 2D.
  */
-abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, Tolerable {
+abstract class AbstractCurve2D :
+    AbstractGeometry2D(),
+    DefinableDomain<Double>,
+    Tolerable {
     // Properties
 
     /** length of the curve */
@@ -115,9 +118,8 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates
      * @return point in cartesian coordinates
      */
-    fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D {
-        return calculatePointLocalCSUnbounded(curveRelativePoint).let { affineSequence.solve().transform(it) }
-    }
+    fun calculatePointGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Vector2D =
+        calculatePointLocalCSUnbounded(curveRelativePoint).let { affineSequence.solve().transform(it) }
 
     /**
      * Returns the orientation in the global cartesian coordinate system that is tangential to this curve at a given
@@ -144,9 +146,8 @@ abstract class AbstractCurve2D : AbstractGeometry2D(), DefinableDomain<Double>, 
      * @param curveRelativePoint point in curve relative coordinates for which the orientation is to be calculated
      * @return orientation tangential to this curve
      */
-    fun calculateRotationGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D {
-        return calculateRotationLocalCSUnbounded(curveRelativePoint).let { affineSequence.solve().transform(it) }
-    }
+    fun calculateRotationGlobalCSUnbounded(curveRelativePoint: CurveRelativeVector1D): Rotation2D =
+        calculateRotationLocalCSUnbounded(curveRelativePoint).let { affineSequence.solve().transform(it) }
 
     /**
      * Returns a pose at the position along the curve [curveRelativePoint].

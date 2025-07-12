@@ -28,9 +28,10 @@ fun AbstractThematicSurface.populateLod2MultiSurfaceOrLod0Geometry(
     val lod2MultiSurfaceError = populateLod2MultiSurface(geometryTransformer).fold({ it }, { return it.right() })
     val lod0GeometryError = populateLod0Geometry(geometryTransformer).fold({ it }, { return it.right() })
 
-    return GeometryTransformerException.NoSuiteableSourceGeometry(
-        "LOD2 multi surface or LOD0 geometry of the abstract thematic surface.",
-    ).left()
+    return GeometryTransformerException
+        .NoSuiteableSourceGeometry(
+            "LOD2 multi surface or LOD0 geometry of the abstract thematic surface.",
+        ).left()
 }
 
 /**
@@ -51,7 +52,9 @@ fun AbstractThematicSurface.populateLod0Geometry(geometryTransformer: GeometryTr
             return@either
         }
 
-        GeometryTransformerException.NoSuiteableSourceGeometry("LOD0 geometry of the abstract thematic surface.").left()
+        GeometryTransformerException
+            .NoSuiteableSourceGeometry("LOD0 geometry of the abstract thematic surface.")
+            .left()
             .bind()
     }
 
@@ -68,8 +71,10 @@ fun AbstractThematicSurface.populateLod1MultiSurface(geometryTransformer: Geomet
             return@either
         }
 
-        GeometryTransformerException.NoSuiteableSourceGeometry("LOD1 multi surface of the abstract thematic surface.")
-            .left().bind()
+        GeometryTransformerException
+            .NoSuiteableSourceGeometry("LOD1 multi surface of the abstract thematic surface.")
+            .left()
+            .bind()
     }
 
 /**
@@ -85,8 +90,10 @@ fun AbstractThematicSurface.populateLod2MultiSurface(geometryTransformer: Geomet
             return@either
         }
 
-        GeometryTransformerException.NoSuiteableSourceGeometry("LOD2 multi surface of the abstract thematic surface.")
-            .left().bind()
+        GeometryTransformerException
+            .NoSuiteableSourceGeometry("LOD2 multi surface of the abstract thematic surface.")
+            .left()
+            .bind()
     }
 
 /**
@@ -102,8 +109,10 @@ fun AbstractThematicSurface.populateLod3MultiSurface(geometryTransformer: Geomet
             return@either
         }
 
-        GeometryTransformerException.NoSuiteableSourceGeometry("LOD3 multi surface of the abstract thematic surface.")
-            .left().bind()
+        GeometryTransformerException
+            .NoSuiteableSourceGeometry("LOD3 multi surface of the abstract thematic surface.")
+            .left()
+            .bind()
     }
 
 fun AbstractThematicSurface.populateLod2MultiSurfaceFromSolidCutoutOrSurface(
@@ -111,12 +120,15 @@ fun AbstractThematicSurface.populateLod2MultiSurfaceFromSolidCutoutOrSurface(
     solidFaceSelection: List<GeometryTransformer.FaceType>,
 ): Either<GeometryTransformerException, Unit> =
     either {
-        geometryTransformer.getSolidCutoutOrSurface(*solidFaceSelection.toTypedArray())
+        geometryTransformer
+            .getSolidCutoutOrSurface(*solidFaceSelection.toTypedArray())
             .onSome { currentMultiSurfaceResult ->
                 lod2MultiSurface = currentMultiSurfaceResult.mapLeft { it.toGeometryGenerationException() }.bind()
                 return@either
             }
 
-        GeometryTransformerException.NoSuiteableSourceGeometry("LOD2 multi surface of the abstract thematic surface.")
-            .left().bind()
+        GeometryTransformerException
+            .NoSuiteableSourceGeometry("LOD2 multi surface of the abstract thematic surface.")
+            .left()
+            .bind()
     }

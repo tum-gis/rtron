@@ -24,9 +24,7 @@ data class RoadLanesLaneSectionCenter(
     var lane: RoadLanesLaneSectionCenterLane = RoadLanesLaneSectionCenterLane(),
 ) : OpendriveElement() {
     // Methods
-    fun getIndividualCenterLane(): RoadLanesLaneSectionCenterLane {
-        return lane
-    }
+    fun getIndividualCenterLane(): RoadLanesLaneSectionCenterLane = lane
 
     fun getNumberOfLanes() = 1 // TODO remove
 

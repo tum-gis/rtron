@@ -25,7 +25,10 @@ import kotlin.reflect.KProperty
  * @param value actual value of the property
  * @param isDefault true, if value constitutes a default value
  */
-open class Property<T>(value: T, isDefault: Boolean = false) {
+open class Property<T>(
+    value: T,
+    isDefault: Boolean = false,
+) {
     // Properties and Initializers
     var value: T = value
         protected set
@@ -41,9 +44,7 @@ open class Property<T>(value: T, isDefault: Boolean = false) {
     operator fun getValue(
         thisRef: Any?,
         prop: KProperty<*>,
-    ): T {
-        return value
-    }
+    ): T = value
 
     /**
      * Merges the [other] property into this property.
@@ -64,7 +65,10 @@ open class Property<T>(value: T, isDefault: Boolean = false) {
  * @param value actual value of the property
  * @param isDefault true, if value constitutes a default value and is set to false, when [value] is overwritten
  */
-class SettableProperty<T>(value: T, isDefault: Boolean = false) : Property<T>(value, isDefault) {
+class SettableProperty<T>(
+    value: T,
+    isDefault: Boolean = false,
+) : Property<T>(value, isDefault) {
     // Secondary Constructors
     constructor(property: Property<T>) : this(property.value, property.isDefault)
 

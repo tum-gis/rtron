@@ -27,7 +27,9 @@ import io.rtron.math.range.Tolerable
 /**
  * Abstract class for all geometric surface objects in 3D.
  */
-abstract class AbstractSurface3D : AbstractGeometry3D(), Tolerable {
+abstract class AbstractSurface3D :
+    AbstractGeometry3D(),
+    Tolerable {
     /**
      * Calculates the polygons for the respective surface geometry within the local coordinate system of the surface.
      */

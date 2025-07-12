@@ -20,25 +20,26 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 
-class DoubleRangeSetExtensionsTest : FunSpec({
-    context("TestCreation") {
+class DoubleRangeSetExtensionsTest :
+    FunSpec({
+        context("TestCreation") {
 
-        test("intersecting ranges should throw an IllegalArgumentException") {
-            val rangeA = Range.closed(0.0, 2.0)
-            val rangeB = Range.closed(1.0, 4.0)
+            test("intersecting ranges should throw an IllegalArgumentException") {
+                val rangeA = Range.closed(0.0, 2.0)
+                val rangeB = Range.closed(1.0, 4.0)
 
-            shouldThrow<IllegalArgumentException> {
-                RangeSet.ofNonIntersectingRanges(rangeA, rangeB)
+                shouldThrow<IllegalArgumentException> {
+                    RangeSet.ofNonIntersectingRanges(rangeA, rangeB)
+                }
+            }
+
+            test("connected ranges are combined to one range") {
+                val rangeA = Range.closedOpen(0.0, 2.0)
+                val rangeB = Range.closed(2.0, 4.0)
+
+                val actualRangeSet = RangeSet.ofNonIntersectingRanges(rangeA, rangeB)
+
+                actualRangeSet.asRanges() shouldHaveSize 1
             }
         }
-
-        test("connected ranges are combined to one range") {
-            val rangeA = Range.closedOpen(0.0, 2.0)
-            val rangeB = Range.closed(2.0, 4.0)
-
-            val actualRangeSet = RangeSet.ofNonIntersectingRanges(rangeA, rangeB)
-
-            actualRangeSet.asRanges() shouldHaveSize 1
-        }
-    }
-})
+    })

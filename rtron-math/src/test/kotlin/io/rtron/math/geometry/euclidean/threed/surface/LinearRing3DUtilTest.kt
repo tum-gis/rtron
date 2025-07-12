@@ -21,20 +21,21 @@ import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.processing.removeConsecutiveSideDuplicates
 
-class LinearRing3DUtilTest : FunSpec({
-    context("TestRemoveCuts") {
+class LinearRing3DUtilTest :
+    FunSpec({
+        context("TestRemoveCuts") {
 
-        test("remove cut with edge matching pattern") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D(-1.0, -1.0, 0.0)
-            val pointC = Vector3D.X_AXIS
-            val pointD = Vector3D.Y_AXIS
-            val vertices = listOf(pointA, pointB, pointA, pointC, pointD, pointB)
-            val expected = listOf(pointA, pointC, pointD, pointB)
+            test("remove cut with edge matching pattern") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D(-1.0, -1.0, 0.0)
+                val pointC = Vector3D.X_AXIS
+                val pointD = Vector3D.Y_AXIS
+                val vertices = listOf(pointA, pointB, pointA, pointC, pointD, pointB)
+                val expected = listOf(pointA, pointC, pointD, pointB)
 
-            val actualRemovedVerticesList = vertices.removeConsecutiveSideDuplicates()
+                val actualRemovedVerticesList = vertices.removeConsecutiveSideDuplicates()
 
-            actualRemovedVerticesList shouldBe expected
+                actualRemovedVerticesList shouldBe expected
+            }
         }
-    }
-})
+    })

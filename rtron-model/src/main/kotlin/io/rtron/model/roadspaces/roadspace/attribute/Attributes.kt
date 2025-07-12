@@ -24,12 +24,17 @@ import arrow.core.some
 /**
  * Abstract class of an attribute.
  */
-sealed class Attribute(val name: String)
+sealed class Attribute(
+    val name: String,
+)
 
 /**
  * Attribute with a [name] containing a certain string [value].
  */
-class StringAttribute(name: String, val value: String) : Attribute(name) {
+class StringAttribute(
+    name: String,
+    val value: String,
+) : Attribute(name) {
     // Properties and Initializers
     init {
         require(value.isNotBlank()) { "String value must not be blank." }
@@ -51,12 +56,18 @@ class StringAttribute(name: String, val value: String) : Attribute(name) {
 /**
  * Attribute with a [name] containing a certain integer [value].
  */
-class IntAttribute(name: String, val value: Int) : Attribute(name)
+class IntAttribute(
+    name: String,
+    val value: Int,
+) : Attribute(name)
 
 /**
  * Attribute with a [name] containing a certain double [value].
  */
-class DoubleAttribute(name: String, val value: Double) : Attribute(name) {
+class DoubleAttribute(
+    name: String,
+    val value: Double,
+) : Attribute(name) {
     // Properties and Initializers
     init {
         require(value.isFinite()) { "Value must be finite." }
@@ -78,14 +89,21 @@ class DoubleAttribute(name: String, val value: Double) : Attribute(name) {
 /**
  * Attribute with a [name] containing a certain boolean [value].
  */
-class BooleanAttribute(name: String, val value: Boolean) : Attribute(name)
+class BooleanAttribute(
+    name: String,
+    val value: Boolean,
+) : Attribute(name)
 
 /**
  * Attribute with a [name] containing a certain double [value] with a [UnitOfMeasure].
  *
  * @param uom unit of measure of the value
  */
-class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) : Attribute(name) {
+class MeasureAttribute(
+    name: String,
+    val value: Double,
+    val uom: UnitOfMeasure,
+) : Attribute(name) {
     // Properties and Initializers
     init {
         require(value.isFinite()) { "Value must be finite." }
@@ -110,7 +128,10 @@ class MeasureAttribute(name: String, val value: Double, val uom: UnitOfMeasure) 
  *
  * @param name name of the list
  */
-class AttributeList(val attributes: List<Attribute> = emptyList(), name: String = "") : Attribute(name) {
+class AttributeList(
+    val attributes: List<Attribute> = emptyList(),
+    name: String = "",
+) : Attribute(name) {
     // Operators
     operator fun plus(other: AttributeList): AttributeList {
         require(this.name == other.name) { "Merging of attribute lists requires the same name." }

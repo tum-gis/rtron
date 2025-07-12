@@ -90,9 +90,7 @@ data class Cylinder3D(
     override fun accept(visitor: Geometry3DVisitor) = visitor.visit(this)
 
     // Conversions
-    override fun toString(): String {
-        return "Cylinder(referencePose=$affineSequence, radius=$radius, height=$height)"
-    }
+    override fun toString(): String = "Cylinder(referencePose=$affineSequence, radius=$radius, height=$height)"
 
     companion object {
         const val DEFAULT_NUMBER_SLICES: Int = 16 // used for tesselation

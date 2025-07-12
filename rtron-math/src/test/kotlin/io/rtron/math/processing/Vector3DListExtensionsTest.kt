@@ -23,199 +23,200 @@ import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 import io.rtron.math.std.DBL_EPSILON_1
 
-class Vector3DListExtensionsTest : FunSpec({
-    context("TestTripleIsColinear") {
+class Vector3DListExtensionsTest :
+    FunSpec({
+        context("TestTripleIsColinear") {
 
-        test("if first and third vector are equal, vector triple should be colinear") {
-            val pointA = Vector3D.X_AXIS
-            val pointB = Vector3D(3.0, 4.0, 0.0)
-            val pointC = Vector3D.X_AXIS
-            val vertices = Triple(pointA, pointB, pointC)
+            test("if first and third vector are equal, vector triple should be colinear") {
+                val pointA = Vector3D.X_AXIS
+                val pointB = Vector3D(3.0, 4.0, 0.0)
+                val pointC = Vector3D.X_AXIS
+                val vertices = Triple(pointA, pointB, pointC)
 
-            val isColinear = vertices.isColinear(DBL_EPSILON_1)
+                val isColinear = vertices.isColinear(DBL_EPSILON_1)
 
-            isColinear.shouldBeTrue()
+                isColinear.shouldBeTrue()
+            }
+
+            test("three linearly independent vectors should be not colinear") {
+                val vertices = Triple(Vector3D.X_AXIS, Vector3D.Y_AXIS, Vector3D.Z_AXIS)
+
+                val isColinear = vertices.isColinear(DBL_EPSILON_1)
+
+                isColinear.shouldBeFalse()
+            }
+
+            test("three colinear vectors with a mixed ordering should still result true") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS.scalarMultiply(5.0)
+                val pointC = Vector3D.X_AXIS
+                val vertices = Triple(pointA, pointB, pointC)
+
+                val isColinear = vertices.isColinear(DBL_EPSILON_1)
+
+                isColinear.shouldBeTrue()
+            }
         }
 
-        test("three linearly independent vectors should be not colinear") {
-            val vertices = Triple(Vector3D.X_AXIS, Vector3D.Y_AXIS, Vector3D.Z_AXIS)
+        context("TestRemoveLinearlyRedundantVertices") {
 
-            val isColinear = vertices.isColinear(DBL_EPSILON_1)
+            test("empty list should yield an empty list") {
+                val vertices = listOf<Vector3D>()
+                val expectedVertices = listOf<Vector3D>()
 
-            isColinear.shouldBeFalse()
+                val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+                actualResultingVertices shouldBe expectedVertices
+            }
+
+            test("two different point should yield the exact points") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val vertices = listOf(pointA, pointB)
+                val expectedVertices = listOf(pointA, pointB)
+
+                val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+                actualResultingVertices shouldBe expectedVertices
+            }
+
+            test("two equal points should yield only one point") {
+                val pointA = Vector3D.X_AXIS
+                val pointB = Vector3D.X_AXIS
+                val vertices = listOf(pointA, pointB)
+                val expectedVertices = listOf(pointA)
+
+                val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+                actualResultingVertices shouldBe expectedVertices
+            }
+
+            test("three points of pattern ABB") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val pointC = Vector3D.X_AXIS
+                val vertices = listOf(pointA, pointB, pointC)
+                val expectedVertices = listOf(pointA, pointB)
+
+                val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+                actualResultingVertices shouldBe expectedVertices
+            }
+
+            test("basic four points") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val pointC = Vector3D.X_AXIS.scalarMultiply(2.0)
+                val pointD = Vector3D(1.0, 1.0, 0.0)
+                val vertices = listOf(pointA, pointB, pointC, pointD)
+                val expectedVertices = listOf(pointA, pointC, pointD)
+
+                val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+                actualResultingVertices shouldBe expectedVertices
+            }
+
+            test("four points of pattern ABBA") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val pointC = Vector3D.X_AXIS
+                val pointD = Vector3D.ZERO
+                val vertices = listOf(pointA, pointB, pointC, pointD)
+                val expectedVertices = listOf(pointA, pointB)
+
+                val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+                actualResultingVertices shouldBe expectedVertices
+            }
+
+            test("five points of pattern ABBBA") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val pointC = Vector3D.X_AXIS
+                val pointD = Vector3D.X_AXIS
+                val pointE = Vector3D.ZERO
+                val vertices = listOf(pointA, pointB, pointC, pointD, pointE)
+                val expectedVertices = listOf(pointA, pointB)
+
+                val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+
+                actualResultingVertices shouldBe expectedVertices
+            }
         }
 
-        test("three colinear vectors with a mixed ordering should still result true") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS.scalarMultiply(5.0)
-            val pointC = Vector3D.X_AXIS
-            val vertices = Triple(pointA, pointB, pointC)
+        context("TestListIsColinear") {
 
-            val isColinear = vertices.isColinear(DBL_EPSILON_1)
+            test("three points located on x axis should be colinear") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val pointC = Vector3D.X_AXIS.scalarMultiply(2.0)
+                val vertices = listOf(pointA, pointB, pointC)
 
-            isColinear.shouldBeTrue()
-        }
-    }
+                val isColinear = vertices.isColinear(DBL_EPSILON_1)
 
-    context("TestRemoveLinearlyRedundantVertices") {
-
-        test("empty list should yield an empty list") {
-            val vertices = listOf<Vector3D>()
-            val expectedVertices = listOf<Vector3D>()
-
-            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
-
-            actualResultingVertices shouldBe expectedVertices
+                isColinear.shouldBeTrue()
+            }
         }
 
-        test("two different point should yield the exact points") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val vertices = listOf(pointA, pointB)
-            val expectedVertices = listOf(pointA, pointB)
+        context("TestIsPlanar") {
 
-            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+            test("test triangle polygon") {
+                val points = listOf(Vector3D.ZERO, Vector3D.X_AXIS, Vector3D.Y_AXIS)
 
-            actualResultingVertices shouldBe expectedVertices
+                val actual = points.isPlanar(DBL_EPSILON_1)
+
+                actual.shouldBeTrue()
+            }
+
+            test("test planar quadrilateral polygon") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val pointC = Vector3D(1.0, 0.0, 1.0)
+                val pointD = Vector3D.Z_AXIS
+                val points = listOf(pointA, pointB, pointC, pointD)
+
+                val actual = points.isPlanar(DBL_EPSILON_1)
+
+                actual.shouldBeTrue()
+            }
+
+            test("test non-planar quadrilateral polygon") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D.X_AXIS
+                val pointC = Vector3D.Y_AXIS
+                val pointD = Vector3D(1.0, 1.0, 1.0)
+                val points = listOf(pointA, pointB, pointC, pointD)
+
+                val actual = points.isPlanar(DBL_EPSILON_1)
+
+                actual.shouldBeFalse()
+            }
         }
 
-        test("two equal points should yield only one point") {
-            val pointA = Vector3D.X_AXIS
-            val pointB = Vector3D.X_AXIS
-            val vertices = listOf(pointA, pointB)
-            val expectedVertices = listOf(pointA)
+        context("TestCentroidCalculation") {
 
-            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
+            test("centroid of triangle") {
+                val pointA = Vector3D.ZERO
+                val pointB = Vector3D(6.0, 0.0, 0.0)
+                val pointC = Vector3D(0.0, 6.0, 0.0)
+                val expectedCentroid = Vector3D(2.0, 2.0, 0.0)
 
-            actualResultingVertices shouldBe expectedVertices
+                val actualCentroid = listOf(pointA, pointB, pointC).calculateCentroid()
+
+                actualCentroid shouldBe expectedCentroid
+            }
+
+            test("centroid of multiple points") {
+                val points = mutableListOf<Vector3D>()
+                points += Vector3D(1.0, 2.0, 1.0)
+                points += Vector3D(3.0, 2.0, 1.0)
+                points += Vector3D(2.0, 1.0, 3.0)
+                points += Vector3D(2.0, 3.0, 7.0)
+                val expectedCentroid = Vector3D(2.0, 2.0, 3.0)
+
+                val actualCentroid = points.calculateCentroid()
+
+                actualCentroid shouldBe expectedCentroid
+            }
         }
-
-        test("three points of pattern ABB") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val pointC = Vector3D.X_AXIS
-            val vertices = listOf(pointA, pointB, pointC)
-            val expectedVertices = listOf(pointA, pointB)
-
-            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
-
-            actualResultingVertices shouldBe expectedVertices
-        }
-
-        test("basic four points") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val pointC = Vector3D.X_AXIS.scalarMultiply(2.0)
-            val pointD = Vector3D(1.0, 1.0, 0.0)
-            val vertices = listOf(pointA, pointB, pointC, pointD)
-            val expectedVertices = listOf(pointA, pointC, pointD)
-
-            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
-
-            actualResultingVertices shouldBe expectedVertices
-        }
-
-        test("four points of pattern ABBA") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val pointC = Vector3D.X_AXIS
-            val pointD = Vector3D.ZERO
-            val vertices = listOf(pointA, pointB, pointC, pointD)
-            val expectedVertices = listOf(pointA, pointB)
-
-            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
-
-            actualResultingVertices shouldBe expectedVertices
-        }
-
-        test("five points of pattern ABBBA") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val pointC = Vector3D.X_AXIS
-            val pointD = Vector3D.X_AXIS
-            val pointE = Vector3D.ZERO
-            val vertices = listOf(pointA, pointB, pointC, pointD, pointE)
-            val expectedVertices = listOf(pointA, pointB)
-
-            val actualResultingVertices = vertices.removeRedundantVerticesOnLineSegmentsEnclosing(DBL_EPSILON_1)
-
-            actualResultingVertices shouldBe expectedVertices
-        }
-    }
-
-    context("TestListIsColinear") {
-
-        test("three points located on x axis should be colinear") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val pointC = Vector3D.X_AXIS.scalarMultiply(2.0)
-            val vertices = listOf(pointA, pointB, pointC)
-
-            val isColinear = vertices.isColinear(DBL_EPSILON_1)
-
-            isColinear.shouldBeTrue()
-        }
-    }
-
-    context("TestIsPlanar") {
-
-        test("test triangle polygon") {
-            val points = listOf(Vector3D.ZERO, Vector3D.X_AXIS, Vector3D.Y_AXIS)
-
-            val actual = points.isPlanar(DBL_EPSILON_1)
-
-            actual.shouldBeTrue()
-        }
-
-        test("test planar quadrilateral polygon") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val pointC = Vector3D(1.0, 0.0, 1.0)
-            val pointD = Vector3D.Z_AXIS
-            val points = listOf(pointA, pointB, pointC, pointD)
-
-            val actual = points.isPlanar(DBL_EPSILON_1)
-
-            actual.shouldBeTrue()
-        }
-
-        test("test non-planar quadrilateral polygon") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D.X_AXIS
-            val pointC = Vector3D.Y_AXIS
-            val pointD = Vector3D(1.0, 1.0, 1.0)
-            val points = listOf(pointA, pointB, pointC, pointD)
-
-            val actual = points.isPlanar(DBL_EPSILON_1)
-
-            actual.shouldBeFalse()
-        }
-    }
-
-    context("TestCentroidCalculation") {
-
-        test("centroid of triangle") {
-            val pointA = Vector3D.ZERO
-            val pointB = Vector3D(6.0, 0.0, 0.0)
-            val pointC = Vector3D(0.0, 6.0, 0.0)
-            val expectedCentroid = Vector3D(2.0, 2.0, 0.0)
-
-            val actualCentroid = listOf(pointA, pointB, pointC).calculateCentroid()
-
-            actualCentroid shouldBe expectedCentroid
-        }
-
-        test("centroid of multiple points") {
-            val points = mutableListOf<Vector3D>()
-            points += Vector3D(1.0, 2.0, 1.0)
-            points += Vector3D(3.0, 2.0, 1.0)
-            points += Vector3D(2.0, 1.0, 3.0)
-            points += Vector3D(2.0, 3.0, 7.0)
-            val expectedCentroid = Vector3D(2.0, 2.0, 3.0)
-
-            val actualCentroid = points.calculateCentroid()
-
-            actualCentroid shouldBe expectedCentroid
-        }
-    }
-})
+    })

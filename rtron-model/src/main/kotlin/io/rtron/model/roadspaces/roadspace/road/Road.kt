@@ -95,11 +95,13 @@ class Road(
             ),
         ) { "The lane offset function must be defined everywhere where the surface is also defined." }
         require(
-            laneSections.mapIndexed { index, laneSection -> index to laneSection }
+            laneSections
+                .mapIndexed { index, laneSection -> index to laneSection }
                 .all { it.first == it.second.id.laneSectionId },
         ) { "LaneSection elements must be positioned according to their laneSection id on the list." }
         require(
-            laneSections.dropLast(1)
+            laneSections
+                .dropLast(1)
                 .all {
                     it.curvePositionDomain.lowerBoundType() == BoundType.CLOSED &&
                         it.curvePositionDomain.upperBoundType() == BoundType.OPEN
@@ -412,12 +414,13 @@ class Road(
                 getLaneSection(laneIdentifier.laneSectionIdentifier)
                     .getOrElse { throw it }
             if (laneSection.curvePositionDomain.length < geometricalTolerance) {
-                Either.Left(
-                    IllegalStateException(
-                        "${laneIdentifier.toIdentifierText()}: The length of the lane is almost zero " +
-                            "(below tolerance) and thus no surface can be constructed.",
-                    ),
-                ).bind<AbstractSurface3D>()
+                Either
+                    .Left(
+                        IllegalStateException(
+                            "${laneIdentifier.toIdentifierText()}: The length of the lane is almost zero " +
+                                "(below tolerance) and thus no surface can be constructed.",
+                        ),
+                    ).bind<AbstractSurface3D>()
             }
 
             val leftBoundary =
@@ -434,16 +437,18 @@ class Road(
                     .getOrElse { throw it }
 
             if (leftBoundary.zip(rightBoundary).all { it.first.fuzzyEquals(it.second, geometricalTolerance) }) {
-                Either.Left(
-                    IllegalStateException(
-                        "${laneIdentifier.toIdentifierText()}: Lane has zero width (when discretized) and " +
-                            "thus no surface can be constructed.",
-                    ),
-                ).bind<AbstractSurface3D>()
+                Either
+                    .Left(
+                        IllegalStateException(
+                            "${laneIdentifier.toIdentifierText()}: Lane has zero width (when discretized) and " +
+                                "thus no surface can be constructed.",
+                        ),
+                    ).bind<AbstractSurface3D>()
             }
 
             val surface =
-                LinearRing3D.ofWithDuplicatesRemoval(leftBoundary, rightBoundary, geometricalTolerance)
+                LinearRing3D
+                    .ofWithDuplicatesRemoval(leftBoundary, rightBoundary, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
                     .let { CompositeSurface3D(it) }
@@ -476,59 +481,69 @@ class Road(
                 )
 
             val lowerLeftBoundarySampled =
-                lowerLeftBoundary.calculatePointListGlobalCS(step)
+                lowerLeftBoundary
+                    .calculatePointListGlobalCS(step)
                     .mapLeft { it.toIllegalStateException() }
                     .getOrElse { throw it }
             val lowerRightBoundarySampled =
-                lowerRightBoundary.calculatePointListGlobalCS(step)
+                lowerRightBoundary
+                    .calculatePointListGlobalCS(step)
                     .mapLeft { it.toIllegalStateException() }
                     .getOrElse { throw it }
             val upperLeftBoundarySampled =
-                upperLeftBoundary.calculatePointListGlobalCS(step)
+                upperLeftBoundary
+                    .calculatePointListGlobalCS(step)
                     .mapLeft { it.toIllegalStateException() }
                     .getOrElse { throw it }
             val upperRightBoundarySampled =
-                upperRightBoundary.calculatePointListGlobalCS(step)
+                upperRightBoundary
+                    .calculatePointListGlobalCS(step)
                     .mapLeft { it.toIllegalStateException() }
                     .getOrElse { throw it }
 
             val baseFace =
-                LinearRing3D.ofWithDuplicatesRemoval(lowerRightBoundarySampled, lowerLeftBoundarySampled, geometricalTolerance)
+                LinearRing3D
+                    .ofWithDuplicatesRemoval(lowerRightBoundarySampled, lowerLeftBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
             val topFace =
-                LinearRing3D.ofWithDuplicatesRemoval(upperLeftBoundarySampled, upperRightBoundarySampled, geometricalTolerance)
+                LinearRing3D
+                    .ofWithDuplicatesRemoval(upperLeftBoundarySampled, upperRightBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
             val leftFace =
-                LinearRing3D.ofWithDuplicatesRemoval(lowerLeftBoundarySampled, upperLeftBoundarySampled, geometricalTolerance)
+                LinearRing3D
+                    .ofWithDuplicatesRemoval(lowerLeftBoundarySampled, upperLeftBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
             val rightFace =
-                LinearRing3D.ofWithDuplicatesRemoval(upperRightBoundarySampled, lowerRightBoundarySampled, geometricalTolerance)
+                LinearRing3D
+                    .ofWithDuplicatesRemoval(upperRightBoundarySampled, lowerRightBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
             val frontFace =
-                LinearRing3D.of(
-                    nonEmptyListOf(
-                        lowerLeftBoundarySampled.first(),
-                        lowerRightBoundarySampled.first(),
-                        upperRightBoundarySampled.first(),
-                        upperLeftBoundarySampled.first(),
-                    ),
-                    geometricalTolerance,
-                ).mapLeft { IllegalStateException(it.message) }
+                LinearRing3D
+                    .of(
+                        nonEmptyListOf(
+                            lowerLeftBoundarySampled.first(),
+                            lowerRightBoundarySampled.first(),
+                            upperRightBoundarySampled.first(),
+                            upperLeftBoundarySampled.first(),
+                        ),
+                        geometricalTolerance,
+                    ).mapLeft { IllegalStateException(it.message) }
                     .bind()
             val endFace =
-                LinearRing3D.of(
-                    nonEmptyListOf(
-                        lowerLeftBoundarySampled.last(),
-                        upperLeftBoundarySampled.last(),
-                        upperRightBoundarySampled.last(),
-                        lowerRightBoundarySampled.last(),
-                    ),
-                    geometricalTolerance,
-                ).mapLeft { IllegalStateException(it.message) }
+                LinearRing3D
+                    .of(
+                        nonEmptyListOf(
+                            lowerLeftBoundarySampled.last(),
+                            upperLeftBoundarySampled.last(),
+                            upperRightBoundarySampled.last(),
+                            lowerRightBoundarySampled.last(),
+                        ),
+                        geometricalTolerance,
+                    ).mapLeft { IllegalStateException(it.message) }
                     .bind()
 
             // triangulate faces
@@ -561,7 +576,8 @@ class Road(
             require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
             val innerLaneBoundaryOfThisLaneSampled =
-                getInnerLaneBoundary(laneIdentifier).bind()
+                getInnerLaneBoundary(laneIdentifier)
+                    .bind()
                     .calculatePointListGlobalCS(step)
                     .mapLeft { it.toIllegalStateException() }
                     .bind()
@@ -577,7 +593,8 @@ class Road(
                     )
                 }
             val outerLaneBoundaryOfInnerLaneSampled =
-                outerLaneBoundaryOfInnerLane.bind()
+                outerLaneBoundaryOfInnerLane
+                    .bind()
                     .calculatePointListGlobalCS(step)
                     .mapLeft { it.toIllegalStateException() }
                     .bind()
@@ -592,7 +609,8 @@ class Road(
             val rightLaneBoundary =
                 if (laneIdentifier.isLeft()) innerLaneBoundaryOfThisLaneSampled else outerLaneBoundaryOfInnerLaneSampled
 
-            LinearRing3D.ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary, geometricalTolerance)
+            LinearRing3D
+                .ofWithDuplicatesRemoval(rightLaneBoundary, leftLaneBoundary, geometricalTolerance)
                 .mapLeft { IllegalStateException(it.message) }
                 .bind()
                 .let { CompositeSurface3D(it) }
@@ -652,7 +670,8 @@ class Road(
         }
 
         val leftOffsetFunction =
-            roadMarking.getLeftOffsetFunction()
+            roadMarking
+                .getLeftOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val leftRoadMarkingBoundary =
             getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, leftOffsetFunction)
@@ -661,7 +680,8 @@ class Road(
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         val rightOffsetFunction =
-            roadMarking.getRightOffsetFunction()
+            roadMarking
+                .getRightOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val rightRoadMarkingBoundary =
             getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, rightOffsetFunction)
@@ -670,12 +690,12 @@ class Road(
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
 
-        return LinearRing3D.ofWithDuplicatesRemoval(
-            leftRoadMarkingBoundary,
-            rightRoadMarkingBoundary,
-            geometricalTolerance,
-        )
-            .getOrElse { throw IllegalStateException(it.message) }
+        return LinearRing3D
+            .ofWithDuplicatesRemoval(
+                leftRoadMarkingBoundary,
+                rightRoadMarkingBoundary,
+                geometricalTolerance,
+            ).getOrElse { throw IllegalStateException(it.message) }
             .let { CompositeSurface3D(it) }
     }
 
@@ -722,7 +742,8 @@ class Road(
         }
 
         val leftOffsetFunction =
-            roadMarking.getLeftOffsetFunction()
+            roadMarking
+                .getLeftOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val leftRoadMarkBoundary =
             getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
@@ -731,7 +752,8 @@ class Road(
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         val rightOffsetFunction =
-            roadMarking.getRightOffsetFunction()
+            roadMarking
+                .getRightOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val rightRoadMarkBoundary =
             getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
@@ -740,7 +762,8 @@ class Road(
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
 
-        return LinearRing3D.ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
+        return LinearRing3D
+            .ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
             .getOrElse { return IllegalStateException(it.message).left() }
             .let { CompositeSurface3D(it) }
             .let { Either.Right(it) }

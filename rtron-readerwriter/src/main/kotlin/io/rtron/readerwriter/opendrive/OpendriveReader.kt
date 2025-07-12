@@ -120,26 +120,44 @@ object OpendriveReader {
         )
 }
 
-sealed class OpendriveReaderException(message: String) : BaseException(message) {
-    data class FileNotFound(val path: Path) : OpendriveReaderException("File not found at $path")
+sealed class OpendriveReaderException(
+    message: String,
+) : BaseException(message) {
+    data class FileNotFound(
+        val path: Path,
+    ) : OpendriveReaderException("File not found at $path")
 
-    data class FileEndingNotSupported(val path: Path) : OpendriveReaderException("File not found at $path")
+    data class FileEndingNotSupported(
+        val path: Path,
+    ) : OpendriveReaderException("File not found at $path")
 
-    data class MalformedXmlDocument(val reason: String) : OpendriveReaderException("OpenDRIVE file cannot be parsed: $reason")
+    data class MalformedXmlDocument(
+        val reason: String,
+    ) : OpendriveReaderException("OpenDRIVE file cannot be parsed: $reason")
 
-    data class HeaderElementNotFound(val reason: String) : OpendriveReaderException(
-        "Header element of OpenDRIVE dataset not found: $reason",
-    )
+    data class HeaderElementNotFound(
+        val reason: String,
+    ) : OpendriveReaderException(
+            "Header element of OpenDRIVE dataset not found: $reason",
+        )
 
-    data class VersionNotIdentifiable(val reason: String) : OpendriveReaderException("Version of OpenDRIVE dataset not deducible: $reason")
+    data class VersionNotIdentifiable(
+        val reason: String,
+    ) : OpendriveReaderException("Version of OpenDRIVE dataset not deducible: $reason")
 
-    data class NoDedicatedUnmarshallerAvailable(val version: OpendriveVersion) : OpendriveReaderException(
-        "No dedicated unmarshaller available for $version",
-    )
+    data class NoDedicatedUnmarshallerAvailable(
+        val version: OpendriveVersion,
+    ) : OpendriveReaderException(
+            "No dedicated unmarshaller available for $version",
+        )
 
-    data class FatalSchemaValidationError(val reason: String) : OpendriveReaderException("Fatal error during schema validation: $reason")
+    data class FatalSchemaValidationError(
+        val reason: String,
+    ) : OpendriveReaderException("Fatal error during schema validation: $reason")
 
-    data class NumberFormatException(val reason: String) : OpendriveReaderException(
-        "Invalid formatting of a number in the dataset: $reason",
-    )
+    data class NumberFormatException(
+        val reason: String,
+    ) : OpendriveReaderException(
+            "Invalid formatting of a number in the dataset: $reason",
+        )
 }

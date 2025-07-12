@@ -20,57 +20,58 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.rtron.math.geometry.euclidean.threed.point.Vector3D
 
-class LineSegment3DTest : FunSpec({
-    context("TestDistance") {
+class LineSegment3DTest :
+    FunSpec({
+        context("TestDistance") {
 
-        test("point located on line segment returns zero distance") {
-            val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
-            val point = Vector3D(0.5, 0.0, 0.0)
-            val expectedDistance = 0.0
+            test("point located on line segment returns zero distance") {
+                val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
+                val point = Vector3D(0.5, 0.0, 0.0)
+                val expectedDistance = 0.0
 
-            val actualResultingVertices = lineSegment.distance(point)
+                val actualResultingVertices = lineSegment.distance(point)
 
-            actualResultingVertices shouldBe expectedDistance
+                actualResultingVertices shouldBe expectedDistance
+            }
+
+            test("point located outside of line segment returns the distance to closest boundary point") {
+                val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
+                val point = Vector3D(1.5, 0.0, 0.0)
+                val expectedDistance = 0.5
+
+                val actualResultingVertices = lineSegment.distance(point)
+
+                actualResultingVertices shouldBe expectedDistance
+            }
+
+            test("point located not on line segment returns the correct distance") {
+                val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
+                val point = Vector3D(0.5, 2.3, 0.0)
+                val expectedDistance = 2.3
+
+                val actualResultingVertices = lineSegment.distance(point)
+
+                actualResultingVertices shouldBe expectedDistance
+            }
+
+            test("boundary point of line segment returns the zero distance") {
+                val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
+                val point = Vector3D.X_AXIS
+                val expectedDistance = 0.0
+
+                val actualResultingVertices = lineSegment.distance(point)
+
+                actualResultingVertices shouldBe expectedDistance
+            }
+
+            test("point on line but outside of line segment return distances to the shortest boundary point") {
+                val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
+                val point = Vector3D(1.5, 0.0, 0.0)
+                val expectedDistance = 0.5
+
+                val actualResultingVertices = lineSegment.distance(point)
+
+                actualResultingVertices shouldBe expectedDistance
+            }
         }
-
-        test("point located outside of line segment returns the distance to closest boundary point") {
-            val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
-            val point = Vector3D(1.5, 0.0, 0.0)
-            val expectedDistance = 0.5
-
-            val actualResultingVertices = lineSegment.distance(point)
-
-            actualResultingVertices shouldBe expectedDistance
-        }
-
-        test("point located not on line segment returns the correct distance") {
-            val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
-            val point = Vector3D(0.5, 2.3, 0.0)
-            val expectedDistance = 2.3
-
-            val actualResultingVertices = lineSegment.distance(point)
-
-            actualResultingVertices shouldBe expectedDistance
-        }
-
-        test("boundary point of line segment returns the zero distance") {
-            val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
-            val point = Vector3D.X_AXIS
-            val expectedDistance = 0.0
-
-            val actualResultingVertices = lineSegment.distance(point)
-
-            actualResultingVertices shouldBe expectedDistance
-        }
-
-        test("point on line but outside of line segment return distances to the shortest boundary point") {
-            val lineSegment = LineSegment3D(Vector3D.ZERO, Vector3D.X_AXIS, 0.0)
-            val point = Vector3D(1.5, 0.0, 0.0)
-            val expectedDistance = 0.5
-
-            val actualResultingVertices = lineSegment.distance(point)
-
-            actualResultingVertices shouldBe expectedDistance
-        }
-    }
-})
+    })

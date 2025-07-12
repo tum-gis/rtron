@@ -111,9 +111,7 @@ class Affine2D(
         return true
     }
 
-    override fun hashCode(): Int {
-        return matrix.hashCode()
-    }
+    override fun hashCode(): Int = matrix.hashCode()
 
     // Conversions
     fun toMatrix3JOML() = JOMLMatrix3d(this.matrix)
@@ -177,9 +175,7 @@ class Affine2D(
          * Creates an [Affine2D] transformation matrix from a list of sequentially applied affine
          * transformation matrices.
          */
-        fun of(affineList: List<Affine2D>): Affine2D {
-            return affineList.fold(UNIT) { acc, affine -> acc.append(affine) }
-        }
+        fun of(affineList: List<Affine2D>): Affine2D = affineList.fold(UNIT) { acc, affine -> acc.append(affine) }
 
         /**
          * Creates an [Affine2D] transformation matrix from a list of sequentially applied affine
@@ -195,10 +191,11 @@ class Affine2D(
             rotation: Rotation2D,
         ): Affine2D {
             val matrix =
-                JOMLMatrix3d().apply {
-                    m20 = translation.x
-                    m21 = translation.y
-                }.rotateZ(rotation.angle)
+                JOMLMatrix3d()
+                    .apply {
+                        m20 = translation.x
+                        m21 = translation.y
+                    }.rotateZ(rotation.angle)
             return Affine2D(matrix)
         }
 
@@ -207,10 +204,11 @@ class Affine2D(
          */
         fun of(pose: Pose2D): Affine2D {
             val matrix =
-                JOMLMatrix3d().apply {
-                    m20 = pose.point.x
-                    m21 = pose.point.y
-                }.rotateZ(pose.rotation.angle)
+                JOMLMatrix3d()
+                    .apply {
+                        m20 = pose.point.x
+                        m21 = pose.point.y
+                    }.rotateZ(pose.rotation.angle)
             return Affine2D(matrix)
         }
     }

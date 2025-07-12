@@ -76,8 +76,7 @@ class OpendriveCropper(
         // remove roads belonging to a junction, which was removed
         val remainingJunctionIds = junctionsFiltered.map { it.id }.toSet()
         val roadsFilteredFiltered =
-            roadsFiltered.filter {
-                    currentRoad ->
+            roadsFiltered.filter { currentRoad ->
                 currentRoad.getJunctionOption().fold({ true }, { remainingJunctionIds.contains(it) })
             }
         modifiedOpendriveModel.road = roadsFilteredFiltered

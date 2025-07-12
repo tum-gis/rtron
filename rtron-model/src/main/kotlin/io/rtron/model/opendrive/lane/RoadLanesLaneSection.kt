@@ -32,7 +32,8 @@ data class RoadLanesLaneSection(
     var s: Double = Double.NaN,
     var singleSide: Option<Boolean> = None,
     override var additionalId: Option<LaneSectionIdentifier> = None,
-) : OpendriveElement(), AdditionalLaneSectionIdentifier {
+) : OpendriveElement(),
+    AdditionalLaneSectionIdentifier {
     // Properties and Initializers
     val laneSectionStart get() = CurveRelativeVector1D(s)
 

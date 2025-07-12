@@ -33,7 +33,9 @@ data class ParametricBoundedSurface3D(
     val rightBoundary: Curve3D,
     override val tolerance: Double,
     private val discretizationStepSize: Double,
-) : AbstractSurface3D(), DefinableDomain<Double>, Tolerable {
+) : AbstractSurface3D(),
+    DefinableDomain<Double>,
+    Tolerable {
     // Properties and Initializers
     init {
         require(leftBoundary.domain == rightBoundary.domain) { "Boundary curves must have the identical domain." }
@@ -48,7 +50,8 @@ data class ParametricBoundedSurface3D(
 
     private val leftVertices by lazy {
         val vertices =
-            leftBoundary.calculatePointListGlobalCS(discretizationStepSize)
+            leftBoundary
+                .calculatePointListGlobalCS(discretizationStepSize)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
@@ -56,7 +59,8 @@ data class ParametricBoundedSurface3D(
 
     private val rightVertices by lazy {
         val vertices =
-            rightBoundary.calculatePointListGlobalCS(discretizationStepSize)
+            rightBoundary
+                .calculatePointListGlobalCS(discretizationStepSize)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         vertices.toNonEmptyListOrNull()!!
@@ -66,7 +70,8 @@ data class ParametricBoundedSurface3D(
 
     override fun calculatePolygonsLocalCS(): Either<GeometryException.BoundaryRepresentationGenerationError, NonEmptyList<Polygon3D>> =
         either {
-            LinearRing3D.ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
+            LinearRing3D
+                .ofWithDuplicatesRemoval(leftVertices, rightVertices, tolerance)
                 .mapLeft { GeometryException.BoundaryRepresentationGenerationError(it.message) }
                 .bind()
                 .map { it.calculatePolygonsGlobalCS().bind() }

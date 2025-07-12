@@ -78,7 +78,8 @@ class RoadBuilder(
 
         val laneOffset = road.lanes.getLaneOffsetEntries().fold({ LinearFunction.X_AXIS }, { FunctionBuilder.buildLaneOffset(it) })
         val laneSections: NonEmptyList<LaneSection> =
-            road.lanes.getLaneSectionsWithRanges(road.length)
+            road.lanes
+                .getLaneSectionsWithRanges(road.length)
                 .mapIndexed { currentId, currentLaneSection ->
                     buildLaneSection(
                         LaneSectionIdentifier(currentId, id),
@@ -87,8 +88,7 @@ class RoadBuilder(
                         baseAttributes,
                         roadMarkRepresentationRegistry,
                     ).handleIssueList { issueList += it }
-                }
-                .let { it.toNonEmptyListOrNull()!! }
+                }.let { it.toNonEmptyListOrNull()!! }
 
         val roadLinkage = buildRoadLinkage(id, road)
 
@@ -116,28 +116,30 @@ class RoadBuilder(
 
         val laneSectionAttributes = buildAttributes(laneSection)
         val lanes =
-            laneSection.getLeftRightLanes()
+            laneSection
+                .getLeftRightLanes()
                 .map { (currentLaneId, currentSrcLane) ->
                     val laneIdentifier = LaneIdentifier(currentLaneId, laneSectionIdentifier)
                     val attributes = baseAttributes + laneSectionAttributes
-                    laneBuilder.buildLane(
-                        laneIdentifier,
-                        localCurvePositionDomain,
-                        currentSrcLane,
-                        attributes,
-                        roadMarkRepresentationRegistry,
-                    )
-                        .handleIssueList { issueList += it }
+                    laneBuilder
+                        .buildLane(
+                            laneIdentifier,
+                            localCurvePositionDomain,
+                            currentSrcLane,
+                            attributes,
+                            roadMarkRepresentationRegistry,
+                        ).handleIssueList { issueList += it }
                 }
 
         val centerLane =
-            laneBuilder.buildCenterLane(
-                laneSectionIdentifier,
-                localCurvePositionDomain,
-                laneSection.center.getIndividualCenterLane(),
-                baseAttributes,
-                roadMarkRepresentationRegistry,
-            ).handleIssueList { issueList += it }
+            laneBuilder
+                .buildCenterLane(
+                    laneSectionIdentifier,
+                    localCurvePositionDomain,
+                    laneSection.center.getIndividualCenterLane(),
+                    baseAttributes,
+                    roadMarkRepresentationRegistry,
+                ).handleIssueList { issueList += it }
 
         val roadspaceLaneSection = LaneSection(laneSectionIdentifier, curvePositionDomain, lanes, centerLane)
         return ContextIssueList(roadspaceLaneSection, issueList)
@@ -148,7 +150,8 @@ class RoadBuilder(
         road: OpendriveRoad,
     ): RoadLinkage {
         val belongsToJunctionId =
-            road.getJunctionOption()
+            road
+                .getJunctionOption()
                 .map { JunctionIdentifier(it) }
 
         val predecessorRoadspaceContactPointId =

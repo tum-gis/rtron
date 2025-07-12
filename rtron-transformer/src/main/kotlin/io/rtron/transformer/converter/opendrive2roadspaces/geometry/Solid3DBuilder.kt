@@ -110,12 +110,16 @@ object Solid3DBuilder {
                 .separateEither()
 
         issueList +=
-            builderExceptions.map {
-                DefaultIssue.of(
-                    "PolyhedronNotConstructableFromRoadCornerOutlines", it.message, it.location,
-                    Severity.WARNING, wasFixed = true,
-                )
-            }.mergeToReport()
+            builderExceptions
+                .map {
+                    DefaultIssue.of(
+                        "PolyhedronNotConstructableFromRoadCornerOutlines",
+                        it.message,
+                        it.location,
+                        Severity.WARNING,
+                        wasFixed = true,
+                    )
+                }.mergeToReport()
         val polyhedrons = polyhedronsWithContext.handleIssueList { issueList += it.issueList }
 
         return ContextIssueList(polyhedrons, issueList)
@@ -136,11 +140,12 @@ object Solid3DBuilder {
             },
         ) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
         val outlineId =
-            outline.additionalId.toEither {
-                IllegalStateException(
-                    "Additional outline ID must be available.",
-                )
-            }.getOrElse { throw it }
+            outline.additionalId
+                .toEither {
+                    IllegalStateException(
+                        "Additional outline ID must be available.",
+                    )
+                }.getOrElse { throw it }
 
         val verticalOutlineElements =
             outline.cornerRoad
@@ -172,12 +177,16 @@ object Solid3DBuilder {
                 .separateEither()
 
         issueList +=
-            builderExceptions.map {
-                DefaultIssue.of(
-                    "PolyhedronNotConstructableFromRoadCornerOutlines", it.message, it.location,
-                    Severity.WARNING, wasFixed = true,
-                )
-            }.mergeToReport()
+            builderExceptions
+                .map {
+                    DefaultIssue.of(
+                        "PolyhedronNotConstructableFromRoadCornerOutlines",
+                        it.message,
+                        it.location,
+                        Severity.WARNING,
+                        wasFixed = true,
+                    )
+                }.mergeToReport()
         val polyhedrons = polyhedronsWithContext.handleIssueList { issueList += it.issueList }
 
         return ContextIssueList(polyhedrons, issueList)
@@ -198,11 +207,12 @@ object Solid3DBuilder {
             },
         ) { "All cornerRoad elements must have a height of either zero or above the tolerance threshold." }
         val outlineId =
-            outline.additionalId.toEither {
-                IllegalStateException(
-                    "Additional outline ID must be available.",
-                )
-            }.getOrElse { throw it }
+            outline.additionalId
+                .toEither {
+                    IllegalStateException(
+                        "Additional outline ID must be available.",
+                    )
+                }.getOrElse { throw it }
 
         val verticalOutlineElements =
             outline.cornerRoad
@@ -260,11 +270,13 @@ object Solid3DBuilder {
             builderExceptions
                 .map {
                     DefaultIssue.of(
-                        "PolyhedronNotConstructableFromLocalCornerOutlines", it.message, it.location,
-                        Severity.WARNING, wasFixed = true,
+                        "PolyhedronNotConstructableFromLocalCornerOutlines",
+                        it.message,
+                        it.location,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
-                }
-                .mergeToReport()
+                }.mergeToReport()
         val polyhedrons =
             polyhedronsWithContext
                 .handleIssueList { issueList += it.issueList }
@@ -288,11 +300,12 @@ object Solid3DBuilder {
                 },
             ) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
             val outlineId =
-                outline.additionalId.toEither {
-                    IllegalStateException(
-                        "Additional outline ID must be available.",
-                    )
-                }.getOrElse { throw it }
+                outline.additionalId
+                    .toEither {
+                        IllegalStateException(
+                            "Additional outline ID must be available.",
+                        )
+                    }.getOrElse { throw it }
 
             val issueList = DefaultIssueList()
 
@@ -303,11 +316,12 @@ object Solid3DBuilder {
                     .let { it.toNonEmptyListOrNull()!! }
 
             val polyhedronWithContextIssueList =
-                Polyhedron3DFactory.buildFromVerticalOutlineElements(
-                    outlineId,
-                    verticalOutlineElements,
-                    numberTolerance,
-                ).bind()
+                Polyhedron3DFactory
+                    .buildFromVerticalOutlineElements(
+                        outlineId,
+                        verticalOutlineElements,
+                        numberTolerance,
+                    ).bind()
             polyhedronWithContextIssueList
         }
 
@@ -338,11 +352,13 @@ object Solid3DBuilder {
             builderExceptions
                 .map {
                     DefaultIssue.of(
-                        "PolyhedronNotConstructableFromLocalCornerOutlines", it.message, it.location,
-                        Severity.WARNING, wasFixed = true,
+                        "PolyhedronNotConstructableFromLocalCornerOutlines",
+                        it.message,
+                        it.location,
+                        Severity.WARNING,
+                        wasFixed = true,
                     )
-                }
-                .mergeToReport()
+                }.mergeToReport()
         val polyhedrons =
             polyhedronsWithContext
                 .handleIssueList { issueList += it.issueList }
@@ -366,11 +382,12 @@ object Solid3DBuilder {
                 },
             ) { "All cornerLocal elements must have a height of either zero or above the tolerance threshold." }
             val outlineId =
-                outline.additionalId.toEither {
-                    IllegalStateException(
-                        "Additional outline ID must be available.",
-                    )
-                }.getOrElse { throw it }
+                outline.additionalId
+                    .toEither {
+                        IllegalStateException(
+                            "Additional outline ID must be available.",
+                        )
+                    }.getOrElse { throw it }
 
             val issueList = DefaultIssueList()
 
@@ -382,11 +399,12 @@ object Solid3DBuilder {
                     .let { it.toNonEmptyListOrNull()!! }
 
             val polyhedronWithContextIssueList =
-                Polyhedron3DFactory.buildFromVerticalOutlineElements(
-                    outlineId,
-                    verticalOutlineElements,
-                    numberTolerance,
-                ).bind()
+                Polyhedron3DFactory
+                    .buildFromVerticalOutlineElements(
+                        outlineId,
+                        verticalOutlineElements,
+                        numberTolerance,
+                    ).bind()
             polyhedronWithContextIssueList
         }
 

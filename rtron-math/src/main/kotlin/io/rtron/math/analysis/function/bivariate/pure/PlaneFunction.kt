@@ -45,9 +45,7 @@ class PlaneFunction(
     override fun valueUnbounded(
         x: Double,
         y: Double,
-    ): Either<Exception, Double> {
-        return Either.Right(intercept + slopeX * x + slopeY * y)
-    }
+    ): Either<Exception, Double> = Either.Right(intercept + slopeX * x + slopeY * y)
 
     companion object {
         val ZERO = PlaneFunction(0.0, 0.0, 0.0)

@@ -19,7 +19,10 @@ package io.rtron.io.files
 /**
  * File extension representation of supported compression formats.
  */
-enum class CompressedFileExtension(val extension: String, val extensionWithDot: String) {
+enum class CompressedFileExtension(
+    val extension: String,
+    val extensionWithDot: String,
+) {
     ZIP("zip", ".zip"),
     GZ("gz", ".gz"),
     ZST("zst", ".zst"),

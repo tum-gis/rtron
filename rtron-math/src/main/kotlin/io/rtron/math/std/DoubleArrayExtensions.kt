@@ -24,9 +24,12 @@ import kotlin.math.PI
  * @param columnDimension number of columns or size of returned [DoubleArray], respectively
  * @return matrix represented as an [Array] (columns) of [DoubleArray] (rows)
  */
-fun DoubleArray.reshapeByColumnDimension(columnDimension: Int): Array<DoubleArray> {
-    return this.toList().chunked(columnDimension).map { it.toDoubleArray() }.toTypedArray()
-}
+fun DoubleArray.reshapeByColumnDimension(columnDimension: Int): Array<DoubleArray> =
+    this
+        .toList()
+        .chunked(columnDimension)
+        .map { it.toDoubleArray() }
+        .toTypedArray()
 
 /**
  * Reshapes a [DoubleArray] towards a matrix with a defined [rowDimension].

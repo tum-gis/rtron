@@ -47,18 +47,15 @@ abstract class Opendrive18CoreMapper {
     //
     // Header
     //
-    fun mapHeaderGeoreference(source: T_Header_GeoReference): Option<HeaderGeoReference> {
-        return HeaderGeoReference(content = source.content.joinToString()).some()
-    }
+    fun mapHeaderGeoreference(source: T_Header_GeoReference): Option<HeaderGeoReference> =
+        HeaderGeoReference(content = source.content.joinToString()).some()
 
     fun mapHeaderOffsetToOptionHeaderOffset(source: T_Header_Offset?): Option<HeaderOffset> =
         source?.let { mapHeaderOffset(it).some() } ?: None
 
     abstract fun mapHeaderOffset(source: T_Header_Offset): HeaderOffset
 
-    fun mapAdditionalData(source: List<Any>): List<AdditionalData> {
-        return emptyList()
-    }
+    fun mapAdditionalData(source: List<Any>): List<AdditionalData> = emptyList()
 
     //
     // Enumerations

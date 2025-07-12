@@ -42,7 +42,9 @@ fun <V : Any?> List<V>.getValueEither(index: Int): Either<NoSuchElementException
     return Either.Right(value)
 }
 
-data class NoSuchElementException(val elementName: String) : BaseException("No element found with name $elementName.") {
+data class NoSuchElementException(
+    val elementName: String,
+) : BaseException("No element found with name $elementName.") {
     fun toIllegalArgumentException() = IllegalArgumentException(message)
 }
 

@@ -19,218 +19,219 @@ package io.rtron.std
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
-class CollectionsKtTest : FunSpec({
-    context("TestDistinctConsecutive") {
+class CollectionsKtTest :
+    FunSpec({
+        context("TestDistinctConsecutive") {
 
-        test("test basic list with consecutive duplicate at the beginning") {
-            val expectedValues = listOf("a", "b", "c")
+            test("test basic list with consecutive duplicate at the beginning") {
+                val expectedValues = listOf("a", "b", "c")
 
-            val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveBy { it }
+                val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveBy { it }
 
-            actualValues shouldBe expectedValues
+                actualValues shouldBe expectedValues
+            }
+
+            test("test basic list with same enclosing pair") {
+                val expectedValues = listOf("a", "b", "c", "a")
+
+                val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveBy { it }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test empty list") {
+                val actualValues = emptyList<String>().distinctConsecutiveBy { it }
+
+                actualValues shouldBe emptyList<String>()
+            }
+
+            test("test list with a single element") {
+                val actualValues = listOf("a").distinctConsecutiveBy { it }
+
+                actualValues shouldBe listOf("a")
+            }
         }
 
-        test("test basic list with same enclosing pair") {
-            val expectedValues = listOf("a", "b", "c", "a")
+        context("TestDistinctConsecutiveEnclosing") {
 
-            val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveBy { it }
+            test("test basic list with consecutive duplicate at the beginning") {
+                val expectedValues = listOf("a", "b", "c")
 
-            actualValues shouldBe expectedValues
+                val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveEnclosingBy { it }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test basic list with same enclosing pair") {
+                val expectedValues = listOf("a", "b", "c")
+
+                val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveEnclosingBy { it }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test removal of multiple consecutive objects") {
+                val expectedValues = listOf("a", "b", "c")
+
+                val actualValues = listOf("a", "b", "b", "b", "c").distinctConsecutiveEnclosingBy { it }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test empty list") {
+                val actualValues = emptyList<String>().distinctConsecutiveEnclosingBy { it }
+
+                actualValues shouldBe emptyList<String>()
+            }
+
+            test("test list with a single element") {
+                val actualValues = listOf("a").distinctConsecutiveEnclosingBy { it }
+
+                actualValues shouldBe listOf("a")
+            }
         }
 
-        test("test empty list") {
-            val actualValues = emptyList<String>().distinctConsecutiveBy { it }
+        context("TestFilterToSorting") {
 
-            actualValues shouldBe emptyList<String>()
+            test("test basic list with consecutive duplicate at the beginning") {
+                val expectedValues = listOf(1, 2, 3)
+
+                val actualValues = listOf(1, 1, 2, 3).filterToSorting { first, second -> first < second }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test unsorted list") {
+                val expectedValues = listOf(3, 4, 12)
+
+                val actualValues = listOf(3, 1, 2, 4, 12, 5, 3).filterToSorting { first, second -> first < second }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test empty list") {
+                val actualValues = emptyList<String>().filterToSorting { first, second -> first < second }
+
+                actualValues shouldBe emptyList<String>()
+            }
+
+            test("test list with a single element") {
+                val actualValues = listOf("a").filterToSorting { first, second -> first < second }
+
+                actualValues shouldBe listOf("a")
+            }
         }
 
-        test("test list with a single element") {
-            val actualValues = listOf("a").distinctConsecutiveBy { it }
+        context("TestWindowedEnclosing") {
 
-            actualValues shouldBe listOf("a")
-        }
-    }
+            test("test basic enclosed windowing of character sequence") {
+                val baseSequence = sequenceOf("a", "b", "c", "d")
+                val expectedSequence =
+                    sequenceOf(
+                        listOf("a", "b", "c"),
+                        listOf("b", "c", "d"),
+                        listOf("c", "d", "a"),
+                        listOf("d", "a", "b"),
+                    )
 
-    context("TestDistinctConsecutiveEnclosing") {
+                val actualSequence = baseSequence.windowedEnclosing(3)
 
-        test("test basic list with consecutive duplicate at the beginning") {
-            val expectedValues = listOf("a", "b", "c")
+                actualSequence.toList() shouldBe expectedSequence.toList()
+            }
 
-            val actualValues = listOf("a", "a", "b", "c").distinctConsecutiveEnclosingBy { it }
+            test("test basic enclosed windowing of integer sequence") {
+                val baseSequence = sequenceOf(1, 2, 3, 4, 5, 6)
+                val expectedSequence =
+                    sequenceOf(
+                        listOf(1, 2, 3),
+                        listOf(2, 3, 4),
+                        listOf(3, 4, 5),
+                        listOf(4, 5, 6),
+                        listOf(5, 6, 1),
+                        listOf(6, 1, 2),
+                    )
 
-            actualValues shouldBe expectedValues
-        }
+                val actualValues = baseSequence.windowedEnclosing(3)
 
-        test("test basic list with same enclosing pair") {
-            val expectedValues = listOf("a", "b", "c")
-
-            val actualValues = listOf("a", "a", "b", "c", "a").distinctConsecutiveEnclosingBy { it }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test removal of multiple consecutive objects") {
-            val expectedValues = listOf("a", "b", "c")
-
-            val actualValues = listOf("a", "b", "b", "b", "c").distinctConsecutiveEnclosingBy { it }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test empty list") {
-            val actualValues = emptyList<String>().distinctConsecutiveEnclosingBy { it }
-
-            actualValues shouldBe emptyList<String>()
+                actualValues.toList() shouldBe expectedSequence.toList()
+            }
         }
 
-        test("test list with a single element") {
-            val actualValues = listOf("a").distinctConsecutiveEnclosingBy { it }
+        context("TestFilterWithNext") {
 
-            actualValues shouldBe listOf("a")
-        }
-    }
+            test("test basic enclosed windowing of character sequence") {
+                val expectedValues = listOf("a", "b", "c")
 
-    context("TestFilterToSorting") {
+                val actualValues = listOf("a", "a", "b", "c").filterWithNext { a, b -> a != b }
 
-        test("test basic list with consecutive duplicate at the beginning") {
-            val expectedValues = listOf(1, 2, 3)
+                actualValues shouldBe expectedValues
+            }
 
-            val actualValues = listOf(1, 1, 2, 3).filterToSorting { first, second -> first < second }
+            test("test basic list with same enclosing pair") {
+                val expectedValues = listOf("a", "b", "c", "a")
 
-            actualValues shouldBe expectedValues
-        }
+                val actualValues = listOf("a", "a", "b", "c", "a").filterWithNext { a, b -> a != b }
 
-        test("test unsorted list") {
-            val expectedValues = listOf(3, 4, 12)
+                actualValues shouldBe expectedValues
+            }
 
-            val actualValues = listOf(3, 1, 2, 4, 12, 5, 3).filterToSorting { first, second -> first < second }
+            test("test list with three consecutively following duplicates") {
+                val expectedValues = listOf("a", "b", "c", "a")
 
-            actualValues shouldBe expectedValues
-        }
+                val actualValues = listOf("a", "a", "a", "b", "b", "c", "a").filterWithNext { a, b -> a != b }
 
-        test("test empty list") {
-            val actualValues = emptyList<String>().filterToSorting { first, second -> first < second }
+                actualValues shouldBe expectedValues
+            }
 
-            actualValues shouldBe emptyList<String>()
-        }
+            test("test empty list") {
+                val actualValues = emptyList<String>().filterWithNext { a, b -> a != b }
 
-        test("test list with a single element") {
-            val actualValues = listOf("a").filterToSorting { first, second -> first < second }
+                actualValues shouldBe emptyList<String>()
+            }
 
-            actualValues shouldBe listOf("a")
-        }
-    }
+            test("test list with a single element") {
+                val actualValues = listOf("a").filterWithNext { a, b -> a != b }
 
-    context("TestWindowedEnclosing") {
-
-        test("test basic enclosed windowing of character sequence") {
-            val baseSequence = sequenceOf("a", "b", "c", "d")
-            val expectedSequence =
-                sequenceOf(
-                    listOf("a", "b", "c"),
-                    listOf("b", "c", "d"),
-                    listOf("c", "d", "a"),
-                    listOf("d", "a", "b"),
-                )
-
-            val actualSequence = baseSequence.windowedEnclosing(3)
-
-            actualSequence.toList() shouldBe expectedSequence.toList()
+                actualValues shouldBe listOf("a")
+            }
         }
 
-        test("test basic enclosed windowing of integer sequence") {
-            val baseSequence = sequenceOf(1, 2, 3, 4, 5, 6)
-            val expectedSequence =
-                sequenceOf(
-                    listOf(1, 2, 3),
-                    listOf(2, 3, 4),
-                    listOf(3, 4, 5),
-                    listOf(4, 5, 6),
-                    listOf(5, 6, 1),
-                    listOf(6, 1, 2),
-                )
+        context("TestFilterWithNextEnclosing") {
 
-            val actualValues = baseSequence.windowedEnclosing(3)
+            test("test basic list with consecutive duplicate at the beginning") {
+                val expectedValues = listOf("a", "b", "c")
 
-            actualValues.toList() shouldBe expectedSequence.toList()
+                val actualValues = listOf("a", "a", "b", "c").filterWithNextEnclosing { a, b -> a != b }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test basic list with same enclosing pair") {
+                val expectedValues = listOf("a", "b", "c")
+
+                val actualValues = listOf("a", "a", "b", "c", "a").filterWithNextEnclosing { a, b -> a != b }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test removal of multiple consecutive objects") {
+                val expectedValues = listOf("a", "b", "c")
+
+                val actualValues = listOf("a", "b", "b", "b", "c").filterWithNextEnclosing { a, b -> a != b }
+
+                actualValues shouldBe expectedValues
+            }
+
+            test("test empty list") {
+                val actualValues = emptyList<String>().filterWithNextEnclosing { a, b -> a != b }
+
+                actualValues shouldBe emptyList<String>()
+            }
+
+            test("test list with a single element") {
+                val actualValues = listOf("a").filterWithNextEnclosing { a, b -> a != b }
+
+                actualValues shouldBe listOf("a")
+            }
         }
-    }
-
-    context("TestFilterWithNext") {
-
-        test("test basic enclosed windowing of character sequence") {
-            val expectedValues = listOf("a", "b", "c")
-
-            val actualValues = listOf("a", "a", "b", "c").filterWithNext { a, b -> a != b }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test basic list with same enclosing pair") {
-            val expectedValues = listOf("a", "b", "c", "a")
-
-            val actualValues = listOf("a", "a", "b", "c", "a").filterWithNext { a, b -> a != b }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test list with three consecutively following duplicates") {
-            val expectedValues = listOf("a", "b", "c", "a")
-
-            val actualValues = listOf("a", "a", "a", "b", "b", "c", "a").filterWithNext { a, b -> a != b }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test empty list") {
-            val actualValues = emptyList<String>().filterWithNext { a, b -> a != b }
-
-            actualValues shouldBe emptyList<String>()
-        }
-
-        test("test list with a single element") {
-            val actualValues = listOf("a").filterWithNext { a, b -> a != b }
-
-            actualValues shouldBe listOf("a")
-        }
-    }
-
-    context("TestFilterWithNextEnclosing") {
-
-        test("test basic list with consecutive duplicate at the beginning") {
-            val expectedValues = listOf("a", "b", "c")
-
-            val actualValues = listOf("a", "a", "b", "c").filterWithNextEnclosing { a, b -> a != b }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test basic list with same enclosing pair") {
-            val expectedValues = listOf("a", "b", "c")
-
-            val actualValues = listOf("a", "a", "b", "c", "a").filterWithNextEnclosing { a, b -> a != b }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test removal of multiple consecutive objects") {
-            val expectedValues = listOf("a", "b", "c")
-
-            val actualValues = listOf("a", "b", "b", "b", "c").filterWithNextEnclosing { a, b -> a != b }
-
-            actualValues shouldBe expectedValues
-        }
-
-        test("test empty list") {
-            val actualValues = emptyList<String>().filterWithNextEnclosing { a, b -> a != b }
-
-            actualValues shouldBe emptyList<String>()
-        }
-
-        test("test list with a single element") {
-            val actualValues = listOf("a").filterWithNextEnclosing { a, b -> a != b }
-
-            actualValues shouldBe listOf("a")
-        }
-    }
-})
+    })

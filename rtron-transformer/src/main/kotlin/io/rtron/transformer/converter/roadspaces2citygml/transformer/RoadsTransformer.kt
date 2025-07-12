@@ -95,7 +95,8 @@ class RoadsTransformer(
         val issueList = DefaultIssueList()
 
         val roadspacesInJunction =
-            roadspacesModel.getRoadspacesWithinJunction(junctionId)
+            roadspacesModel
+                .getRoadspacesWithinJunction(junctionId)
                 .getOrElse { throw it }
                 .sortedBy { it.name }
 
@@ -149,24 +150,28 @@ class RoadsTransformer(
 
         // transforms the lines of the center lane (id=0)
         val roadCenterLaneLines =
-            roadspace.road.getAllCenterLanes()
+            roadspace.road
+                .getAllCenterLanes()
                 .map { genericsModuleBuilder.createRoadCenterLaneLine(it.first, it.second, it.third) }
                 .mergeIssueLists()
                 .handleIssueList { issueList += it }
 
         // transforms lane boundaries and center lines of the lanes
         val leftLaneBoundaries =
-            roadspace.road.getAllLeftLaneBoundaries()
+            roadspace.road
+                .getAllLeftLaneBoundaries()
                 .map { genericsModuleBuilder.createLeftLaneBoundary(it.first, it.second) }
                 .mergeIssueLists()
                 .handleIssueList { issueList += it }
         val rightLaneBoundaries =
-            roadspace.road.getAllRightLaneBoundaries()
+            roadspace.road
+                .getAllRightLaneBoundaries()
                 .map { genericsModuleBuilder.createRightLaneBoundary(it.first, it.second) }
                 .mergeIssueLists()
                 .handleIssueList { issueList += it }
         val laneCenterLines =
-            roadspace.road.getAllCurvesOnLanes(0.5)
+            roadspace.road
+                .getAllCurvesOnLanes(0.5)
                 .map { genericsModuleBuilder.createCenterLaneLine(it.first, it.second) }
                 .mergeIssueLists()
                 .handleIssueList { issueList += it }
@@ -212,23 +217,31 @@ class RoadsTransformer(
     ): DefaultIssueList {
         val issueList = DefaultIssueList()
         val lane =
-            road.getLane(id)
+            road
+                .getLane(id)
                 .getOrElse {
                     issueList +=
                         DefaultIssue.of(
-                            "LaneNotConstructable", "${it.message} Ignoring lane.", id,
-                            Severity.WARNING, wasFixed = true,
+                            "LaneNotConstructable",
+                            "${it.message} Ignoring lane.",
+                            id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     return issueList
                 }
 
         val surface =
-            road.getLaneSurface(id, parameters.discretizationStepSize)
+            road
+                .getLaneSurface(id, parameters.discretizationStepSize)
                 .getOrElse {
                     issueList +=
                         DefaultIssue.of(
-                            "LaneSurfaceNotConstructable", "${it.message} Ignoring lane.", id,
-                            Severity.WARNING, wasFixed = true,
+                            "LaneSurfaceNotConstructable",
+                            "${it.message} Ignoring lane.",
+                            id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     return issueList
                 }
@@ -240,12 +253,16 @@ class RoadsTransformer(
                     ) { parameters.laneSurfaceExtrusionHeight }
 
                 val extrudedSurface =
-                    road.getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = trafficSpaceHeight)
+                    road
+                        .getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = trafficSpaceHeight)
                         .getOrElse {
                             issueList +=
                                 DefaultIssue.of(
-                                    "ExtrudedLaneSurfaceNotConstructable", "${it.message} Ignoring lane.", id,
-                                    Severity.WARNING, wasFixed = true,
+                                    "ExtrudedLaneSurfaceNotConstructable",
+                                    "${it.message} Ignoring lane.",
+                                    id,
+                                    Severity.WARNING,
+                                    wasFixed = true,
                                 )
                             return issueList
                         }
@@ -255,22 +272,30 @@ class RoadsTransformer(
             }
 
         val centerLine =
-            road.getCurveOnLane(id, 0.5)
+            road
+                .getCurveOnLane(id, 0.5)
                 .getOrElse {
                     issueList +=
                         DefaultIssue.of(
-                            "CenterLineNotConstructable", "${it.message} Ignoring lane.", id,
-                            Severity.WARNING, wasFixed = true,
+                            "CenterLineNotConstructable",
+                            "${it.message} Ignoring lane.",
+                            id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     return issueList
                 }
         val lateralFillerSurface =
-            road.getLateralFillerSurface(id, parameters.discretizationStepSize)
+            road
+                .getLateralFillerSurface(id, parameters.discretizationStepSize)
                 .getOrElse {
                     issueList +=
                         DefaultIssue.of(
-                            "LateralFillerSurfaceNotConstructable", "${it.message} Ignoring lane.", id,
-                            Severity.WARNING, wasFixed = true,
+                            "LateralFillerSurfaceNotConstructable",
+                            "${it.message} Ignoring lane.",
+                            id,
+                            Severity.WARNING,
+                            wasFixed = true,
                         )
                     return issueList
                 }
@@ -279,15 +304,26 @@ class RoadsTransformer(
             when (LaneRouter.route(lane)) {
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
                     transportationModuleBuilder.addTrafficSpaceFeature(
-                        lane, surface, extrudedSurface, centerLine, lateralFillerSurface,
-                        longitudinalFillerSurfaces, relatedObjects, dstTransportationSpace,
+                        lane,
+                        surface,
+                        extrudedSurface,
+                        centerLine,
+                        lateralFillerSurface,
+                        longitudinalFillerSurfaces,
+                        relatedObjects,
+                        dstTransportationSpace,
                     )
                 }
 
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
                     transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(
-                        lane, surface, extrudedSurface, centerLine, lateralFillerSurface,
-                        longitudinalFillerSurfaces, dstTransportationSpace,
+                        lane,
+                        surface,
+                        extrudedSurface,
+                        centerLine,
+                        lateralFillerSurface,
+                        longitudinalFillerSurfaces,
+                        dstTransportationSpace,
                     )
                 }
             }
@@ -326,11 +362,11 @@ class RoadsTransformer(
         dstTransportationSpace: AbstractTransportationSpace,
     ): DefaultIssueList {
         val issueList = DefaultIssueList()
-        road.getRoadMarkings(id, parameters.discretizationStepSize)
+        road
+            .getRoadMarkings(id, parameters.discretizationStepSize)
             .handleLeftAndFilter {
                 issueList += DefaultIssue.of("RoadMarkingNotConstructable", it.value.message!!, id, Severity.WARNING, wasFixed = true)
-            }
-            .forEachIndexed { index, (roadMarking, geometry) ->
+            }.forEachIndexed { index, (roadMarking, geometry) ->
                 issueList += transportationModuleBuilder.addMarkingFeature(id, index, roadMarking, geometry, dstTransportationSpace)
             }
 

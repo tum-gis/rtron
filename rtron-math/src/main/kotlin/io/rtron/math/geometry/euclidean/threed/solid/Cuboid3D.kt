@@ -118,14 +118,11 @@ data class Cuboid3D(
         )
 
     // Methods
-    override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> {
-        return nonEmptyListOf(basePolygon, elevatedPolygon, frontPolygon, leftPolygon, backPolygon, rightPolygon)
-    }
+    override fun calculatePolygonsLocalCS(): NonEmptyList<Polygon3D> =
+        nonEmptyListOf(basePolygon, elevatedPolygon, frontPolygon, leftPolygon, backPolygon, rightPolygon)
 
     // Conversions
-    override fun toString(): String {
-        return "Cuboid3D(referencePose=$affineSequence, width=$length, height=$width, depth=$height)"
-    }
+    override fun toString(): String = "Cuboid3D(referencePose=$affineSequence, width=$length, height=$width, depth=$height)"
 
     companion object {
         val UNIT = Cuboid3D(1.0, 1.0, 1.0, DEFAULT_TOLERANCE)
