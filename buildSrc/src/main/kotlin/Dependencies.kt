@@ -17,7 +17,7 @@
 
 object DependencyVersions {
     // standard libraries
-    const val kotlin = "2.1.20"
+    const val kotlin = "2.2.0"
     const val coroutines = "1.10.2"
     const val arrow = "1.2.4"
 
@@ -51,7 +51,7 @@ object DependencyVersions {
     const val emojiJava = "5.1.1"
 
     // math libraries
-    const val guava = "33.4.0-jre"
+    const val guava = "33.4.8-jre"
     const val commonsMath = "3.6.1"
     const val joml = "1.10.8"
     const val poly2tri = "0.1.2"
