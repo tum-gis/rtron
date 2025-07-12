@@ -25,7 +25,7 @@ import com.google.common.collect.Sets as GSets
  * @receiver the set for which all possible subsets are constructed
  * @return all possible subsets
  */
-fun <T: Any> Set<T>.powerSet(): Set<Set<T>> = GSets.powerSet(this)
+fun <T : Any> Set<T>.powerSet(): Set<Set<T>> = GSets.powerSet(this)
 
 /**
  * Returns all possible subsets of [this] with [size].
@@ -34,4 +34,4 @@ fun <T: Any> Set<T>.powerSet(): Set<Set<T>> = GSets.powerSet(this)
  * @param size the number of elements per combination
  * @return all possible subsets of provided [size]
  */
-fun <T: Any> Set<T>.combinations(size: Int): Set<Set<T>> = GSets.combinations(this, size)
+fun <T : Any> Set<T>.combinations(size: Int): Set<Set<T>> = GSets.combinations(this, size)

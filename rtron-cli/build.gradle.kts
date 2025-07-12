@@ -19,9 +19,6 @@ dependencies {
     implementation(project(ProjectComponents.transformer))
     implementation(project(ProjectComponents.model))
 
-    // batch processing layer
-    implementation(project(ProjectComponents.main))
-
     // object creation libraries
     implementation(Dependencies.kotlinxSerializationJson)
     implementation(Dependencies.kaml)
@@ -30,6 +27,10 @@ dependencies {
     implementation(Dependencies.clikt)
     implementation(Dependencies.mordant)
     implementation(Dependencies.commonsLang)
+
+    // logging libraries
+    implementation(Dependencies.kotlinLogging)
+    implementation(Dependencies.slf4jSimple)
 }
 
 application {

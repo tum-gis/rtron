@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package io.rtron.main.project
+package io.rtron.cli.utility
 
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
-
-data class Project(
-    val inputFilePath: Path,
-    val outputDirectoryPath: Path,
-) {
-    // Properties and Initializers
-    init {
-        outputDirectoryPath.createDirectories()
-    }
+enum class CompressionFormat {
+    NONE,
+    GZ,
+    ZIP,
+    ZST,
 }
+
+fun CompressionFormat.toFileExtension(): String =
+    when (this) {
+        CompressionFormat.NONE -> ""
+        CompressionFormat.GZ -> ".gz"
+        CompressionFormat.ZIP -> ".zip"
+        CompressionFormat.ZST -> ".zst"
+    }

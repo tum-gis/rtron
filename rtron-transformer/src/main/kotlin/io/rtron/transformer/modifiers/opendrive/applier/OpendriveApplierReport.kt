@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package io.rtron.main.processor
+package io.rtron.transformer.modifiers.opendrive.applier
 
-enum class CompressionFormat {
-    NONE,
-    GZ,
-    ZIP,
-    ZST,
-}
+import kotlinx.serialization.Serializable
 
-fun CompressionFormat.toFileExtension(): String =
-    when (this) {
-        CompressionFormat.NONE -> ""
-        CompressionFormat.GZ -> ".gz"
-        CompressionFormat.ZIP -> ".zip"
-        CompressionFormat.ZST -> ".zst"
-    }
+@Serializable
+data class OpendriveApplierReport(
+    val parameters: OpendriveApplierParameters,
+    var numberOfRoads: Int = 0,
+    var numberOfRoadNamesChanged: Int = 0,
+    var roadNamesAdded: HashSet<String> = hashSetOf(),
+)
