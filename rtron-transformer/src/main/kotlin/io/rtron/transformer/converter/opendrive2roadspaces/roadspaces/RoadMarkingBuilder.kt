@@ -261,11 +261,17 @@ class RoadMarkingBuilder(
                     if (currentTypeLine.tOffset < parameters.numberTolerance) None else Some(currentTypeLine.tOffset)
 
                 val step = currentTypeLine.length + currentTypeLine.space
-                (0..floor((domain.upperEndpointOrNull()!! - currentTypeLineCurvePositionStart) / step).toInt())
+                val upperIndexLimit =
+                    if (step <= parameters.numberTolerance) {
+                        0
+                    } else {
+                        floor((domain.upperEndpointOrNull()!! - currentTypeLineCurvePositionStart) / step).toInt()
+                    }
+                (0..upperIndexLimit)
                     .map { currentRegularIndex ->
                         val start = currentTypeLineCurvePositionStart + currentRegularIndex * step
                         val end =
-                            if (start + currentTypeLine.length < domain.upperEndpointOrNull()!!) {
+                            if (step > parameters.numberTolerance && start + currentTypeLine.length < domain.upperEndpointOrNull()!!) {
                                 start + currentTypeLine.length
                             } else {
                                 domain.upperEndpointOrNull()!!
