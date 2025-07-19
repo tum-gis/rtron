@@ -1,14 +1,14 @@
 default: lint build test doc
 
-# format and lint
+# format and lint the project
 lint:
     ./gradlew ktlintFormat
 
-# generate required code
+# generate code
 generate:
     ./gradlew xjcGeneration
 
-# compile the current package
+# compile the project
 build mode="develop":
     if [ "{{mode}}" = "develop" ]; then \
         ./gradlew build; \
@@ -19,7 +19,7 @@ build mode="develop":
         exit 1; \
     fi
 
-# run unit tests and check linting
+# execute unit and integration tests
 test: generate
     ./gradlew check
 
@@ -27,7 +27,7 @@ test: generate
 clean:
     ./gradlew clean
 
-# create documentation
+# build the documentation
 doc: generate
     ./gradlew dokkaHtmlMultiModule
 
