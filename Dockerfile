@@ -1,4 +1,4 @@
-FROM gradle:jdk17 AS builder
+FROM gradle:jdk21 AS builder
 
 LABEL maintainer="Benedikt Schwab"
 LABEL maintainer.email="benedikt.schwab(at)tum.de"
@@ -11,7 +11,7 @@ WORKDIR /home/app
 RUN gradle shadowJar
 
 
-FROM bellsoft/liberica-openjdk-debian:17 AS runtime
+FROM bellsoft/liberica-openjdk-debian:21 AS runtime
 
 WORKDIR /app
 COPY --from=builder /home/app/rtron-cli/build/libs/rtron-1*.jar /app/app.jar
