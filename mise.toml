@@ -1,0 +1,49 @@
+[tasks.default]
+run = [
+    'mise run lint',
+    'mise run build',
+    'mise run test',
+    'mise run doc'
+]
+
+[tasks.lint]
+description = "Format and lint the project"
+run = "./gradlew ktlintFormat"
+
+[tasks.build]
+description = "Compile the project"
+run = '''
+if [ '{{flag(name='release')}}' = 'true' ]; then
+    ./gradlew shadowJar;
+else
+    ./gradlew build;
+fi
+'''
+
+[tasks.test]
+description = "Execute unit and integration tests"
+run = '''
+./gradlew check
+./gradlew test
+'''
+
+[tasks.run]
+description = "Run the project"
+run = "./gradlew clean"
+
+[tasks.doc]
+description = "Build the documentation"
+run = "./gradlew dokkaHtmlMultiModule"
+
+[tasks.serve-doc]
+description = "Start a local webserver with the documentation"
+depends = ["doc"]
+run = "miniserve ./build/dokka/htmlMultiModule --index index.html"
+
+[tasks.check-dependencies]
+description = "Check dependencies for updates or similiar"
+run = "./gradlew dependencyUpdates"
+
+[tasks.build-container]
+description = "Build a container of the project"
+run = "docker build -t rtron ."
