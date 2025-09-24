@@ -42,7 +42,7 @@ run = "miniserve ./build/dokka/htmlMultiModule --index index.html"
 
 [tasks.check-dependencies]
 description = "Check dependencies for updates or similiar"
-run = "./gradlew dependencyUpdates"
+run = "./gradlew dependencyUpdates --no-parallel"
 
 [tasks.build-container]
 description = "Build a container of the project"

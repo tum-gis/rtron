@@ -16,17 +16,17 @@
 
 
 object PluginVersions {
-    const val shadowjar = "8.1.1"
-    const val ktlint = "13.0.0"
+    const val shadowjar = "9.2.1"
+    const val ktlint = "13.1.0"
     const val xjc = "1.6"
-    const val versionChecker = "0.52.0"
+    const val versionChecker = "0.53.0"
     const val dokka = "2.0.0"
-    const val serialization = "2.2.0"
-    const val ksp = "2.2.0-2.0.2"
+    const val serialization = "2.2.20"
+    const val ksp = "2.2.20-2.0.3"
 }
 
 object Plugins {
-    const val shadowjar = "com.github.johnrengelman.shadow"
+    const val shadowjar = "com.gradleup.shadow"
     const val ktlint = "org.jlleitschuh.gradle.ktlint"
     const val xjc = "com.github.edeandrea.xjc-generation"
     const val versionChecker = "com.github.ben-manes.versions"
