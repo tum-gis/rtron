@@ -35,17 +35,17 @@ enum class OpendriveVersion(
     V0_7(Pair(0, 7)),
 
     /**
-     * OpenDRIVE version 1.1 Rev.D released on the 11 Apr 2008 by VIRES Simulationstechnologie GmbH.
+     * OpenDRIVE version 1.1 Rev.D released on the 11 Apr 2007 by VIRES Simulationstechnologie GmbH.
      */
     V1_1(Pair(1, 1)),
 
     /**
-     * OpenDRIVE version 1.2 Rev.A released on the 06 Jan 2008 by VIRES Simulationstechnologie GmbH.
+     * OpenDRIVE version 1.2 Rev.A released on the 02 Jan 2008 by VIRES Simulationstechnologie GmbH.
      */
     V1_2(Pair(1, 2)),
 
     /**
-     * OpenDRIVE version 1.3 Rev.C released on the 07 Aug 2010 by VIRES Simulationstechnologie GmbH.
+     * OpenDRIVE version 1.3 Rev.D released on the 17 Aug 2010 by VIRES Simulationstechnologie GmbH.
      */
     V1_3(Pair(1, 3)),
 
@@ -55,7 +55,7 @@ enum class OpendriveVersion(
     V1_4(Pair(1, 4)),
 
     /**
-     * OpenDRIVE version 1.5 released on the 17 Feb 2019 by ASAM e.V.
+     * OpenDRIVE version 1.5.0 released on the 17 Feb 2019 by ASAM e.V.
      */
     V1_5(Pair(1, 5)),
 
@@ -69,6 +69,9 @@ enum class OpendriveVersion(
      */
     V1_7(Pair(1, 7)),
 
+    /**
+     * OpenDRIVE version 1.8.1 released on the 21 Nov 2024 by ASAM e.V.
+     */
     V1_8(Pair(1, 8)),
     ;
 
