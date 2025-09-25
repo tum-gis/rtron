@@ -117,8 +117,8 @@ abstract class Opendrive14LaneMapper {
     //
     // Access
     //
-    fun mapLaneAccessRestrictionTypeToList(source: Restriction): List<RoadLanesLaneSectionLRLaneAccessRestriction> =
-        listOf(mapLaneAccessRestrictionTypeToClass(source))
+    fun mapLaneAccessRestrictionTypeToList(source: Restriction?): List<RoadLanesLaneSectionLRLaneAccessRestriction> =
+        source?.let { listOf(mapLaneAccessRestrictionTypeToClass(it)) } ?: emptyList()
 
     fun mapLaneAccessRestrictionTypeToClass(source: Restriction): RoadLanesLaneSectionLRLaneAccessRestriction =
         RoadLanesLaneSectionLRLaneAccessRestriction(type = mapLaneAccessRestrictionType(source))
