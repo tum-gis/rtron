@@ -123,6 +123,67 @@ object JunctionEvaluator {
                 currentJunction
             }
 
+        val allRoadIds: Set<String> = modifiedOpendriveModel.road.map { it.id }.toSet()
+        modifiedOpendriveModel =
+            everyJunction.modify(modifiedOpendriveModel) { currentJunction ->
+
+                // remove connections with a connectingRoad that don't exist
+                val junctionConnectionsFilteredByConnecting =
+                    currentJunction.connection.filter { currentConnection ->
+                        currentConnection.connectingRoad.fold({ true }, { allRoadIds.contains(it) })
+                    }
+                if (currentJunction.connection.size > junctionConnectionsFilteredByConnecting.size) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "JunctionConnectionWithNotExistentConnectingRoad",
+                            "Junction connections (number of connections: ${currentJunction.connection.size -
+                                junctionConnectionsFilteredByConnecting.size}) were removed since the specified connectingRoad did not exist.",
+                            currentJunction.additionalId,
+                            Severity.ERROR,
+                            wasFixed = true,
+                        )
+                }
+                currentJunction.connection = junctionConnectionsFilteredByConnecting
+
+                // remove connections with an incomingRoad that don't exist
+                val junctionConnectionsFilteredByIncoming =
+                    currentJunction.connection.filter { currentConnection ->
+                        currentConnection.incomingRoad.fold({ true }, { allRoadIds.contains(it) })
+                    }
+                if (currentJunction.connection.size > junctionConnectionsFilteredByIncoming.size) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "JunctionConnectionWithNotExistentIncomingRoad",
+                            "Junction connections (number of connections: ${currentJunction.connection.size -
+                                junctionConnectionsFilteredByIncoming.size}) were removed since the specified incomingRoad did not exist.",
+                            currentJunction.additionalId,
+                            Severity.ERROR,
+                            wasFixed = true,
+                        )
+                }
+                currentJunction.connection = junctionConnectionsFilteredByIncoming
+
+                // remove connections with a linkedRoad that don't exist
+                val junctionConnectionsFilteredByLinked =
+                    currentJunction.connection.filter { currentConnection ->
+                        currentConnection.linkedRoad.fold({ true }, { allRoadIds.contains(it) })
+                    }
+                if (currentJunction.connection.size > junctionConnectionsFilteredByLinked.size) {
+                    issueList +=
+                        DefaultIssue.of(
+                            "JunctionConnectionWithNotExistentLinkedRoad",
+                            "Junction connections (number of connections: ${currentJunction.connection.size -
+                                junctionConnectionsFilteredByLinked.size}) were removed since the specified linkedRoad did not exist.",
+                            currentJunction.additionalId,
+                            Severity.ERROR,
+                            wasFixed = true,
+                        )
+                }
+                currentJunction.connection = junctionConnectionsFilteredByLinked
+
+                currentJunction
+            }
+
         val junctionsFiltered = modifiedOpendriveModel.junction.filter { it.connection.isEmpty() }
         junctionsFiltered.map { it.additionalId }.flattenOption().forEach { currentId ->
             modifiedOpendriveModel = JunctionModifier.removeJunction(modifiedOpendriveModel, currentId)

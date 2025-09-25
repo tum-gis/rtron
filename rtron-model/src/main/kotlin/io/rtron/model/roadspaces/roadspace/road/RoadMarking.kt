@@ -40,7 +40,7 @@ data class RoadMarking(
     // Properties and Initializers
     init {
         require(domain.isNotEmpty()) { "The domain of the road marking's width must not be empty." }
-        require(width.isSome { it > 0.0 } || width.isNone()) { "The width of the road marking must be greater than zero." }
+        require(width.fold({ true }, { it > 0.0 })) { "The width of the road marking must be greater than zero." }
     }
 
     val widthFunction get(): Option<ConstantFunction> = width.map { ConstantFunction(it, domain) }

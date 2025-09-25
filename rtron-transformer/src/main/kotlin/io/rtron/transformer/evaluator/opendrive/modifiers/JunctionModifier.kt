@@ -44,7 +44,7 @@ object JunctionModifier {
         // remove links to junction to be deleted
         everyRoadLink.modify(modifiedOpendriveModel) { currentLink ->
 
-            // remove the predecessor link, if it is the junction to be deleted
+            // remove the predecessor link if it is the junction to be deleted
             if (currentLink.predecessor.isSome { currentPredecessor ->
                     currentPredecessor.getJunctionPredecessorSuccessor().isSome { it == id.junctionId }
                 }
@@ -52,7 +52,7 @@ object JunctionModifier {
                 currentLink.predecessor = None
             }
 
-            // remove the successor link, if it is the junction to be deleted
+            // remove the successor link if it is the junction to be deleted
             if (currentLink.successor.isSome { currentSuccessor ->
                     currentSuccessor.getJunctionPredecessorSuccessor().isSome { it == id.junctionId }
                 }
