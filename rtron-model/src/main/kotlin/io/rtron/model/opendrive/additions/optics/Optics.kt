@@ -30,6 +30,7 @@ import io.rtron.model.opendrive.lane.RoadLanes
 import io.rtron.model.opendrive.lane.RoadLanesLaneSection
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenter
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeft
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeftLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRight
@@ -40,6 +41,7 @@ import io.rtron.model.opendrive.lane.laneSection
 import io.rtron.model.opendrive.lane.left
 import io.rtron.model.opendrive.lane.right
 import io.rtron.model.opendrive.lane.roadMark
+import io.rtron.model.opendrive.lane.type
 import io.rtron.model.opendrive.objects.RoadObjects
 import io.rtron.model.opendrive.objects.RoadObjectsObject
 import io.rtron.model.opendrive.objects.RoadObjectsObjectOutlines
@@ -98,6 +100,13 @@ val everyRoadLanesLaneSectionRightLaneRoadMark =
 val everyRoadLanesLaneSectionCenterLaneRoadMark =
     everyRoadLanesLaneSectionCenterLane compose
         RoadLanesLaneSectionCenterLane.roadMark compose Traversal.list()
+
+val everyRoadLanesLaneSectionLeftLaneRoadMarkType =
+    everyRoadLanesLaneSectionLeftLaneRoadMark compose RoadLanesLaneSectionLCRLaneRoadMark.type compose PPrism.some()
+val everyRoadLanesLaneSectionRightLaneRoadMarkType =
+    everyRoadLanesLaneSectionRightLaneRoadMark compose RoadLanesLaneSectionLCRLaneRoadMark.type compose PPrism.some()
+val everyRoadLanesLaneSectionCenterLaneRoadMarkType =
+    everyRoadLanesLaneSectionCenterLaneRoadMark compose RoadLanesLaneSectionLCRLaneRoadMark.type compose PPrism.some()
 
 // junction
 val everyJunction = OpendriveModel.junction compose Traversal.list()

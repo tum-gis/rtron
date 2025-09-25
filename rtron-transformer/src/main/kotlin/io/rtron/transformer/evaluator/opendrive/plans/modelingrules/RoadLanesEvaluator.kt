@@ -16,6 +16,7 @@
 
 package io.rtron.transformer.evaluator.opendrive.plans.modelingrules
 
+import arrow.core.None
 import arrow.core.Option
 import io.rtron.io.issues.DefaultIssue
 import io.rtron.io.issues.DefaultIssueList
@@ -25,8 +26,11 @@ import io.rtron.model.opendrive.additions.identifier.LaneIdentifier
 import io.rtron.model.opendrive.additions.optics.everyLaneSection
 import io.rtron.model.opendrive.additions.optics.everyRoad
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionCenterLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionCenterLaneRoadMark
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionLeftLaneRoadMark
 import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLane
+import io.rtron.model.opendrive.additions.optics.everyRoadLanesLaneSectionRightLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.transformer.evaluator.opendrive.OpendriveEvaluatorParameters
 import io.rtron.transformer.issues.opendrive.of
@@ -186,7 +190,44 @@ object RoadLanesEvaluator {
                 currentRightLane
             }
 
+        // road marks
+        modifiedOpendriveModel =
+            everyRoadLanesLaneSectionCenterLaneRoadMark.modify(modifiedOpendriveModel) { currentRoadMark ->
+                evaluateRoadMark(currentRoadMark, parameters, issueList)
+                currentRoadMark
+            }
+
+        modifiedOpendriveModel =
+            everyRoadLanesLaneSectionLeftLaneRoadMark.modify(modifiedOpendriveModel) { currentRoadMark ->
+                evaluateRoadMark(currentRoadMark, parameters, issueList)
+                currentRoadMark
+            }
+
+        modifiedOpendriveModel =
+            everyRoadLanesLaneSectionRightLaneRoadMark.modify(modifiedOpendriveModel) { currentRoadMark ->
+                evaluateRoadMark(currentRoadMark, parameters, issueList)
+                currentRoadMark
+            }
+
         return modifiedOpendriveModel
+    }
+
+    private fun evaluateRoadMark(
+        roadMark: RoadLanesLaneSectionLCRLaneRoadMark,
+        parameters: OpendriveEvaluatorParameters,
+        issueList: DefaultIssueList,
+    ) {
+        if (roadMark.type.isSome { it.width <= parameters.numberTolerance }) {
+            roadMark.type = None
+            issueList +=
+                DefaultIssue.of(
+                    "RoadMarkTypeWidthBelowThreshold",
+                    "Road mark type with width zero (or below threshold).",
+                    roadMark.additionalId,
+                    Severity.ERROR,
+                    wasFixed = true,
+                )
+        }
     }
 
     private fun filterToNonZeroLengthRoadMarks(
