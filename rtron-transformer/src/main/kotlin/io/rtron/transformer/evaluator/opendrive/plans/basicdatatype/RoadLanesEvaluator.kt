@@ -276,6 +276,16 @@ object RoadLanesEvaluator {
                 parameters.numberTolerance,
             )
 
+        roadMark.type.onSome {
+            it.width =
+                BasicDataTypeModifier.modifyToFinitePositiveDouble(
+                    it.width,
+                    roadMark.additionalId,
+                    "width",
+                    issueList,
+                )
+        }
+
         return issueList
     }
 }

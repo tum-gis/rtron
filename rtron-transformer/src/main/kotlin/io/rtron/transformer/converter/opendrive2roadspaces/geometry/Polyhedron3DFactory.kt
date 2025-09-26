@@ -302,7 +302,7 @@ object Polyhedron3DFactory {
         either {
             val issueList = DefaultIssueList()
 
-            // remove consecutively following line segment duplicates
+            // remove the consecutively following line segment duplicates
             val elementsWithoutDuplicates =
                 verticalOutlineElements.filterWithNextEnclosing {
                     a,
@@ -330,7 +330,7 @@ object Polyhedron3DFactory {
                     .bind<ContextIssueList<NonEmptyList<VerticalOutlineElement>>>()
             }
 
-            // remove consecutively following side duplicates of the form (…, A, B, A, …)
+            // remove the consecutively following side duplicates of the form (…, A, B, A, …)
             val cleanedElements =
                 elementsWithoutDuplicates
                     .filterWindowedEnclosing(listOf(false, true, true)) { it[0].basePoint == it[2].basePoint }

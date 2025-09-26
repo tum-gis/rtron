@@ -76,7 +76,9 @@ data class Curve3D(
      * @return pose whereby the orientation is tangential to this curve and its torsion
      */
     fun calculatePose(curveRelativePoint: CurveRelativeVector1D): Pose3D {
-        require(this.domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance))
+        require(this.domain.fuzzyContains(curveRelativePoint.curvePosition, tolerance)) {
+            "The curve position (${curveRelativePoint.curvePosition}) must be within the defined domain ($domain)."
+        }
 
         val poseXY = curveXY.calculatePoseGlobalCSUnbounded(curveRelativePoint)
         val height = heightFunction.value(curveRelativePoint.curvePosition).getOrElse { throw it }

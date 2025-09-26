@@ -159,10 +159,6 @@ object RoadObjectsEvaluator {
                             Severity.FATAL_ERROR,
                             wasFixed = true,
                         )
-                    // issueList += OpendriveException.UnexpectedValues("s, tStart, zOffsetStart",
-                    // "Ignoring ${currentRoadObject.repeat.size - repeatElementsFiltered.size} repeat entries which do not have a
-                    // finite s, tStart and zOffsetStart value.").toIssue(currentRoadObject.additionalId,
-                    // isFatal = false, wasFixed: Boolean)
                     currentRoadObject.repeat = repeatElementsFiltered
                 }
 
@@ -175,13 +171,9 @@ object RoadObjectsEvaluator {
                 val cornerRoadElementsFiltered =
                     currentOutlineElement.cornerRoad.filter { it.s.isFinite() && it.t.isFinite() && it.dz.isFinite() }
                 if (cornerRoadElementsFiltered.size < currentOutlineElement.cornerRoad.size) {
-                    // issueList += OpendriveException.UnexpectedValues("s, t, dz",
-                    // "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries which
-                    // do not have a finite s, t and dz value.").toIssue(currentOutlineElement.additionalId,
-                    // isFatal = false, wasFixed: Boolean)
                     issueList +=
                         DefaultIssue.of(
-                            "UnexpectedValues",
+                            "RoadObjectOutlineCornerRoadWithNonFinitePositionValues",
                             "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries " +
                                 "which do not have a finite s, t and dz value.",
                             currentOutlineElement.additionalId,
@@ -196,7 +188,7 @@ object RoadObjectsEvaluator {
                     if (!currentCornerRoad.height.isFinite() || currentCornerRoad.height < 0.0) {
                         issueList +=
                             DefaultIssue.of(
-                                "UnexpectedValue",
+                                "RoadObjectOutlineCornerRoadWithNonFiniteHeightValue",
                                 "Unexpected value for attribute 'height'",
                                 currentOutlineElement.additionalId,
                                 Severity.WARNING,
@@ -213,15 +205,11 @@ object RoadObjectsEvaluator {
                 val cornerLocalElementsFiltered =
                     currentOutlineElement.cornerLocal.filter { it.u.isFinite() && it.v.isFinite() && it.z.isFinite() }
                 if (cornerLocalElementsFiltered.size < currentOutlineElement.cornerLocal.size) {
-                    // issueList += OpendriveException.UnexpectedValues("s, t, dz",
-                    // "Ignoring ${currentOutlineElement.cornerLocal.size - cornerLocalElementsFiltered.size} cornerLocal entries which
-                    // do not have a finite u, v and z value.").toIssue(currentOutlineElement.additionalId,
-                    // isFatal = false, wasFixed = true)
                     issueList +=
                         DefaultIssue.of(
-                            "UnexpectedValues",
-                            "Ignoring ${currentOutlineElement.cornerRoad.size - cornerRoadElementsFiltered.size} cornerRoad entries " +
-                                "which do not have a finite s, t and dz value.",
+                            "RoadObjectOutlineCornerLocalWithNonFinitePositionValues",
+                            "Ignoring ${currentOutlineElement.cornerLocal.size - cornerRoadElementsFiltered.size} cornerLocal entries " +
+                                "which do not have a finite u, v and z value.",
                             currentOutlineElement.additionalId,
                             Severity.FATAL_ERROR,
                             wasFixed = true,
@@ -234,7 +222,7 @@ object RoadObjectsEvaluator {
                     if (!currentCornerLocal.height.isFinite() || currentCornerLocal.height < 0.0) {
                         issueList +=
                             DefaultIssue.of(
-                                "UnexpectedValue",
+                                "RoadObjectOutlineCornerLocalWithNonFiniteHeightValue",
                                 "Unexpected value for attribute 'height'",
                                 currentOutlineElement.additionalId,
                                 Severity.WARNING,

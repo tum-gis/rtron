@@ -128,10 +128,6 @@ object RoadEvaluator {
                             currentShapeSubEntries.value.filterToStrictSortingBy { it.t }
                         }
                     if (shapeEntriesFilteredByT.size < currentLateralProfile.shape.size) {
-                        // OpendriveException.NonStrictlySortedList("shape",
-                        // "Ignoring ${it.shape.size - shapeEntriesFilteredByT.size} shape entries which are not placed
-                        // in ascending order according to t for each s group.").toIssue(currentRoad.additionalId,
-                        // isFatal = false, wasFixed = true)
                         issueList +=
                             DefaultIssue.of(
                                 "NonStrictlySortedList",
