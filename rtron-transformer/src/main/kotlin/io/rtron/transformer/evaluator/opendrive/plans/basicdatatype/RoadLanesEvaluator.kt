@@ -276,14 +276,25 @@ object RoadLanesEvaluator {
                 parameters.numberTolerance,
             )
 
-        roadMark.type.onSome {
-            it.width =
+        roadMark.type.onSome { currentType ->
+            currentType.width =
                 BasicDataTypeModifier.modifyToFinitePositiveDouble(
-                    it.width,
+                    currentType.width,
                     roadMark.additionalId,
                     "width",
                     issueList,
                 )
+
+            currentType.line.forEach {
+                it.width =
+                    BasicDataTypeModifier.modifyToOptionalFinitePositiveDouble(
+                        it.width,
+                        roadMark.additionalId,
+                        "width",
+                        issueList,
+                        parameters.numberTolerance,
+                    )
+            }
         }
 
         return issueList

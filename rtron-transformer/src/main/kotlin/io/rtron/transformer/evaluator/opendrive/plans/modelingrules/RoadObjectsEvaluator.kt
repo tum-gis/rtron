@@ -66,6 +66,32 @@ object RoadObjectsEvaluator {
                     }
                     currentRoadObjects.roadObject = roadObjectsFiltered
 
+                    currentRoadObjects.roadObject
+                        .map { it.outlines }
+                        .flattenOption()
+                        .flatMap { it.outline }
+                        .forEach { currentOutline ->
+                            val outlineCornerRoadFiltered =
+                                currentOutline.cornerRoad.filter {
+                                    it.s <=
+                                        currentRoad.length + parameters.numberTolerance
+                                }
+                            if (currentOutline.cornerRoad.size > outlineCornerRoadFiltered.size) {
+                                issueList +=
+                                    DefaultIssue.of(
+                                        "RoadObjectOutlineCornerRoadPositionNotInSValueRange",
+                                        "Outline cornerRoad elements (number of cornerRoad elements affected: " +
+                                            "${currentOutline.cornerRoad.size - outlineCornerRoadFiltered.size}) " +
+                                            "were removed since they were positioned outside the defined length " +
+                                            "of the road.",
+                                        currentOutline.additionalId,
+                                        Severity.ERROR,
+                                        wasFixed = true,
+                                    )
+                            }
+                            currentOutline.cornerRoad = outlineCornerRoadFiltered
+                        }
+
                     val roadObjectsFilteredRepeat =
                         currentRoadObjects.roadObject.filter { currentRoadObject ->
                             currentRoadObject.repeat.isEmpty() ||

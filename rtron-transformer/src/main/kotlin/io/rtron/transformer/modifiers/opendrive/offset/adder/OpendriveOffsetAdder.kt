@@ -38,10 +38,10 @@ class OpendriveOffsetAdder(
         }
 
         val headerOffset = modifiedOpendriveModel.header.offset.getOrElse { HeaderOffset() }
-        headerOffset.x = headerOffset.x + parameters.offsetX
-        headerOffset.y = headerOffset.y + parameters.offsetY
-        headerOffset.z = headerOffset.z + parameters.offsetZ
-        headerOffset.hdg = headerOffset.hdg + parameters.offsetHeading
+        headerOffset.x += parameters.offsetX
+        headerOffset.y += parameters.offsetY
+        headerOffset.z += parameters.offsetZ
+        headerOffset.hdg += parameters.offsetHeading
         modifiedOpendriveModel.header.offset = Some(headerOffset)
 
         return modifiedOpendriveModel to report

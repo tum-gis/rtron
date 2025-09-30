@@ -97,8 +97,8 @@ object Polyhedron3DFactory {
      * The [basePoint] defines the bound of the base surface.
      *
      * @param basePoint base point of the outline element
-     * @param leftHeadPoint left head point representing the bound point of the side surface to the left
-     * @param rightHeadPoint right head point representing the bound point of the side surface to the right
+     * @param leftHeadPoint the left head point representing the bound point of the side surface to the left
+     * @param rightHeadPoint the right head point representing the bound point of the side surface to the right
      */
     data class VerticalOutlineElement(
         val basePoint: Vector3D,

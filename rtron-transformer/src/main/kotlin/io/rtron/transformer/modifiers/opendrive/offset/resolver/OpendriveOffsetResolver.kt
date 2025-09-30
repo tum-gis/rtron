@@ -49,8 +49,8 @@ class OpendriveOffsetResolver {
         modifiedOpendriveModel =
             everyRoadPlanViewGeometry.modify(modifiedOpendriveModel) { currentPlanViewGeometry ->
                 val modifiedPlanViewGeometry = currentPlanViewGeometry.copy()
-                modifiedPlanViewGeometry.x = modifiedPlanViewGeometry.x + headerOffset.x
-                modifiedPlanViewGeometry.y = modifiedPlanViewGeometry.y + headerOffset.y
+                modifiedPlanViewGeometry.x += headerOffset.x
+                modifiedPlanViewGeometry.y += headerOffset.y
 
                 modifiedPlanViewGeometry
             }
