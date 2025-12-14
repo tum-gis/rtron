@@ -33,12 +33,12 @@ run = "./gradlew clean"
 
 [tasks.doc]
 description = "Build the documentation"
-run = "./gradlew dokkaHtmlMultiModule"
+run = "./gradlew dokkaGenerateHtml"
 
 [tasks.serve-doc]
 description = "Start a local webserver with the documentation"
 depends = ["doc"]
-run = "miniserve ./build/dokka/htmlMultiModule --index index.html"
+run = "miniserve ./build/dokka/html --index index.html"
 
 [tasks.check-dependencies]
 description = "Check dependencies for updates or similiar"

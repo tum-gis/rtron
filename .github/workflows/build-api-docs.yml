@@ -21,7 +21,7 @@ jobs:
           java-version: 17
           distribution: 'temurin'
       - name: Run dokka build
-        run: ./gradlew dokkaHtmlMultiModule --no-daemon --stacktrace
+        run: ./gradlew dokkaGenerateHtml --no-daemon --stacktrace
       - name: Deploy to netlify
         uses: netlify/actions/cli@master
         env:

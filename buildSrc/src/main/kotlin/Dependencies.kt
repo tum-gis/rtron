@@ -17,14 +17,14 @@
 
 object DependencyVersions {
     // standard libraries
-    const val kotlin = "2.2.20"
+    const val kotlin = "2.2.21"
     const val coroutines = "1.10.2"
-    const val arrow = "2.1.2"
+    const val arrow = "2.2.0"
 
     // testing libraries
-    const val kotest = "6.0.3"
+    const val kotest = "6.0.7"
     const val kotestExtensionArrow = "2.0.0"
-    const val mockk = "1.14.5"
+    const val mockk = "1.14.7"
 
     // logging libraries
     const val kotlinLogging = "7.0.13"
@@ -32,7 +32,7 @@ object DependencyVersions {
 
     // object creation libraries
     const val kotlinxSerializationJson = "1.9.0"
-    const val kaml = "0.96.0"
+    const val kaml = "0.104.0"
     const val jakartaActivationApi = "2.1.4"
     const val jakartaXmlBindApi = "4.0.4"
     const val jaxb = "4.0.6"
@@ -43,11 +43,11 @@ object DependencyVersions {
     // io libraries
     const val clikt = "5.0.3"
     const val mordant = "1.2.1"
-    const val commonsIO = "2.20.0"
+    const val commonsIO = "2.21.0"
     const val commonsCSV = "1.14.1"
-    const val commonsLang = "3.19.0"
+    const val commonsLang = "3.20.0"
     const val commonsCompress = "1.28.0"
-    const val zstdJni = "1.5.7-4"
+    const val zstdJni = "1.5.7-6"
     const val emojiJava = "5.1.1"
 
     // math libraries
@@ -58,7 +58,7 @@ object DependencyVersions {
 
     // geo libraries
     const val proj4 = "1.4.1"
-    const val citygml4j = "3.2.5"
+    const val citygml4j = "3.2.7"
 }
 
 object Dependencies {

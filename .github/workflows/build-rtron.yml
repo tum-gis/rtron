@@ -44,7 +44,7 @@ jobs:
         run: ./gradlew build publishToMavenLocal -Pskip.signing
         if: matrix.os == 'ubuntu'
       - name: "Build documentation"
-        run: ./gradlew dokkaHtmlMultiModule --no-daemon
+        run: ./gradlew dokkaGenerateHtml --no-daemon
         if: matrix.os == 'ubuntu'
       - name: "Build uber JAR with Gradle"
         run: ./gradlew shadowJar

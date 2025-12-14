@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+import PluginVersions.dokka
+import org.jetbrains.dokka.gradle.DokkaExtension
+import org.jetbrains.dokka.gradle.engine.plugins.DokkaHtmlPluginParameters
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 
 if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     throw GradleException(
@@ -181,7 +183,8 @@ fun configureDokka() {
         plugins.apply("org.jetbrains.dokka")
     }
 
-    tasks.withType<DokkaMultiModuleTask> {
+    dependencies {
+        subprojects.forEach { dokka(project(it.path)) }
     }
 }
 
