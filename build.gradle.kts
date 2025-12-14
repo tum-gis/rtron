@@ -15,8 +15,6 @@
  */
 
 import PluginVersions.dokka
-import org.jetbrains.dokka.gradle.DokkaExtension
-import org.jetbrains.dokka.gradle.engine.plugins.DokkaHtmlPluginParameters
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
