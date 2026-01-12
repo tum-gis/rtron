@@ -25,6 +25,7 @@ import io.rtron.io.issues.DefaultIssue
 import io.rtron.io.issues.DefaultIssueList
 import io.rtron.io.issues.Severity
 import io.rtron.io.issues.mergeIssueLists
+import io.rtron.math.geometry.euclidean.threed.solid.AbstractSolid3D
 import io.rtron.model.roadspaces.RoadspacesModel
 import io.rtron.model.roadspaces.common.LongitudinalFillerSurface
 import io.rtron.model.roadspaces.identifier.JunctionIdentifier
@@ -231,6 +232,10 @@ class RoadsTransformer(
                     return issueList
                 }
 
+        if (id.laneId == -3 && id.laneSectionId == 1 && id.roadspaceId == "1112000") {
+            print("ok")
+        }
+
         val surface =
             road
                 .getLaneSurface(id, parameters.discretizationStepSize)
@@ -252,10 +257,10 @@ class RoadsTransformer(
                         lane.type,
                     ) { parameters.laneSurfaceExtrusionHeight }
 
-                val extrudedSurface =
+                val extrudedSurface: Option<AbstractSolid3D> =
                     road
                         .getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = trafficSpaceHeight)
-                        .getOrElse {
+                        .fold({
                             issueList +=
                                 DefaultIssue.of(
                                     "ExtrudedLaneSurfaceNotConstructable",
@@ -264,9 +269,11 @@ class RoadsTransformer(
                                     Severity.WARNING,
                                     wasFixed = true,
                                 )
-                            return issueList
-                        }
-                Some(extrudedSurface)
+                            None
+                        }, {
+                            Some(it)
+                        })
+                extrudedSurface
             } else {
                 None
             }

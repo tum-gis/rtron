@@ -501,27 +501,27 @@ class Road(
                     .mapLeft { it.toIllegalStateException() }
                     .getOrElse { throw it }
 
-            val baseFace =
+            val baseFace: NonEmptyList<LinearRing3D> =
                 LinearRing3D
                     .ofWithDuplicatesRemoval(lowerRightBoundarySampled, lowerLeftBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
-            val topFace =
+            val topFace: NonEmptyList<LinearRing3D> =
                 LinearRing3D
                     .ofWithDuplicatesRemoval(upperLeftBoundarySampled, upperRightBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
-            val leftFace =
+            val leftFace: NonEmptyList<LinearRing3D> =
                 LinearRing3D
                     .ofWithDuplicatesRemoval(lowerLeftBoundarySampled, upperLeftBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
-            val rightFace =
+            val rightFace: NonEmptyList<LinearRing3D> =
                 LinearRing3D
                     .ofWithDuplicatesRemoval(upperRightBoundarySampled, lowerRightBoundarySampled, geometricalTolerance)
                     .mapLeft { IllegalStateException(it.message) }
                     .bind()
-            val frontFace =
+            val frontFace: Option<LinearRing3D> =
                 LinearRing3D
                     .of(
                         nonEmptyListOf(
@@ -531,9 +531,8 @@ class Road(
                             upperLeftBoundarySampled.first(),
                         ),
                         geometricalTolerance,
-                    ).mapLeft { IllegalStateException(it.message) }
-                    .bind()
-            val endFace =
+                    ).getOrNone()
+            val endFace: Option<LinearRing3D> =
                 LinearRing3D
                     .of(
                         nonEmptyListOf(
@@ -543,12 +542,11 @@ class Road(
                             lowerRightBoundarySampled.last(),
                         ),
                         geometricalTolerance,
-                    ).mapLeft { IllegalStateException(it.message) }
-                    .bind()
+                    ).getOrNone()
 
             // triangulate faces
             val triangulatedFaces =
-                (baseFace + topFace + leftFace + rightFace + frontFace + endFace)
+                (baseFace + topFace + leftFace + rightFace + frontFace.toList() + endFace.toList())
                     .map { currentFace -> Triangulator.triangulate(currentFace, geometricalTolerance) }
                     .handleLeftAndFilter { throw IllegalStateException(it.value.message) }
                     .flatten()
