@@ -39,6 +39,7 @@ application {
 
 tasks {
     named<ShadowJar>("shadowJar") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
         mergeServiceFiles()
         archiveFileName.set("${Project.name}.${this.archiveExtension.get()}")
     }
