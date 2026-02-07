@@ -147,6 +147,7 @@ class SubcommandValidateOpendrive :
             generateLaneSurfaceExtrusions = false,
             laneSurfaceExtrusionHeight = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT,
             laneSurfaceExtrusionHeightPerLaneType = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE,
+            computeObjectEnvelopes = false,
             mappingBackwardsCompatibility = true,
         )
 
@@ -167,6 +168,7 @@ class SubcommandValidateOpendrive :
             generateLaneSurfaceExtrusions = false,
             laneSurfaceExtrusionHeight = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT,
             laneSurfaceExtrusionHeightPerLaneType = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE,
+            computeObjectEnvelopes = false,
             mappingBackwardsCompatibility = false,
         )
 

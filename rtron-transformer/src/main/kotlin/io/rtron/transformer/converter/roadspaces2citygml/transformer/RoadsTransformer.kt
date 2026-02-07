@@ -232,10 +232,6 @@ class RoadsTransformer(
                     return issueList
                 }
 
-        if (id.laneId == -3 && id.laneSectionId == 1 && id.roadspaceId == "1112000") {
-            print("ok")
-        }
-
         val surface =
             road
                 .getLaneSurface(id, parameters.discretizationStepSize)

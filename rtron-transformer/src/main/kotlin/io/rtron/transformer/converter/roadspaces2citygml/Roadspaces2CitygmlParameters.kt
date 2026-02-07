@@ -54,6 +54,8 @@ data class Roadspaces2CitygmlParameters(
     val laneSurfaceExtrusionHeight: Double,
     /** custom extrusion heights per lane type for traffic space solids (in meters) */
     val laneSurfaceExtrusionHeightPerLaneType: Map<LaneType, Double>,
+    /** if true, compute envelopes for each object */
+    val computeObjectEnvelopes: Boolean,
     /** if true, only classes are populated that are also available in CityGML2 */
     val mappingBackwardsCompatibility: Boolean,
 ) {
@@ -84,6 +86,7 @@ data class Roadspaces2CitygmlParameters(
                 LaneType.SIDEWALK to 2.5,
                 LaneType.WALKING to 2.5,
             )
+        const val DEFAULT_COMPUTE_OBJECT_ENVELOPES = false
         const val DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY = true
     }
 }

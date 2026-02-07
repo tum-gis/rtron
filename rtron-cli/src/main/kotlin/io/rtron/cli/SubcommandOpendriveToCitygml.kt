@@ -201,6 +201,10 @@ class SubcommandOpendriveToCitygml :
         resultMap.toMap()
     }.default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE)
 
+    private val computeObjectEnvelopes by option(
+        help = "Compute envelopes for each object",
+    ).flag()
+
     private val compressionFormat: CompressionFormat by option(
         help = "Compress the output files with the respective compression format",
     ).enum<CompressionFormat>()
@@ -305,6 +309,7 @@ class SubcommandOpendriveToCitygml :
             generateLaneSurfaceExtrusions = !skipLaneSurfaceExtrusions,
             laneSurfaceExtrusionHeight = laneSurfaceExtrusionHeight,
             laneSurfaceExtrusionHeightPerLaneType = laneSurfaceExtrusionHeightPerLaneType,
+            computeObjectEnvelopes = computeObjectEnvelopes,
             mappingBackwardsCompatibility = convertToCitygml2,
         )
 

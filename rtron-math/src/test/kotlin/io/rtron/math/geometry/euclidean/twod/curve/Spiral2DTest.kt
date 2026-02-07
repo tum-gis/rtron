@@ -30,7 +30,6 @@ import io.rtron.math.std.PI
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVRecord
 import java.io.FileReader
-import java.lang.Math.abs
 import kotlin.io.path.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.exists
@@ -112,9 +111,9 @@ class Spiral2DTest :
                     val actualPoint = spiral.calculatePoint(s)
                     val actualRotation = spiral.calculateRotation(s)
 
-                    if (abs(actualPoint.x - x) > DBL_EPSILON_1 || abs(actualPoint.y - y) > DBL_EPSILON_1) {
+                    /*if (abs(actualPoint.x - x) > DBL_EPSILON_1 || abs(actualPoint.y - y) > DBL_EPSILON_1) {
                         println("test")
-                    }
+                    }*/
                     actualPoint.x.shouldBe(x plusOrMinus DBL_EPSILON_3)
                     actualPoint.y.shouldBe(y plusOrMinus DBL_EPSILON_3)
                     actualRotation.angle.shouldBe(Rotation2D(t).angle plusOrMinus DBL_EPSILON_1)

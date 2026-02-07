@@ -41,9 +41,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.citygml4j.core.model.core.AbstractCityObject
+import org.citygml4j.core.model.core.AbstractFeature
 import org.citygml4j.core.model.transportation.Road
 import org.citygml4j.core.model.transportation.TrafficSpaceProperty
 import org.citygml4j.core.model.transportation.TrafficSpaceReference
+import org.citygml4j.core.visitor.ObjectWalker
 import org.xmlobjects.gml.model.feature.BoundingShape
 import org.xmlobjects.gml.model.geometry.Envelope
 
@@ -82,9 +84,11 @@ class Roadspaces2CitygmlTransformer(
                 transformRoadspacesSequentially(roadspacesModel).handleIssueList { report.conversion += it }
             }
 
+        if (parameters.computeObjectEnvelopes) computeObjectEnvelopes(abstractCityObjects)
+
         // create CityGML model
         val boundingShape =
-            calculateBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
+            computeBoundingShape(abstractCityObjects, roadspacesModel.header.coordinateReferenceSystem)
         logger.info { "Completed transformation with ${report.getTextSummary()}." }
         val citygmlModel = CitygmlModel(roadspacesModel.header.name, boundingShape, abstractCityObjects)
         return citygmlModel to report
@@ -294,7 +298,19 @@ class Roadspaces2CitygmlTransformer(
         }
     }
 
-    private fun calculateBoundingShape(
+    private fun computeObjectEnvelopes(abstractCityObjects: List<AbstractCityObject>) {
+        val walker: ObjectWalker =
+            object : ObjectWalker() {
+                public override fun visit(feature: AbstractFeature) {
+                    feature.boundedBy = BoundingShape(feature.computeEnvelope())
+
+                    super.visit(feature)
+                }
+            }
+        abstractCityObjects.forEach { it.accept(walker) }
+    }
+
+    private fun computeBoundingShape(
         abstractCityObjects: List<AbstractCityObject>,
         crs: Option<CoordinateReferenceSystem>,
     ): BoundingShape {
