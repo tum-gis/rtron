@@ -36,35 +36,24 @@ fun EUnitSpeed.toUnitOfMeasure(): UnitOfMeasure =
  */
 fun ELaneType.toLaneType(): LaneType =
     when (this) {
-        ELaneType.SHOULDER -> LaneType.SHOULDER
-        ELaneType.BORDER -> LaneType.BORDER
-        ELaneType.DRIVING -> LaneType.DRIVING
-        ELaneType.STOP -> LaneType.STOP
-        ELaneType.NONE -> LaneType.NONE
-        ELaneType.RESTRICTED -> LaneType.RESTRICTED
-        ELaneType.PARKING -> LaneType.PARKING
-        ELaneType.MEDIAN -> LaneType.MEDIAN
         ELaneType.BIKING -> LaneType.BIKING
-        ELaneType.SHARED -> LaneType.SHARED
-        ELaneType.SIDEWALK -> LaneType.SIDEWALK
+        ELaneType.BORDER -> LaneType.BORDER
+        ELaneType.CONNECTING_RAMP -> LaneType.CONNECTING_RAMP
         ELaneType.CURB -> LaneType.CURB
-        ELaneType.BIDIRECTIONAL -> LaneType.BIDIRECTIONAL
-        ELaneType.SPECIAL_1 -> LaneType.SPECIAL_1
-        ELaneType.SPECIAL_2 -> LaneType.SPECIAL_2
-        ELaneType.SPECIAL_3 -> LaneType.SPECIAL_3
-        ELaneType.ROAD_WORKS -> LaneType.ROAD_WORKS
-        ELaneType.TRAM -> LaneType.TRAM
-        ELaneType.RAIL -> LaneType.RAIL
+        ELaneType.DRIVING -> LaneType.DRIVING
         ELaneType.ENTRY -> LaneType.ENTRY
         ELaneType.EXIT -> LaneType.EXIT
+        ELaneType.MEDIAN -> LaneType.MEDIAN
+        ELaneType.NONE -> LaneType.NONE
         ELaneType.OFF_RAMP -> LaneType.OFF_RAMP
         ELaneType.ON_RAMP -> LaneType.ON_RAMP
-        ELaneType.CONNECTING_RAMP -> LaneType.CONNECTING_RAMP
-        ELaneType.BUS -> LaneType.BUS
-        ELaneType.TAXI -> LaneType.TAXI
-        ELaneType.HOV -> LaneType.HOV
-        ELaneType.MWY_ENTRY -> LaneType.MWY_ENTRY
-        ELaneType.MWY_EXIT -> LaneType.MWY_EXIT
-        ELaneType.WALKING -> LaneType.WALKING
+        ELaneType.PARKING -> LaneType.PARKING
+        ELaneType.RAIL -> LaneType.RAIL
+        ELaneType.RESTRICTED -> LaneType.RESTRICTED
+        ELaneType.SHARED -> LaneType.SHARED
+        ELaneType.SHOULDER -> LaneType.SHOULDER
         ELaneType.SLIP_LANE -> LaneType.SLIP_LANE
+        ELaneType.STOP -> LaneType.STOP
+        ELaneType.TRAM -> LaneType.TRAM
+        ELaneType.WALKING -> LaneType.WALKING
     }

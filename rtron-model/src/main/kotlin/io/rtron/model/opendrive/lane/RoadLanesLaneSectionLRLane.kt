@@ -39,6 +39,7 @@ abstract class RoadLanesLaneSectionLRLane(
     open var access: List<RoadLanesLaneSectionLRLaneAccess> = emptyList(),
     open var height: List<RoadLanesLaneSectionLRLaneHeight> = emptyList(),
     open var rule: List<RoadLanesLaneSectionLRLaneRule> = emptyList(),
+    open var direction: Option<ELaneDirection> = None,
     open var level: Option<Boolean> = None,
     open var type: ELaneType = ELaneType.NONE,
     override var additionalId: Option<LaneIdentifier> = None,

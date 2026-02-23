@@ -34,6 +34,7 @@ data class RoadLanesLaneSectionRightLane(
     override var access: List<RoadLanesLaneSectionLRLaneAccess> = emptyList(),
     override var height: List<RoadLanesLaneSectionLRLaneHeight> = emptyList(),
     override var rule: List<RoadLanesLaneSectionLRLaneRule> = emptyList(),
+    override var direction: Option<ELaneDirection> = None,
     override var level: Option<Boolean> = None,
     override var type: ELaneType = ELaneType.NONE,
     override var additionalId: Option<LaneIdentifier> = None,

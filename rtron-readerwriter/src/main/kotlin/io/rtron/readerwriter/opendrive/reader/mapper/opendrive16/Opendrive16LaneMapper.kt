@@ -21,8 +21,10 @@ import arrow.core.Option
 import arrow.core.some
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.rtron.model.opendrive.lane.EAccessRestrictionType
+import io.rtron.model.opendrive.lane.ELaneDirection
 import io.rtron.model.opendrive.lane.ELaneType
 import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
+import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLRLaneAccessRule
 import io.rtron.model.opendrive.lane.ERoadMarkColor
 import io.rtron.model.opendrive.lane.ERoadMarkRule
 import io.rtron.model.opendrive.lane.ERoadMarkType
@@ -36,6 +38,7 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkExplicit
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkType
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkTypeLine
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneAccess
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneAccessRestriction
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneBorder
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneWidth
@@ -123,6 +126,38 @@ abstract class Opendrive16LaneMapper {
             source.borderOrWidth
                 .filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Width::class.java)
                 .map { mapLrLaneWidth(it) }
+
+        // mapping deprecated lane types onto access and direction concepts
+        when (source.type) {
+            E_LaneType.BIDIRECTIONAL -> {
+                target.direction = ELaneDirection.BOTH.some()
+            }
+            E_LaneType.HOV -> {
+                target.access +=
+                    RoadLanesLaneSectionLRLaneAccess(
+                        restriction = listOf(RoadLanesLaneSectionLRLaneAccessRestriction(EAccessRestrictionType.HOV)),
+                        rule = ERoadLanesLaneSectionLRLaneAccessRule.ALLOW,
+                        sOffset = target.width.first().sOffset,
+                    )
+            }
+            E_LaneType.BUS -> {
+                target.access +=
+                    RoadLanesLaneSectionLRLaneAccess(
+                        restriction = listOf(RoadLanesLaneSectionLRLaneAccessRestriction(EAccessRestrictionType.BUS)),
+                        rule = ERoadLanesLaneSectionLRLaneAccessRule.ALLOW,
+                        sOffset = target.width.first().sOffset,
+                    )
+            }
+            E_LaneType.TAXI -> {
+                target.access +=
+                    RoadLanesLaneSectionLRLaneAccess(
+                        restriction = listOf(RoadLanesLaneSectionLRLaneAccessRestriction(EAccessRestrictionType.TAXI)),
+                        rule = ERoadLanesLaneSectionLRLaneAccessRule.ALLOW,
+                        sOffset = target.width.first().sOffset,
+                    )
+            }
+            else -> {}
+        }
     }
 
     abstract fun mapRoadLanesLaneSectionRightLane(source: T_Road_Lanes_LaneSection_Right_Lane): RoadLanesLaneSectionRightLane
@@ -140,6 +175,38 @@ abstract class Opendrive16LaneMapper {
             source.borderOrWidth
                 .filterIsInstance(T_Road_Lanes_LaneSection_Lr_Lane_Width::class.java)
                 .map { mapLrLaneWidth(it) }
+
+        // mapping deprecated lane types onto access and direction concepts
+        when (source.type) {
+            E_LaneType.BIDIRECTIONAL -> {
+                target.direction = ELaneDirection.BOTH.some()
+            }
+            E_LaneType.HOV -> {
+                target.access +=
+                    RoadLanesLaneSectionLRLaneAccess(
+                        restriction = listOf(RoadLanesLaneSectionLRLaneAccessRestriction(EAccessRestrictionType.HOV)),
+                        rule = ERoadLanesLaneSectionLRLaneAccessRule.ALLOW,
+                        sOffset = target.width.first().sOffset,
+                    )
+            }
+            E_LaneType.BUS -> {
+                target.access +=
+                    RoadLanesLaneSectionLRLaneAccess(
+                        restriction = listOf(RoadLanesLaneSectionLRLaneAccessRestriction(EAccessRestrictionType.BUS)),
+                        rule = ERoadLanesLaneSectionLRLaneAccessRule.ALLOW,
+                        sOffset = target.width.first().sOffset,
+                    )
+            }
+            E_LaneType.TAXI -> {
+                target.access +=
+                    RoadLanesLaneSectionLRLaneAccess(
+                        restriction = listOf(RoadLanesLaneSectionLRLaneAccessRestriction(EAccessRestrictionType.TAXI)),
+                        rule = ERoadLanesLaneSectionLRLaneAccessRule.ALLOW,
+                        sOffset = target.width.first().sOffset,
+                    )
+            }
+            else -> {}
+        }
     }
 
     //
@@ -193,6 +260,17 @@ abstract class Opendrive16LaneMapper {
 
     fun mapLaneTypeToOption(source: E_LaneType?): Option<ELaneType> = source?.let { mapLaneType(it).some() } ?: None
 
+    @ValueMapping(source = "BIDIRECTIONAL", target = "DRIVING")
+    @ValueMapping(source = "BUS", target = "DRIVING")
+    @ValueMapping(source = "HOV", target = "DRIVING")
+    @ValueMapping(source = "MWY_ENTRY", target = "ENTRY")
+    @ValueMapping(source = "MWY_EXIT", target = "EXIT")
+    @ValueMapping(source = "ROAD_WORKS", target = "NONE")
+    @ValueMapping(source = "SIDEWALK", target = "WALKING")
+    @ValueMapping(source = "SPECIAL_1", target = "NONE")
+    @ValueMapping(source = "SPECIAL_2", target = "NONE")
+    @ValueMapping(source = "SPECIAL_3", target = "NONE")
+    @ValueMapping(source = "TAXI", target = "DRIVING")
     abstract fun mapLaneType(source: E_LaneType): ELaneType
 
     fun mapERoadMarkColorToOption(source: E_RoadMarkColor?): Option<ERoadMarkColor> = source?.let { mapRoadMarkColor(it).some() } ?: None

@@ -39,17 +39,11 @@ object LaneRouter {
             LaneType.SHOULDER -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.BIKING -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.SHARED -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            LaneType.SIDEWALK -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.BORDER -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.RESTRICTED -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.CURB -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.PARKING -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            LaneType.BIDIRECTIONAL -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.MEDIAN -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-            LaneType.SPECIAL_1 -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-            LaneType.SPECIAL_2 -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-            LaneType.SPECIAL_3 -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-            LaneType.ROAD_WORKS -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.TRAM -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.RAIL -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.ENTRY -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
@@ -57,11 +51,6 @@ object LaneRouter {
             LaneType.OFF_RAMP -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.ON_RAMP -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.CONNECTING_RAMP -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            LaneType.BUS -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            LaneType.TAXI -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            LaneType.HOV -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-            LaneType.MWY_ENTRY -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
-            LaneType.MWY_EXIT -> CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE
             LaneType.WALKING -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             LaneType.SLIP_LANE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
         }

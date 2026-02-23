@@ -70,7 +70,7 @@ data class Roadspaces2CitygmlParameters(
         const val DEFAULT_XLINK_PREFIX = "#"
         const val DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX = "identifier_"
         const val DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX = "geometry_"
-        const val DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS = true
+        const val DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS = false
         const val DEFAULT_DISCRETIZATION_STEP_SIZE = 0.5
         const val DEFAULT_SWEEP_DISCRETIZATION_STEP_SIZE = ParametricSweep3D.DEFAULT_STEP_SIZE
         const val DEFAULT_CIRCLE_SLICES = Cylinder3D.DEFAULT_NUMBER_SLICES
@@ -83,7 +83,6 @@ data class Roadspaces2CitygmlParameters(
             mapOf(
                 LaneType.BIKING to 2.5,
                 LaneType.BORDER to 2.5,
-                LaneType.SIDEWALK to 2.5,
                 LaneType.WALKING to 2.5,
             )
         const val DEFAULT_COMPUTE_OBJECT_ENVELOPES = false

@@ -47,6 +47,8 @@ data class Lane(
     val successors: List<Int>,
     val type: LaneType,
     val laneMaterial: Option<LaneMaterial>,
+    val direction: Option<LaneDirection>,
+    val laneAccess: List<LaneAccess>,
     val attributes: AttributeList,
 ) {
     // Properties and Initializers

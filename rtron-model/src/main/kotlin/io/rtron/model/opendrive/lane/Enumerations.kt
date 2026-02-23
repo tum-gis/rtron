@@ -17,78 +17,98 @@
 package io.rtron.model.opendrive.lane
 
 enum class EAccessRestrictionType {
-    SIMULATOR,
     AUTONOMOUS_TRAFFIC,
-    PEDESTRIAN,
-    PASSENGER_CAR,
+    BICYCLE,
     BUS,
     DELIVERY,
     EMERGENCY,
+    HOV,
+    MOTORCYCLE,
+    NONE,
+    PASSENGER_CAR,
+    PEDESTRIAN,
+    SIMULATOR,
     TAXI,
     THROUGH_TRAFFIC,
     TRUCK,
-    BICYCLE,
-    MOTORCYCLE,
-    NONE,
     TRUCKS,
-    HOV,
 }
 
 enum class ELaneType {
-    SHOULDER,
-    BORDER,
-    DRIVING,
-    STOP,
-    NONE,
-    RESTRICTED,
-    PARKING,
-    MEDIAN,
     BIKING,
-    SHARED,
-    SIDEWALK,
-    CURB,
-    EXIT,
-    ENTRY,
-    ON_RAMP,
-    OFF_RAMP,
+    BORDER,
     CONNECTING_RAMP,
-    BIDIRECTIONAL,
-    SPECIAL_1,
-    SPECIAL_2,
-    SPECIAL_3,
-    ROAD_WORKS,
-    TRAM,
+    CURB,
+    DRIVING,
+    ENTRY,
+    EXIT,
+    MEDIAN,
+    NONE,
+    OFF_RAMP,
+    ON_RAMP,
+    PARKING,
     RAIL,
-    BUS,
-    TAXI,
-    HOV,
-    MWY_ENTRY,
-    MWY_EXIT,
-    WALKING,
+    RESTRICTED,
+    SHARED,
+    SHOULDER,
     SLIP_LANE,
+    STOP,
+    TRAM,
+    WALKING,
 }
 
-enum class ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange { INCREASE, DECREASE, BOTH, NONE }
+enum class ELaneDirection {
+    BOTH,
+    REVERSED,
+    STANDARD,
+}
 
-enum class ERoadLanesLaneSectionLRLaneAccessRule { ALLOW, DENY }
+enum class ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange {
+    BOTH,
+    DECREASE,
+    INCREASE,
+    NONE,
+}
 
-enum class ERoadMarkColor { STANDARD, BLUE, GREEN, RED, WHITE, YELLOW, BLACK, ORANGE, VIOLET }
+enum class ERoadLanesLaneSectionLRLaneAccessRule {
+    ALLOW,
+    DENY,
+}
 
-enum class ERoadMarkRule { NO_PASSING, CAUTION, NONE }
+enum class ERoadMarkColor {
+    BLACK,
+    BLUE,
+    GREEN,
+    ORANGE,
+    RED,
+    STANDARD,
+    VIOLET,
+    WHITE,
+    YELLOW,
+}
+
+enum class ERoadMarkRule {
+    NO_PASSING,
+    CAUTION,
+    NONE,
+}
 
 enum class ERoadMarkType {
-    NONE,
-    SOLID,
-    BROKEN,
-    SOLID_SOLID,
-    SOLID_BROKEN,
-    BROKEN_SOLID,
-    BROKEN_BROKEN,
     BOTTS_DOTS,
-    GRASS,
+    BROKEN,
+    BROKEN_BROKEN,
+    BROKEN_SOLID,
     CURB,
     CUSTOM,
     EDGE,
+    GRASS,
+    NONE,
+    SOLID,
+    SOLID_BROKEN,
+    SOLID_SOLID,
 }
 
-enum class ERoadMarkWeight { STANDARD, BOLD }
+enum class ERoadMarkWeight {
+    BOLD,
+    STANDARD,
+}

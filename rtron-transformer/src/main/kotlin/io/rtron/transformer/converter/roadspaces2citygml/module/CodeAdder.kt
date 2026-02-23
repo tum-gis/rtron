@@ -24,53 +24,64 @@ import io.rtron.model.citygml.code.TrafficAreaAndAuxiliaryTrafficAreaSurfaceMate
 import io.rtron.model.citygml.code.TrafficAreaFunctionCode
 import io.rtron.model.citygml.code.TrafficAreaUsageCode
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
+import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneAccessRule
 import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.LaneType
+import io.rtron.model.roadspaces.roadspace.road.RestrictionType
 
 object CodeAdder {
     // Methods
+
+    fun deriveTrafficAreaUsageCodesFromLane(lane: Lane): HashSet<TrafficAreaUsageCode> {
+        val usageCodes: HashSet<TrafficAreaUsageCode> = CodeAdder.mapToTrafficAreaUsageCodes(lane.type).toHashSet()
+        usageCodes.addAll(
+            lane.laneAccess
+                .filter {
+                    it.rule == LaneAccessRule.ALLOW
+                }.flatMap { CodeAdder.mapToTrafficAreaUsageCodes(it.restrictionType) }
+                .toSet(),
+        )
+        usageCodes.removeAll(
+            lane.laneAccess
+                .filter { it.rule == LaneAccessRule.DENY }
+                .flatMap { CodeAdder.mapToTrafficAreaUsageCodes(it.restrictionType) }
+                .toSet(),
+        )
+
+        return usageCodes
+    }
 
     /**
      * Returns the [TrafficAreaFunctionCode] list of a `TrafficArea` from the [laneType] of a lane.
      */
     fun mapToTrafficAreaFunctionCodes(laneType: LaneType): List<TrafficAreaFunctionCode> =
         when (laneType) {
-            LaneType.NONE -> emptyList()
-            LaneType.DRIVING -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.STOP -> emptyList()
-            LaneType.SHOULDER -> emptyList()
             LaneType.BIKING -> listOf(TrafficAreaFunctionCode.CYCLEPATH)
+            LaneType.BORDER -> emptyList()
+            LaneType.CONNECTING_RAMP -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.CURB -> emptyList()
+            LaneType.DRIVING -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.ENTRY -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.EXIT -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.MEDIAN -> emptyList()
+            LaneType.NONE -> emptyList()
+            LaneType.OFF_RAMP -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.ON_RAMP -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.PARKING -> listOf(TrafficAreaFunctionCode.PARKING_LAY_BY)
+            LaneType.RAIL -> listOf(TrafficAreaFunctionCode.RAIL)
+            LaneType.RESTRICTED -> emptyList()
             LaneType.SHARED ->
                 listOf(
                     TrafficAreaFunctionCode.DRIVING_LANE,
                     TrafficAreaFunctionCode.FOOTPATH,
                     TrafficAreaFunctionCode.CYCLEPATH,
                 )
-            LaneType.SIDEWALK -> listOf(TrafficAreaFunctionCode.FOOTPATH)
-            LaneType.BORDER -> emptyList()
-            LaneType.RESTRICTED -> emptyList()
-            LaneType.PARKING -> listOf(TrafficAreaFunctionCode.PARKING_LAY_BY)
-            LaneType.CURB -> emptyList()
-            LaneType.BIDIRECTIONAL -> emptyList()
-            LaneType.MEDIAN -> emptyList()
-            LaneType.SPECIAL_1 -> emptyList()
-            LaneType.SPECIAL_2 -> emptyList()
-            LaneType.SPECIAL_3 -> emptyList()
-            LaneType.ROAD_WORKS -> emptyList()
-            LaneType.TRAM -> emptyList()
-            LaneType.RAIL -> listOf(TrafficAreaFunctionCode.RAIL)
-            LaneType.ENTRY -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.EXIT -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.OFF_RAMP -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.ON_RAMP -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.CONNECTING_RAMP -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.BUS -> emptyList()
-            LaneType.TAXI -> emptyList()
-            LaneType.HOV -> emptyList()
-            LaneType.MWY_ENTRY -> listOf(TrafficAreaFunctionCode.MOTORWAY_ENTRY, TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.MWY_EXIT -> listOf(TrafficAreaFunctionCode.MOTORWAY_EXIT, TrafficAreaFunctionCode.DRIVING_LANE)
-            LaneType.WALKING -> listOf(TrafficAreaFunctionCode.FOOTPATH)
+            LaneType.SHOULDER -> emptyList()
             LaneType.SLIP_LANE -> listOf(TrafficAreaFunctionCode.DRIVING_LANE)
+            LaneType.STOP -> emptyList()
+            LaneType.TRAM -> emptyList()
+            LaneType.WALKING -> listOf(TrafficAreaFunctionCode.FOOTPATH)
         }
 
     /**
@@ -78,37 +89,26 @@ object CodeAdder {
      */
     fun mapToAuxiliaryTrafficAreaFunctionCodes(laneType: LaneType): List<AuxiliaryTrafficAreaFunctionCode> =
         when (laneType) {
-            LaneType.NONE -> emptyList()
-            LaneType.DRIVING -> emptyList()
-            LaneType.STOP -> emptyList()
-            LaneType.SHOULDER -> emptyList()
             LaneType.BIKING -> emptyList()
-            LaneType.SHARED -> emptyList()
-            LaneType.SIDEWALK -> emptyList()
             LaneType.BORDER -> emptyList()
-            LaneType.RESTRICTED -> emptyList()
+            LaneType.CONNECTING_RAMP -> emptyList()
             LaneType.CURB -> emptyList()
-            LaneType.PARKING -> listOf(AuxiliaryTrafficAreaFunctionCode.PARKING_BAY)
-            LaneType.BIDIRECTIONAL -> emptyList()
-            LaneType.MEDIAN -> emptyList()
-            LaneType.SPECIAL_1 -> emptyList()
-            LaneType.SPECIAL_2 -> emptyList()
-            LaneType.SPECIAL_3 -> emptyList()
-            LaneType.ROAD_WORKS -> emptyList()
-            LaneType.TRAM -> emptyList()
-            LaneType.RAIL -> emptyList()
+            LaneType.DRIVING -> emptyList()
             LaneType.ENTRY -> emptyList()
             LaneType.EXIT -> emptyList()
+            LaneType.MEDIAN -> emptyList()
+            LaneType.NONE -> emptyList()
             LaneType.OFF_RAMP -> emptyList()
             LaneType.ON_RAMP -> emptyList()
-            LaneType.CONNECTING_RAMP -> emptyList()
-            LaneType.BUS -> emptyList()
-            LaneType.TAXI -> emptyList()
-            LaneType.HOV -> emptyList()
-            LaneType.MWY_ENTRY -> emptyList()
-            LaneType.MWY_EXIT -> emptyList()
-            LaneType.WALKING -> emptyList()
+            LaneType.PARKING -> listOf(AuxiliaryTrafficAreaFunctionCode.PARKING_BAY)
+            LaneType.RAIL -> emptyList()
+            LaneType.RESTRICTED -> emptyList()
+            LaneType.SHARED -> emptyList()
+            LaneType.SHOULDER -> emptyList()
             LaneType.SLIP_LANE -> emptyList()
+            LaneType.STOP -> emptyList()
+            LaneType.TRAM -> emptyList()
+            LaneType.WALKING -> emptyList()
         }
 
     /**
@@ -116,37 +116,45 @@ object CodeAdder {
      */
     fun mapToTrafficAreaUsageCodes(laneType: LaneType): List<TrafficAreaUsageCode> =
         when (laneType) {
-            LaneType.NONE -> emptyList()
-            LaneType.DRIVING -> listOf(TrafficAreaUsageCode.CAR)
-            LaneType.STOP -> emptyList()
-            LaneType.SHOULDER -> emptyList()
             LaneType.BIKING -> listOf(TrafficAreaUsageCode.BICYCLE)
-            LaneType.SHARED -> listOf(TrafficAreaUsageCode.CAR, TrafficAreaUsageCode.BICYCLE, TrafficAreaUsageCode.PEDESTRIAN)
-            LaneType.SIDEWALK -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
             LaneType.BORDER -> emptyList()
-            LaneType.RESTRICTED -> emptyList()
+            LaneType.CONNECTING_RAMP -> listOf(TrafficAreaUsageCode.CAR)
             LaneType.CURB -> emptyList()
-            LaneType.PARKING -> emptyList()
-            LaneType.BIDIRECTIONAL -> emptyList()
-            LaneType.MEDIAN -> emptyList()
-            LaneType.SPECIAL_1 -> emptyList()
-            LaneType.SPECIAL_2 -> emptyList()
-            LaneType.SPECIAL_3 -> emptyList()
-            LaneType.ROAD_WORKS -> emptyList()
-            LaneType.TRAM -> emptyList()
-            LaneType.RAIL -> emptyList()
+            LaneType.DRIVING -> listOf(TrafficAreaUsageCode.CAR)
             LaneType.ENTRY -> listOf(TrafficAreaUsageCode.CAR)
-            LaneType.EXIT -> emptyList()
+            LaneType.EXIT -> listOf(TrafficAreaUsageCode.CAR)
+            LaneType.MEDIAN -> emptyList()
+            LaneType.NONE -> emptyList()
             LaneType.OFF_RAMP -> listOf(TrafficAreaUsageCode.CAR)
             LaneType.ON_RAMP -> listOf(TrafficAreaUsageCode.CAR)
-            LaneType.CONNECTING_RAMP -> listOf(TrafficAreaUsageCode.CAR)
-            LaneType.BUS -> listOf(TrafficAreaUsageCode.BUS_TAXI)
-            LaneType.TAXI -> listOf(TrafficAreaUsageCode.TAXI)
-            LaneType.HOV -> emptyList()
-            LaneType.MWY_ENTRY -> listOf(TrafficAreaUsageCode.CAR)
-            LaneType.MWY_EXIT -> listOf(TrafficAreaUsageCode.CAR)
-            LaneType.WALKING -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
+            LaneType.PARKING -> emptyList()
+            LaneType.RAIL -> emptyList()
+            LaneType.RESTRICTED -> emptyList()
+            LaneType.SHARED -> listOf(TrafficAreaUsageCode.CAR, TrafficAreaUsageCode.BICYCLE, TrafficAreaUsageCode.PEDESTRIAN)
+            LaneType.SHOULDER -> emptyList()
             LaneType.SLIP_LANE -> listOf(TrafficAreaUsageCode.CAR)
+            LaneType.STOP -> emptyList()
+            LaneType.TRAM -> emptyList()
+            LaneType.WALKING -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
+        }
+
+    fun mapToTrafficAreaUsageCodes(restrictionType: RestrictionType): List<TrafficAreaUsageCode> =
+        when (restrictionType) {
+            RestrictionType.AUTONOMOUS_TRAFFIC -> listOf(TrafficAreaUsageCode.CAR)
+            RestrictionType.BICYCLE -> listOf(TrafficAreaUsageCode.BICYCLE)
+            RestrictionType.BUS -> listOf(TrafficAreaUsageCode.BUS_TAXI)
+            RestrictionType.DELIVERY -> listOf(TrafficAreaUsageCode.CAR)
+            RestrictionType.EMERGENCY -> listOf(TrafficAreaUsageCode.CAR)
+            RestrictionType.HOV -> listOf(TrafficAreaUsageCode.CAR)
+            RestrictionType.MOTORCYCLE -> listOf(TrafficAreaUsageCode.MOTORCYCLE)
+            RestrictionType.NONE -> emptyList()
+            RestrictionType.PASSENGER_CAR -> listOf(TrafficAreaUsageCode.CAR)
+            RestrictionType.PEDESTRIAN -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
+            RestrictionType.SIMULATOR -> emptyList()
+            RestrictionType.TAXI -> listOf(TrafficAreaUsageCode.TAXI)
+            RestrictionType.THROUGH_TRAFFIC -> emptyList()
+            RestrictionType.TRUCK -> listOf(TrafficAreaUsageCode.TRUCK)
+            RestrictionType.TRUCKS -> listOf(TrafficAreaUsageCode.TRUCK)
         }
 
     fun mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(
@@ -161,55 +169,55 @@ object CodeAdder {
 
     fun mapToTrafficAreaFunctionCodes(roadObjectType: RoadObjectType): List<TrafficAreaFunctionCode> =
         when (roadObjectType) {
-            RoadObjectType.NONE -> emptyList()
-            RoadObjectType.OBSTACLE -> emptyList()
-            RoadObjectType.POLE -> emptyList()
-            RoadObjectType.TREE -> emptyList()
-            RoadObjectType.VEGETATION -> emptyList()
             RoadObjectType.BARRIER -> emptyList()
             RoadObjectType.BUILDING -> emptyList()
-            RoadObjectType.PARKING_SPACE -> listOf(TrafficAreaFunctionCode.PARKING_LAY_BY)
-            RoadObjectType.TRAFFIC_ISLAND -> emptyList()
             RoadObjectType.CROSSWALK -> listOf(TrafficAreaFunctionCode.CROSSWALK)
             RoadObjectType.GANTRY -> emptyList()
+            RoadObjectType.NONE -> emptyList()
+            RoadObjectType.OBSTACLE -> emptyList()
+            RoadObjectType.PARKING_SPACE -> listOf(TrafficAreaFunctionCode.PARKING_LAY_BY)
+            RoadObjectType.POLE -> emptyList()
             RoadObjectType.ROAD_MARK -> emptyList()
             RoadObjectType.ROAD_SURFACE -> emptyList()
             RoadObjectType.SIGNAL -> emptyList()
+            RoadObjectType.TRAFFIC_ISLAND -> emptyList()
+            RoadObjectType.TREE -> emptyList()
+            RoadObjectType.VEGETATION -> emptyList()
         }
 
     fun mapToAuxiliaryTrafficAreaFunctionCodes(roadObjectType: RoadObjectType): List<AuxiliaryTrafficAreaFunctionCode> =
         when (roadObjectType) {
-            RoadObjectType.NONE -> emptyList()
-            RoadObjectType.OBSTACLE -> emptyList()
-            RoadObjectType.POLE -> emptyList()
-            RoadObjectType.TREE -> emptyList()
-            RoadObjectType.VEGETATION -> emptyList()
             RoadObjectType.BARRIER -> emptyList()
             RoadObjectType.BUILDING -> emptyList()
-            RoadObjectType.PARKING_SPACE -> listOf(AuxiliaryTrafficAreaFunctionCode.PARKING_BAY)
-            RoadObjectType.TRAFFIC_ISLAND -> listOf(AuxiliaryTrafficAreaFunctionCode.TRAFFIC_ISLAND)
             RoadObjectType.CROSSWALK -> emptyList()
             RoadObjectType.GANTRY -> emptyList()
+            RoadObjectType.NONE -> emptyList()
+            RoadObjectType.OBSTACLE -> emptyList()
+            RoadObjectType.PARKING_SPACE -> listOf(AuxiliaryTrafficAreaFunctionCode.PARKING_BAY)
+            RoadObjectType.POLE -> emptyList()
             RoadObjectType.ROAD_MARK -> emptyList()
             RoadObjectType.ROAD_SURFACE -> emptyList()
             RoadObjectType.SIGNAL -> emptyList()
+            RoadObjectType.TRAFFIC_ISLAND -> listOf(AuxiliaryTrafficAreaFunctionCode.TRAFFIC_ISLAND)
+            RoadObjectType.TREE -> emptyList()
+            RoadObjectType.VEGETATION -> emptyList()
         }
 
     fun mapToTrafficAreaUsageCodes(roadObjectType: RoadObjectType): List<TrafficAreaUsageCode> =
         when (roadObjectType) {
-            RoadObjectType.NONE -> emptyList()
-            RoadObjectType.OBSTACLE -> emptyList()
-            RoadObjectType.POLE -> emptyList()
-            RoadObjectType.TREE -> emptyList()
-            RoadObjectType.VEGETATION -> emptyList()
             RoadObjectType.BARRIER -> emptyList()
             RoadObjectType.BUILDING -> emptyList()
-            RoadObjectType.PARKING_SPACE -> listOf(TrafficAreaUsageCode.CAR)
-            RoadObjectType.TRAFFIC_ISLAND -> listOf(TrafficAreaUsageCode.PEDESTRIAN, TrafficAreaUsageCode.BICYCLE)
             RoadObjectType.CROSSWALK -> listOf(TrafficAreaUsageCode.PEDESTRIAN)
             RoadObjectType.GANTRY -> emptyList()
+            RoadObjectType.NONE -> emptyList()
+            RoadObjectType.OBSTACLE -> emptyList()
+            RoadObjectType.PARKING_SPACE -> listOf(TrafficAreaUsageCode.CAR)
+            RoadObjectType.POLE -> emptyList()
             RoadObjectType.ROAD_MARK -> emptyList()
             RoadObjectType.ROAD_SURFACE -> emptyList()
             RoadObjectType.SIGNAL -> emptyList()
+            RoadObjectType.TRAFFIC_ISLAND -> listOf(TrafficAreaUsageCode.PEDESTRIAN, TrafficAreaUsageCode.BICYCLE)
+            RoadObjectType.TREE -> emptyList()
+            RoadObjectType.VEGETATION -> emptyList()
         }
 }

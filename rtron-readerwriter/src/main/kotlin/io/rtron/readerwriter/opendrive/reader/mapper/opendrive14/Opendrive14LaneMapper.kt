@@ -20,6 +20,8 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
 import io.rtron.model.opendrive.lane.EAccessRestrictionType
+import io.rtron.model.opendrive.lane.ELaneDirection
+import io.rtron.model.opendrive.lane.ELaneType
 import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
 import io.rtron.model.opendrive.lane.ERoadMarkRule
 import io.rtron.model.opendrive.lane.ERoadMarkType
@@ -32,17 +34,21 @@ import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkType
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneAccessRestriction
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLeft
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRight
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionRightLane
 import io.rtron.readerwriter.opendrive.reader.mapper.common.OpendriveCommonMapper
 import org.asam.opendrive14.CenterLane
 import org.asam.opendrive14.Lane
 import org.asam.opendrive14.LaneChange
+import org.asam.opendrive14.LaneType
 import org.asam.opendrive14.OpenDRIVE
 import org.asam.opendrive14.Restriction
 import org.asam.opendrive14.RoadmarkType
 import org.asam.opendrive14.Rule
 import org.asam.opendrive14.SingleSide
 import org.asam.opendrive14.Weight
+import org.mapstruct.AfterMapping
 import org.mapstruct.Mapper
+import org.mapstruct.MappingTarget
 import org.mapstruct.NullValueCheckStrategy
 import org.mapstruct.ValueMapping
 
@@ -68,6 +74,19 @@ abstract class Opendrive14LaneMapper {
         source?.let { listOf(mapRoadLanesLaneSectionCenterLane(it)) } ?: emptyList()
 
     abstract fun mapRoadLanesLaneSectionCenterLane(source: CenterLane): RoadLanesLaneSectionCenterLane
+
+    @AfterMapping
+    open fun afterMappingRoadLanesLaneSectionRightLane(
+        source: Lane,
+        @MappingTarget target: RoadLanesLaneSectionRightLane,
+    ) {
+        when (source.type) {
+            LaneType.BIDIRECTIONAL -> {
+                target.direction = ELaneDirection.BOTH.some()
+            }
+            else -> {}
+        }
+    }
 
     //
     // Lane Link
@@ -136,6 +155,16 @@ abstract class Opendrive14LaneMapper {
             SingleSide.TRUE -> true
             SingleSide.FALSE -> false
         }
+
+    fun mapLaneTypeToOption(source: LaneType?): Option<ELaneType> = source?.let { mapLaneType(it).some() } ?: None
+
+    @ValueMapping(source = "BIDIRECTIONAL", target = "DRIVING")
+    @ValueMapping(source = "SIDEWALK", target = "WALKING")
+    @ValueMapping(source = "SPECIAL_1", target = "NONE")
+    @ValueMapping(source = "SPECIAL_2", target = "NONE")
+    @ValueMapping(source = "SPECIAL_3", target = "NONE")
+    @ValueMapping(source = "ROAD_WORKS", target = "NONE")
+    abstract fun mapLaneType(source: LaneType): ELaneType
 
     @ValueMapping(source = "AUTONOMOUS___TRAFFIC", target = "AUTONOMOUS_TRAFFIC")
     abstract fun map(source: Restriction): EAccessRestrictionType

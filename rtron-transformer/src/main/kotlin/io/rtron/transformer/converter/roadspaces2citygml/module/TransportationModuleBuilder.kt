@@ -31,7 +31,7 @@ import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
-import io.rtron.model.roadspaces.roadspace.road.LaneType
+import io.rtron.model.roadspaces.roadspace.road.LaneDirection
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
@@ -111,14 +111,14 @@ class TransportationModuleBuilder(
             lane.id.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(parameters.gmlIdPrefix),
             trafficSpaceFeature,
         )
-        trafficSpaceFeature.usages = CodeAdder.mapToTrafficAreaUsageCodes(lane.type).map { it.code }
         trafficSpaceFeature.functions = CodeAdder.mapToTrafficAreaFunctionCodes(lane.type).map { it.code }
+        trafficSpaceFeature.usages = CodeAdder.deriveTrafficAreaUsageCodesFromLane(lane).map { it.code }
         attributesAdder.addAttributes(lane, trafficSpaceFeature)
         relatedObjects.forEach { relationAdder.addRelatedToRelation(it, trafficSpaceFeature) }
         // TODO: consider left-hand traffic (LHT)
         trafficSpaceFeature.trafficDirection =
             when {
-                lane.type == LaneType.BIDIRECTIONAL -> TrafficDirectionValue.BOTH
+                lane.direction.isSome { it == LaneDirection.BOTH } -> TrafficDirectionValue.BOTH
                 lane.id.isForward() -> TrafficDirectionValue.FORWARDS
                 else -> TrafficDirectionValue.BACKWARDS
             }
@@ -139,8 +139,8 @@ class TransportationModuleBuilder(
             "Lane",
             trafficAreaFeature,
         )
-        trafficAreaFeature.usages = CodeAdder.mapToTrafficAreaUsageCodes(lane.type).map { it.code }
         trafficAreaFeature.functions = CodeAdder.mapToTrafficAreaFunctionCodes(lane.type).map { it.code }
+        trafficAreaFeature.usages = CodeAdder.deriveTrafficAreaUsageCodesFromLane(lane).map { it.code }
         lane.laneMaterial
             .flatMap { CodeAdder.mapToTrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode(it) }
             .onSome { trafficAreaFeature.surfaceMaterial = it.code }

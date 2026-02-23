@@ -28,8 +28,12 @@ import io.rtron.math.analysis.function.univariate.combination.ConcatenatedFuncti
 import io.rtron.math.analysis.function.univariate.pure.LinearFunction
 import io.rtron.math.range.Range
 import io.rtron.math.std.fuzzyEquals
+import io.rtron.model.opendrive.lane.EAccessRestrictionType
+import io.rtron.model.opendrive.lane.ELaneDirection
+import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLRLaneAccessRule
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionCenterLane
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLane
+import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneAccess
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneHeight
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLRLaneMaterial
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
@@ -38,7 +42,11 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.CenterLane
 import io.rtron.model.roadspaces.roadspace.road.Lane
+import io.rtron.model.roadspaces.roadspace.road.LaneAccess
+import io.rtron.model.roadspaces.roadspace.road.LaneAccessRule
+import io.rtron.model.roadspaces.roadspace.road.LaneDirection
 import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
+import io.rtron.model.roadspaces.roadspace.road.RestrictionType
 import io.rtron.model.roadspaces.roadspace.road.RoadMarking
 import io.rtron.std.isStrictlySortedBy
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
@@ -102,6 +110,8 @@ class LaneBuilder(
         // build lane attributes
         val type = lrLane.type.toLaneType()
         val laneMaterial = buildLaneMaterial(lrLane.material)
+        val laneAccess = buildLaneAccess(lrLane.access)
+        val direction = lrLane.direction.map { it.toLaneDirection() }
         val attributes = baseAttributes + buildAttributes(lrLane)
 
         // build up lane object
@@ -117,6 +127,8 @@ class LaneBuilder(
                 successors,
                 type,
                 laneMaterial,
+                direction,
+                laneAccess,
                 attributes,
             )
         return ContextIssueList(lane, issueList)
@@ -219,6 +231,22 @@ class LaneBuilder(
         return Some(laneMaterial)
     }
 
+    private fun buildLaneAccess(laneAccess: List<RoadLanesLaneSectionLRLaneAccess>): List<LaneAccess> =
+        laneAccess.flatMap { currentLaneAccess ->
+            val rule =
+                when (currentLaneAccess.rule) {
+                    ERoadLanesLaneSectionLRLaneAccessRule.ALLOW -> LaneAccessRule.ALLOW
+                    ERoadLanesLaneSectionLRLaneAccessRule.DENY -> LaneAccessRule.DENY
+                }
+
+            currentLaneAccess.restriction.map { currentRestriction ->
+                LaneAccess(
+                    restrictionType = currentRestriction.type.toRestrictionType(),
+                    rule = rule,
+                )
+            }
+        }
+
     private fun buildAttributes(centerLane: RoadLanesLaneSectionCenterLane) =
         attributes("${parameters.attributesPrefix}lane_") {
             attribute("type", centerLane.type.toString())
@@ -301,3 +329,29 @@ class LaneBuilder(
             }
         }
 }
+
+fun ELaneDirection.toLaneDirection(): LaneDirection =
+    when (this) {
+        ELaneDirection.BOTH -> LaneDirection.BOTH
+        ELaneDirection.REVERSED -> LaneDirection.REVERSED
+        ELaneDirection.STANDARD -> LaneDirection.STANDARD
+    }
+
+fun EAccessRestrictionType.toRestrictionType(): RestrictionType =
+    when (this) {
+        EAccessRestrictionType.AUTONOMOUS_TRAFFIC -> RestrictionType.AUTONOMOUS_TRAFFIC
+        EAccessRestrictionType.BICYCLE -> RestrictionType.BICYCLE
+        EAccessRestrictionType.BUS -> RestrictionType.BUS
+        EAccessRestrictionType.DELIVERY -> RestrictionType.DELIVERY
+        EAccessRestrictionType.EMERGENCY -> RestrictionType.EMERGENCY
+        EAccessRestrictionType.HOV -> RestrictionType.HOV
+        EAccessRestrictionType.MOTORCYCLE -> RestrictionType.MOTORCYCLE
+        EAccessRestrictionType.NONE -> RestrictionType.NONE
+        EAccessRestrictionType.PASSENGER_CAR -> RestrictionType.PASSENGER_CAR
+        EAccessRestrictionType.PEDESTRIAN -> RestrictionType.PEDESTRIAN
+        EAccessRestrictionType.SIMULATOR -> RestrictionType.SIMULATOR
+        EAccessRestrictionType.TAXI -> RestrictionType.TAXI
+        EAccessRestrictionType.THROUGH_TRAFFIC -> RestrictionType.THROUGH_TRAFFIC
+        EAccessRestrictionType.TRUCK -> RestrictionType.TRUCK
+        EAccessRestrictionType.TRUCKS -> RestrictionType.TRUCKS
+    }

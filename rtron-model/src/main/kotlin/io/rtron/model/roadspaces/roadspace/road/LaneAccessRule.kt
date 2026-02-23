@@ -16,25 +16,7 @@
 
 package io.rtron.model.roadspaces.roadspace.road
 
-enum class LaneType {
-    BIKING,
-    BORDER,
-    CONNECTING_RAMP,
-    CURB,
-    DRIVING,
-    ENTRY,
-    EXIT,
-    MEDIAN,
-    NONE,
-    OFF_RAMP,
-    ON_RAMP,
-    PARKING,
-    RAIL,
-    RESTRICTED,
-    SHARED,
-    SHOULDER,
-    SLIP_LANE,
-    STOP,
-    TRAM,
-    WALKING,
+enum class LaneAccessRule {
+    ALLOW,
+    DENY,
 }
