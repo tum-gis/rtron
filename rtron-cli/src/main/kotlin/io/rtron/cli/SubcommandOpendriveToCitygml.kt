@@ -156,6 +156,8 @@ class SubcommandOpendriveToCitygml :
         resultMap.toMap()
     }.default(Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE)
 
+    private val flattenGenericAttributeSets by option(help = "Flatten generic attribute sets out")
+        .flag()
     private val discretizationStepSize by option(help = "Distance between each discretization step for curves and surfaces")
         .double()
         .default(Roadspaces2CitygmlParameters.DEFAULT_DISCRETIZATION_STEP_SIZE)
@@ -299,7 +301,7 @@ class SubcommandOpendriveToCitygml :
             xlinkPrefix = Roadspaces2CitygmlParameters.DEFAULT_XLINK_PREFIX,
             identifierAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_IDENTIFIER_ATTRIBUTES_PREFIX,
             geometryAttributesPrefix = Roadspaces2CitygmlParameters.DEFAULT_GEOMETRY_ATTRIBUTES_PREFIX,
-            flattenGenericAttributeSets = Roadspaces2CitygmlParameters.DEFAULT_FLATTEN_GENERIC_ATTRIBUTE_SETS,
+            flattenGenericAttributeSets = flattenGenericAttributeSets,
             discretizationStepSize = discretizationStepSize,
             sweepDiscretizationStepSize = sweepDiscretizationStepSize,
             circleSlices = circleSlices,
