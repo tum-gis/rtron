@@ -41,9 +41,13 @@ data class Opendrive2RoadspacesParameters(
     /** linear extrapolation of lateral road shapes if they are not defined at the position (otherwise errors are thrown) */
     val extrapolateLateralRoadShapes: Boolean,
     /** if true, road object top surfaces are extruded for generating traffic space solids */
-    val generateRoadObjectTopSurfaceExtrusions: Boolean,
+    val generateRoadObjectTopSurfaceExtrusionsForUsage: Boolean,
     /** custom extrusion heights per road object type for traffic space solids (in meters) */
-    val roadObjectTopSurfaceExtrusionHeightPerObjectType: Map<RoadObjectType, Double>,
+    val roadObjectTopSurfaceExtrusionHeightForUsagePerObjectType: Map<RoadObjectType, Double>,
+    /** if true, road object top surfaces are extruded for generating clearance space solids */
+    val generateRoadObjectTopSurfaceExtrusionsForClearance: Boolean,
+    /** custom extrusion heights per road object type for clearance space solids (in meters) */
+    val roadObjectTopSurfaceExtrusionHeightForClearancePerObjectType: Map<RoadObjectType, Double>,
 ) {
     companion object {
         const val DEFAULT_NUMBER_TOLERANCE = 1E-7
@@ -54,12 +58,19 @@ data class Opendrive2RoadspacesParameters(
         const val DEFAULT_DERIVE_CRS_EPSG_AUTOMATICALLY = false
         const val DEFAULT_CRS_EPSG = 0
         const val DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES = false
-        const val DEFAULT_GENERATE_ROAD_OBJECT_TOP_SURFACE_EXTRUSIONS = true
-        val DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE =
+        const val DEFAULT_GENERATE_ROAD_OBJECT_TOP_SURFACE_EXTRUSIONS_FOR_USAGE = true
+        val DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_OBJECT_TYPE =
             mapOf(
                 RoadObjectType.PARKING_SPACE to 4.5,
                 RoadObjectType.TRAFFIC_ISLAND to 2.5,
                 RoadObjectType.CROSSWALK to 2.5,
+            )
+        const val DEFAULT_GENERATE_ROAD_OBJECT_TOP_SURFACE_EXTRUSIONS_FOR_CLEARANCE = true
+        val DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_OBJECT_TYPE =
+            mapOf(
+                RoadObjectType.PARKING_SPACE to 5.0,
+                RoadObjectType.TRAFFIC_ISLAND to 3.0,
+                RoadObjectType.CROSSWALK to 3.0,
             )
     }
 }

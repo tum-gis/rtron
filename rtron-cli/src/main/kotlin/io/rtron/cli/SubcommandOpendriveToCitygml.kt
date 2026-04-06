@@ -130,13 +130,15 @@ class SubcommandOpendriveToCitygml :
 
     private val cropPolygon by option(help = "2D polygon outline for cropping the OpenDRIVE dataset").double().pair().multiple()
     private val removeRoadObjectOfType by option(help = "Remove road object of a specific type").enum<EObjectType>().multiple().unique()
-    private val skipRoadObjectTopSurfaceExtrusions by option(
+    private val skipRoadObjectTopSurfaceExtrusionsForUsage by option(
         help = "Skip extruding the top surfaces of road objects for traffic space solids",
     ).flag()
-    private val roadObjectTopSurfaceExtrusionHeightPerObjectType: Map<RoadObjectType, Double> by option(
+    private val roadObjectTopSurfaceExtrusionHeightForUsagePerObjectType: Map<RoadObjectType, Double> by option(
         help = "Comma-separated list of enum=value pairs, e.g. PARKING_SPACE=4.5,CROSSWALK=2.5",
     ).convert { input ->
-        val resultMap = Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE.toMutableMap()
+        val resultMap =
+            Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_OBJECT_TYPE
+                .toMutableMap()
 
         input.split(",").forEach { entry ->
             if (entry.isNotBlank()) {
@@ -154,7 +156,35 @@ class SubcommandOpendriveToCitygml :
             }
         }
         resultMap.toMap()
-    }.default(Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE)
+    }.default(Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_OBJECT_TYPE)
+
+    private val skipRoadObjectTopSurfaceExtrusionsForClearance by option(
+        help = "Skip extruding the top surfaces of road objects for clearance space solids",
+    ).flag()
+    private val roadObjectTopSurfaceExtrusionHeightForClearancePerObjectType: Map<RoadObjectType, Double> by option(
+        help = "Comma-separated list of enum=value pairs, e.g. PARKING_SPACE=4.5,CROSSWALK=2.5",
+    ).convert { input ->
+        val resultMap =
+            Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_OBJECT_TYPE
+                .toMutableMap()
+
+        input.split(",").forEach { entry ->
+            if (entry.isNotBlank()) {
+                val (key, value) = entry.split("=")
+                val roadObjectType =
+                    try {
+                        RoadObjectType.valueOf(key.uppercase())
+                    } catch (e: IllegalArgumentException) {
+                        fail("Invalid OpenDRIVE road object type: $key")
+                    }
+                val doubleValue =
+                    value.toDoubleOrNull()
+                        ?: fail("Invalid value for $key: $value is not a number")
+                resultMap[roadObjectType] = doubleValue
+            }
+        }
+        resultMap.toMap()
+    }.default(Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_OBJECT_TYPE)
 
     private val flattenGenericAttributeSets by option(help = "Flatten generic attribute sets out")
         .flag()
@@ -173,17 +203,17 @@ class SubcommandOpendriveToCitygml :
         help = "If true, additional road lines, such as the reference line, lane boundaries, etc., are also transformed",
     ).flag()
 
-    private val skipLaneSurfaceExtrusions by option(
+    private val skipLaneSurfaceExtrusionsForUsage by option(
         help = "Skip extruding lane surfaces for traffic space solids",
     ).flag()
-    private val laneSurfaceExtrusionHeight by option(help = "Default extrusion height for traffic space solids (in meters)")
+    private val laneSurfaceExtrusionHeightForUsage by option(help = "Default extrusion height for traffic space solids (in meters)")
         .double()
-        .default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT)
+        .default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE)
 
-    private val laneSurfaceExtrusionHeightPerLaneType: Map<LaneType, Double> by option(
+    private val laneSurfaceExtrusionHeightForUsagePerLaneType: Map<LaneType, Double> by option(
         help = "Comma-separated list of enum=value pairs, e.g. DRIVING=4.5,SIDEWALK=2.5",
     ).convert { input ->
-        val resultMap = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE.toMutableMap()
+        val resultMap = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_LANE_TYPE.toMutableMap()
 
         input.split(",").forEach { entry ->
             if (entry.isNotBlank()) {
@@ -201,7 +231,37 @@ class SubcommandOpendriveToCitygml :
             }
         }
         resultMap.toMap()
-    }.default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE)
+    }.default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_LANE_TYPE)
+
+    private val skipLaneSurfaceExtrusionsForClearance by option(
+        help = "Skip extruding lane surfaces for clearance space solids",
+    ).flag()
+    private val laneSurfaceExtrusionHeightForClearance by option(help = "Default extrusion height for clearance space solids (in meters)")
+        .double()
+        .default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE)
+
+    private val laneSurfaceExtrusionHeightForClearancePerLaneType: Map<LaneType, Double> by option(
+        help = "Comma-separated list of enum=value pairs, e.g. DRIVING=4.5,SIDEWALK=2.5",
+    ).convert { input ->
+        val resultMap = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_LANE_TYPE.toMutableMap()
+
+        input.split(",").forEach { entry ->
+            if (entry.isNotBlank()) {
+                val (key, value) = entry.split("=")
+                val laneType =
+                    try {
+                        LaneType.valueOf(key.uppercase())
+                    } catch (e: IllegalArgumentException) {
+                        fail("Invalid OpenDRIVE lane type: $key")
+                    }
+                val doubleValue =
+                    value.toDoubleOrNull()
+                        ?: fail("Invalid value for $key: $value is not a number")
+                resultMap[laneType] = doubleValue
+            }
+        }
+        resultMap.toMap()
+    }.default(Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_LANE_TYPE)
 
     private val computeObjectEnvelopes by option(
         help = "Compute envelopes for each object",
@@ -284,8 +344,10 @@ class SubcommandOpendriveToCitygml :
             crsEpsg = crsEpsg,
             extrapolateLateralRoadShapes =
                 Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
-            generateRoadObjectTopSurfaceExtrusions = !skipRoadObjectTopSurfaceExtrusions,
-            roadObjectTopSurfaceExtrusionHeightPerObjectType = roadObjectTopSurfaceExtrusionHeightPerObjectType,
+            generateRoadObjectTopSurfaceExtrusionsForUsage = !skipRoadObjectTopSurfaceExtrusionsForUsage,
+            roadObjectTopSurfaceExtrusionHeightForUsagePerObjectType = roadObjectTopSurfaceExtrusionHeightForUsagePerObjectType,
+            generateRoadObjectTopSurfaceExtrusionsForClearance = !skipRoadObjectTopSurfaceExtrusionsForClearance,
+            roadObjectTopSurfaceExtrusionHeightForClearancePerObjectType = roadObjectTopSurfaceExtrusionHeightForClearancePerObjectType,
         )
 
     fun deriveRoadspacesEvaluatorParameters() =
@@ -308,9 +370,12 @@ class SubcommandOpendriveToCitygml :
             generateRandomGeometryIds = generateRandomGeometryIds,
             transformAdditionalRoadLines = transformAdditionalRoadLines,
             generateLongitudinalFillerSurfaces = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES,
-            generateLaneSurfaceExtrusions = !skipLaneSurfaceExtrusions,
-            laneSurfaceExtrusionHeight = laneSurfaceExtrusionHeight,
-            laneSurfaceExtrusionHeightPerLaneType = laneSurfaceExtrusionHeightPerLaneType,
+            generateLaneSurfaceExtrusionsForUsage = !skipLaneSurfaceExtrusionsForUsage,
+            laneSurfaceExtrusionHeightForUsage = laneSurfaceExtrusionHeightForUsage,
+            laneSurfaceExtrusionHeightForUsagePerLaneType = laneSurfaceExtrusionHeightForUsagePerLaneType,
+            generateLaneSurfaceExtrusionsForClearance = !skipLaneSurfaceExtrusionsForClearance,
+            laneSurfaceExtrusionHeightForClearance = laneSurfaceExtrusionHeightForClearance,
+            laneSurfaceExtrusionHeightForClearancePerLaneType = laneSurfaceExtrusionHeightForClearancePerLaneType,
             computeObjectEnvelopes = computeObjectEnvelopes,
             mappingBackwardsCompatibility = convertToCitygml2,
         )

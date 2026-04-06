@@ -48,12 +48,18 @@ data class Roadspaces2CitygmlParameters(
     val transformAdditionalRoadLines: Boolean,
     /** if true, filler surfaces are generated to close gaps at lane transitions */
     val generateLongitudinalFillerSurfaces: Boolean,
-    /** if true, lane surfaces are extruded for generating traffic space solids */
-    val generateLaneSurfaceExtrusions: Boolean,
+    /** if true, lane surfaces are extruded to generate traffic space solids */
+    val generateLaneSurfaceExtrusionsForUsage: Boolean,
     /** default extrusion height for traffic space solids (in meters) */
-    val laneSurfaceExtrusionHeight: Double,
+    val laneSurfaceExtrusionHeightForUsage: Double,
     /** custom extrusion heights per lane type for traffic space solids (in meters) */
-    val laneSurfaceExtrusionHeightPerLaneType: Map<LaneType, Double>,
+    val laneSurfaceExtrusionHeightForUsagePerLaneType: Map<LaneType, Double>,
+    /** if true, lane surfaces are extruded to generate clearance space solids */
+    val generateLaneSurfaceExtrusionsForClearance: Boolean,
+    /** default extrusion height for clearance space solids (in meters) */
+    val laneSurfaceExtrusionHeightForClearance: Double,
+    /** custom extrusion heights per lane type for clearance space solids (in meters) */
+    val laneSurfaceExtrusionHeightForClearancePerLaneType: Map<LaneType, Double>,
     /** if true, compute envelopes for each object */
     val computeObjectEnvelopes: Boolean,
     /** if true, only classes are populated that are also available in CityGML2 */
@@ -77,13 +83,21 @@ data class Roadspaces2CitygmlParameters(
         const val DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS = false
         const val DEFAULT_TRANSFORM_ADDITIONAL_ROAD_LINES = true
         const val DEFAULT_GENERATE_LONGITUDINAL_FILLER_SURFACES = true
-        const val DEFAULT_GENERATE_LANE_SURFACE_EXTRUSIONS = true
-        const val DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT = 4.5
-        val DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE: Map<LaneType, Double> =
+        const val DEFAULT_GENERATE_LANE_SURFACE_EXTRUSIONS_FOR_USAGE = true
+        const val DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE = 4.5
+        val DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_LANE_TYPE: Map<LaneType, Double> =
             mapOf(
                 LaneType.BIKING to 2.5,
                 LaneType.BORDER to 2.5,
                 LaneType.WALKING to 2.5,
+            )
+        const val DEFAULT_GENERATE_LANE_SURFACE_EXTRUSIONS_FOR_CLEARANCE = true
+        const val DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE = 5.0
+        val DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_LANE_TYPE: Map<LaneType, Double> =
+            mapOf(
+                LaneType.BIKING to 3.0,
+                LaneType.BORDER to 3.0,
+                LaneType.WALKING to 3.0,
             )
         const val DEFAULT_COMPUTE_OBJECT_ENVELOPES = false
         const val DEFAULT_MAPPING_BACKWARDS_COMPATIBILITY = true

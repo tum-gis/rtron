@@ -40,7 +40,8 @@ data class RoadspaceObject(
     val pointGeometry: AbstractPoint3D,
     val boundingBoxGeometry: Option<AbstractGeometry3D>,
     val complexGeometry: Option<AbstractGeometry3D>,
-    val extrudedTopSurfaceGeometry: Option<AbstractSolid3D>,
+    val extrudedTopSurfaceGeometryForUsage: Option<AbstractSolid3D>,
+    val extrudedTopSurfaceGeometryForClearance: Option<AbstractSolid3D>,
     val laneRelations: List<LateralLaneRangeIdentifier>,
     val attributes: AttributeList,
 ) {

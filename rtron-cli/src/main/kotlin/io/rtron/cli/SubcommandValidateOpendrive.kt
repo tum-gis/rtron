@@ -119,9 +119,12 @@ class SubcommandValidateOpendrive :
             deriveCrsEpsgAutomatically = false,
             crsEpsg = Opendrive2RoadspacesParameters.DEFAULT_CRS_EPSG,
             extrapolateLateralRoadShapes = Opendrive2RoadspacesParameters.DEFAULT_EXTRAPOLATE_LATERAL_ROAD_SHAPES,
-            generateRoadObjectTopSurfaceExtrusions = false,
-            roadObjectTopSurfaceExtrusionHeightPerObjectType =
-                Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_PER_OBJECT_TYPE,
+            generateRoadObjectTopSurfaceExtrusionsForUsage = false,
+            roadObjectTopSurfaceExtrusionHeightForUsagePerObjectType =
+                Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_OBJECT_TYPE,
+            generateRoadObjectTopSurfaceExtrusionsForClearance = false,
+            roadObjectTopSurfaceExtrusionHeightForClearancePerObjectType =
+                Opendrive2RoadspacesParameters.DEFAULT_ROAD_OBJECT_TOP_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_OBJECT_TYPE,
         )
 
     fun deriveRoadspacesEvaluatorParameters() =
@@ -144,9 +147,14 @@ class SubcommandValidateOpendrive :
             generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
             transformAdditionalRoadLines = true,
             generateLongitudinalFillerSurfaces = false,
-            generateLaneSurfaceExtrusions = false,
-            laneSurfaceExtrusionHeight = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT,
-            laneSurfaceExtrusionHeightPerLaneType = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE,
+            generateLaneSurfaceExtrusionsForUsage = false,
+            laneSurfaceExtrusionHeightForUsage = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE,
+            laneSurfaceExtrusionHeightForUsagePerLaneType =
+                Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_LANE_TYPE,
+            generateLaneSurfaceExtrusionsForClearance = false,
+            laneSurfaceExtrusionHeightForClearance = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE,
+            laneSurfaceExtrusionHeightForClearancePerLaneType =
+                Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_LANE_TYPE,
             computeObjectEnvelopes = false,
             mappingBackwardsCompatibility = true,
         )
@@ -165,9 +173,15 @@ class SubcommandValidateOpendrive :
             generateRandomGeometryIds = Roadspaces2CitygmlParameters.DEFAULT_GENERATE_RANDOM_GEOMETRY_IDS,
             transformAdditionalRoadLines = true,
             generateLongitudinalFillerSurfaces = false,
-            generateLaneSurfaceExtrusions = false,
-            laneSurfaceExtrusionHeight = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT,
-            laneSurfaceExtrusionHeightPerLaneType = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_PER_LANE_TYPE,
+            generateLaneSurfaceExtrusionsForUsage = false,
+            laneSurfaceExtrusionHeightForUsage = Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE,
+            laneSurfaceExtrusionHeightForUsagePerLaneType =
+                Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_USAGE_PER_LANE_TYPE,
+            generateLaneSurfaceExtrusionsForClearance = false,
+            laneSurfaceExtrusionHeightForClearance =
+                Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE,
+            laneSurfaceExtrusionHeightForClearancePerLaneType =
+                Roadspaces2CitygmlParameters.DEFAULT_LANE_SURFACE_EXTRUSION_HEIGHT_FOR_CLEARANCE_PER_LANE_TYPE,
             computeObjectEnvelopes = false,
             mappingBackwardsCompatibility = false,
         )

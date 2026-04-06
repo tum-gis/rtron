@@ -121,9 +121,15 @@ class RoadspaceObjectBuilder(
                 buildAttributes(roadObject.referenceLinePointRelativeRotation)
         val laneRelations = buildLaneRelations(roadObject, road)
 
-        val extrusionHeight: Option<Double> =
-            if (parameters.generateRoadObjectTopSurfaceExtrusions) {
-                parameters.roadObjectTopSurfaceExtrusionHeightPerObjectType.getOrNone(type)
+        val extrusionHeightForUsage: Option<Double> =
+            if (parameters.generateRoadObjectTopSurfaceExtrusionsForUsage) {
+                parameters.roadObjectTopSurfaceExtrusionHeightForUsagePerObjectType.getOrNone(type)
+            } else {
+                None
+            }
+        val extrusionHeightForClearance: Option<Double> =
+            if (parameters.generateRoadObjectTopSurfaceExtrusionsForUsage) {
+                parameters.roadObjectTopSurfaceExtrusionHeightForClearancePerObjectType.getOrNone(type)
             } else {
                 None
             }
@@ -153,6 +159,7 @@ class RoadspaceObjectBuilder(
                     boundingBoxGeometry,
                     complexGeometry,
                     None,
+                    None,
                     laneRelations,
                     attributes,
                 )
@@ -165,8 +172,13 @@ class RoadspaceObjectBuilder(
                 val boundingBoxGeometry = buildBoundingBoxGeometry(roadObject, roadReferenceLine)
                 val complexGeometry =
                     buildComplexGeometry(roadObject, None, roadReferenceLine).handleIssueList { issueList += it }
-                val extrudedTopSurfaceGeometry =
-                    extrusionHeight.flatMap { height ->
+                val extrudedTopSurfaceGeometryForUsage =
+                    extrusionHeightForUsage.flatMap { height ->
+                        buildExtrudedTopSurfaceGeometry(roadObject, None, roadReferenceLine, height)
+                            .handleIssueList { issueList += it }
+                    }
+                val extrudedTopSurfaceGeometryForClearance =
+                    extrusionHeightForClearance.flatMap { height ->
                         buildExtrudedTopSurfaceGeometry(roadObject, None, roadReferenceLine, height)
                             .handleIssueList { issueList += it }
                     }
@@ -179,7 +191,8 @@ class RoadspaceObjectBuilder(
                         pointGeometry,
                         boundingBoxGeometry,
                         complexGeometry,
-                        extrudedTopSurfaceGeometry,
+                        extrudedTopSurfaceGeometryForUsage,
+                        extrudedTopSurfaceGeometryForClearance,
                         laneRelations,
                         attributes,
                     ),
@@ -530,6 +543,7 @@ class RoadspaceObjectBuilder(
                 pointGeometry,
                 None,
                 complexGeometry,
+                None,
                 None,
                 laneRelations,
                 attributes,

@@ -51,6 +51,8 @@ import org.citygml4j.core.model.transportation.AbstractTransportationSpace
 import org.citygml4j.core.model.transportation.AuxiliaryTrafficArea
 import org.citygml4j.core.model.transportation.AuxiliaryTrafficSpace
 import org.citygml4j.core.model.transportation.AuxiliaryTrafficSpaceProperty
+import org.citygml4j.core.model.transportation.ClearanceSpace
+import org.citygml4j.core.model.transportation.ClearanceSpaceProperty
 import org.citygml4j.core.model.transportation.GranularityValue
 import org.citygml4j.core.model.transportation.Intersection
 import org.citygml4j.core.model.transportation.Marking
@@ -95,9 +97,10 @@ class TransportationModuleBuilder(
      */
     fun addTrafficSpaceFeature(
         lane: Lane,
-        surface: AbstractSurface3D,
-        extrudedSurface: Option<AbstractSolid3D>,
         centerLine: AbstractCurve3D,
+        extrudedSurfaceForUsage: Option<AbstractSolid3D>,
+        extrudedSurfaceForClearance: Option<AbstractSolid3D>,
+        surface: AbstractSurface3D,
         lateralFillerSurface: Option<LateralFillerSurface>,
         longitudinalFillerSurfaces: List<LongitudinalFillerSurface>,
         relatedObjects: List<RoadspaceObject>,
@@ -127,9 +130,16 @@ class TransportationModuleBuilder(
         val centerLineGeometryTransformer = GeometryTransformer(parameters).also { centerLine.accept(it) }
         trafficSpaceFeature.populateLod2Geometry(centerLineGeometryTransformer)
 
-        extrudedSurface.onSome { currentExtrudedSurface ->
+        extrudedSurfaceForUsage.onSome { currentExtrudedSurface ->
             val extrudedSurfaceGeometryTransformer = GeometryTransformer(parameters).also { currentExtrudedSurface.accept(it) }
             trafficSpaceFeature.populateLod2Geometry(extrudedSurfaceGeometryTransformer)
+        }
+
+        extrudedSurfaceForClearance.onSome { currentExtrudedSurface ->
+            val extrudedSurfaceGeometryTransformer = GeometryTransformer(parameters).also { currentExtrudedSurface.accept(it) }
+            val clearanceSpaceFeature = ClearanceSpace()
+            clearanceSpaceFeature.populateLod2Geometry(extrudedSurfaceGeometryTransformer)
+            trafficSpaceFeature.clearanceSpaces.add(ClearanceSpaceProperty(clearanceSpaceFeature))
         }
 
         // traffic area feature
@@ -193,9 +203,9 @@ class TransportationModuleBuilder(
      */
     fun addAuxiliaryTrafficSpaceFeature(
         lane: Lane,
-        surface: AbstractSurface3D,
-        extrudedSurface: Option<AbstractSolid3D>,
         centerLine: AbstractCurve3D,
+        extrudedSurface: Option<AbstractSolid3D>,
+        surface: AbstractSurface3D,
         lateralFillerSurface: Option<LateralFillerSurface>,
         longitudinalFillerSurfaces: List<LongitudinalFillerSurface>,
         dstTransportationSpace: AbstractTransportationSpace,
@@ -328,7 +338,7 @@ class TransportationModuleBuilder(
             trafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(trafficAreaFeature))
         }
 
-        roadspaceObject.extrudedTopSurfaceGeometry.onSome { currentExtrudedTopSurfaceGeometry ->
+        roadspaceObject.extrudedTopSurfaceGeometryForUsage.onSome { currentExtrudedTopSurfaceGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
             trafficSpaceFeature
                 .populateLod2Geometry(geometryTransformer)
@@ -342,6 +352,22 @@ class TransportationModuleBuilder(
                             wasFixed = true,
                         )
                 }
+        }
+
+        roadspaceObject.extrudedTopSurfaceGeometryForClearance.onSome { currentExtrudedTopSurfaceGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
+            val clearanceSpaceFeature = ClearanceSpace()
+            clearanceSpaceFeature.populateLod2Geometry(geometryTransformer).onLeft {
+                issueList +=
+                    DefaultIssue.of(
+                        "NoSuitableGeometryForTrafficSpaceLod2",
+                        it.message,
+                        roadspaceObject.id,
+                        Severity.WARNING,
+                        wasFixed = true,
+                    )
+            }
+            trafficSpaceFeature.clearanceSpaces.add(ClearanceSpaceProperty(clearanceSpaceFeature))
         }
 
         // populate transportation space
@@ -402,7 +428,7 @@ class TransportationModuleBuilder(
             auxiliaryTrafficSpaceFeature.addBoundary(AbstractSpaceBoundaryProperty(auxiliaryTrafficAreaFeature))
         }
 
-        roadspaceObject.extrudedTopSurfaceGeometry.onSome { currentExtrudedTopSurfaceGeometry ->
+        roadspaceObject.extrudedTopSurfaceGeometryForUsage.onSome { currentExtrudedTopSurfaceGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
             auxiliaryTrafficSpaceFeature
                 .populateLod2Geometry(geometryTransformer)

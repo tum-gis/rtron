@@ -246,16 +246,43 @@ class RoadsTransformer(
                         )
                     return issueList
                 }
-        val extrudedSurface =
-            if (parameters.generateLaneSurfaceExtrusions) {
-                val trafficSpaceHeight =
-                    parameters.laneSurfaceExtrusionHeightPerLaneType.getOrElse(
+        val extrudedSurfaceForUsage =
+            if (parameters.generateLaneSurfaceExtrusionsForUsage) {
+                val laneUsageHeight =
+                    parameters.laneSurfaceExtrusionHeightForUsagePerLaneType.getOrElse(
                         lane.type,
-                    ) { parameters.laneSurfaceExtrusionHeight }
+                    ) { parameters.laneSurfaceExtrusionHeightForUsage }
 
                 val extrudedSurface: Option<AbstractSolid3D> =
                     road
-                        .getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = trafficSpaceHeight)
+                        .getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = laneUsageHeight)
+                        .fold({
+                            issueList +=
+                                DefaultIssue.of(
+                                    "ExtrudedLaneSurfaceNotConstructable",
+                                    "${it.message} Ignoring lane.",
+                                    id,
+                                    Severity.WARNING,
+                                    wasFixed = true,
+                                )
+                            None
+                        }, {
+                            Some(it)
+                        })
+                extrudedSurface
+            } else {
+                None
+            }
+        val extrudedSurfaceForClearance =
+            if (parameters.generateLaneSurfaceExtrusionsForClearance) {
+                val laneClearanceHeight =
+                    parameters.laneSurfaceExtrusionHeightForClearancePerLaneType.getOrElse(
+                        lane.type,
+                    ) { parameters.laneSurfaceExtrusionHeightForClearance }
+
+                val extrudedSurface: Option<AbstractSolid3D> =
+                    road
+                        .getExtrudedLaneSurface(id, parameters.discretizationStepSize, height = laneClearanceHeight)
                         .fold({
                             issueList +=
                                 DefaultIssue.of(
@@ -308,9 +335,10 @@ class RoadsTransformer(
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
                     transportationModuleBuilder.addTrafficSpaceFeature(
                         lane,
-                        surface,
-                        extrudedSurface,
                         centerLine,
+                        extrudedSurfaceForUsage,
+                        extrudedSurfaceForClearance,
+                        surface,
                         lateralFillerSurface,
                         longitudinalFillerSurfaces,
                         relatedObjects,
@@ -321,9 +349,9 @@ class RoadsTransformer(
                 LaneRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> {
                     transportationModuleBuilder.addAuxiliaryTrafficSpaceFeature(
                         lane,
-                        surface,
-                        extrudedSurface,
                         centerLine,
+                        extrudedSurfaceForUsage,
+                        surface,
                         lateralFillerSurface,
                         longitudinalFillerSurfaces,
                         dstTransportationSpace,
