@@ -32,6 +32,9 @@ fun RoadspaceObjectIdentifier.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdenti
 fun RoadspaceObjectIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "TrafficAreaOrAuxiliaryTrafficArea_${this.hashKey}")
 
+fun RoadspaceObjectIdentifier.deriveClearanceSpaceGmlIdentifier(prefix: String): String =
+    generateGmlIdentifier(prefix, "ClearanceSpace_${this.hashKey}")
+
 fun RoadspaceObjectIdentifier.deriveLod2RoofGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "Lod2RoofSurface_${this.hashKey}")
 
@@ -51,6 +54,9 @@ fun LaneIdentifier.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier(prefix
 
 fun LaneIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "TrafficAreaOrAuxiliaryTrafficArea_${this.hashKey}")
+
+fun LaneIdentifier.deriveClearanceSpaceGmlIdentifier(prefix: String): String =
+    generateGmlIdentifier(prefix, "ClearanceSpace_${this.hashKey}")
 
 fun LaneIdentifier.deriveRoadMarkingGmlIdentifier(
     prefix: String,

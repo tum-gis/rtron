@@ -39,6 +39,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1Mu
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceFromSolidCutoutOrSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveClearanceSpaceGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadMarkingGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier
@@ -138,6 +139,10 @@ class TransportationModuleBuilder(
         extrudedSurfaceForClearance.onSome { currentExtrudedSurface ->
             val extrudedSurfaceGeometryTransformer = GeometryTransformer(parameters).also { currentExtrudedSurface.accept(it) }
             val clearanceSpaceFeature = ClearanceSpace()
+            IdentifierAdder.addIdentifier(
+                lane.id.deriveClearanceSpaceGmlIdentifier(parameters.gmlIdPrefix),
+                clearanceSpaceFeature,
+            )
             clearanceSpaceFeature.populateLod2Geometry(extrudedSurfaceGeometryTransformer)
             trafficSpaceFeature.clearanceSpaces.add(ClearanceSpaceProperty(clearanceSpaceFeature))
         }
@@ -357,6 +362,10 @@ class TransportationModuleBuilder(
         roadspaceObject.extrudedTopSurfaceGeometryForClearance.onSome { currentExtrudedTopSurfaceGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentExtrudedTopSurfaceGeometry, parameters)
             val clearanceSpaceFeature = ClearanceSpace()
+            IdentifierAdder.addIdentifier(
+                roadspaceObject.id.deriveClearanceSpaceGmlIdentifier(parameters.gmlIdPrefix),
+                clearanceSpaceFeature,
+            )
             clearanceSpaceFeature.populateLod2Geometry(geometryTransformer).onLeft {
                 issueList +=
                     DefaultIssue.of(
