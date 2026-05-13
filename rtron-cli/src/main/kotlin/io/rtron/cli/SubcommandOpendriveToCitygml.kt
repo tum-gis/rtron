@@ -272,6 +272,8 @@ class SubcommandOpendriveToCitygml :
     ).enum<CompressionFormat>()
         .default(CompressionFormat.GZ)
 
+    private val prettyPrint by option(help = "Write output files with pretty-printed formatting").flag()
+
     // Methods
     override fun help(context: Context) = "Transform OpenDRIVE datasets to CityGML"
 
@@ -545,6 +547,7 @@ class SubcommandOpendriveToCitygml :
             CitygmlWriter.writeToFile(
                 citygmlModelResult.first,
                 getCitygmlWriteVersion(),
+                prettyPrint,
                 outputSubDirectoryPath / ("citygml_model.gml" + compressionFormat.toFileExtension()),
             )
         }

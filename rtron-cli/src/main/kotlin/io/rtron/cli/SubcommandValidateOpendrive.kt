@@ -270,7 +270,7 @@ class SubcommandValidateOpendrive :
             // write CityGML 2 model
             if (!skipCitygmlExport) {
                 val filePath = outputDirectoryPath / ("citygml2_model.gml" + compressionFormat.toFileExtension())
-                CitygmlWriter.writeToFile(citygml2ModelResult.first, CitygmlVersion.V2_0, filePath)
+                CitygmlWriter.writeToFile(citygml2ModelResult.first, CitygmlVersion.V2_0, false, filePath)
             }
 
             // transform Roadspaces model to CityGML3 model
@@ -284,7 +284,7 @@ class SubcommandValidateOpendrive :
             // write CityGML3 model
             if (!skipCitygmlExport) {
                 val filePath = outputDirectoryPath / ("citygml3_model.gml" + compressionFormat.toFileExtension())
-                CitygmlWriter.writeToFile(citygml3ModelResult.first, CitygmlVersion.V3_0, filePath)
+                CitygmlWriter.writeToFile(citygml3ModelResult.first, CitygmlVersion.V3_0, false, filePath)
             }
         }
     }

@@ -37,10 +37,11 @@ object CitygmlWriter {
     fun writeToFile(
         model: CitygmlModel,
         version: CitygmlVersion,
+        prettyPrint: Boolean,
         filePath: Path,
     ) {
         val outputStream = filePath.outputStreamDirectOrCompressed()
-        writeToStream(model, version, outputStream)
+        writeToStream(model, version, prettyPrint, outputStream)
         outputStream.close()
 
         logger.info { "Completed writing of file ${filePath.fileName} (around ${filePath.getFileSizeToDisplay()})." }
@@ -49,6 +50,7 @@ object CitygmlWriter {
     fun writeToStream(
         model: CitygmlModel,
         version: CitygmlVersion,
+        prettyPrint: Boolean,
         outputStream: OutputStream,
     ) {
         val citygmlVersion = version.toGmlCitygml()
@@ -56,7 +58,11 @@ object CitygmlWriter {
 
         val writer = out.createCityGMLChunkWriter(outputStream, StandardCharsets.UTF_8.name())
         writer.apply {
-            withIndent("  ")
+            if (prettyPrint) {
+                withIndent("  ")
+            } else {
+                withIndent("")
+            }
             withDefaultSchemaLocations()
             withDefaultPrefixes()
             withDefaultNamespace(CoreModule.of(citygmlVersion).namespaceURI)
