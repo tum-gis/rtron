@@ -26,6 +26,7 @@ import arrow.core.left
 import arrow.core.nonEmptyListOf
 import arrow.core.raise.either
 import arrow.core.right
+import arrow.core.some
 import arrow.core.toNonEmptyListOrNull
 import io.rtron.math.analysis.function.univariate.UnivariateFunction
 import io.rtron.math.analysis.function.univariate.combination.SectionedUnivariateFunction
@@ -34,7 +35,6 @@ import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.geometry.curved.oned.point.CurveRelativeVector1D
 import io.rtron.math.geometry.curved.threed.surface.AbstractCurveRelativeSurface3D
 import io.rtron.math.geometry.curved.threed.surface.SectionedCurveRelativeParametricSurface3D
-import io.rtron.math.geometry.euclidean.threed.AbstractGeometry3D
 import io.rtron.math.geometry.euclidean.threed.curve.AbstractCurve3D
 import io.rtron.math.geometry.euclidean.threed.curve.CurveOnParametricSurface3D
 import io.rtron.math.geometry.euclidean.threed.point.fuzzyEquals
@@ -616,14 +616,14 @@ class Road(
                 .let { Some(it) }
         }
 
-    fun getRoadMarkings(
+    fun getRoadMarksWithGeometry(
         laneIdentifier: LaneIdentifier,
         step: Double,
-    ): List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> =
+    ): List<Either<Exception, Triple<RoadMark, AbstractCurve3D, Option<AbstractSurface3D>>>> =
         if (laneIdentifier.isCenter()) {
-            getCenterRoadMarkings(laneIdentifier, step)
+            getCenterRoadMarks(laneIdentifier, step)
         } else {
-            getLeftRightRoadMarkings(
+            getLeftRightRoadMarks(
                 laneIdentifier,
                 step,
             )
@@ -635,66 +635,71 @@ class Road(
      * @param laneIdentifier identifier of lane (must represent a center lane) for which the road markings shall be returned
      * @param step discretization step size
      */
-    private fun getCenterRoadMarkings(
+    private fun getCenterRoadMarks(
         laneIdentifier: LaneIdentifier,
         step: Double,
-    ): List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> {
+    ): List<Either<Exception, Triple<RoadMark, AbstractCurve3D, Option<AbstractSurface3D>>>> {
         require(laneIdentifier.isCenter()) { "Identifier of lane must represent a center lane." }
 
         val centerLane = getLaneSection(laneIdentifier.laneSectionIdentifier).getOrElse { throw it }.centerLane
 
-        return centerLane.roadMarkings.map {
-            Either.Right(it to getCenterRoadMarkingGeometry(centerLane, it, step))
+        return centerLane.roadMarks.map {
+            val (geometryCurve, geometrySurface) = getCenterRoadMarkGeometry(centerLane, it, step)
+            Either.Right(Triple(it, geometryCurve, geometrySurface))
         }
     }
 
     /**
-     * Returns the geometry of a [roadMarking] which is attached to a [centerLane].
+     * Returns the geometry of a [roadMark] which is attached to a [centerLane].
      *
      * @param centerLane center lane for which the road markings shall be returned
-     * @param roadMarking road marking for which the geometry shall be returned
+     * @param roadMark road marking for which the geometry shall be returned
      * @return either a [AbstractCurve3D], if the road marking has zero width, or a [AbstractSurface3D], if the width
      * is not zero
      */
-    private fun getCenterRoadMarkingGeometry(
+    private fun getCenterRoadMarkGeometry(
         centerLane: CenterLane,
-        roadMarking: RoadMarking,
+        roadMark: RoadMark,
         step: Double,
-    ): AbstractGeometry3D {
-        require(roadMarking.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
-        if (roadMarking.width.isNone()) {
-            return getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level)
+    ): Pair<AbstractCurve3D, Option<AbstractSurface3D>> {
+        require(roadMark.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
+        val curveGeometry =
+            getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, roadMark.lateralOffsetFunction)
                 .getOrElse { throw it }
+        if (roadMark.width.isNone()) {
+            return Pair(curveGeometry, None)
         }
 
         val leftOffsetFunction =
-            roadMarking
+            roadMark
                 .getLeftOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
-        val leftRoadMarkingBoundary =
+        val leftRoadMarkBoundary =
             getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, leftOffsetFunction)
                 .getOrElse { throw it }
                 .calculatePointListGlobalCS(step)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         val rightOffsetFunction =
-            roadMarking
+            roadMark
                 .getRightOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
-        val rightRoadMarkingBoundary =
+        val rightRoadMarkBoundary =
             getCurveOnLaneSectionSurface(centerLane.id.laneSectionIdentifier, centerLane.level, rightOffsetFunction)
                 .getOrElse { throw it }
                 .calculatePointListGlobalCS(step)
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
+        val surfaceGeometry =
+            LinearRing3D
+                .ofWithDuplicatesRemoval(
+                    leftRoadMarkBoundary,
+                    rightRoadMarkBoundary,
+                    geometricalTolerance,
+                ).getOrElse { throw IllegalStateException(it.message) }
+                .let { CompositeSurface3D(it) }
 
-        return LinearRing3D
-            .ofWithDuplicatesRemoval(
-                leftRoadMarkingBoundary,
-                rightRoadMarkingBoundary,
-                geometricalTolerance,
-            ).getOrElse { throw IllegalStateException(it.message) }
-            .let { CompositeSurface3D(it) }
+        return Pair(curveGeometry, surfaceGeometry.some())
     }
 
     /**
@@ -703,44 +708,50 @@ class Road(
      * @param laneIdentifier lane identifier for which the road markings shall be returned
      * @param step discretization step size
      */
-    private fun getLeftRightRoadMarkings(
+    private fun getLeftRightRoadMarks(
         laneIdentifier: LaneIdentifier,
         step: Double,
-    ): List<Either<Exception, Pair<RoadMarking, AbstractGeometry3D>>> {
+    ): List<Either<Exception, Triple<RoadMark, AbstractCurve3D, Option<AbstractSurface3D>>>> {
         require(laneIdentifier.isLeft() || laneIdentifier.isRight()) { "Identifier of lane must represent a left or a right lane." }
 
         return getLane(laneIdentifier)
             .getOrElse { throw it }
-            .roadMarkings
-            .map { currentRoadMarking ->
-                val geometry: AbstractGeometry3D =
-                    getRoadMarkingGeometry(laneIdentifier, currentRoadMarking, step)
+            .roadMarks
+            .map { currentRoadMark ->
+                val (geometryCurve, geometrySurface) =
+                    getRoadMarkGeometry(laneIdentifier, currentRoadMark, step)
                         .getOrElse { return@map it.left() }
-                Either.Right(currentRoadMarking to geometry)
+                Either.Right(Triple(currentRoadMark, geometryCurve, geometrySurface))
             }
     }
 
     /**
-     * Returns the geometry of a [roadMarking] which is attached to a lane with [laneIdentifier].
+     * Returns the geometry of a [roadMark] which is attached to a lane with [laneIdentifier].
      *
-     * @param laneIdentifier identifier of the lane to which the [roadMarking] belongs
-     * @param roadMarking road marking for which the geometry shall be returned
+     * @param laneIdentifier identifier of the lane to which the [roadMark] belongs
+     * @param roadMark road marking for which the geometry shall be returned
      * @return either a [AbstractCurve3D], if the road marking has zero width, or a [AbstractSurface3D], if the width
      * is not zero
      */
-    private fun getRoadMarkingGeometry(
+    private fun getRoadMarkGeometry(
         laneIdentifier: LaneIdentifier,
-        roadMarking: RoadMarking,
+        roadMark: RoadMark,
         step: Double,
-    ): Either<Exception, AbstractGeometry3D> {
-        require(roadMarking.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
+    ): Either<Exception, Pair<AbstractCurve3D, Option<AbstractSurface3D>>> {
+        require(roadMark.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
 
-        if (roadMarking.width.isNone()) {
-            return getCurveOnLane(laneIdentifier, 1.0, roadMarking.lateralOffsetFunction)
+        val curveGeometry: AbstractCurve3D =
+            getCurveOnLane(laneIdentifier, 1.0, roadMark.lateralOffsetFunction)
+                .getOrElse { throw it }
+                .calculateLineStringGlobalCS(step)
+                .mapLeft { it.toIllegalStateException() }
+                .getOrElse { throw it }
+        if (roadMark.width.isNone()) {
+            return Pair(curveGeometry, None).right()
         }
 
         val leftOffsetFunction =
-            roadMarking
+            roadMark
                 .getLeftOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val leftRoadMarkBoundary =
@@ -750,7 +761,7 @@ class Road(
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
         val rightOffsetFunction =
-            roadMarking
+            roadMark
                 .getRightOffsetFunction()
                 .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
         val rightRoadMarkBoundary =
@@ -760,11 +771,13 @@ class Road(
                 .mapLeft { it.toIllegalStateException() }
                 .getOrElse { throw it }
 
-        return LinearRing3D
-            .ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
-            .getOrElse { return IllegalStateException(it.message).left() }
-            .let { CompositeSurface3D(it) }
-            .let { Either.Right(it) }
+        val surfaceGeometry =
+            LinearRing3D
+                .ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
+                .getOrElse { return IllegalStateException(it.message).left() }
+                .let { CompositeSurface3D(it) }
+
+        return Either.Right(Pair(curveGeometry, surfaceGeometry.some()))
     }
 
     /** Returns the curve position domains of each lane section. */

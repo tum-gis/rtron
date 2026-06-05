@@ -36,10 +36,13 @@ import io.rtron.model.opendrive.lane.ERoadMarkType
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMark
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine
 import io.rtron.model.opendrive.lane.RoadLanesLaneSectionLCRLaneRoadMarkTypeLine
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
+import io.rtron.model.roadspaces.identifier.RoadMarkIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.road.LaneChange
-import io.rtron.model.roadspaces.roadspace.road.RoadMarking
+import io.rtron.model.roadspaces.roadspace.road.RoadMark
+import io.rtron.model.roadspaces.roadspace.road.RoadMarkType
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.issues.opendrive.of
 import kotlin.math.floor
@@ -117,9 +120,9 @@ class RoadMarkRepresentationRegistry(
 }
 
 /**
- * Builder for [RoadMarking] objects of the RoadSpaces data model.
+ * Builder for [RoadMark] objects of the RoadSpaces data model.
  */
-class RoadMarkingBuilder(
+class RoadMarkBuilder(
     private val parameters: Opendrive2RoadspacesParameters,
 ) {
     // Methods
@@ -130,11 +133,12 @@ class RoadMarkingBuilder(
      * @param curvePositionDomain curve position domain (relative to the lane section) where the road markings is defined
      * @param roadMark road marking entries of the OpenDRIVE data model
      */
-    fun buildRoadMarkings(
+    fun buildRoadMarks(
+        id: LaneIdentifier,
         curvePositionDomain: Range<Double>,
         roadMark: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMark>,
         roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
-    ): ContextIssueList<List<RoadMarking>> {
+    ): ContextIssueList<List<RoadMark>> {
         require(curvePositionDomain.hasUpperBound()) { "curvePositionDomain must have an upper bound." }
         val roadMarkId =
             roadMark.head.additionalId
@@ -162,42 +166,42 @@ class RoadMarkingBuilder(
 
         if (adjustedSrcRoadMark.isEmpty()) return ContextIssueList(emptyList(), issueList)
 
-        val roadMarkingsWithIndex = adjustedSrcRoadMark.withIndex()
-        val roadMarkings =
-            roadMarkingsWithIndex
+        val roadMarksWithIndex = adjustedSrcRoadMark.withIndex()
+        val roadMarks =
+            roadMarksWithIndex
                 .zipWithNext()
                 .flatMap {
-                    buildRoadMarking(it.first.value, it.first.index, it.second.value.sOffset, roadMarkRepresentationRegistry)
+                    val roadMarkId = RoadMarkIdentifier(it.first.index, id)
+                    buildRoadMark(roadMarkId, it.first.value, it.second.value.sOffset, roadMarkRepresentationRegistry)
                 } +
-                buildRoadMarking(
-                    roadMarkingsWithIndex.last().value,
-                    roadMarkingsWithIndex.last().index,
+                buildRoadMark(
+                    RoadMarkIdentifier(roadMarksWithIndex.last().index, id),
+                    roadMarksWithIndex.last().value,
                     curvePositionDomainEnd,
                     roadMarkRepresentationRegistry,
                 )
 
-        return ContextIssueList(roadMarkings, issueList)
+        return ContextIssueList(roadMarks, issueList)
     }
 
     /**
-     * Builds an individual road marking [roadMark].
+     * Builds an individual road mark [roadMark].
      *
      * @param roadMark road mark entry of the OpenDRIVE data model
      * @param domainEndpoint upper domain endpoint for the domain of the road mark
      */
-    private fun buildRoadMarking(
+    private fun buildRoadMark(
+        id: RoadMarkIdentifier,
         roadMark: RoadLanesLaneSectionLCRLaneRoadMark,
-        roadMarkIndex: Int,
         domainEndpoint: Double,
         roadMarkRepresentationRegistry: RoadMarkRepresentationRegistry,
-    ): List<RoadMarking> {
+    ): List<RoadMark> {
         val domain = Range.closed(roadMark.sOffset, domainEndpoint)
         require(domain.length > parameters.numberTolerance) { "Length of road marking must be above zero and the tolerance threshold." }
 
         val typeRepresentation = roadMarkRepresentationRegistry.getRoadMarkTypeRepresentation(roadMark.typeAttribute)
         val generalAttributes =
-            attributes("${parameters.attributesPrefix}roadMarking_") {
-                attribute("index", roadMarkIndex)
+            attributes("${parameters.attributesPrefix}roadMark_") {
                 attribute("curvePositionStart", roadMark.sOffset)
                 attribute("type", roadMark.typeAttribute.toString())
                 attribute("weight", roadMark.weight.map { it.toString() })
@@ -207,22 +211,18 @@ class RoadMarkingBuilder(
                 attribute("width", roadMark.width)
             }
         val laneChange =
-            when (roadMark.laneChange.getOrElse { ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH }) {
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.INCREASE -> LaneChange.INCREASE
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.DECREASE -> LaneChange.DECREASE
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH -> LaneChange.BOTH
-                ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE -> LaneChange.NONE
-            }
+            roadMark.laneChange.getOrElse { ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH }.toLaneChange()
+        val type = roadMark.typeAttribute.toRoadMarkType()
 
         return when (typeRepresentation) {
-            RoadMarkRepresentationType.GENERAL -> listOf(RoadMarking(domain, roadMark.width, None, laneChange, generalAttributes))
+            RoadMarkRepresentationType.GENERAL -> listOf(RoadMark(id, domain, roadMark.width, None, type, laneChange, generalAttributes))
             RoadMarkRepresentationType.REGULAR -> {
                 roadMark.getTypeLines().fold(
                     ifEmpty = {
                         listOf()
                     },
                     ifSome = {
-                        buildRoadMarkings(roadMark.sOffset, it, domain, laneChange, generalAttributes)
+                        buildRoadMarks(id, roadMark.sOffset, it, domain, type, laneChange, generalAttributes)
                     },
                 )
             }
@@ -232,31 +232,38 @@ class RoadMarkingBuilder(
                         emptyList()
                     },
                     ifSome = {
-                        buildRoadMarkings(roadMark.sOffset, it, laneChange, generalAttributes)
+                        buildRoadMarks(id, roadMark.sOffset, it, type, laneChange, generalAttributes)
                     },
                 )
             }
         }
     }
 
-    private fun buildRoadMarkings(
-        roadMarkingCurvePositionStart: Double,
+    private fun buildRoadMarks(
+        id: RoadMarkIdentifier,
+        roadMarkCurvePositionStart: Double,
         typeLines: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkTypeLine>,
         domain: Range<Double>,
+        type: RoadMarkType,
         laneChange: LaneChange,
         generalAttributeList: AttributeList,
-    ): List<RoadMarking> {
+    ): List<RoadMark> {
         require(domain.hasUpperBound()) { "Domain must have an upper bound." }
 
         return typeLines
             .withIndex()
             .flatMap { (currentIndex, currentTypeLine) ->
                 val typeLineAttributes =
-                    attributes("${parameters.attributesPrefix}roadMarking_typeLine_") {
+                    attributes("${parameters.attributesPrefix}roadMark_typeLine_") {
                         attribute("index", currentIndex)
+                        attribute("length", currentTypeLine.length)
+                        attribute("space", currentTypeLine.space)
                         attribute("width", currentTypeLine.width)
+                        attribute("lateralOffset", currentTypeLine.tOffset)
+                        attribute("rule", currentTypeLine.rule.map { it.toString() })
+                        attribute("color", currentTypeLine.color.map { it.toString() })
                     }
-                val currentTypeLineCurvePositionStart = roadMarkingCurvePositionStart + currentTypeLine.sOffset
+                val currentTypeLineCurvePositionStart = roadMarkCurvePositionStart + currentTypeLine.sOffset
                 val lateralOffset =
                     if (currentTypeLine.tOffset < parameters.numberTolerance) None else Some(currentTypeLine.tOffset)
 
@@ -279,16 +286,18 @@ class RoadMarkingBuilder(
                         if (end - start < parameters.numberTolerance) return@map None
 
                         val attributes =
-                            attributes("${parameters.attributesPrefix}roadMarking_typeLine_regular_") {
+                            attributes("${parameters.attributesPrefix}roadMark_typeLine_regular_") {
                                 attribute("index", currentIndex)
                                 attribute("curvePositionStart", start)
                                 attribute("curvePositionEnd", end)
                             }
 
-                        RoadMarking(
+                        RoadMark(
+                            id,
                             Range.closed(start, end),
                             currentTypeLine.width,
                             lateralOffset,
+                            type,
                             laneChange,
                             generalAttributeList + typeLineAttributes + attributes,
                         ).some()
@@ -296,22 +305,25 @@ class RoadMarkingBuilder(
             }
     }
 
-    private fun buildRoadMarkings(
-        roadMarkingCurvePositionStart: Double,
+    private fun buildRoadMarks(
+        id: RoadMarkIdentifier,
+        roadMarkCurvePositionStart: Double,
         explicitLines: NonEmptyList<RoadLanesLaneSectionLCRLaneRoadMarkExplicitLine>,
+        type: RoadMarkType,
         laneChange: LaneChange,
         generalAttributeList: AttributeList,
-    ): NonEmptyList<RoadMarking> =
+    ): NonEmptyList<RoadMark> =
         explicitLines
             .withIndex()
             .map { (currentIndex, currentExplicitLine) ->
                 val attributes =
-                    attributes("${parameters.attributesPrefix}roadMarking_explicitLine_") {
+                    attributes("${parameters.attributesPrefix}roadMark_explicitLine_") {
                         attribute("index", currentIndex)
                         attribute("curvePositionStart", currentExplicitLine.sOffset)
                         attribute("curvePositionEnd", currentExplicitLine.sOffset + currentExplicitLine.length)
                         attribute("lateralOffset", currentExplicitLine.tOffset)
                         attribute("width", currentExplicitLine.width)
+                        attribute("rule", currentExplicitLine.rule.map { it.toString() })
                     }
                 val lateralOffset =
                     if (currentExplicitLine.tOffset <
@@ -324,10 +336,18 @@ class RoadMarkingBuilder(
 
                 val currentEntryDomain =
                     Range.closed(
-                        roadMarkingCurvePositionStart + currentExplicitLine.sOffset,
-                        roadMarkingCurvePositionStart + currentExplicitLine.sOffset + currentExplicitLine.length,
+                        roadMarkCurvePositionStart + currentExplicitLine.sOffset,
+                        roadMarkCurvePositionStart + currentExplicitLine.sOffset + currentExplicitLine.length,
                     )
-                RoadMarking(currentEntryDomain, currentExplicitLine.width, lateralOffset, laneChange, generalAttributeList + attributes)
+                RoadMark(
+                    id,
+                    currentEntryDomain,
+                    currentExplicitLine.width,
+                    lateralOffset,
+                    type,
+                    laneChange,
+                    generalAttributeList + attributes,
+                )
             }.toNonEmptyListOrNone()
             .getOrElse { throw IllegalArgumentException("Explicit road markings must contain at least one entry.") }
 }

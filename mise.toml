@@ -12,8 +12,12 @@ run = "./gradlew ktlintFormat"
 
 [tasks.build]
 description = "Compile the project"
+usage = '''
+flag "-r --release" help="Build artifacts in release mode, with optimizations"
+'''
+
 run = '''
-if [ '{{flag(name='release')}}' = 'true' ]; then
+if [ "${usage_release}" = 'true' ]; then
     ./gradlew shadowJar;
 else
     ./gradlew build;

@@ -20,7 +20,6 @@ import io.rtron.math.geometry.euclidean.threed.Rotation3D
 import io.rtron.model.roadspaces.common.LateralFillerSurface
 import io.rtron.model.roadspaces.common.LongitudinalFillerSurface
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
-import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.Attribute
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 import io.rtron.model.roadspaces.roadspace.attribute.BooleanAttribute
@@ -32,7 +31,7 @@ import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
 import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
-import io.rtron.model.roadspaces.roadspace.road.RoadMarking
+import io.rtron.model.roadspaces.roadspace.road.RoadMark
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.core.AbstractGenericAttribute
@@ -102,11 +101,10 @@ class AttributesAdder(
     }
 
     fun addAttributes(
-        laneId: LaneIdentifier,
-        roadMarking: RoadMarking,
+        roadMark: RoadMark,
         dstCityObject: AbstractCityObject,
     ) {
-        val attributes = laneId.toAttributes(parameters.identifierAttributesPrefix) + roadMarking.attributes
+        val attributes = roadMark.id.toAttributes(parameters.identifierAttributesPrefix) + roadMark.attributes
         addAttributes(attributes, dstCityObject)
     }
 

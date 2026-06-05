@@ -394,11 +394,20 @@ class RoadsTransformer(
     ): DefaultIssueList {
         val issueList = DefaultIssueList()
         road
-            .getRoadMarkings(id, parameters.discretizationStepSize)
+            .getRoadMarksWithGeometry(id, parameters.discretizationStepSize)
             .handleLeftAndFilter {
                 issueList += DefaultIssue.of("RoadMarkingNotConstructable", it.value.message!!, id, Severity.WARNING, wasFixed = true)
-            }.forEachIndexed { index, (roadMarking, geometry) ->
-                issueList += transportationModuleBuilder.addMarkingFeature(id, index, roadMarking, geometry, dstTransportationSpace)
+            }.forEachIndexed { index, (roadMark, curveGeometry, surfaceGeometry) ->
+                issueList +=
+                    transportationModuleBuilder.addMarkingFeature(
+                        id,
+                        index,
+                        roadMark,
+                        curveGeometry,
+                        surfaceGeometry,
+                        road.getLane(id.getAdjacentOuterLaneIdentifier()).isRight(),
+                        dstTransportationSpace,
+                    )
             }
 
         return issueList

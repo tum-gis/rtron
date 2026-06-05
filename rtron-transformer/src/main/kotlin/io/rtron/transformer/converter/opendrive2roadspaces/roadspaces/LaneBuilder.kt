@@ -47,7 +47,7 @@ import io.rtron.model.roadspaces.roadspace.road.LaneAccessRule
 import io.rtron.model.roadspaces.roadspace.road.LaneDirection
 import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.RestrictionType
-import io.rtron.model.roadspaces.roadspace.road.RoadMarking
+import io.rtron.model.roadspaces.roadspace.road.RoadMark
 import io.rtron.std.isStrictlySortedBy
 import io.rtron.transformer.converter.opendrive2roadspaces.Opendrive2RoadspacesParameters
 import io.rtron.transformer.converter.opendrive2roadspaces.analysis.FunctionBuilder
@@ -59,7 +59,7 @@ class LaneBuilder(
     private val parameters: Opendrive2RoadspacesParameters,
 ) {
     // Properties and Initializers
-    private val roadMarkingBuilder = RoadMarkingBuilder(parameters)
+    private val roadMarkBuilder = RoadMarkBuilder(parameters)
 
     // Methods
 
@@ -91,12 +91,13 @@ class LaneBuilder(
                 .fold({ LaneHeightOffset(LinearFunction.X_AXIS, LinearFunction.X_AXIS) }, { buildLaneHeightOffset(it) })
 
         // build road markings
-        val roadMarkings: List<RoadMarking> =
+        val roadMarks: List<RoadMark> =
             if (lrLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
-                roadMarkingBuilder
-                    .buildRoadMarkings(
+                roadMarkBuilder
+                    .buildRoadMarks(
+                        id,
                         curvePositionDomain,
                         lrLane.roadMark.toNonEmptyListOrNull()!!,
                         roadMarkRepresentationRegistry,
@@ -122,7 +123,7 @@ class LaneBuilder(
                 laneHeightOffsets.inner,
                 laneHeightOffsets.outer,
                 lrLane.getLevelWithDefault(),
-                roadMarkings,
+                roadMarks,
                 predecessors,
                 successors,
                 type,
@@ -154,12 +155,13 @@ class LaneBuilder(
         val laneIdentifier = LaneIdentifier(0, id)
         val issueList = DefaultIssueList()
 
-        val roadMarkings =
+        val roadMarks =
             if (centerLane.roadMark.isEmpty()) {
                 emptyList()
             } else {
-                roadMarkingBuilder
-                    .buildRoadMarkings(
+                roadMarkBuilder
+                    .buildRoadMarks(
+                        laneIdentifier,
                         curvePositionDomain,
                         centerLane.roadMark.toNonEmptyListOrNull()!!,
                         roadMarkRepresentationRegistry,
@@ -169,7 +171,7 @@ class LaneBuilder(
         val type = centerLane.type.toLaneType()
         val attributes = baseAttributes + buildAttributes(centerLane)
 
-        val lane = CenterLane(laneIdentifier, centerLane.getLevelWithDefault(), roadMarkings, type, attributes)
+        val lane = CenterLane(laneIdentifier, centerLane.getLevelWithDefault(), roadMarks, type, attributes)
         return ContextIssueList(lane, issueList)
     }
 

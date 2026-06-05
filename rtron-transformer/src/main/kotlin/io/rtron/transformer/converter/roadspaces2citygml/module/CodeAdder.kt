@@ -20,6 +20,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.some
 import io.rtron.model.citygml.code.AuxiliaryTrafficAreaFunctionCode
+import io.rtron.model.citygml.code.MarkingClassCode
 import io.rtron.model.citygml.code.TrafficAreaAndAuxiliaryTrafficAreaSurfaceMaterialCode
 import io.rtron.model.citygml.code.TrafficAreaFunctionCode
 import io.rtron.model.citygml.code.TrafficAreaUsageCode
@@ -29,6 +30,7 @@ import io.rtron.model.roadspaces.roadspace.road.LaneAccessRule
 import io.rtron.model.roadspaces.roadspace.road.LaneMaterial
 import io.rtron.model.roadspaces.roadspace.road.LaneType
 import io.rtron.model.roadspaces.roadspace.road.RestrictionType
+import io.rtron.model.roadspaces.roadspace.road.RoadMarkType
 
 object CodeAdder {
     // Methods
@@ -219,5 +221,21 @@ object CodeAdder {
             RoadObjectType.TRAFFIC_ISLAND -> listOf(TrafficAreaUsageCode.PEDESTRIAN, TrafficAreaUsageCode.BICYCLE)
             RoadObjectType.TREE -> emptyList()
             RoadObjectType.VEGETATION -> emptyList()
+        }
+
+    fun mapToMarkingClassCode(roadMarkType: RoadMarkType): Option<MarkingClassCode> =
+        when (roadMarkType) {
+            RoadMarkType.BOTTS_DOTS -> MarkingClassCode.ROAD_MARKING_LANE.some()
+            RoadMarkType.BROKEN -> MarkingClassCode.ROAD_MARKING_LANE_BROKEN.some()
+            RoadMarkType.BROKEN_BROKEN -> MarkingClassCode.ROAD_MARKING_LANE.some()
+            RoadMarkType.BROKEN_SOLID -> MarkingClassCode.ROAD_MARKING_LANE.some()
+            RoadMarkType.CURB -> None
+            RoadMarkType.CUSTOM -> None
+            RoadMarkType.EDGE -> None
+            RoadMarkType.GRASS -> None
+            RoadMarkType.NONE -> None
+            RoadMarkType.SOLID -> MarkingClassCode.ROAD_MARKING_LANE_SOLID.some()
+            RoadMarkType.SOLID_BROKEN -> MarkingClassCode.ROAD_MARKING_LANE.some()
+            RoadMarkType.SOLID_SOLID -> MarkingClassCode.ROAD_MARKING_LANE_SOLID.some()
         }
 }

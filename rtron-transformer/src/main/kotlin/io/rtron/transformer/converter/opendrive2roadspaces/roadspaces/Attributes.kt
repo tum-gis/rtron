@@ -18,8 +18,12 @@ package io.rtron.transformer.converter.opendrive2roadspaces.roadspaces
 
 import io.rtron.model.opendrive.core.EUnitSpeed
 import io.rtron.model.opendrive.lane.ELaneType
+import io.rtron.model.opendrive.lane.ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange
+import io.rtron.model.opendrive.lane.ERoadMarkType
 import io.rtron.model.roadspaces.roadspace.attribute.UnitOfMeasure
+import io.rtron.model.roadspaces.roadspace.road.LaneChange
 import io.rtron.model.roadspaces.roadspace.road.LaneType
+import io.rtron.model.roadspaces.roadspace.road.RoadMarkType
 
 /**
  * Transforms units of the OpenDRIVE data model to units of the RoadSpaces data model.
@@ -56,4 +60,34 @@ fun ELaneType.toLaneType(): LaneType =
         ELaneType.STOP -> LaneType.STOP
         ELaneType.TRAM -> LaneType.TRAM
         ELaneType.WALKING -> LaneType.WALKING
+    }
+
+/**
+ * Transforms road mark types of the OpenDRIVE data model to the road mark types of the RoadSpaces data model.
+ */
+fun ERoadMarkType.toRoadMarkType(): RoadMarkType =
+    when (this) {
+        ERoadMarkType.BOTTS_DOTS -> RoadMarkType.BOTTS_DOTS
+        ERoadMarkType.BROKEN -> RoadMarkType.BROKEN
+        ERoadMarkType.BROKEN_BROKEN -> RoadMarkType.BROKEN_BROKEN
+        ERoadMarkType.BROKEN_SOLID -> RoadMarkType.BROKEN_SOLID
+        ERoadMarkType.CURB -> RoadMarkType.CURB
+        ERoadMarkType.CUSTOM -> RoadMarkType.CUSTOM
+        ERoadMarkType.EDGE -> RoadMarkType.EDGE
+        ERoadMarkType.GRASS -> RoadMarkType.GRASS
+        ERoadMarkType.NONE -> RoadMarkType.NONE
+        ERoadMarkType.SOLID -> RoadMarkType.SOLID
+        ERoadMarkType.SOLID_BROKEN -> RoadMarkType.SOLID_BROKEN
+        ERoadMarkType.SOLID_SOLID -> RoadMarkType.SOLID_SOLID
+    }
+
+/**
+ * Transforms lane change types of the OpenDRIVE data model to the lane change types of the RoadSpaces data model.
+ */
+fun ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.toLaneChange(): LaneChange =
+    when (this) {
+        ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.BOTH -> LaneChange.BOTH
+        ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.DECREASE -> LaneChange.DECREASE
+        ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.INCREASE -> LaneChange.INCREASE
+        ERoadLanesLaneSectionLCRLaneRoadMarkLaneChange.NONE -> LaneChange.NONE
     }

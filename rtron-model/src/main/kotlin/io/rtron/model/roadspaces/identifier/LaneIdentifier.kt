@@ -22,15 +22,23 @@ import io.rtron.model.roadspaces.roadspace.attribute.attributes
 import kotlin.math.abs
 
 /**
+ * Lane section identifier interface required for class delegation.
+ */
+interface LaneIdentifierInterface : LaneSectionIdentifierInterface {
+    val laneId: Int
+}
+
+/**
  * Identifier of a lane containing essential meta information.
  *
  * @param laneId id of the lane
  * @param laneSectionIdentifier identifier of the lane section
  */
 data class LaneIdentifier(
-    val laneId: Int,
+    override val laneId: Int,
     val laneSectionIdentifier: LaneSectionIdentifier,
 ) : AbstractRoadspacesIdentifier(),
+    LaneIdentifierInterface,
     LaneSectionIdentifierInterface by laneSectionIdentifier {
     // Properties and Initializers
     val hashKey get() = "Lane_${laneId}_${laneSectionIdentifier.laneSectionId}_${laneSectionIdentifier.roadspaceIdentifier.roadspaceId}"

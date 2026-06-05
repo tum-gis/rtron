@@ -32,16 +32,18 @@ import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.model.roadspaces.roadspace.road.LaneDirection
-import io.rtron.model.roadspaces.roadspace.road.RoadMarking
+import io.rtron.model.roadspaces.roadspace.road.RoadMark
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.GeometryTransformer
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod0Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod1MultiSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Geometry
+import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceFromSolidCutoutOrSurface
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveClearanceSpaceGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
-import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadMarkingGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadMarkGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier
 import io.rtron.transformer.issues.roadspaces.of
@@ -462,18 +464,20 @@ class TransportationModuleBuilder(
 
     fun addMarkingFeature(
         id: LaneIdentifier,
-        roadMarkingIndex: Int,
-        roadMarking: RoadMarking,
-        geometry: AbstractGeometry3D,
+        roadMarkIndex: Int,
+        roadMark: RoadMark,
+        curveGeometry: AbstractCurve3D,
+        surfaceGeometry: Option<AbstractSurface3D>,
+        hasAdjacentOuterLane: Boolean,
         dstTransportationSpace: AbstractTransportationSpace,
     ): DefaultIssueList {
         val issueList = DefaultIssueList()
-        val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
+        val markingFeature = createMarking()
 
         // geometry
-        val geometryTransformer = GeometryTransformer(parameters).also { geometry.accept(it) }
+        val curveGeometryTransformer = GeometryTransformer(parameters).also { curveGeometry.accept(it) }
         markingFeature
-            .populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
+            .populateLod0Geometry(curveGeometryTransformer)
             .onLeft {
                 issueList +=
                     DefaultIssue.of(
@@ -485,13 +489,37 @@ class TransportationModuleBuilder(
                     )
             }
 
+        surfaceGeometry.onSome { currentSurfaceGeometry ->
+            val surfaceGeometryTransformer = GeometryTransformer(parameters).also { currentSurfaceGeometry.accept(it) }
+            markingFeature
+                .populateLod2MultiSurface(surfaceGeometryTransformer)
+                .onLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForMarkingLod2",
+                            it.message,
+                            id,
+                            Severity.WARNING,
+                            wasFixed = true,
+                        )
+                }
+        }
+
         // semantics
         IdentifierAdder.addIdentifier(
-            id.deriveRoadMarkingGmlIdentifier(parameters.gmlIdPrefix, roadMarkingIndex),
-            "RoadMarking",
+            roadMark.id.deriveRoadMarkGmlIdentifier(parameters.gmlIdPrefix, roadMarkIndex),
+            "RoadMark",
             markingFeature,
         )
-        attributesAdder.addAttributes(id, roadMarking, markingFeature)
+        CodeAdder.mapToMarkingClassCode(roadMark.type).onSome {
+            markingFeature.classifier = it.code
+        }
+        attributesAdder.addAttributes(roadMark, markingFeature)
+
+        relationAdder.addLaterallyAdjacentLaneRelation(id, markingFeature)
+        if (hasAdjacentOuterLane) {
+            relationAdder.addLaterallyAdjacentLaneRelation(id.getAdjacentOuterLaneIdentifier(), markingFeature)
+        }
 
         // populate transportation space
         addMarkingFeature(markingFeature, dstTransportationSpace)
@@ -503,7 +531,7 @@ class TransportationModuleBuilder(
         dstTransportationSpace: AbstractTransportationSpace,
     ): DefaultIssueList {
         val issueList = DefaultIssueList()
-        val markingFeature = if (parameters.mappingBackwardsCompatibility) AuxiliaryTrafficArea() else createMarking()
+        val markingFeature = createMarking()
 
         // geometry
         roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->

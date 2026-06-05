@@ -20,6 +20,7 @@ import io.rtron.model.roadspaces.identifier.JunctionIdentifier
 import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.LateralLaneRangeIdentifier
 import io.rtron.model.roadspaces.identifier.LongitudinalLaneRangeIdentifier
+import io.rtron.model.roadspaces.identifier.RoadMarkIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceIdentifier
 import io.rtron.model.roadspaces.identifier.RoadspaceObjectIdentifier
 import java.util.UUID
@@ -58,10 +59,10 @@ fun LaneIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(prefix: 
 fun LaneIdentifier.deriveClearanceSpaceGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "ClearanceSpace_${this.hashKey}")
 
-fun LaneIdentifier.deriveRoadMarkingGmlIdentifier(
+fun RoadMarkIdentifier.deriveRoadMarkGmlIdentifier(
     prefix: String,
-    roadMarkingIndex: Int,
-): String = generateGmlIdentifier(prefix, "RoadMarking_${roadMarkingIndex}_${this.hashKey}")
+    roadMarkIndex: Int,
+): String = generateGmlIdentifier(prefix, "RoadMark_${roadMarkIndex}_${this.hashKey}")
 
 fun LateralLaneRangeIdentifier.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "LateralFillerSurface_${this.hashKey}")

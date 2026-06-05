@@ -17,16 +17,19 @@
 package io.rtron.transformer.converter.roadspaces2citygml.module
 
 import io.rtron.model.roadspaces.identifier.AbstractRoadspacesIdentifier
+import io.rtron.model.roadspaces.identifier.LaneIdentifier
 import io.rtron.model.roadspaces.identifier.RoadSide
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.model.roadspaces.roadspace.road.Lane
 import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParameters
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.core.CityObjectRelation
 import org.citygml4j.core.model.core.CityObjectRelationProperty
+import org.citygml4j.core.model.transportation.Marking
 import org.citygml4j.core.model.transportation.TrafficSpace
 import org.xmlobjects.gml.model.basictypes.Code
 
@@ -96,6 +99,18 @@ class RelationAdder(
             }
         val relation: CityObjectRelationProperty = createCityObjectRelation(gmlId, relationType, lane.id)
         dstTrafficSpace.relatedTo.add(relation)
+    }
+
+    /**
+     * Adds a laterally adjacent lane relation to the [Marking] object
+     */
+    fun addLaterallyAdjacentLaneRelation(
+        laneId: LaneIdentifier,
+        dstMarking: Marking,
+    ) {
+        val gmlId = laneId.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier(parameters.gmlIdPrefix)
+        val relation: CityObjectRelationProperty = createCityObjectRelation(gmlId, "laterallyAdjacentLane", laneId)
+        dstMarking.relatedTo.add(relation)
     }
 
     private fun createCityObjectRelation(

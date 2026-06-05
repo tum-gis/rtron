@@ -22,6 +22,7 @@ import arrow.core.getOrElse
 import arrow.core.some
 import io.rtron.math.analysis.function.univariate.pure.ConstantFunction
 import io.rtron.math.range.Range
+import io.rtron.model.roadspaces.identifier.RoadMarkIdentifier
 import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
 
 /**
@@ -30,10 +31,12 @@ import io.rtron.model.roadspaces.roadspace.attribute.AttributeList
  * @param width lateral width of the road marking
  * @param attributes further information attributes
  */
-data class RoadMarking(
+data class RoadMark(
+    val id: RoadMarkIdentifier,
     val domain: Range<Double>,
     val width: Option<Double>,
     val lateralOffset: Option<Double>,
+    val type: RoadMarkType,
     val laneChange: LaneChange,
     val attributes: AttributeList,
 ) {
