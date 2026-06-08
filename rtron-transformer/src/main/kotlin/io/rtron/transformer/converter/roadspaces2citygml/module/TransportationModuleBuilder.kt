@@ -123,10 +123,10 @@ class TransportationModuleBuilder(
         relatedObjects.forEach { relationAdder.addRelatedToRelation(it, trafficSpaceFeature) }
         // TODO: consider left-hand traffic (LHT)
         trafficSpaceFeature.trafficDirection =
-            when {
-                lane.direction.isSome { it == LaneDirection.BOTH } -> TrafficDirectionValue.BOTH
-                lane.id.isForward() -> TrafficDirectionValue.FORWARDS
-                else -> TrafficDirectionValue.BACKWARDS
+            when (lane.direction.fold({ LaneDirection.STANDARD }, { it })) {
+                LaneDirection.BOTH -> TrafficDirectionValue.BOTH
+                LaneDirection.STANDARD -> if (lane.id.isForward()) TrafficDirectionValue.FORWARDS else TrafficDirectionValue.BACKWARDS
+                LaneDirection.REVERSED -> if (lane.id.isForward()) TrafficDirectionValue.BACKWARDS else TrafficDirectionValue.FORWARDS
             }
 
         // geometry
