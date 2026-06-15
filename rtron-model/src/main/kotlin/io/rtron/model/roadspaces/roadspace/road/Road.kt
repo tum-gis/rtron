@@ -24,6 +24,7 @@ import arrow.core.Some
 import arrow.core.getOrElse
 import arrow.core.left
 import arrow.core.nonEmptyListOf
+import arrow.core.raise.context.bind
 import arrow.core.raise.either
 import arrow.core.right
 import arrow.core.some
@@ -737,48 +738,49 @@ class Road(
         laneIdentifier: LaneIdentifier,
         roadMark: RoadMark,
         step: Double,
-    ): Either<Exception, Pair<AbstractCurve3D, Option<AbstractSurface3D>>> {
-        require(roadMark.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
+    ): Either<Exception, Pair<AbstractCurve3D, Option<AbstractSurface3D>>> =
+        either {
+            require(roadMark.domain.length >= geometricalTolerance) { "Domain must be above tolerance threshold." }
 
-        val curveGeometry: AbstractCurve3D =
-            getCurveOnLane(laneIdentifier, 1.0, roadMark.lateralOffsetFunction)
-                .getOrElse { throw it }
-                .calculateLineStringGlobalCS(step)
-                .mapLeft { it.toIllegalStateException() }
-                .getOrElse { throw it }
-        if (roadMark.width.isNone()) {
-            return Pair(curveGeometry, None).right()
+            val curveGeometry: AbstractCurve3D =
+                getCurveOnLane(laneIdentifier, 1.0, roadMark.lateralOffsetFunction)
+                    .getOrElse { throw it }
+                    .calculateLineStringGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .bind()
+            if (roadMark.width.isNone()) {
+                return Pair(curveGeometry, None).right()
+            }
+
+            val leftOffsetFunction =
+                roadMark
+                    .getLeftOffsetFunction()
+                    .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
+            val leftRoadMarkBoundary =
+                getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
+                    .getOrElse { throw it }
+                    .calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .bind()
+            val rightOffsetFunction =
+                roadMark
+                    .getRightOffsetFunction()
+                    .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
+            val rightRoadMarkBoundary =
+                getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
+                    .getOrElse { throw it }
+                    .calculatePointListGlobalCS(step)
+                    .mapLeft { it.toIllegalStateException() }
+                    .bind()
+
+            val surfaceGeometry =
+                LinearRing3D
+                    .ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
+                    .getOrElse { return IllegalStateException(it.message).left() }
+                    .let { CompositeSurface3D(it) }
+
+            Pair(curveGeometry, surfaceGeometry.some())
         }
-
-        val leftOffsetFunction =
-            roadMark
-                .getLeftOffsetFunction()
-                .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
-        val leftRoadMarkBoundary =
-            getCurveOnLane(laneIdentifier, 1.0, leftOffsetFunction)
-                .getOrElse { throw it }
-                .calculatePointListGlobalCS(step)
-                .mapLeft { it.toIllegalStateException() }
-                .getOrElse { throw it }
-        val rightOffsetFunction =
-            roadMark
-                .getRightOffsetFunction()
-                .getOrElse { throw IllegalStateException("Case without width must have already been handled.") }
-        val rightRoadMarkBoundary =
-            getCurveOnLane(laneIdentifier, 1.0, rightOffsetFunction)
-                .getOrElse { throw it }
-                .calculatePointListGlobalCS(step)
-                .mapLeft { it.toIllegalStateException() }
-                .getOrElse { throw it }
-
-        val surfaceGeometry =
-            LinearRing3D
-                .ofWithDuplicatesRemoval(leftRoadMarkBoundary, rightRoadMarkBoundary, geometricalTolerance)
-                .getOrElse { return IllegalStateException(it.message).left() }
-                .let { CompositeSurface3D(it) }
-
-        return Either.Right(Pair(curveGeometry, surfaceGeometry.some()))
-    }
 
     /** Returns the curve position domains of each lane section. */
     private fun getLaneSectionCurvePositionDomains(): List<Range<Double>> {
