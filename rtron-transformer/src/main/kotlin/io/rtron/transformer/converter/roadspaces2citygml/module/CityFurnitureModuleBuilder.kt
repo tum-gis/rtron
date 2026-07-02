@@ -98,6 +98,14 @@ class CityFurnitureModuleBuilder(
             roadspaceObject.name,
             cityFurnitureFeature,
         )
+        CodeAdder.mapToCityFurnitureClassCode(roadspaceObject.type, roadspaceObject.subType).onSome {
+            cityFurnitureFeature.classifier = it.code
+        }
+        cityFurnitureFeature.functions =
+            CodeAdder.mapToCityFurnitureFunctionCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+        cityFurnitureFeature.usages =
+            CodeAdder.mapToCityFurnitureUsageCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+
         relationAdder.addBelongToRelations(roadspaceObject, cityFurnitureFeature)
         attributesAdder.addAttributes(roadspaceObject, cityFurnitureFeature)
 

@@ -53,9 +53,11 @@ class RelationAdder(
                     RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> "Building"
                     RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> "Furniture"
                     RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> "OccupiedSpace"
-                    RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> return
                     RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> return
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_HOLE -> "Hole"
                     RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> return
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> return
+                    RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_PLANTCOVER -> "Vegetation"
                     RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> "Vegetation"
                 }
 

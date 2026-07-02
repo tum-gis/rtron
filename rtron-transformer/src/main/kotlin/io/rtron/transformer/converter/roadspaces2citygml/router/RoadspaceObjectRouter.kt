@@ -16,9 +16,11 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml.router
 
-import arrow.core.some
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectBarrierSubType
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectBuildingSubType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectRoadSurfaceSubType
 import io.rtron.model.roadspaces.roadspace.objects.RoadObjectType
+import io.rtron.model.roadspaces.roadspace.objects.RoadObjectVegetationSubType
 import io.rtron.model.roadspaces.roadspace.objects.RoadspaceObject
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter.CitygmlTargetFeatureType
 
@@ -30,9 +32,11 @@ object RoadspaceObjectRouter {
         BUILDING_BUILDING,
         CITYFURNITURE_CITYFURNITURE,
         GENERICS_GENERICOCCUPIEDSPACE,
-        TRANSPORTATION_TRAFFICSPACE,
         TRANSPORTATION_AUXILIARYTRAFFICSPACE,
+        TRANSPORTATION_HOLE,
         TRANSPORTATION_MARKING,
+        TRANSPORTATION_TRAFFICSPACE,
+        VEGETATION_PLANTCOVER,
         VEGETATION_SOLITARYVEGETATIONOBJECT,
     }
 
@@ -41,24 +45,65 @@ object RoadspaceObjectRouter {
      */
     fun route(roadspaceObject: RoadspaceObject): CitygmlTargetFeatureType =
         when (roadspaceObject.type) {
-            RoadObjectType.NONE -> CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE
-            RoadObjectType.OBSTACLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            RoadObjectType.POLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            RoadObjectType.TREE -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
-            RoadObjectType.VEGETATION -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
-            RoadObjectType.BARRIER -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-            RoadObjectType.BUILDING -> {
-                when (roadspaceObject.subType) {
-                    RoadObjectBuildingSubType.BUS_STOP.some() -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
-                    else -> CitygmlTargetFeatureType.BUILDING_BUILDING
-                }
+            RoadObjectType.BARRIER -> {
+                roadspaceObject.subType.fold(
+                    ifEmpty = { CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE },
+                    ifSome = { subType ->
+                        when (subType as RoadObjectBarrierSubType) {
+                            RoadObjectBarrierSubType.HEDGE -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
+                            else -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
+                        }
+                    },
+                )
             }
-            RoadObjectType.PARKING_SPACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
-            RoadObjectType.TRAFFIC_ISLAND -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
+            RoadObjectType.BUILDING -> {
+                roadspaceObject.subType.fold(
+                    ifEmpty = { CitygmlTargetFeatureType.BUILDING_BUILDING },
+                    ifSome = { subType ->
+                        when (subType as RoadObjectBuildingSubType) {
+                            RoadObjectBuildingSubType.BUS_STOP -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
+                            else -> CitygmlTargetFeatureType.BUILDING_BUILDING
+                        }
+                    },
+                )
+            }
             RoadObjectType.CROSSWALK -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
             RoadObjectType.GANTRY -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
+            RoadObjectType.NONE -> CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE
+            RoadObjectType.OBSTACLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
+            RoadObjectType.PARKING_SPACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
+            RoadObjectType.POLE -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
             RoadObjectType.ROAD_MARK -> CitygmlTargetFeatureType.TRANSPORTATION_MARKING
-            RoadObjectType.ROAD_SURFACE -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
+            RoadObjectType.ROAD_SURFACE -> {
+                roadspaceObject.subType.fold(
+                    ifEmpty = { CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE },
+                    ifSome = { subType ->
+                        when (subType as RoadObjectRoadSurfaceSubType) {
+                            RoadObjectRoadSurfaceSubType.MANHOLE,
+                            RoadObjectRoadSurfaceSubType.POTHOLE,
+                            RoadObjectRoadSurfaceSubType.DRAIN_GUTTER,
+                            -> CitygmlTargetFeatureType.TRANSPORTATION_HOLE
+                            RoadObjectRoadSurfaceSubType.PATCH,
+                            RoadObjectRoadSurfaceSubType.SPEED_BUMP,
+                            RoadObjectRoadSurfaceSubType.OTHER,
+                            -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
+                        }
+                    },
+                )
+            }
             RoadObjectType.SIGNAL -> CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE
+            RoadObjectType.TRAFFIC_ISLAND -> CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE
+            RoadObjectType.TREE -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
+            RoadObjectType.VEGETATION -> {
+                roadspaceObject.subType.fold(
+                    ifEmpty = { CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT },
+                    ifSome = { subType ->
+                        when (subType as RoadObjectVegetationSubType) {
+                            RoadObjectVegetationSubType.FOREST -> CitygmlTargetFeatureType.VEGETATION_PLANTCOVER
+                            else -> CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT
+                        }
+                    },
+                )
+            }
         }
 }

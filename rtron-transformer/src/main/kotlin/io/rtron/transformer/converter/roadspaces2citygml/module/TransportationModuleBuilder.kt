@@ -43,6 +43,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Mu
 import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2MultiSurfaceOrLod0Geometry
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveClearanceSpaceGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveHoleSurfaceGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveRoadMarkGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficAreaOrAuxiliaryTrafficAreaGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier
@@ -57,6 +58,8 @@ import org.citygml4j.core.model.transportation.AuxiliaryTrafficSpaceProperty
 import org.citygml4j.core.model.transportation.ClearanceSpace
 import org.citygml4j.core.model.transportation.ClearanceSpaceProperty
 import org.citygml4j.core.model.transportation.GranularityValue
+import org.citygml4j.core.model.transportation.Hole
+import org.citygml4j.core.model.transportation.HoleSurface
 import org.citygml4j.core.model.transportation.Intersection
 import org.citygml4j.core.model.transportation.Marking
 import org.citygml4j.core.model.transportation.MarkingProperty
@@ -308,8 +311,9 @@ class TransportationModuleBuilder(
             ),
             trafficSpaceFeature,
         )
-        trafficSpaceFeature.usages = CodeAdder.mapToTrafficAreaUsageCodes(roadspaceObject.type).map { it.code }
-        trafficSpaceFeature.functions = CodeAdder.mapToTrafficAreaFunctionCodes(roadspaceObject.type).map { it.code }
+        trafficSpaceFeature.usages = CodeAdder.mapToTrafficAreaUsageCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+        trafficSpaceFeature.functions =
+            CodeAdder.mapToTrafficAreaFunctionCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
         attributesAdder.addAttributes(roadspaceObject, trafficSpaceFeature)
 
         // surface representation
@@ -322,8 +326,9 @@ class TransportationModuleBuilder(
                 ),
                 trafficAreaFeature,
             )
-            trafficAreaFeature.usages = CodeAdder.mapToTrafficAreaUsageCodes(roadspaceObject.type).map { it.code }
-            trafficAreaFeature.functions = CodeAdder.mapToTrafficAreaFunctionCodes(roadspaceObject.type).map { it.code }
+            trafficAreaFeature.usages = CodeAdder.mapToTrafficAreaUsageCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+            trafficAreaFeature.functions =
+                CodeAdder.mapToTrafficAreaFunctionCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
             attributesAdder.addAttributes(roadspaceObject, trafficAreaFeature)
 
             // geometry
@@ -402,7 +407,7 @@ class TransportationModuleBuilder(
             auxiliaryTrafficSpaceFeature,
         )
         auxiliaryTrafficSpaceFeature.functions =
-            CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(roadspaceObject.type).map { it.code }
+            CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
 
         // surface representation
         roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
@@ -415,7 +420,7 @@ class TransportationModuleBuilder(
                 auxiliaryTrafficAreaFeature,
             )
             auxiliaryTrafficAreaFeature.functions =
-                CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(roadspaceObject.type).map { it.code }
+                CodeAdder.mapToAuxiliaryTrafficAreaFunctionCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
             attributesAdder.addAttributes(roadspaceObject, auxiliaryTrafficAreaFeature)
 
             // geometry
@@ -526,6 +531,52 @@ class TransportationModuleBuilder(
         return issueList
     }
 
+    fun createHoleFeature(roadspaceObject: RoadspaceObject): ContextIssueList<Hole> {
+        val issueList = DefaultIssueList()
+        val holeFeature = Hole()
+        val holeSurfaceFeature = HoleSurface()
+
+        // geometry
+        roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
+            holeSurfaceFeature
+                .populateLod1MultiSurface(geometryTransformer)
+                .onLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForHoleSurfaceLod1",
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
+                        )
+                }
+        }
+        roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
+            holeSurfaceFeature
+                .populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
+                .onLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForHoleSurfaceLod2",
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
+                        )
+                }
+        }
+
+        // semantics
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), holeFeature)
+        IdentifierAdder.addIdentifier(roadspaceObject.id.deriveHoleSurfaceGmlIdentifier(parameters.gmlIdPrefix), holeSurfaceFeature)
+        attributesAdder.addAttributes(roadspaceObject, holeFeature)
+
+        holeFeature.addBoundary(AbstractSpaceBoundaryProperty(holeSurfaceFeature))
+        return ContextIssueList(holeFeature, issueList)
+    }
+
     fun addMarkingFeature(
         roadspaceObject: RoadspaceObject,
         dstTransportationSpace: AbstractTransportationSpace,
@@ -567,6 +618,9 @@ class TransportationModuleBuilder(
 
         // semantics
         IdentifierAdder.addIdentifier(roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix), markingFeature)
+        CodeAdder.mapToMarkingClassCode(roadspaceObject.type, roadspaceObject.subType).onSome {
+            markingFeature.classifier = it.code
+        }
         attributesAdder.addAttributes(roadspaceObject, markingFeature)
 
         // populate transportation space

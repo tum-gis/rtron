@@ -47,6 +47,9 @@ fun RoadspaceObjectIdentifier.deriveLod2WallGmlIdentifier(
     wallIndex: Int,
 ): String = generateGmlIdentifier(prefix, "Lod2WallSurface_${wallIndex}_${this.hashKey}")
 
+fun RoadspaceObjectIdentifier.deriveHoleSurfaceGmlIdentifier(prefix: String): String =
+    generateGmlIdentifier(prefix, "HoleSurface_${this.hashKey}")
+
 fun JunctionIdentifier.deriveIntersectionGmlIdentifier(prefix: String): String =
     generateGmlIdentifier(prefix, "Intersection_${this.hashKey}")
 

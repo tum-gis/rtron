@@ -28,6 +28,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.Roadspaces2CitygmlParam
 import io.rtron.transformer.converter.roadspaces2citygml.module.BuildingModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.CityFurnitureModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.GenericsModuleBuilder
+import io.rtron.transformer.converter.roadspaces2citygml.module.TransportationModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.module.VegetationModuleBuilder
 import io.rtron.transformer.converter.roadspaces2citygml.router.RoadspaceObjectRouter
 import org.citygml4j.core.model.core.AbstractCityObject
@@ -44,6 +45,7 @@ class RoadspaceObjectTransformer(
     private val buildingModuleBuilder = BuildingModuleBuilder(parameters)
     private val cityFurnitureModuleBuilder = CityFurnitureModuleBuilder(parameters)
     private val vegetationModuleBuilder = VegetationModuleBuilder(parameters)
+    private val transportationModuleBuilder = TransportationModuleBuilder(parameters)
 
     // Methods
 
@@ -92,6 +94,20 @@ class RoadspaceObjectTransformer(
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> None
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_AUXILIARYTRAFFICSPACE -> None
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_MARKING -> None
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_HOLE ->
+                    transportationModuleBuilder
+                        .createHoleFeature(
+                            roadspaceObject,
+                        ).handleIssueList {
+                            issueList += it
+                        }.some()
+                RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_PLANTCOVER ->
+                    vegetationModuleBuilder
+                        .createPlantCoverFeature(
+                            roadspaceObject,
+                        ).handleIssueList {
+                            issueList += it
+                        }.some()
                 RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT ->
                     vegetationModuleBuilder
                         .createSolitaryVegetationObjectFeature(

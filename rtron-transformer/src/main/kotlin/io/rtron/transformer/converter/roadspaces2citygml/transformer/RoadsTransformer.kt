@@ -369,6 +369,9 @@ class RoadsTransformer(
         val issueList = DefaultIssueList()
 
         when (RoadspaceObjectRouter.route(roadspaceObject)) {
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_HOLE -> {
+                issueList += transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
+            }
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
                 issueList += transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
             }
@@ -381,6 +384,7 @@ class RoadsTransformer(
             RoadspaceObjectRouter.CitygmlTargetFeatureType.BUILDING_BUILDING -> {}
             RoadspaceObjectRouter.CitygmlTargetFeatureType.CITYFURNITURE_CITYFURNITURE -> {}
             RoadspaceObjectRouter.CitygmlTargetFeatureType.GENERICS_GENERICOCCUPIEDSPACE -> {}
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_PLANTCOVER -> {}
             RoadspaceObjectRouter.CitygmlTargetFeatureType.VEGETATION_SOLITARYVEGETATIONOBJECT -> {}
         }
 

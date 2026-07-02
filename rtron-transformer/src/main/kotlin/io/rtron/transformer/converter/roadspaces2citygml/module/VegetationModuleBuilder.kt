@@ -33,6 +33,7 @@ import io.rtron.transformer.converter.roadspaces2citygml.geometry.populateLod2Ge
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveGmlIdentifier
 import io.rtron.transformer.issues.roadspaces.of
 import org.citygml4j.core.model.core.SpaceType
+import org.citygml4j.core.model.vegetation.PlantCover
 import org.citygml4j.core.model.vegetation.SolitaryVegetationObject
 import org.xmlobjects.gml.model.measures.Length
 
@@ -101,10 +102,83 @@ class VegetationModuleBuilder(
             roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix),
             solitaryVegetationObjectFeature,
         )
+        CodeAdder.mapToSolitaryVegetationObjectClassCode(roadspaceObject.type, roadspaceObject.subType).onSome {
+            solitaryVegetationObjectFeature.classifier = it.code
+        }
+        solitaryVegetationObjectFeature.functions =
+            CodeAdder.mapToSolitaryVegetationObjectFunctionCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+        solitaryVegetationObjectFeature.usages =
+            CodeAdder.mapToSolitaryVegetationObjectUsageCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+
         relationAdder.addBelongToRelations(roadspaceObject, solitaryVegetationObjectFeature)
         attributesAdder.addAttributes(roadspaceObject, solitaryVegetationObjectFeature)
 
         return ContextIssueList(solitaryVegetationObjectFeature, issueList)
+    }
+
+    fun createPlantCoverFeature(roadspaceObject: RoadspaceObject): ContextIssueList<PlantCover> {
+        val issueList = DefaultIssueList()
+
+        val plantCoverFeature = PlantCover()
+
+        // geometry
+        plantCoverFeature.spaceType = SpaceType.SEMI_OPEN
+
+        val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
+        plantCoverFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
+        pointGeometryTransformer.rotation.onSome {
+            attributesAdder.addRotationAttributes(it, plantCoverFeature)
+        }
+
+        roadspaceObject.boundingBoxGeometry.onSome { currentBoundingBoxGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentBoundingBoxGeometry, parameters)
+            plantCoverFeature
+                .populateLod1Geometry(geometryTransformer)
+                .mapLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForPlantCoverLod1",
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
+                        )
+                }
+        }
+
+        roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
+            val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
+            plantCoverFeature
+                .populateLod2Geometry(geometryTransformer)
+                .mapLeft {
+                    issueList +=
+                        DefaultIssue.of(
+                            "NoSuitableGeometryForPlantCoverLod2",
+                            it.message,
+                            roadspaceObject.id,
+                            Severity.WARNING,
+                            wasFixed = true,
+                        )
+                }
+        }
+
+        // semantics
+        IdentifierAdder.addIdentifier(
+            roadspaceObject.id.deriveGmlIdentifier(parameters.gmlIdPrefix),
+            plantCoverFeature,
+        )
+        CodeAdder.mapToPlantCoverClassCode(roadspaceObject.type, roadspaceObject.subType).onSome {
+            plantCoverFeature.classifier = it.code
+        }
+        plantCoverFeature.functions =
+            CodeAdder.mapToPlantCoverFunctionCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+        plantCoverFeature.usages =
+            CodeAdder.mapToPlantCoverUsageCodes(roadspaceObject.type, roadspaceObject.subType).map { it.code }
+
+        relationAdder.addBelongToRelations(roadspaceObject, plantCoverFeature)
+        attributesAdder.addAttributes(roadspaceObject, plantCoverFeature)
+
+        return ContextIssueList(plantCoverFeature, issueList)
     }
 
     private fun addAttributes(

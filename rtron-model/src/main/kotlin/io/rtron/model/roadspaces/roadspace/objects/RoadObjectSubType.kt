@@ -58,6 +58,9 @@ enum class RoadObjectBarrierSubType(
 
     /** higher wall for noise protection */
     NOISE_PROTECTIONS("noiseProtections"),
+
+    /** all other barrier objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectBuildingSubType(
@@ -71,6 +74,9 @@ enum class RoadObjectBuildingSubType(
 
     /** small building with a barrier to collect tolls or charges */
     TOLL_BOOTH("tollBooth"),
+
+    /** all other building objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectCrosswalkSubType(
@@ -87,6 +93,9 @@ enum class RoadObjectCrosswalkSubType(
 
     /** invisible crosswalk */
     VIRTUAL("virtual"),
+
+    /** all other crosswalk objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectGantrySubType(
@@ -97,6 +106,9 @@ enum class RoadObjectGantrySubType(
 
     /** has a pole on one side of the road and an overhead construction attached to it */
     GANTRY_HALF("gantryHalf"),
+
+    /** all other gantry objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectObstacleSubType(
@@ -131,6 +143,9 @@ enum class RoadObjectObstacleSubType(
     ROAD_BLOCKAGE("roadBlockage"),
     WALL("wall"),
     FENCE("fence"),
+
+    /** all other obstacle objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectParkingSpaceSubType(
@@ -141,6 +156,9 @@ enum class RoadObjectParkingSpaceSubType(
 
     /** typically indoors, limit to the top for example, inside a building */
     CLOSED_SPACE("closedSpace"),
+
+    /** all other parkingSpace objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectPoleSubType(
@@ -162,6 +180,9 @@ enum class RoadObjectPoleSubType(
     /** has a light source. Might also have trafficSigns or trafficLights attached to it */
     STREET_LAMP("streetLamp"),
     WIND_TURBINE("windTurbine"),
+
+    /** all other pole objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectRoadMarkSubType(
@@ -192,6 +213,9 @@ enum class RoadObjectRoadMarkSubType(
 
     /** for example, restricted area, keep clear area */
     AREA("area"),
+
+    /** all other roadMark objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectRoadSurfaceSubType(
@@ -211,6 +235,9 @@ enum class RoadObjectRoadSurfaceSubType(
 
     /** water drainage */
     DRAIN_GUTTER("drainGutter"),
+
+    /** all other roadSurface objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectTrafficIslandSubType(
@@ -218,6 +245,9 @@ enum class RoadObjectTrafficIslandSubType(
 ) : RoadObjectSubType {
     /** typical traffic island with some curbstone, road mark */
     ISLAND("island"),
+
+    /** all other trafficIsland objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectTreeSubType(
@@ -231,6 +261,9 @@ enum class RoadObjectTreeSubType(
 
     /** palm tree */
     PALM("palm"),
+
+    /** all other tree objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
 
 enum class RoadObjectVegetationSubType(
@@ -244,4 +277,7 @@ enum class RoadObjectVegetationSubType(
 
     /** a single hedge */
     HEDGE("hedge"),
+
+    /** all other vegetation objects subtypes that do not fit into current categories */
+    OTHER("other"),
 }
