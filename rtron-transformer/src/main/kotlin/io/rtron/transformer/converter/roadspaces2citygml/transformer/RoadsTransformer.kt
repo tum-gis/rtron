@@ -369,9 +369,7 @@ class RoadsTransformer(
         val issueList = DefaultIssueList()
 
         when (RoadspaceObjectRouter.route(roadspaceObject)) {
-            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_HOLE -> {
-                issueList += transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
-            }
+            RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_HOLE -> {}
             RoadspaceObjectRouter.CitygmlTargetFeatureType.TRANSPORTATION_TRAFFICSPACE -> {
                 issueList += transportationModuleBuilder.addTrafficSpaceFeature(roadspaceObject, dstTransportationSpace)
             }

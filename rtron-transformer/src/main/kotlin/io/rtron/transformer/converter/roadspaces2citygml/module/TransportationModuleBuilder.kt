@@ -554,8 +554,9 @@ class TransportationModuleBuilder(
         }
         roadspaceObject.complexGeometry.onSome { currentComplexGeometry ->
             val geometryTransformer = GeometryTransformer.of(currentComplexGeometry, parameters)
+            val solidFaceSelection = listOf(GeometryTransformer.FaceType.TOP, GeometryTransformer.FaceType.SIDE)
             holeSurfaceFeature
-                .populateLod2MultiSurfaceOrLod0Geometry(geometryTransformer)
+                .populateLod2MultiSurfaceFromSolidCutoutOrSurface(geometryTransformer, solidFaceSelection)
                 .onLeft {
                     issueList +=
                         DefaultIssue.of(
