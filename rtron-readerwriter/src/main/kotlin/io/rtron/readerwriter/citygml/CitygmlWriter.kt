@@ -66,7 +66,7 @@ object CitygmlWriter {
             withDefaultSchemaLocations()
             withDefaultPrefixes()
             withDefaultNamespace(CoreModule.of(citygmlVersion).namespaceURI)
-            cityModelInfo.boundedBy = model.boundingShape
+            model.boundingShape.onSome { cityModelInfo.boundedBy = it }
         }
         model.cityObjects.forEach {
             writer.writeMember(it)

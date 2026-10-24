@@ -16,7 +16,9 @@
 
 package io.rtron.transformer.converter.roadspaces2citygml
 
+import arrow.core.None
 import arrow.core.Option
+import arrow.core.Some
 import arrow.core.flattenOption
 import arrow.core.getOrElse
 import arrow.core.toOption
@@ -333,7 +335,8 @@ class Roadspaces2CitygmlTransformer(
         val walker: ObjectWalker =
             object : ObjectWalker() {
                 public override fun visit(feature: AbstractFeature) {
-                    feature.boundedBy = BoundingShape(feature.computeEnvelope())
+                    val envelope = feature.computeEnvelope()
+                    feature.boundedBy = if (envelope.isValid) BoundingShape(envelope) else null
 
                     super.visit(feature)
                 }
@@ -344,11 +347,11 @@ class Roadspaces2CitygmlTransformer(
     private fun computeBoundingShape(
         abstractCityObjects: List<AbstractCityObject>,
         crs: Option<CoordinateReferenceSystem>,
-    ): BoundingShape {
+    ): Option<BoundingShape> {
         val envelope = Envelope()
         crs.onSome { envelope.srsName = it.srsName }
         envelope.srsDimension = 3
         abstractCityObjects.forEach { envelope.include(it.computeEnvelope()) }
-        return BoundingShape(envelope)
+        return if (envelope.isValid) Some(BoundingShape(envelope)) else None
     }
 }

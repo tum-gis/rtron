@@ -26,11 +26,11 @@ import org.xmlobjects.gml.model.feature.BoundingShape
  * See the [official page](https://www.ogc.org/standards/citygml) from the Open Geospatial Consortium (OGC) for more.
  *
  * @param name name of the model
- * @param boundingShape bounding shape containing coordinate reference system
+ * @param boundingShape bounding shape containing coordinate reference system (none if no valid envelope could be computed)
  * @param cityObjects list of city objects
  */
 class CitygmlModel(
     val name: Option<String>,
-    val boundingShape: BoundingShape,
+    val boundingShape: Option<BoundingShape>,
     val cityObjects: List<AbstractCityObject>,
 ) : AbstractModel()
