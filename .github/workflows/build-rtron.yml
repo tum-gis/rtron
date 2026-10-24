@@ -8,23 +8,23 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu', 'macos', 'windows']
-        java: [ '17' ]
+        java: [ '21' ]
         distribution: [ 'temurin' ]
         include:
           - os: 'ubuntu'
-            java: '17'
+            java: '21'
             distribution: 'zulu'
           - os: 'ubuntu'
-            java: '17'
+            java: '21'
             distribution: 'microsoft'
           - os: 'ubuntu'
-            java: '17'
+            java: '21'
             distribution: 'corretto'
           - os: 'windows'
-            java: '17'
+            java: '21'
             distribution: 'oracle'
           - os: 'ubuntu'
-            java: '20'
+            java: '25'
             distribution: 'temurin'
       fail-fast: false
 
@@ -63,7 +63,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - name: "Build with Gradle"
         run: ./gradlew shadowJar
       - name: "Upload build artifacts"
