@@ -55,6 +55,9 @@ class CityFurnitureModuleBuilder(
         cityFurnitureFeature.spaceType = deriveSpaceType(roadspaceObject.type, roadspaceObject.subType)
 
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
+        pointGeometryTransformer.getPoint().onSome {
+            cityFurnitureFeature.lod0Point = it
+        }
         cityFurnitureFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
         pointGeometryTransformer.rotation.onSome {
             attributesAdder.addRotationAttributes(it, cityFurnitureFeature)

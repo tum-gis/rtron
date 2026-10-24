@@ -58,6 +58,9 @@ class BuildingModuleBuilder(
         // geometry
         buildingFeature.spaceType = SpaceType.CLOSED
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
+        pointGeometryTransformer.getPoint().onSome {
+            buildingFeature.lod0Point = it
+        }
         buildingFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
         pointGeometryTransformer.rotation.onSome {
             attributesAdder.addRotationAttributes(it, buildingFeature)

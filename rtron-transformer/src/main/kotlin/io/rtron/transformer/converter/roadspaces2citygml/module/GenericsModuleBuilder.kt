@@ -59,6 +59,9 @@ class GenericsModuleBuilder(
 
         // geometry
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
+        pointGeometryTransformer.getPoint().onSome {
+            genericOccupiedSpaceFeature.lod0Point = it
+        }
         genericOccupiedSpaceFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
         pointGeometryTransformer.rotation.onSome {
             attributesAdder.addRotationAttributes(it, genericOccupiedSpaceFeature)

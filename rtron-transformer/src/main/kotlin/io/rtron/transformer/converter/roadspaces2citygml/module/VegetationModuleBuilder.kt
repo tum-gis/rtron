@@ -58,6 +58,9 @@ class VegetationModuleBuilder(
         solitaryVegetationObjectFeature.spaceType = SpaceType.CLOSED
 
         val pointGeometryTransformer = GeometryTransformer.of(roadspaceObject.pointGeometry, parameters)
+        pointGeometryTransformer.getPoint().onSome {
+            solitaryVegetationObjectFeature.lod0Point = it
+        }
         solitaryVegetationObjectFeature.populateLod1ImplicitGeometry(pointGeometryTransformer)
         pointGeometryTransformer.rotation.onSome {
             attributesAdder.addRotationAttributes(it, solitaryVegetationObjectFeature)
