@@ -36,12 +36,15 @@ import io.rtron.transformer.converter.roadspaces2citygml.module.RelationAdder
 import io.rtron.transformer.converter.roadspaces2citygml.report.Roadspaces2CitygmlReport
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadsTransformer
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.RoadspaceObjectTransformer
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveIntersectionGmlIdentifier
 import io.rtron.transformer.converter.roadspaces2citygml.transformer.deriveTrafficSpaceOrAuxiliaryTrafficSpaceGmlIdentifier
+import io.rtron.transformer.converter.roadspaces2citygml.transformer.generateRoadIdentifier
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.citygml4j.core.model.core.AbstractCityObject
 import org.citygml4j.core.model.core.AbstractFeature
+import org.citygml4j.core.model.transportation.IntersectionProperty
 import org.citygml4j.core.model.transportation.Road
 import org.citygml4j.core.model.transportation.TrafficSpaceProperty
 import org.citygml4j.core.model.transportation.TrafficSpaceReference
@@ -136,6 +139,7 @@ class Roadspaces2CitygmlTransformer(
             }
 
         addLaneTopology(roadspacesModel, roadFeatures)
+        addIntersectionLinks(roadspacesModel, roadFeatures)
         val cityObjects: List<AbstractCityObject> = roadFeatures + roadspaceObjects + additionalRoadLines
         return ContextIssueList(cityObjects, issueList)
     }
@@ -200,21 +204,48 @@ class Roadspaces2CitygmlTransformer(
             }
 
         addLaneTopology(roadspacesModel, roadFeatures)
+        addIntersectionLinks(roadspacesModel, roadFeatures)
         val cityObjects: List<AbstractCityObject> = roadFeatures + roadspaceObjects + additionalRoadLines
         return ContextIssueList(cityObjects, issueList)
     }
 
+    private fun addIntersectionLinks(
+        roadspacesModel: RoadspacesModel,
+        dstRoads: List<Road>,
+    ) {
+        if (parameters.mappingBackwardsCompatibility) return
+        val dstRoadsMap: Map<String, Road> = dstRoads.filter { it.id != null }.associateBy { it.id }
+
+        roadspacesModel.getAllJunctions().forEach { currentJunction ->
+            val intersectionGmlId = currentJunction.id.deriveIntersectionGmlIdentifier(parameters.gmlIdPrefix)
+
+            currentJunction
+                .getIncomingRoadspaceIds()
+                .map { roadspacesModel.getRoadspace(it).getOrElse { throw it }.name }
+                .distinct()
+                .mapNotNull { dstRoadsMap[generateRoadIdentifier(it, parameters.gmlIdPrefix)] }
+                .filterNot { it.containsIntersection(intersectionGmlId) }
+                .forEach { it.intersections.add(IntersectionProperty(parameters.xlinkPrefix + intersectionGmlId)) }
+        }
+    }
+
+    private fun Road.containsIntersection(intersectionGmlId: String): Boolean =
+        intersections.any {
+            (it.isSetObject && it.`object`.id == intersectionGmlId) ||
+                it.href?.removePrefix(parameters.xlinkPrefix) == intersectionGmlId
+        }
+
     private fun addLaneTopology(
         roadspacesModel: RoadspacesModel,
-        dstTransportationSpaces: List<Road>,
+        dstRoads: List<Road>,
     ) {
         val trafficSpaceProperties =
-            dstTransportationSpaces.flatMap { it.trafficSpaces } +
-                dstTransportationSpaces
+            dstRoads.flatMap { it.trafficSpaces } +
+                dstRoads
                     .flatMap { it.sections }
                     .filter { it.isSetObject }
                     .flatMap { it.`object`.trafficSpaces } +
-                dstTransportationSpaces
+                dstRoads
                     .flatMap { it.intersections }
                     .filter { it.isSetObject }
                     .flatMap { it.`object`.trafficSpaces }

@@ -76,7 +76,7 @@ class RoadsTransformer(
 
         val junctions = roadspacesModel.getAllJunctionIdentifiersContainingRoadspaces(roadspaceName)
         junctions.forEach {
-            issueList += addIntersectionOrLink(it, roadspaceName, roadspacesModel, roadFeature)
+            issueList += addIntersection(it, roadspaceName, roadspacesModel, roadFeature)
         }
 
         val roads = roadspacesModel.getAllRoadspaceIdentifiersNotLocatedInJunctions(roadspaceName)
@@ -87,7 +87,7 @@ class RoadsTransformer(
         return ContextIssueList(Some(roadFeature), issueList)
     }
 
-    private fun addIntersectionOrLink(
+    private fun addIntersection(
         junctionId: JunctionIdentifier,
         roadspaceName: String,
         roadspacesModel: RoadspacesModel,
@@ -112,8 +112,6 @@ class RoadsTransformer(
                 issueList += addRoadspace(it, roadspacesModel, intersectionFeature)
             }
             dstRoad.intersections.add(IntersectionProperty(intersectionFeature))
-        } else {
-            dstRoad.intersections.add(IntersectionProperty(junctionId.deriveIntersectionGmlIdentifier(parameters.gmlIdPrefix)))
         }
 
         return issueList

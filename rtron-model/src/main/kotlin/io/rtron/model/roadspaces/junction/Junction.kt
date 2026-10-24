@@ -42,6 +42,11 @@ data class Junction(
             .map { it.connectingRoadspaceContactPointId.roadspaceIdentifier }
             .distinct()
 
+    fun getIncomingRoadspaceIds() =
+        connections
+            .map { it.incomingRoadspaceContactPointId.roadspaceIdentifier }
+            .distinct()
+
     /*fun getConnection(incomingRoadspace: RoadspaceContactPointIdentifier): Option<RoadspaceContactPointIdentifier> {
         connections.filter { it.incomingRoadspaceContactPointId == incomingRoadspace }
     }*/

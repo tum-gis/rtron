@@ -17,9 +17,9 @@
 import PluginVersions.dokka
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
-if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
+if (!JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_21)) {
     throw GradleException(
-        "This build requires Java ${JavaVersion.VERSION_17}, " +
+        "This build requires Java ${JavaVersion.VERSION_21}, " +
             "but version ${JavaVersion.current()} is currently in use.",
     )
 }
@@ -71,6 +71,13 @@ allprojects {
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
+        options.release.set(JavaVersion.VERSION_21.majorVersion.toInt())
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
     }
 
     tasks.withType<Javadoc> {
